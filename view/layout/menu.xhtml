@@ -36,6 +36,7 @@
             s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
     <h:panelGrid columns="11" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
 
+        <!-- Uncomment
         <rich:dropDownMenu value="#{messages['menu.customers.order']}"
                            rendered="#{
         s:hasPermission('ORDER','VIEW')}">
@@ -57,7 +58,7 @@
                         propagation="none"/>
             </rich:menuItem>
 
-        </rich:dropDownMenu>
+        </rich:dropDownMenu>-->
 
         <rich:dropDownMenu value="#{messages['menu.customers.sales']}"
                            rendered="#{s:hasPermission('CASHBOX','VIEW') or s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
@@ -96,27 +97,37 @@
                 styleClass="tab-cell"
                 propagation="none"/>
 
-        <s:link view="/customers/cashSaleList.xhtml"
-                value="#{messages['menu.customers.sales.cashSales']}"
+        <s:link view="/warehouse/productItemList.xhtml"
+                value="#{messages['menu.warehouse.configuration.productItem']}"
+                rendered="#{s:hasPermission('PRODUCTITEM','VIEW')}"
                 styleClass="tab-cell"
                 propagation="none"/>
 
+        <!--
+        <s:link view="/customers/cashSaleList.xhtml"
+                value="#{messages['menu.customers.sales.cashSales']}"
+                styleClass="tab-cell"
+                propagation="none"/>-->
+
         <s:link view="/customers/partnerList.xhtml"
                 value="#{messages['menu.customers.partner']}"
+                rendered="#{s:hasPermission('CREDIT','CREATE')}"
                 styleClass="tab-cell"
                 propagation="none"/>
 
         <s:link view="/customers/creditList.xhtml"
                 value="#{messages['menu.customers.credit']}"
+                rendered="#{s:hasPermission('CREDIT','CREATE')}"
                 styleClass="tab-cell"
                 propagation="none"/>
 
         <s:link view="/customers/accountList.xhtml"
                 value="#{messages['menu.customers.saving']}"
+                rendered="#{s:hasPermission('CREDIT','CREATE')}"
                 styleClass="tab-cell"
                 propagation="none"/>
 
-        <rich:dropDownMenu value="#{messages['menu.customers.report']}">
+        <rich:dropDownMenu value="#{messages['menu.customers.report']}" rendered="#{s:hasPermission('CREDIT','CREATE')}">
             <rich:menuItem submitMode="none" styleClass="main-menu-item">
                 <s:link view="/customers/creditStatusReport.xhtml"
                         value="#{messages['menu.customers.report.creditStatus']}"

@@ -278,6 +278,9 @@ INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecu
 VALUES(434, 'CREDITSALE_INVOICING_SFE', 1, 1, 'Functionality.customers.orderInvoicingSFE', 1);
 
 
+ALTER TABLE configuracion ADD COLUMN annul_date DATE AFTER lugar;
+UPDATE configuracion c SET c.`annul_date` = '2021-12-31';
+
 --
 --
 UPDATE personacliente SET idtipodocsin = 	2	 WHERE idpersonacliente = 	1495	;

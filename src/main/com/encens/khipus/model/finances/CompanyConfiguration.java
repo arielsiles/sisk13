@@ -17,6 +17,7 @@ import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 import static com.encens.khipus.model.usertype.StringBooleanUserType.*;
 
@@ -52,6 +53,9 @@ public class CompanyConfiguration {
 
     @Column(name = "lugar")
     private String locationName;
+
+    @Column(name = "annul_date")
+    private Date invoiceAnnulDate;
 
     @Column(name = "url_measure_units")
     private String measureUnitsURL;
@@ -1608,5 +1612,13 @@ public class CompanyConfiguration {
 
     public void setMeasureUnitsURL(String measureUnitsURL) {
         this.measureUnitsURL = measureUnitsURL;
+    }
+
+    public Date getInvoiceAnnulDate() {
+        return invoiceAnnulDate;
+    }
+
+    public void setInvoiceAnnulDate(Date invoiceAnnulDate) {
+        this.invoiceAnnulDate = invoiceAnnulDate;
     }
 }

@@ -6,6 +6,7 @@ import com.encens.khipus.model.customers.CancellationReason;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.Movement;
 import com.encens.khipus.model.customers.SaleStatus;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.VoucherState;
 import com.encens.khipus.model.rest.CancelBillResponsePOJO;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -14,11 +15,13 @@ import com.encens.khipus.service.customers.DosageService;
 import com.encens.khipus.service.customers.MovementService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.warehouse.InventoryService;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -66,6 +69,39 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     public void annulOrder(CustomerOrder customerOrder) {
         System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " +
                                         customerOrder.getTotalAmount() + " - " + cancellationReason.getDescription());
+
+        CompanyConfiguration companyConfiguration = billControllerAction.getCompanyConfiguration();
+
+        Date controlAnnulDate = DateUtils.removeTime(companyConfiguration.getInvoiceAnnulDate());
+        Date currentDate = DateUtils.toDay();
+
+        Integer day   = DateUtils.getDay(companyConfiguration.getInvoiceAnnulDate());
+        Integer month = DateUtils.getCurrentMonth(DateUtils.addMonth(customerOrder.getOrderDate(), 1));
+        Integer year  = DateUtils.getCurrentYear(DateUtils.addMonth(customerOrder.getOrderDate(), 1));
+        Date maxAnnulDate = DateUtils.getDate(year, month, day);
+
+
+        System.out.println("-------------------------------------------------");
+        System.out.println("------> Fecha Pedido: " + DateUtils.format(customerOrder.getOrderDate(), "dd/MM/yyyy"));
+        System.out.println("------> Fecha Max Anular: " + DateUtils.format(maxAnnulDate, "dd/MM/yyyy"));
+        System.out.println("-------------------------------------------------");
+        System.out.println("------> Fecha control: " + DateUtils.format(controlAnnulDate, "dd/MM/yyyy"));
+        System.out.println("------> Fecha actual: " + DateUtils.format(currentDate, "dd/MM/yyyy"));
+        System.out.println("------> Fecha Mes sgte: " + DateUtils.format(DateUtils.addMonth(currentDate, 1), "dd/MM/yyyy"));
+        System.out.println("------> Fecha Mes sgte: " + DateUtils.format(DateUtils.addMonth(currentDate, 2), "dd/MM/yyyy"));
+        System.out.println("------> Fecha Mes sgte: " + DateUtils.format(DateUtils.addMonth(currentDate, 3), "dd/MM/yyyy"));
+
+
+        System.out.println("----------------> currentDate.compareTo(maxAnnulDate): " + currentDate.compareTo(maxAnnulDate));
+        System.out.println("====> currentDate: " + currentDate);
+        System.out.println("====> maxAnnulDate:" + maxAnnulDate);
+
+        if (currentDate.compareTo(maxAnnulDate) > 0){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible anular, se encuentra fuera de la fecha valida.");
+            return;
+        }
+
+
         CancelBillResponsePOJO cancelResponse = null;
         try {
             cancelResponse = billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());

@@ -154,8 +154,8 @@ public class SalesAction extends GenericAction {
     public List<CustomerCategoryType> initFixedProductDeliveryTypes() {
         List<CustomerCategoryType> resulTypes = new ArrayList<CustomerCategoryType>(0);
         resulTypes.add(CustomerCategoryType.FACTORY);
-        resulTypes.add(CustomerCategoryType.STORE);
-        resulTypes.add(CustomerCategoryType.CONSUMER);
+        //resulTypes.add(CustomerCategoryType.STORE); uncomment
+        //resulTypes.add(CustomerCategoryType.CONSUMER); uncomment
         resulTypes.add(CustomerCategoryType.AGENCY_LIST);
 
         return resulTypes;
@@ -197,10 +197,11 @@ public class SalesAction extends GenericAction {
 
         if (client == null) return;
 
+        /* Uncomment
         if (!isThereInventory(productItem)){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No existe inventario suficiente...");
             return;
-        }
+        }*/
 
 
         if (productItemCodesSelected.contains(productItem.getProductItemCode())){
@@ -277,10 +278,12 @@ public class SalesAction extends GenericAction {
     public void calculateAmount(ArticleOrder articleOrder){
 
         //if (articleOrder.getQuantity() >  articleOrder.getUnitaryBalance().intValue()){
+
+        /* Uncomment
         if (articleOrder.getQuantity() >  getUnitaryBalance(articleOrder).intValue()){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Inventario Insuficiente...");
             articleOrder.setQuantity(0);
-        }
+        }*/
 
         //Double amount = articleOrder.getQuantity() * articleOrder.getPrice();
         BigDecimal amountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getQuantity()), BigDecimalUtil.toBigDecimal(articleOrder.getPrice()));
@@ -458,12 +461,13 @@ public class SalesAction extends GenericAction {
         System.out.println("------------> Subsidio: " + this.subsidyEnun);
 
         /** Verifica existencia de inventario antes de registrar la venta **/
+        /* Uncomment
         for (ArticleOrder articleOrder : articleOrderList){
             if (!isThereInventory(articleOrder.getProductItem())){
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Inventario Insuficiente...");
                 return null;
             }
-        }
+        }*/
 
         observation = (observation == null) ? "" : observation;
         CustomerOrder customerOrder = new CustomerOrder();
@@ -565,8 +569,8 @@ public class SalesAction extends GenericAction {
                             customerOrder.getTotalAmount(),
                             dosage.getKey());
         /** Gen. Codigo de Control **/
-        String controlCode = sfc.generateControlCode();
-        //String controlCode = "0"; /** todo **/
+        //String controlCode = sfc.generateControlCode(); Uncomment
+        String controlCode = "0"; /** todo **/
 
         String nitCiValue = sfc.getClientNit();
         if (customerOrder.getClient().getComplement() != null)

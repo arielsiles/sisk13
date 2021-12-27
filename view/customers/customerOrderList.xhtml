@@ -358,6 +358,12 @@
                                        reRender="confirmCancelOrderModalPanel">
                     </a4j:commandButton>
 
+                    <h:commandLink action="#{billReportAction.generateReportXml(customerOrder)}"
+                                   immediate="true">
+                        <h:graphicImage value="/img/payroll.jpg" styleClass="select-image"
+                                        title="Generar XML"/>
+                    </h:commandLink>
+
 
                 </rich:column>
 

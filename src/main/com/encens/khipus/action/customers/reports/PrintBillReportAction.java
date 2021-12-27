@@ -130,6 +130,8 @@ public class PrintBillReportAction extends GenericReportAction {
                 return;
             }
 
+            dosage = dosageService.findDosageByOffice(order.getUser().getBranchOffice().getId());
+
             Map params = new HashMap();
             params.putAll(getReportParams(dosage, order));
             reportDataList.add(addDetailReport(params, order));

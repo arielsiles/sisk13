@@ -22,14 +22,23 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
+import org.xml.sax.SAXException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Name("billControllerAction")
@@ -324,16 +333,16 @@ public class BillControllerAction {
                     /** todo **/
                     if (responsePOJO.getCodigoDescripcion().equals("ANULACION CONFIRMADA")){
                         responseResult = responsePOJO;
-                        //facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Factura anulada correctamente.");
+                        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"ANULACION CONFIRMADA ...");
                     }else {
-                        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible anular por el momento....");
+                        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"ANULACION RECHAZADA ...");
                     }
                 }else {
-                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error al anular...");
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"ANULACION RECHAZADA ..");
                 }
             } else {
                 System.out.println(">>>>> SIN CONEXION!!!");
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible anular por el momento...");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"SIN CONEXION...");
             }
         }
         return responseResult;
@@ -597,6 +606,25 @@ public class BillControllerAction {
         return result;
     }
 
+
+    public void decodeInvoice(CustomerOrder customerOrder) throws IOException, SAXException, ParserConfigurationException, TransformerConfigurationException {
+
+        System.out.println("======> FACTURA: " + customerOrder.getMovement().getFactura());
+
+        String input = customerOrder.getMovement().getFactura();
+        byte[] resultDecode = Base64.getDecoder().decode(input);
+
+        // decode the encoded data
+        Base64.Decoder decoder = Base64.getDecoder();
+        String decoded = new String(decoder.decode(input));
+        System.out.println("Decoded Data: " + decoded);
+
+
+
+
+    }
+
+
     private User getUser(Long id) {
         try {
             return userService.findById(User.class, id);
@@ -615,7 +643,7 @@ public class BillControllerAction {
         return result;
     }
 
-    private CompanyConfiguration getCompanyConfiguration(){
+    public CompanyConfiguration getCompanyConfiguration(){
         CompanyConfiguration companyConfiguration = null;
         try {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
