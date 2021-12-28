@@ -71,6 +71,9 @@ public class SalesAction extends GenericAction {
     private String connectionStatus;
     private String billingMode;
 
+    private Boolean validNitCi = Boolean.FALSE;
+    private Boolean nitCiHasBeenValidated = Boolean.FALSE;
+
     private String cafcCode;
     private boolean showCAFC = false;
 
@@ -213,6 +216,15 @@ public class SalesAction extends GenericAction {
             return;
         }*/
 
+        if (!this.nitCiHasBeenValidated){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible continuar con la venta, debe validar el NIT/CI.");
+            return;
+        }
+
+        if (!this.validNitCi){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible continuar con la venta, NIT incorrecto.");
+            return;
+        }
 
         if (productItemCodesSelected.contains(productItem.getProductItemCode())){
             clearProduct();
@@ -350,6 +362,9 @@ public class SalesAction extends GenericAction {
         setCustomerCategoryTypeEnum(null);
         setFinalConsumer(Boolean.FALSE);
         setMoneyReturned(BigDecimal.ZERO);
+
+        this.nitCiHasBeenValidated = Boolean.FALSE;
+        this.validNitCi = Boolean.FALSE;
 
         setNitValidationMessage(null);
     }
@@ -1202,6 +1217,9 @@ public class SalesAction extends GenericAction {
         setCustomerCategoryTypeEnum(null);
         setNitValidationMessage(null);
 
+        this.nitCiHasBeenValidated = Boolean.FALSE;
+        this.validNitCi = Boolean.FALSE;
+
         assignCustomerOrderTypeDefault();
     }
 
@@ -1225,7 +1243,34 @@ public class SalesAction extends GenericAction {
         try {
             result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
             System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
+
             setNitValidationMessage(result);
+            this.nitCiHasBeenValidated = Boolean.TRUE;
+
+            if (result.equals("NIT INEXISTENTE")) {
+
+                DocumentType docType = getClient().getInvoiceDocumentType();
+                if (docType.getSinCode() == 1 || docType.getSinCode() == 2 || docType.getSinCode() == 3 || docType.getSinCode() == 4) {
+
+                    validNitCi = Boolean.TRUE;
+                }
+
+                if (docType.getSinCode() == 5){ //Si es NIT
+                    if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")){
+                        validNitCi = Boolean.TRUE;
+                    }else
+                        validNitCi = Boolean.FALSE;
+                }
+            }
+
+            if (result.equals("NIT ACTIVO")) {
+                validNitCi = Boolean.TRUE;
+            }
+
+            if (result.equals("NIT INACTIVO")) {
+                validNitCi = Boolean.TRUE;
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             setNitValidationMessage("¡No se pudo validar!");
@@ -1429,5 +1474,21 @@ public class SalesAction extends GenericAction {
 
     public void setNitValidationMessage(String nitValidationMessage) {
         this.nitValidationMessage = nitValidationMessage;
+    }
+
+    public Boolean getValidNitCi() {
+        return validNitCi;
+    }
+
+    public void setValidNitCi(Boolean validNitCi) {
+        this.validNitCi = validNitCi;
+    }
+
+    public Boolean getNitCiHasBeenValidated() {
+        return nitCiHasBeenValidated;
+    }
+
+    public void setNitCiHasBeenValidated(Boolean nitCiHasBeenValidated) {
+        this.nitCiHasBeenValidated = nitCiHasBeenValidated;
     }
 }

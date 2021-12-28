@@ -244,7 +244,22 @@ public class Client implements BaseModel {
     }
 
     public String getNitNumberComplement() {
-        return nitNumber + ((getComplement() != null) ? " " + getComplement() : "");
+
+        String nitCiCexPasOd = "";
+        if (getInvoiceDocumentType() != null) {
+            if (getInvoiceDocumentType().getSinCode() == 1)
+                nitCiCexPasOd = "CI-";
+            if (getInvoiceDocumentType().getSinCode() == 2)
+                nitCiCexPasOd = "CEX-";
+            if (getInvoiceDocumentType().getSinCode() == 3)
+                nitCiCexPasOd = "PAS-";
+            if (getInvoiceDocumentType().getSinCode() == 4)
+                nitCiCexPasOd = "OD-";
+            if (getInvoiceDocumentType().getSinCode() == 5)
+                nitCiCexPasOd = "NIT-";
+        }
+
+        return nitCiCexPasOd + nitNumber + ((getComplement() != null) ? " " + getComplement() : "");
     }
 
     public void setNitNumber(String nit) {

@@ -358,17 +358,17 @@
                                        reRender="confirmCancelOrderModalPanel">
                     </a4j:commandButton>
 
-                    <h:commandLink action="#{billReportAction.generateFileXML(customerOrder)}"
+                    <h:commandLink action="#{salesAction.generateFileXML(customerOrder)}"
                                    immediate="true">
                         <h:graphicImage value="/img/payroll.jpg" styleClass="select-image"
                                         title="Generar XML"/>
                     </h:commandLink>
 
-                    <h:commandLink action="#{billingReportAction.generateReport(customerOrder)}"
+                    <!--<h:commandLink action="#{billingReportAction.generateReport(customerOrder)}"
                                    immediate="true">
                         <h:graphicImage value="/img/payroll.jpg" styleClass="select-image"
                                         title="Generar XML Jasper"/>
-                    </h:commandLink>
+                    </h:commandLink>-->
 
 
                 </rich:column>
