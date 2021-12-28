@@ -2,6 +2,7 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.action.billing.BillControllerAction;
+import com.encens.khipus.action.billing.SendMessageAction;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
@@ -29,6 +30,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -139,6 +141,9 @@ public class SalesAction extends GenericAction {
 
     @In(create = true)
     private BillControllerAction billControllerAction;
+
+    @In(create = true)
+    private SendMessageAction sendMessageAction;
 
     @Factory(value = "subsidyEnumList")
     public SubsidyEnun[] getExperienceType() {
@@ -433,6 +438,13 @@ public class SalesAction extends GenericAction {
             } catch (IOException e) {
                 //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion, venta al contado...");
+            }
+
+            try {
+                sendMessageAction.sendEmail(customerOrder);
+
+            } catch (MessagingException e) {
+                e.printStackTrace();
             }
 
             clearAll();
