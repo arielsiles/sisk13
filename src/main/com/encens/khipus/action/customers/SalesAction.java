@@ -3,6 +3,7 @@ package com.encens.khipus.action.customers;
 import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.action.billing.BillControllerAction;
 import com.encens.khipus.action.billing.SendMessageAction;
+import com.encens.khipus.action.customers.reports.PrintBillReportAction;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
@@ -22,6 +23,7 @@ import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.*;
+import net.sf.jasperreports.engine.JRException;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
@@ -31,7 +33,9 @@ import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
 import javax.mail.MessagingException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -141,6 +145,9 @@ public class SalesAction extends GenericAction {
 
     @In(create = true)
     private BillControllerAction billControllerAction;
+
+    @In(create = true)
+    private PrintBillReportAction printBillReportAction;
 
     @In(create = true)
     private SendMessageAction sendMessageAction;
@@ -440,16 +447,35 @@ public class SalesAction extends GenericAction {
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion, venta al contado...");
             }
 
-            try {
-                sendMessageAction.sendEmail(customerOrder);
-
-            } catch (MessagingException e) {
-                e.printStackTrace();
-            }
+            generateFileXML(customerOrder);
 
             clearAll();
             assignCustomerOrderTypeDefault();
         }
+    }
+
+    public void generateFileXML(CustomerOrder customerOrder) throws IOException {
+
+        String input = customerOrder.getMovement().getFactura();
+        // decode the encoded data
+        Base64.Decoder decoder = Base64.getDecoder();
+        String decoded = new String(decoder.decode(input));
+
+        System.out.println("Decoded Data: " + decoded);
+
+        FileWriter archivo = null;
+        PrintWriter escritor = null;
+
+        try {
+            archivo = new FileWriter("C:\\TEMP\\FACTURA.xml");
+            escritor = new PrintWriter(archivo);
+            escritor.print(decoded);
+        }catch (Exception e){
+            System.out.println("Error: " + e.getMessage() );
+        }finally {
+            archivo.close();
+        }
+
     }
 
     public void registerCashSaleNoInvoice(){

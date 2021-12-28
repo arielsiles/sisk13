@@ -1,5 +1,6 @@
 package com.encens.khipus.action.customers.reports;
 
+import com.encens.khipus.action.billing.SendMessageAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
@@ -23,12 +24,16 @@ import com.encens.khipus.util.FileCacheLoader;
 import com.encens.khipus.util.MoneyUtil;
 import com.encens.khipus.util.barcode.BarcodeRenderer;
 import com.jatun.titus.reportgenerator.util.TypedReportData;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -62,6 +67,9 @@ public class PrintBillReportAction extends GenericReportAction {
     @In
     private UserService userService;
 
+    @In(create = true)
+    private SendMessageAction sendMessageAction;
+
     private Long customerOrderId;
     private CustomerOrder lastCustomerOrder;
 
@@ -88,7 +96,6 @@ public class PrintBillReportAction extends GenericReportAction {
             return;
         }
 
-        String labelType = "ORIGINAL";
         Map params = new HashMap();
         params.putAll(getReportParams(dosage, lastCustomerOrder));
         TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
@@ -96,7 +103,49 @@ public class PrintBillReportAction extends GenericReportAction {
         try {
             GenerationReportData generationReportData = new GenerationReportData(reportData);
             generationReportData.exportReport();
+
+            generateFileReport();
+
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            sendMessageAction.sendEmailAttachment(lastCustomerOrder);
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void generateFileReport() {
+
+        User user = getUser(currentUser.getId());
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
+        this.customerOrderId = saleService.findLastSaleId(user);
+        this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
+        setReportFormat(ReportFormat.PDF);
+
+
+        if (!hasValidInvoice(lastCustomerOrder)){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
+            return;
+        }
+
+        Map params = new HashMap();
+        params.putAll(getReportParams(dosage, lastCustomerOrder));
+        TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
+
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            generationReportData.exportReport();
+
+            JasperPrint jasperPrint = generationReportData.getExportReport().getJasperPrint();
+            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/TEMP/FACTURA.pdf");
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

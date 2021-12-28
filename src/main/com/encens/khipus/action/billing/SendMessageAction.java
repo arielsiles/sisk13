@@ -11,6 +11,7 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.util.Properties;
 
 /**
@@ -65,16 +66,28 @@ public class SendMessageAction {
         Session s = Session.getDefaultInstance(p);
 
         BodyPart texto = new MimeBodyPart();
-        texto.setText("");
-        BodyPart adjunto = new MimeBodyPart();
-        adjunto.setDataHandler(new DataHandler(new FileDataSource(rutaArchivo)));
+        texto.setText("Archivo adjuntos:");
 
+        BodyPart adjuntoXml = new MimeBodyPart();
+        adjuntoXml.setDataHandler(new DataHandler(new FileDataSource("C:/TEMP/FACTURA.xml")));
+        adjuntoXml.setFileName("Factura.xml");
+
+        BodyPart adjuntoPdf = new MimeBodyPart();
+        adjuntoPdf.setDataHandler(new DataHandler(new FileDataSource("C:/TEMP/FACTURA.pdf")));
+        adjuntoPdf.setFileName("Factura.pdf");
+
+
+
+        MimeMultipart m = new MimeMultipart();
+        m.addBodyPart(texto);
+        m.addBodyPart(adjuntoXml);
+        m.addBodyPart(adjuntoPdf);
 
         MimeMessage mensaje = new MimeMessage(s);
         mensaje.setFrom(new InternetAddress(correo));
         mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(correoDestino));
-        mensaje.setSubject("Factura Electronica en Linea, XML");
-        mensaje.setText(customerOrder.getMovement().getFactura());
+        mensaje.setSubject("Factura Electronica en Linea, CISC LTDA");
+        mensaje.setContent(m);
 
         Transport t = s.getTransport("smtp");
         t.connect(correo, contra);
