@@ -1,6 +1,7 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.billing.BillControllerAction;
+import com.encens.khipus.action.billing.SendMessageAction;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.model.customers.CancellationReason;
 import com.encens.khipus.model.customers.CustomerOrder;
@@ -15,6 +16,7 @@ import com.encens.khipus.service.customers.DosageService;
 import com.encens.khipus.service.customers.MovementService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.warehouse.InventoryService;
+import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
@@ -37,6 +39,8 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     private BillControllerAction billControllerAction;
     @In
     private SalesAction salesAction;
+    @In(create = true)
+    private SendMessageAction sendMessageAction;
 
     @In
     private UserService userService;
@@ -127,9 +131,23 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
                 voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
             }
 
+            sendMessageAnnulledInvoice(customerOrder);
+
             cleanAnnulOrder();
         }
-        //facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Invoice.messages.annnulOk");
+
+    }
+
+    public void sendMessageAnnulledInvoice(CustomerOrder customerOrder){
+        Movement movement = customerOrder.getMovement();
+        String text = "La Factura "  + movement.getNumber() + " de fecha "
+                                        + DateUtils.format(movement.getDate(), "dd/MM/yyyy")
+                                        + " emitida por " + Constants.EMAIL_BUSINESS_NAME
+                                        + " \ncon razón social " + movement.getName() + " y NIT " + movement.getNit() + " ha sido ANULADA."
+                                        + "\nPor favor tomar las previsiones necesarias.";
+
+        sendMessageAction.sendEmail(customerOrder, Constants.EMAIL_SUBJECT_ANNULLED, text);
+        System.out.println("................" + Constants.EMAIL_SUBJECT_ANNULLED + "................");
     }
 
     public void executeBilling(List<CustomerOrder> customerOrderList) {

@@ -23,7 +23,6 @@ import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.util.*;
-import net.sf.jasperreports.engine.JRException;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
@@ -32,7 +31,6 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
-import javax.mail.MessagingException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -456,26 +454,30 @@ public class SalesAction extends GenericAction {
 
     public void generateFileXML(CustomerOrder customerOrder) throws IOException {
 
-        String input = customerOrder.getMovement().getFactura();
-        // decode the encoded data
-        Base64.Decoder decoder = Base64.getDecoder();
-        String decoded = new String(decoder.decode(input));
+        if (customerOrder.getMovement() != null) {
+            String fileName = Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".xml";
+            String pathFileName = Constants.PATH_FILE_INVOICE + fileName;
 
-        System.out.println("Decoded Data: " + decoded);
+            /** decode the encoded data **/
+            String input = customerOrder.getMovement().getFactura();
+            Base64.Decoder decoder = Base64.getDecoder();
+            String decoded = new String(decoder.decode(input));
 
-        FileWriter archivo = null;
-        PrintWriter escritor = null;
+            //System.out.println("Decoded Data: " + decoded);
 
-        try {
-            archivo = new FileWriter("C:\\TEMP\\FACTURA.xml");
-            escritor = new PrintWriter(archivo);
-            escritor.print(decoded);
-        }catch (Exception e){
-            System.out.println("Error: " + e.getMessage() );
-        }finally {
-            archivo.close();
+            FileWriter archivo = null;
+            PrintWriter escritor = null;
+
+            try {
+                archivo = new FileWriter(pathFileName);
+                escritor = new PrintWriter(archivo);
+                escritor.print(decoded);
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            } finally {
+                archivo.close();
+            }
         }
-
     }
 
     public void registerCashSaleNoInvoice(){

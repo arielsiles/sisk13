@@ -1,6 +1,7 @@
 package com.encens.khipus.action.billing;
 
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -22,78 +23,91 @@ import java.util.Properties;
 @Scope(ScopeType.PAGE)
 public class SendMessageAction {
 
-    private static final String correo = "ariel.siles@gmail.com";
-    private static final String contra = "nhefhdnzwjtymynk";
+    private static final String correo = Constants.EMAIL_FROM;
+    private static final String contra = Constants.EMAIL_PASSW;
 
 
-    public void sendEmail(CustomerOrder customerOrder) throws MessagingException {
+    public void sendEmail(CustomerOrder customerOrder, String subject, String text) {
 
         String correoDestino = customerOrder.getClient().getEmail();
 
-        Properties p = new Properties();
-        p.put("mail.smtp.host", "smtp.gmail.com");
-        p.setProperty("mail.smtp.starttls.enable", "true");
-        p.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-        p.setProperty("mail.smtp.port", "587");
-        p.setProperty("mail.smtp.user", correo);
-        p.setProperty("mail.smtp.auth", "true");
-        Session s = Session.getDefaultInstance(p);
+        if (correoDestino != null) {
+            try {
+                Properties p = new Properties();
+                p.put("mail.smtp.host", "smtp.gmail.com");
+                p.setProperty("mail.smtp.starttls.enable", "true");
+                p.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+                p.setProperty("mail.smtp.port", "587");
+                p.setProperty("mail.smtp.user", correo);
+                p.setProperty("mail.smtp.auth", "true");
+                Session s = Session.getDefaultInstance(p);
 
-        MimeMessage mensaje = new MimeMessage(s);
-        mensaje.setFrom(new InternetAddress(correo));
-        mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(correoDestino));
-        mensaje.setSubject("Factura Electronica en Linea, XML");
-        mensaje.setText(customerOrder.getMovement().getFactura());
+                MimeMessage mensaje = new MimeMessage(s);
+                mensaje.setFrom(new InternetAddress(correo));
+                mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(correoDestino));
+                mensaje.setSubject(subject);
+                mensaje.setText(text);
 
-        Transport t = s.getTransport("smtp");
-        t.connect(correo, contra);
-        t.sendMessage(mensaje, mensaje.getAllRecipients());
-        t.close();
-        System.out.println("................Mensaje Enviado...............");
+                Transport t = s.getTransport("smtp");
+                t.connect(correo, contra);
+                t.sendMessage(mensaje, mensaje.getAllRecipients());
+                t.close();
+                System.out.println("................Mensaje Enviado...............");
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void sendEmailAttachment(CustomerOrder customerOrder) throws MessagingException {
 
         String correoDestino = customerOrder.getClient().getEmail();
 
-        Properties p = new Properties();
-        p.put("mail.smtp.host", "smtp.gmail.com");
-        p.setProperty("mail.smtp.starttls.enable", "true");
-        p.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-        p.setProperty("mail.smtp.port", "587");
-        p.setProperty("mail.smtp.user", correo);
-        p.setProperty("mail.smtp.auth", "true");
-        Session s = Session.getDefaultInstance(p);
+        if (correoDestino != null) {
 
-        BodyPart texto = new MimeBodyPart();
-        texto.setText("Archivo adjuntos:");
+            String fileNameXml = Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".xml";
+            String fileNamePdf = Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".pdf";
 
-        BodyPart adjuntoXml = new MimeBodyPart();
-        adjuntoXml.setDataHandler(new DataHandler(new FileDataSource("C:/TEMP/FACTURA.xml")));
-        adjuntoXml.setFileName("Factura.xml");
+            String pathFileNameXml = Constants.PATH_FILE_INVOICE + fileNameXml;
+            String pathFileNamePdf = Constants.PATH_FILE_INVOICE + fileNamePdf;
 
-        BodyPart adjuntoPdf = new MimeBodyPart();
-        adjuntoPdf.setDataHandler(new DataHandler(new FileDataSource("C:/TEMP/FACTURA.pdf")));
-        adjuntoPdf.setFileName("Factura.pdf");
+            Properties p = new Properties();
+            p.put("mail.smtp.host", "smtp.gmail.com");
+            p.setProperty("mail.smtp.starttls.enable", "true");
+            p.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+            p.setProperty("mail.smtp.port", "587");
+            p.setProperty("mail.smtp.user", correo);
+            p.setProperty("mail.smtp.auth", "true");
+            Session s = Session.getDefaultInstance(p);
 
+            BodyPart texto = new MimeBodyPart();
+            texto.setText(Constants.EMAIL_TEXT_1);
 
+            BodyPart adjuntoXml = new MimeBodyPart();
+            adjuntoXml.setDataHandler(new DataHandler(new FileDataSource(pathFileNameXml)));
+            adjuntoXml.setFileName(fileNameXml);
 
-        MimeMultipart m = new MimeMultipart();
-        m.addBodyPart(texto);
-        m.addBodyPart(adjuntoXml);
-        m.addBodyPart(adjuntoPdf);
+            BodyPart adjuntoPdf = new MimeBodyPart();
+            adjuntoPdf.setDataHandler(new DataHandler(new FileDataSource(pathFileNamePdf)));
+            adjuntoPdf.setFileName(fileNamePdf);
 
-        MimeMessage mensaje = new MimeMessage(s);
-        mensaje.setFrom(new InternetAddress(correo));
-        mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(correoDestino));
-        mensaje.setSubject("Factura Electronica en Linea, CISC LTDA");
-        mensaje.setContent(m);
+            MimeMultipart m = new MimeMultipart();
+            m.addBodyPart(texto);
+            m.addBodyPart(adjuntoXml);
+            m.addBodyPart(adjuntoPdf);
 
-        Transport t = s.getTransport("smtp");
-        t.connect(correo, contra);
-        t.sendMessage(mensaje, mensaje.getAllRecipients());
-        t.close();
-        System.out.println("................Mensaje Enviado...............");
+            MimeMessage mensaje = new MimeMessage(s);
+            mensaje.setFrom(new InternetAddress(correo));
+            mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(correoDestino));
+            mensaje.setSubject(Constants.EMAIL_SUBJECT);
+            mensaje.setContent(m);
+
+            Transport t = s.getTransport("smtp");
+            t.connect(correo, contra);
+            t.sendMessage(mensaje, mensaje.getAllRecipients());
+            t.close();
+            System.out.println("................Mensaje Enviado...............");
+        }
     }
 
 

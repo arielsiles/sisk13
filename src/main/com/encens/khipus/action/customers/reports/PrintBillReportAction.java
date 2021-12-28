@@ -18,10 +18,7 @@ import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.DosageService;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
-import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.DateUtils;
-import com.encens.khipus.util.FileCacheLoader;
-import com.encens.khipus.util.MoneyUtil;
+import com.encens.khipus.util.*;
 import com.encens.khipus.util.barcode.BarcodeRenderer;
 import com.jatun.titus.reportgenerator.util.TypedReportData;
 import net.sf.jasperreports.engine.JRException;
@@ -104,7 +101,8 @@ public class PrintBillReportAction extends GenericReportAction {
             GenerationReportData generationReportData = new GenerationReportData(reportData);
             generationReportData.exportReport();
 
-            generateFileReport();
+            //generateFileReport();
+            generatePdfFileReport(lastCustomerOrder, generationReportData);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,6 +117,17 @@ public class PrintBillReportAction extends GenericReportAction {
 
     }
 
+    public void generatePdfFileReport(CustomerOrder customerOrder, GenerationReportData generationReportData) {
+
+        String destFileName = Constants.PATH_FILE_INVOICE + Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".pdf";
+
+        JasperPrint jasperPrint = generationReportData.getExportReport().getJasperPrint();
+        try {
+            JasperExportManager.exportReportToPdfFile(jasperPrint, destFileName);
+        } catch (JRException e) {
+            e.printStackTrace();
+        }
+    }
     public void generateFileReport() {
 
         User user = getUser(currentUser.getId());

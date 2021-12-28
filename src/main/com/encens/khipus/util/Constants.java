@@ -310,6 +310,18 @@ public final class Constants {
     public static final String ONLINE = "ONLINE";
     public static final String OFFLINE = "OFFLINE";
 
+    public static final String EMAIL_FROM = "ariel.siles@gmail.com";
+    public static final String EMAIL_PASSW = "nhefhdnzwjtymynk";
+    public static final String EMAIL_SUBJECT = "Factura Electrónica en Linea, CISC Ltda. - ILVA";
+    public static final String PATH_FILE_INVOICE = "C:/TEMP/";
+    public static final String PREFIX_NAME_INVOICE = "FACTURA-";
+
+    public static final String EMAIL_TEXT_1 = "Usted tiene una Factura Electrónica en Linea, por favor revise sus archivos adjuntos.";
+    public static final String EMAIL_SUBJECT_ANNULLED = "Factura Electrónica en Linea ANULADA, CISC Ltda. - ILVA";
+    public static final String EMAIL_BUSINESS_NAME = "COOPERATIVA INTEGRAL DE SERVICIOS COCHABAMBA LTDA.";
+
+
+
     private Constants() {
     }
 }
