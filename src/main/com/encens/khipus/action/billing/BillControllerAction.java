@@ -24,19 +24,14 @@ import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.*;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -547,7 +542,8 @@ public class BillControllerAction {
         pedidoPOJO.setNumeroFactura(customerOrder.getMovement().getNumber());
         pedidoPOJO.setNombreRazonSocial(customerOrder.getClient().getBusinessName());
 
-        String clientCode = customerOrder.getClient().getNitNumber();
+        //String clientCode = customerOrder.getClient().getNitNumber();
+        String clientCode = customerOrder.getClient().getId().toString();
         if (clientCode == null)
             clientCode = customerOrder.getClient().getNitNumber();
 

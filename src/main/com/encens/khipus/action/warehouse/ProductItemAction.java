@@ -107,8 +107,10 @@ public class ProductItemAction extends GenericAction<ProductItem> {
                 getInstance().setEconomicActivityCode(economicActivity.getActivityCode());
             if (productService != null)
                 getInstance().setProductSinCode(productService.getProductCode());
-            if (measureUnitSIN != null)
+            if (measureUnitSIN != null) {
                 getInstance().setMeasureUnitSinCode(measureUnitSIN.getCode());
+                getInstance().setMeasureUnitDescription(measureUnitSIN.getDescription());
+            }
 
             productItemService.createProductItem(getInstance());
             createProductionItem(getInstance());
@@ -195,8 +197,10 @@ public class ProductItemAction extends GenericAction<ProductItem> {
                 getInstance().setEconomicActivityCode(economicActivity.getActivityCode());
             if (productService != null)
                 getInstance().setProductSinCode(productService.getProductCode());
-            if (measureUnitSIN != null)
+            if (measureUnitSIN != null) {
                 getInstance().setMeasureUnitSinCode(measureUnitSIN.getCode());
+                getInstance().setMeasureUnitDescription(measureUnitSIN.getDescription());
+            }
 
             productItemService.updateProductItem(getInstance());
             updateProductionItem(getInstance());

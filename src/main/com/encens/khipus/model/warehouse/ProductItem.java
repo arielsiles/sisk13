@@ -3,7 +3,6 @@ package com.encens.khipus.model.warehouse;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
-import com.encens.khipus.model.customers.ProductsServices;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.production.MeasurementUnit;
@@ -62,6 +61,9 @@ public class ProductItem implements BaseModel {
 
     @Column(name = "COD_MEDS")
     private Integer measureUnitSinCode;
+
+    @Column(name = "UNI_MEDS")
+    private String measureUnitDescription;
 
     @Column(name = "CODEQ", insertable = false, updatable = false)
     private String productItemCodeEq;
@@ -549,5 +551,13 @@ public class ProductItem implements BaseModel {
 
     public void setMeasureUnitSinCode(Integer measureUnitSin) {
         this.measureUnitSinCode = measureUnitSin;
+    }
+
+    public String getMeasureUnitDescription() {
+        return measureUnitDescription;
+    }
+
+    public void setMeasureUnitDescription(String measureUnitDescription) {
+        this.measureUnitDescription = measureUnitDescription;
     }
 }

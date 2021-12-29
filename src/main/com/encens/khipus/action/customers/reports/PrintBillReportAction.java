@@ -225,22 +225,15 @@ public class PrintBillReportAction extends GenericReportAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
-        //Double subtotal = lastCustomerOrder.getTotalAmount();
-        //Double totalAmount = lastCustomerOrder.getTotalAmount() - lastCustomerOrder.getCommissionValue();
-
-        //BigDecimal subtotal     = BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getProductDiscountValue());
-        //BigDecimal totalAmount  = BigDecimalUtil.subtract(subtotal, lastCustomerOrder.getAdditionalDiscountValue());
         BigDecimal subtotal    = BigDecimalUtil.sum(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getAdditionalDiscountValue());
         BigDecimal totalAmount = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount());
-
-
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("companyNit", dosage.getCompanyNit());
         paramMap.put("invoiceNumber", lastCustomerOrder.getMovement().getNumber().longValue());
         paramMap.put("authorizationNumber", dosage.getAuthorizationNumber());
         paramMap.put("clientNit", lastCustomerOrder.getMovement().getNit());
-        //paramMap.put("name", lastCustomerOrder.getClient().getBusinessName()); Err
+        paramMap.put("clientCode", lastCustomerOrder.getClient().getId().toString());
         paramMap.put("name", lastCustomerOrder.getMovement().getName());
         paramMap.put("invoiceDateLiteral", DateUtils.getLiteralDate("Cochabamba", lastCustomerOrder.getMovement().getDate()));
         paramMap.put("expirationDate", dosage.getExpirationDate());
@@ -311,7 +304,8 @@ public class PrintBillReportAction extends GenericReportAction {
                 " articleOrder.amount as amount, "+
                 " articleOrder.customerOrder.description as description," +
                 " articleOrder.codArt," +
-                " articleOrder.discount "+
+                " articleOrder.discount, "+
+                " articleOrder.productItem.measureUnitDescription as uniMed "+
                 " FROM ArticleOrder articleOrder";
 
         String[] restrictions = new String[]{"articleOrder.customerOrder.id = #{printBillReportAction.customerOrder.getId()}"};

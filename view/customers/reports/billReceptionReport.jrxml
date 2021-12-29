@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="609" pageHeight="467" whenNoDataType="AllSectionsNoDetail" columnWidth="575" leftMargin="17" rightMargin="17" topMargin="14" bottomMargin="13" isSummaryWithPageHeaderAndFooter="true">
-	<property name="ireport.zoom" value="1.7715610000000026"/>
+	<property name="ireport.zoom" value="1.948717100000003"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="companyNit" class="java.lang.String"/>
@@ -29,6 +29,7 @@
 	<parameter name="phone" class="java.lang.String"/>
 	<parameter name="place" class="java.lang.String"/>
 	<parameter name="address" class="java.lang.String"/>
+	<parameter name="clientCode" class="java.lang.String"/>
 	<field name="quantity" class="java.lang.Integer">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -53,6 +54,9 @@
 	<field name="discount" class="java.lang.Double">
 		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
 	</field>
+	<field name="uniMed" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+	</field>
 	<variable name="detail" class="java.lang.String">
 		<variableExpression><![CDATA[$F{description} != null ? $F{name} + " (" + $F{description} + ")" : $F{name}]]></variableExpression>
 	</variable>
@@ -65,7 +69,7 @@
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="102" y="122" width="275" height="214"/>
+				<reportElement x="147" y="122" width="230" height="214"/>
 				<graphicElement>
 					<pen lineWidth="0.75" lineColor="#000000"/>
 				</graphicElement>
@@ -83,13 +87,19 @@
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="42" y="122" width="60" height="214"/>
+				<reportElement x="42" y="122" width="50" height="214"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
 			</rectangle>
 			<rectangle>
 				<reportElement x="432" y="122" width="63" height="214"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="92" y="122" width="55" height="214"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
@@ -175,21 +185,22 @@
 				<textFieldExpression class="java.util.Date"><![CDATA[$P{fechasin}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="398" y="78" width="55" height="12"/>
-				<textElement verticalAlignment="Middle">
+				<reportElement x="438" y="78" width="57" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
-				<text><![CDATA[NIT/CI/CEX: ]]></text>
+				<text><![CDATA[NIT/CI/CEX:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="453" y="78" width="119" height="12"/>
+				<reportElement x="495" y="78" width="80" height="12"/>
+				<box leftPadding="4"/>
 				<textElement verticalAlignment="Middle">
 					<font size="9"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{clientNit}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="100" y="89" width="475" height="12"/>
+				<reportElement x="100" y="89" width="338" height="12"/>
 				<box leftPadding="3"/>
 				<textElement verticalAlignment="Middle">
 					<font size="9"/>
@@ -197,7 +208,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{name}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="42" y="102" width="60" height="20"/>
+				<reportElement x="42" y="102" width="50" height="20"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -211,7 +222,7 @@
 				<text><![CDATA[CANTIDAD]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="102" y="102" width="275" height="20"/>
+				<reportElement x="147" y="102" width="230" height="20"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -347,6 +358,35 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{address}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="438" y="89" width="57" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cod. Cliente:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="495" y="89" width="80" height="12"/>
+				<box leftPadding="4"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{clientCode}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="92" y="102" width="55" height="20"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[UNIDAD]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>
@@ -358,7 +398,7 @@
 	<detail>
 		<band height="10" splitType="Stretch">
 			<textField>
-				<reportElement x="102" y="0" width="275" height="10"/>
+				<reportElement x="147" y="0" width="230" height="10"/>
 				<box leftPadding="5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
@@ -366,7 +406,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{detail}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0">
-				<reportElement x="42" y="0" width="60" height="10"/>
+				<reportElement x="42" y="0" width="50" height="10"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -401,6 +441,13 @@
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{discount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="92" y="0" width="55" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{uniMed}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -451,7 +498,7 @@
 			</image>
 			<staticText>
 				<reportElement x="377" y="0" width="118" height="11"/>
-				<box>
+				<box rightPadding="3">
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
 					<leftPen lineWidth="0.75"/>
@@ -465,7 +512,7 @@
 			</staticText>
 			<staticText>
 				<reportElement x="377" y="11" width="118" height="11"/>
-				<box>
+				<box rightPadding="3">
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
 					<leftPen lineWidth="0.75"/>
@@ -479,7 +526,7 @@
 			</staticText>
 			<staticText>
 				<reportElement x="377" y="22" width="118" height="11"/>
-				<box>
+				<box rightPadding="3">
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
 					<leftPen lineWidth="0.75"/>
