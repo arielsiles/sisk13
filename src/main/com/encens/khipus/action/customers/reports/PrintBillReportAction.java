@@ -93,6 +93,15 @@ public class PrintBillReportAction extends GenericReportAction {
             return;
         }
 
+
+        if (lastCustomerOrder.getMovement() != null){
+            if (lastCustomerOrder.getMovement().getDescri().equals("RECHAZADA")){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURA RECHAZADA, No se puede imprimir.");
+                return;
+            }
+
+        }
+
         Map params = new HashMap();
         params.putAll(getReportParams(dosage, lastCustomerOrder));
         TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
