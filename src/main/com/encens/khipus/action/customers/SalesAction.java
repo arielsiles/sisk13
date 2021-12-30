@@ -31,9 +31,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -497,21 +495,31 @@ public class SalesAction extends GenericAction {
             /** decode the encoded data **/
             String input = customerOrder.getMovement().getFactura();
             Base64.Decoder decoder = Base64.getDecoder();
-            String decoded = new String(decoder.decode(input));
+            String decoded = new String(decoder.decode(input), "UTF-8");
+
+            /** todo Verificar con Javier **/
+            String newDecoded = decoded.replace("Ley N?", "Ley N°");
 
             //System.out.println("Decoded Data: " + decoded);
 
             FileWriter archivo = null;
             PrintWriter escritor = null;
 
+            Writer out = null;
             try {
-                archivo = new FileWriter(pathFileName);
+
+                out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathFileName), "UTF-8"));
+                out.write(newDecoded);
+
+                /*archivo = new FileWriter(pathFileName);
                 escritor = new PrintWriter(archivo);
-                escritor.print(decoded);
+                escritor.print(decoded);*/
+
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             } finally {
-                archivo.close();
+                //archivo.close();
+                out.close();
             }
         }
     }
@@ -643,7 +651,7 @@ public class SalesAction extends GenericAction {
 
         String nitCiValue = sfc.getClientNit();
         if (customerOrder.getClient().getComplement() != null)
-            nitCiValue = nitCiValue + " " + customerOrder.getClient().getComplement();
+            nitCiValue = nitCiValue + "-" + customerOrder.getClient().getComplement();
 
         Movement movement = new Movement();
         movement.setDate(sfc.getDate());
