@@ -302,11 +302,24 @@
         </h:inputText>
     </s:decorate>-->
 
+    <!--
+    <h:inputText id="rate"
+                 value="#{afpRate.rate}"
+                 required="true"
+                 maxlength="20"
+                 styleClass="input"
+                 tabindex="5">
+        <app:realNumberConverter forId="rate" minimum="0" maximum="100"/>
+    </h:inputText>
+    <h:outputText value="#{messages['Common.percentageSymbol']}"/>
+    -->
+
+
     <s:decorate id="productDiscountField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.productDiscountPercentage']}</ui:define>
         <h:inputText id="productDiscount" value="#{client.productDiscount}" required="false" tabindex="8" styleClass="inputTiny">
             <a4j:support event="onchange" reRender="productDiscountField"/>
-            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="productDiscount"/>
+            <app:realNumberConverter forId="productDiscount" pattern="#{messages['patterns.decimalNumber']}" minimum="0" maximum="99" />
         </h:inputText>
     </s:decorate>
 
@@ -314,7 +327,7 @@
         <ui:define name="label">#{messages['Client.additionalDiscountPercentage']}</ui:define>
         <h:inputText id="additionalDiscount" value="#{client.additionalDiscount}" required="false" tabindex="8" styleClass="inputTiny">
             <a4j:support event="onchange" reRender="additionalDiscountField"/>
-            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="additionalDiscount"/>
+            <app:realNumberConverter forId="additionalDiscount" pattern="#{messages['patterns.decimalNumber']}" minimum="0" maximum="99" />
         </h:inputText>
     </s:decorate>
 
