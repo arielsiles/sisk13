@@ -54,6 +54,15 @@ public class CompanyConfiguration {
     @Column(name = "lugar")
     private String locationName;
 
+    @Column(name = "leyenda_uno")
+    private String oneLegend;
+
+    @Column(name = "leyenda_online")
+    private String onlineLegend;
+
+    @Column(name = "leyenda_offline")
+    private String offlineLegend;
+
     @Column(name = "annul_date")
     private Date invoiceAnnulDate;
 
@@ -1620,5 +1629,29 @@ public class CompanyConfiguration {
 
     public void setInvoiceAnnulDate(Date invoiceAnnulDate) {
         this.invoiceAnnulDate = invoiceAnnulDate;
+    }
+
+    public String getOnlineLegend() {
+        return onlineLegend;
+    }
+
+    public void setOnlineLegend(String onlineLegend) {
+        this.onlineLegend = onlineLegend;
+    }
+
+    public String getOfflineLegend() {
+        return offlineLegend;
+    }
+
+    public void setOfflineLegend(String offlineLegend) {
+        this.offlineLegend = offlineLegend;
+    }
+
+    public String getOneLegend() {
+        return oneLegend;
+    }
+
+    public void setOneLegend(String oneLegend) {
+        this.oneLegend = oneLegend;
     }
 }

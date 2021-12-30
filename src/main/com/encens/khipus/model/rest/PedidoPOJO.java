@@ -10,6 +10,7 @@ public class PedidoPOJO {
     private Integer numeroFactura;
     private String nombreRazonSocial;
     private Integer codigoTipoDocumentoIdentidad;
+    private String complemento;
     private String numeroDocumento;
     private String codigoCliente;
     private Integer codigoMetodoPago;
@@ -158,5 +159,13 @@ public class PedidoPOJO {
 
     public void setDescuentoAdicional(BigDecimal descuentoAdicional) {
         this.descuentoAdicional = descuentoAdicional;
+    }
+
+    public String getComplemento() {
+        return complemento;
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
     }
 }

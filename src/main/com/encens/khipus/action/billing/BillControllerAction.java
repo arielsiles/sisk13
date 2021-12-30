@@ -276,6 +276,8 @@ public class BillControllerAction {
 
             BillResponsePOJO billResponsePOJO = Json.fromJson(jsonNode, BillResponsePOJO.class);
 
+            System.out.println("====>>>> LEYENDA Response: " + billResponsePOJO.getLeyenda());
+
             Movement movement = customerOrder.getMovement();
             movement.setCuf(billResponsePOJO.getCuf());
             movement.setFechaSin(billResponsePOJO.getFecha().toString());
@@ -559,6 +561,7 @@ public class BillControllerAction {
 
         pedidoPOJO.setCodigoTipoDocumentoIdentidad(customerOrder.getClient().getInvoiceDocumentType().getSinCode());
         pedidoPOJO.setNumeroDocumento(customerOrder.getClient().getNitNumber());
+        pedidoPOJO.setComplemento(customerOrder.getClient().getComplement());
         pedidoPOJO.setCodigoCliente(clientCode);
         pedidoPOJO.setCodigoMetodoPago(customerOrder.getClient().getPaymentMethodTypeCode());
         pedidoPOJO.setUsuario(user.getUsername());

@@ -79,6 +79,9 @@ public class CustomerOrder implements BaseModel  {
 
     /* -- */
 
+    @Column(name = "FACTURA")
+    private String invoiceNumberCafc;
+
     @Column(name = "DESCRIPCION")
     private String description;
 
@@ -436,5 +439,13 @@ public class CustomerOrder implements BaseModel  {
 
     public void setAdditionalDiscountValue(BigDecimal additionalDiscountValue) {
         this.additionalDiscountValue = additionalDiscountValue;
+    }
+
+    public String getInvoiceNumberCafc() {
+        return invoiceNumberCafc;
+    }
+
+    public void setInvoiceNumberCafc(String invoiceNumberCafc) {
+        this.invoiceNumberCafc = invoiceNumberCafc;
     }
 }

@@ -228,6 +228,12 @@ public class PrintBillReportAction extends GenericReportAction {
         BigDecimal subtotal    = BigDecimalUtil.sum(BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount()), lastCustomerOrder.getAdditionalDiscountValue());
         BigDecimal totalAmount = BigDecimalUtil.toBigDecimal(lastCustomerOrder.getTotalAmount());
 
+
+        String legend1 = companyConfiguration.getOneLegend();
+        String legend3 = companyConfiguration.getOnlineLegend();
+        if (lastCustomerOrder.getMovement().getEmissionType().equals("OFFLINE"))
+            legend3 = companyConfiguration.getOfflineLegend();
+
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("companyNit", dosage.getCompanyNit());
         paramMap.put("invoiceNumber", lastCustomerOrder.getMovement().getNumber().longValue());
@@ -245,6 +251,9 @@ public class PrintBillReportAction extends GenericReportAction {
         paramMap.put("discount", lastCustomerOrder.getAdditionalDiscountValue().doubleValue());
         paramMap.put("total", totalAmount.doubleValue());
         paramMap.put("literalTotal", moneyUtil.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs")));
+
+        paramMap.put("legend1", legend1);
+        paramMap.put("legend3", legend3);
 
         /*
         System.out.println("................subtotal: " + lastCustomerOrder.getTotalAmount());

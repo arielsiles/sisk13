@@ -283,8 +283,16 @@ UPDATE configuracion c SET c.`annul_date` = '2021-12-31';
 
 
 ALTER TABLE inv_articulos ADD COLUMN uni_meds VARCHAR(50) AFTER cod_meds;
-UPDATE inv_articulos i SET i.`cod_meds` = 57;
-UPDATE inv_articulos i SET i.`uni_meds` = 'UNIDAD (BIENES)';
+-- UPDATE inv_articulos i SET i.`cod_meds` = 57;
+-- UPDATE inv_articulos i SET i.`uni_meds` = 'UNIDAD (BIENES)';
+
+ALTER TABLE configuracion ADD COLUMN leyenda_uno VARCHAR(300) AFTER lugar;
+ALTER TABLE configuracion ADD COLUMN leyenda_online VARCHAR(300) AFTER lugar;
+ALTER TABLE configuracion ADD COLUMN leyenda_offline VARCHAR(300) AFTER lugar;
+
+UPDATE configuracion c SET c.`leyenda_uno` = 'ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS. EL USO ILÍCITO SERÁ SANCIONADO PENALMENTE DE ACUERDO A LEY';
+UPDATE configuracion c SET c.`leyenda_online` = 'Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido en una modalidad de facturación en línea';
+UPDATE configuracion c SET c.`leyenda_offline` = 'Este documento es la Representación Gráfica de un Documento Fiscal Digital emitido fuera de línea, verifique su envío con su proveedor o en la página web www.impuestos.gob.bo';
 
 --
 --

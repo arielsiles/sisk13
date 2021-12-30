@@ -292,7 +292,7 @@
                 <rich:column styleClass="center">
                     <h:selectBooleanCheckbox id="selectCheckboxItem"
                                              immediate="true"
-                                             disabled="#{salesAction.isAnnulled(customerOrder)}"
+                                             disabled="#{salesAction.isAnnulled(customerOrder) or salesAction.isRejected(customerOrder)}"
                                              value="#{customerOrderDataModel.selectedList[customerOrderDataModel.page][customerOrder.id]}">
                         <a4j:support event="onchange" reRender="selectCheckboxItem"/>
                     </h:selectBooleanCheckbox>
@@ -353,12 +353,13 @@
                                        value="Anular"
                                        styleClass="button"
                                        immediate="true"
-                                       rendered="#{!salesAction.isAnnulled(customerOrder)}"
+                                       rendered="#{salesAction.showActionsBilling(customerOrder)}"
                                        oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
                                        reRender="confirmCancelOrderModalPanel">
                     </a4j:commandButton>
 
                     <h:commandLink action="#{salesAction.generateFileXML(customerOrder)}"
+                                   rendered="#{salesAction.showActionsBilling(customerOrder)}"
                                    immediate="true">
                         <h:graphicImage value="/img/payroll.jpg" styleClass="select-image"
                                         title="Generar XML"/>

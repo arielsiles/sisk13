@@ -30,6 +30,8 @@
 	<parameter name="place" class="java.lang.String"/>
 	<parameter name="address" class="java.lang.String"/>
 	<parameter name="clientCode" class="java.lang.String"/>
+	<parameter name="legend1" class="java.lang.String"/>
+	<parameter name="legend3" class="java.lang.String"/>
 	<field name="quantity" class="java.lang.Integer">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -385,7 +387,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="false"/>
 				</textElement>
-				<text><![CDATA[UNIDAD]]></text>
+				<text><![CDATA[UNIDAD DE MEDIDA]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -456,20 +458,13 @@
 	</columnFooter>
 	<pageFooter>
 		<band height="104" splitType="Stretch">
-			<textField>
-				<reportElement x="18" y="77" width="467" height="18"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="18" y="68" width="467" height="18"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{leyenda}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="18" y="67" width="467" height="11"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="7" isBold="false"/>
-				</textElement>
-				<text><![CDATA[ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS.EL USO ILÍCITO DE ÉSTA SERÁ SANCIONADO DE ACUERDO A LEY]]></text>
-			</staticText>
 			<textField>
 				<reportElement x="26" y="34" width="473" height="11"/>
 				<textElement verticalAlignment="Middle">
@@ -580,13 +575,20 @@
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{subtotal}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="18" y="94" width="467" height="10"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="57" width="502" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="7" isBold="false"/>
+					<font fontName="Arial" size="7"/>
 				</textElement>
-				<text><![CDATA["Este documento es una impresión de un Documento Digital emitido en una Modalidad de Facturación en Línea"]]></text>
-			</staticText>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{legend1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="1" y="86" width="502" height="18"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{legend3}]]></textFieldExpression>
+			</textField>
 		</band>
 	</pageFooter>
 </jasperReport>

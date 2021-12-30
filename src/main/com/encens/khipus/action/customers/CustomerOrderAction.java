@@ -143,8 +143,13 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         String text = "La Factura "  + movement.getNumber() + " de fecha "
                                         + DateUtils.format(movement.getDate(), "dd/MM/yyyy")
                                         + " emitida por " + Constants.EMAIL_BUSINESS_NAME
-                                        + " \ncon razón social " + movement.getName() + " y NIT " + movement.getNit() + " ha sido ANULADA."
-                                        + "\nPor favor tomar las previsiones necesarias.";
+                                        + " \ncon razón social " + movement.getName() + ", NIT/CI " + movement.getNit()
+                                        + " y Código de Autorización " + movement.getCuf()
+                                        + " ha sido ANULADA."
+                                        + "\nPor favor tomar las previsiones necesarias."
+                                        + "\n\nAtte."
+                                        + "\nCOOPERATIVA INTEGRAL DE SERVICIOS CBBA LTDA"
+                                        + "\nINDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
 
         sendMessageAction.sendEmail(customerOrder, Constants.EMAIL_SUBJECT_ANNULLED, text);
         System.out.println("................" + Constants.EMAIL_SUBJECT_ANNULLED + "................");

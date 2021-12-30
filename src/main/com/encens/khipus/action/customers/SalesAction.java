@@ -44,6 +44,9 @@ public class SalesAction extends GenericAction {
     private ProductItem productItem;
     private String productItemFullName;
     private BigDecimal totalAmount = BigDecimal.ZERO;
+    private BigDecimal additionalDiscountAmount = BigDecimal.ZERO;
+
+    private Integer invoiceNumberCafc;
 
     private BigDecimal moneyReceived = BigDecimal.ZERO;
     private BigDecimal moneyReturned = BigDecimal.ZERO;
@@ -320,14 +323,23 @@ public class SalesAction extends GenericAction {
     }
 
     public BigDecimal calculateTotalAmount(){
-        BigDecimal result = BigDecimal.ZERO;
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        BigDecimal totalAmountResult = BigDecimal.ZERO;
         setZeroProduct(Boolean.FALSE);
-        for (ArticleOrder articleOrder:articleOrderList){
-            result = BigDecimalUtil.sum(result, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
-            if (articleOrder.getQuantity() == 0) setZeroProduct(Boolean.TRUE); /** Verifica productos con cantidad CERO **/
+
+        if (getClient() != null) {
+            for (ArticleOrder articleOrder : articleOrderList) {
+                totalAmount = BigDecimalUtil.sum(totalAmount, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
+                if (articleOrder.getQuantity() == 0)
+                    setZeroProduct(Boolean.TRUE); /** Verifica productos con cantidad CERO **/
+            }
+
+            BigDecimal discount = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(getClient().getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED, 4));
+            totalAmountResult = BigDecimalUtil.subtract(totalAmount, discount);
+            this.additionalDiscountAmount = discount;
         }
-        setTotalAmount(result);
-        return result;
+        setTotalAmount(totalAmountResult);
+        return totalAmountResult;
     }
 
     public void calculateTotalUnits(ArticleOrder articleOrder){
@@ -365,6 +377,8 @@ public class SalesAction extends GenericAction {
 
         this.nitCiHasBeenValidated = Boolean.FALSE;
         this.validNitCi = Boolean.FALSE;
+        setInvoiceNumberCafc(null);
+        setAdditionalDiscountAmount(BigDecimal.ZERO);
 
         setNitValidationMessage(null);
     }
@@ -434,12 +448,13 @@ public class SalesAction extends GenericAction {
         checkMinimumValues();
 
         if (this.client == null || totalAmount.compareTo(BigDecimal.ZERO) == 0){
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No se puede realizar la venta, datos incompletos...");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No se puede realizar la venta, monto incorrecto.");
             return;
         }
 
 
         CustomerOrder customerOrder = createSale();
+        System.out.println("======> customerOrder???? " + customerOrder);
         if (customerOrder!= null) {
             Movement movement = createInvoice(customerOrder);
             customerOrder.setMovement(movement);
@@ -453,14 +468,20 @@ public class SalesAction extends GenericAction {
             try {
                 System.out.println("--->>> !hasInvoice ???" +  !billControllerAction.hasInvoice(customerOrder));
                 if (!billControllerAction.hasInvoice(customerOrder)){
-                    billControllerAction.createBill(customerOrder);
+
+                    /** todo Verifica que no se pueda emitir la factura con monto CERO o menor **/
+                    if ( customerOrder.getTotalAmount() > 0)
+                        billControllerAction.createBill(customerOrder);
+
                 }
             } catch (IOException e) {
                 //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion, venta al contado...");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion...");
             }
 
-            generateFileXML(customerOrder);
+            /** todo **/
+            if ( customerOrder.getTotalAmount() > 0)
+                generateFileXML(customerOrder);
 
             clearAll();
             assignCustomerOrderTypeDefault();
@@ -526,6 +547,11 @@ public class SalesAction extends GenericAction {
 
         observation = (observation == null) ? "" : observation;
         CustomerOrder customerOrder = new CustomerOrder();
+
+        System.out.println("--------------------> Invoice Number CAFC: " + this.invoiceNumberCafc);
+        if (this.invoiceNumberCafc != null)
+            customerOrder.setInvoiceNumberCafc(this.invoiceNumberCafc.toString());
+
         Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
         customerOrder.setCode(saleCode);
         customerOrder.setUser(currentUser);
@@ -541,29 +567,12 @@ public class SalesAction extends GenericAction {
             customerOrder.setState(SaleStatus.CONTABILIZADO);
 
         customerOrder.setTotalAmount(totalAmount.doubleValue());
+        customerOrder.setAdditionalDiscountValue(this.additionalDiscountAmount);
+
         customerOrder.setCommissionPercentage(0.0);
         customerOrder.setCommissionValue(0.0);
         //BigDecimal tax = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT);
         //customerOrder.setTax(tax.doubleValue());
-
-        /** For commissions **/
-        /*if (client.getCommission() > 0){
-            BigDecimal percentage = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(client.getCommission()), BigDecimalUtil.ONE_HUNDRED, 4);
-            BigDecimal commissionValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
-            BigDecimal totalVar = BigDecimalUtil.subtract(totalAmount, commissionValue);
-            customerOrder.setTax(BigDecimalUtil.multiply(totalVar, Constants.VAT).doubleValue());
-            //customerOrder.setCommissionValue(commissionValue.doubleValue());
-            customerOrder.setCommissionPercentage(client.getCommission());
-
-            BigDecimal sumDiscount = BigDecimal.ZERO;
-            for (ArticleOrder articleOrder : articleOrderList){
-                //double discount = articleOrder.getAmount() * percentage.doubleValue();
-                BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getAmount()), percentage);
-                articleOrder.setDiscount(discountValue.doubleValue());
-                sumDiscount = BigDecimalUtil.sum(sumDiscount, discountValue);
-            }
-            customerOrder.setCommissionValue(sumDiscount.doubleValue());
-        }*/
 
         /** For Product Discount **/
         System.out.println("----------------> client.getProductDiscount(): " + client.getProductDiscount().doubleValue());
@@ -580,14 +589,14 @@ public class SalesAction extends GenericAction {
         System.out.println("==============> 1.TOTAL AMOUNT: " + customerOrder.getTotalAmount());
         System.out.println("==============> 1.PRODUCT DISCOUNT: " + customerOrder.getProductDiscountValue());
 
-        /** For Additional Discount **/
-        if (client.getAdditionalDiscount().doubleValue() > 0){
+        /** For Additional Discount
+         *  Se calcula el descuento al registrar los productos **/
+        /*if (client.getAdditionalDiscount().doubleValue() > 0){
             BigDecimal percentage = BigDecimalUtil.divide(client.getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED, 4);
             BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
-
             customerOrder.setAdditionalDiscountValue(discountValue);
             customerOrder.setTotalAmount(BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), discountValue).doubleValue());
-        }
+        }*/
         System.out.println("==============> 2.TOTAL AMOUNT: " + customerOrder.getTotalAmount());
 
         customerOrder.setTax( BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT).doubleValue() );
@@ -606,7 +615,12 @@ public class SalesAction extends GenericAction {
             customerOrder.setObservation(observation);
         }
 
-        String outcome = saleService.createSale(customerOrder);
+        if (customerOrder.getTotalAmount() > 0){
+            String outcome = saleService.createSale(customerOrder);
+        }else {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Monto total incorrecto para facturar, revise el % descuento.");
+            customerOrder = null;
+        }
 
         return customerOrder;
     }
@@ -634,7 +648,13 @@ public class SalesAction extends GenericAction {
         Movement movement = new Movement();
         movement.setDate(sfc.getDate());
         movement.setState(Constants.MOVEMENT_STATE_V);
-        movement.setNumber(dosage.getCurrentNumber().intValue());
+
+        if (customerOrder.getInvoiceNumberCafc() != null) {
+            movement.setNumber(new Integer(customerOrder.getInvoiceNumberCafc()));
+        }else{
+            movement.setNumber(dosage.getCurrentNumber().intValue());
+        }
+
         movement.setNit(nitCiValue);
         movement.setName(sfc.getName());
         movement.setAmount(BigDecimalUtil.toBigDecimal(sfc.getAmount()));
@@ -668,7 +688,9 @@ public class SalesAction extends GenericAction {
         movement.setAuthorizationNumber(dosage.getAuthorizationNumber().toString());
         /*movement.setCustomerOrder(customerOrder);*/
 
-        dosageService.increaseInvoiceNumber(dosage);
+        if (customerOrder.getInvoiceNumberCafc() == null)
+            dosageService.increaseInvoiceNumber(dosage);
+
         movementService.createMovement(movement);
 
         return movement;
@@ -985,8 +1007,31 @@ public class SalesAction extends GenericAction {
 
     }
 
+    public boolean showActionsBilling(CustomerOrder customerOrder){
+        boolean result = true;
+
+        if (customerOrder.getState().equals(SaleStatus.ANULADO))
+            result = false;
+        if (customerOrder.getMovement() != null){
+            if (customerOrder.getMovement().getDescri() != null)
+                if (customerOrder.getMovement().getDescri().equals("RECHAZADA"))
+                    result = false;
+        }
+        return result;
+    }
+
     public boolean isAnnulled(CustomerOrder customerOrder){
         return customerOrder.getState().equals(SaleStatus.ANULADO);
+    }
+
+    public boolean isRejected(CustomerOrder customerOrder){
+        boolean result = false;
+        if (customerOrder.getMovement() != null){
+            if (customerOrder.getMovement().getDescri() != null)
+                result = customerOrder.getMovement().getDescri().equals("RECHAZADA");
+        }
+
+        return result;
     }
 
     public void assignClient(Client client){
@@ -1219,6 +1264,8 @@ public class SalesAction extends GenericAction {
 
         this.nitCiHasBeenValidated = Boolean.FALSE;
         this.validNitCi = Boolean.FALSE;
+        setInvoiceNumberCafc(null);
+        setAdditionalDiscountAmount(BigDecimal.ZERO);
 
         assignCustomerOrderTypeDefault();
     }
@@ -1251,10 +1298,8 @@ public class SalesAction extends GenericAction {
 
                 DocumentType docType = getClient().getInvoiceDocumentType();
                 if (docType.getSinCode() == 1 || docType.getSinCode() == 2 || docType.getSinCode() == 3 || docType.getSinCode() == 4) {
-
                     validNitCi = Boolean.TRUE;
                 }
-
                 if (docType.getSinCode() == 5){ //Si es NIT
                     if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")){
                         validNitCi = Boolean.TRUE;
@@ -1262,13 +1307,53 @@ public class SalesAction extends GenericAction {
                         validNitCi = Boolean.FALSE;
                 }
             }
-
             if (result.equals("NIT ACTIVO")) {
                 validNitCi = Boolean.TRUE;
             }
-
             if (result.equals("NIT INACTIVO")) {
                 validNitCi = Boolean.TRUE;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            setNitValidationMessage("¡No se pudo validar!");
+        }
+    }
+
+    public void validateNitCi(){
+        String result = "";
+        try {
+            DocumentType docType = getClient().getInvoiceDocumentType();
+
+            if (docType.getSinCode() == 5) {
+                result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
+                setNitValidationMessage(result);
+                this.nitCiHasBeenValidated = Boolean.TRUE;
+
+                if (result.equals("NIT INEXISTENTE")) {
+
+                    if (docType.getSinCode() == 1 || docType.getSinCode() == 2 || docType.getSinCode() == 3 || docType.getSinCode() == 4) {
+                        validNitCi = Boolean.TRUE;
+                    }
+                    if (docType.getSinCode() == 5) { //Si es NIT
+                        if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")) {
+                            validNitCi = Boolean.TRUE;
+                        } else
+                            validNitCi = Boolean.FALSE;
+                    }
+                }
+                if (result.equals("NIT ACTIVO")) {
+                    validNitCi = Boolean.TRUE;
+                }
+                if (result.equals("NIT INACTIVO")) {
+                    validNitCi = Boolean.TRUE;
+                }
+            }else {
+                result = "CI/CEX/PAS/OD";
+                setNitValidationMessage(result);
+                validNitCi = Boolean.TRUE;
+                nitCiHasBeenValidated = Boolean.TRUE;
             }
 
         } catch (Exception e) {
@@ -1490,5 +1575,21 @@ public class SalesAction extends GenericAction {
 
     public void setNitCiHasBeenValidated(Boolean nitCiHasBeenValidated) {
         this.nitCiHasBeenValidated = nitCiHasBeenValidated;
+    }
+
+    public Integer getInvoiceNumberCafc() {
+        return invoiceNumberCafc;
+    }
+
+    public void setInvoiceNumberCafc(Integer invoiceNumberCafc) {
+        this.invoiceNumberCafc = invoiceNumberCafc;
+    }
+
+    public BigDecimal getAdditionalDiscountAmount() {
+        return additionalDiscountAmount;
+    }
+
+    public void setAdditionalDiscountAmount(BigDecimal additionalDiscountAmount) {
+        this.additionalDiscountAmount = additionalDiscountAmount;
     }
 }
