@@ -1333,7 +1333,9 @@ public class SalesAction extends GenericAction {
         try {
             DocumentType docType = getClient().getInvoiceDocumentType();
 
-            if (docType.getSinCode() == 5) {
+            boolean isOnlineMode =  billControllerAction.checkBillingMode();
+
+            if (docType.getSinCode() == 5 && isOnlineMode) {
                 result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
                 System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
                 setNitValidationMessage(result);
@@ -1359,6 +1361,10 @@ public class SalesAction extends GenericAction {
                 }
             }else {
                 result = "CI/CEX/PAS/OD";
+
+                if (!isOnlineMode)
+                    result = "Fuera de línea";
+
                 setNitValidationMessage(result);
                 validNitCi = Boolean.TRUE;
                 nitCiHasBeenValidated = Boolean.TRUE;
