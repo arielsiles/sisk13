@@ -23,6 +23,8 @@ public class PedidoPOJO {
     private BigDecimal montoTotalMoneda;
     private BigDecimal descuentoAdicional;
 
+    private Integer codigoExcepcion;
+
     private List<DetallePedidoPOJO> detalle;
 
     public String getNombreRazonSocial() {
@@ -167,5 +169,13 @@ public class PedidoPOJO {
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
+    }
+
+    public Integer getCodigoExcepcion() {
+        return codigoExcepcion;
+    }
+
+    public void setCodigoExcepcion(Integer codigoExcepcion) {
+        this.codigoExcepcion = codigoExcepcion;
     }
 }

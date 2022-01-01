@@ -9,7 +9,7 @@
                  xmlns:c="http://java.sun.com/jstl/core"
                  xmlns:app="http://encens.com/products/khipus/facelets"
                  id="#{dialogId}"
-                 onshow="jQuery('##{containerId}\\:clientListForm#{dialogId}\\:nameField\\:name').focus();">
+                 onshow="jQuery('##{containerId}\\:salesForm#{dialogId}\\:nameField\\:name').focus();">
 
     <c:if test="#{empty dataModel}">
         <c:set var="dataModel" value="#{clientDataModel}"/>
@@ -111,6 +111,6 @@
         <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
                                operation="hide" event="onclick"/>
     </h:form>
-
+    <!--<rich:jQuery selector="#name" query="focus()" timing="onload"/>-->
 </rich:modalPanel>
 

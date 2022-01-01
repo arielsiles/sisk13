@@ -346,27 +346,33 @@ public class BillControllerAction {
     }
 
 
-    public String nitVerification(Long nit) throws IOException{
+    public String nitVerification(Long nit) {
 
         User user = getUser(currentUser.getId());
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
 
-        NitVerificationPOJO nitVerificationPOJO = new NitVerificationPOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode(), nit);
-        String jsonString = Json.prettyPrint(Json.toJson(nitVerificationPOJO));
-        System.out.println("-----------------------CheckBillingModePOJO-------------------");
-        System.out.println("----------> URL: " + companyConfiguration.getNitVerificationURL());
-        System.out.println(jsonString);
+        try {
 
-        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getNitVerificationURL(), jsonString);
-        if (serverResponse.getResponseJson() != null) {
-            JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
-            NitVerificationResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, NitVerificationResponsePOJO.class);
+            NitVerificationPOJO nitVerificationPOJO = new NitVerificationPOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode(), nit);
+            String jsonString = Json.prettyPrint(Json.toJson(nitVerificationPOJO));
+            System.out.println("-----------------------CheckBillingModePOJO-------------------");
+            System.out.println("----------> URL: " + companyConfiguration.getNitVerificationURL());
+            System.out.println(jsonString);
 
-            System.out.println("---====> Mensaje: " + responsePOJO.getMensaje());
-            System.out.println("---====> NIT: " + responsePOJO.getNitParaVerificacion());
-            return responsePOJO.getMensaje();
-        }else {
-            return "No se pudo validar!";
+            ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getNitVerificationURL(), jsonString);
+            if (serverResponse.getResponseJson() != null) {
+                JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+                NitVerificationResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, NitVerificationResponsePOJO.class);
+
+                System.out.println("---====> Mensaje: " + responsePOJO.getMensaje());
+                System.out.println("---====> NIT: " + responsePOJO.getNitParaVerificacion());
+                return responsePOJO.getMensaje();
+            } else {
+                return "No se pudo validar!";
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return "Error, no se pudo validar.";
         }
     }
 
@@ -375,37 +381,43 @@ public class BillControllerAction {
      * @return true en linea, false fuera de linea
      * @throws IOException
      */
-    public Boolean checkBillingMode() throws IOException{
+    public Boolean checkBillingMode(){
 
         User user = getUser(currentUser.getId());
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
 
-        CheckBillingModePOJO checkBillingModePOJO = new CheckBillingModePOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode());
-        String jsonString = Json.prettyPrint(Json.toJson(checkBillingModePOJO));
-        System.out.println("-----------------------CheckBillingModePOJO-------------------");
-        System.out.println("----------> URL: " + companyConfiguration.getCheckBillingModeURL());
-        System.out.println(jsonString);
+        try {
 
-        ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCheckBillingModeURL() , jsonString);
+            CheckBillingModePOJO checkBillingModePOJO = new CheckBillingModePOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode());
+            String jsonString = Json.prettyPrint(Json.toJson(checkBillingModePOJO));
+            System.out.println("-----------------------CheckBillingModePOJO-------------------");
+            System.out.println("----------> URL: " + companyConfiguration.getCheckBillingModeURL());
+            System.out.println(jsonString);
 
-        JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
-        String result = Json.prettyPrint(jsonNodeResponse);
-        System.out.println(result);
+            ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCheckBillingModeURL(), jsonString);
 
-        CheckBillingModeResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, CheckBillingModeResponsePOJO.class);
-        this.checkBillingModeResponse = responsePOJO; // ***
+            JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+            String result = Json.prettyPrint(jsonNodeResponse);
+            System.out.println(result);
 
-        System.out.println("----> Response isOnline: " + responsePOJO.getIsOnline());
+            CheckBillingModeResponsePOJO responsePOJO = Json.fromJson(jsonNodeResponse, CheckBillingModeResponsePOJO.class);
+            this.checkBillingModeResponse = responsePOJO; // ***
 
-        if (responsePOJO.getIsOnline()) {
+            System.out.println("----> Response isOnline: " + responsePOJO.getIsOnline());
 
-            System.out.println("---> ok true");
+            if (responsePOJO.getIsOnline()) {
+
+                System.out.println("---> ok true");
+            } else {
+                System.out.println("----> Fail true");
+            }
+
+            return responsePOJO.getIsOnline();
+
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
         }
-        else {
-            System.out.println("----> Fail true");
-        }
-
-        return responsePOJO.getIsOnline();
     }
 
 
@@ -572,6 +584,24 @@ public class BillControllerAction {
         pedidoPOJO.setMontoTotalSujetoIva(amountValue);
         pedidoPOJO.setMontoTotalMoneda(amountValue);
         pedidoPOJO.setDescuentoAdicional(customerOrder.getAdditionalDiscountValue());
+
+        boolean isOnlineMode = checkBillingMode();
+
+        if (isOnlineMode && pedidoPOJO.getCodigoTipoDocumentoIdentidad()==5){
+            String validNitResult = nitVerification(new Long(pedidoPOJO.getNumeroDocumento()));
+            System.out.println("******************>>>>>> validNitResult: " + pedidoPOJO.getNumeroDocumento() + " - "  + validNitResult);
+            if (validNitResult.equals("NIT INEXISTENTE")){
+                System.out.println("**********> NIT INEXISTENTE, CODIGO EXCEPCION 1");
+                pedidoPOJO.setCodigoExcepcion(1);
+            }
+        }
+
+
+        /** Caso Offline, no se puede validar NIT **/
+        if (!isOnlineMode && pedidoPOJO.getCodigoTipoDocumentoIdentidad()==5){
+            System.out.println("**********> CODIGO EXCEPCION 1 NOSE PUEDE VALIDAR");
+            pedidoPOJO.setCodigoExcepcion(1);
+        }
 
         List<DetallePedidoPOJO> detallePedidoPOJOList = new ArrayList<DetallePedidoPOJO>();
 

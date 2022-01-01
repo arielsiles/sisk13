@@ -223,7 +223,7 @@ public class SalesAction extends GenericAction {
         }
 
         if (!this.validNitCi){
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible continuar con la venta, NIT incorrecto.");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible continuar con la venta, debe validar el NIT.");
             return;
         }
 
@@ -1343,15 +1343,11 @@ public class SalesAction extends GenericAction {
 
                 if (result.equals("NIT INEXISTENTE")) {
 
-                    if (docType.getSinCode() == 1 || docType.getSinCode() == 2 || docType.getSinCode() == 3 || docType.getSinCode() == 4) {
+                    if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")) {
                         validNitCi = Boolean.TRUE;
-                    }
-                    if (docType.getSinCode() == 5) { //Si es NIT
-                        if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")) {
-                            validNitCi = Boolean.TRUE;
-                        } else
-                            validNitCi = Boolean.FALSE;
-                    }
+                    } else
+                        validNitCi = Boolean.TRUE; /** FALSE Para controlar que no continue la venta en caso de un NIT inexistente **/
+
                 }
                 if (result.equals("NIT ACTIVO")) {
                     validNitCi = Boolean.TRUE;
