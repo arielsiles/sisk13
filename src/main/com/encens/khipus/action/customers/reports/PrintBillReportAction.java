@@ -30,7 +30,6 @@ import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -118,12 +117,12 @@ public class PrintBillReportAction extends GenericReportAction {
             e.printStackTrace();
         }
 
-        try {
+        /*try {
             sendMessageAction.sendEmailAttachment(lastCustomerOrder);
 
         } catch (MessagingException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 
@@ -138,6 +137,18 @@ public class PrintBillReportAction extends GenericReportAction {
             e.printStackTrace();
         }
     }
+
+    public void sendMailAttachments(){
+
+        User user = getUser(currentUser.getId());
+        this.customerOrderId = saleService.findLastSaleId(user);
+        this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
+
+        sendMessageAction.sendEmailAttachment(lastCustomerOrder);
+
+    }
+
+
     public void generateFileReport() {
 
         User user = getUser(currentUser.getId());

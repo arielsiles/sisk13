@@ -213,6 +213,16 @@
             </s:span>
 
             <!-- -->
+
+            <a4j:commandButton id="enviarButton"
+                               action="#{printBillReportAction.sendMailAttachments()}"
+                               value="Enviar"
+                               styleClass="button"
+                               immediate="true"
+                               rendered="#{s:hasPermission('BILLING_MANAGE_SFE','VIEW')}"
+                               ajaxSingle="true">
+            </a4j:commandButton>
+
             <a4j:commandButton id="syncButton"
                                action="#{syncControllerAction.syncData()}"
                                value="SYNC"
