@@ -522,9 +522,19 @@ public class BillControllerAction {
         return objectResponse.getListaCodigos();
     }
 
-    public void printResponseObject(String responseJsonString) throws IOException {
-        JsonNode nodeResponse = Json.parse(responseJsonString);
-        BillResponsePOJO billResponsePOJO = Json.fromJson(nodeResponse, BillResponsePOJO.class);
+    public void printResponseObject(String responseJsonString) {
+        System.out.println("---------------printResponseObject-------------------");
+
+        JsonNode nodeResponse = null;
+        BillResponsePOJO billResponsePOJO = null;
+        try {
+            nodeResponse = Json.parse(responseJsonString);
+            billResponsePOJO = Json.fromJson(nodeResponse, BillResponsePOJO.class);
+
+        } catch (IOException e) {
+            System.out.println("--------------- Response OBJETC-------------------");
+            e.printStackTrace();
+        }
 
         System.out.println("---------------OBJETC-------------------");
         System.out.println("numeroFactura: " + billResponsePOJO.getNumeroFactura());

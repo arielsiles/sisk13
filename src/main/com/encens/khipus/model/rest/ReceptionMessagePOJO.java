@@ -4,7 +4,7 @@ public class ReceptionMessagePOJO {
 
     private Integer codigo;
     private String descripcion;
-    private Integer advertencia;
+    private Boolean advertencia;
     private Integer numeroArchivo;
     private Integer numeroDetalle;
 
@@ -24,14 +24,6 @@ public class ReceptionMessagePOJO {
         this.descripcion = descripcion;
     }
 
-    public Integer getAdvertencia() {
-        return advertencia;
-    }
-
-    public void setAdvertencia(Integer advertencia) {
-        this.advertencia = advertencia;
-    }
-
     public Integer getNumeroArchivo() {
         return numeroArchivo;
     }
@@ -46,5 +38,13 @@ public class ReceptionMessagePOJO {
 
     public void setNumeroDetalle(Integer numeroDetalle) {
         this.numeroDetalle = numeroDetalle;
+    }
+
+    public Boolean getAdvertencia() {
+        return advertencia;
+    }
+
+    public void setAdvertencia(Boolean advertencia) {
+        this.advertencia = advertencia;
     }
 }
