@@ -283,9 +283,10 @@
                                reRender="productDataTable,confirmCreditSaleModalPanel">
             </a4j:commandButton>
 
+            <!-- Venta al contado -->
             <a4j:commandButton id="cashSaleCommandButton"
                                action="#{salesAction.initCashSale}"
-                               value="Venta contado"
+                               value="Registrar Venta"
                                rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
                                styleClass="button"
                                immediate="true"
