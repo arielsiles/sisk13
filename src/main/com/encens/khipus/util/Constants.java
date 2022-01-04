@@ -312,7 +312,7 @@ public final class Constants {
 
     public static final String EMAIL_FROM = "ariel.siles@gmail.com";
     public static final String EMAIL_PASSW = "nhefhdnzwjtymynk";
-    public static final String EMAIL_SUBJECT = "Factura Electrónica en Línea, CISC Ltda. - ILVA";
+    public static final String EMAIL_SUBJECT = "Factura Electrónica en Línea {0}, CISC Ltda. - ILVA";
     public static final String PATH_FILE_INVOICE = "C:/TEMP/";
     public static final String PREFIX_NAME_INVOICE = "FACTURA-";
 

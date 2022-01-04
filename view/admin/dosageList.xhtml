@@ -42,11 +42,12 @@
             <rich:dataTable value="#{dosageDataModel}" var="dosageItem" id="dosageList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="5%, 20%, 15%, 15%, 15%, 10%, 10%">
+                            columnsWidth="5%, 15%, 15%, 15%, 15%, 15%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
                         <rich:column>#{messages['Dosage.id']}</rich:column>
+                        <rich:column>#{messages['Dosage.branchOffice']}</rich:column>
                         <rich:column>#{messages['Dosage.authorizationNumber']}</rich:column>
                         <rich:column>#{messages['Dosage.expirationDate']}</rich:column>
                         <rich:column>#{messages['Dosage.currentNumber']}</rich:column>
@@ -61,6 +62,9 @@
 
                 <rich:column>
                     <h:outputText value="#{dosageItem.id}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{dosageItem.branchOffice.description}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{dosageItem.authorizationNumber}"/>

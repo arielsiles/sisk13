@@ -105,7 +105,8 @@ public class SendMessageAction {
                 MimeMessage mensaje = new MimeMessage(s);
                 mensaje.setFrom(new InternetAddress(correo));
                 mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(correoDestino));
-                mensaje.setSubject(Constants.EMAIL_SUBJECT);
+                String subject = Constants.EMAIL_SUBJECT.replace("{0}", customerOrder.getMovement().getNumber().toString());
+                mensaje.setSubject(subject);
                 mensaje.setContent(m);
 
                 Transport t = s.getTransport("smtp");
