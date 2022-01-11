@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="609" pageHeight="467" whenNoDataType="AllSectionsNoDetail" columnWidth="575" leftMargin="17" rightMargin="17" topMargin="14" bottomMargin="13" isSummaryWithPageHeaderAndFooter="true">
 	<property name="ireport.zoom" value="1.948717100000003"/>
-	<property name="ireport.x" value="3"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="105"/>
 	<parameter name="companyNit" class="java.lang.String"/>
 	<parameter name="invoiceNumber" class="java.lang.Long"/>
 	<parameter name="authorizationNumber" class="java.lang.Long"/>
@@ -65,43 +65,43 @@
 	<background>
 		<band height="424" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="122" width="42" height="214"/>
+				<reportElement x="0" y="122" width="42" height="194"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="147" y="122" width="230" height="214"/>
+				<reportElement x="147" y="122" width="230" height="194"/>
 				<graphicElement>
 					<pen lineWidth="0.75" lineColor="#000000"/>
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="495" y="122" width="80" height="214"/>
+				<reportElement x="495" y="122" width="80" height="194"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="377" y="122" width="55" height="214"/>
+				<reportElement x="377" y="122" width="55" height="194"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="42" y="122" width="50" height="214"/>
+				<reportElement x="42" y="122" width="50" height="194"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="432" y="122" width="63" height="214"/>
+				<reportElement x="432" y="122" width="63" height="194"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="92" y="122" width="55" height="214"/>
+				<reportElement x="92" y="122" width="55" height="194"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
@@ -457,31 +457,31 @@
 		<band/>
 	</columnFooter>
 	<pageFooter>
-		<band height="104" splitType="Stretch">
+		<band height="124" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement x="18" y="68" width="467" height="18"/>
+				<reportElement x="18" y="88" width="467" height="18"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{leyenda}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="26" y="34" width="473" height="11"/>
+				<reportElement x="26" y="54" width="469" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{literalTotal}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="1" y="34" width="25" height="11"/>
+				<reportElement x="1" y="54" width="25" height="11"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[SON:]]></text>
 			</staticText>
 			<image scaleImage="RetainShape" onErrorType="Icon" evaluationTime="Report">
-				<reportElement key="COMPANY_LOGO_ELEMENT" x="503" y="34" width="70" height="70" isRemoveLineWhenBlank="true"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+				<reportElement key="COMPANY_LOGO_ELEMENT" x="500" y="44" width="80" height="80" isRemoveLineWhenBlank="true"/>
+				<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
 					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -492,7 +492,7 @@
     new com.google.zxing.qrcode.QRCodeWriter().encode($P{llaveQR}, com.google.zxing.BarcodeFormat.QR_CODE, 300, 300))]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="377" y="0" width="118" height="11"/>
+				<reportElement x="358" y="0" width="137" height="11"/>
 				<box rightPadding="3">
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -506,7 +506,7 @@
 				<text><![CDATA[Subtotal Bs:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="377" y="11" width="118" height="11"/>
+				<reportElement x="358" y="11" width="137" height="11"/>
 				<box rightPadding="3">
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -520,7 +520,7 @@
 				<text><![CDATA[Descuento Adicional Bs:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="377" y="22" width="118" height="11"/>
+				<reportElement x="358" y="22" width="137" height="11"/>
 				<box rightPadding="3">
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -576,19 +576,47 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{subtotal}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1" y="57" width="502" height="11"/>
+				<reportElement x="1" y="77" width="494" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{legend1}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="1" y="86" width="502" height="18"/>
+				<reportElement x="1" y="106" width="494" height="18"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{legend3}]]></textFieldExpression>
 			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="495" y="33" width="80" height="11"/>
+				<box rightPadding="5">
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="358" y="33" width="137" height="11"/>
+				<box rightPadding="3">
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[IMPORTE BASE CRÉDITO FISCAL:]]></text>
+			</staticText>
 		</band>
 	</pageFooter>
 </jasperReport>

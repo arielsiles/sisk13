@@ -427,14 +427,13 @@ public class SalesAction extends GenericAction {
 
         Movement movement = createInvoice(customerOrder);
         customerOrder.setMovement(movement);
-        //Voucher voucher = accountingCashSale(customerOrder, movement);
-        //Voucher voucher = accountingCreditSale(customerOrder, movement);
-        //customerOrder.setVoucher(voucher);
-        //customerOrder.setAccounted(Boolean.TRUE);
-        //customerOrder.setState(SaleStatus.CONTABILIZADO);
         saleService.updateCustomerOrder(customerOrder);
-
         inventoryService.updateInventoryForSales(customerOrder);
+
+        generateInvoiceOnline(customerOrder);
+
+        if ( customerOrder.getTotalAmount() > 0)
+            generateFileXML(customerOrder);
 
         clearAll();
         assignCustomerOrderTypeDefault();
@@ -450,7 +449,6 @@ public class SalesAction extends GenericAction {
             return;
         }
 
-
         CustomerOrder customerOrder = createSale();
         System.out.println("======> customerOrder???? " + customerOrder);
         if (customerOrder!= null) {
@@ -463,21 +461,8 @@ public class SalesAction extends GenericAction {
 
             inventoryService.updateInventoryForSales(customerOrder);
 
-            try {
-                System.out.println("--->>> !hasInvoice ???" +  !billControllerAction.hasInvoice(customerOrder));
-                if (!billControllerAction.hasInvoice(customerOrder)){
+            generateInvoiceOnline(customerOrder);
 
-                    /** todo Verifica que no se pueda emitir la factura con monto CERO o menor **/
-                    if ( customerOrder.getTotalAmount() > 0)
-                        billControllerAction.createBill(customerOrder);
-
-                }
-            } catch (IOException e) {
-                //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion...");
-            }
-
-            /** todo **/
             if ( customerOrder.getTotalAmount() > 0)
                 generateFileXML(customerOrder);
 
@@ -486,41 +471,50 @@ public class SalesAction extends GenericAction {
         }
     }
 
-    public void generateFileXML(CustomerOrder customerOrder) throws IOException {
+    public void generateInvoiceOnline(CustomerOrder customerOrder){
+        try {
+            System.out.println("--->>> !hasInvoice ???" +  !billControllerAction.hasInvoice(customerOrder));
+            if (!billControllerAction.hasInvoice(customerOrder)){
+                /** todo Verifica que no se pueda emitir la factura con monto CERO o menor **/
+                if ( customerOrder.getTotalAmount() > 0)
+                    billControllerAction.createBill(customerOrder);
+            }
+        } catch (IOException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion...");
+        }
+    }
+
+    public void generateFileXML(CustomerOrder customerOrder) {
 
         if (customerOrder.getMovement() != null) {
-            String fileName = Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".xml";
-            String pathFileName = Constants.PATH_FILE_INVOICE + fileName;
-
-            /** decode the encoded data **/
-            String input = customerOrder.getMovement().getFactura();
-            Base64.Decoder decoder = Base64.getDecoder();
-            String decoded = new String(decoder.decode(input), "UTF-8");
-
-            /** todo Verificar con Javier **/
-            String newDecoded = decoded.replace("Ley N?", "Ley N°");
-
-            //System.out.println("Decoded Data: " + decoded);
-
-            FileWriter archivo = null;
-            PrintWriter escritor = null;
-
-            Writer out = null;
             try {
+                String fileName = Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".xml";
+                String pathFileName = Constants.PATH_FILE_INVOICE + fileName;
 
-                out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathFileName), "UTF-8"));
+                /** decode the encoded data **/
+                String input = customerOrder.getMovement().getFactura();
+                Base64.Decoder decoder = Base64.getDecoder();
+                String decoded = new String(decoder.decode(input), "UTF-8");
+
+                /** todo Verificar con Javier **/
+                String newDecoded = decoded.replace("Ley N?", "Ley N°");
+
+                //System.out.println("Decoded Data: " + decoded);
+
+                FileWriter archivo = null;
+                PrintWriter escritor = null;
+
+                //Writer out = null;
+
+                Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathFileName), "UTF-8"));
                 out.write(newDecoded);
-
-                /*archivo = new FileWriter(pathFileName);
-                escritor = new PrintWriter(archivo);
-                escritor.print(decoded);*/
+                out.close();
 
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
-            } finally {
-                //archivo.close();
+            } /*finally {
                 out.close();
-            }
+            }*/
         }
     }
 
@@ -1293,82 +1287,52 @@ public class SalesAction extends GenericAction {
         return result;
     }
 
-    public void validateNit(){
-        String result = "";
-        try {
-            result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
-
-            setNitValidationMessage(result);
-            this.nitCiHasBeenValidated = Boolean.TRUE;
-
-            if (result.equals("NIT INEXISTENTE")) {
-
-                DocumentType docType = getClient().getInvoiceDocumentType();
-                if (docType.getSinCode() == 1 || docType.getSinCode() == 2 || docType.getSinCode() == 3 || docType.getSinCode() == 4) {
-                    validNitCi = Boolean.TRUE;
-                }
-                if (docType.getSinCode() == 5){ //Si es NIT
-                    if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")){
-                        validNitCi = Boolean.TRUE;
-                    }else
-                        validNitCi = Boolean.FALSE;
-                }
-            }
-            if (result.equals("NIT ACTIVO")) {
-                validNitCi = Boolean.TRUE;
-            }
-            if (result.equals("NIT INACTIVO")) {
-                validNitCi = Boolean.TRUE;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            setNitValidationMessage("¡No se pudo validar!");
-        }
-    }
-
     public void validateNitCi(){
         String result = "";
-        try {
-            DocumentType docType = getClient().getInvoiceDocumentType();
 
-            boolean isOnlineMode =  billControllerAction.checkBillingMode();
+        boolean connectionTest = billControllerAction.connectionTest();
+        if (connectionTest){
+            try {
+                DocumentType docType = getClient().getInvoiceDocumentType();
+                boolean isOnlineMode =  billControllerAction.checkBillingMode();
 
-            if (docType.getSinCode() == 5 && isOnlineMode) {
-                result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
-                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
-                setNitValidationMessage(result);
-                this.nitCiHasBeenValidated = Boolean.TRUE;
+                if (docType.getSinCode() == 5 && isOnlineMode) {
+                    result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
+                    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
+                    setNitValidationMessage(result);
+                    this.nitCiHasBeenValidated = Boolean.TRUE;
 
-                if (result.equals("NIT INEXISTENTE")) {
-
-                    if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")) {
+                    if (result.equals("NIT INEXISTENTE")) {
+                        if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")) {
+                            validNitCi = Boolean.TRUE;
+                        } else
+                            validNitCi = Boolean.TRUE; /** FALSE Para controlar que no continue la venta en caso de un NIT inexistente **/
+                    }
+                    if (result.equals("NIT ACTIVO") || result.equals("NIT INACTIVO")) {
                         validNitCi = Boolean.TRUE;
-                    } else
-                        validNitCi = Boolean.TRUE; /** FALSE Para controlar que no continue la venta en caso de un NIT inexistente **/
+                    }
+                }else {
+                    result = "CI/CEX/PAS/OD";
+                    if (!isOnlineMode)
+                        result = "Fuera de línea";
 
-                }
-                if (result.equals("NIT ACTIVO")) {
+                    setNitValidationMessage(result);
                     validNitCi = Boolean.TRUE;
+                    nitCiHasBeenValidated = Boolean.TRUE;
                 }
-                if (result.equals("NIT INACTIVO")) {
-                    validNitCi = Boolean.TRUE;
-                }
-            }else {
-                result = "CI/CEX/PAS/OD";
-
-                if (!isOnlineMode)
-                    result = "Fuera de línea";
-
-                setNitValidationMessage(result);
+            } catch (Exception e) {
+                e.printStackTrace();
+                setNitValidationMessage("¡No se pudo validar!");
+            }
+        }else {
+            setNitValidationMessage("¡Sin conexion!");
+            boolean isOnlineMode =  billControllerAction.checkBillingMode();
+            if (!isOnlineMode){
+                setNitValidationMessage("Modo Fuera de línea");
                 validNitCi = Boolean.TRUE;
                 nitCiHasBeenValidated = Boolean.TRUE;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            setNitValidationMessage("¡No se pudo validar!");
         }
     }
 

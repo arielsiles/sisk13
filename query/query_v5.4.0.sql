@@ -69,7 +69,7 @@ UPDATE configuracion c SET c.`url_set_online_mode` = "http://10.0.0.106:8080/api
 UPDATE configuracion c SET c.`url_set_offline_mode` = "http://10.0.0.106:8080/api/billing/set-offline-mode";
 UPDATE configuracion c SET c.url_significant_event = "http://10.0.0.106:8080/api/sync/significant-events";
 UPDATE configuracion c SET c.`url_online_offline_mode` = 'http://10.0.0.106:8080/api/billing/query-online-offline-mode';
-UPDATE configuracion c SET c.url_ping = 'http://10.0.0.106:8080/api/sync/ping';
+UPDATE configuracion c SET c.url_ping = 'http://10.0.0.106:8080/api/billing/ping';
 UPDATE configuracion c SET c.`url_createbill` = 'http://10.0.0.106:8080/api/billing/bills';
 UPDATE configuracion c SET c.`url_cancelbill` = 'http://10.0.0.106:8080/api/billing/cancel-bill';
 UPDATE configuracion c SET c.`url_qr` = 'https://pilotosiat.impuestos.gob.bo/facturacionv2/public/Qr.xhtml?nit=valorNit&cuf=valorCuf&numero=valorNroFactura&t=2';

@@ -60,7 +60,64 @@ public class BillControllerAction {
     @In
     private FacesMessages facesMessages;
 
-    public Boolean connectionTest() throws IOException {
+
+    public Boolean connectionTest() {
+
+        Boolean result = Boolean.FALSE;
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+
+        HttpURLConnection connection = null;
+        BufferedReader reader;
+        String line;
+        StringBuffer responseContent = new StringBuffer();
+
+        try {
+            URL url = new URL(companyConfiguration.getConnectionTestURL());
+            connection = (HttpURLConnection) url.openConnection();
+            // Request Setup
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(8000);
+            connection.setReadTimeout(8000);
+
+            int status = connection.getResponseCode();
+            if (status > 299){
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                while ((line = reader.readLine()) != null){
+                    responseContent.append(line);
+                }
+                reader.close();
+                result = Boolean.FALSE;
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null){
+                    responseContent.append(line);
+                }
+                reader.close();
+                result = Boolean.TRUE;
+            }
+        } catch (SocketTimeoutException e) {
+            System.out.println(".............. EXCEPTION: SocketTimeoutException");
+            e.printStackTrace();
+            return  Boolean.FALSE;
+        } catch (ConnectException e) {
+            System.out.println(".............. EXCEPTION: ConnectException");
+            e.printStackTrace();
+            return  Boolean.FALSE;
+        } catch (MalformedURLException e) {
+            System.out.println(".............. EXCEPTION: MalformedURLException");
+            e.printStackTrace();
+            return  Boolean.FALSE;
+        } catch (IOException e) {
+            System.out.println(".............. EXCEPTION: IOException");
+            e.printStackTrace();
+            return  Boolean.FALSE;
+        } finally {
+            connection.disconnect();
+        }
+        return result;
+    }
+
+    public Boolean connectionTest0() throws IOException {
 
         /** TODO Probar **/
         if (!checkBillingMode()) {
@@ -254,50 +311,50 @@ public class BillControllerAction {
         String jsonPedido = pedidoToJson(pedidoPOJO);
         System.out.println(jsonPedido);
 
-        if (connectionTest()) {
-            System.out.println(">>>>> CONEXION EXITOSA!!!");
-            ServerResponse serverResponse = doPostHttpConnection(url_createbill, jsonPedido);
-            System.out.println("---------- SERVER RESPONSE ----------");
-            System.out.println("--> Connection: " + serverResponse.getConnection());
-            System.out.println("--> Response Code: " + serverResponse.getResponseCode());
-            System.out.println("--> Response Json: " + serverResponse.getResponseJson());
+        //if (connectionTest()) {
+        //System.out.println(">>>>> CONEXION EXITOSA!!!");
+        ServerResponse serverResponse = doPostHttpConnection(url_createbill, jsonPedido);
+        System.out.println("---------- SERVER RESPONSE ----------");
+        System.out.println("--> Connection: " + serverResponse.getConnection());
+        System.out.println("--> Response Code: " + serverResponse.getResponseCode());
+        System.out.println("--> Response Json: " + serverResponse.getResponseJson());
 
-            if (serverResponse.getResponseCode() == -1){
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Facturacion SIN CONEXION, -1");
-                return;
-            }
+        if (serverResponse.getResponseCode() == -1){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Facturacion SIN CONEXION, -1");
+            return;
+        }
 
-            JsonNode jsonNode = Json.parse(serverResponse.getResponseJson()); /** **/
-            String result = Json.prettyPrint(jsonNode);
-            System.out.println(result);
+        JsonNode jsonNode = Json.parse(serverResponse.getResponseJson()); /** **/
+        String result = Json.prettyPrint(jsonNode);
+        System.out.println(result);
 
-            /** NULL cuando la facturacion es offline **/
-            printResponseObject(serverResponse.getResponseJson());
+        /** NULL cuando la facturacion es offline **/
+        printResponseObject(serverResponse.getResponseJson());
 
-            BillResponsePOJO billResponsePOJO = Json.fromJson(jsonNode, BillResponsePOJO.class);
+        BillResponsePOJO billResponsePOJO = Json.fromJson(jsonNode, BillResponsePOJO.class);
 
-            System.out.println("====>>>> LEYENDA Response: " + billResponsePOJO.getLeyenda());
+        System.out.println("====>>>> LEYENDA Response: " + billResponsePOJO.getLeyenda());
 
-            Movement movement = customerOrder.getMovement();
-            movement.setCuf(billResponsePOJO.getCuf());
-            movement.setFechaSin(billResponsePOJO.getFecha().toString());
-            movement.setLeyenda(billResponsePOJO.getLeyenda());
+        Movement movement = customerOrder.getMovement();
+        movement.setCuf(billResponsePOJO.getCuf());
+        movement.setFechaSin(billResponsePOJO.getFecha().toString());
+        movement.setLeyenda(billResponsePOJO.getLeyenda());
 
-            if (billResponsePOJO.getRespuestaRecepcion() != null) {
-                movement.setDescri(billResponsePOJO.getRespuestaRecepcion().getCodigoDescripcion());
-                movement.setCodigoEstado(billResponsePOJO.getRespuestaRecepcion().getCodigoEstado().toString());
-                movement.setCodigoRecepcion(billResponsePOJO.getRespuestaRecepcion().getCodigoRecepcion());
-            }
+        if (billResponsePOJO.getRespuestaRecepcion() != null) {
+            movement.setDescri(billResponsePOJO.getRespuestaRecepcion().getCodigoDescripcion());
+            movement.setCodigoEstado(billResponsePOJO.getRespuestaRecepcion().getCodigoEstado().toString());
+            movement.setCodigoRecepcion(billResponsePOJO.getRespuestaRecepcion().getCodigoRecepcion());
+        }
 
-            movement.setFactura(billResponsePOJO.getFactura());
-            movement.setEmissionType(billResponsePOJO.getTipo());
+        movement.setFactura(billResponsePOJO.getFactura());
+        movement.setEmissionType(billResponsePOJO.getTipo());
 
-            movementService.updateMovement(movement);
+        movementService.updateMovement(movement);
 
-        } else {
+        /*} else {
             System.out.println(">>>>> SIN CONEXION!!!");
             facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Facturacion SIN CONEXION...");
-        }
+        }*/
 
 
     }
