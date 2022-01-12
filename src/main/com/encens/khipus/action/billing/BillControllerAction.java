@@ -62,6 +62,13 @@ public class BillControllerAction {
 
 
     public Boolean connectionTest() {
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        ServerResponse serverResponse = doGetHttpConnection(companyConfiguration.getConnectionTestURL());
+
+        return serverResponse.getConnection();
+    }
+
+    public Boolean connectionTestOk() {
 
         Boolean result = Boolean.FALSE;
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
@@ -76,8 +83,8 @@ public class BillControllerAction {
             connection = (HttpURLConnection) url.openConnection();
             // Request Setup
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(8000);
-            connection.setReadTimeout(8000);
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
 
             int status = connection.getResponseCode();
             if (status > 299){
@@ -208,8 +215,8 @@ public class BillControllerAction {
 
             // Request Setup
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(8000);
-            connection.setReadTimeout(8000);
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
 
             int status = connection.getResponseCode();
 
