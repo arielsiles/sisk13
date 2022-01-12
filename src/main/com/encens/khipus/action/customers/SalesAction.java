@@ -466,6 +466,8 @@ public class SalesAction extends GenericAction {
             if ( customerOrder.getTotalAmount() > 0)
                 generateFileXML(customerOrder);
 
+
+            printBillReportAction.generateReport();
             clearAll();
             assignCustomerOrderTypeDefault();
         }

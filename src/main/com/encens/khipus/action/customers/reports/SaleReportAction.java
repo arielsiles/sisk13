@@ -156,12 +156,19 @@ public class SaleReportAction extends GenericReportAction {
     public void generateNotesReport(List<CustomerOrder> customerOrderList){
         setReportFormat(ReportFormat.PDF);
         List<TypedReportData> reportDataList = new ArrayList<TypedReportData>();
-        for (CustomerOrder order : customerOrderList){
 
+        /** Ordenar **/
+        Collections.sort(customerOrderList, new Comparator<CustomerOrder>() {
+            @Override
+            public int compare(CustomerOrder o1, CustomerOrder o2) {
+                return o1.getCode().compareTo(o2.getCode());
+            }
+        });
+
+        for (CustomerOrder order : customerOrderList){
             Map params = new HashMap();
             params.putAll(getReportParams(order));
             reportDataList.add(addDetailReport(params, order));
-
         }
 
         TypedReportData result = reportDataList.get(0);

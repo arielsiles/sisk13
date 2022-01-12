@@ -109,21 +109,11 @@ public class PrintBillReportAction extends GenericReportAction {
         try {
             GenerationReportData generationReportData = new GenerationReportData(reportData);
             generationReportData.exportReport();
-
-            //generateFileReport();
             generatePdfFileReport(lastCustomerOrder, generationReportData);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        /*try {
-            sendMessageAction.sendEmailAttachment(lastCustomerOrder);
-
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }*/
-
     }
 
     public void generatePdfFileReport(CustomerOrder customerOrder, GenerationReportData generationReportData) {
@@ -148,39 +138,6 @@ public class PrintBillReportAction extends GenericReportAction {
 
     }
 
-
-    public void generateFileReport() {
-
-        User user = getUser(currentUser.getId());
-        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
-        this.customerOrderId = saleService.findLastSaleId(user);
-        this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
-        setReportFormat(ReportFormat.PDF);
-
-
-        if (!hasValidInvoice(lastCustomerOrder)){
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
-            return;
-        }
-
-        Map params = new HashMap();
-        params.putAll(getReportParams(dosage, lastCustomerOrder));
-        TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
-
-        try {
-            GenerationReportData generationReportData = new GenerationReportData(reportData);
-            generationReportData.exportReport();
-
-            JasperPrint jasperPrint = generationReportData.getExportReport().getJasperPrint();
-            JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/TEMP/FACTURA.pdf");
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private boolean hasValidInvoice(CustomerOrder customerOrder){
         boolean result = false;
         if (customerOrder.getMovement() != null) {
@@ -200,6 +157,14 @@ public class PrintBillReportAction extends GenericReportAction {
 
         System.out.println("---------> Pedido List 0: " + customerOrderList.get(0));
         System.out.println("---------> Pedido List 0: " + customerOrderList.get(0).getTotalAmount());
+
+        /** Ordenar **/
+        Collections.sort(customerOrderList, new Comparator<CustomerOrder>() {
+            @Override
+            public int compare(CustomerOrder o1, CustomerOrder o2) {
+                return o1.getMovement().getNumber().compareTo(o2.getMovement().getNumber());
+            }
+        });
 
         List<TypedReportData> reportDataList = new ArrayList<TypedReportData>();
         for (CustomerOrder order : customerOrderList){
@@ -275,14 +240,6 @@ public class PrintBillReportAction extends GenericReportAction {
 
         paramMap.put("legend1", legend1);
         paramMap.put("legend3", legend3);
-
-        /*
-        System.out.println("................subtotal: " + lastCustomerOrder.getTotalAmount());
-        System.out.println("................CommissionValue: " + lastCustomerOrder.getCommissionValue());
-        System.out.println("................totalAmount: " + (lastCustomerOrder.getTotalAmount() - lastCustomerOrder.getCommissionValue()));
-        System.out.println("................TOTALAMOUNT: " + totalAmount);
-        System.out.println("................Literal: " + moneyUtil.Convertir(totalAmount.toString(), true, messages.get("Reports.cashAvailable.bs")));
-        */
 
         paramMap.put("activity", dosage.getBranchOffice().getActivity());
         paramMap.put("companyName", dosage.getBranchOffice().getCompanyName());
