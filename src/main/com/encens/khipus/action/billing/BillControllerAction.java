@@ -473,7 +473,7 @@ public class BillControllerAction {
 
         } catch (Exception e){
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 

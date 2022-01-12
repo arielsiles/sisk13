@@ -1325,14 +1325,23 @@ public class SalesAction extends GenericAction {
                 setNitValidationMessage("¡No se pudo validar!");
             }
         }else {
-            setNitValidationMessage("¡Sin conexion!");
-            boolean isOnlineMode =  billControllerAction.checkBillingMode();
-            if (!isOnlineMode){
-                setNitValidationMessage("Modo Fuera de línea");
-                validNitCi = Boolean.TRUE;
-                nitCiHasBeenValidated = Boolean.TRUE;
-            }
 
+            Boolean isOnlineMode =  billControllerAction.checkBillingMode();
+            if (isOnlineMode != null){ // ebilling conexion ok
+                if (!isOnlineMode){
+                    setNitValidationMessage("Modo Fuera de Línea, continuar.");
+                    validNitCi = Boolean.TRUE;
+                    nitCiHasBeenValidated = Boolean.TRUE;
+                } else {
+                    setNitValidationMessage("Intente otra vez o Cambie a modo Fuera de Línea.");
+                    validNitCi = Boolean.FALSE;
+                    nitCiHasBeenValidated = Boolean.FALSE;
+                }
+            } else { // ebilling sin conexion
+                setNitValidationMessage("Sistema sin conexion, consulte con el administrador.");
+                validNitCi = Boolean.FALSE;
+                nitCiHasBeenValidated = Boolean.FALSE;
+            }
         }
     }
 
