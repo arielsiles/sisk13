@@ -351,7 +351,7 @@
                                        value="Anular"
                                        styleClass="button"
                                        immediate="true"
-                                       rendered="#{salesAction.showActionsBilling(customerOrder)}"
+                                       rendered="#{salesAction.showActionsBilling(customerOrder) and s:hasPermission('CANCEL_ORDER_INVOICE_SFE','VIEW')}"
                                        oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
                                        reRender="confirmCancelOrderModalPanel">
                     </a4j:commandButton>
