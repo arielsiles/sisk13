@@ -40,7 +40,7 @@
                     <a4j:commandButton id="validateNitButton"
                                        action="#{salesAction.validateNitCi()}"
                                        value="Validar NIT"
-                                       rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
+                                       rendered="#{s:hasPermission('VALIDATE_NIT_SFE', 'VIEW')}"
                                        styleClass="button"
                                        immediate="true"
                                        ajaxSingle="true"
@@ -216,10 +216,10 @@
 
             <a4j:commandButton id="enviarButton"
                                action="#{printBillReportAction.sendMailAttachments()}"
-                               value="Enviar"
+                               value="Enviar Mail"
                                styleClass="button"
                                immediate="true"
-                               rendered="#{s:hasPermission('BILLING_MANAGE_SFE','VIEW')}"
+                               rendered="#{s:hasPermission('SEND_MAIL_INVOICE','VIEW')}"
                                ajaxSingle="true">
             </a4j:commandButton>
 
@@ -238,13 +238,13 @@
                       view="/customers/changeBillingMode.xhtml"
                       styleClass="button"
                       propagation="begin"
-                      rendered="#{s:hasPermission('BILLING_MANAGE_SFE','VIEW')}">
+                      rendered="#{s:hasPermission('CHANGE_BILLING_METHOD_SFE','VIEW')}">
             </s:button>
 
             <a4j:commandButton id="connectionTestButton"
                                action="#{salesAction.connectionTest()}"
                                value="Test Conexion"
-                               rendered="#{s:hasPermission('BILLING_MANAGE_SFE','VIEW')}"
+                               rendered="#{s:hasPermission('CONNECTION_TEST_SFE','VIEW')}"
                                styleClass="button"
                                immediate="true"
                                ajaxSingle="true"
@@ -254,7 +254,7 @@
             <h:commandButton id="printBillReportButtonId"
                              action="#{printBillReportAction.generateReport()}"
                              value="Imprimir Factura SFE"
-                             rendered="#{s:hasPermission('CASHSALE_PRINT_INVOICE_SFE', 'VIEW')}"
+                             rendered="#{s:hasPermission('PRINT_INVOICE_SFE', 'VIEW')}"
                              styleClass="button"
                              immediate="true"/>
 
@@ -269,7 +269,7 @@
             <h:commandButton id="generateReportButtonId"
                              action="#{saleReportAction.generateReport()}"
                              value="#{messages['SalesBox.printNote']}"
-                             rendered="#{s:hasPermission('CASHSALES', 'VIEW') or s:hasPermission('CREDITSALES', 'VIEW')}"
+                             rendered="#{s:hasPermission('PRINT_DELIVERY_NOTE', 'VIEW')}"
                              styleClass="button"
                              immediate="true"/>
 

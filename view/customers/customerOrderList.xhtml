@@ -162,16 +162,16 @@
                     <h:commandButton id="generateInvoicesId"
                                        action="#{printBillReportAction.generateInvoicesReport(customerOrderDataModel.selectedCustomerOrdes)}"
                                        styleClass="button"
-                                       rendered="#{s:hasPermission('CREDITSALE_INVOICING_SFE','VIEW')}"
-                                       value="Imprimir Facts" >
+                                       rendered="#{s:hasPermission('PRINT_INVOICE_SFE','VIEW')}"
+                                       value="Imprimir Factura" >
 
                     </h:commandButton>
 
                     <h:commandButton id="generateNotesId"
                                      action="#{saleReportAction.generateNotesReport(customerOrderDataModel.selectedCustomerOrdes)}"
                                      styleClass="button"
-                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING_SFE','VIEW')}"
-                                     value="Imprimir Notas" >
+                                     rendered="#{s:hasPermission('PRINT_DELIVERY_NOTE','VIEW')}"
+                                     value="Imprimir Nota" >
                     </h:commandButton>
 
                 </s:div>
