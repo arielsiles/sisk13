@@ -168,8 +168,8 @@ public class SalesAction extends GenericAction {
     public List<CustomerCategoryType> initFixedProductDeliveryTypes() {
         List<CustomerCategoryType> resulTypes = new ArrayList<CustomerCategoryType>(0);
         resulTypes.add(CustomerCategoryType.FACTORY);
-        //resulTypes.add(CustomerCategoryType.STORE); uncomment
-        //resulTypes.add(CustomerCategoryType.CONSUMER); uncomment
+        resulTypes.add(CustomerCategoryType.STORE);
+        resulTypes.add(CustomerCategoryType.CONSUMER);
         resulTypes.add(CustomerCategoryType.AGENCY_LIST);
 
         return resulTypes;

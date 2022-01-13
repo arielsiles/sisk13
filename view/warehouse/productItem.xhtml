@@ -30,14 +30,6 @@
 <h:form id="productItemForm">
 <div class="buttons">
 
-    <a4j:commandButton id="connectionTestButton"
-                       action="#{syncControllerAction.syncActivities()}"
-                       value="Test Sync"
-                       styleClass="button"
-                       immediate="true"
-                       ajaxSingle="true">
-    </a4j:commandButton>
-
     <h:commandButton id="createButtonId"
                      action="#{productItemAction.create}"
                      value="#{messages['Common.save']}"
