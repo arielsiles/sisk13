@@ -18,3 +18,7 @@ VALUES(440, 'CONNECTION_TEST_SFE', 1, 1, 'Functionality.customers.connectionTest
 
 INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
 VALUES(441, 'CANCEL_ORDER_INVOICE_SFE', 1, 1, 'Functionality.customers.cancelInvoiceOrderSFE', 1);
+
+-- 13.01.2022
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(442, 'PRODUCT_HOMOLOGATION', 1, 1, 'Functionality.customers.homologationSinProducts', 1);
