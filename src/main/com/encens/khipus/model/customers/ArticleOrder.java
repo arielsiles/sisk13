@@ -121,6 +121,9 @@ public class ArticleOrder {
     @Column(name="TIPO")
     private String tipo;
 
+    @Column(name = "descuento",nullable = true )
+    private Double discount;
+
     @Column(name = "importe",nullable = true )
     private Double amount;
 
@@ -265,5 +268,13 @@ public class ArticleOrder {
 
     public void setUnitaryBalance(BigDecimal unitaryBalance) {
         this.unitaryBalance = unitaryBalance;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
     }
 }

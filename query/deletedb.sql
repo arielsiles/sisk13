@@ -54,6 +54,41 @@ DELETE FROM `cuenta`;
 
 DELETE FROM bonoconseguido;
 
+-- 
+-- 26.11.2021 Preparando ambiente pruebas para SFE
+DELETE FROM movimiento WHERE FECHA_FACTURA < '2021-10-01';
+DELETE FROM sf_tmpdet;
+DELETE FROM articulos_pedido WHERE IDVENTADIRECTA IS NOT NULL;
+DELETE FROM ventadirecta;
+
+UPDATE pedidos p SET p.`id_tmpenc` = NULL;
+
+DELETE FROM pago;
+
+DELETE FROM `cxp_lcompras`;
+DELETE FROM `documentocompra`;
+DELETE FROM `documentocontable`;
+UPDATE inv_vales i SET i.`idtmpenc` = NULL;
+
+DELETE FROM sf_tmpenc;
+
+DELETE FROM ventaarticulo;
+DELETE FROM ventacliente;
+
+
+DELETE FROM pr_insumo;
+DELETE FROM pr_producto;
+DELETE FROM pr_produccion;
+DELETE FROM pr_plan;
+DELETE FROM pr_material;
+
+
+DELETE FROM inv_articulos
+WHERE cod_alm NOT IN (2);
+
+
+
+
 
 
 

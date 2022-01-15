@@ -1,0 +1,28 @@
+{
+  "numeroFactura": 14,
+  "nombreRazonSocial": "RAMIREZ",
+  "codigoTipoDocumentoIdentidad": 1,
+  "numeroDocumento": "5153244",
+  "codigoCliente": "10101010",
+  "codigoMetodoPago": 1,
+  "usuario": "milena",
+  "codigoDocumentoSector": 1,
+  "codigoMoneda": 1,
+  "tipoCambio": 1,
+  "montoTotal": 900,
+  "montoTotalSujetoIva": 900,
+  "montoTotalMoneda": 900,
+  "detalle": [
+    {
+      "actividadEconomica": "105000",
+      "codigoProductoSin": 22221,
+      "codigoProducto": "JN-22221",
+      "unidadMedida": 26,
+      "descripcion": "LECHE EVAPORADA",
+      "cantidad": 100,
+      "precioUnitario": 10,
+      "montoDescuento": 100,
+      "subTotal": 900
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{branchOfficeAction.managed}">
+            #{messages['BranchOffice.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['BranchOffice.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+<ui:param name="bodyWidth" value="70%"/>
+
+<ui:param name="selectedTab" value="admin"/>
+<ui:define name="body">
+
+<h:form id="branchOfficeForm">
+
+<div class="buttons">
+    <h:commandButton id="createButtonId"
+                     action="#{branchOfficeAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!businessUnitAction.managed and s:hasPermission('BRANCHOFFICE','CREATE')}">
+        <s:defaultAction/>
+    </h:commandButton>
+
+    <a4j:commandButton id="updateButtonId"
+                       action="#{branchOfficeAction.update}"
+                       value="#{messages['Common.save']}"
+                       styleClass="button"
+                       rendered="#{branchOfficeAction.managed and s:hasPermission('BRANCHOFFICE','UPDATE')}"
+                       reRender="branchOfficeForm">
+        <s:defaultAction/>
+    </a4j:commandButton>
+
+    <h:commandButton action="#{branchOfficeAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     immediate="true">
+    </h:commandButton>
+</div>
+
+<rich:panel id="formPanel">
+<f:facet name="header">
+    <c:choose>
+        <c:when test="#{branchOfficeAction.managed}">
+            #{messages['BranchOffice.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['BranchOffice.new']}
+        </c:otherwise>
+    </c:choose>
+</f:facet>
+
+<h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+<s:div>
+    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.name']}</ui:define>
+        <h:inputText id="name" value="#{branchOffice.name}"
+                     required="true"
+                     tabindex="1"
+                     styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="officeCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.officeCode']}</ui:define>
+        <h:inputText id="officeCode" value="#{branchOffice.officeCode}"
+                     required="true"
+                     tabindex="2"
+                     styleClass="inputTiny"/>
+    </s:decorate>
+
+    <s:decorate id="posCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.posCode']}</ui:define>
+        <h:inputText id="posCode" value="#{branchOffice.posCode}"
+                     required="true"
+                     tabindex="3"
+                     styleClass="inputTiny"/>
+    </s:decorate>
+
+    <s:decorate id="posNameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.posName']}</ui:define>
+        <h:inputText id="posName" value="#{branchOffice.posName}"
+                     required="true"
+                     tabindex="4"
+                     styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="sectorDocumentCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.sectorDocumentCode']}</ui:define>
+        <h:inputText id="sectorDocumentCode" value="#{branchOffice.sectorDocumentCode}"
+                     required="true"
+                     tabindex="5"
+                     styleClass="inputTiny"/>
+    </s:decorate>
+
+    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.description']}</ui:define>
+        <h:inputText id="description" value="#{branchOffice.description}"
+                     required="true"
+                     tabindex="6"
+                     styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="activityField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.economicActivity']}</ui:define>
+        <h:inputText id="activity" value="#{branchOffice.activity}"
+                     required="true"
+                     tabindex="7"
+                     styleClass="inputLarge400"/>
+    </s:decorate>
+
+    <s:decorate id="companyNameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.companyName']}</ui:define>
+        <h:inputText id="companyName" value="#{branchOffice.companyName}"
+                     required="true"
+                     tabindex="8"
+                     styleClass="inputLarge400"/>
+    </s:decorate>
+
+    <s:decorate id="branchNameField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.branchName']}</ui:define>
+        <h:inputText id="branchName" value="#{branchOffice.branchName}"
+                     required="true"
+                     tabindex="9"
+                     styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="placeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.place']}</ui:define>
+        <h:inputText id="place" value="#{branchOffice.place}"
+                     required="true"
+                     tabindex="10"
+                     styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.phone']}</ui:define>
+        <h:inputText id="phone" value="#{branchOffice.phone}"
+                     required="true"
+                     tabindex="11"
+                     styleClass="input"/>
+    </s:decorate>
+
+    <s:decorate id="addressField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.address']}</ui:define>
+        <h:inputText id="address" value="#{branchOffice.address}"
+                     required="true"
+                     tabindex="12"
+                     styleClass="inputLarge400"/>
+    </s:decorate>
+
+</s:div>
+
+</h:panelGrid>
+</rich:panel>
+
+<div class="buttons">
+    <h:commandButton action="#{branchOfficeAction.create}"
+                     value="#{messages['Common.save']}"
+                     styleClass="button"
+                     rendered="#{!businessUnitAction.managed and s:hasPermission('BRANCHOFFICE','CREATE')}"
+                     tabindex="18"/>
+
+    <a4j:commandButton action="#{branchOfficeAction.update}"
+                       value="#{messages['Common.save']}"
+                       styleClass="button"
+                       rendered="#{businessUnitAction.managed and s:hasPermission('BRANCHOFFICE','UPDATE')}"
+                       reRender="branchOfficeForm"
+                       tabindex="19">
+        <s:defaultAction/>
+    </a4j:commandButton>
+
+
+    <h:commandButton action="#{branchOfficeAction.cancel}"
+                     value="#{messages['Common.cancel']}"
+                     styleClass="button"
+                     tabindex="21"
+                     immediate="true"/>
+</div>
+</h:form>
+
+<rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+
+</ui:define>
+</ui:composition>
+

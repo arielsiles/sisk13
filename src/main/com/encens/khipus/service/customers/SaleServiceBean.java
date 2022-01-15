@@ -97,6 +97,28 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
     }
 
     @Override
+    public void updateArticleForInputs(ArticleOrder articleOrder) {
+
+        ProductItem productItem = getEntityManager().find(ProductItem.class, articleOrder.getProductItem().getId());
+
+        /** todo Controlar negativos, si cuando se requiera **/
+
+        /** Actualiza CT **/
+        BigDecimal total = BigDecimalUtil.multiply(productItem.getCu(), BigDecimalUtil.toBigDecimal(articleOrder.getTotal()), 6);
+        BigDecimal newTotalCost = BigDecimalUtil.sum(productItem.getCt(), total, 6);
+        productItem.setCt(newTotalCost);
+
+        /** Actualiza Saldo_Mon **/
+        BigDecimal totalCost = BigDecimalUtil.multiply(productItem.getUnitCost(), BigDecimalUtil.toBigDecimal(articleOrder.getTotal()));
+        BigDecimal newInvestmentAmount = BigDecimalUtil.sum(productItem.getInvestmentAmount(), totalCost, 6);
+        productItem.setInvestmentAmount(newInvestmentAmount);
+
+        em.merge(productItem);
+        em.flush();
+
+    }
+
+    @Override
     public CustomerOrder findCustomerOrderByParams(SaleTypeEnum saleType, Date date, String code) {
 
         CustomerOrder customerOrder = (CustomerOrder)em.createQuery("select c from CustomerOrder c" +

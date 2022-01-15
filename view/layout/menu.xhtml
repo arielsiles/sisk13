@@ -36,6 +36,7 @@
             s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
     <h:panelGrid columns="11" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-end-separator">
 
+        <!-- Uncomment
         <rich:dropDownMenu value="#{messages['menu.customers.order']}"
                            rendered="#{
         s:hasPermission('ORDER','VIEW')}">
@@ -57,7 +58,7 @@
                         propagation="none"/>
             </rich:menuItem>
 
-        </rich:dropDownMenu>
+        </rich:dropDownMenu>-->
 
         <rich:dropDownMenu value="#{messages['menu.customers.sales']}"
                            rendered="#{s:hasPermission('CASHBOX','VIEW') or s:hasPermission('CASHBOXTRANSACTION','VIEW')}">
@@ -83,7 +84,13 @@
                 action="#{salesAction.openSale()}"
                 rendered="#{s:hasPermission('SALES', 'VIEW')}"
                 styleClass="tab-cell"
-                propagation="none"/>
+                propagation="begin"/>
+
+        <s:link view="/customers/customerOrderList.xhtml"
+                value="#{messages['menu.customers.configuration.customerOrderList']}"
+                rendered="#{s:hasPermission('SALES', 'VIEW')}"
+                styleClass="tab-cell"
+                propagation="begin"/>
 
         <s:link view="/customers/clientList.xhtml"
                 value="#{messages['menu.customers.client']}"
@@ -92,11 +99,18 @@
                 propagation="none"/>
 
 
+        <s:link view="/warehouse/productItemList.xhtml"
+                value="#{messages['menu.warehouse.configuration.productItem']}"
+                rendered="#{s:hasPermission('PRODUCTITEM','VIEW')}"
+                styleClass="tab-cell"
+                propagation="none"/>
+
+        <!--
         <s:link view="/customers/customerOrderList.xhtml"
                 value="#{messages['menu.customers.configuration.customerOrderList']}"
                 rendered="#{s:hasPermission('SALES', 'VIEW')}"
                 styleClass="tab-cell"
-                propagation="none"/>
+                propagation="none"/>-->
 
         <s:link view="/customers/partnerList.xhtml"
                 value="#{messages['menu.customers.partner']}"
@@ -116,7 +130,7 @@
                 styleClass="tab-cell"
                 propagation="none"/>
 
-        <rich:dropDownMenu value="#{messages['menu.customers.report']}">
+        <rich:dropDownMenu value="#{messages['menu.customers.report']}" rendered="#{s:hasPermission('CREDIT','CREATE')}">
             <rich:menuItem submitMode="none" styleClass="main-menu-item">
                 <s:link view="/customers/creditStatusReport.xhtml"
                         value="#{messages['menu.customers.report.creditStatus']}"
@@ -2416,6 +2430,20 @@
                         view="/admin/companySetting.xhtml"
                         value="#{messages['Functionality.admin.companySetting']}">
                 </s:link>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('BRANCHOFFICE','VIEW')}">
+                <s:link view="/admin/branchOfficeList.xhtml"
+                        value="#{messages['menu.admin.configuration.branchOffice']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('BRANCHOFFICE','VIEW')}">
+                <s:link view="/admin/dosageList.xhtml"
+                        value="#{messages['menu.admin.configuration.dosage']}"
+                        propagation="none"/>
             </rich:menuItem>
         </rich:dropDownMenu>
     </h:panelGrid>

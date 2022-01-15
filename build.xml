@@ -3,5 +3,7 @@
 <project name="KHIPUS" default="explode" basedir=".">
     <!-- Give user a chance to override without editing this file or typing -D -->
     <property name="profile" value="dev"/>
+    <!---->
+    <!--<presetdef name="javac"><javac includeantruntime="false" /></presetdef>-->
     <import file="build-common.xml"/>
 </project>

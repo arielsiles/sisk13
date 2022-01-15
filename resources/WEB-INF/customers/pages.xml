@@ -16,6 +16,15 @@
         </navigation>
     </page>
 
+    <page view-id="/employees/customerOrderList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{customerOrderAction.cancelOrder(customerOrderItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/cancelOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/customers/documentType.xhtml" no-conversation-view-id="/customers/documentTypeList.xhtml">
         <navigation from-action="#{extensionAction.addExtension}">
             <rule if-outcome="Success">
@@ -514,12 +523,47 @@
             </rule>
         </navigation>
         <navigation>
+            <begin-conversation join="true" flush-mode="AUTO"/>
             <rule if-outcome="Cancel">
                 <redirect view-id="/customers/customerOrderList.xhtml"/>
             </rule>
         </navigation>
     </page>
 
-
+    <page view-id="/customers/changeBillingMode.xhtml" no-conversation-view-id="/customers/customerOrderList.xhtml">
+        <navigation from-action="#{salesAction.cancelBillingMode()}">
+            <begin-conversation join="true" flush-mode="AUTO"/>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/salesBox.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesAction.changeToOnlineBillingMode()}">
+            <begin-conversation join="true" flush-mode="AUTO"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/salesBox.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesAction.changeToOfflineBillingMode()}">
+            <begin-conversation join="true" flush-mode="AUTO"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/salesBox.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesAction.prepareOfflineBillPackages()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/changeBillingMode.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesAction.processOfflineBillPackages()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/changeBillingMode.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesAction.validateOfflineBillPackages()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/changeBillingMode.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
 
 </pages>

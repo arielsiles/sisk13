@@ -21,6 +21,9 @@
     <factory name="creditTypeList" value="#{creditTypeQuery}"/>
     <framework:entity-query name="creditTypeQuery" ejbql="select c from CreditType c"/>
 
+    <factory name="paymentMethodSinList" value="#{PaymentMethodSinQuery}"/>
+    <framework:entity-query name="PaymentMethodSinQuery" ejbql="select p from PaymentMethodSin p"/>
+
     <factory name="discountPolicyTypeList" value="#{discountPolicyTypeQuery}"/>
     <framework:entity-query name="discountPolicyTypeQuery" ejbql="select d from DiscountPolicyType d"
                             order="d.measurement DESC">
@@ -55,8 +58,28 @@
     <factory name="customerOrderTypeList" value="#{customerOrderTypeQuery}"/>
     <framework:entity-query name="customerOrderTypeQuery" ejbql="select c from CustomerOrderType c "/>
 
+    <factory name="territoriotrabajoList" value="#{territoriotrabajoQuery}"/>
+    <framework:entity-query name="territoriotrabajoQuery" ejbql="select c from Territoriotrabajo c "/>
+
     <factory name="clientTypeList" value="#{clientTypeQuery}"/>
     <framework:entity-query name="clientTypeQuery" ejbql="select c from ClientType c" />
+
+    <factory name="cancellationReasonList" value="#{cancellationReasonQuery}"/>
+    <framework:entity-query name="cancellationReasonQuery" ejbql="select c from CancellationReason c" />
+
+    <factory name="economicActivityList" value="#{economicActivityQuery}"/>
+    <framework:entity-query name="economicActivityQuery" ejbql="select c from EconomicActivity c" />
+
+    <factory name="ProductsAndServicesList" value="#{productsAndServices}"/>
+    <framework:entity-query name="productsAndServices" ejbql="select p from ProductsServices p">
+        <framework:restrictions>
+            <value>p.economicActivity = #{productItemAction.economicActivity}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+
+    <factory name="productsServicesList" value="#{productsServicesQuery}"/>
+    <framework:entity-query name="productsServicesQuery" ejbql="select c from ProductsServices c" />
 
     <factory name="customerCategoryList" value="#{customerCategoryQuery}"/>
     <framework:entity-query name="customerCategoryQuery" ejbql="select c from CustomerCategory c" />
@@ -66,5 +89,14 @@
 
     <factory name="customerSaleTypes"
              value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.customers.SaleTypeEnum')}"/>
+
+    <factory name="branchOfficeList" value="#{branchOfficeQuery}"/>
+    <framework:entity-query name="branchOfficeQuery" ejbql="select d from BranchOffice d "/>
+
+    <factory name="measureUnitSINList" value="#{measureUnitSINQuery}"/>
+    <framework:entity-query name="measureUnitSINQuery" ejbql="select d from MeasureUnitSIN d "/>
+
+    <factory name="significantEventSINList" value="#{significantEventSINQuery}"/>
+    <framework:entity-query name="significantEventSINQuery" ejbql="select d from SignificantEventSIN d "/>
 
 </components>

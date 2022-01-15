@@ -1,11 +1,17 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.SessionUser;
+import com.encens.khipus.action.billing.BillControllerAction;
+import com.encens.khipus.action.billing.SendMessageAction;
+import com.encens.khipus.action.customers.reports.PrintBillReportAction;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.framework.action.GenericAction;
+import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.*;
+import com.encens.khipus.model.rest.SignificantEventCodePOJO;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
@@ -25,16 +31,20 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 
 @Name("salesAction")
-@Scope(ScopeType.PAGE)
-public class SalesAction {
+@Scope(ScopeType.CONVERSATION)
+public class SalesAction extends GenericAction {
 
     private ProductItem productItem;
     private String productItemFullName;
     private BigDecimal totalAmount = BigDecimal.ZERO;
+    private BigDecimal additionalDiscountAmount = BigDecimal.ZERO;
+
+    private Integer invoiceNumberCafc;
 
     private BigDecimal moneyReceived = BigDecimal.ZERO;
     private BigDecimal moneyReturned = BigDecimal.ZERO;
@@ -58,6 +68,22 @@ public class SalesAction {
     private Date billingSpecialDate = new Date();
     private String nameSpecialBill = "";
     private Double amountSpecialBill = 0.0;
+
+    private String connectionStatus;
+    private String billingMode;
+
+    private Boolean validNitCi = Boolean.FALSE;
+    private Boolean nitCiHasBeenValidated = Boolean.FALSE;
+
+    private String cafcCode;
+    private boolean showCAFC = false;
+
+    private String nitValidationMessage;
+
+    private List<SignificantEventCodePOJO> significantEventsCodes; // no usado
+    private SignificantEventCodePOJO significantEventSelected; // no usado
+
+    private SignificantEventSIN significantEventSIN;
 
     //private List<ProductItem> productsSelected = new ArrayList<ProductItem>();
     private List<String> productItemCodesSelected = new ArrayList<String>();
@@ -119,6 +145,15 @@ public class SalesAction {
         setOrderDate(new Date());
     }*/
 
+    @In(create = true)
+    private BillControllerAction billControllerAction;
+
+    @In(create = true)
+    private PrintBillReportAction printBillReportAction;
+
+    @In(create = true)
+    private SendMessageAction sendMessageAction;
+
     @Factory(value = "subsidyEnumList")
     public SubsidyEnun[] getExperienceType() {
         return SubsidyEnun.values();
@@ -176,11 +211,21 @@ public class SalesAction {
 
         if (client == null) return;
 
+        /* Uncomment
         if (!isThereInventory(productItem)){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No existe inventario suficiente...");
             return;
+        }*/
+
+        if (!this.nitCiHasBeenValidated){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible continuar con la venta, debe validar el NIT/CI.");
+            return;
         }
 
+        if (!this.validNitCi){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible continuar con la venta, debe validar el NIT.");
+            return;
+        }
 
         if (productItemCodesSelected.contains(productItem.getProductItemCode())){
             clearProduct();
@@ -199,6 +244,7 @@ public class SalesAction {
         articleOrder.setPromotion(0);
         articleOrder.setReposicion(0);
         articleOrder.setTotal(0);
+        articleOrder.setDiscount(0.0);
         articleOrder.setAmount(0.0);
         articleOrder.setCu(BigDecimal.ZERO);
         articleOrder.setUnitCost(BigDecimal.ZERO);
@@ -255,25 +301,43 @@ public class SalesAction {
     public void calculateAmount(ArticleOrder articleOrder){
 
         //if (articleOrder.getQuantity() >  articleOrder.getUnitaryBalance().intValue()){
+
+        /* Uncomment
         if (articleOrder.getQuantity() >  getUnitaryBalance(articleOrder).intValue()){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Inventario Insuficiente...");
             articleOrder.setQuantity(0);
-        }
+        }*/
 
-        Double amount = articleOrder.getQuantity() * articleOrder.getPrice();
-        articleOrder.setAmount(BigDecimalUtil.toBigDecimal(amount).doubleValue());
+        //Double amount = articleOrder.getQuantity() * articleOrder.getPrice();
+        BigDecimal amountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(articleOrder.getQuantity()), BigDecimalUtil.toBigDecimal(articleOrder.getPrice()));
+        BigDecimal discount    = BigDecimalUtil.multiply(amountValue, BigDecimalUtil.divide(getClient().getProductDiscount(), BigDecimalUtil.ONE_HUNDRED, 4) );
+
+        articleOrder.setDiscount(discount.doubleValue());
+
+        amountValue = BigDecimalUtil.subtract(amountValue, discount);
+        articleOrder.setAmount(amountValue.doubleValue());
+
         calculateTotalUnits(articleOrder);
     }
 
     public BigDecimal calculateTotalAmount(){
-        BigDecimal result = BigDecimal.ZERO;
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        BigDecimal totalAmountResult = BigDecimal.ZERO;
         setZeroProduct(Boolean.FALSE);
-        for (ArticleOrder articleOrder:articleOrderList){
-            result = BigDecimalUtil.sum(result, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
-            if (articleOrder.getQuantity() == 0) setZeroProduct(Boolean.TRUE); /** Verifica productos con cantidad CERO **/
+
+        if (getClient() != null) {
+            for (ArticleOrder articleOrder : articleOrderList) {
+                totalAmount = BigDecimalUtil.sum(totalAmount, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
+                if (articleOrder.getQuantity() == 0)
+                    setZeroProduct(Boolean.TRUE); /** Verifica productos con cantidad CERO **/
+            }
+
+            BigDecimal discount = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(getClient().getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED, 4));
+            totalAmountResult = BigDecimalUtil.subtract(totalAmount, discount);
+            this.additionalDiscountAmount = discount;
         }
-        setTotalAmount(result);
-        return result;
+        setTotalAmount(totalAmountResult);
+        return totalAmountResult;
     }
 
     public void calculateTotalUnits(ArticleOrder articleOrder){
@@ -308,6 +372,13 @@ public class SalesAction {
         setCustomerCategoryTypeEnum(null);
         setFinalConsumer(Boolean.FALSE);
         setMoneyReturned(BigDecimal.ZERO);
+
+        this.nitCiHasBeenValidated = Boolean.FALSE;
+        this.validNitCi = Boolean.FALSE;
+        setInvoiceNumberCafc(null);
+        setAdditionalDiscountAmount(BigDecimal.ZERO);
+
+        setNitValidationMessage(null);
     }
 
     public void clearSpecialBilling(){
@@ -356,25 +427,30 @@ public class SalesAction {
 
         Movement movement = createInvoice(customerOrder);
         customerOrder.setMovement(movement);
-        //Voucher voucher = accountingCashSale(customerOrder, movement);
-        //Voucher voucher = accountingCreditSale(customerOrder, movement);
-        //customerOrder.setVoucher(voucher);
-        //customerOrder.setAccounted(Boolean.TRUE);
-        //customerOrder.setState(SaleStatus.CONTABILIZADO);
         saleService.updateCustomerOrder(customerOrder);
-
         inventoryService.updateInventoryForSales(customerOrder);
+
+        generateInvoiceOnline(customerOrder);
+
+        if ( customerOrder.getTotalAmount() > 0)
+            generateFileXML(customerOrder);
 
         clearAll();
         assignCustomerOrderTypeDefault();
     }
 
 
-    public void registerCashSale(){
+    public void registerCashSale() throws IOException {
         System.out.println("......Registrando Venta al Contado...");
         checkMinimumValues();
 
+        if (this.client == null || totalAmount.compareTo(BigDecimal.ZERO) == 0){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No se puede realizar la venta, monto incorrecto.");
+            return;
+        }
+
         CustomerOrder customerOrder = createSale();
+        System.out.println("======> customerOrder???? " + customerOrder);
         if (customerOrder!= null) {
             Movement movement = createInvoice(customerOrder);
             customerOrder.setMovement(movement);
@@ -385,8 +461,60 @@ public class SalesAction {
 
             inventoryService.updateInventoryForSales(customerOrder);
 
+            generateInvoiceOnline(customerOrder);
+
+            if ( customerOrder.getTotalAmount() > 0)
+                generateFileXML(customerOrder);
+
             clearAll();
             assignCustomerOrderTypeDefault();
+        }
+    }
+
+    public void generateInvoiceOnline(CustomerOrder customerOrder){
+        try {
+            System.out.println("--->>> !hasInvoice ???" +  !billControllerAction.hasInvoice(customerOrder));
+            if (!billControllerAction.hasInvoice(customerOrder)){
+                /** todo Verifica que no se pueda emitir la factura con monto CERO o menor **/
+                if ( customerOrder.getTotalAmount() > 0)
+                    billControllerAction.createBill(customerOrder);
+            }
+        } catch (IOException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion...");
+        }
+    }
+
+    public void generateFileXML(CustomerOrder customerOrder) {
+
+        if (customerOrder.getMovement() != null) {
+            try {
+                String fileName = Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".xml";
+                String pathFileName = Constants.PATH_FILE_INVOICE + fileName;
+
+                /** decode the encoded data **/
+                String input = customerOrder.getMovement().getFactura();
+                Base64.Decoder decoder = Base64.getDecoder();
+                String decoded = new String(decoder.decode(input), "UTF-8");
+
+                /** todo Verificar con Javier **/
+                String newDecoded = decoded.replace("Ley N?", "Ley N°");
+
+                //System.out.println("Decoded Data: " + decoded);
+
+                FileWriter archivo = null;
+                PrintWriter escritor = null;
+
+                //Writer out = null;
+
+                Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pathFileName), "UTF-8"));
+                out.write(newDecoded);
+                out.close();
+
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            } /*finally {
+                out.close();
+            }*/
         }
     }
 
@@ -411,15 +539,21 @@ public class SalesAction {
         System.out.println("------------> Subsidio: " + this.subsidyEnun);
 
         /** Verifica existencia de inventario antes de registrar la venta **/
+        /* Uncomment
         for (ArticleOrder articleOrder : articleOrderList){
             if (!isThereInventory(articleOrder.getProductItem())){
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Inventario Insuficiente...");
                 return null;
             }
-        }
+        }*/
 
         observation = (observation == null) ? "" : observation;
         CustomerOrder customerOrder = new CustomerOrder();
+
+        System.out.println("--------------------> Invoice Number CAFC: " + this.invoiceNumberCafc);
+        if (this.invoiceNumberCafc != null)
+            customerOrder.setInvoiceNumberCafc(this.invoiceNumberCafc.toString());
+
         Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
         customerOrder.setCode(saleCode);
         customerOrder.setUser(currentUser);
@@ -435,20 +569,39 @@ public class SalesAction {
             customerOrder.setState(SaleStatus.CONTABILIZADO);
 
         customerOrder.setTotalAmount(totalAmount.doubleValue());
+        customerOrder.setAdditionalDiscountValue(this.additionalDiscountAmount);
+
         customerOrder.setCommissionPercentage(0.0);
         customerOrder.setCommissionValue(0.0);
-        BigDecimal tax = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT);
-        customerOrder.setTax(tax.doubleValue());
+        //BigDecimal tax = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT);
+        //customerOrder.setTax(tax.doubleValue());
 
-        /** For commissions **/
-        if (client.getCommission() > 0){
-            BigDecimal percentage = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(client.getCommission()), BigDecimalUtil.ONE_HUNDRED);
-            BigDecimal commissionValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
-            BigDecimal totalVar = BigDecimalUtil.subtract(totalAmount, commissionValue);
-            customerOrder.setTax(BigDecimalUtil.multiply(totalVar, Constants.VAT).doubleValue());
-            customerOrder.setCommissionValue(commissionValue.doubleValue());
-            customerOrder.setCommissionPercentage(client.getCommission());
+        /** For Product Discount **/
+        System.out.println("----------------> client.getProductDiscount(): " + client.getProductDiscount().doubleValue());
+        if (client.getProductDiscount().doubleValue() > 0){
+            BigDecimal sumDiscount = BigDecimal.ZERO;
+
+            for (ArticleOrder articleOrder : articleOrderList){
+                sumDiscount = BigDecimalUtil.sum(sumDiscount, BigDecimalUtil.toBigDecimal(articleOrder.getDiscount()));
+                System.out.println("........sumDiscount: " + sumDiscount);
+            }
+            customerOrder.setProductDiscountValue(sumDiscount);
         }
+
+        System.out.println("==============> 1.TOTAL AMOUNT: " + customerOrder.getTotalAmount());
+        System.out.println("==============> 1.PRODUCT DISCOUNT: " + customerOrder.getProductDiscountValue());
+
+        /** For Additional Discount
+         *  Se calcula el descuento al registrar los productos **/
+        /*if (client.getAdditionalDiscount().doubleValue() > 0){
+            BigDecimal percentage = BigDecimalUtil.divide(client.getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED, 4);
+            BigDecimal discountValue = BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), percentage);
+            customerOrder.setAdditionalDiscountValue(discountValue);
+            customerOrder.setTotalAmount(BigDecimalUtil.subtract(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), discountValue).doubleValue());
+        }*/
+        System.out.println("==============> 2.TOTAL AMOUNT: " + customerOrder.getTotalAmount());
+
+        customerOrder.setTax( BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.VAT).doubleValue() );
 
         if (subsidyEnun != null)
             customerOrder.setDescription(subsidyEnun.getSubsidyType());
@@ -464,19 +617,17 @@ public class SalesAction {
             customerOrder.setObservation(observation);
         }
 
-        String outcome = saleService.createSale(customerOrder);
-
-        /*if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH)){
-            Movement movement = createInvoice(customerOrder);
-            movementService.createMovement(movement);
-            customerOrder.setMovement(movement);
-            saleService.updateCustomerOrder(customerOrder);
-        }*/
+        if (customerOrder.getTotalAmount() > 0){
+            String outcome = saleService.createSale(customerOrder);
+        }else {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Monto total incorrecto para facturar, revise el % descuento.");
+            customerOrder = null;
+        }
 
         return customerOrder;
     }
 
-    private Movement createInvoice(CustomerOrder customerOrder){
+    public Movement createInvoice(CustomerOrder customerOrder){
         User user = getUser(currentUser.getId()); //
         Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
 
@@ -488,20 +639,33 @@ public class SalesAction {
                             customerOrder.getOrderDate(),
                             customerOrder.getTotalAmount(),
                             dosage.getKey());
-        String controlCode = sfc.generateControlCode();
+        /** Gen. Codigo de Control **/
+        //String controlCode = sfc.generateControlCode(); Uncomment
+        String controlCode = "0"; /** todo **/
+
+        String nitCiValue = sfc.getClientNit();
+        if (customerOrder.getClient().getComplement() != null)
+            nitCiValue = nitCiValue + "-" + customerOrder.getClient().getComplement();
 
         Movement movement = new Movement();
         movement.setDate(sfc.getDate());
         movement.setState(Constants.MOVEMENT_STATE_V);
-        movement.setNumber(dosage.getCurrentNumber().intValue());
-        movement.setNit(sfc.getClientNit());
+
+        if (customerOrder.getInvoiceNumberCafc() != null) {
+            movement.setNumber(new Integer(customerOrder.getInvoiceNumberCafc()));
+        }else{
+            movement.setNumber(dosage.getCurrentNumber().intValue());
+        }
+
+        movement.setNit(nitCiValue);
         movement.setName(sfc.getName());
         movement.setAmount(BigDecimalUtil.toBigDecimal(sfc.getAmount()));
         movement.setAmountIce(BigDecimal.ZERO);
         movement.setExemptExport(BigDecimal.ZERO);
         movement.setTaxedSalesZero(BigDecimal.ZERO);
         movement.setSubtotal(BigDecimalUtil.toBigDecimal(sfc.getAmount())); /** todo **/
-        movement.setDiscount(BigDecimalUtil.toBigDecimal(customerOrder.getCommissionValue()));
+        //movement.setDiscount(BigDecimalUtil.toBigDecimal(customerOrder.getCommmissionValue()));
+        movement.setDiscount(BigDecimalUtil.sum(customerOrder.getProductDiscountValue(), customerOrder.getAdditionalDiscountValue()));
 
         BigDecimal amountFiscalDebit = BigDecimalUtil.subtract(movement.getAmount(), movement.getDiscount());
         movement.setAmountFiscalDebit(amountFiscalDebit);
@@ -526,7 +690,9 @@ public class SalesAction {
         movement.setAuthorizationNumber(dosage.getAuthorizationNumber().toString());
         movement.setCustomerOrder(customerOrder);
 
-        dosageService.increaseInvoiceNumber(dosage);
+        if (customerOrder.getInvoiceNumberCafc() == null)
+            dosageService.increaseInvoiceNumber(dosage);
+
         movementService.createMovement(movement);
 
         return movement;
@@ -853,8 +1019,31 @@ public class SalesAction {
 
     }
 
+    public boolean showActionsBilling(CustomerOrder customerOrder){
+        boolean result = true;
+
+        if (customerOrder.getState().equals(SaleStatus.ANULADO))
+            result = false;
+        if (customerOrder.getMovement() != null){
+            if (customerOrder.getMovement().getDescri() != null)
+                if (customerOrder.getMovement().getDescri().equals("RECHAZADA"))
+                    result = false;
+        }
+        return result;
+    }
+
     public boolean isAnnulled(CustomerOrder customerOrder){
         return customerOrder.getState().equals(SaleStatus.ANULADO);
+    }
+
+    public boolean isRejected(CustomerOrder customerOrder){
+        boolean result = false;
+        if (customerOrder.getMovement() != null){
+            if (customerOrder.getMovement().getDescri() != null)
+                result = customerOrder.getMovement().getDescri().equals("RECHAZADA");
+        }
+
+        return result;
     }
 
     public void assignClient(Client client){
@@ -862,6 +1051,7 @@ public class SalesAction {
         assignCustomerOrderTypeDefault();
         setCustomerCategoryTypeEnum(null);
         setPriceItemListMap(null);
+        setNitValidationMessage(null);
 
         if (client.getCustomerCategory() != null)
             setPriceItemListMap(priceItemService.getPriceItemsMap(client.getCustomerCategory()));
@@ -927,6 +1117,57 @@ public class SalesAction {
         return resultProductItems;
     }
 
+    public boolean showInputCAFC(){
+        System.out.println("********************>>>> >>> >>>" + getSignificantEventSIN());
+
+        boolean result = false;
+        if (getSignificantEventSIN() != null) { /** todo codes **/
+            if (    getSignificantEventSIN().getCode() == 5 ||
+                    getSignificantEventSIN().getCode() == 6 ||
+                    getSignificantEventSIN().getCode() == 7) {
+                result = true;
+            } else
+                result = false;
+        }
+        return result;
+    }
+
+    public String cancelBillingMode(){
+        return Outcome.CANCEL;
+    }
+
+    public String changeToOfflineBillingMode() throws IOException {
+
+        String cafc = null;
+        if (showInputCAFC())
+            cafc = getCafcCode();
+
+        billControllerAction.changeToOfflineBillingMode(this.significantEventSIN, cafc);
+        return Outcome.SUCCESS;
+    }
+
+    public String changeToOnlineBillingMode() throws IOException {
+        billControllerAction.changeToOnlineBillingMode();
+        return Outcome.SUCCESS;
+    }
+
+    public String prepareOfflineBillPackages() throws IOException {
+        billControllerAction.prepareOfflineBillPackages();
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"PREPARANDO: FACTURAS OFFLINE!!!");
+        return Outcome.SUCCESS;
+    }
+
+    public String processOfflineBillPackages() throws IOException {
+        billControllerAction.processOfflineBillPackages();
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"PROCESANDO: FACTURAS OFFLINE!!!");
+        return Outcome.SUCCESS;
+    }
+
+    public String validateOfflineBillPackages() throws IOException {
+        billControllerAction.validateOfflineBillPackages();
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"VALIDANDO: FACTURAS OFFLINE!!!");
+        return Outcome.SUCCESS;
+    }
 
     public ProductItem getProductItem() {
         return productItem;
@@ -1031,8 +1272,102 @@ public class SalesAction {
         setDistributor(null);
         setSubsidyEnun(null);
         setCustomerCategoryTypeEnum(null);
+        setNitValidationMessage(null);
+
+        this.nitCiHasBeenValidated = Boolean.FALSE;
+        this.validNitCi = Boolean.FALSE;
+        setInvoiceNumberCafc(null);
+        setAdditionalDiscountAmount(BigDecimal.ZERO);
 
         assignCustomerOrderTypeDefault();
+    }
+
+    public Boolean connectionTest() throws IOException {
+        Boolean result = Boolean.FALSE;
+
+        if (billControllerAction.connectionTest()){
+            connectionStatus = "Conexion OK";
+            result = Boolean.TRUE;
+        } else {
+            connectionStatus = "Sin conexion";
+        }
+
+        System.out.println("-----> Test Conexion: " + connectionStatus);
+
+        return result;
+    }
+
+    public void validateNitCi(){
+        String result = "";
+
+        boolean connectionTest = billControllerAction.connectionTest();
+        if (connectionTest){
+            try {
+                DocumentType docType = getClient().getInvoiceDocumentType();
+                boolean isOnlineMode =  billControllerAction.checkBillingMode();
+
+                if (docType.getSinCode() == 5 && isOnlineMode) {
+                    result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
+                    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
+                    setNitValidationMessage(result);
+                    this.nitCiHasBeenValidated = Boolean.TRUE;
+
+                    if (result.equals("NIT INEXISTENTE")) {
+                        if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")) {
+                            validNitCi = Boolean.TRUE;
+                        } else
+                            validNitCi = Boolean.TRUE; /** FALSE Para controlar que no continue la venta en caso de un NIT inexistente **/
+                    }
+                    if (result.equals("NIT ACTIVO") || result.equals("NIT INACTIVO")) {
+                        validNitCi = Boolean.TRUE;
+                    }
+                }else {
+                    result = "CI/CEX/PAS/OD";
+                    if (!isOnlineMode)
+                        result = "Fuera de línea";
+
+                    setNitValidationMessage(result);
+                    validNitCi = Boolean.TRUE;
+                    nitCiHasBeenValidated = Boolean.TRUE;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                setNitValidationMessage("¡No se pudo validar!");
+            }
+        }else {
+
+            Boolean isOnlineMode =  billControllerAction.checkBillingMode();
+            if (isOnlineMode != null){ // ebilling conexion ok
+                if (!isOnlineMode){
+                    setNitValidationMessage("Modo Fuera de Línea, continuar.");
+                    validNitCi = Boolean.TRUE;
+                    nitCiHasBeenValidated = Boolean.TRUE;
+                } else {
+                    setNitValidationMessage("Intente otra vez o Cambie a modo Fuera de Línea.");
+                    validNitCi = Boolean.FALSE;
+                    nitCiHasBeenValidated = Boolean.FALSE;
+                }
+            } else { // ebilling sin conexion
+                setNitValidationMessage("Sistema sin conexion, consulte con el administrador.");
+                validNitCi = Boolean.FALSE;
+                nitCiHasBeenValidated = Boolean.FALSE;
+            }
+        }
+    }
+
+    // No usado
+    public void initBillingMode() throws IOException {
+        chekBillingMode();
+        //setSignificantEventsCodes(billControllerAction.querySignificantEvents());
+    }
+
+    public void chekBillingMode() throws IOException {
+
+        if (billControllerAction.checkBillingMode())
+            this.setBillingMode("En Linea");
+        else
+            this.setBillingMode("Fuera de Linea");
+
     }
 
     public Date getOrderDate() {
@@ -1153,5 +1488,101 @@ public class SalesAction {
 
     public void setAmountSpecialBill(Double amountSpecialBill) {
         this.amountSpecialBill = amountSpecialBill;
+    }
+
+    public String getConnectionStatus() {
+        return connectionStatus;
+    }
+
+    public void setConnectionStatus(String connectionStatus) {
+        this.connectionStatus = connectionStatus;
+    }
+
+    public String getBillingMode() {
+        return billingMode;
+    }
+
+    public void setBillingMode(String billingMode) {
+        this.billingMode = billingMode;
+    }
+
+    public List<SignificantEventCodePOJO> getSignificantEventsCodes() {
+        return significantEventsCodes;
+    }
+
+    public void setSignificantEventsCodes(List<SignificantEventCodePOJO> significantEventsCodes) {
+        this.significantEventsCodes = significantEventsCodes;
+    }
+
+    public SignificantEventCodePOJO getSignificantEventSelected() {
+        return significantEventSelected;
+    }
+
+    public void setSignificantEventSelected(SignificantEventCodePOJO significantEventSelected) {
+        this.significantEventSelected = significantEventSelected;
+    }
+
+    public String getCafcCode() {
+        return cafcCode;
+    }
+
+    public void setCafcCode(String cafcCode) {
+        this.cafcCode = cafcCode;
+    }
+
+    public boolean isShowCAFC() {
+        return showCAFC;
+    }
+
+    public void setShowCAFC(boolean showCAFC) {
+        this.showCAFC = showCAFC;
+    }
+
+    public SignificantEventSIN getSignificantEventSIN() {
+        return significantEventSIN;
+    }
+
+    public void setSignificantEventSIN(SignificantEventSIN significantEventSIN) {
+        this.significantEventSIN = significantEventSIN;
+    }
+
+    public String getNitValidationMessage() {
+        return nitValidationMessage;
+    }
+
+    public void setNitValidationMessage(String nitValidationMessage) {
+        this.nitValidationMessage = nitValidationMessage;
+    }
+
+    public Boolean getValidNitCi() {
+        return validNitCi;
+    }
+
+    public void setValidNitCi(Boolean validNitCi) {
+        this.validNitCi = validNitCi;
+    }
+
+    public Boolean getNitCiHasBeenValidated() {
+        return nitCiHasBeenValidated;
+    }
+
+    public void setNitCiHasBeenValidated(Boolean nitCiHasBeenValidated) {
+        this.nitCiHasBeenValidated = nitCiHasBeenValidated;
+    }
+
+    public Integer getInvoiceNumberCafc() {
+        return invoiceNumberCafc;
+    }
+
+    public void setInvoiceNumberCafc(Integer invoiceNumberCafc) {
+        this.invoiceNumberCafc = invoiceNumberCafc;
+    }
+
+    public BigDecimal getAdditionalDiscountAmount() {
+        return additionalDiscountAmount;
+    }
+
+    public void setAdditionalDiscountAmount(BigDecimal additionalDiscountAmount) {
+        this.additionalDiscountAmount = additionalDiscountAmount;
     }
 }

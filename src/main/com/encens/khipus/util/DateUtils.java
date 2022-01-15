@@ -461,6 +461,13 @@ public final class DateUtils {
         return calendar.getTime();
     }
 
+
+    public static Date addMonth(Date date, int num){
+        Calendar calendar = toCalendar(date);
+        calendar.add(Calendar.MONTH, num);
+        return calendar.getTime();
+    }
+
     public static String getMonthLiteral(Date date){
         String result = "";
 

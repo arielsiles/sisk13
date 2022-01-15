@@ -33,7 +33,7 @@ public class Dosage implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Dosage.tableGenerator")
     private Long id;
 
-    @Column(name = "NROAUTORIZACION", nullable = false)
+    @Column(name = "NROAUTORIZACION")
     private Long authorizationNumber;
 
     @Temporal(value = TemporalType.DATE)
@@ -50,7 +50,7 @@ public class Dosage implements BaseModel {
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean active;
 
-    @Column(name = "NUMEROACTUAL", nullable = false)
+    @Column(name = "NUMEROACTUAL")
     private Long currentNumber;
 
     @Column(name="NITEMPRESA")
@@ -61,17 +61,17 @@ public class Dosage implements BaseModel {
 
     @Temporal(value = TemporalType.DATE)
     @Column(name = "FECHAINICIO")
-    private Date startDate;
+    private Date startDate  = new Date();
 
     @Temporal(value = TemporalType.DATE)
     @Column(name = "FECHACONTROL")
-    private Date controlDate;
+    private Date controlDate = new Date();
 
     @Column(name="ETIQUETALEY")
     private String lawLabel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDSUCURSAL", referencedColumnName = "IDSUCURSAL", nullable = false)
+    @JoinColumn(name = "IDSUCURSAL", referencedColumnName = "IDSUCURSAL", nullable = true)
     private BranchOffice branchOffice;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -202,4 +202,5 @@ public class Dosage implements BaseModel {
     public void setVersion(long version) {
         this.version = version;
     }
+
 }

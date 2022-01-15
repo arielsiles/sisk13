@@ -17,6 +17,7 @@ import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 import static com.encens.khipus.model.usertype.StringBooleanUserType.*;
 
@@ -52,6 +53,63 @@ public class CompanyConfiguration {
 
     @Column(name = "lugar")
     private String locationName;
+
+    @Column(name = "leyenda_uno")
+    private String oneLegend;
+
+    @Column(name = "leyenda_online")
+    private String onlineLegend;
+
+    @Column(name = "leyenda_offline")
+    private String offlineLegend;
+
+    @Column(name = "annul_date")
+    private Date invoiceAnnulDate;
+
+    @Column(name = "url_measure_units")
+    private String measureUnitsURL;
+
+    @Column(name = "url_products_services")
+    private String productsAndServicesURL;
+
+    @Column(name = "url_activities")
+    private String activitiesURL;
+
+    @Column(name = "url_nit_verification")
+    private String nitVerificationURL;
+
+    @Column(name = "url_validate_offline_bill_packages")
+    private String validateOfflineBillPackagesURL;
+
+    @Column(name = "url_process_offline_bill_packages")
+    private String processOfflineBillPackagesURL;
+
+    @Column(name = "url_prepare_offline_bill_packages")
+    private String prepareOfflineBillPackagesURL;
+
+    @Column(name = "url_set_online_mode")
+    private String onlineModeURL;
+
+    @Column(name = "url_set_offline_mode")
+    private String offlineModeURL;
+
+    @Column(name = "url_significant_event")
+    private String significantEventURL;
+
+    @Column(name = "url_online_offline_mode")
+    private String checkBillingModeURL;
+
+    @Column(name = "url_createbill")
+    private String createbillURL;
+
+    @Column(name = "url_cancelbill")
+    private String cancelbillURL;
+
+    @Column(name = "url_qr")
+    private String qrcodeURL;
+
+    @Column(name = "url_ping")
+    private String connectionTestURL;
 
     @Column(name = "CTADIFTIPCAM", length = 20, nullable = false)
     @Length(max = 20)
@@ -1443,5 +1501,157 @@ public class CompanyConfiguration {
 
     public void setCtaAlmPTAG(CashAccount ctaAlmPTAG) {
         this.ctaAlmPTAG = ctaAlmPTAG;
+    }
+
+    public String getCreatebillURL() {
+        return createbillURL;
+    }
+
+    public void setCreatebillURL(String createbillURL) {
+        this.createbillURL = createbillURL;
+    }
+
+    public String getCancelbillURL() {
+        return cancelbillURL;
+    }
+
+    public void setCancelbillURL(String cancelbillURL) {
+        this.cancelbillURL = cancelbillURL;
+    }
+
+    public String getQrcodeURL() {
+        return qrcodeURL;
+    }
+
+    public void setQrcodeURL(String qrcodeURL) {
+        this.qrcodeURL = qrcodeURL;
+    }
+
+    public String getConnectionTestURL() {
+        return connectionTestURL;
+    }
+
+    public void setConnectionTestURL(String connectionTestURL) {
+        this.connectionTestURL = connectionTestURL;
+    }
+
+    public String getCheckBillingModeURL() {
+        return checkBillingModeURL;
+    }
+
+    public void setCheckBillingModeURL(String checkBillingModeURL) {
+        this.checkBillingModeURL = checkBillingModeURL;
+    }
+
+    public String getSignificantEventURL() {
+        return significantEventURL;
+    }
+
+    public void setSignificantEventURL(String significantEventURL) {
+        this.significantEventURL = significantEventURL;
+    }
+
+    public String getOnlineModeURL() {
+        return onlineModeURL;
+    }
+
+    public void setOnlineModeURL(String onlineModeURL) {
+        this.onlineModeURL = onlineModeURL;
+    }
+
+    public String getOfflineModeURL() {
+        return offlineModeURL;
+    }
+
+    public void setOfflineModeURL(String offlineModeURL) {
+        this.offlineModeURL = offlineModeURL;
+    }
+
+    public String getValidateOfflineBillPackagesURL() {
+        return validateOfflineBillPackagesURL;
+    }
+
+    public void setValidateOfflineBillPackagesURL(String validateOfflineBillPackagesURL) {
+        this.validateOfflineBillPackagesURL = validateOfflineBillPackagesURL;
+    }
+
+    public String getProcessOfflineBillPackagesURL() {
+        return processOfflineBillPackagesURL;
+    }
+
+    public void setProcessOfflineBillPackagesURL(String processOfflineBillPackagesURL) {
+        this.processOfflineBillPackagesURL = processOfflineBillPackagesURL;
+    }
+
+    public String getPrepareOfflineBillPackagesURL() {
+        return prepareOfflineBillPackagesURL;
+    }
+
+    public void setPrepareOfflineBillPackagesURL(String prepareOfflineBillPackagesURL) {
+        this.prepareOfflineBillPackagesURL = prepareOfflineBillPackagesURL;
+    }
+
+    public String getNitVerificationURL() {
+        return nitVerificationURL;
+    }
+
+    public void setNitVerificationURL(String nitVerificationURL) {
+        this.nitVerificationURL = nitVerificationURL;
+    }
+
+    public String getActivitiesURL() {
+        return activitiesURL;
+    }
+
+    public void setActivitiesURL(String activitiesURL) {
+        this.activitiesURL = activitiesURL;
+    }
+
+    public String getProductsAndServicesURL() {
+        return productsAndServicesURL;
+    }
+
+    public void setProductsAndServicesURL(String productsAndServicesURL) {
+        this.productsAndServicesURL = productsAndServicesURL;
+    }
+
+    public String getMeasureUnitsURL() {
+        return measureUnitsURL;
+    }
+
+    public void setMeasureUnitsURL(String measureUnitsURL) {
+        this.measureUnitsURL = measureUnitsURL;
+    }
+
+    public Date getInvoiceAnnulDate() {
+        return invoiceAnnulDate;
+    }
+
+    public void setInvoiceAnnulDate(Date invoiceAnnulDate) {
+        this.invoiceAnnulDate = invoiceAnnulDate;
+    }
+
+    public String getOnlineLegend() {
+        return onlineLegend;
+    }
+
+    public void setOnlineLegend(String onlineLegend) {
+        this.onlineLegend = onlineLegend;
+    }
+
+    public String getOfflineLegend() {
+        return offlineLegend;
+    }
+
+    public void setOfflineLegend(String offlineLegend) {
+        this.offlineLegend = offlineLegend;
+    }
+
+    public String getOneLegend() {
+        return oneLegend;
+    }
+
+    public void setOneLegend(String oneLegend) {
+        this.oneLegend = oneLegend;
     }
 }

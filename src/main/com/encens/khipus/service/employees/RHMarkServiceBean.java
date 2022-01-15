@@ -8,14 +8,14 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.log.Log;
-import org.omg.PortableServer.POAPackage.AdapterAlreadyExistsHelper;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.persistence.TemporalType;
 import java.util.*;
+
+//import org.omg.PortableServer.POAPackage.AdapterAlreadyExistsHelper;
 
 /**
  * RHMark service implementation class

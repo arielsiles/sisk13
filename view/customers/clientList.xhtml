@@ -71,7 +71,7 @@
             <rich:dataTable value="#{clientDataModel}" var="clientItem" id="clientList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="10%, 50%, 10%, 10%, 10%, 10%">
+                            columnsWidth="5%, 25%, 10%, 10%, 35%, 10% 5%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -82,6 +82,8 @@
                         <rich:column>#{messages['Client.ci']}</rich:column>
 
                         <rich:column>#{messages['Client.nit']}</rich:column>
+
+                        <rich:column>#{messages['Client.businessName']}</rich:column>
 
                         <rich:column>#{messages['Client.phone']}</rich:column>
 
@@ -104,6 +106,10 @@
 
                 <rich:column>
                     <h:outputText value="#{clientItem.nitNumber}"/>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{clientItem.businessName}"/>
                 </rich:column>
 
                 <rich:column>

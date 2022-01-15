@@ -53,6 +53,18 @@ public class ProductItem implements BaseModel {
     @Column(name = "COD_ART", insertable = false, updatable = false)
     private String productItemCode;
 
+    @Column(name = "CODACT")
+    private String economicActivityCode;
+
+    @Column(name = "CODSIN")
+    private Integer productSinCode;
+
+    @Column(name = "COD_MEDS")
+    private Integer measureUnitSinCode;
+
+    @Column(name = "UNI_MEDS")
+    private String measureUnitDescription;
+
     @Column(name = "CODEQ", insertable = false, updatable = false)
     private String productItemCodeEq;
 
@@ -514,5 +526,38 @@ public class ProductItem implements BaseModel {
 
     public void setProductItemCodeEq(String productItemCodeEq) {
         this.productItemCodeEq = productItemCodeEq;
+    }
+
+    public String getEconomicActivityCode() {
+        return economicActivityCode;
+    }
+
+    public void setEconomicActivityCode(String economicActivityCode) {
+        this.economicActivityCode = economicActivityCode;
+    }
+
+
+    public Integer getProductSinCode() {
+        return productSinCode;
+    }
+
+    public void setProductSinCode(Integer productSinCode) {
+        this.productSinCode = productSinCode;
+    }
+
+    public Integer getMeasureUnitSinCode() {
+        return measureUnitSinCode;
+    }
+
+    public void setMeasureUnitSinCode(Integer measureUnitSin) {
+        this.measureUnitSinCode = measureUnitSin;
+    }
+
+    public String getMeasureUnitDescription() {
+        return measureUnitDescription;
+    }
+
+    public void setMeasureUnitDescription(String measureUnitDescription) {
+        this.measureUnitDescription = measureUnitDescription;
     }
 }

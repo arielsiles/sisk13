@@ -1,0 +1,76 @@
+<rich:modalPanel height="250" width="500" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:productItemListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['Invoice.onlineOfflineMode.title']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="productItemListForm">
+
+        <rich:panel id="onOffPanel">
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Facturación:</ui:define>
+                <h:outputText value="#{salesAction.billingMode}"/>
+            </s:decorate>
+
+            <s:div id="significantEventDiv">
+                <s:decorate id="significantEventField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">Evento:</ui:define>
+                    <h:selectOneMenu id="significantEvent"
+                                     value="#{salesAction.significantEventSelected}"
+                                     styleClass="input"
+                                     required="false"
+                                     tabindex="10">
+                        <s:selectItems value="#{salesAction.significantEventsCodes}" var="significantEventCode"
+                                       label="#{significantEventCode}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+
+                        <a4j:support event="onchange"
+                                     action="#{salesAction.updateShowCAFC()}"
+                                     reRender="cafcField"
+                                     ajaxSingle="true"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="cafcField"
+                            rendered="#{salesAction.showCAFC}"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">CAFC:</ui:define>
+                    <h:inputText id="cafc"
+                                 value="#{salesAction.cafcCode}"
+                                 required="false"
+                                 maxlength="100"
+                                 styleClass="input"
+                                 tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+
+            </s:div>
+
+
+        </rich:panel>
+
+        <div class="buttonsRight">
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </h:commandButton>
+        </div>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, confirmRegisterButton, confirmRegisterNoInvoiceButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

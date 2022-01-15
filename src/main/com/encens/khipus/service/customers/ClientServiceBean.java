@@ -1,6 +1,7 @@
 package com.encens.khipus.service.customers;
 
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.customers.PaymentMethodSin;
 import com.encens.khipus.model.finances.VoucherDetail;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -68,6 +69,15 @@ public class ClientServiceBean implements ClientService {
         }
         balance = (balanceD - balanceC);
         return balance;
+    }
+
+    public PaymentMethodSin findPaymentMethodSin(Integer code){
+
+        return (PaymentMethodSin)em.createQuery("select p from PaymentMethodSin p " +
+                "where p.code =:code ")
+                .setParameter("code", code)
+                .getSingleResult();
+
     }
 
 }

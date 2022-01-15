@@ -22,7 +22,7 @@
 
     <rich:panel id="salesPanel">
         <!--<f:facet name="header">V e n t a s</f:facet>-->
-        <h:panelGrid columns="3" border="0" width="100%" columnClasses="width40percent,width30percent,width30percent">
+        <h:panelGrid columns="3" border="0" width="100%" columnClasses="width50percent,width25percent,width25percent">
             <s:div id="part1">
                 <!--<s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow,left">-->
                 <s:div id="clientField" styleClass="formRow,left">
@@ -36,6 +36,21 @@
                                      reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, customerCategoryTypeId, distributorField, productDataTable"
                                      tabindex="12">
                     </app:selectPopUp>
+
+                    <a4j:commandButton id="validateNitButton"
+                                       action="#{salesAction.validateNitCi()}"
+                                       value="Validar NIT"
+                                       rendered="#{s:hasPermission('VALIDATE_NIT_SFE', 'VIEW')}"
+                                       styleClass="button"
+                                       immediate="true"
+                                       ajaxSingle="true"
+                                       reRender="nitValidationMessage">
+                    </a4j:commandButton>
+
+                    <s:span id="nitValidationMessage">
+                        <h:outputText>#{salesAction.nitValidationMessage}</h:outputText>
+                    </s:span>
+
                 </s:div>
 
                 <s:div id="customerCategoryTypeField" styleClass="formRow,left">
@@ -182,7 +197,8 @@
 
     </rich:panel>
 
-    <h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width33percent,width33percent,width33percent">
+    <!--<h:panelGrid columns="3" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width33percent,width33percent,width33percent">-->
+    <h:panelGrid columns="2" cellpadding="0" cellspacing="0" border="0" width="100%" columnClasses="width30percent,width70percent">
         <s:div id="totalAmountField">
                 <h:outputText value="Total:" styleClass="text10" />
                 <h:outputText id="totalAmount" value="#{salesAction.calculateTotalAmount()}" styleClass="textBold12Blue" >
@@ -191,17 +207,69 @@
         </s:div>
 
         <s:div styleClass="buttonsRight">
+
+            <s:span id="connectionStatus">
+                <h:outputText styleClass="textBold12Blue">#{salesAction.connectionStatus}</h:outputText>
+            </s:span>
+
+            <!-- -->
+
+            <a4j:commandButton id="enviarButton"
+                               action="#{printBillReportAction.sendMailAttachments()}"
+                               value="Enviar Mail"
+                               styleClass="button"
+                               immediate="true"
+                               rendered="#{s:hasPermission('SEND_MAIL_INVOICE','VIEW')}"
+                               ajaxSingle="true">
+            </a4j:commandButton>
+
+            <a4j:commandButton id="syncButton"
+                               action="#{syncControllerAction.syncData()}"
+                               value="SYNC"
+                               styleClass="button"
+                               immediate="true"
+                               rendered="#{s:hasPermission('BILLING_MANAGE_SFE','VIEW')}"
+                               ajaxSingle="true">
+            </a4j:commandButton>
+
+
+            <s:button value="On/Off Line"
+                      action="#{salesAction.initBillingMode()}"
+                      view="/customers/changeBillingMode.xhtml"
+                      styleClass="button"
+                      propagation="begin"
+                      rendered="#{s:hasPermission('CHANGE_BILLING_METHOD_SFE','VIEW')}">
+            </s:button>
+
+            <a4j:commandButton id="connectionTestButton"
+                               action="#{salesAction.connectionTest()}"
+                               value="Test Conexion"
+                               rendered="#{s:hasPermission('CONNECTION_TEST_SFE','VIEW')}"
+                               styleClass="button"
+                               immediate="true"
+                               ajaxSingle="true"
+                               reRender="connectionStatus">
+            </a4j:commandButton>
+
+            <h:commandButton id="printBillReportButtonId"
+                             action="#{printBillReportAction.generateReport()}"
+                             value="Imprimir Factura SFE"
+                             rendered="#{s:hasPermission('PRINT_INVOICE_SFE', 'VIEW')}"
+                             styleClass="button"
+                             immediate="true"/>
+
+            <!-- -->
             <h:commandButton id="printInvoiceReportButtonId"
                              action="#{printInvoiceReportAction.generateReport()}"
                              value="#{messages['SalesBox.printInvoice']}"
-                             rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
+                             rendered="#{s:hasPermission('CASHSALE_PRINT_INVOICE_SFV', 'VIEW')}"
                              styleClass="button"
                              immediate="true"/>
 
             <h:commandButton id="generateReportButtonId"
                              action="#{saleReportAction.generateReport()}"
                              value="#{messages['SalesBox.printNote']}"
-                             rendered="#{s:hasPermission('CASHSALES', 'VIEW') or s:hasPermission('CREDITSALES', 'VIEW')}"
+                             rendered="#{s:hasPermission('PRINT_DELIVERY_NOTE', 'VIEW')}"
                              styleClass="button"
                              immediate="true"/>
 
@@ -215,9 +283,10 @@
                                reRender="productDataTable,confirmCreditSaleModalPanel">
             </a4j:commandButton>
 
+            <!-- Venta al contado -->
             <a4j:commandButton id="cashSaleCommandButton"
                                action="#{salesAction.initCashSale}"
-                               value="Venta contado"
+                               value="Registrar Venta"
                                rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
                                styleClass="button"
                                immediate="true"
@@ -334,7 +403,7 @@
                                    action="#{salesAction.assignClient(clientItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
-                                   reRender="clientField, part2, customerOrderTypeField, customerOrderType, customerCategoryTypeField, customerCategoryTypeId"
+                                   reRender="clientField, nitValidationMessage, part2, customerOrderTypeField, customerOrderType, customerCategoryTypeField, customerCategoryTypeId"
                                    oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
             </ui:define>
         </s:decorate>
@@ -348,6 +417,11 @@
     <s:decorate id="confirmCashSaleModalPanelContainer" template="/customers/confirmCashSaleModalPanel.xhtml">
         <ui:param name="containerId" value="confirmCashSaleModalPanelContainer"/>
         <ui:param name="dialogId" value="confirmCashSaleModalPanel"/>
+    </s:decorate>
+
+    <s:decorate id="confirmOnlineOfflineModeContainer" template="/customers/confirmOnlineOfflineModeModalPanel.xhtml">
+        <ui:param name="containerId" value="confirmOnlineOfflineModeModalPanelContainer"/>
+        <ui:param name="dialogId" value="confirmOnlineOfflineModeModalPanel"/>
     </s:decorate>
 
     <s:decorate id="productItemsByWarehouseListModalPanelContainer"

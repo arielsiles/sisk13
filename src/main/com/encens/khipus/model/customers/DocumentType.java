@@ -42,6 +42,9 @@ public class DocumentType implements BaseModel {
     @Column(name = "nombre", nullable = false, length = 150)
     private String name;
 
+    @Column(name = "codsin")
+    private Integer sinCode;
+
     @Column(name = "APLICABLEA", length = 100, nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
@@ -93,5 +96,13 @@ public class DocumentType implements BaseModel {
 
     public void setEntityType(EntityType entityType) {
         this.entityType = entityType;
+    }
+
+    public Integer getSinCode() {
+        return sinCode;
+    }
+
+    public void setSinCode(Integer sinCode) {
+        this.sinCode = sinCode;
     }
 }

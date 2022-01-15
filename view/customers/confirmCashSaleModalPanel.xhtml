@@ -36,6 +36,11 @@
                     <f:convertDateTime pattern="#{messages['patterns.date']}"/>
                 </h:outputText>
             </s:decorate>
+
+            <s:decorate id="invoiceNumberCafcField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Nro.</ui:define>
+                <h:inputText id="invoiceNumberCafcId" value="#{salesAction.invoiceNumberCafc}" styleClass="inputTiny" />
+            </s:decorate>
             <br/>
             <s:decorate id="totalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">TOTAL:</ui:define>
@@ -70,7 +75,7 @@
                                styleClass="button"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"/>
 
-            <a4j:commandButton id="confirmRegisterButton" value="Cobrar y facturar"
+            <a4j:commandButton id="confirmRegisterButton" value="Aceptar y facturar"
                                action="#{salesAction.registerCashSale()}"
                                rendered="#{s:hasPermission('CASHSALE_INVOICE','VIEW')}"
                                styleClass="button"

@@ -9,7 +9,7 @@
                  xmlns:c="http://java.sun.com/jstl/core"
                  xmlns:app="http://encens.com/products/khipus/facelets"
                  id="#{dialogId}"
-                 onshow="jQuery('##{containerId}\\:clientListForm#{dialogId}\\:nameField\\:name').focus();">
+                 onshow="jQuery('##{containerId}\\:salesForm#{dialogId}\\:nameField\\:name').focus();">
 
     <c:if test="#{empty dataModel}">
         <c:set var="dataModel" value="#{clientDataModel}"/>
@@ -43,7 +43,7 @@
                     <ui:define name="label">#{messages['Client.maidenName']}</ui:define>
                     <h:inputText id="am" value="#{dataModel.criteria.maidenName}" maxlength="100"
                                  styleClass="input"
-                                 tabindex="2002"/>
+                                 tabindex="2003"/>
                 </s:decorate>
 
                 <s:decorate id="searchButtonField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -58,7 +58,7 @@
         </rich:simpleTogglePanel>
         <br/>
         <rich:dataTable value="#{dataModel}" var="clientItem" id="clientList"
-                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="30%, 30%, 30%,10%">
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="30%, 25%, 25%, 15, 5%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>
@@ -82,6 +82,7 @@
                             #{messages['Client.maidenName']}
                         </app:commandSortHeader>
                     </rich:column>
+                    <rich:column>#{messages['Client.nitOrCi']}</rich:column>
                     <rich:column styleClass="center">
                         #{messages['Common.select']}
                     </rich:column>
@@ -96,16 +97,20 @@
             <rich:column>
                 <h:outputText value="#{clientItem.maidenName}"/>
             </rich:column>
+            <rich:column>
+                <h:outputText value="#{clientItem.nitNumberComplement}"/>
+            </rich:column>
             <rich:column styleClass="center">
-                <ui:insert name="assignButton"/>
-                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide"
-                                       event="onclick"/>
+                <s:div rendered="#{clientItem.validNitNumber()}">
+                    <ui:insert name="assignButton"/>
+                    <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide" event="onclick"/>
+                </s:div>
             </rich:column>
         </rich:dataTable>
         <app:dataScroller id="dataScroller" for="clientList" dataModel="#{dataModel}"/>
         <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
                                operation="hide" event="onclick"/>
     </h:form>
-
+    <rich:jQuery selector="#name" query="focus()" timing="onload"/>
 </rich:modalPanel>
 

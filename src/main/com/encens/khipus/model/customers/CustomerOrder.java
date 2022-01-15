@@ -79,6 +79,9 @@ public class CustomerOrder implements BaseModel  {
 
     /* -- */
 
+    @Column(name = "FACTURA")
+    private String invoiceNumberCafc;
+
     @Column(name = "DESCRIPCION")
     private String description;
 
@@ -99,6 +102,12 @@ public class CustomerOrder implements BaseModel  {
 
     @Column(name = "PORCENTAJEGARANTIA")
     private Double guaranteePercentage = 0.0;
+
+    @Column(name = "DESCUENTOPRODUCTO")
+    private BigDecimal productDiscountValue = BigDecimal.ZERO;
+
+    @Column(name = "DESCUENTOADICIONAL")
+    private BigDecimal additionalDiscountValue = BigDecimal.ZERO;
 
     @Column(name = "VALORCOMISION")
     private Double commissionValue = 0.0;
@@ -377,11 +386,66 @@ public class CustomerOrder implements BaseModel  {
         return result;
     }
 
+    public String getEmissionType(){
+        String result = "";
+        if (getMovement() != null) {
+            result = getMovement().getEmissionType();
+        }
+        return result;
+    }
+
+    public String isValidInvoice(){
+        String result = "NO";
+        if (getMovement() != null){
+            if (getMovement().getCodigoEstado() != null)
+                if (getMovement().getCodigoEstado().equals("908"))
+                    result = "SI";
+        }
+        return result;
+    }
+
+    public String getInvoiceStatusSIN(){
+        String result = "";
+        if (getMovement() != null){
+            if (getMovement().getCuf() != null){
+                result = getMovement().getDescri();
+                if (result != null)
+                    if (result.equals("ANULACION CONFIRMADA"))
+                        result = "ANULADA";
+            }
+        }
+        return result;
+    }
+
     public Boolean getFlagct() {
         return flagct;
     }
 
     public void setFlagct(Boolean flagct) {
         this.flagct = flagct;
+    }
+
+    public BigDecimal getProductDiscountValue() {
+        return productDiscountValue;
+    }
+
+    public void setProductDiscountValue(BigDecimal productDiscountValue) {
+        this.productDiscountValue = productDiscountValue;
+    }
+
+    public BigDecimal getAdditionalDiscountValue() {
+        return additionalDiscountValue;
+    }
+
+    public void setAdditionalDiscountValue(BigDecimal additionalDiscountValue) {
+        this.additionalDiscountValue = additionalDiscountValue;
+    }
+
+    public String getInvoiceNumberCafc() {
+        return invoiceNumberCafc;
+    }
+
+    public void setInvoiceNumberCafc(String invoiceNumberCafc) {
+        this.invoiceNumberCafc = invoiceNumberCafc;
     }
 }

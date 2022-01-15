@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+<ui:define name="pageTitle">#{messages['Invoice.changeBillingMode.title']}</ui:define>
+<ui:param name="bodyWidth" value="60%"/>
+<ui:param name="selectedTab" value="customers"/>
+<ui:define name="body">
+
+<h:form id="billingModeForm">
+
+    <div class="buttons">
+
+        <!--<h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.processOfflineBillPackages()}" value="#{messages['Invoice.billingMode.process']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.prepareOfflineBillPackages()}" value="#{messages['Invoice.billingMode.prepare']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>-->
+
+        <h:commandButton action="#{salesAction.changeToOnlineBillingMode()}" value="#{messages['Invoice.billingMode.changeOnlineMode']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.cancelBillingMode()}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"
+                         tabindex="104">
+        </h:commandButton>
+    </div>
+
+    <rich:panel id="formPanel">
+
+        <f:facet name="header">#{messages['Invoice.changeBillingMode.title']}</f:facet>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Invoice.billingMode.currentMode']}</ui:define>
+            <h:outputText value="#{salesAction.billingMode}"/>
+        </s:decorate>
+
+        <s:decorate id="significantEventField" rendered="#{billControllerAction.checkBillingModeResponse.isOnline}"
+                    template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Invoice.billingMode.event']}</ui:define>
+            <h:selectOneMenu id="significantEvent"
+                             value="#{salesAction.significantEventSIN}"
+                             styleClass="input"
+                             required="false"
+                             tabindex="8">
+                <s:selectItems value="#{significantEventSINList}"
+                               var="significantEventSIN"
+                               label="#{significantEventSIN}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange"
+                             reRender="significantEventDiv"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:div id="significantEventDiv">
+            <s:decorate id="cafcField"
+                        rendered="#{salesAction.showInputCAFC()}"
+                        template="/include/inputField.xhtml"
+                        styleClass="formRow">
+                <ui:define name="label">CAFC:</ui:define>
+                <h:inputText id="cafc"
+                             value="#{salesAction.cafcCode}"
+                             required="true"
+                             maxlength="100"
+                             styleClass="input"
+                             tabindex="5">
+                </h:inputText>
+            </s:decorate>
+        </s:div>
+
+        <s:div id="offLineMode" rendered="#{!billControllerAction.checkBillingModeResponse.isOnline}">
+
+            <s:decorate id="eventoField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Evento</ui:define>
+                <h:outputText value="#{billControllerAction.checkBillingModeResponse.description}"/>
+            </s:decorate>
+
+            <s:decorate id="facturasField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Facturas</ui:define>
+                <h:outputText value="#{billControllerAction.checkBillingModeResponse.offlineBills}"/>
+            </s:decorate>
+
+            <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Fecha inicio</ui:define>
+                <h:outputText value="#{billControllerAction.checkBillingModeResponse.getInitDate()}">
+                    <s:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
+                </h:outputText>
+            </s:decorate>
+
+        </s:div>
+
+</rich:panel>
+
+    <div class="buttons">
+
+        <h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.processOfflineBillPackages()}" value="#{messages['Invoice.billingMode.process']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.prepareOfflineBillPackages()}" value="#{messages['Invoice.billingMode.prepare']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.changeToOfflineBillingMode()}" value="#{messages['Invoice.billingMode.changeOfflineMode']}"
+                         styleClass="button"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+    </div>
+
+</h:form>
+
+
+<s:fragment rendered="#{!clientAction.managed}">
+    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+</s:fragment>
+<s:fragment rendered="#{clientAction.managed}">
+    <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
+</s:fragment>
+</ui:define>
+</ui:composition>
+

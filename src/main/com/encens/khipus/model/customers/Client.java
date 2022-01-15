@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -40,6 +41,9 @@ public class Client implements BaseModel {
 
     @Column(name = "NRO_DOC")
     private String idNumber;
+
+    @Column(name = "COMP")
+    private String complement;
 
     @Column(name = "AP")
     private String lastName;
@@ -78,11 +82,23 @@ public class Client implements BaseModel {
     @Column(name = "TELEFONO")
     private Integer phone;
 
+    @Column(name = "EMAIL")
+    private String email;
+
     @Column(name = "NIT")
     private String nitNumber;
 
     @Column(name = "RAZONSOCIAL")
     private String businessName;
+
+    @Column(name = "CODMETODOPAGOSIN")
+    private Integer paymentMethodTypeCode;
+
+    @Column(name = "DESCUENTO")
+    private BigDecimal additionalDiscount = BigDecimal.ZERO;
+
+    @Column(name = "DESCUENTOPROD")
+    private BigDecimal productDiscount  = BigDecimal.ZERO;;
 
     @Column(name = "PORCENTAJECOMISION")
     private Double commission;
@@ -103,6 +119,10 @@ public class Client implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipocliente", referencedColumnName = "idtipocliente", nullable = false)
     private ClientType clientType;
+
+    @ManyToOne
+    @JoinColumn(name = "idtipodocsin", referencedColumnName = "idtipodocumento")
+    private DocumentType invoiceDocumentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcategoriacliente", referencedColumnName = "idcategoriacliente", nullable = true)
@@ -223,6 +243,25 @@ public class Client implements BaseModel {
         return nitNumber;
     }
 
+    public String getNitNumberComplement() {
+
+        String nitCiCexPasOd = "";
+        if (getInvoiceDocumentType() != null) {
+            if (getInvoiceDocumentType().getSinCode() == 1)
+                nitCiCexPasOd = "CI-";
+            if (getInvoiceDocumentType().getSinCode() == 2)
+                nitCiCexPasOd = "CEX-";
+            if (getInvoiceDocumentType().getSinCode() == 3)
+                nitCiCexPasOd = "PAS-";
+            if (getInvoiceDocumentType().getSinCode() == 4)
+                nitCiCexPasOd = "OD-";
+            if (getInvoiceDocumentType().getSinCode() == 5)
+                nitCiCexPasOd = "NIT-";
+        }
+
+        return nitCiCexPasOd + nitNumber + ((getComplement() != null) ? " " + getComplement() : "");
+    }
+
     public void setNitNumber(String nit) {
         this.nitNumber = nit;
     }
@@ -264,6 +303,14 @@ public class Client implements BaseModel {
         String result = getName() + " ";
         result = result + (getLastName() != null ? getLastName() + " " : "") + (getMaidenName() != null ? getMaidenName() : "");
         return result;
+    }
+
+    public boolean validNitNumber(){
+        Long number = new Long(getNitNumber());
+        if (number <= 0)
+            return false;
+        else
+            return true;
     }
 
     public Territoriotrabajo getTerritoriotrabajo() {
@@ -320,5 +367,53 @@ public class Client implements BaseModel {
 
     public void setGuarantee(Double guarantee) {
         this.guarantee = guarantee;
+    }
+
+    public DocumentType getInvoiceDocumentType() {
+        return invoiceDocumentType;
+    }
+
+    public void setInvoiceDocumentType(DocumentType invoiceDocumentType) {
+        this.invoiceDocumentType = invoiceDocumentType;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getComplement() {
+        return complement;
+    }
+
+    public void setComplement(String complement) {
+        this.complement = complement;
+    }
+
+    public BigDecimal getAdditionalDiscount() {
+        return additionalDiscount;
+    }
+
+    public void setAdditionalDiscount(BigDecimal additionalDiscount) {
+        this.additionalDiscount = additionalDiscount;
+    }
+
+    public BigDecimal getProductDiscount() {
+        return productDiscount;
+    }
+
+    public void setProductDiscount(BigDecimal productDiscount) {
+        this.productDiscount = productDiscount;
+    }
+
+    public Integer getPaymentMethodTypeCode() {
+        return paymentMethodTypeCode;
+    }
+
+    public void setPaymentMethodTypeCode(Integer paymentMethodTypeCode) {
+        this.paymentMethodTypeCode = paymentMethodTypeCode;
     }
 }

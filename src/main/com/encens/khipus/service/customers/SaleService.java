@@ -19,6 +19,7 @@ public interface SaleService extends GenericService {
     Long findLastSaleId(User user);
     CustomerOrder findSaleById(Long id);
     void updateArticleForOutputs(ArticleOrder articleOrder);
+    void updateArticleForInputs(ArticleOrder articleOrder);
     CustomerOrder findCustomerOrderByParams(SaleTypeEnum saleType, Date date, String code);
     List<CustomerOrder> getPendingCustomerOrderList(User user, Date date);
     List<CustomerOrder> getPendingCustomerOrderList(Date date);
