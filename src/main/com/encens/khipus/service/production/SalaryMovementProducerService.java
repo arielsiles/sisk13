@@ -7,9 +7,11 @@ import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialProducer;
 import com.encens.khipus.model.production.RawMaterialProducerDiscount;
+import com.encens.khipus.model.production.SalaryMovementProducer;
 
 import javax.ejb.Local;
 import java.util.Date;
+import java.util.List;
 
 @Local
 public interface SalaryMovementProducerService extends GenericService {
@@ -24,5 +26,9 @@ public interface SalaryMovementProducerService extends GenericService {
     void moveDiscountsProductor(RawMaterialProducer rawMaterialProducer, Date date, ProductiveZone productiveZone) throws SalaryMovementProducerException;
 
     void createSalaryMovementProducer(CustomerOrder customerOrder);
+
+    List<RawMaterialProducer> findProducersWithCollection(Date startDate, Date endDate);
+
+    void createSalaryMovementProducer(List<SalaryMovementProducer> salaryMovementProducerList);
 
 }

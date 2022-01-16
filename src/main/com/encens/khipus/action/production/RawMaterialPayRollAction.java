@@ -439,6 +439,7 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         this.delete = delete;
     }
 
+    /* Devuelve la ultima gestion
     public Gestion getGestion() {
         if(getInstance().getId() != null)
         {
@@ -448,6 +449,10 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         }else
             gestion = gestionService.getLastGestion();
 
+        return gestion;
+    }*/
+
+    public Gestion getGestion() {
         return gestion;
     }
 

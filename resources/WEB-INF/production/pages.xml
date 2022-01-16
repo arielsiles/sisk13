@@ -635,4 +635,18 @@
         </navigation>
     </page>
 
+    <page view-id="/production/salaryMovementProducerGral.xhtml" no-conversation-view-id="/production/salaryMovementProducerList.xhtml">
+        <navigation from-action="#{salaryMovementProducerAction.createGeneralDiscounts}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/salaryMovementProducerList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/production/salaryMovementProducerList.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+
 </pages>

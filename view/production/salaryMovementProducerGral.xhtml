@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{salaryMovementProducerAction.managed}">
+                #{messages['SalaryMovementProducerAction.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['SalaryMovementProducerAction.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="salaryMovementProducerForm">
+            <div class="buttons">
+
+                <h:commandButton action="#{salaryMovementProducerAction.createGeneralDiscounts}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!salaryMovementProducerAction.managed and s:hasPermission('SALARYMOVEMENTPRODUCER','CREATE')}" >
+
+                </h:commandButton>
+
+                <h:commandButton action="#{salaryMovementProducerAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">#{messages['SalaryMovementProducer.generalDiscount.title']}</f:facet>
+
+                <s:decorate id="typeMovementProducerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.typeMovementProducer']}</ui:define>
+                    <h:selectOneMenu id="typeMovementProducer"
+                                     value="#{salaryMovementProducerAction.movementProducerType}"
+                                     styleClass="input"
+                                     tabindex="3"
+                                     required="true">
+                        <s:selectItems value="#{typeMovementProducerList}" var="typeMovementProducer"
+                                       label="#{typeMovementProducer.name}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.startDate']}</ui:define>
+                    <rich:calendar value="#{salaryMovementProducerAction.startDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="4"
+                                   required="true">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.endDate']}</ui:define>
+                    <rich:calendar value="#{salaryMovementProducerAction.endDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="4"
+                                   required="true">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="valorField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.valor']}</ui:define>
+                    <h:inputText id="valor" value="#{salaryMovementProducerAction.amount}" styleClass="input" required="true"
+                                 maxlength="100" tabindex="5">
+                        <a4j:support event="onblur" reRender="valorField"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalaryMovementProducer.description']}</ui:define>
+                    <h:inputTextarea id="description"
+                                     value="#{salaryMovementProducerAction.description}"
+                                     styleClass="input textarea"
+                                     tabindex="6">
+                        <a4j:support event="onblur" reRender="valorField"/>
+                    </h:inputTextarea>
+                </s:decorate>
+
+
+            </rich:panel>
+
+            <div class="buttons"></div>
+
+        </h:form>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+    </ui:define>
+</ui:composition>

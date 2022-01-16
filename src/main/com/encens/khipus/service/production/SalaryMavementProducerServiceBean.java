@@ -360,4 +360,32 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
         em.flush();
     }
 
+    @Override
+    public List<RawMaterialProducer> findProducersWithCollection(Date startDate, Date endDate) {
+
+        List<RawMaterialProducer> rawMaterialProducerList =
+        em.createQuery("select distinct c.rawMaterialProducer from CollectedRawMaterial c " +
+                          " where c.rawMaterialCollectionSession.date between :startDate and :endDate " +
+                          " and c.amount > 0 ")
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .getResultList();
+
+        System.out.println("--------------> PRODUCTORES: " + rawMaterialProducerList.size());
+
+        for (RawMaterialProducer producer : rawMaterialProducerList){
+            System.out.println("......:::..." + producer.getFullName());
+        }
+        return rawMaterialProducerList;
+    }
+
+    public void createSalaryMovementProducer(List<SalaryMovementProducer> salaryMovementProducerList){
+
+        for (SalaryMovementProducer salaryMovementProducer : salaryMovementProducerList){
+            em.persist(salaryMovementProducer);
+            em.flush();
+        }
+
+    }
+
 }

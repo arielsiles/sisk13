@@ -1,7 +1,7 @@
 package com.encens.khipus.action.production;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.production.SalaryMovementProducer;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -22,21 +22,29 @@ import java.util.List;
 @Scope(ScopeType.PAGE)
 public class SalaryMovementProducerDataModel extends QueryDataModel<Long, SalaryMovementProducer> {
 
-    private PrivateCriteria privateCriteria;
+    private Date startDate;
+    private Date endDate;
+    private String firstName;
+    private String lastName;
+    private String maidenName;
 
     private static final String[] RESTRICTIONS = {
-            "salaryMovementProducer.date >= #{salaryMovementProducerDataModel.privateCriteria.startDate}",
-            "salaryMovementProducer.date <= #{salaryMovementProducerDataModel.privateCriteria.endDate}",
-            "salaryMovementProducer.state = #{salaryMovementProducerDataModel.privateCriteria.state}",
+            "salaryMovementProducer.date >= #{salaryMovementProducerDataModel.startDate}",
+            "salaryMovementProducer.date <= #{salaryMovementProducerDataModel.endDate}",
+            "salaryMovementProducer.typeMovementProducer = #{salaryMovementProducerDataModel.criteria.typeMovementProducer}",
+            "upper(rawMaterialProducer.firstName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.firstName})), '%')",
+            "upper(rawMaterialProducer.lastName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.lastName})), '%')",
+            "upper(rawMaterialProducer.maidenName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.maidenName})), '%')"
+    };
+
+    /*private static final String[] RESTRICTIONS = {
+            "salaryMovementProducer.date >= #{salaryMovementProducerDataModel.startDate}",
+            "salaryMovementProducer.date <= #{salaryMovementProducerDataModel.endDate}",
+            *//*"salaryMovementProducer.state = #{salaryMovementProducerDataModel.privateCriteria.state}",*//*
             "upper(rawMaterialProducer.firstName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.criteria.rawMaterialProducer.firstName})), '%')",
             "upper(rawMaterialProducer.lastName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.criteria.rawMaterialProducer.lastName})), '%')",
             "upper(rawMaterialProducer.maidenName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.criteria.rawMaterialProducer.maidenName})), '%')"
-    };
-
-    @Create
-    public void init() {
-        sortProperty = "salaryMovementProducer.date";
-    }
+    };*/
 
     @Override
     public String getEjbql() {
@@ -46,57 +54,54 @@ public class SalaryMovementProducerDataModel extends QueryDataModel<Long, Salary
         return query;
     }
 
+    @Create
+    public void defaultSort() {
+        sortProperty = "salaryMovementProducer.date";
+        this.sortAsc = false;
+    }
+
     @Override
     public List<String> getRestrictions() {
         return Arrays.asList(RESTRICTIONS);
     }
 
-    @Override
-    public SalaryMovementProducer createInstance() {
-        SalaryMovementProducer salaryMovementGAB = super.createInstance();
-        salaryMovementGAB.setRawMaterialProducer(new RawMaterialProducer());
-        return salaryMovementGAB;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public static class PrivateCriteria{
-        private Date startDate;
-        private Date endDate;
-        private ProductionCollectionState state;
-
-        public ProductionCollectionState getState() {
-            return state;
-        }
-
-        public void setState(ProductionCollectionState state) {
-            this.state = state;
-        }
-
-        public Date getStartDate() {
-            return startDate;
-        }
-
-        public void setStartDate(Date startDate) {
-            this.startDate = startDate;
-        }
-
-        public Date getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(Date endDate) {
-            this.endDate = endDate;
-        }
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public PrivateCriteria getPrivateCriteria() {
-        if (privateCriteria == null) {
-            privateCriteria = new PrivateCriteria();
-            privateCriteria.setState(ProductionCollectionState.PENDING);
-        }
-        return privateCriteria;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setPrivateCriteria(PrivateCriteria privateCriteria) {
-        this.privateCriteria = privateCriteria;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getMaidenName() {
+        return maidenName;
+    }
+
+    public void setMaidenName(String maidenName) {
+        this.maidenName = maidenName;
     }
 }
