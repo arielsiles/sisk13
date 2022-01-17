@@ -1,10 +1,8 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:s="http://jboss.com/products/seam/taglib"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich" xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
@@ -18,7 +16,7 @@
         <rich:simpleTogglePanel id="grawMaterilPaySummaryReportSearchPanel" label="#{messages['menu.production.rawmaterialpayroll.search']}"
                                 switchType="client">
             <h:panelGrid columns="2"
-                         width="98%"
+                         width="70%"
                          columnClasses="width55percent,width45percent"
                          cellpadding="0"
                          cellspacing="0"
@@ -108,9 +106,15 @@
                                   showReportTitle="false"/>
 
         <div class="buttons">
+            <h:commandButton action="#{rawMaterialPaySummaryReportAction.accountingPeriod}"
+                             styleClass="button"
+                             rendered="#{s:hasPermission('ACCOUNTIG_PROUCER_PAYMENT','VIEW')}"
+                             value="#{messages['Common.accounting']}" id="accountingButtonId" tabindex="2">
+                <s:defaultAction/>
+            </h:commandButton>
             <h:commandButton action="#{rawMaterialPaySummaryReportAction.generateReport}"
                              styleClass="button"
-                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="2">
+                             value="#{messages['Common.generate']}" id="generateButtonId" tabindex="2">
                 <s:defaultAction/>
             </h:commandButton>
         </div>

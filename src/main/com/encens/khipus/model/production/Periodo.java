@@ -1,6 +1,5 @@
 package com.encens.khipus.model.production;
 
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -84,5 +83,9 @@ public enum Periodo {
 
     public String getPeriodoLiteral() {
         return (resourceKey == "Periodo.first") ? " Primera Quincena " : " Segunda Quincena ";
+    }
+
+    public String getQuincenaLiteral() {
+        return (resourceKey == "Periodo.first") ? " 1RA QUINCENA " : " 2DA QUINCENA ";
     }
 }

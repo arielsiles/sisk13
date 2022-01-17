@@ -8,16 +8,26 @@ import com.encens.khipus.model.employees.GeneratedPayrollType;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.GestionPayroll;
 import com.encens.khipus.model.employees.Month;
+import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.production.MetaProduct;
 import com.encens.khipus.model.production.Periodo;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialPayRoll;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
 import com.encens.khipus.service.production.RawMaterialPayRollServiceBean;
+import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.util.VoucherBuilder;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -40,6 +50,10 @@ import java.util.List;
 public class RawMaterialPaySummaryReportAction extends GenericReportAction {
     @In
     RawMaterialPayRollService rawMaterialPayRollService;
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
+    @In
+    protected FacesMessages facesMessages;
 
     private String summaryReportTitle;
     private String gestionTitle;
@@ -169,6 +183,237 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         //params.put("liquid_pay", df.format(discounts.liquid));
         params.put("liquid_pay", df.format(totalLiquid));
 
+    }
+
+
+    public void accountingPeriod(){
+
+        Date startDate = DateUtils.getDate(gestion.getYear(), month.getValue()+1, periodo.getInitDay());
+        Date endDate = DateUtils.getDate(gestion.getYear(), month.getValue()+1, periodo.getEndDay(month.getValue() + 1, gestion.getYear()));
+
+        System.out.println("Fecha Inicio: " + DateUtils.format(startDate, "dd/MM/yyyy"));
+        System.out.println("Fecha Fin: " + DateUtils.format(endDate, "dd/MM/yyyy"));
+
+        discounts = rawMaterialPayRollService.getDiscounts(startDate, endDate, zone, metaProduct);
+        summaryTotal = rawMaterialPayRollService.getSumaryTotal(startDate, endDate, zone, metaProduct);
+
+        Double totalMoneyCollected = discounts.mount;
+        Double totalDifferencesMoney = rawMaterialPayRollService.getTotalMoneyDiff(discounts.unitPrice, startDate, endDate, metaProduct);
+        Double diffTotal = rawMaterialPayRollService.getTotalDiff(discounts.unitPrice, startDate, endDate, metaProduct);
+        Double balanceWeightTotal = rawMaterialPayRollService.getBalanceWeightTotal(discounts.unitPrice, startDate, endDate, metaProduct);
+        Double totalMoneyBalance = totalMoneyCollected + totalDifferencesMoney;
+        Double reservProducer = rawMaterialPayRollService.getReservProducer(startDate,endDate);
+        Double reserveGA = discounts.collected * Constants.DISCOUNT_GA;
+        Double total = totalMoneyBalance + discounts.otherIncome;
+
+        Double totalDiscount = discounts.alcohol + discounts.concentrated + discounts.yogurt
+                + discounts.veterinary + discounts.credit + discounts.recip + discounts.retention
+                + discounts.otherDiscount + reservProducer + reserveGA + discounts.commission;
+
+        Double iue, it,porcentageIUE;
+        RawMaterialPayRoll rawMaterialPayRoll =  rawMaterialPayRollService.getTotalsRawMaterialPayRoll(startDate,endDate,null,null);
+        porcentageIUE = rawMaterialPayRoll.getIue() / rawMaterialPayRoll.getTaxRate();
+        iue = discounts.retention * porcentageIUE;
+        it = discounts.retention - iue;
+        Double totalLiquid = total - totalDiscount;
+
+
+        System.out.println(".......PARA CONTABILIZAR......");
+        System.out.println("-----> Total: " + BigDecimalUtil.toBigDecimal(totalMoneyBalance));
+        System.out.println("-----> alcohol: " + discounts.alcohol);
+        System.out.println("-----> concentrated: " + discounts.concentrated);
+        System.out.println("-----> yogurt: " + discounts.yogurt);
+        System.out.println("-----> veterinary: " + discounts.veterinary);
+        System.out.println("-----> credit: " + discounts.credit);
+        System.out.println("-----> recip: " + discounts.recip);
+        System.out.println("-----> retention: " + discounts.retention);
+        System.out.println("-----> commission: " + discounts.commission);
+        System.out.println("-----> otherIncome: " + discounts.otherIncome);
+
+        System.out.println("-----> IT: " + it);
+        System.out.println("-----> IUE: " + iue);
+
+        System.out.println("-----> Total Descuentos: " + totalDiscount);
+        System.out.println("-----> Liquido Pagable: " + totalLiquid);
+
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, "REGISTRO ACOPIO DE LECHE "
+                                                                + periodo.getQuincenaLiteral()
+                                                                + month.getMonthLiteral().toUpperCase()
+                                                                + " " + gestion.getYear());
+        voucher.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
+        voucher.setDate(endDate);
+
+        VoucherDetail voucherDebit = new VoucherDetail();
+        voucherDebit.setAccount(Constants.ACCOUNT_LECHECRUDA);
+        voucherDebit.setDebit(BigDecimalUtil.toBigDecimal(totalMoneyBalance));
+        voucherDebit.setCredit(BigDecimal.ZERO);
+        voucherDebit.setCurrency(FinancesCurrencyType.P);
+        voucherDebit.setExchangeAmount(BigDecimal.ONE);
+        voucherDebit.setDebitMe(BigDecimal.ZERO);
+        voucherDebit.setCreditMe(BigDecimal.ZERO);
+        voucher.addVoucherDetail(voucherDebit);
+
+        if (discounts.commission > 0){
+            VoucherDetail voucherCredt1 = new VoucherDetail();
+            voucherCredt1.setAccount(Constants.ACCOUNT_FONDOSCUSTODIA);
+            voucherCredt1.setDebit(BigDecimal.ZERO);
+            voucherCredt1.setCredit(BigDecimalUtil.toBigDecimal(discounts.commission));
+            voucherCredt1.setCurrency(FinancesCurrencyType.P);
+            voucherCredt1.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt1.setDebitMe(BigDecimal.ZERO);
+            voucherCredt1.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt1);
+
+        }
+
+        if (it > 0){
+            VoucherDetail voucherCredt2 = new VoucherDetail();
+            voucherCredt2.setAccount(Constants.ACCOUNT_IT_RETENIDO);
+            voucherCredt2.setDebit(BigDecimal.ZERO);
+            voucherCredt2.setCredit(BigDecimalUtil.toBigDecimal(it));
+            voucherCredt2.setCurrency(FinancesCurrencyType.P);
+            voucherCredt2.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt2.setDebitMe(BigDecimal.ZERO);
+            voucherCredt2.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt2);
+        }
+
+        if (iue > 0){
+            VoucherDetail voucherCredt3 = new VoucherDetail();
+            voucherCredt3.setAccount(Constants.ACCOUNT_IUE_RETENIDO);
+            voucherCredt3.setDebit(BigDecimal.ZERO);
+            voucherCredt3.setCredit(BigDecimalUtil.toBigDecimal(iue));
+            voucherCredt3.setCurrency(FinancesCurrencyType.P);
+            voucherCredt3.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt3.setDebitMe(BigDecimal.ZERO);
+            voucherCredt3.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt3);
+        }
+
+        if (totalLiquid > 0){
+            VoucherDetail voucherCredt4 = new VoucherDetail();
+            voucherCredt4.setAccount(Constants.ACCOUNT_ACREEDORES_BIENESSERVICIOS);
+            voucherCredt4.setDebit(BigDecimal.ZERO);
+            voucherCredt4.setCredit(BigDecimalUtil.toBigDecimal(totalLiquid));
+            voucherCredt4.setCurrency(FinancesCurrencyType.P);
+            voucherCredt4.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt4.setDebitMe(BigDecimal.ZERO);
+            voucherCredt4.setCreditMe(BigDecimal.ZERO);
+            voucherCredt4.setProviderCode(Constants.PROVIDER_CODE_PRODUCTORES);
+            voucher.addVoucherDetail(voucherCredt4);
+        }
+
+        if (discounts.veterinary > 0){
+            VoucherDetail voucherCredt4 = new VoucherDetail();
+            voucherCredt4.setAccount(Constants.ACCOUNT_CLIENTESPRODUCTORES);
+            voucherCredt4.setDebit(BigDecimal.ZERO);
+            voucherCredt4.setCredit(BigDecimalUtil.toBigDecimal(discounts.veterinary));
+            voucherCredt4.setCurrency(FinancesCurrencyType.P);
+            voucherCredt4.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt4.setDebitMe(BigDecimal.ZERO);
+            voucherCredt4.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt4);
+        }
+
+        if (discounts.yogurt > 0){
+            VoucherDetail voucherCredt5 = new VoucherDetail();
+            voucherCredt5.setAccount(Constants.ACCOUNT_CLIENTES);
+            voucherCredt5.setDebit(BigDecimal.ZERO);
+            voucherCredt5.setCredit(BigDecimalUtil.toBigDecimal(discounts.yogurt));
+            voucherCredt5.setCurrency(FinancesCurrencyType.P);
+            voucherCredt5.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt5.setDebitMe(BigDecimal.ZERO);
+            voucherCredt5.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt5);
+        }
+
+        if (discounts.credit > 0){
+            VoucherDetail voucherCredt6 = new VoucherDetail();
+            voucherCredt6.setAccount(Constants.ACCOUNT_FONDOSCUSTODIA);
+            voucherCredt6.setDebit(BigDecimal.ZERO);
+            voucherCredt6.setCredit(BigDecimalUtil.toBigDecimal(discounts.credit));
+            voucherCredt6.setCurrency(FinancesCurrencyType.P);
+            voucherCredt6.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt6.setDebitMe(BigDecimal.ZERO);
+            voucherCredt6.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt6);
+        }
+
+        if (discounts.alcohol > 0){
+            VoucherDetail voucherCredt6 = new VoucherDetail();
+            voucherCredt6.setAccount(Constants.ACCOUNT_FONDOSCUSTODIA);
+            voucherCredt6.setDebit(BigDecimal.ZERO);
+            voucherCredt6.setCredit(BigDecimalUtil.toBigDecimal(discounts.alcohol));
+            voucherCredt6.setCurrency(FinancesCurrencyType.P);
+            voucherCredt6.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt6.setDebitMe(BigDecimal.ZERO);
+            voucherCredt6.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt6);
+        }
+
+        if (discounts.concentrated > 0){
+            VoucherDetail voucherCredt6 = new VoucherDetail();
+            voucherCredt6.setAccount(Constants.ACCOUNT_FONDOSCUSTODIA);
+            voucherCredt6.setDebit(BigDecimal.ZERO);
+            voucherCredt6.setCredit(BigDecimalUtil.toBigDecimal(discounts.concentrated));
+            voucherCredt6.setCurrency(FinancesCurrencyType.P);
+            voucherCredt6.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt6.setDebitMe(BigDecimal.ZERO);
+            voucherCredt6.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt6);
+        }
+
+        if (discounts.recip > 0){
+            VoucherDetail voucherCredt6 = new VoucherDetail();
+            voucherCredt6.setAccount(Constants.ACCOUNT_FONDOSCUSTODIA);
+            voucherCredt6.setDebit(BigDecimal.ZERO);
+            voucherCredt6.setCredit(BigDecimalUtil.toBigDecimal(discounts.recip));
+            voucherCredt6.setCurrency(FinancesCurrencyType.P);
+            voucherCredt6.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt6.setDebitMe(BigDecimal.ZERO);
+            voucherCredt6.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt6);
+        }
+
+        if (discounts.otherDiscount > 0){
+            VoucherDetail voucherCredt6 = new VoucherDetail();
+            voucherCredt6.setAccount(Constants.ACCOUNT_FONDOSCUSTODIA);
+            voucherCredt6.setDebit(BigDecimal.ZERO);
+            voucherCredt6.setCredit(BigDecimalUtil.toBigDecimal(discounts.otherDiscount));
+            voucherCredt6.setCurrency(FinancesCurrencyType.P);
+            voucherCredt6.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt6.setDebitMe(BigDecimal.ZERO);
+            voucherCredt6.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt6);
+        }
+
+        if (reservProducer > 0){
+            VoucherDetail voucherCredt6 = new VoucherDetail();
+            voucherCredt6.setAccount(Constants.ACCOUNT_FONDOSCUSTODIA);
+            voucherCredt6.setDebit(BigDecimal.ZERO);
+            voucherCredt6.setCredit(BigDecimalUtil.toBigDecimal(reservProducer));
+            voucherCredt6.setCurrency(FinancesCurrencyType.P);
+            voucherCredt6.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt6.setDebitMe(BigDecimal.ZERO);
+            voucherCredt6.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt6);
+        }
+
+        if (reserveGA > 0){
+            VoucherDetail voucherCredt6 = new VoucherDetail();
+            voucherCredt6.setAccount(Constants.ACCOUNT_FONDOSCUSTODIA);
+            voucherCredt6.setDebit(BigDecimal.ZERO);
+            voucherCredt6.setCredit(BigDecimalUtil.toBigDecimal(reserveGA));
+            voucherCredt6.setCurrency(FinancesCurrencyType.P);
+            voucherCredt6.setExchangeAmount(BigDecimal.ONE);
+            voucherCredt6.setDebitMe(BigDecimal.ZERO);
+            voucherCredt6.setCreditMe(BigDecimal.ZERO);
+            voucher.addVoucherDetail(voucherCredt6);
+        }
+
+        voucherAccoutingService.saveVoucher(voucher);
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Se contabilizó la quincena correctamente.");
     }
 
     @Override

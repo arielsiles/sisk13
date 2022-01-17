@@ -325,6 +325,14 @@ public final class Constants {
     public static final String EMAIL_SUBJECT_ANNULLED = "Factura Electrónica en Línea ANULADA, CISC Ltda. - ILVA";
     public static final String EMAIL_BUSINESS_NAME = "COOPERATIVA INTEGRAL DE SERVICIOS COCHABAMBA LTDA.";
 
+    public static final String ACCOUNT_LECHECRUDA = "1580110400";
+    public static final String ACCOUNT_FONDOSCUSTODIA = "2429910400";
+    public static final String ACCOUNT_IT_RETENIDO = "2420310500";
+    public static final String ACCOUNT_IUE_RETENIDO = "2420310400";
+    public static final String ACCOUNT_CLIENTESPRODUCTORES = "1421010200";
+    public static final String ACCOUNT_CLIENTES= "1421010100";
+    public static final String ACCOUNT_ACREEDORES_BIENESSERVICIOS = "2420910300";
+    public static final String PROVIDER_CODE_PRODUCTORES = "433";
 
 
     private Constants() {
