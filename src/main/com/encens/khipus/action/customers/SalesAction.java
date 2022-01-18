@@ -628,8 +628,9 @@ public class SalesAction extends GenericAction {
     }
 
     public Movement createInvoice(CustomerOrder customerOrder){
-        User user = getUser(currentUser.getId()); //
-        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+        //User user = getUser(currentUser.getId()); //
+        //Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+        Dosage dosage = dosageService.findDosageByOffice(customerOrder.getUser().getBranchOffice().getId());
 
         Long invoiceNumber = dosage.getCurrentNumber();
         SFC sfc = new SFC(  dosage.getAuthorizationNumber().toString(),

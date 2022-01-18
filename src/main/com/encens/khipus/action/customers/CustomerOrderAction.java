@@ -70,7 +70,66 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         return outCome;
     }
 
+    public void cancelOrderInvoice(CustomerOrder customerOrder){
+
+        customerOrder.setState(SaleStatus.ANULADO);
+        inventoryService.updateInventoryForSalesAnnuled(customerOrder);
+        saleService.updateCustomerOrder(customerOrder);
+
+        if (customerOrder.getVoucher() != null) {
+            customerOrder.getVoucher().setState(VoucherState.ANL.toString());
+            voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
+        }
+
+        /** Anular Factura En Linea **/
+        if (customerOrder.getMovement() != null){
+            if (customerOrder.getMovement().getDescri().equals("VALIDADA")){
+                annulOrder(customerOrder);
+            }
+        }
+        cleanAnnulOrder();
+    }
+
     public void annulOrder(CustomerOrder customerOrder) {
+
+        CompanyConfiguration companyConfiguration = billControllerAction.getCompanyConfiguration();
+
+        Date controlAnnulDate = DateUtils.removeTime(companyConfiguration.getInvoiceAnnulDate());
+        Date currentDate = DateUtils.toDay();
+
+        Integer day   = DateUtils.getDay(companyConfiguration.getInvoiceAnnulDate());
+        Integer month = DateUtils.getCurrentMonth(DateUtils.addMonth(customerOrder.getOrderDate(), 1));
+        Integer year  = DateUtils.getCurrentYear(DateUtils.addMonth(customerOrder.getOrderDate(), 1));
+        Date maxAnnulDate = DateUtils.getDate(year, month, day);
+
+        if (currentDate.compareTo(maxAnnulDate) > 0){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible anular, se encuentra fuera de la fecha valida.");
+            return;
+        }
+
+        CancelBillResponsePOJO cancelResponse = null;
+        try {
+            cancelResponse = billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());
+        } catch (IOException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorAnnulOrder");
+            return;
+        }
+
+        if (cancelResponse != null) {
+            Movement movement = customerOrder.getMovement();
+            movement.setState("A");
+            movement.setCodigoEstado(cancelResponse.getCodigoEstado().toString());
+            movement.setDescri(cancelResponse.getCodigoDescripcion());
+            movementService.updateMovement(movement);
+
+            sendMessageAnnulledInvoice(customerOrder);
+        }
+        cleanAnnulOrder();
+    }
+
+
+
+    public void annulOrder0(CustomerOrder customerOrder) {
         System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " +
                                         customerOrder.getTotalAmount() + " - " + cancellationReason.getDescription());
 

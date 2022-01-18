@@ -111,7 +111,7 @@ public class User implements BaseModel {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserBusinessUnit> businessUnits;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "idsucursal", referencedColumnName = "idsucursal", nullable = true)
     private BranchOffice branchOffice;
 

@@ -66,9 +66,9 @@
 
         <div class="buttonsRight">
             <a4j:commandButton id="annulOrderButton" value="Anular"
-                               action="#{customerOrderAction.annulOrder(customerOrder)}"
+                               action="#{customerOrderAction.cancelOrderInvoice(customerOrder)}"
                                styleClass="button"
-                               reRender="customerOrderSearch, customerOrderList">
+                               reRender="customerOrderList">
             </a4j:commandButton>
 
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">

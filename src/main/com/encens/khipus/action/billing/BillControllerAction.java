@@ -368,8 +368,8 @@ public class BillControllerAction {
 
     public CancelBillResponsePOJO cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
         System.out.println("---------- CANCEL BILL ----------");
-        User user = getUser(currentUser.getId()); //
-        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+        //User user = getUser(currentUser.getId()); //
+        Dosage dosage = dosageService.findDosageByOffice(customerOrder.getUser().getBranchOffice().getId());
 
         CancelBillResponsePOJO responseResult = null;
 
@@ -623,8 +623,11 @@ public class BillControllerAction {
 
     public PedidoPOJO createPedidoPojo(CustomerOrder customerOrder){
 
-        User user = getUser(currentUser.getId()); //
-        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+        //User user = getUser(currentUser.getId()); //
+        //Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId());
+
+        Dosage dosage = dosageService.findDosageByOffice(customerOrder.getUser().getBranchOffice().getId());
+        User user = customerOrder.getUser();
 
         PedidoPOJO pedidoPOJO = new PedidoPOJO();
         pedidoPOJO.setNumeroFactura(customerOrder.getMovement().getNumber());

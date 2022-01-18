@@ -263,7 +263,7 @@
 
             <!--rows="#{sessionUser.rowsPerPage50}"-->
             <rich:dataTable id="customerOrderList" value="#{customerOrderDataModel}" var="customerOrder"
-                            rows="10"
+                            rows="15"
                             width="100%" columnsWidth="2%, 5%, 5%, 5%, 25%, 5%, 5%, 10%, 8%, 5%, 10%, 5%, 10%">
 
                 <f:facet name="header">
@@ -355,7 +355,7 @@
                                        immediate="true"
                                        rendered="#{salesAction.showActionsBilling(customerOrder) and s:hasPermission('CANCEL_ORDER_INVOICE_SFE','VIEW')}"
                                        oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
-                                       reRender="confirmCancelOrderModalPanel">
+                                       reRender="customerOrderList,confirmCancelOrderModalPanel">
                     </a4j:commandButton>
 
                     <h:commandLink action="#{salesAction.generateFileXML(customerOrder)}"
