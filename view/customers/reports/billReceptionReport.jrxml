@@ -286,9 +286,9 @@
 				</textElement>
 				<text><![CDATA[CÓDIGO PRODUCTO]]></text>
 			</staticText>
-			<image>
+			<image onErrorType="Icon">
 				<reportElement x="260" y="0" width="61" height="61"/>
-				<imageExpression class="java.lang.String"><![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logo-cisc-ilva.png")]]></imageExpression>
+				<imageExpression class="java.io.InputStream"><![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logo-cisc-ilva.png")]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="450" y="102" width="50" height="20"/>
