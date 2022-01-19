@@ -6,7 +6,7 @@
 
     <property file="build-${profile}.properties"/>
     <property name="app.name" value="KHIPUS"/>
-    <property name="app.version" value="5.4.4"/>
+    <property name="app.version" value="5.4.5"/>
     <property environment="env"/>
     <property name="app.build" value="${env.BUILD_NUMBER}"/>
 
