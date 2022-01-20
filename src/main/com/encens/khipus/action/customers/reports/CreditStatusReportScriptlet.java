@@ -70,13 +70,20 @@ public class CreditStatusReportScriptlet extends JRDefaultScriptlet {
         //  Date nextPaymentDate = endPeriodDate;
         Long expiredDays = new Long(0);
 
+        System.out.println(creditId + " ++++++++++++++++>>>>> CAPITAL BALANCE::::::::: " + capitalBalance);
         if (capitalBalance.doubleValue() > 0) {
+
             if (state.equals(CreditState.VIG))
                 interestToDate = creditTransactionAction.calculateInterest(capitalBalance, lastPaymentDate, endPeriodDate, credit.getAnnualRate());
 
             //nextPaymentDate = creditAction.findDateOfNextPayment(credit, endPeriodDate);
-            expiredDays = creditAction.calculateExpiredDays(credit, endPeriodDate);
-
+            try {
+                expiredDays = creditAction.calculateExpiredDays(credit, endPeriodDate);
+            } catch (Exception e){
+                System.out.println("ERROR ++++++++++++++++++++++++ ERROR CALCULO EXPIRED DAYS");
+                expiredDays = 0L;
+            }
+            System.out.println(creditId + " ++++++++++++++++>>>>> EXPIRED DAYS::::::::: " + expiredDays);
             if (expiredDays <= 0)
                 expiredDays = BigDecimal.ZERO.longValue();
 
