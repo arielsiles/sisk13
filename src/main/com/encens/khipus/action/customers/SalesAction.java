@@ -929,10 +929,12 @@ public class SalesAction extends GenericAction {
                         ArticleOrder articleOrd = productsArt.get(articleOrderCode);
                         Integer quantityOrd     = articleOrd.getQuantity() + articleOrder.getQuantity();
                         articleOrd.setQuantity(quantityOrd);
-                        Double amount = articleOrd.getAmount() + articleOrder.getAmount();
-                        articleOrd.setAmount(amount);
-                        Double price = articleOrd.getAmount() / articleOrd.getQuantity();
-                        articleOrd.setPrice(price);
+                        BigDecimal amount = BigDecimalUtil.sum(BigDecimalUtil.toBigDecimal(articleOrd.getAmount()), BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
+                        articleOrd.setAmount(amount.doubleValue());
+                        //Double price = articleOrd.getAmount() / articleOrd.getQuantity();
+                        BigDecimal price = BigDecimalUtil.divide(BigDecimalUtil.toBigDecimal(articleOrd.getAmount()), BigDecimalUtil.toBigDecimal(articleOrd.getQuantity()));
+                        articleOrd.setPrice(price.doubleValue());
+                        articleOrd.setDiscount(0.0);
                         productsArt.put(articleOrderCode, articleOrd);
 
                     }else {
@@ -946,6 +948,7 @@ public class SalesAction extends GenericAction {
                         article.setCompanyNumber(Constants.defaultCompanyNumber);
                         article.setPromotion(0);
                         article.setReposicion(0);
+                        article.setDiscount(0.0);
                         article.setTotal(articleOrder.getQuantity());
                         article.setAmount(articleOrder.getAmount());
 
@@ -980,7 +983,7 @@ public class SalesAction extends GenericAction {
 
             customerOrderBill.setTotalAmount(totalAmount);
             customerOrderBill.setTax(BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(totalAmount), Constants.VAT).doubleValue());
-            customerOrderBill.setState(SaleStatus.PREPARAR);
+            customerOrderBill.setState(SaleStatus.CONTABILIZADO);
             customerOrderBill.setUser(currentUser);
 
             saleService.createSale(customerOrderBill);
