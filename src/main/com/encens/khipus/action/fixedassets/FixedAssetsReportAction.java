@@ -109,6 +109,7 @@ public class FixedAssetsReportAction extends GenericReportAction {
                 "      fixedAssetGroup.description, " +
                 "      fixedAssetSubGroup.description, " +
                 "      fixedAsset.acumulatedDepreciation, " +
+                "      fixedAsset.detail, " +
                 "      (fixedAsset.bsOriginalValue - fixedAsset.acumulatedDepreciation) as balance " +
                 "FROM  FixedAsset as fixedAsset" +
                 "      LEFT JOIN fixedAsset.businessUnit businessUnit" +
