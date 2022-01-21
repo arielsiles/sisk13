@@ -449,15 +449,15 @@
         </navigation>
     </page>
 
-    <page view-id="/customers/transferCashSale.xhtml" no-conversation-view-id="/customers/cashSaleList.xhtml">
+    <page view-id="/customers/transferCashSale.xhtml" no-conversation-view-id="/accounting/voucherList.xhtml">
         <navigation from-action="#{cashSaleAction.generateTransfer}">
             <rule if-outcome="Success">
-                <redirect view-id="/customers/cashSaleList.xhtml"/>
+                <redirect view-id="/accounting/voucherList.xhtml"/>
             </rule>
         </navigation>
         <navigation>
             <rule if-outcome="Cancel">
-                <redirect view-id="/customers/cashSaleList.xhtml"/>
+                <redirect view-id="/accounting/voucherList.xhtml"/>
             </rule>
         </navigation>
     </page>
