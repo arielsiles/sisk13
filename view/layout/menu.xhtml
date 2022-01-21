@@ -130,7 +130,7 @@
                 styleClass="tab-cell"
                 propagation="none"/>
 
-        <rich:dropDownMenu value="#{messages['menu.customers.report']}" rendered="#{s:hasPermission('VIEW','CREATE')}">
+        <rich:dropDownMenu value="#{messages['menu.customers.report']}" rendered="#{s:hasPermission('CREDIT','VIEW')}">
             <rich:menuItem submitMode="none" styleClass="main-menu-item">
                 <s:link view="/customers/creditStatusReport.xhtml"
                         value="#{messages['menu.customers.report.creditStatus']}"
