@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="556" leftMargin="28" rightMargin="28" topMargin="14" bottomMargin="14" scriptletClass="com.encens.khipus.action.fixedassets.FixedAssetsReportScriptlet">
 	<property name="ireport.zoom" value="2.853116706110008"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="438"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
@@ -97,6 +97,9 @@
 	<field name="balance" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[COLUMN_30]]></fieldDescription>
 	</field>
+	<field name="totalBsOriginalValue" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_31]]></fieldDescription>
+	</field>
 	<variable name="cancelCauseVar" class="java.lang.String" calculation="System"/>
 	<variable name="responsibleMovementVar" class="java.lang.String"/>
 	<variable name="lastMovementVar" class="java.lang.String" calculation="System"/>
@@ -106,6 +109,9 @@
 	</variable>
 	<variable name="bsOriginalValueTotal" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{fixedAsset.bsOriginalValue}]]></variableExpression>
+	</variable>
+	<variable name="bsOriginalValueTotal2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalBsOriginalValue}]]></variableExpression>
 	</variable>
 	<variable name="ufvImprovementTotal" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{fixedAsset.ufvImprovement}]]></variableExpression>
@@ -125,6 +131,9 @@
 	<variable name="subGroupBsOriginalValueTotal" class="java.math.BigDecimal" resetType="Group" resetGroup="fixedAssetSubGroup" calculation="Sum">
 		<variableExpression><![CDATA[$F{fixedAsset.bsOriginalValue}]]></variableExpression>
 	</variable>
+	<variable name="subGroupBsOriginalValueTotal2" class="java.math.BigDecimal" resetType="Group" resetGroup="fixedAssetSubGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalBsOriginalValue}]]></variableExpression>
+	</variable>
 	<variable name="subGroupUfvImprovementTotal" class="java.math.BigDecimal" resetType="Group" resetGroup="fixedAssetSubGroup" calculation="Sum">
 		<variableExpression><![CDATA[$F{fixedAsset.ufvImprovement}]]></variableExpression>
 	</variable>
@@ -142,6 +151,9 @@
 	</variable>
 	<variable name="groupBsOriginalValueTotal" class="java.math.BigDecimal" resetType="Group" resetGroup="fixedAssetGroup" calculation="Sum">
 		<variableExpression><![CDATA[$F{fixedAsset.bsOriginalValue}]]></variableExpression>
+	</variable>
+	<variable name="groupBsOriginalValueTotal2" class="java.math.BigDecimal" resetType="Group" resetGroup="fixedAssetGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalBsOriginalValue}]]></variableExpression>
 	</variable>
 	<variable name="groupUfvImprovementTotal" class="java.math.BigDecimal" resetType="Group" resetGroup="fixedAssetGroup" calculation="Sum">
 		<variableExpression><![CDATA[$F{fixedAsset.ufvImprovement}]]></variableExpression>
@@ -200,20 +212,6 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.subTotal} + ":"]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="361" y="0" width="60" height="11"/>
-					<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
-						<pen lineStyle="Solid" lineColor="#000000"/>
-						<topPen lineWidth="0.5" lineStyle="Solid"/>
-						<leftPen lineWidth="0.5" lineStyle="Solid"/>
-						<bottomPen lineWidth="0.5" lineStyle="Solid"/>
-						<rightPen lineWidth="0.5" lineStyle="Solid"/>
-					</box>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{groupBsOriginalValueTotal}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="421" y="0" width="60" height="11"/>
 					<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
 						<pen lineStyle="Solid" lineColor="#000000"/>
@@ -240,6 +238,20 @@
 						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{groupBalanceTotal}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="361" y="0" width="60" height="11"/>
+					<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
+						<pen lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="0.5" lineStyle="Solid"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{groupBsOriginalValueTotal2}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
@@ -303,20 +315,6 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Fixedassets.report.duration}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="361" y="0" width="60" height="11" backcolor="#CCCCCC"/>
-						<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5" lineStyle="Solid"/>
-							<leftPen lineWidth="0.5" lineStyle="Solid"/>
-							<bottomPen lineWidth="0.5" lineStyle="Solid"/>
-							<rightPen lineWidth="0.5" lineStyle="Solid"/>
-						</box>
-						<textElement textAlignment="Center" verticalAlignment="Middle">
-							<font fontName="Arial" size="7"/>
-						</textElement>
-						<textFieldExpression class="java.lang.String"><![CDATA[$R{Fixedassets.report.bsOriginalValue}]]></textFieldExpression>
-					</textField>
-					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 						<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="421" y="0" width="60" height="11" backcolor="#CCCCCC"/>
 						<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -344,25 +342,25 @@
 						</textElement>
 						<textFieldExpression class="java.lang.String"><![CDATA["Saldo neto"]]></textFieldExpression>
 					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="361" y="0" width="60" height="11" backcolor="#CCCCCC"/>
+						<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							<topPen lineWidth="0.5" lineStyle="Solid"/>
+							<leftPen lineWidth="0.5" lineStyle="Solid"/>
+							<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+							<rightPen lineWidth="0.5" lineStyle="Solid"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="7"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$R{Fixedassets.report.bsOriginalValue}]]></textFieldExpression>
+					</textField>
 				</frame>
 			</band>
 		</groupHeader>
 		<groupFooter>
 			<band height="13">
-				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="361" y="0" width="60" height="11"/>
-					<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
-						<pen lineStyle="Solid" lineColor="#000000"/>
-						<topPen lineWidth="0.5" lineStyle="Solid"/>
-						<leftPen lineWidth="0.5" lineStyle="Solid"/>
-						<bottomPen lineWidth="0.5" lineStyle="Solid"/>
-						<rightPen lineWidth="0.5" lineStyle="Solid"/>
-					</box>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{subGroupBsOriginalValueTotal}]]></textFieldExpression>
-				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="421" y="0" width="60" height="11"/>
 					<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
@@ -390,6 +388,20 @@
 						<font fontName="Arial" size="7"/>
 					</textElement>
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{subGroupBalanceTotal}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="361" y="0" width="60" height="11"/>
+					<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
+						<pen lineStyle="Solid" lineColor="#000000"/>
+						<topPen lineWidth="0.5" lineStyle="Solid"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid"/>
+						<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+						<rightPen lineWidth="0.5" lineStyle="Solid"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{subGroupBsOriginalValueTotal2}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
@@ -477,20 +489,6 @@
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{fixedAsset.duration}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="361" y="0" width="60" height="11"/>
-				<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
-					<pen lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5" lineStyle="Solid"/>
-					<leftPen lineWidth="0.5" lineStyle="Solid"/>
-					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
-					<rightPen lineWidth="0.5" lineStyle="Solid"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="7"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{fixedAsset.bsOriginalValue}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="421" y="0" width="60" height="11"/>
 				<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
 					<pen lineStyle="Solid" lineColor="#000000"/>
@@ -516,6 +514,20 @@
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{balance}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="361" y="0" width="60" height="11"/>
+				<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
+					<pen lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{totalBsOriginalValue}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -563,20 +575,6 @@
 				<textFieldExpression class="java.lang.String"><![CDATA["TOTAL:"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="361" y="2" width="60" height="12" backcolor="#CCCCCC"/>
-				<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
-					<pen lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5" lineStyle="Solid"/>
-					<leftPen lineWidth="0.5" lineStyle="Solid"/>
-					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
-					<rightPen lineWidth="0.5" lineStyle="Solid"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Arial" size="7" isBold="false"/>
-				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{bsOriginalValueTotal}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="421" y="2" width="60" height="12" backcolor="#CCCCCC"/>
 				<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
 					<pen lineStyle="Solid" lineColor="#000000"/>
@@ -603,6 +601,20 @@
 					<font fontName="Arial" size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{balanceTotal}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="361" y="2" width="60" height="12" backcolor="#CCCCCC"/>
+				<box padding="1" topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="5">
+					<pen lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{bsOriginalValueTotal2}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
