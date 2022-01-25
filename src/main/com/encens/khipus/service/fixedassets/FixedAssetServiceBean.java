@@ -418,6 +418,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             // create the vouchers for depreciation
             if (businessUnitDepreciationVoucherMappings.size() > 0) {
                 Voucher depreciationVoucher = createVoucherByDetailMappings(businessUnitDepreciationVoucherMappings, gloss + " al " + DateUtils.format(lastDayOfCurrentProcessMonth, "dd/MM/yyyy"));
+                depreciationVoucher.setDate(lastDayOfCurrentProcessMonth);
                 depreciationVoucher.setDocumentType(documentType);
                 //voucherService.create(depreciationVoucher);
                 voucherAccoutingService.saveVoucher(depreciationVoucher);
@@ -1207,7 +1208,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                 BigDecimalUtil.toBigDecimal(FixedAssetDefaultConstants.DEPRECIATION_FUNCTION_DIVIDER)
         );*/
 
-        return BigDecimalUtil.divide(
+        /*return BigDecimalUtil.divide(
                 BigDecimalUtil.multiply(
                         BigDecimalUtil.sum(
                                 fixedAsset.getBsOriginalValue(),
@@ -1216,8 +1217,23 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                         fixedAsset.getDepreciationRate()
                 ),
                 BigDecimalUtil.toBigDecimal(FixedAssetDefaultConstants.DEPRECIATION_FUNCTION_DIVIDER)
-        );
+        );*/
 
+        BigDecimal result = BigDecimal.ZERO;
+
+        if (fixedAsset.getImprovement().doubleValue() > 0){
+            if (fixedAsset.getAcumulatedDepreciation().doubleValue() >= fixedAsset.getBsOriginalValue().doubleValue()){
+                BigDecimal totalValue = BigDecimalUtil.sum(BigDecimal.ZERO, fixedAsset.getImprovement());
+                BigDecimal auxValue = BigDecimalUtil.multiply(totalValue, fixedAsset.getDepreciationRate());
+                result = BigDecimalUtil.divide(auxValue, BigDecimalUtil.toBigDecimal(FixedAssetDefaultConstants.DEPRECIATION_FUNCTION_DIVIDER));
+            }
+        } else {
+            BigDecimal totalOriginValue = BigDecimalUtil.sum(fixedAsset.getBsOriginalValue(), fixedAsset.getImprovement());
+            BigDecimal auxValue = BigDecimalUtil.multiply(totalOriginValue, fixedAsset.getDepreciationRate());
+            result = BigDecimalUtil.divide(auxValue, BigDecimalUtil.toBigDecimal(FixedAssetDefaultConstants.DEPRECIATION_FUNCTION_DIVIDER));
+        }
+
+        return result;
     }
 
     private BigDecimal residualCandidate(FixedAsset fixedAsset) {
