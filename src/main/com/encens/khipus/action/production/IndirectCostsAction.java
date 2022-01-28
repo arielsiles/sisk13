@@ -1,29 +1,26 @@
 package com.encens.khipus.action.production;
 
-import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
-import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
-import com.encens.khipus.framework.action.*;
-import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.Month;
-import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.IndirectCosts;
 import com.encens.khipus.model.production.IndirectCostsConfig;
 import com.encens.khipus.model.production.PeriodIndirectCost;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.IndirectCostsService;
 import com.encens.khipus.service.production.PeriodIndirectCostService;
-import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import org.jboss.seam.annotations.Outcome;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,6 +41,8 @@ public class IndirectCostsAction extends GenericAction<IndirectCosts> {
 
     @In
     private IndirectCostsService indirectCostsService;
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
 
     @In
     private CompanyConfigurationService companyConfigurationService;
@@ -215,19 +214,33 @@ public class IndirectCostsAction extends GenericAction<IndirectCosts> {
                 "Indirectcosts.message.created");
     }
 
-    public void findLastPeriod()
-    {
+    public void findLastPeriod() {
+
         List<IndirectCostsConfig> costGeneral = periodIndirectCostService.findPredefinedIndirectCost();
-       for(IndirectCostsConfig costs:costGeneral){
-           if(!findByName(costs.getDescription()))
-           {
-           IndirectCosts cost= new IndirectCosts();
-           cost.setAmountBs(BigDecimal.ZERO);
-           cost.setName(costs.getDescription());
-           cost.setCostsConifg(costs);
-           indirectCostses.add(cost);
-           }
-       }
+
+        Date startDate = DateUtils.getFirstDayOfMonth(month.getValue()+1, gestion.getYear());
+        Date endDate   = DateUtils.getLastDayOfMonth(startDate);
+
+        System.out.println("----------> star: " + startDate);
+        System.out.println("----------> end: " + endDate);
+
+        for(IndirectCostsConfig costs:costGeneral){
+        //if(!findByName(costs.getDescription())) {
+
+            BigDecimal value = voucherAccoutingService.calculateBalanceDebit(startDate, endDate, costs.getAccount());
+
+            if (value.doubleValue() > 0) {
+                IndirectCosts cost = new IndirectCosts();
+                cost.setAmountBs(value);
+                cost.setName(costs.getDescription());
+                cost.setCostsConifg(costs);
+                indirectCostses.add(cost);
+            }
+        //}
+        }
+
+        System.out.println("==========>>>>> Gestion: " + gestion);
+        System.out.println("==========>>>>> Month: " + month);
 
     }
 

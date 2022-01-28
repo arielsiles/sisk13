@@ -5,7 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
-                xmlns:rich="http://richfaces.org/rich"
+                xmlns:rich="http://richfaces.org/rich" xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">
@@ -28,12 +28,10 @@
 <h:form id="IndirectCostsForm">
     <div class="buttons">
 
-        <a4j:commandButton action="#{indirectCostsAction.findLastPeriod}"
+        <a4j:commandButton action="#{indirectCostsAction.findLastPeriod()}"
                            reRender="indirectCostsList"
                            styleClass="button"
                            value="#{messages['Indirectcosts.searchLast']}"
-                           ajaxSingle="true"
-                           immediate="true"
                            tabindex="1">
             <s:defaultAction/>
         </a4j:commandButton>
@@ -137,7 +135,9 @@
         </rich:column>
 
         <rich:column>
-            <h:inputText value="#{item.amountBs}"/>
+            <h:inputText id="amount" value="#{item.amountBs}">
+                <app:realNumberConverter forId="amount" pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:inputText>
         </rich:column>
 
         <rich:column styleClass="center">

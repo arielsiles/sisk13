@@ -876,6 +876,35 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return  totalResultStateBalance;
     }
 
+
+    public BigDecimal calculateBalanceDebit(Date startDate, Date endDate, String cashAccount){
+
+        BigDecimal result = BigDecimal.ZERO;
+
+        try {
+
+            result = (BigDecimal) em.createQuery(
+                    " SELECT " +
+                            " SUM(voucherDetail.debit) - SUM(voucherDetail.credit) AS balance " +
+                            " FROM VoucherDetail voucherDetail " +
+                            " WHERE voucherDetail.account =:cashAccount " +
+                            " AND voucherDetail.voucher.state <> 'ANL' " +
+                            " AND voucherDetail.voucher.date between :startDate and :endDate ")
+                    .setParameter("cashAccount", cashAccount)
+                    .setParameter("startDate", startDate)
+                    .setParameter("endDate", endDate)
+                    .getSingleResult();
+
+        }catch (NoResultException e){
+            e.printStackTrace();
+        }
+
+        if (result == null) result = BigDecimal.ZERO;
+
+        return result;
+    }
+
+
     /**  **/
     public BigDecimal calculateLossesNiv3(String startDate, String endDate, String accountLevel3){
 

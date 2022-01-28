@@ -76,6 +76,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     public HashMap<String, BigDecimal> stateBalanceReport(String start, String end);
 
+    public BigDecimal calculateBalanceDebit(Date startDate, Date endDate, String cashAccount);
+
     public BigDecimal calculateLossesNiv3(String startDate, String endDate, String accountLevel3);
 
     public BigDecimal calculateBalanceNiv3(String startDate, String endDate, String accountLevel3, String accountType);
