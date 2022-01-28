@@ -1967,7 +1967,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 " where voucher.date between :startDate and :endDate " +
                 " and voucher.documentCode =:documentCode " +
                 " and voucher.state =:state " +
-                " ")
+                " and voucher.voucher is null ")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("documentCode", "RPT")

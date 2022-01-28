@@ -179,6 +179,11 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             }
 
             voucherAccoutingService.saveVoucher(voucher);
+
+            for (WarehouseVoucher warehouseVoucher : transferWarehouseVoucherList){
+                warehouseVoucher.setVoucher(voucher);
+                approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
+            }
         }
     }
 
