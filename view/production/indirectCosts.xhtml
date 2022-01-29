@@ -136,6 +136,7 @@
 
         <rich:column>
             <h:inputText id="amount" value="#{item.amountBs}">
+                <a4j:support event="onchange" reRender="amount"/>
                 <app:realNumberConverter forId="amount" pattern="#{messages['patterns.decimalNumber']}"/>
             </h:inputText>
         </rich:column>

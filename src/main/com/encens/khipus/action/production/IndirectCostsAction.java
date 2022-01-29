@@ -10,6 +10,7 @@ import com.encens.khipus.model.production.IndirectCosts;
 import com.encens.khipus.model.production.IndirectCostsConfig;
 import com.encens.khipus.model.production.PeriodIndirectCost;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
+import com.encens.khipus.service.employees.GestionService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.IndirectCostsService;
 import com.encens.khipus.service.production.PeriodIndirectCostService;
@@ -43,6 +44,8 @@ public class IndirectCostsAction extends GenericAction<IndirectCosts> {
     private IndirectCostsService indirectCostsService;
     @In
     private VoucherAccoutingService voucherAccoutingService;
+    @In
+    private GestionService gestionService;
 
     @In
     private CompanyConfigurationService companyConfigurationService;
@@ -86,11 +89,9 @@ public class IndirectCostsAction extends GenericAction<IndirectCosts> {
         for(IndirectCosts costs:indirectCostses){
             costs.setPeriodIndirectCost(periodIndirectCost);
             setInstance(costs);
-            result = super.update();
+            //result = super.update();
         }
-
-        return result;
-
+        return super.update();
     }
 
     @Override
@@ -221,9 +222,6 @@ public class IndirectCostsAction extends GenericAction<IndirectCosts> {
         Date startDate = DateUtils.getFirstDayOfMonth(month.getValue()+1, gestion.getYear());
         Date endDate   = DateUtils.getLastDayOfMonth(startDate);
 
-        System.out.println("----------> star: " + startDate);
-        System.out.println("----------> end: " + endDate);
-
         for(IndirectCostsConfig costs:costGeneral){
         //if(!findByName(costs.getDescription())) {
 
@@ -238,10 +236,6 @@ public class IndirectCostsAction extends GenericAction<IndirectCosts> {
             }
         //}
         }
-
-        System.out.println("==========>>>>> Gestion: " + gestion);
-        System.out.println("==========>>>>> Month: " + month);
-
     }
 
     private Boolean findByName(String name) {
@@ -315,8 +309,16 @@ public class IndirectCostsAction extends GenericAction<IndirectCosts> {
             return com.encens.khipus.framework.action.Outcome.REDISPLAY;
         }
 
+        System.out.println("===========> Mes: " + costs.getPeriodIndirectCost().getMonth());
+        System.out.println("===========> Gestion: " + costs.getPeriodIndirectCost().getGestion().getYear());
+
+        Gestion gestion = gestionService.getGestion(costs.getPeriodIndirectCost().getGestion().getYear());
+
         this.month = Month.getMonth(costs.getPeriodIndirectCost().getMonth());
-        this.gestion = costs.getPeriodIndirectCost().getGestion();
+        //this.gestion = costs.getPeriodIndirectCost().getGestion();
+
+        this.gestion = gestion;
+
         indirectCostses = indirectCostsService.getIndirectCostGeneral(costs.getPeriodIndirectCost());
         return super.select(costs);
     }
