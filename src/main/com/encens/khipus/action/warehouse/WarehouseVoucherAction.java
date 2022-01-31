@@ -206,7 +206,8 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
             BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
 
-            VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+            //VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+            VoucherDetail voucherDetailCredit = new VoucherDetail(movementDetail.getWarehouse().getCashAccount(),
             BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,
             movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
@@ -226,7 +227,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
         Voucher voucher = new Voucher();
         voucher.setDate(endDate);
-        voucher.setDocumentType(Constants.IA_VOUCHER_DOCTYPE);
+        voucher.setDocumentType(Constants.CB_VOUCHER_DOCTYPE);
         voucher.setGloss("DEVOLUCION/ENTRADA PT, " + warehouseVoucher.getInventoryMovementList().get(0).getDescription());
 
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -243,8 +244,8 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             }
 
             BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
-
-            VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+            //VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+            VoucherDetail voucherDetailDebit = new VoucherDetail(movementDetail.getWarehouse().getCashAccount(),
                     amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
                     movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
@@ -252,7 +253,8 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             totalAmount = BigDecimalUtil.sum(totalAmount, amount, 2);
         }
 
-        VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaCostPT().getAccountCode(),
+        //VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaCostPT().getAccountCode(),
+        VoucherDetail voucherDetailCredit = new VoucherDetail(warehouseVoucher.getWarehouse().getCashAccountCost(),
                 BigDecimal.ZERO, totalAmount, FinancesCurrencyType.P, BigDecimal.ONE,null, null);
         voucher.getDetails().add(voucherDetailCredit);
 
