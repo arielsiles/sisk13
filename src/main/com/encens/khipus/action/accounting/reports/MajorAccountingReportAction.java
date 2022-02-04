@@ -6,6 +6,7 @@ import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.CashAccountType;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.CashAccountService;
@@ -29,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Encens S.R.L.
@@ -46,6 +48,7 @@ public class MajorAccountingReportAction extends GenericReportAction {
     private Date endDate;
 
     private CashAccount cashAccount;
+    private CashAccountType cashAccountType;
 
     @In
     private CompanyConfigurationService companyConfigurationService;
@@ -59,7 +62,8 @@ public class MajorAccountingReportAction extends GenericReportAction {
     private VoucherAccoutingService voucherAccoutingService;
     @In
     private CashAccountService cashAccountService;
-
+    @In
+    protected Map<String, String> messages;
 
     @Create
     public void init() {
@@ -126,7 +130,7 @@ public class MajorAccountingReportAction extends GenericReportAction {
 
 
     public void generateCSV(){
-        final String fileName = "d:/mayor.csv";
+        final String fileName = "c:/TMP/Mayor-" + messages.get(this.cashAccountType.getResourceKey()) + ".csv";
         final String NEXT_LINE = "\n";
         String delim = "|";
 
@@ -137,7 +141,10 @@ public class MajorAccountingReportAction extends GenericReportAction {
         try {
             FileWriter fw = new FileWriter(fileName);
 
-            List<CashAccount> cashAccountList = cashAccountService.findCashAccountList();
+            //List<CashAccount> cashAccountList = cashAccountService.findCashAccountList();
+
+            List<CashAccount> cashAccountList = cashAccountService.findCashAccountListByType(this.cashAccountType);
+
             boolean flag = false;
             fw.append("CUENTA").append(delim).append("FECHA").append(delim).append("TIPO").append(delim).append("NO_DOC").append(delim).append("GLOSA").append(delim).append("DEBE").append(delim).append("HABER").append(delim).append("SALDO").append(NEXT_LINE);
             for (CashAccount ca:cashAccountList){
@@ -233,5 +240,13 @@ public class MajorAccountingReportAction extends GenericReportAction {
 
     public void setCashAccount(CashAccount cashAccount) {
         this.cashAccount = cashAccount;
+    }
+
+    public CashAccountType getCashAccountType() {
+        return cashAccountType;
+    }
+
+    public void setCashAccountType(CashAccountType cashAccountType) {
+        this.cashAccountType = cashAccountType;
     }
 }

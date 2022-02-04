@@ -6,7 +6,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets"
-                xmlns:c="http://java.sun.com/jstl/core"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">#{messages['MajorAccounting.report']}</ui:define>
@@ -68,7 +67,21 @@
                                 </ui:define>
                     </app:selectPopUp>
                 </s:decorate>
-                <s:decorate><h:outputText value="#{majorAccountingReportAction.cashAccount.fullName}"/></s:decorate>
+                <!--<s:decorate><h:outputText value="#{majorAccountingReportAction.cashAccount.fullName}"/></s:decorate>-->
+
+                <s:decorate id="cashAccountTypeField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{s:hasPermission('MAJORACCOUNTINGCSV','VIEW')}">
+                    <ui:define name="label">#{messages['Account.accountType']}</ui:define>
+                    <h:selectOneMenu id="cashAccountType"
+                                     value="#{majorAccountingReportAction.cashAccountType}"
+                                     styleClass="input" required="false">
+
+                        <s:selectItems value="#{cashAccountTypeList}" var="cashAccountType"
+                                       label="#{messages[cashAccountType.resourceKey]}"
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
 
             </h:panelGrid>
         </rich:panel>

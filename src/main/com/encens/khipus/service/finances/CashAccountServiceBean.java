@@ -1,6 +1,7 @@
 package com.encens.khipus.service.finances;
 
 import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.CashAccountType;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -57,6 +58,16 @@ public class CashAccountServiceBean implements CashAccountService {
     public List<CashAccount> findCashAccountList(){
         try {
             return em.createNamedQuery("CashAccount.findCashAccountList").getResultList();
+        } catch (NoResultException e) {
+            return new ArrayList<CashAccount>();
+        }
+    }
+
+    public List<CashAccount> findCashAccountListByType(CashAccountType accountType){
+        try {
+            return em.createNamedQuery("CashAccount.findCashAccountListByType")
+                    .setParameter("accountType", accountType)
+                    .getResultList();
         } catch (NoResultException e) {
             return new ArrayList<CashAccount>();
         }

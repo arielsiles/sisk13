@@ -6,10 +6,7 @@ import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.accounting.SaleType;
 import com.encens.khipus.model.admin.ProductSaleType;
 import com.encens.khipus.model.employees.Month;
-import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.FinancesCurrencyType;
-import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.model.warehouse.WarehouseType;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -68,6 +65,11 @@ public class VoucherAction extends GenericAction<Voucher> {
 
     @In
     private VoucherAccoutingService voucherAccoutingService;
+
+    @Factory(value = "cashAccountTypeList", scope = ScopeType.STATELESS)
+    public CashAccountType[] getPeriodos() {
+        return CashAccountType.values();
+    }
 
     @Override
     @Begin(ifOutcome = com.encens.khipus.framework.action.Outcome.SUCCESS, flushMode = FlushModeType.MANUAL, join=true)

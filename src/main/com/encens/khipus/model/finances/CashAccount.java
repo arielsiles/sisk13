@@ -25,6 +25,7 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = "CashAccount.findByAccountCode", query = "select ca from CashAccount ca where ca.accountCode=:accountCode"),
         @NamedQuery(name = "CashAccount.findCashAccountList", query = "select ca from CashAccount ca order by ca.accountCode"),
+        @NamedQuery(name = "CashAccount.findCashAccountListByType", query = "select ca from CashAccount ca where ca.accountType=:accountType order by ca.accountCode"),
         @NamedQuery(name = "CashAccount.findByActiveAccount", query = "select ca from CashAccount ca where ca.accountCode=:accountCode and ca.active=:active")
 })
 @Entity
