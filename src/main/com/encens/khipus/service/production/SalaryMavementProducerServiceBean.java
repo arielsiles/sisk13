@@ -388,4 +388,22 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
 
     }
 
+    @Override
+    public List<SalaryMovementProducer> findSalaryMovementProducerList(Date startDate, Date endDate, TypeMovementProducer typeMovementProducer) {
+
+        List<SalaryMovementProducer> salaryMovementProducerList = em.createQuery("" +
+                "select s from SalaryMovementProducer s " +
+                " where s.date between :startDate and :endDate " +
+                " and s.typeMovementProducer =:typeMovementProducer ")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("typeMovementProducer", typeMovementProducer)
+                .getResultList();
+
+        if (salaryMovementProducerList == null)
+            salaryMovementProducerList = new ArrayList<SalaryMovementProducer>();
+
+        return salaryMovementProducerList;
+    }
+
 }

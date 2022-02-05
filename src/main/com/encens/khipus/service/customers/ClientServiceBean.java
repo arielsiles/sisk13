@@ -80,4 +80,15 @@ public class ClientServiceBean implements ClientService {
 
     }
 
+    @Override
+    public Client findClientByIdNumber(String idNumber) {
+
+        try {
+            return (Client) em.createNamedQuery("Client.findByIdNumber")
+                    .setParameter("idNumber", idNumber).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
 }

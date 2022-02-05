@@ -18,4 +18,6 @@ public interface ClientService {
     Double getBalanceClient(Date startDate, String cashAccountCode, Long clientId);
     PaymentMethodSin findPaymentMethodSin(Integer code);
 
+    Client findClientByIdNumber(String idNumber);
+
 }

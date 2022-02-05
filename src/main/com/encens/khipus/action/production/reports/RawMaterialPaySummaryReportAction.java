@@ -4,6 +4,7 @@ import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.framework.service.GenericService;
+import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.employees.GeneratedPayrollType;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.GestionPayroll;
@@ -11,13 +12,13 @@ import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.Periodo;
-import com.encens.khipus.model.production.ProductiveZone;
-import com.encens.khipus.model.production.RawMaterialPayRoll;
+import com.encens.khipus.model.production.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
+import com.encens.khipus.service.customers.ClientService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
 import com.encens.khipus.service.production.RawMaterialPayRollServiceBean;
+import com.encens.khipus.service.production.SalaryMovementProducerService;
+import com.encens.khipus.service.production.TypeMovementProducerService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
@@ -54,6 +55,12 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
     private VoucherAccoutingService voucherAccoutingService;
     @In
     protected FacesMessages facesMessages;
+    @In
+    private TypeMovementProducerService typeMovementProducerService;
+    @In
+    private SalaryMovementProducerService salaryMovementProducerService;
+    @In
+    private ClientService clientService;
 
     private String summaryReportTitle;
     private String gestionTitle;
@@ -305,7 +312,26 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         }
 
         if (discounts.veterinary > 0){
-            VoucherDetail voucherCredt4 = new VoucherDetail();
+
+            TypeMovementProducer type = typeMovementProducerService.findTypeMovementProducer(SalaryMovementProducerTypeEnum.VETE);
+            List<SalaryMovementProducer> salaryMovementProducerList = salaryMovementProducerService.findSalaryMovementProducerList(startDate, endDate, type);
+
+            for (SalaryMovementProducer salaryMovementProducer : salaryMovementProducerList){
+                Client client = clientService.findClientByIdNumber(salaryMovementProducer.getRawMaterialProducer().getIdNumber());
+                VoucherDetail voucherCredt4 = new VoucherDetail();
+                voucherCredt4.setAccount(Constants.ACCOUNT_CLIENTESPRODUCTORES);
+                voucherCredt4.setDebit(BigDecimal.ZERO);
+                voucherCredt4.setCredit(BigDecimalUtil.toBigDecimal(salaryMovementProducer.getValor()));
+                voucherCredt4.setCurrency(FinancesCurrencyType.P);
+                voucherCredt4.setExchangeAmount(BigDecimal.ONE);
+                voucherCredt4.setDebitMe(BigDecimal.ZERO);
+                voucherCredt4.setCreditMe(BigDecimal.ZERO);
+                voucherCredt4.setClient(client);
+                voucher.addVoucherDetail(voucherCredt4);
+            }
+
+
+            /*VoucherDetail voucherCredt4 = new VoucherDetail();
             voucherCredt4.setAccount(Constants.ACCOUNT_CLIENTESPRODUCTORES);
             voucherCredt4.setDebit(BigDecimal.ZERO);
             voucherCredt4.setCredit(BigDecimalUtil.toBigDecimal(discounts.veterinary));
@@ -313,11 +339,27 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
             voucherCredt4.setExchangeAmount(BigDecimal.ONE);
             voucherCredt4.setDebitMe(BigDecimal.ZERO);
             voucherCredt4.setCreditMe(BigDecimal.ZERO);
-            voucher.addVoucherDetail(voucherCredt4);
+            voucher.addVoucherDetail(voucherCredt4);*/
         }
 
         if (discounts.yogurt > 0){
-            VoucherDetail voucherCredt5 = new VoucherDetail();
+            TypeMovementProducer type = typeMovementProducerService.findTypeMovementProducer(SalaryMovementProducerTypeEnum.LACT);
+            List<SalaryMovementProducer> salaryMovementProducerList = salaryMovementProducerService.findSalaryMovementProducerList(startDate, endDate, type);
+
+            for (SalaryMovementProducer salaryMovementProducer : salaryMovementProducerList){
+                Client client = clientService.findClientByIdNumber(salaryMovementProducer.getRawMaterialProducer().getIdNumber());
+                VoucherDetail voucherCredt5 = new VoucherDetail();
+                voucherCredt5.setAccount(Constants.ACCOUNT_CLIENTES);
+                voucherCredt5.setDebit(BigDecimal.ZERO);
+                voucherCredt5.setCredit(BigDecimalUtil.toBigDecimal(salaryMovementProducer.getValor()));
+                voucherCredt5.setCurrency(FinancesCurrencyType.P);
+                voucherCredt5.setExchangeAmount(BigDecimal.ONE);
+                voucherCredt5.setDebitMe(BigDecimal.ZERO);
+                voucherCredt5.setCreditMe(BigDecimal.ZERO);
+                voucherCredt5.setClient(client);
+                voucher.addVoucherDetail(voucherCredt5);
+            }
+            /*VoucherDetail voucherCredt5 = new VoucherDetail();
             voucherCredt5.setAccount(Constants.ACCOUNT_CLIENTES);
             voucherCredt5.setDebit(BigDecimal.ZERO);
             voucherCredt5.setCredit(BigDecimalUtil.toBigDecimal(discounts.yogurt));
@@ -325,7 +367,7 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
             voucherCredt5.setExchangeAmount(BigDecimal.ONE);
             voucherCredt5.setDebitMe(BigDecimal.ZERO);
             voucherCredt5.setCreditMe(BigDecimal.ZERO);
-            voucher.addVoucherDetail(voucherCredt5);
+            voucher.addVoucherDetail(voucherCredt5);*/
         }
 
         if (discounts.credit > 0){

@@ -19,7 +19,8 @@ import java.util.Date;
 
 @NamedQueries(
         {
-                @NamedQuery(name = "Client.findAll", query = "select c from Client c")
+                @NamedQuery(name = "Client.findAll", query = "select c from Client c"),
+                @NamedQuery(name = "Client.findByIdNumber", query = "select c from Client c where c.idNumber =:idNumber")
         }
 )
 
