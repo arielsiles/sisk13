@@ -6,6 +6,8 @@ import com.encens.khipus.model.finances.VoucherDetail;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -24,6 +26,9 @@ import java.util.List;
 @Name("clientService")
 @AutoCreate
 public class ClientServiceBean implements ClientService {
+
+    @In
+    private FacesMessages facesMessages;
 
     @In("#{entityManager}")
     private EntityManager em;
@@ -87,6 +92,8 @@ public class ClientServiceBean implements ClientService {
             return (Client) em.createNamedQuery("Client.findByIdNumber")
                     .setParameter("idNumber", idNumber).getSingleResult();
         } catch (NoResultException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"La persona con Nro. CI: " + idNumber +
+                    " no se encuentra registrado en Clientes. Completar la contabilidad.");
             return null;
         }
     }
