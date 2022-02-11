@@ -56,7 +56,7 @@ public class UserCashBox implements BaseModel {
 
     @Column(name = "validar")
     @Type(type = IntegerBooleanUserType.NAME)
-    private Boolean validate;
+    private Boolean validate = Boolean.TRUE;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
