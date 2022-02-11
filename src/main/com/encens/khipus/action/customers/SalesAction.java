@@ -187,6 +187,7 @@ public class SalesAction extends GenericAction {
             }
         }
 
+        updateSaleWithInvoiceParam();
 
         /*CashBox cashBox = userCashBoxService.findByUser(currentUser);
         System.out.println("------------> cashBox: " + cashBox);
@@ -241,7 +242,6 @@ public class SalesAction extends GenericAction {
         }
 
         System.out.println("--------------->>>----> VALIDAR VENTA PARAM: " + this.validateSale);
-        updateSaleWithInvoiceParam();
 
         if (!this.nitCiHasBeenValidated){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible continuar con la venta, debe validar el NIT/CI.");
