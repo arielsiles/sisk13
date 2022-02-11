@@ -71,5 +71,6 @@ public interface ProductItemService extends GenericService {
 
     EconomicActivity findEconomicActivity(String code);
     ProductsServices findProductsAndServices(Integer code);
+    ProductsServices findProductsAndServices(String activityCode, Integer productCode);
     MeasureUnitSIN findMeasureUnitSIN(Integer code);
 }

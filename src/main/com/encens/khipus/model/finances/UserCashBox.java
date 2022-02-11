@@ -5,7 +5,9 @@ import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.admin.User;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
@@ -51,6 +53,10 @@ public class UserCashBox implements BaseModel {
     @Column(name = "estado", nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
     private UserCashBoxState state;
+
+    @Column(name = "validar")
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean validate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -132,5 +138,13 @@ public class UserCashBox implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public Boolean getValidate() {
+        return validate;
+    }
+
+    public void setValidate(Boolean validate) {
+        this.validate = validate;
     }
 }

@@ -130,7 +130,7 @@ public class ProductItemAction extends GenericAction<ProductItem> {
     public String select(ProductItem instance){
 
         setEconomicActivity(productItemService.findEconomicActivity(instance.getEconomicActivityCode()));
-        setProductService(productItemService.findProductsAndServices(instance.getProductSinCode()));
+        setProductService(productItemService.findProductsAndServices(instance.getEconomicActivityCode(), instance.getProductSinCode()));
         setMeasureUnitSIN(productItemService.findMeasureUnitSIN(instance.getMeasureUnitSinCode()));
 
         return super.select(instance);

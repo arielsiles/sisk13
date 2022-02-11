@@ -293,6 +293,23 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
     }
 
     @Override
+    public ProductsServices findProductsAndServices(String activityCode, Integer productCode) {
+
+        try {
+            return (ProductsServices)
+                    em.createQuery("select p from ProductsServices p " +
+                            " where p.activityCode =:activityCode " +
+                            " and p.productCode =:productCode ")
+                            .setParameter("activityCode", activityCode)
+                            .setParameter("productCode", productCode)
+                            .getSingleResult();
+        }catch (Exception e){
+            return null;
+        }
+
+    }
+
+    @Override
     public MeasureUnitSIN findMeasureUnitSIN(Integer code) {
         try {
             return (MeasureUnitSIN)

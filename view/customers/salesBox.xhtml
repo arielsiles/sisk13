@@ -37,6 +37,17 @@
                                      tabindex="12">
                     </app:selectPopUp>
 
+                    <h:selectBooleanCheckbox id="saleWithInvoice"
+                                             value="#{salesAction.validateSale}"
+                                             disabled="#{s:hasPermission('VALIDATE_SALE', 'VIEW')}"
+                                             tabindex="14">
+                        <a4j:support event="onchange"
+                                     action="#{salesAction.updateSaleWithInvoiceParam()}"
+                                     reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, customerCategoryTypeId, distributorField, productDataTable"
+                                     ajaxSingle="true"/>
+                    </h:selectBooleanCheckbox>
+
+
                     <a4j:commandButton id="validateNitButton"
                                        action="#{salesAction.validateNitCi()}"
                                        value="Validar NIT"

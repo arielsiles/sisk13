@@ -71,14 +71,14 @@ public class SalesAction extends GenericAction {
 
     private String connectionStatus;
     private String billingMode;
-
     private Boolean validNitCi = Boolean.FALSE;
     private Boolean nitCiHasBeenValidated = Boolean.FALSE;
-
     private String cafcCode;
     private boolean showCAFC = false;
-
     private String nitValidationMessage;
+    private Boolean validateSale = Boolean.FALSE;
+
+    private UserCashBox userCashBox;
 
     private List<SignificantEventCodePOJO> significantEventsCodes; // no usado
     private SignificantEventCodePOJO significantEventSelected; // no usado
@@ -177,6 +177,16 @@ public class SalesAction extends GenericAction {
 
     public void openSale(){
         setCustomerOrderType(customerOrderTypeService.findCustomerOrderTypeDefault());
+        CashBox cashBox = userCashBoxService.findByUser(currentUser);
+        UserCashBox userCashBox = userCashBoxService.findByCashBox(cashBox);
+        this.userCashBox = userCashBox;
+
+        if (userCashBox != null){
+            if (userCashBox.getValidate()){
+                validateSale = Boolean.TRUE;
+            }
+        }
+
 
         /*CashBox cashBox = userCashBoxService.findByUser(currentUser);
         System.out.println("------------> cashBox: " + cashBox);
@@ -207,15 +217,31 @@ public class SalesAction extends GenericAction {
         return  result;
     }
 
+    public void updateSaleWithInvoiceParam(){
+
+        System.out.println("======>=======>>>> VALIDAR VENTA PARAM: " + this.validateSale);
+
+        if (this.validateSale){
+            this.nitCiHasBeenValidated = Boolean.FALSE;
+            this.validNitCi = Boolean.FALSE;
+        } else {
+            this.nitCiHasBeenValidated = Boolean.TRUE;
+            this.validNitCi = Boolean.TRUE;
+        }
+
+    }
+
     public void addProduct(){
 
         if (client == null) return;
 
-        /* Uncomment
         if (!isThereInventory(productItem)){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No existe inventario suficiente...");
             return;
-        }*/
+        }
+
+        System.out.println("--------------->>>----> VALIDAR VENTA PARAM: " + this.validateSale);
+        updateSaleWithInvoiceParam();
 
         if (!this.nitCiHasBeenValidated){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible continuar con la venta, debe validar el NIT/CI.");
@@ -1588,5 +1614,13 @@ public class SalesAction extends GenericAction {
 
     public void setAdditionalDiscountAmount(BigDecimal additionalDiscountAmount) {
         this.additionalDiscountAmount = additionalDiscountAmount;
+    }
+
+    public Boolean getValidateSale() {
+        return validateSale;
+    }
+
+    public void setValidateSale(Boolean validateSale) {
+        this.validateSale = validateSale;
     }
 }
