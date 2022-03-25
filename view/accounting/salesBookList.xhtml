@@ -60,7 +60,7 @@
                     <h:outputText value="#{messages['Common.dateFrom']}"/>
                     <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
                         <rich:calendar id="startDate"
-                                       value="#{purchaseDocumentDataModel.startDate}"
+                                       value="#{movementDataModel.startDate}"
                                        inputClass="inputSmall"
                                        datePattern="#{messages['patterns.date']}"
                                        enableManualInput="true"
@@ -73,7 +73,7 @@
                     <h:outputText value="#{messages['Common.dateTo']}"/>
                     <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
                         <rich:calendar id="endDate"
-                                       value="#{purchaseDocumentDataModel.endDate}"
+                                       value="#{movementDataModel.endDate}"
                                        inputClass="inputSmall"
                                        datePattern="#{messages['patterns.date']}"
                                        enableManualInput="true"

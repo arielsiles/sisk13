@@ -21,7 +21,7 @@ public class MovementDataModel extends QueryDataModel<Long, Movement> {
 
     private Date startDate;
     private Date endDate;
-    private String number;
+    private Integer number;
     private String name;
 
     private static final String[] RESTRICTIONS = {
@@ -63,11 +63,11 @@ public class MovementDataModel extends QueryDataModel<Long, Movement> {
         this.endDate = endDate;
     }
 
-    public String getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public void setNumber(String number) {
+    public void setNumber(Integer number) {
         this.number = number;
     }
 
