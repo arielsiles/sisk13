@@ -778,6 +778,8 @@ public class WarehousePurchaseOrderServiceBean extends PurchaseOrderServiceBean 
             log.debug(e, "This exception never happen because I just created a new input WarehouseVoucher");
         }
 
+        BigDecimal percentVal = BigDecimalUtil.divide(entity.getDiscountPercent(), BigDecimalUtil.ONE_HUNDRED, 6);
+
         for (PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails) {
             ProductItem productItem = getEntityManager().find(ProductItem.class,
                     purchaseOrderDetail.getProductItem().getId());
@@ -798,8 +800,14 @@ public class WarehousePurchaseOrderServiceBean extends PurchaseOrderServiceBean 
             movementDetailTemp.setProductItem(productItem);
             movementDetailTemp.setProductItemAccount(productItem.getProductItemAccount());
             movementDetailTemp.setQuantity(requestedQuantity);
+
             if (CollectionDocumentType.INVOICE.equals(entity.getDocumentType())) {
-                movementDetailTemp.setAmount(BigDecimalUtil.multiply(purchaseOrderDetail.getTotalAmount(), Constants.VAT_COMPLEMENT, 6));
+
+                BigDecimal discountValue = BigDecimalUtil.multiply(purchaseOrderDetail.getTotalAmount(), percentVal);
+                BigDecimal totalAmount = BigDecimalUtil.subtract(purchaseOrderDetail.getTotalAmount(), discountValue);
+                //movementDetailTemp.setAmount(BigDecimalUtil.multiply(purchaseOrderDetail.getTotalAmount(), Constants.VAT_COMPLEMENT, 6));
+                movementDetailTemp.setAmount(BigDecimalUtil.multiply(totalAmount, Constants.VAT_COMPLEMENT, 6));
+
             } else {
                 movementDetailTemp.setAmount(purchaseOrderDetail.getTotalAmount());
             }

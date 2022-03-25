@@ -295,9 +295,16 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
 
         validateInvoiceDocument(document);
 
+        /*BigDecimal netAmount = PurchaseDocumentUtil.i.calculateNETAmount(document.getAmount(),
+                document.getExempt(),
+                document.getIce());*/
+
         BigDecimal netAmount = PurchaseDocumentUtil.i.calculateNETAmount(document.getAmount(),
                 document.getExempt(),
-                document.getIce());
+                document.getIce(),
+                document.getRates(),
+                document.getNoTaxCredit(),
+                document.getDiscounts());
 
         document.setNetAmount(netAmount);
         document.setIva(PurchaseDocumentUtil.i.calculateIVAAmount(netAmount));
@@ -347,11 +354,13 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
 
         PurchaseOrder dbPurchaseOrder = getPurchaseOrderFromDatabase(document.getPurchaseOrderId());
 
-        BigDecimal limit = BigDecimalUtil.subtract(dbPurchaseOrder.getTotalAmount(), totalAmount);
+        //BigDecimal limit = BigDecimalUtil.subtract(dbPurchaseOrder.getTotalAmount(), totalAmount);
+        BigDecimal limit = BigDecimalUtil.subtract(dbPurchaseOrder.getSubTotalAmount(), totalAmount);
 
         totalAmount = BigDecimalUtil.sum(totalAmount, processDocumentAmount(document));
 
-        if (totalAmount.compareTo(dbPurchaseOrder.getTotalAmount()) == 1) {
+        //if (totalAmount.compareTo(dbPurchaseOrder.getTotalAmount()) == 1) {
+        if (totalAmount.compareTo(dbPurchaseOrder.getSubTotalAmount()) == 1) {
             throw new PurchaseDocumentAmountException(limit);
         }
     }

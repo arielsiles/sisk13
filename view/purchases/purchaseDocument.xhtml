@@ -73,6 +73,24 @@
              columnClasses="width50percent, width50percent">
 
 <s:div id="leftDocDiv">
+    <s:div id="financesEntityDiv">
+        <s:decorate id="financesEntityField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.provider']}</ui:define>
+
+            <app:selectPopUp id="financesEntitySelectPopup"
+                             required="true"
+                             textValue="#{purchaseDocument.financesEntity.acronym}"
+                             value="#{purchaseDocument.financesEntity}"
+                             clearAction="#{action.clearFinancesEntity()}"
+                             searchModalPanel="financesEntityListModalPanel"
+                             dataModel="#{financesEntityDataModel}"
+                             reRender="financesEntityField, nitField"
+                             readOnly="#{isReadOnly and not isPostApprovedUpdate}"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+    </s:div>
     <s:decorate id="documentTypeField"
                 template="/include/inputField.xhtml"
                 styleClass="formRow">
@@ -154,6 +172,23 @@
         <h:outputText value="#{purchaseDocument.name}"
                       rendered="#{isReadOnly and not isPostApprovedUpdate}"/>
     </s:decorate>
+
+    <s:decorate id="nitField"
+                template="/include/inputField.xhtml"
+                styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.nit']}</ui:define>
+        <h:inputText id="nit"
+                     value="#{purchaseDocument.nit}"
+                     rendered="#{not isReadOnly or isPostApprovedUpdate}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="9">
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.nit}"
+                      rendered="#{isReadOnly and not isPostApprovedUpdate}">
+        </h:outputText>
+    </s:decorate>
+
     <s:decorate id="documentDateField"
                 template="/include/inputField.xhtml"
                 styleClass="formRow">
@@ -180,7 +215,7 @@
     <s:decorate id="amountField"
                 template="/include/inputField.xhtml"
                 styleClass="formRow">
-        <ui:define name="label">#{messages['PurchaseDocument.amount']}</ui:define>
+        <ui:define name="label">#{messages['PurchaseDocument.totalAmount']}</ui:define>
         <h:inputText id="amountInputText"
                      value="#{purchaseDocument.amount}"
                      rendered="#{isPurchaseDocumentPending}"
@@ -192,7 +227,9 @@
                                      forId="amountInputText"/>
         </h:inputText>
         <h:outputText value="#{purchaseDocument.amount}"
-                      rendered="#{isReadOnly}"/>
+                      rendered="#{isReadOnly}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
     </s:decorate>
 </s:div>
 
@@ -246,7 +283,7 @@
 </s:div>
 
 <s:div id="rigthInvoicePanel" rendered="#{purchaseDocument.invoiceDocument}">
-    <s:div id="financesEntityDiv">
+    <!--<s:div id="financesEntityDiv">
         <s:decorate id="financesEntityField"
                     template="/include/inputField.xhtml"
                     styleClass="formRow">
@@ -263,8 +300,8 @@
                              readOnly="#{isReadOnly and not isPostApprovedUpdate}"
                              hotKeySelect="alt+1"/>
         </s:decorate>
-    </s:div>
-    <s:decorate id="nitField"
+    </s:div>-->
+    <!--<s:decorate id="nitField"
                 template="/include/inputField.xhtml"
                 styleClass="formRow">
         <ui:define name="label">#{messages['PurchaseDocument.nit']}</ui:define>
@@ -278,11 +315,11 @@
         <h:outputText value="#{purchaseDocument.nit}"
                       rendered="#{isReadOnly and not isPostApprovedUpdate}">
         </h:outputText>
-    </s:decorate>
+    </s:decorate>-->
     <s:decorate id="authorizationNumberField"
                 template="/include/inputField.xhtml"
                 styleClass="formRow">
-        <ui:define name="label">#{messages['PurchaseDocument.authorizationNumber']}</ui:define>
+        <ui:define name="label">#{messages['PurchaseDocument.authorizationCode']}</ui:define>
         <h:inputText id="authorizationNumber"
                      value="#{purchaseDocument.authorizationNumber}"
                      rendered="#{not isReadOnly or isPostApprovedUpdate}"
@@ -327,8 +364,9 @@
                       rendered="#{isReadOnly}">
             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
         </h:outputText>
-        <h:outputText value="#{messages[purchaseDocument.currency.symbolResourceKey]}"/>
+        <!--<h:outputText value="#{messages[purchaseDocument.currency.symbolResourceKey]}"/>-->
     </s:decorate>
+
     <s:decorate id="iceField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['PurchaseDocument.ice']}</ui:define>
         <h:inputText id="ice"
@@ -348,8 +386,72 @@
                       rendered="#{isReadOnly}">
             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
         </h:outputText>
-        <h:outputText value="#{messages[purchaseDocument.currency.symbolResourceKey]}"/>
+        <!--<h:outputText value="#{messages[purchaseDocument.currency.symbolResourceKey]}"/>-->
     </s:decorate>
+
+    <s:decorate id="ratesField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.rates']}</ui:define>
+        <h:inputText id="rates"
+                     value="#{purchaseDocument.rates}"
+                     rendered="#{isPurchaseDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="14">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     minimum="0"
+                                     forId="rates"/>
+            <a4j:support event="onchange"
+                         reRender="ratesField"
+                         ajaxSingle="true"/>
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.rates}"
+                      rendered="#{isReadOnly}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:decorate id="noTaxCreditField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.noTaxCredit']}</ui:define>
+        <h:inputText id="noTaxCredit"
+                     value="#{purchaseDocument.noTaxCredit}"
+                     rendered="#{isPurchaseDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="15">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     minimum="0"
+                                     forId="noTaxCredit"/>
+            <a4j:support event="onchange"
+                         reRender="noTaxCreditField"
+                         ajaxSingle="true"/>
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.noTaxCredit}"
+                      rendered="#{isReadOnly}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+
+    <s:decorate id="discountsField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseDocument.discounts']}</ui:define>
+        <h:inputText id="discounts"
+                     value="#{purchaseDocument.discounts}"
+                     rendered="#{isPurchaseDocumentPending}"
+                     required="true"
+                     styleClass="input right"
+                     tabindex="16">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                     minimum="0"
+                                     forId="discounts"/>
+            <a4j:support event="onchange"
+                         reRender="discountsField"
+                         ajaxSingle="true"/>
+        </h:inputText>
+        <h:outputText value="#{purchaseDocument.discounts}"
+                      rendered="#{isReadOnly}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </s:decorate>
+
 </s:div>
 </h:panelGrid>
 </rich:panel>

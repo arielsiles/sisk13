@@ -53,6 +53,12 @@ public class AccountingDocument implements BaseModel {
     @Temporal(TemporalType.DATE)
     private Date date;
 
+    @Column(name = "TASAS", precision = 12, scale = 2)
+    private BigDecimal rates;
+
+    @Column(name = "NOCF", precision = 12, scale = 2)
+    private BigDecimal noTaxCredit;
+
     @Column(name = "ICE", precision = 12, scale = 2)
     private BigDecimal ice;
 
@@ -76,6 +82,9 @@ public class AccountingDocument implements BaseModel {
     @Column(name = "NOMBRE", length = 100)
     @Length(max = 100)
     private String name;
+
+    @Column(name = "DESCUENTOS", precision = 12, scale = 2)
+    private BigDecimal discounts;
 
     @Column(name = "NUMERO", length = 20)
     @Length(max = 20)
@@ -232,5 +241,29 @@ public class AccountingDocument implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public BigDecimal getRates() {
+        return rates;
+    }
+
+    public void setRates(BigDecimal rates) {
+        this.rates = rates;
+    }
+
+    public BigDecimal getDiscounts() {
+        return discounts;
+    }
+
+    public void setDiscounts(BigDecimal discounts) {
+        this.discounts = discounts;
+    }
+
+    public BigDecimal getNoTaxCredit() {
+        return noTaxCredit;
+    }
+
+    public void setNoTaxCredit(BigDecimal noTaxCredit) {
+        this.noTaxCredit = noTaxCredit;
     }
 }

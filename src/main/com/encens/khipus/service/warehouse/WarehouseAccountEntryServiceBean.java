@@ -472,15 +472,6 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         BigDecimal totalDebitAmount = BigDecimal.ZERO;
         List<MovementDetail> movementDetailList = movementDetailService.findDetailListByVoucher(warehouseVoucher);
         for (MovementDetail detail : movementDetailList){
-
-            /*System.out.println("----> executorUnitCode: " + executorUnitCode);
-            System.out.println("----> costCenterCode: " + costCenterCode);
-            System.out.println("----> warehouseVoucher.getWarehouse().getCashAccount(): " + warehouseVoucher.getWarehouse().getCashAccount());
-            System.out.println("----> cashAccountService.findByAccountCode: " + cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()));
-            System.out.println("----> detail.getAmount(): " + detail.getAmount());
-            System.out.println("----> detail.getProductItemCode(): " + detail.getProductItemCode());
-            System.out.println("----> detail.getQuantity(): " + detail.getQuantity());*/
-
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,

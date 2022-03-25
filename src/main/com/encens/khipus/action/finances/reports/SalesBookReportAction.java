@@ -47,7 +47,8 @@ public class SalesBookReportAction extends GenericReportAction {
                 "movement.discount, " +
                 "movement.amountFiscalDebit, " +
                 "movement.fiscalDebit, " +
-                "movement.controlCode " +
+                "movement.controlCode, " +
+                "movement.cuf " +
                 "from Movement movement ";
     }
 

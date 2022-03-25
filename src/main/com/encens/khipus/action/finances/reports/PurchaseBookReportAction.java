@@ -50,9 +50,13 @@ public class PurchaseBookReportAction extends GenericReportAction {
                 "purchaseDocument.amount, " +
                 "purchaseDocument.ice, " +
                 "purchaseDocument.exempt, " +
-                "(purchaseDocument.amount-purchaseDocument.ice-purchaseDocument.exempt), " +
+                "(purchaseDocument.amount - purchaseDocument.ice - purchaseDocument.rates - purchaseDocument.noTaxCredit - purchaseDocument.exempt) as subtotal, " +
                 "purchaseDocument.iva, " +
-                "purchaseDocument.controlCode " +
+                "purchaseDocument.controlCode, " +
+                "purchaseDocument.rates, " +
+                "purchaseDocument.discounts, " +
+                "purchaseDocument.noTaxCredit, " +
+                "purchaseDocument.netAmount " +
                 "from PurchaseDocument purchaseDocument " +
                 "where purchaseDocument.type = #{purchaseBookReportAction.invoiceDocumentType} " +
                 "and purchaseDocument.state <> #{purchaseBookReportAction.nullifiedDocumentState}";
@@ -74,7 +78,7 @@ public class PurchaseBookReportAction extends GenericReportAction {
 
         String filterInfo = "";
         if (startDate != null) {
-            filterInfo = filterInfo + MessageUtils.getMessage("Reports.salesBookReport.period") + ": " + formatter.format(startDate);
+            filterInfo = filterInfo + MessageUtils.getMessage("PurchaseBook.period") + ": " + formatter.format(startDate);
         }
         if (endDate != null) {
             filterInfo = filterInfo + " - " + formatter.format(endDate);

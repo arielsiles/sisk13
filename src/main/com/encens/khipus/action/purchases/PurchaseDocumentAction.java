@@ -353,6 +353,10 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
         getInstance().setState(PurchaseDocumentState.PENDING);
         getInstance().setIce(BigDecimal.ZERO);
         getInstance().setExempt(BigDecimal.ZERO);
+        getInstance().setRates(BigDecimal.ZERO);
+        getInstance().setDiscounts(BigDecimal.ZERO);
+        getInstance().setNoTaxCredit(BigDecimal.ZERO);
+        getInstance().setControlCode("0");
         getInstance().setCurrency(FinancesCurrencyType.P);
         getInstance().setExchangeRate(BigDecimal.ONE);
         getInstance().setType(purchaseOrderAction.getInstance().getDocumentType());

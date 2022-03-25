@@ -33,6 +33,11 @@ public class PurchaseDocumentUtil {
         return BigDecimalUtil.subtract(amount, partial);
     }
 
+    public BigDecimal calculateNETAmount(BigDecimal amount, BigDecimal exempt, BigDecimal ice, BigDecimal rates, BigDecimal noTaxCredit, BigDecimal discounts) {
+        BigDecimal partial = BigDecimalUtil.sum(exempt, ice, rates, noTaxCredit, discounts);
+        return BigDecimalUtil.subtract(amount, partial);
+    }
+
     public BigDecimal calculateIVAAmount(BigDecimal totalNETAmount) {
         return BigDecimalUtil.multiply(totalNETAmount, Constants.VAT);
     }

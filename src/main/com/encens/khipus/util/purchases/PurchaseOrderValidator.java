@@ -80,7 +80,8 @@ public class PurchaseOrderValidator {
                 return false;
             }
 
-            BigDecimal purchaseOrderAmount = purchaseOrder.getTotalAmount();
+            //BigDecimal purchaseOrderAmount = purchaseOrder.getTotalAmount();
+            BigDecimal purchaseOrderAmount = purchaseOrder.getSubTotalAmount();
             // if there is approved documents
             if (isTotalAmountPositive && (totalAmount.compareTo(purchaseOrderAmount) != 0)) {
                 // in case the approved purchaseOrder documents sum is not equal to purchaseOrder amount
