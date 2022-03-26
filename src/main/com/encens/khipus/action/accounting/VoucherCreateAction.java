@@ -167,7 +167,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             for (PurchaseDocument purchaseDocument : purchaseDocumentList){
                 totalI = totalI.add(purchaseDocument.getAmount());
-                BigDecimal partial = BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt());
+                BigDecimal discounts = BigDecimalUtil.sum(purchaseDocument.getRates(), purchaseDocument.getNoTaxCredit(), purchaseDocument.getExempt(), purchaseDocument.getDiscounts());
+                BigDecimal partial = BigDecimalUtil.subtract(purchaseDocument.getAmount(), discounts);
                 totalIVA = BigDecimalUtil.sum(totalIVA, (BigDecimalUtil.multiply(partial, Constants.VAT)) , 2 );
             }
 
@@ -544,6 +545,11 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
                 setFiscalCredit(true);
                 PurchaseDocument purchaseDocument = new PurchaseDocument();
+                purchaseDocument.setControlCode("0");
+                purchaseDocument.setExempt(BigDecimal.ZERO);
+                purchaseDocument.setRates(BigDecimal.ZERO);
+                purchaseDocument.setNoTaxCredit(BigDecimal.ZERO);
+                purchaseDocument.setDiscounts(BigDecimal.ZERO);
                 purchaseDocumentList.add(purchaseDocument);
 
             }else {
@@ -572,7 +578,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
             purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
 
-            BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), purchaseDocument.getExempt(), 2), BigDecimalUtil.toBigDecimal(0.13),2 );
+            BigDecimal discounts = BigDecimalUtil.sum(purchaseDocument.getRates(), purchaseDocument.getNoTaxCredit(), purchaseDocument.getExempt(), purchaseDocument.getDiscounts());
+
+            BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), discounts, 2), BigDecimalUtil.toBigDecimal(0.13),2 );
 
             VoucherDetail voucherDetail = new VoucherDetail();
             voucherDetail.setCashAccount(this.account);
