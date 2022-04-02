@@ -17,25 +17,25 @@ import javax.persistence.*;
  */
 @Entity
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(name = "unidadmedida", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = {@UniqueConstraint(columnNames = {"NO_CIA", "NOMBRE"})})
+@Table(name = "unidadmedida", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = {@UniqueConstraint(columnNames = {"no_cia", "nombre"})})
 public class MeasureUnit implements BaseModel {
 
     @EmbeddedId
     private MeasureUnitPk id = new MeasureUnitPk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     private String companyNumber;
-    @Column(name = "COD_MED", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_med", nullable = false, updatable = false, insertable = false)
     private String measureUnitCode;
-    @Column(name = "NOMBRE", length = 150, nullable = false)
+    @Column(name = "nombre", length = 150, nullable = false)
     @NotNull
     @Length(max = 150)
     private String name;
-    @Column(name = "DESCRIPCION", length = 500)
+    @Column(name = "descripcion", length = 500)
     @Length(max = 500)
     private String description;
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public MeasureUnitPk getId() {

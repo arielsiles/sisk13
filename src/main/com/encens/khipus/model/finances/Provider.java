@@ -31,17 +31,17 @@ public class Provider implements BaseModel {
     @EmbeddedId
     private ProviderPk id = new ProviderPk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "COD_PROV", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_prov", nullable = false, updatable = false, insertable = false)
     private String providerCode;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "COD_PROV", nullable = false, updatable = false, insertable = false)
+    @JoinColumn(name = "cod_prov", nullable = false, updatable = false, insertable = false)
     private FinancesEntity entity;
 
-    @Column(name = "CTAXPAGAR")
+    @Column(name = "ctaxpagar")
     private String payableAccountCode;
 
     @Transient
@@ -49,18 +49,18 @@ public class Provider implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAXPAGAR", referencedColumnName = "CUENTA", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaxpagar", referencedColumnName = "cuenta", nullable = false, insertable = false, updatable = false)
     })
     private CashAccount payableAccount;
 
-    @Column(name = "CLASE")
+    @Column(name = "clase")
     private String providerClassCode;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CLASE", referencedColumnName = "CLASE", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "clase", referencedColumnName = "clase", updatable = false, insertable = false)
     })
     private ProviderClass providerClass;
 

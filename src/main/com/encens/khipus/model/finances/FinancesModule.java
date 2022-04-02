@@ -20,23 +20,23 @@ public class FinancesModule implements BaseModel {
     @EmbeddedId
     private FinancesModulePK id = new FinancesModulePK();
 
-    @Column(name = "DESCRI", nullable = true, length = 100)
+    @Column(name = "descri", nullable = true, length = 100)
     @Length(max = 100)
     private String description;
 
-    @Column(name = "MONEDA", nullable = true, length = 6)
+    @Column(name = "moneda", nullable = true, length = 6)
     @Length(max = 6)
     private String currency;
 
-    @Column(name = "ESTADO", nullable = true)
+    @Column(name = "estado", nullable = true)
     @Enumerated(EnumType.STRING)
     private FinancesModuleState state;
 
-    @Column(name = "MES_PROCE", nullable = false)
+    @Column(name = "mes_proce", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "TIPO_DOC_EXT", nullable = true, length = 3)
+    @Column(name = "tipo_doc_ext", nullable = true, length = 3)
     @Length(max = 3)
     private String documentTypeExtension;
 

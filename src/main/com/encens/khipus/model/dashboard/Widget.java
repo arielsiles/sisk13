@@ -34,72 +34,72 @@ import java.util.List;
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
 @Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA,
-        name = "COMPONENTEPANEL",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"XMLID", "IDCOMPANIA"}))
+        name = "componentepanel",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"xmlid", "idcompania"}))
 public class Widget implements BaseModel {
 
     @Id
-    @Column(name = "IDCOMPONENTEPANEL", nullable = false)
+    @Column(name = "idcomponentepanel", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Widget.tableGenerator")
     private Long id;
 
     @Length(max = 50)
-    @Column(name = "XMLID", length = 50, nullable = false)
+    @Column(name = "xmlid", length = 50, nullable = false)
     @NotNull
     private String xmlId;
 
     @Length(max = 255)
-    @Column(name = "TITULO", length = 255, nullable = false)
+    @Column(name = "titulo", length = 255, nullable = false)
     private String title;
 
     @Length(max = 255)
-    @Column(name = "NOMBRECOMPONENTE", length = 255, nullable = false, insertable = true, updatable = false)
+    @Column(name = "nombrecomponente", length = 255, nullable = false, insertable = true, updatable = false)
     private String componentName;
 
     @Length(max = 255)
-    @Column(name = "AREA", length = 255)
+    @Column(name = "area", length = 255)
     private String area;
 
     @Length(max = 255)
-    @Column(name = "MODULO", length = 255)
+    @Column(name = "modulo", length = 255)
     private String module;
 
     @Length(max = 255)
-    @Column(name = "FUNCION", length = 255)
+    @Column(name = "funcion", length = 255)
     private String function;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "VERIFICACION", length = 30, nullable = false)
+    @Column(name = "verificacion", length = 30, nullable = false)
     @NotNull
     private Verification verification;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "UNIDAD", length = 30, nullable = false)
+    @Column(name = "unidad", length = 30, nullable = false)
     @NotNull
     private Unit unit;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "IDCOMPONENTEPANEL", referencedColumnName = "IDCOMPONENTEPANEL", nullable = false)
+    @JoinColumn(name = "idcomponentepanel", referencedColumnName = "idcomponentepanel", nullable = false)
     @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
     @OrderBy("index asc")
     private List<com.encens.khipus.model.dashboard.Filter> filters = new ArrayList<com.encens.khipus.model.dashboard.Filter>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDRESPONSABLENACIONAL")
+    @JoinColumn(name = "idresponsablenacional")
     private JobContract nationalResponsible;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    @JoinColumn(name = "IDCOMPONENTEPANEL", referencedColumnName = "IDCOMPONENTEPANEL", nullable = false)
+    @JoinColumn(name = "idcomponentepanel", referencedColumnName = "idcomponentepanel", nullable = false)
     @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
     private List<Responsible> regionalResponsibles = new ArrayList<Responsible>();
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private Long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 

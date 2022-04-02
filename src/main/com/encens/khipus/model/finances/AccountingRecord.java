@@ -137,22 +137,22 @@ public class AccountingRecord implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "numerocompania", referencedColumnName = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "codigoproveedor", referencedColumnName = "COD_PROV", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "numerocompania", referencedColumnName = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "codigoproveedor", referencedColumnName = "cod_prov", nullable = false, insertable = false, updatable = false)
     })
     private Provider provider;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "numerocompania", referencedColumnName = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "tipodocumentocxp", referencedColumnName = "TIPO_DOC", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "numerocompania", referencedColumnName = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "tipodocumentocxp", referencedColumnName = "tipo_doc", nullable = false, insertable = false, updatable = false)
     })
     private PayableDocumentType documentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "numerocompania", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "cuentaxpagar", referencedColumnName = "CUENTA", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "numerocompania", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuentaxpagar", referencedColumnName = "cuenta", nullable = false, insertable = false, updatable = false)
     })
     private CashAccount payableAccount;
 

@@ -15,11 +15,11 @@ import java.io.Serializable;
  */
 @Embeddable
 public class FinancesExecutorUnitPk implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_UEJ", nullable = false, updatable = false)
+    @Column(name = "cod_uej", nullable = false, updatable = false)
     @Length(max = 6)
     private String executorUnitCode;
 

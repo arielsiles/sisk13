@@ -21,30 +21,30 @@ import java.util.List;
  */
 
 @TableGenerator(name = "SingleProduct_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PRODUCTOSIMPLE",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "productosimple",
         allocationSize = 10)
 
 @Entity
-@Table(name = "PRODUCTOSIMPLE")
+@Table(name = "productosimple")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class SingleProduct implements BaseModel {
 
     @Id
-    @Column(name = "IDPRODUCTOSIMPLE", nullable = false)
+    @Column(name = "idproductosimple", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "SingleProduct_Generator")
     private Long id;
 
-    @Column(name = "CANTIDAD", nullable = true)
+    @Column(name = "cantidad", nullable = true)
     private Integer amount = 0;
 
-    @Column(name = "CANTIDADPRODUCIDARESPONSABLE", nullable = true)
+    @Column(name = "cantidadproducidaresponsable", nullable = true)
     private Integer amountResponsible = 0;
 
-    @Column(name = "ESTADO", length = 20, nullable = false)
+    @Column(name = "estado", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductionPlanningState state = ProductionPlanningState.PENDING;
 
@@ -52,16 +52,16 @@ public class SingleProduct implements BaseModel {
     @PrimaryKeyJoinColumn(name = "IDMETAPRODUCTOPRODUCCION")
     private MetaProduct metaProduct;
 */
-    @Column(name = "NO_TRANS",nullable = true)
+    @Column(name = "no_trans",nullable = true)
     private String numberTransaction;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDPRODUCTOBASE", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductobase", nullable = true, updatable = false, insertable = true)
     private BaseProduct baseProduct;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "singleProduct", cascade = CascadeType.ALL)
@@ -72,25 +72,25 @@ public class SingleProduct implements BaseModel {
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private List<OrderMaterial> orderMaterials = new ArrayList<OrderMaterial>();
 
-    @Column(name = "COSTOTOTALMATERIALES", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costototalmateriales", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal totalMaterial = new BigDecimal(0.0);
 
-    @Column(name = "COSTOTOTALINSUMOS", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costototalinsumos", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal totalInput = new BigDecimal(0.0);
 
-    @Column(name = "COSTOTOTALMANOOBRA", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costototalmanoobra", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal costLabor = new BigDecimal(0.0);
 
-    @Column(name = "COSTOTOTALINDIRECTO", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costototalindirecto", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal totalIndirecCost = new BigDecimal(0.0);
 
-    @Column(name = "COSTOUNITARIO", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costounitario", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal unitCost = new BigDecimal(0.0);
 
-    @Column(name = "PORCENTAJEGRASA", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "porcentajegrasa", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal greasePorentage = new BigDecimal(0.0);
 
-    @Column(name = "COSTOTOTALPRODUCCION", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costototalproduccion", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal totalCostProduction = new BigDecimal(0.0);
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "singleProduct", cascade = CascadeType.ALL)

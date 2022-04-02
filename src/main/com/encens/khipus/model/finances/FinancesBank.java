@@ -47,10 +47,10 @@ import java.util.List;
 public class FinancesBank implements BaseModel {
 
     @Id
-    @Column(name = "COD_BCO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_bco", nullable = false, updatable = false, insertable = false)
     private String id;
 
-    @Column(name = "DESCRI", length = 100)
+    @Column(name = "descri", length = 100)
     @Length(max = 100)
     private String name;
 

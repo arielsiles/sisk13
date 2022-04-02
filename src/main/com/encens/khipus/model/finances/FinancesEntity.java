@@ -32,7 +32,7 @@ import javax.persistence.*;
 public class FinancesEntity implements BaseModel {
 
     @Id
-    @Column(name = "COD_ENTI", nullable = false)
+    @Column(name = "cod_enti", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FinancesEntity.tableGenerator")
     private Long id;
 
@@ -45,60 +45,60 @@ public class FinancesEntity implements BaseModel {
     /*@Column(name = "COD_ENTI", insertable = false, updatable = false)
     private String code;*/
 
-    @Column(name = "NIT", length = 20)
+    @Column(name = "nit", length = 20)
     @Length(max = 20)
     private String nitNumber;
 
-    @Column(name = "CI", length = 20)
+    @Column(name = "ci", length = 20)
     @Length(max = 20)
     private String idNumber;
 
-    @Column(name = "RAZON_SOCIAL", length = 100)
+    @Column(name = "razon_social", length = 100)
     @Length(max = 100)
     private String acronym;
 
-    @Column(name = "DIRECCION", length = 100)
+    @Column(name = "direccion", length = 100)
     @Length(max = 100)
     private String mainAddress;
 
-    @Column(name = "DIRECCION1", length = 100)
+    @Column(name = "direccion1", length = 100)
     @Length(max = 100)
     private String secondaryAddress;
 
-    @Column(name = "LUGAR", length = 100)
+    @Column(name = "lugar", length = 100)
     @Length(max = 100)
     private String place;
 
-    @Column(name = "TELEFONO", length = 30)
+    @Column(name = "telefono", length = 30)
     @Length(max = 30)
     private String phoneNumber;
 
-    @Column(name = "FAX", length = 30)
+    @Column(name = "fax", length = 30)
     @Length(max = 30)
     private String faxNumber;
 
-    @Column(name = "CASILLA", length = 10)
+    @Column(name = "casilla", length = 10)
     @Length(max = 10)
     private String postOfficeBox;
 
-    @Column(name = "RESPONSABLE", length = 100)
+    @Column(name = "responsable", length = 100)
     @Length(max = 100)
     private String responsible;
 
-    @Column(name = "OBS", length = 240)
+    @Column(name = "obs", length = 240)
     @Length(max = 240)
     private String observations;
 
-    @Column(name = "ESTADO", length = 3)
+    @Column(name = "estado", length = 3)
     @Enumerated(EnumType.STRING)
     private FinancesEntityState state;
 
-    @Column(name = "MOTIVO_BLOQUEO", length = 100)
+    @Column(name = "motivo_bloqueo", length = 100)
     @Length(max = 100)
     private String blockReason;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
     public Long getId() {

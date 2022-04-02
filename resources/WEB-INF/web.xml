@@ -126,9 +126,9 @@
         <listener-class>org.jboss.seam.servlet.SeamListener</listener-class>
     </listener>
 
-    <listener>
+    <!--<listener>
         <listener-class>com.jatun.commons.fonts.FontRegisterListener</listener-class>
-    </listener>
+    </listener>-->
 
     <filter>
         <filter-name>Seam Filter</filter-name>

@@ -52,7 +52,7 @@ public abstract class Entity implements Serializable, BaseModel {
     private String idNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDEXTTIPODOCUMENTO", referencedColumnName = "IDEXTTIPODOCUMENTO")
+    @JoinColumn(name = "idexttipodocumento", referencedColumnName = "idexttipodocumento")
     private Extension extensionSite;
 
     @Version

@@ -26,7 +26,7 @@ import java.util.Date;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "PAGOFONDOROTA",
+        pkColumnValue = "pagofondorota",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @NamedQueries({
@@ -55,150 +55,150 @@ import java.util.Date;
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
-@Table(name = "PAGOFONDOROTA", schema = Constants.KHIPUS_SCHEMA,
-        uniqueConstraints = @UniqueConstraint(columnNames = {"IDCOMPANIA", "CODIGO"}))
+@Table(name = "pagofondorota", schema = Constants.KHIPUS_SCHEMA,
+        uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "codigo"}))
 @EntityListeners({CompanyListener.class, CompanyNumberListener.class, UpperCaseStringListener.class})
 
 public class RotatoryFundPayment implements BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RotatoryFundPayment.tableGenerator")
-    @Column(name = "IDPAGO", nullable = false)
+    @Column(name = "idpago", nullable = false)
     private Long id;
 
-    @Column(name = "CODIGO", nullable = true)
+    @Column(name = "codigo", nullable = true)
     private Integer code;
 
-    @Column(name = "NOTRANS")
+    @Column(name = "notrans")
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "CUENTABANCO", length = 20)
+    @Column(name = "cuentabanco", length = 20)
     @Length(max = 20)
     private String bankAccountNumber;
 
-    @Column(name = "ESTADO", nullable = false, length = 20)
+    @Column(name = "estado", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private RotatoryFundPaymentState state;
 
-    @Column(name = "DESCRIPCION", length = 1000)
+    @Column(name = "descripcion", length = 1000)
     @Length(max = 1000)
     private String description;
 
-    @Column(name = "MOTIVOREVERSION", length = 1000)
+    @Column(name = "motivoreversion", length = 1000)
     @Length(max = 1000)
     private String reversionCause;
 
-    @Column(name = "MONEDAORIGEN", length = 20)
+    @Column(name = "monedaorigen", length = 20)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType sourceCurrency;
 
-    @Column(name = "MONEDAPAGO", nullable = false)
+    @Column(name = "monedapago", nullable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType paymentCurrency;
 
-    @Column(name = "MONTOORIGEN", precision = 12, scale = 2)
+    @Column(name = "montoorigen", precision = 12, scale = 2)
     private BigDecimal sourceAmount;
 
-    @Column(name = "MONTOPAGO", precision = 12, scale = 2, nullable = false)
+    @Column(name = "montopago", precision = 12, scale = 2, nullable = false)
     private BigDecimal paymentAmount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
-    @Column(name = "NOMBREBENEFICIARIO", length = 200)
+    @Column(name = "nombrebeneficiario", length = 200)
     @Length(max = 200)
     private String beneficiaryName;
 
-    @Column(name = "TIPOBENEFICIARIO")
+    @Column(name = "tipobeneficiario")
     @Enumerated(EnumType.STRING)
     private BeneficiaryType beneficiaryType;
 
-    @Column(name = "TIPOCAMBIO", precision = 12, scale = 2)
+    @Column(name = "tipocambio", precision = 12, scale = 2)
     private BigDecimal exchangeRate;
 
-    @Column(name = "TIPOPAGO")
+    @Column(name = "tipopago")
     @Enumerated(EnumType.STRING)
     private RotatoryFundPaymentType rotatoryFundPaymentType;
 
-    @Column(name = "FECHACREACION")
+    @Column(name = "fechacreacion")
     @Temporal(TemporalType.DATE)
     private Date creationDate;
 
-    @Column(name = "FECHAPAGO")
+    @Column(name = "fechapago")
     @Temporal(TemporalType.DATE)
     private Date paymentDate;
 
-    @Column(name = "FECHAAPROBACION")
+    @Column(name = "fechaaprobacion")
     @Temporal(TemporalType.DATE)
     private Date approvalDate;
 
     @ManyToOne
-    @JoinColumn(name = "CREADOPOR")
+    @JoinColumn(name = "creadopor")
     private User registerEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "APROBADOPOR")
+    @JoinColumn(name = "aprobadopor")
     private User approvedByEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "ANULADOPOR")
+    @JoinColumn(name = "anuladopor")
     private User annulledByEmployee;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDSEDEDESTINOCHEQUE", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idsededestinocheque", referencedColumnName = "idunidadnegocio")
     private BusinessUnit checkDestination;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private Long version;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTABANCO", referencedColumnName = "CTA_BCO", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentabanco", referencedColumnName = "cta_bco", updatable = false, insertable = false)
     })
     private FinancesBankAccount bankAccount;
 
     /* the cash box account*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTACAJA", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentacaja", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashBoxCashAccount;
 
     /* the cash box account code*/
-    @Column(name = "CUENTACAJA", length = 20)
+    @Column(name = "cuentacaja", length = 20)
     @Length(max = 20)
     private String cashBoxAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDFONDOROTATORIO", referencedColumnName = "IDFONDOROTATORIO")
+    @JoinColumn(name = "idfondorotatorio", referencedColumnName = "idfondorotatorio")
     private RotatoryFund rotatoryFund;
 
-    @Column(name = "NO_CIA", length = 2)
+    @Column(name = "no_cia", length = 2)
     @Length(max = 2)
     private String companyNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NOTRANS", referencedColumnName = "NO_TRANS", insertable = false, updatable = false)
+    @JoinColumn(name = "notrans", referencedColumnName = "no_trans", insertable = false, updatable = false)
     private FinanceDocument financeDocument;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NOTRANS", referencedColumnName = "NO_TRANS", insertable = false, updatable = false)
+    @JoinColumn(name = "notrans", referencedColumnName = "no_trans", insertable = false, updatable = false)
     private PayableDocument payableDocument;
 
     /* the cash account adjustment*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTAAJUSTE", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentaajuste", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashAccountAdjustment;
-    @Column(name = "CUENTAAJUSTE", length = 20)
+    @Column(name = "cuentaajuste", length = 20)
     @Length(max = 20)
     private String cashAccountCodeAdjustment;
 

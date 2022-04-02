@@ -50,78 +50,78 @@ public class AccountingMovementDetail implements BaseModel {
     @EmbeddedId
     private AccountingMovementDetailPk id = new AccountingMovementDetailPk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", nullable = false, insertable = false, updatable = false)
+    @Column(name = "no_trans", nullable = false, insertable = false, updatable = false)
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "NO_LINEA", nullable = false, insertable = false, updatable = false)
+    @Column(name = "no_linea", nullable = false, insertable = false, updatable = false)
     @Length(max = 10)
     private String detailNumber;
 
-    @Column(name = "TIPO_COMPRO", nullable = false)
+    @Column(name = "tipo_compro", nullable = false)
     private String voucherType;
 
-    @Column(name = "NO_COMPRO", nullable = false)
+    @Column(name = "no_compro", nullable = false)
     private String voucherNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "TIPO_COMPRO", referencedColumnName = "TIPO_COMPRO", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "NO_COMPRO", referencedColumnName = "NO_COMPRO", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "tipo_compro", referencedColumnName = "tipo_compro", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "no_compro", referencedColumnName = "no_compro", nullable = false, insertable = false, updatable = false)
     })
     private AccountingMovement accountingMovement;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA", referencedColumnName = "CUENTA", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta", referencedColumnName = "cuenta", nullable = false, insertable = false, updatable = false)
     })
     private CashAccount account;
 
-    @Column(name = "COD_UNI", length = 8)
+    @Column(name = "cod_uni", length = 8)
     private String executorUnitCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COD_UNI", referencedColumnName = "codunidadejecutora", updatable = false, insertable = false)
+    @JoinColumn(name = "cod_uni", referencedColumnName = "codunidadejecutora", updatable = false, insertable = false)
     private BusinessUnit businessUnit;
 
-    @Column(name = "COD_CC", length = 8)
+    @Column(name = "cod_cc", length = 8)
     private String costCenterCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NO_TRANS", referencedColumnName = "NO_TRANS", updatable = false, insertable = false)
+    @JoinColumn(name = "no_trans", referencedColumnName = "no_trans", updatable = false, insertable = false)
     private Voucher voucher;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NO_TRANS", referencedColumnName = "NOTRANS", updatable = false, insertable = false)
+    @JoinColumn(name = "no_trans", referencedColumnName = "notrans", updatable = false, insertable = false)
     private PurchaseOrderPayment purchaseOrderPayment;
 
-    @Column(name = "TIPO_MOV", length = 1)
+    @Column(name = "tipo_mov", length = 1)
     @Enumerated(EnumType.STRING)
     private FinanceMovementType type;
 
-    @Column(name = "MONTO_MN", precision = 16, scale = 2)
+    @Column(name = "monto_mn", precision = 16, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "MONEDA", length = 3, nullable = false)
+    @Column(name = "moneda", length = 3, nullable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "TC", precision = 10, scale = 6)
+    @Column(name = "tc", precision = 10, scale = 6)
     private BigDecimal exchangeRate;
 
-    @Column(name = "REFERENCIA")
+    @Column(name = "referencia")
     private String referencedDocument;
 
     public AccountingMovementDetailPk getId() {

@@ -19,29 +19,29 @@ import java.util.List;
 })
 
 @Entity
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "BONOANTIGUEDAD")
-@DiscriminatorValue("BONO_ANTIGUEDAD")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "bonoantiguedad")
+@DiscriminatorValue("bono_antiguedad")
 @PrimaryKeyJoinColumns(value = {
-        @PrimaryKeyJoinColumn(name = "IDBONOANTIGUEDAD", referencedColumnName = "IDBONO")
+        @PrimaryKeyJoinColumn(name = "idbonoantiguedad", referencedColumnName = "idbono")
 })
 public class SeniorityBonus extends Bonus {
 
-    @Column(name = "FECHAINICIO", nullable = false)
+    @Column(name = "fechainicio", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
-    @Column(name = "FECHAFIN", nullable = false)
+    @Column(name = "fechafin", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    @JoinColumn(name = "IDBONOANTIGUEDAD", referencedColumnName = "IDBONOANTIGUEDAD", nullable = false)
+    @JoinColumn(name = "idbonoantiguedad", referencedColumnName = "idbonoantiguedad", nullable = false)
     @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
     private List<SeniorityBonusDetail> details = new ArrayList<SeniorityBonusDetail>(0);
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Date getStartDate() {

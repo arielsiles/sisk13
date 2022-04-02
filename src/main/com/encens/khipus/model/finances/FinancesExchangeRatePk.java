@@ -18,11 +18,11 @@ import java.util.Date;
 @Embeddable
 public class FinancesExchangeRatePk implements Serializable {
 
-    @Column(name = "CLASE_CAMBIO", nullable = false, updatable = false)
+    @Column(name = "clase_cambio", nullable = false, updatable = false)
     @Length(max = 2)
     private String exchangeKind;
 
-    @Column(name = "FECHA", nullable = false, updatable = false)
+    @Column(name = "fecha", nullable = false, updatable = false)
     @Temporal(TemporalType.DATE)
     private Date date = new Date();
 

@@ -101,7 +101,7 @@ public class FixedAssetMovement implements BaseModel {
     private String transactionNumber;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDACTIVO", referencedColumnName = "IDACTIVO", nullable = false)
+    @JoinColumn(name = "idactivo", referencedColumnName = "idactivo", nullable = false)
     private FixedAsset fixedAsset;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -141,26 +141,26 @@ public class FixedAssetMovement implements BaseModel {
     @Transient
     private BigDecimal susAmount;
 
-    @Column(name = "montoUfv", precision = 12, scale = 2)
+    @Column(name = "montoufv", precision = 12, scale = 2)
     private BigDecimal ufvAmount;
 
-    @Column(name = "montoBs", precision = 12, scale = 2)
+    @Column(name = "montobs", precision = 12, scale = 2)
     private BigDecimal bsAmount;
 
     @Column(name = "moneda")
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "tasaBsSus", precision = 16, scale = 6)
+    @Column(name = "tasabssus", precision = 16, scale = 6)
     private BigDecimal bsSusRate;
 
-    @Column(name = "tasaBsUfv", precision = 16, scale = 6)
+    @Column(name = "tasabsufv", precision = 16, scale = 6)
     private BigDecimal bsUfvRate;
 
-    @Column(name = "tasaBsSusMesAnt", precision = 16, scale = 6)
+    @Column(name = "tasabssusmesant", precision = 16, scale = 6)
     private BigDecimal lastMonthBsSusRate;
 
-    @Column(name = "tasaBsUfvMesAnt", precision = 16, scale = 6)
+    @Column(name = "tasabsufvmesant", precision = 16, scale = 6)
     private BigDecimal lastMonthBsUfvRate;
 
     @Column(name = "dep_ini", precision = 12, scale = 2)
@@ -189,8 +189,8 @@ public class FixedAssetMovement implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "no_cia", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "cod_cc", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
@@ -204,8 +204,8 @@ public class FixedAssetMovement implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "no_cia", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "cod_cc_ant", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc_ant", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter lastCostCenter;
 
@@ -228,16 +228,16 @@ public class FixedAssetMovement implements BaseModel {
 
     /*represents the executor unit*/
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idunidadnegocio", referencedColumnName = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
     /*represents the executor unit*/
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIOANT", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idunidadnegocioant", referencedColumnName = "idunidadnegocio")
     private BusinessUnit lastBusinessUnit;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "IDPAGO", nullable = true)
+    @JoinColumn(name = "idpago", nullable = true)
     private FixedAssetPayment fixedAssetPayment;
 
     /* the FixedAssetVoucher associated if the movement is product of a block movement*/
@@ -246,11 +246,11 @@ public class FixedAssetMovement implements BaseModel {
     private FixedAssetVoucher fixedAssetVoucher;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDAFLOCALIZACION_ANT")
+    @JoinColumn(name = "idaflocalizacion_ant")
     private FixedAssetLocation lastFixedAssetLocation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDAFLOCALIZACION_NVO")
+    @JoinColumn(name = "idaflocalizacion_nvo")
     private FixedAssetLocation newFixedAssetLocation;
 
     public Long getId() {

@@ -8,8 +8,8 @@ import com.encens.khipus.model.customers.DocumentType;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.Length;
 
-import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.*;
 
 /**
  * Entity for Limit
@@ -22,7 +22,7 @@ import javax.persistence.Entity;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "EXTTIPODOCUMENTO",
+        pkColumnValue = "exttipodocumento",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @NamedQueries(
@@ -35,28 +35,28 @@ import javax.persistence.Entity;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "EXTTIPODOCUMENTO", uniqueConstraints = @UniqueConstraint(columnNames = {"IDTIPODOCUMENTO", "IDEXTTIPODOCUMENTO"}))
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "exttipodocumento", uniqueConstraints = @UniqueConstraint(columnNames = {"idtipodocumento", "idexttipodocumento"}))
 public class Extension implements BaseModel {
 
     @Id
-    @Column(name = "IDEXTTIPODOCUMENTO", nullable = false)
+    @Column(name = "idexttipodocumento", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Extension.tableGenerator")
     private Long id;
 
-    @Column(name = "EXTENSION", nullable = false, length = 100)
+    @Column(name = "extension", nullable = false, length = 100)
     @Length(max = 100)
     private String extension;
 
     @ManyToOne
-    @JoinColumn(name = "IDTIPODOCUMENTO", referencedColumnName = "idtipodocumento", nullable = false)
+    @JoinColumn(name = "idtipodocumento", referencedColumnName = "idtipodocumento", nullable = false)
     private DocumentType documentType;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

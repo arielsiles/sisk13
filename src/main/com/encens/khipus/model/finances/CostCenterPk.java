@@ -14,11 +14,11 @@ import java.io.Serializable;
  */
 @Embeddable
 public class CostCenterPk implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_CC", length = 6, nullable = false, updatable = false)
+    @Column(name = "cod_cc", length = 6, nullable = false, updatable = false)
     @Length(max = 6)
     private String code;
 

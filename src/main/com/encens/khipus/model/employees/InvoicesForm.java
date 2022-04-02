@@ -18,7 +18,7 @@ import java.util.Date;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "FormFactura",
+        pkColumnValue = "formfactura",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @NamedQueries({
@@ -34,42 +34,42 @@ import java.util.Date;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "FORMFACTURA")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "formfactura")
 public class InvoicesForm implements BaseModel {
     @Id
-    @Column(name = "IDFORMFACTURA", nullable = false)
+    @Column(name = "idformfactura", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "InvoicesForm.tableGenerator")
     private Long id;
 
-    @Column(name = "FECHAPRESENTACION", nullable = false)
+    @Column(name = "fechapresentacion", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date presentationDate;
 
-    @Column(name = "CREDITOFISCAL", nullable = false)
+    @Column(name = "creditofiscal", nullable = false)
     private Integer fiscalCredit;
 
-    @Column(name = "IDCONTRATOPUESTO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "idcontratopuesto", nullable = false, updatable = false, insertable = false)
     private Long jobContractId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCONTRATOPUESTO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcontratopuesto", nullable = false, updatable = false, insertable = true)
     private JobContract jobContract;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDEMPLEADO", referencedColumnName = "idempleado", nullable = false)
+    @JoinColumn(name = "idempleado", referencedColumnName = "idempleado", nullable = false)
     @NotNull
     private Employee employee;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCICLOGENERACIONPLANILLA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idciclogeneracionplanilla", nullable = false, updatable = false, insertable = true)
     private PayrollGenerationCycle payrollGenerationCycle;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

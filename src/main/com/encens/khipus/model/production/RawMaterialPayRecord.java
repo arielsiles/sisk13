@@ -8,68 +8,68 @@ import javax.persistence.*;
 import java.util.Date;
 
 @TableGenerator(name = "rawMaterialPayRecord_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "REGISTROPAGOMATERIAPRIMA",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "registropagomateriaprima",
         allocationSize = 10)
 
 @Entity
-@Table(name = "REGISTROPAGOMATERIAPRIMA")
+@Table(name = "registropagomateriaprima")
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class RawMaterialPayRecord {
 
     @Id
-    @Column(name = "IDREGISTROPAGOMATERIAPRIMA", nullable = false)
+    @Column(name = "idregistropagomateriaprima", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "rawMaterialPayRecord_Generator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "IDDESCUENTPRODUCTMATERIAPRIMA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "iddescuentproductmateriaprima", nullable = false, updatable = false, insertable = true)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private RawMaterialProducerDiscount rawMaterialProducerDiscount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDPLANILLAPAGOMATERIAPRIMA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idplanillapagomateriaprima", nullable = false, updatable = false, insertable = true)
     private RawMaterialPayRoll rawMaterialPayRoll;
 
-    @Column(name = "CANTIDADTOTAL", columnDefinition = "DECIMAL(24,2)" ,nullable = false)
+    @Column(name = "cantidadtotal", columnDefinition = "DECIMAL(24,2)" ,nullable = false)
     private double totalAmount = 0.0;
 
-    @Column(name = "AJUSTEZONAPRODUCTIVA",columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "ajustezonaproductiva",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double productiveZoneAdjustment = 0.0;
 
-    @Column(name = "DESCUENTORESERVA",columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "descuentoreserva",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double discountReserve = 0.0;
 
-    @Column(name = "GA",columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "ga",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double discountGA = 0.0;
 
-    @Column(name = "LICENCIAIMPUESTOS", nullable = true, length = 200)
+    @Column(name = "licenciaimpuestos", nullable = true, length = 200)
     private String taxLicense;
 
-    @Column(name = "FECHAEXPIRALICENCIAIMPUESTO",columnDefinition = "DATE" ,nullable = true)
+    @Column(name = "fechaexpiralicenciaimpuesto",columnDefinition = "DATE" ,nullable = true)
     private Date expirationDateTaxLicence;
 
-    @Column(name = "FECHAINICIALICENCIAIMPUESTO",columnDefinition = "DATE" ,nullable = true)
+    @Column(name = "fechainicialicenciaimpuesto",columnDefinition = "DATE" ,nullable = true)
     private Date startDateTaxLicence;
 
-    @Column(name = "TOTALGANADO", columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "totalganado", columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double earnedMoney;
 
-    @Column(name = "TOTALPAGOACOPIO", columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "totalpagoacopio", columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double totalPayCollected = 0.0;
 
-    @Column(name = "LIQUIDOPAGABLE", columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "liquidopagable", columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double liquidPayable = 0.0;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     public double getTotalPayCollected() {

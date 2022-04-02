@@ -12,11 +12,11 @@ import java.io.Serializable;
  */
 @Embeddable
 public class ProviderClassPk implements Serializable {
-    @Column(name = "NO_CIA", updatable = false)
+    @Column(name = "no_cia", updatable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "CLASE", updatable = false)
+    @Column(name = "clase", updatable = false)
     @Length(max = 4)
     private String code;
 

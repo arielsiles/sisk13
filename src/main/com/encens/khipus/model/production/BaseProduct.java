@@ -30,40 +30,40 @@ import java.util.List;
 })
 
 @TableGenerator(name = "BaseProduct_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PRODUCTOBASE",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "productobase",
         allocationSize = 10)
 
 @Entity
-@Table(name = "PRODUCTOBASE")
+@Table(name = "productobase")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class BaseProduct implements BaseModel {
 
     @Id
-    @Column(name = "IDPRODUCTOBASE", nullable = false)
+    @Column(name = "idproductobase", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "BaseProduct_Generator")
     private Long id;
 
-    @Column(name = "UNIDADES", nullable = true)
+    @Column(name = "unidades", nullable = true)
     private Integer units;
 
-    @Column(name = "VOLUMEN", nullable = true ,columnDefinition = "DECIMAL(8,2)")
+    @Column(name = "volumen", nullable = true ,columnDefinition = "DECIMAL(8,2)")
     private Double volume;
 
-    @Column(name = "ESTADO", length = 20, nullable = false)
+    @Column(name = "estado", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductionPlanningState state = ProductionPlanningState.PENDING;
 
     @Column(name = "id_tmpenc")
     private Long voucherId;
 
-    @Column(name = "NO_TRANS",nullable = true)
+    @Column(name = "no_trans",nullable = true)
     private String numberTransaction;
 
-    @Column(name = "NO_VALE",nullable = true)
+    @Column(name = "no_vale",nullable = true)
     private String numberVoucher;
 
     @Transient
@@ -74,11 +74,11 @@ public class BaseProduct implements BaseModel {
     private List<ProductProcessing> productProcessings = new ArrayList<ProductProcessing>();
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "IDPLANIFICACIONPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idplanificacionproduccion", nullable = false, updatable = false, insertable = true)
     private ProductionPlanning productionPlanningBase;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
@@ -86,14 +86,14 @@ public class BaseProduct implements BaseModel {
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private List<SingleProduct> singleProducts = new ArrayList<SingleProduct>();
 
-    @Column(name = "COSTOTOTALINSUMOS", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costototalinsumos", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal totalInput = new BigDecimal(0.0);
 
     @OneToMany(mappedBy = "baseProductInput", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private List<OrderInput> orderInputs = new ArrayList<OrderInput>();
 
-    @Column(name = "CODIGO", length = 50, nullable = false)
+    @Column(name = "codigo", length = 50, nullable = false)
     private String code;
 
     public Long getId() {

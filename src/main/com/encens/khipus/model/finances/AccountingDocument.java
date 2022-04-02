@@ -34,77 +34,77 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class AccountingDocument implements BaseModel {
     @Id
-    @Column(name = "IDDOCUMENTOCONTABLE", nullable = false, scale = 24)
+    @Column(name = "iddocumentocontable", nullable = false, scale = 24)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "AccountingDocument.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGOCONTROL", length = 20)
+    @Column(name = "codigocontrol", length = 20)
     @Length(max = 20)
     private String controlCode;
 
-    @Column(name = "DIRECCION", length = 50)
+    @Column(name = "direccion", length = 50)
     @Length(max = 50)
     private String address;
 
-    @Column(name = "EXENTO", precision = 12, scale = 2)
+    @Column(name = "exento", precision = 12, scale = 2)
     private BigDecimal exempt;
 
-    @Column(name = "FECHA", nullable = false)
+    @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "TASAS", precision = 12, scale = 2)
+    @Column(name = "tasas", precision = 12, scale = 2)
     private BigDecimal rates;
 
-    @Column(name = "NOCF", precision = 12, scale = 2)
+    @Column(name = "nocf", precision = 12, scale = 2)
     private BigDecimal noTaxCredit;
 
-    @Column(name = "ICE", precision = 12, scale = 2)
+    @Column(name = "ice", precision = 12, scale = 2)
     private BigDecimal ice;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
-    @Column(name = "IMPORTE", precision = 12, scale = 2)
+    @Column(name = "importe", precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "IMPORTENETO", precision = 12, scale = 2)
+    @Column(name = "importeneto", precision = 12, scale = 2)
     private BigDecimal netAmount;
 
-    @Column(name = "IVA", precision = 12, scale = 2)
+    @Column(name = "iva", precision = 12, scale = 2)
     private BigDecimal iva;
 
-    @Column(name = "NIT", length = 20)
+    @Column(name = "nit", length = 20)
     @Length(max = 20)
     private String nit;
 
-    @Column(name = "NOMBRE", length = 100)
+    @Column(name = "nombre", length = 100)
     @Length(max = 100)
     private String name;
 
-    @Column(name = "DESCUENTOS", precision = 12, scale = 2)
+    @Column(name = "descuentos", precision = 12, scale = 2)
     private BigDecimal discounts;
 
-    @Column(name = "NUMERO", length = 20)
+    @Column(name = "numero", length = 20)
     @Length(max = 20)
     private String number;
 
-    @Column(name = "NUMEROAUTORIZACION", length = 150)
+    @Column(name = "numeroautorizacion", length = 150)
     @Length(max = 150)
     private String authorizationNumber;
 
     @GeneratedValue(generator = "AccountingDocument.sequenceGenerator")
-    @Column(name = "NUMEROTRANSACCION", length = 20)
+    @Column(name = "numerotransaccion", length = 20)
     @Length(max = 20)
     private String transactionNumber;
 
-    @Column(name = "REGCOMPRO")
+    @Column(name = "regcompro")
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean hasVoucher = false;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

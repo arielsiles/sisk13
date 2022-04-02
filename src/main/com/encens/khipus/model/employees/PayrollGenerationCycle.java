@@ -25,7 +25,7 @@ import java.util.List;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "CICLOGENERACIONPLANILLA",
+        pkColumnValue = "ciclogeneracionplanilla",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @NamedQueries({
         @NamedQuery(name = "PayrollGenerationCycle.loadPayrollGenerationCycle",
@@ -68,146 +68,146 @@ import java.util.List;
 @Entity
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
-@Table(name = "CICLOGENERACIONPLANILLA", schema = Constants.KHIPUS_SCHEMA, uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"IDUNIDADNEGOCIO", "IDGESTION", "MES", "IDCOMPANIA"}),
-        @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"})
+@Table(name = "ciclogeneracionplanilla", schema = Constants.KHIPUS_SCHEMA, uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"idunidadnegocio", "idgestion", "mes", "idcompania"}),
+        @UniqueConstraint(columnNames = {"nombre", "idcompania"})
 })
 public class PayrollGenerationCycle implements BaseModel {
     @Id
-    @Column(name = "IDCICLOGENERACIONPLANILLA", nullable = false)
+    @Column(name = "idciclogeneracionplanilla", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PayrollGenerationCycle.tableGenerator")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", nullable = false)
+    @JoinColumn(name = "idunidadnegocio", nullable = false)
     @NotNull
     private BusinessUnit businessUnit;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDGESTION", nullable = false)
+    @JoinColumn(name = "idgestion", nullable = false)
     @NotNull
     private Gestion gestion;
 
-    @Column(name = "MES", nullable = false, length = 20)
+    @Column(name = "mes", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     @NotNull
     private Month month;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     @NotNull
     @Length(max = 100)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, optional = false)
-    @JoinColumn(name = "IDTIPOCAMBIO", nullable = false)
+    @JoinColumn(name = "idtipocambio", nullable = false)
     @NotNull
     private ExchangeRate exchangeRate;
 
-    @Column(name = "FECHAINICIOGEN", nullable = false)
+    @Column(name = "fechainiciogen", nullable = false)
     @NotNull
     @Temporal(TemporalType.DATE)
     private Date generationInitDate;
 
-    @Column(name = "FECHAFINGEN", nullable = false)
+    @Column(name = "fechafingen", nullable = false)
     @NotNull
     @Temporal(TemporalType.DATE)
     private Date generationEndDate;
 
-    @Column(name = "FECHAAPERTURAGEN", nullable = false)
+    @Column(name = "fechaaperturagen", nullable = false)
     @NotNull
     @Temporal(TemporalType.DATE)
     private Date generationBeginning;
 
-    @Column(name = "FECHALIMITEGEN", nullable = false)
+    @Column(name = "fechalimitegen", nullable = false)
     @NotNull
     @Temporal(TemporalType.DATE)
     private Date generationDeadline;
 
-    @Column(name = "FECHAPLANOFICIAL", nullable = false)
+    @Column(name = "fechaplanoficial", nullable = false)
     @NotNull
     @Temporal(TemporalType.DATE)
     private Date officialPayrollDeadline;
 
-    @Column(name = "FECHAINICIOFISCAL", nullable = false)
+    @Column(name = "fechainiciofiscal", nullable = false)
     @Temporal(TemporalType.DATE)
     @NotNull
     private Date startDate;
 
-    @Column(name = "FECHAFINFISCAL", nullable = false)
+    @Column(name = "fechafinfiscal", nullable = false)
     @Temporal(TemporalType.DATE)
     @NotNull
     private Date endDate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFP")
+    @JoinColumn(name = "idtasaafp")
     @NotNull
     private AFPRate afpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPPROFRISK")
+    @JoinColumn(name = "idtasaafpprofrisk")
     @NotNull
     private AFPRate professionalRiskAfpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPPROHOUS")
+    @JoinColumn(name = "idtasaafpprohous")
     @NotNull
     private AFPRate proHousingAfpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPSOLIDARIO")
+    @JoinColumn(name = "idtasaafpsolidario")
     @NotNull
     private AFPRate solidaryAfpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPLABINDIVIDUAL")
+    @JoinColumn(name = "idtasaafplabindividual")
     @NotNull
     private AFPRate laborIndividualAfpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPLABRIESGOCOMUN")
+    @JoinColumn(name = "idtasaafplabriesgocomun")
     @NotNull
     private AFPRate laborCommonRiskAfpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPLABSOLIDARIO")
+    @JoinColumn(name = "idtasaafplabsolidario")
     @NotNull
     private AFPRate laborSolidaryContributionAfpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPLABCOMISION")
+    @JoinColumn(name = "idtasaafplabcomision")
     @NotNull
     private AFPRate laborComissionAfpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASACNS")
+    @JoinColumn(name = "idtasacns")
     @NotNull
     private CNSRate cnsRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAIVA")
+    @JoinColumn(name = "idtasaiva")
     @NotNull
     private IVARate ivaRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASASMN")
+    @JoinColumn(name = "idtasasmn")
     @NotNull
     private SMNRate smnRate;
 
-    @Column(name = "FECHACREACION", nullable = false)
+    @Column(name = "fechacreacion", nullable = false)
     @Temporal(TemporalType.DATE)
     @NotNull
     private Date creationDate;
 
-    @Column(name = "TIPOCAMBIOINICIALUFV", precision = 16, scale = 6, nullable = false)
+    @Column(name = "tipocambioinicialufv", precision = 16, scale = 6, nullable = false)
     @NotNull
     private BigDecimal initialUfvExchangeRate = BigDecimal.ZERO;
 
-    @Column(name = "TIPOCAMBIOFINALUFV", precision = 16, scale = 6, nullable = false)
+    @Column(name = "tipocambiofinalufv", precision = 16, scale = 6, nullable = false)
     @NotNull
     private BigDecimal finalUfvExchangeRate = BigDecimal.ZERO;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDREGLADESCUENTO", nullable = false)
+    @JoinColumn(name = "idregladescuento", nullable = false)
     @NotNull
     private DiscountRule nationalSolidaryAfpDiscountRule;
 
@@ -224,11 +224,11 @@ public class PayrollGenerationCycle implements BaseModel {
     private List<InvoicesForm> invoicesFormList;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false)
     private Company company;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
     public Long getId() {

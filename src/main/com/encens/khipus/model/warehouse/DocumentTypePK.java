@@ -12,11 +12,11 @@ import java.io.Serializable;
  */
 @Embeddable
 public class DocumentTypePK implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_DOC", nullable = false, length = 3)
+    @Column(name = "cod_doc", nullable = false, length = 3)
     @Length(max = 3)
     private String documentCode;
 

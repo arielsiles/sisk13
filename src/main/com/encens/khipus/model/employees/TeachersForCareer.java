@@ -20,32 +20,32 @@ import javax.persistence.*;
 
 @Entity
 @EntityListeners(UpperCaseStringListener.class)
-@Table(name = "DOCENTESPORCARRERA", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "docentesporcarrera", schema = Constants.KHIPUS_SCHEMA)
 public class TeachersForCareer {
 
     @Id
-    @Column(name = "IDDOCENTESPORCARRERA", updatable = false, insertable = false)
+    @Column(name = "iddocentesporcarrera", updatable = false, insertable = false)
     private String id;
 
-    @Column(name = "UNIDAD_ACAD_ADM", updatable = false, insertable = false)
+    @Column(name = "unidad_acad_adm", updatable = false, insertable = false)
     private Integer administrativeAcademicUnit;
 
-    @Column(name = "SEDE", length = 200, updatable = false, insertable = false)
+    @Column(name = "sede", length = 200, updatable = false, insertable = false)
     private String city;
 
-    @Column(name = "PLAN_ESTUDIO", length = 200, updatable = false, insertable = false)
+    @Column(name = "plan_estudio", length = 200, updatable = false, insertable = false)
     private String studyPlan;
 
-    @Column(name = "CARRERA", length = 200, updatable = false, insertable = false)
+    @Column(name = "carrera", length = 200, updatable = false, insertable = false)
     private String carrerName;
 
-    @Column(name = "CANT_DOCENTES", updatable = false, insertable = false)
+    @Column(name = "cant_docentes", updatable = false, insertable = false)
     private Integer numberOfTeachers;
 
-    @Column(name = "GESTION", updatable = false, insertable = false)
+    @Column(name = "gestion", updatable = false, insertable = false)
     private Integer gestion;
 
-    @Column(name = "PERIODO", updatable = false, insertable = false)
+    @Column(name = "periodo", updatable = false, insertable = false)
     private Integer period;
 
     public String getId() {

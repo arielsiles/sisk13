@@ -28,17 +28,17 @@ public class SubGroup implements BaseModel {
     @EmbeddedId
     private SubGroupPK id = new SubGroupPK();
 
-    @Column(name = "COD_GRU", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_gru", nullable = false, updatable = false, insertable = false)
     private String groupCode;
 
-    @Column(name = "COD_SUB", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_sub", nullable = false, updatable = false, insertable = false)
     private String subGroupCode;
 
-    @Column(name = "DESCRI", nullable = true, length = 100)
+    @Column(name = "descri", nullable = true, length = 100)
     @Length(max = 100)
     private String name;
 
-    @Column(name = "ESTADO", nullable = false, length = 3)
+    @Column(name = "estado", nullable = false, length = 3)
     @Enumerated(EnumType.STRING)
     private SubGroupState state;
 
@@ -49,8 +49,8 @@ public class SubGroup implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_GRU", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_gru", nullable = false, insertable = false, updatable = false)
     })
     private Group group;
 

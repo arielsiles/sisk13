@@ -27,19 +27,19 @@ import java.util.List;
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
 public class ProductDelivery implements BaseModel {
     @Id
-    @Column(name = "IDENTARTICULO", nullable = false)
+    @Column(name = "identarticulo", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductDelivery.tableGenerator")
     private Long id;
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "NO_FACT", nullable = false, length = 10)
+    @Column(name = "no_fact", nullable = false, length = 10)
     @Length(max = 10)
     private String invoiceNumber;
 
-    @Column(name = "NO_TRANS", nullable = true, length = 10)
+    @Column(name = "no_trans", nullable = true, length = 10)
     @Length(max = 10)
     private String transactionNumber;
 
@@ -49,8 +49,8 @@ public class ProductDelivery implements BaseModel {
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = true, updatable = false, insertable = false),
-            @JoinColumn(name = "NO_TRANS", nullable = true, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = true, updatable = false, insertable = false),
+            @JoinColumn(name = "no_trans", nullable = true, updatable = false, insertable = false)
     })
     private WarehouseVoucher warehouseVoucher;
 

@@ -9,9 +9,9 @@ import java.util.Date;
 import java.util.List;
 
 @TableGenerator(name = "GestionTax_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
         pkColumnValue = "gestionimpuesto",
         allocationSize = 10)
 

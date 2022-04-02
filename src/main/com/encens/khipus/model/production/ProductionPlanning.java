@@ -41,14 +41,14 @@ import java.util.List;
                         "where productionPlanning.date between :startDate and :endDate")
 })
 @TableGenerator(name = "ProductionPlanning_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PLANIFICACIONPRODUCCION",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "planificacionproduccion",
         allocationSize = 10)
 
 @Entity
-@Table(name = "PLANIFICACIONPRODUCCION", uniqueConstraints = @UniqueConstraint(columnNames = {"FECHA", "IDCOMPANIA"}))
+@Table(name = "planificacionproduccion", uniqueConstraints = @UniqueConstraint(columnNames = {"fecha", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class ProductionPlanning implements BaseModel {
@@ -57,26 +57,26 @@ public class ProductionPlanning implements BaseModel {
     public static final String UNIQUE_DATE = "UNIQUE_DATE";
 
     @Id
-    @Column(name = "IDPLANIFICACIONPRODUCCION", nullable = false)
+    @Column(name = "idplanificacionproduccion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionPlanning_Generator")
     private Long id;
 
-    @Column(name = "FECHA", nullable = false, columnDefinition = "DATE")
+    @Column(name = "fecha", nullable = false, columnDefinition = "DATE")
     private Date date;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
-    @Column(name = "OBSERVACIONES", nullable = true, length = 1000)
+    @Column(name = "observaciones", nullable = true, length = 1000)
     private String observations;
 
-    @Column(name = "ESTADO", length = 50, nullable = false)
+    @Column(name = "estado", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductionPlanningState state = ProductionPlanningState.PENDING;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @OneToMany(mappedBy = "productionPlanning", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -89,19 +89,19 @@ public class ProductionPlanning implements BaseModel {
     //@OrderBy("code desc")
     private List<BaseProduct> baseProducts = new ArrayList<BaseProduct>();
 
-    @Column(name = "TOTALLECHEPRODUCIDA", nullable = true, columnDefinition = "DECIMAL(9,0)")
+    @Column(name = "totallecheproducida", nullable = true, columnDefinition = "DECIMAL(9,0)")
     private BigDecimal totalMilk = new BigDecimal(0.0);
 
-    @Column(name = "TOTALLECHEQUESO", nullable = true, columnDefinition = "DECIMAL(9,0)")
+    @Column(name = "totallechequeso", nullable = true, columnDefinition = "DECIMAL(9,0)")
     private BigDecimal totalMilkCheese = new BigDecimal(0.0);
 
-    @Column(name = "TOTALLECHEUHT", nullable = true, columnDefinition = "DECIMAL(9,0)")
+    @Column(name = "totallecheuht", nullable = true, columnDefinition = "DECIMAL(9,0)")
     private BigDecimal totalMilkUHT = new BigDecimal(0.0);
 
-    @Column(name = "TOTALLECHEYOGURT", nullable = true, columnDefinition = "DECIMAL(9,0)")
+    @Column(name = "totallecheyogurt", nullable = true, columnDefinition = "DECIMAL(9,0)")
     private BigDecimal totalMilkYogurt = new BigDecimal(0.0);
 
-    @Column(name = "TOTALLECHEREPROCESO", nullable = true, columnDefinition = "DECIMAL(9,0)")
+    @Column(name = "totallechereproceso", nullable = true, columnDefinition = "DECIMAL(9,0)")
     private BigDecimal totalMilkReprocessed = new BigDecimal(0.0);
 
     public Company getCompany() {
@@ -217,7 +217,7 @@ public class ProductionPlanning implements BaseModel {
 
         for (BaseProduct baseProduct:baseProducts){
             for (SingleProduct singleProduct:baseProduct.getSingleProducts())
-            singleProductList.add(singleProduct);
+                singleProductList.add(singleProduct);
         }
 
         return  singleProductList;

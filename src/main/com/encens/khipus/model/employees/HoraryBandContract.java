@@ -139,7 +139,7 @@ public class HoraryBandContract implements BaseModel, Comparable {
     private HoraryBand horaryBand;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTIPOBANDAHORARIA", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idtipobandahoraria", nullable = true, updatable = false, insertable = true)
     private TypeHoraryBand typeHoraryBand;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -181,17 +181,17 @@ public class HoraryBandContract implements BaseModel, Comparable {
     @Column(name = "horarioacademico", nullable = true)
     private Long academicSchedule;
 
-    @Column(name = "GESTION", nullable = true)
+    @Column(name = "gestion", nullable = true)
     private Integer gestion;
 
-    @Column(name = "PERIODO", nullable = true)
+    @Column(name = "periodo", nullable = true)
     private Integer period;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "horarioacademico", referencedColumnName = "HORARIO", nullable = true, insertable = false, updatable = false),
-            @JoinColumn(name = "GESTION", referencedColumnName = "GESTION", nullable = true, insertable = false, updatable = false),
-            @JoinColumn(name = "PERIODO", referencedColumnName = "PERIODO", nullable = true, insertable = false, updatable = false)
+            @JoinColumn(name = "horarioacademico", referencedColumnName = "horario", nullable = true, insertable = false, updatable = false),
+            @JoinColumn(name = "gestion", referencedColumnName = "gestion", nullable = true, insertable = false, updatable = false),
+            @JoinColumn(name = "periodo", referencedColumnName = "periodo", nullable = true, insertable = false, updatable = false)
     })
     private Horary horary;
 
@@ -207,14 +207,14 @@ public class HoraryBandContract implements BaseModel, Comparable {
     @JoinColumn(name = "asignatura", nullable = true, updatable = false, insertable = false)
     private Asignature asignature;
 
-    @Column(name = "PIVOTECOSTO", nullable = true)
+    @Column(name = "pivotecosto", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean costPivot;
 
-    @Column(name = "EDIFICIO")
+    @Column(name = "edificio")
     private String building;
 
-    @Column(name = "AMBIENTE")
+    @Column(name = "ambiente")
     private String classroom;
 
     @Column(name = "asignatura", nullable = true)
@@ -228,7 +228,7 @@ public class HoraryBandContract implements BaseModel, Comparable {
     @Length(max = 200)
     private String nameSubject;
 
-    @Column(name = "PRECIOPERIODO", precision = 16, scale = 6)
+    @Column(name = "precioperiodo", precision = 16, scale = 6)
     private BigDecimal pricePerPeriod;
 
     public HoraryBandContract() {

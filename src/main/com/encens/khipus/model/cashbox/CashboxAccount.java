@@ -13,14 +13,14 @@ import javax.persistence.Table;
  * @version 2.13
  */
 @Entity
-@Table(name = "CUENTAS", schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "cuentas", schema = Constants.CASHBOX_SCHEMA)
 public class CashboxAccount implements BaseModel {
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "NOMBRE", nullable = false)
+    @Column(name = "nombre", nullable = false)
     private String name;
 
     public Object getId() {

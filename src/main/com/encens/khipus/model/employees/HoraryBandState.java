@@ -100,17 +100,17 @@ public class HoraryBandState implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
-    @Column(name = "COD_CC", length = 6)
+    @Column(name = "cod_cc", length = 6)
     @Length(max = 6)
     private String costCenterCode;
 
 
-    @Column(name = "NO_CIA", length = 2)
+    @Column(name = "no_cia", length = 2)
     @Length(max = 2)
     private String companyNumber;
 

@@ -32,44 +32,44 @@ import java.util.List;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "PLANVACACION",
+        pkColumnValue = "planvacacion",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(name = "PLANVACACION", schema = Constants.KHIPUS_SCHEMA, uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"CODIGO", "IDCOMPANIA"}),
-        @UniqueConstraint(columnNames = {"IDPLANVACACION", "IDCOMPANIA"}),
-        @UniqueConstraint(columnNames = {"IDCOMPANIA", "IDCONTRACTOPUESTO"})
+@Table(name = "planvacacion", schema = Constants.KHIPUS_SCHEMA, uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"codigo", "idcompania"}),
+        @UniqueConstraint(columnNames = {"idplanvacacion", "idcompania"}),
+        @UniqueConstraint(columnNames = {"idcompania", "idcontractopuesto"})
 })
 public class VacationPlanning implements BaseModel {
 
     @Id
-    @Column(name = "IDPLANVACACION", nullable = false)
+    @Column(name = "idplanvacacion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "VacationPlanning.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     @NotNull
     private Long code;
 
-    @Column(name = "ANIOSANTIGUEDAD", nullable = false)
+    @Column(name = "aniosantiguedad", nullable = false)
     @NotNull
     private Integer seniorityYears;
 
-    @Column(name = "DIASVACACION", nullable = false)
+    @Column(name = "diasvacacion", nullable = false)
     @NotNull
     private Integer vacationDays;
 
-    @Column(name = "DIASLIBRES", nullable = false)
+    @Column(name = "diaslibres", nullable = false)
     @NotNull
     private Integer daysOff;
 
-    @Column(name = "DIASUSADOS", nullable = false)
+    @Column(name = "diasusados", nullable = false)
     @NotNull
     private Integer daysUsed;
 
-    @Column(name = "FECHAINICIO", nullable = false)
+    @Column(name = "fechainicio", nullable = false)
     @Temporal(TemporalType.DATE)
     @NotNull
     private Date initDate;
@@ -79,16 +79,16 @@ public class VacationPlanning implements BaseModel {
     private List<VacationGestion> vacationGestionList = new ArrayList<VacationGestion>(0);
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCONTRACTOPUESTO", nullable = false)
+    @JoinColumn(name = "idcontractopuesto", nullable = false)
     @NotNull
     private JobContract jobContract;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

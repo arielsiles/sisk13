@@ -36,88 +36,88 @@ public class FixedAssetPayment implements BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FixedAssetPayment.tableGenerator")
-    @Column(name = "IDPAGO", nullable = false)
+    @Column(name = "idpago", nullable = false)
     private Long id;
 
-    @Column(name = "ESTADO", nullable = false, length = 20)
+    @Column(name = "estado", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private FixedAssetPaymentState state;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = 250)
+    @Column(name = "descripcion", nullable = false, length = 250)
     @Length(max = 250)
     @NotNull
     private String description;
 
-    @Column(name = "MONEDAORIGEN", length = 20)
+    @Column(name = "monedaorigen", length = 20)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType sourceCurrency;
 
-    @Column(name = "MONEDAPAGO", nullable = false)
+    @Column(name = "monedapago", nullable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType payCurrency;
 
-    @Column(name = "MONTOORIGEN", precision = 12, scale = 2)
+    @Column(name = "montoorigen", precision = 12, scale = 2)
     private BigDecimal sourceAmount;
 
-    @Column(name = "MONTOPAGO", precision = 12, scale = 2, nullable = false)
+    @Column(name = "montopago", precision = 12, scale = 2, nullable = false)
     @NotNull
     private BigDecimal payAmount;
 
-    @Column(name = "NOMBREBENEFICIARIO", length = 200)
+    @Column(name = "nombrebeneficiario", length = 200)
     @Length(max = 200)
     private String beneficiaryName;
 
-    @Column(name = "TIPOBENEFICIARIO")
+    @Column(name = "tipobeneficiario")
     @Enumerated(EnumType.STRING)
     private FixedAssetBeneficiaryType fixedAssetBeneficiaryType;
 
-    @Column(name = "TIPOCAMBIO", precision = 16, scale = 6)
+    @Column(name = "tipocambio", precision = 16, scale = 6)
     private BigDecimal exchangeRate;
 
-    @Column(name = "TIPOPAGO")
+    @Column(name = "tipopago")
     @Enumerated(EnumType.STRING)
     private PurchaseOrderPaymentType paymentType;
 
-    @Column(name = "FECHACREACION")
+    @Column(name = "fechacreacion")
     @Temporal(TemporalType.DATE)
     private Date creationDate;
 
-    @Column(name = "CUENTABANCO", length = 20)
+    @Column(name = "cuentabanco", length = 20)
     @Length(max = 20)
     private String bankAccountNumber;
 
-    @Column(name = "NOTRANS", length = 10)
+    @Column(name = "notrans", length = 10)
     @Length(max = 10)
     private String transactionNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDSEDEDESTINOCHEQUE", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idsededestinocheque", referencedColumnName = "idunidadnegocio")
     private BusinessUnit checkDestination;
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private Long version;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = true, updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTABANCO", referencedColumnName = "CTA_BCO", nullable = true, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = true, updatable = false, insertable = false),
+            @JoinColumn(name = "cuentabanco", referencedColumnName = "cta_bco", nullable = true, updatable = false, insertable = false)
     })
     private FinancesBankAccount bankAccount;
 
     /* the cash box account*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTACAJA", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentacaja", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashBoxCashAccount;
 
     /* the cash box account code*/
-    @Column(name = "CUENTACAJA", length = 20)
+    @Column(name = "cuentacaja", length = 20)
     @Length(max = 20)
     private String cashBoxAccount;
 

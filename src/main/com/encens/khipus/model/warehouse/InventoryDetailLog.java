@@ -27,34 +27,34 @@ import java.util.Date;
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
 public class InventoryDetailLog implements BaseModel {
     @Id
-    @Column(name = "ID_INVENTARIO_DETALLE_LOG", nullable = false)
+    @Column(name = "id_inventario_detalle_log", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "InventoryDetailLog.tableGenerator")
     private Long id;
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "ID_INV_DET_ORIGEN", nullable = false)
+    @Column(name = "id_inv_det_origen", nullable = false)
     private Long sourceInventoryDetailId;
 
-    @Column(name = "ID_INV_DET_DESTINO", nullable = false)
+    @Column(name = "id_inv_det_destino", nullable = false)
     private Long targetInventoryDetailId;
 
-    @Column(name = "NO_USR", nullable = false, length = 4)
+    @Column(name = "no_usr", nullable = false, length = 4)
     @Length(max = 4)
     private String userNumber;
 
-    @Column(name = "FECHA", nullable = false)
+    @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = 250)
+    @Column(name = "descripcion", nullable = false, length = 250)
     @Length(max = 250)
     private String description;
 
 
-    @Column(name = "CANTIDAD", nullable = false, precision = 12, scale = 2)
+    @Column(name = "cantidad", nullable = false, precision = 12, scale = 2)
     private BigDecimal quantity;
 
     public Long getId() {

@@ -14,15 +14,15 @@ import java.io.Serializable;
  */
 public class AccountItemPK implements Serializable {
 
-    @Column(name = "ID_CUENTA", nullable = false, length = 10)
+    @Column(name = "id_cuenta", nullable = false, length = 10)
     @Length(max = 10)
     private Integer idAccount;
 
-    @Column(name = "COD_ART", nullable = false, length = 6)
+    @Column(name = "cod_art", nullable = false, length = 6)
     @Length(max = 6)
     private String codArt;
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 

@@ -185,14 +185,14 @@ public class JobContract implements BaseModel {
     @Column(name = "tipo_grupo")
     private String groupType;
 
-    @Column(name = "EDIFICIO")
+    @Column(name = "edificio")
     private String building;
 
-    @Column(name = "AMBIENTE")
+    @Column(name = "ambiente")
     private String classroom;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "IDBANDAHORARIACONTRATO", referencedColumnName = "idbandahorariacontrato")
+    @JoinColumn(name = "idbandahorariacontrato", referencedColumnName = "idbandahorariacontrato")
     private HoraryBandContract costPivotHoraryBandContract;
 
     @Column(name = "montolaboral", precision = 16, scale = 6)

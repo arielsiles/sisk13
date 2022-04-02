@@ -15,35 +15,35 @@ import javax.persistence.*;
  * To change this template use File | Settings | File Templates.
  */
 @TableGenerator(name = "MeasureUnitProduction_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "UNIDADMEDIDA",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "unidadmedida",
         allocationSize = 10)
 
 @Entity
-@Table(name = "UNIDADMEDIDAPRODUCCION", uniqueConstraints = @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"}))
+@Table(name = "unidadmedidaproduccion", uniqueConstraints = @UniqueConstraint(columnNames = {"nombre", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class MeasureUnitProduction implements BaseModel {
 
     @Id
-    @Column(name = "IDUNIDADMEDIDAPRODUCCION", nullable = false)
+    @Column(name = "idunidadmedidaproduccion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "MeasureUnitProduction_Generator")
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 200)
+    @Column(name = "nombre", nullable = false, length = 200)
     private String name;
 
-    @Column(name = "DESCRIPCION", nullable = true, length = 500)
+    @Column(name = "descripcion", nullable = true, length = 500)
     private String description;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Company getCompany() {

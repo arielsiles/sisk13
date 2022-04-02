@@ -37,7 +37,7 @@ import java.math.BigDecimal;
         @NamedQuery(name = "PurchaseDocument.findByOrderVoucher",
                 query = "select purchaseDocument from PurchaseDocument purchaseDocument" +
                         " where purchaseDocument.purchaseOrderId =:purchaseOrderId"
-                        )
+        )
 
 }
 )
@@ -50,58 +50,58 @@ import java.math.BigDecimal;
 
 
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "DOCUMENTOCOMPRA")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "documentocompra")
 public class PurchaseDocument extends AccountingDocument {
-    @Column(name = "TIPO", length = 25)
+    @Column(name = "tipo", length = 25)
     @Enumerated(EnumType.STRING)
     private CollectionDocumentType type;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
-    @Column(name = "ESTADO", length = 25)
+    @Column(name = "estado", length = 25)
     @Enumerated(EnumType.STRING)
     private PurchaseDocumentState state;
 
-    @Column(name = "MONEDA", updatable = false)
+    @Column(name = "moneda", updatable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "TIPOCAMBIO", precision = 16, scale = 6, updatable = true)
+    @Column(name = "tipocambio", precision = 16, scale = 6, updatable = true)
     private BigDecimal exchangeRate;
 
-    @Column(name = "IDORDENCOMPRA", nullable = true, insertable = false, updatable = false)
+    @Column(name = "idordencompra", nullable = true, insertable = false, updatable = false)
     private Long purchaseOrderId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDORDENCOMPRA", nullable = true, insertable = true, updatable = false)
+    @JoinColumn(name = "idordencompra", nullable = true, insertable = true, updatable = false)
     private PurchaseOrder purchaseOrder;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDTMPENC", nullable = true, insertable = true, updatable = true)
+    @JoinColumn(name = "idtmpenc", nullable = true, insertable = true, updatable = true)
     private Voucher voucher;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDENTIDAD", referencedColumnName = "COD_ENTI", nullable = true, insertable = true, updatable = true)
+    @JoinColumn(name = "identidad", referencedColumnName = "cod_enti", nullable = true, insertable = true, updatable = true)
     private FinancesEntity financesEntity;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "ID_TMPDET", nullable = true, insertable = true, updatable = true)
+    @JoinColumn(name = "id_tmpdet", nullable = true, insertable = true, updatable = true)
     private VoucherDetail voucherDetailFiscalCredit;
 
-    @Column(name = "NO_CIA", length = 2)
+    @Column(name = "no_cia", length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "CUENTAAJUSTE", length = 20)
+    @Column(name = "cuentaajuste", length = 20)
     @Length(max = 20)
     private String cashAccountCodeAdjustment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTAAJUSTE", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentaajuste", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashAccountAdjustment;
 

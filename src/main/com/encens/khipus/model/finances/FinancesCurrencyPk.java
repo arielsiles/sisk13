@@ -15,11 +15,11 @@ import java.io.Serializable;
 @Embeddable
 public class FinancesCurrencyPk implements Serializable {
 
-    @Column(name = "COD_MON", nullable = false, updatable = false)
+    @Column(name = "cod_mon", nullable = false, updatable = false)
     @Length(max = 2)
     private String currencyCode;
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     @Length(max = 2)
     private String companyNumber;
 

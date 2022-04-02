@@ -95,10 +95,10 @@ public class FixedAssetVoucher implements BaseModel {
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "tasaBsSus", precision = 16, scale = 6)
+    @Column(name = "tasabssus", precision = 16, scale = 6)
     private BigDecimal bsSusRate;
 
-    @Column(name = "tasaBsUfv", precision = 16, scale = 6)
+    @Column(name = "tasabsufv", precision = 16, scale = 6)
     private BigDecimal bsUfvRate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -107,8 +107,8 @@ public class FixedAssetVoucher implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "no_cia", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "cod_cc", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
@@ -133,12 +133,12 @@ public class FixedAssetVoucher implements BaseModel {
 
     /*represents the executor unit*/
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idunidadnegocio", referencedColumnName = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
     /*in case of approve registration*/
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDORDENCOMPRA", referencedColumnName = "ID_COM_ENCOC")
+    @JoinColumn(name = "idordencompra", referencedColumnName = "id_com_encoc")
     private PurchaseOrder purchaseOrder;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -146,7 +146,7 @@ public class FixedAssetVoucher implements BaseModel {
     private FixedAssetPayment fixedAssetPayment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDAFLOCALIZACION")
+    @JoinColumn(name = "idaflocalizacion")
     private FixedAssetLocation fixedAssetLocation;
 
     @Column(name = "no_trans")

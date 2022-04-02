@@ -173,135 +173,135 @@ import java.util.List;
 public class MovementDetail implements BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "MovementDetail.tableGenerator")
-    @Column(name = "ID_INV_MOVDET", nullable = true)
+    @Column(name = "id_inv_movdet", nullable = true)
     private Long id;
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", nullable = true, length = 10)
+    @Column(name = "no_trans", nullable = true, length = 10)
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "ESTADO", nullable = true, length = 3)
+    @Column(name = "estado", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherState state;
 
-    @Column(name = "COD_ALM", nullable = true, length = 6)
+    @Column(name = "cod_alm", nullable = true, length = 6)
     @Length(max = 6)
     private String warehouseCode;
 
-    @Column(name = "COD_ART", nullable = true, length = 6)
+    @Column(name = "cod_art", nullable = true, length = 6)
     @Length(max = 6)
     private String productItemCode;
 
-    @Column(name = "TIPO_MOV", nullable = true, length = 1)
+    @Column(name = "tipo_mov", nullable = true, length = 1)
     @Enumerated(EnumType.STRING)
     private MovementDetailType movementType;
 
-    @Column(name = "CANTIDAD", nullable = true)
+    @Column(name = "cantidad", nullable = true)
     private BigDecimal quantity;
 
-    @Column(name = "RESIDUO", precision = 12, scale = 2)
+    @Column(name = "residuo", precision = 12, scale = 2)
     private BigDecimal residue;
 
-    @Column(name = "CUENTA_ART", nullable = true, length = 31)
+    @Column(name = "cuenta_art", nullable = true, length = 31)
     @Length(max = 31)
     private String productItemAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA_ART", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta_art", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount productItemCashAccount;
 
-    @Column(name = "COD_MED", nullable = true, length = 6)
+    @Column(name = "cod_med", nullable = true, length = 6)
     @Length(max = 6)
     private String measureCode;
 
-    @Column(name = "COSTOUNITARIO", precision = 16, scale = 6)
+    @Column(name = "costounitario", precision = 16, scale = 6)
     private BigDecimal unitCost;
 
-    @Column(name = "MONTO", nullable = true, precision = 16, scale = 6)
+    @Column(name = "monto", nullable = true, precision = 16, scale = 6)
     private BigDecimal amount;
 
-    @Column(name = "PRECIOUNITCOMPRA", precision = 16, scale = 6)
+    @Column(name = "preciounitcompra", precision = 16, scale = 6)
     private BigDecimal unitPurchasePrice;
 
-    @Column(name = "PRECIOCOMPRA", precision = 16, scale = 6)
+    @Column(name = "preciocompra", precision = 16, scale = 6)
     private BigDecimal purchasePrice;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", updatable = true, insertable = true)
     private BusinessUnit executorUnit;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
-    @Column(name = "COD_CC", nullable = true, length = 8)
+    @Column(name = "cod_cc", nullable = true, length = 8)
     @Length(max = 8)
     private String costCenterCode;
 
-    @Column(name = "FECHA", nullable = true)
+    @Column(name = "fecha", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date movementDetailDate;
 
-    @Column(name = "ID_FUENTE", nullable = true)
+    @Column(name = "id_fuente", nullable = true)
     private Long sourceId;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ART", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_art", nullable = false, insertable = false, updatable = false)
     })
     private ProductItem productItem;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ALM", referencedColumnName = "COD_ALM", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_alm", referencedColumnName = "cod_alm", nullable = false, insertable = false, updatable = false)
     })
     private Warehouse warehouse;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_MED", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_med", nullable = false, updatable = false, insertable = false)
     })
     private MeasureUnit measureUnit;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "NO_TRANS", referencedColumnName = "NO_TRANS", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "ESTADO", referencedColumnName = "ESTADO", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "no_trans", referencedColumnName = "no_trans", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "estado", referencedColumnName = "estado", nullable = false, updatable = false, insertable = false)
     })
     private InventoryMovement inventoryMovement;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA_ART", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta_art", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount cashAccount;
 
-    @Column(name = "ADVERTENCIA", length = 250)
+    @Column(name = "advertencia", length = 250)
     @Length(max = 250)
     private String warning;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_INV_MOVDET_RAIZ", referencedColumnName = "ID_INV_MOVDET")
+    @JoinColumn(name = "id_inv_movdet_raiz", referencedColumnName = "id_inv_movdet")
     private MovementDetail parentMovementDetail;
 
     @OneToMany(mappedBy = "parentMovementDetail", fetch = FetchType.LAZY)

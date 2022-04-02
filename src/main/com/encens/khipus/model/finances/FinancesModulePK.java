@@ -12,11 +12,11 @@ import java.io.Serializable;
  */
 @Embeddable
 public class FinancesModulePK implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "MODULO", nullable = false, length = 6)
+    @Column(name = "modulo", nullable = false, length = 6)
     @Length(max = 6)
     private String module;
 

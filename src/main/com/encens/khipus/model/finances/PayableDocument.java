@@ -37,95 +37,95 @@ public class PayableDocument implements BaseModel {
     @EmbeddedId
     private PayableDocumentPk id = new PayableDocumentPk();
 
-    @Column(name = "NO_TRANS", insertable = false, updatable = false)
+    @Column(name = "no_trans", insertable = false, updatable = false)
     private String transactionNumber;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "COD_ENTI")
+    @Column(name = "cod_enti")
     private String entityCode;
 
-    @Column(name = "COD_PROV")
+    @Column(name = "cod_prov")
     private String providerCode;
 
-    @Column(name = "TIPO_DOC")
+    @Column(name = "tipo_doc")
     private String documentTypeCode;
 
-    @Column(name = "NO_DOC", length = 20)
+    @Column(name = "no_doc", length = 20)
     @Length(max = 20)
     private String documentNumber;
 
-    @Column(name = "CTAXPAGAR", length = 31)
+    @Column(name = "ctaxpagar", length = 31)
     @Length(max = 31)
     private String payableAccountCode;
 
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date movementDate;
 
-    @Column(name = "MONTO", precision = 16, scale = 2)
+    @Column(name = "monto", precision = 16, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "SALDO", precision = 16, scale = 2)
+    @Column(name = "saldo", precision = 16, scale = 2)
     private BigDecimal residue;
 
-    @Column(name = "MONEDA", length = 20)
+    @Column(name = "moneda", length = 20)
     @Length(max = 20)
     private String currencyCode;
 
-    @Column(name = "TC", precision = 10, scale = 6)
+    @Column(name = "tc", precision = 10, scale = 6)
     private BigDecimal exchangeRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "COD_ENTI", nullable = false, updatable = false, insertable = false)
+    @JoinColumn(name = "cod_enti", nullable = false, updatable = false, insertable = false)
     private FinancesEntity entity;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_PROV", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_prov", nullable = false, insertable = false, updatable = false)
     })
     private Provider provider;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "TIPO_DOC", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "tipo_doc", nullable = false, insertable = false, updatable = false)
     })
     private PayableDocumentType documentType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "MONEDA", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "moneda", nullable = false, insertable = false, updatable = false)
     })
     private FinancesCurrency currency;
 
-    @Column(name = "ESTADO")
+    @Column(name = "estado")
     @Enumerated(EnumType.STRING)
     private PayableDocumentState state;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAXPAGAR", referencedColumnName = "CUENTA", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaxpagar", referencedColumnName = "cuenta", nullable = false, insertable = false, updatable = false)
     })
     private CashAccount payableAccount;
 
-    @Column(name = "TIPO_COMPRO", length = 2)
+    @Column(name = "tipo_compro", length = 2)
     @Length(max = 2)
     private String voucherType;
 
-    @Column(name = "NO_COMPRO", length = 10)
+    @Column(name = "no_compro", length = 10)
     @Length(max = 10)
     private String voucherNumber;
 
-    @Column(name = "FECHA_VEN")
+    @Column(name = "fecha_ven")
     @Temporal(TemporalType.DATE)
     private Date expirationDate;
 
-    @Column(name = "MOD_AUT", updatable = false)
+    @Column(name = "mod_aut", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME, parameters = {
             @Parameter(
                     name = com.encens.khipus.model.usertype.StringBooleanUserType.TRUE_PARAMETER,
@@ -138,12 +138,12 @@ public class PayableDocument implements BaseModel {
     })
     private Boolean allowUpdate;
 
-    @Column(name = "FECHA_EMIS")
+    @Column(name = "fecha_emis")
     @Temporal(TemporalType.DATE)
     private Date registrationDate;
 
 
-    @Column(name = "PENDIENTE_REGISTRO", updatable = false)
+    @Column(name = "pendiente_registro", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME, parameters = {
             @Parameter(
                     name = com.encens.khipus.model.usertype.StringBooleanUserType.TRUE_PARAMETER,
@@ -156,30 +156,30 @@ public class PayableDocument implements BaseModel {
     })
     private Boolean registrationPending;
 
-    @Column(name = "NO_FACTURA", length = 20)
+    @Column(name = "no_factura", length = 20)
     @Length(max = 20)
     private String invoiceNumber;
 
-    @Column(name = "TIPO_COMPRO_REGFAC", length = 2)
+    @Column(name = "tipo_compro_regfac", length = 2)
     @Length(max = 2)
     private String regularizeVoucherType;
 
-    @Column(name = "NO_COMPRO_REGFAC", length = 10)
+    @Column(name = "no_compro_regfac", length = 10)
     @Length(max = 10)
     private String regularizeVoucherNumber;
 
-    @Column(name = "BENEFICIARIO", length = 100)
+    @Column(name = "beneficiario", length = 100)
     @Length(max = 100)
     private String beneficiary;
 
-    @Column(name = "SALDO_REGFAC", precision = 16, scale = 2)
+    @Column(name = "saldo_regfac", precision = 16, scale = 2)
     private BigDecimal regularizeVoucherResidue;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "TIPO_COMPRO", referencedColumnName = "TIPO_COMPRO", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "NO_COMPRO", referencedColumnName = "NO_COMPRO", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "tipo_compro", referencedColumnName = "tipo_compro", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "no_compro", referencedColumnName = "no_compro", nullable = false, insertable = false, updatable = false)
     })
     private AccountingMovement accountingMovement;
 

@@ -17,40 +17,40 @@ import javax.persistence.*;
  */
 
 @TableGenerator(name = "ArticleEstate_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "ESTADOARTICULO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "estadoarticulo",
         allocationSize = 10)
 
 @Entity
-@Table(name = "ESTADOARTICULO")
+@Table(name = "estadoarticulo")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class ArticleEstate implements BaseModel {
 
     @Id
-    @Column(name = "IDESTADOARTICULO", nullable = false)
+    @Column(name = "idestadoarticulo", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ArticleEstate_Generator")
     private Long id;
 
-    @Column(name = "ESTADO", nullable = true)
+    @Column(name = "estado", nullable = true)
     private String estate;
 
-    @Column(name = "DESCRIPCION", nullable = true)
+    @Column(name = "descripcion", nullable = true)
     private String description;
 
-    @Column(name = "COD_ART", insertable = false, updatable = false, nullable = false)
+    @Column(name = "cod_art", insertable = false, updatable = false, nullable = false)
     private String productItemCode;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false, nullable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false, nullable = false)
     @Length(max = 2)
     private String companyNumber;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "COD_ART", referencedColumnName = "COD_ART")
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_art", referencedColumnName = "cod_art")
     })
     private ProductItem productItem;
 

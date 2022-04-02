@@ -11,37 +11,37 @@ import javax.persistence.*;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "ACOPIOMATERIAPRIMA",
+        pkColumnValue = "acopiomateriaprima",
         allocationSize = 10)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ACOPIOMATERIAPRIMA", uniqueConstraints = @UniqueConstraint(columnNames = {"IDSESIONACOPIO", "IDPRODUCTORMATERIAPRIMA"}))
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "acopiomateriaprima", uniqueConstraints = @UniqueConstraint(columnNames = {"idsesionacopio", "idproductormateriaprima"}))
 public class CollectedRawMaterial implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDACOPIOMATERIAPRIMA", nullable = false)
+    @Column(name = "idacopiomateriaprima", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "CollectedRawMaterial.tableGenerator")
     private Long id;
 
-    @Column(name = "CANTIDAD", nullable = false, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "cantidad", nullable = false, columnDefinition = "DECIMAL(16,2)")
     private Double amount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPRODUCTORMATERIAPRIMA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductormateriaprima", nullable = false, updatable = false, insertable = true)
     private RawMaterialProducer rawMaterialProducer;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDSESIONACOPIO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idsesionacopio", nullable = false, updatable = false, insertable = true)
     private RawMaterialCollectionSession rawMaterialCollectionSession;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @Transient

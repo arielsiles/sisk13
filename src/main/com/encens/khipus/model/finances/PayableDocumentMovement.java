@@ -23,58 +23,58 @@ public class PayableDocumentMovement implements BaseModel {
     @EmbeddedId
     private PayableDocumentMovementPk id = new PayableDocumentMovementPk();
 
-    @Column(name = "NO_TRANS", insertable = false, updatable = false, length = 10)
+    @Column(name = "no_trans", insertable = false, updatable = false, length = 10)
     private String transactionNumber;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false, length = 2)
+    @Column(name = "no_cia", insertable = false, updatable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_PROV")
+    @Column(name = "cod_prov")
     private String providerCode;
 
-    @Column(name = "ESTADO", insertable = false, updatable = false)
+    @Column(name = "estado", insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private PayableDocumentState state;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_PROV", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_prov", nullable = false, insertable = false, updatable = false)
     })
     private Provider provider;
 
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date movementDate;
 
-    @Column(name = "FECHA_CRE")
+    @Column(name = "fecha_cre")
     @Temporal(TemporalType.DATE)
     private Date createdOnDate;
 
     //todo this value that the same that PayableDocumentType.movementType of the PayableDocument
-    @Column(name = "TIPO_MOV", length = 1, updatable = false)
+    @Column(name = "tipo_mov", length = 1, updatable = false)
     @Enumerated(EnumType.STRING)
     private FinanceMovementType movementType;
 
-    @Column(name = "DESCRI")
+    @Column(name = "descri")
     private String description;
 
-    @Column(name = "TIPO_COMPRO")
+    @Column(name = "tipo_compro")
     private String voucherType;
 
-    @Column(name = "NO_COMPRO")
+    @Column(name = "no_compro")
     private String voucherNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "TIPO_COMPRO", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "NO_COMPRO", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "tipo_compro", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "no_compro", nullable = false, insertable = false, updatable = false)
     })
     private AccountingMovement accountingMovement;
 
-    @Column(name = "NO_USR")
+    @Column(name = "no_usr")
     private String userNumber;
 
     public PayableDocumentMovementPk getId() {

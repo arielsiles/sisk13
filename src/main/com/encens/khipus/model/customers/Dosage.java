@@ -29,49 +29,49 @@ import java.util.Date;
 public class Dosage implements BaseModel {
 
     @Id
-    @Column(name = "IDDOSIFICACION", nullable = false)
+    @Column(name = "iddosificacion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Dosage.tableGenerator")
     private Long id;
 
-    @Column(name = "NROAUTORIZACION")
+    @Column(name = "nroautorizacion")
     private Long authorizationNumber;
 
     @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHAVENCIMIENTO")
+    @Column(name = "fechavencimiento")
     private Date expirationDate;
 
-    @Column(name="LLAVE")
+    @Column(name="llave")
     private String key;
 
-    @Column(name="ESTADO")
+    @Column(name="estado")
     private String state;
 
     @Column(name = "activo")
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean active;
 
-    @Column(name = "NUMEROACTUAL")
+    @Column(name = "numeroactual")
     private Long currentNumber;
 
-    @Column(name="NITEMPRESA")
+    @Column(name="nitempresa")
     private String companyNit;
 
-    @Column(name="ETIQUETAEMPRESA")
+    @Column(name="etiquetaempresa")
     private String companyLabel;
 
     @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHAINICIO")
+    @Column(name = "fechainicio")
     private Date startDate  = new Date();
 
     @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHACONTROL")
+    @Column(name = "fechacontrol")
     private Date controlDate = new Date();
 
-    @Column(name="ETIQUETALEY")
+    @Column(name="etiquetaley")
     private String lawLabel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDSUCURSAL", referencedColumnName = "IDSUCURSAL", nullable = true)
+    @JoinColumn(name = "idsucursal", referencedColumnName = "idsucursal", nullable = true)
     private BranchOffice branchOffice;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

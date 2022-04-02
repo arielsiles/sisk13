@@ -25,74 +25,74 @@ import java.math.BigDecimal;
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE,
-        pkColumnValue = "PREVISIONRETIRO")
+        pkColumnValue = "previsionretiro")
 
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = Constants.KHIPUS_SCHEMA, name = "PREVISIONRETIRO")
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "previsionretiro")
 public class DismissalPrevision implements BaseModel {
 
     @Id
-    @Column(name = "IDPREVISIONRETIRO", nullable = false)
+    @Column(name = "idprevisionretiro", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "DismissalPrevision.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     @NotNull
     private Long code;
 
-    @Column(name = "NOTRANS")
+    @Column(name = "notrans")
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "ESTADO", length = Constants.STRING_LENGTH_20, nullable = false)
+    @Column(name = "estado", length = Constants.STRING_LENGTH_20, nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private DismissalPrevisionState state;
 
-    @Column(name = "MONTO", nullable = false, precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
+    @Column(name = "monto", nullable = false, precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
     @NotNull
     private BigDecimal amount;
 
-    @Column(name = "MONEDA", nullable = false, length = Constants.STRING_LENGTH_20)
+    @Column(name = "moneda", nullable = false, length = Constants.STRING_LENGTH_20)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "TIPOCAMBIO", nullable = false, precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
+    @Column(name = "tipocambio", nullable = false, precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
     private BigDecimal exchangeRate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDGESTIONPLANILLA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idgestionplanilla", nullable = false, updatable = false, insertable = true)
     private GestionPayroll gestionPayroll;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", nullable = false, updatable = false, insertable = true)
     private BusinessUnit businessUnit;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCATEGORIAPUESTO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcategoriapuesto", nullable = false, updatable = false, insertable = true)
     private JobCategory jobCategory;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NUMEROCOMPANIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CODIGOCENCOS", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "numerocompania", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "codigocencos", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDRETIRO", nullable = false)
+    @JoinColumn(name = "idretiro", nullable = false)
     @NotNull
     private Dismissal dismissal;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

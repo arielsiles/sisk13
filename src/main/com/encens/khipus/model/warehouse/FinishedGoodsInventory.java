@@ -9,34 +9,34 @@ import javax.persistence.*;
 import java.util.Date;
 
 @TableGenerator(name = "FinishedGoodsInventory_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "INVENTARIOPRODUCTOTERMINADO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "inventarioproductoterminado",
         allocationSize = 10)
 
 @Entity
-@Table(name = "INVENTARIOPRODUCTOTERMINADO")
+@Table(name = "inventarioproductoterminado")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class FinishedGoodsInventory implements BaseModel {
     @Id
-    @Column(name = "IDINVENTARIOPRODUCTOTERMINADO", nullable = false)
+    @Column(name = "idinventarioproductoterminado", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FinishedGoodsInventory_Generator")
     private Long id;
 
-    @Column(name = "CANTIDAD", nullable = false, columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "cantidad", nullable = false, columnDefinition = "DECIMAL(24,0)")
     private Double amount;
 
-    @Column(name = "FECHA", nullable = false, columnDefinition = "DATE")
+    @Column(name = "fecha", nullable = false, columnDefinition = "DATE")
     private Date date;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "IDAMBIENTEDEPOSITO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idambientedeposito", nullable = false, updatable = false, insertable = true)
     private WarehouseSlot warehouseSlot;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

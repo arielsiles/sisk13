@@ -32,35 +32,35 @@ import java.util.Date;
 @Entity
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
-@Table(name = "PLANILLAFISCALGENERADA", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "planillafiscalgenerada", schema = Constants.KHIPUS_SCHEMA)
 public class TaxPayrollGenerated implements BaseModel {
     @Id
-    @Column(name = "IDPLANILLAFISCALGENERADA", nullable = false)
+    @Column(name = "idplanillafiscalgenerada", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TaxPayrollGenerated.tableGenerator")
     private Long id;
 
-    @Column(name = "ESTADOVALIDACION", nullable = false)
+    @Column(name = "estadovalidacion", nullable = false)
     @Enumerated(EnumType.STRING)
     private TaxPayrollEvaluationState evaluationState;
 
-    @Column(name = "FECHAGENERACION", nullable = false)
+    @Column(name = "fechageneracion", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date generationDate;
 
-    @Column(name = "TIPO", nullable = false)
+    @Column(name = "tipo", nullable = false)
     @Enumerated(EnumType.STRING)
     private TaxPayrollGeneratedType type;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCONFPLANILLAFISCAL", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idconfplanillafiscal", nullable = false, updatable = false, insertable = true)
     private ConfigurationTaxPayroll configurationTaxPayroll;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
     public Long getId() {

@@ -10,13 +10,13 @@ import java.util.Date;
 import java.util.List;
 
 @NamedQueries ({
-    @NamedQuery(name = "RawMaterialProducer.findByIdNumber", query = "select e from RawMaterialProducer e where e.idNumber =:idNumber"),
-    @NamedQuery(name = "RawMaterialProducer.findAllByProductiveZone",
+        @NamedQuery(name = "RawMaterialProducer.findByIdNumber", query = "select e from RawMaterialProducer e where e.idNumber =:idNumber"),
+        @NamedQuery(name = "RawMaterialProducer.findAllByProductiveZone",
                 query = "select rawMaterialProducer " +
                         "from RawMaterialProducer rawMaterialProducer " +
                         "where rawMaterialProducer.productiveZone = :productiveZone" +
                         " order by rawMaterialProducer.lastName"),
-    @NamedQuery(name = "RawMaterialProducer.findReponsibleExceptThisByProductiveZone",
+        @NamedQuery(name = "RawMaterialProducer.findReponsibleExceptThisByProductiveZone",
                 query = "select rawMaterialProducer " +
                         "from RawMaterialProducer rawMaterialProducer " +
                         "where rawMaterialProducer.responsible = 1 and rawMaterialProducer <> :rawMaterialProducer " +
@@ -24,35 +24,35 @@ import java.util.List;
 })
 
 @Entity
-@Table(name = "PRODUCTORMATERIAPRIMA")
-@DiscriminatorValue("PRODUCTORMATERIAPRIMA")
+@Table(name = "productormateriaprima")
+@DiscriminatorValue("productormateriaprima")
 @PrimaryKeyJoinColumns(value = {
-        @PrimaryKeyJoinColumn(name = "IDPRODUCTORMATERIAPRIMA", referencedColumnName = "IDPERSONA")})
+        @PrimaryKeyJoinColumn(name = "idproductormateriaprima", referencedColumnName = "idpersona")})
 public class RawMaterialProducer extends Person {
 
-    @Column(name = "LICENCIAIMPUESTOS2011", length = 200, nullable = true)
+    @Column(name = "licenciaimpuestos2011", length = 200, nullable = true)
     private String codeTaxLicence2011;
 
-    @Column(name = "FECHAINIIMPUESTO2011", columnDefinition = "DATE", nullable = true)
+    @Column(name = "fechainiimpuesto2011", columnDefinition = "DATE", nullable = true)
     private Date startDateTaxLicence2011;
 
-    @Column(name = "FECHAFINIMPUESTO2011", columnDefinition = "DATE",nullable = true)
+    @Column(name = "fechafinimpuesto2011", columnDefinition = "DATE",nullable = true)
     private Date expirationDateTaxLicence2011;
 
-    @Column(name = "LICENCIAIMPUESTOS", length = 200, nullable = true)
+    @Column(name = "licenciaimpuestos", length = 200, nullable = true)
     private String codeTaxLicence;
 
-    @Column(name = "FECHAEXPIRALICENCIAIMPUESTO", columnDefinition = "DATE", nullable = true)
+    @Column(name = "fechaexpiralicenciaimpuesto", columnDefinition = "DATE", nullable = true)
     private Date expirationDateTaxLicence;
 
-    @Column(name = "FECHAINICIALICENCIAIMPUESTO", columnDefinition = "DATE",nullable = true)
+    @Column(name = "fechainicialicenciaimpuesto", columnDefinition = "DATE",nullable = true)
     private Date startDateTaxLicence;
 
-    @Column(name = "ESRESPONSABLE", nullable = false)
+    @Column(name = "esresponsable", nullable = false)
     @Type(type = "IntegerBoolean")
     private Boolean responsible;
 
-    @Column(name = "ACTIVO", nullable = false)
+    @Column(name = "activo", nullable = false)
     @Type(type = "IntegerBoolean")
     private Boolean active;
 
@@ -61,11 +61,11 @@ public class RawMaterialProducer extends Person {
     private String accountNumber;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDZONAPRODUCTIVA", nullable = true, updatable = true, insertable = true)
+    @JoinColumn(name = "idzonaproductiva", nullable = true, updatable = true, insertable = true)
     private ProductiveZone productiveZone;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     @OneToMany(mappedBy = "rawMaterialProducer", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})

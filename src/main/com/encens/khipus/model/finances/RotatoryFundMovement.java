@@ -26,126 +26,126 @@ import java.util.Date;
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
-@Table(name = "MOVFONDOROTA", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "movfondorota", schema = Constants.KHIPUS_SCHEMA)
 public class RotatoryFundMovement implements BaseModel {
     @Id
-    @Column(name = "IDMOVIMIENTO")
+    @Column(name = "idmovimiento")
     private Long id;
 
-    @Column(name = "CLASEMOV")
+    @Column(name = "clasemov")
     @Enumerated(EnumType.STRING)
     private RotatoryFundMovementClass movementClass;
 
-    @Column(name = "CODIGO")
+    @Column(name = "codigo")
     private Integer code;
 
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "TIPOMOV")
+    @Column(name = "tipomov")
     @Enumerated(EnumType.STRING)
     private RotatoryFundMovementType movementType;
 
-    @Column(name = "TIPOCOMPRO")
+    @Column(name = "tipocompro")
     private String voucherType;
 
-    @Column(name = "NOCOMPRO")
+    @Column(name = "nocompro")
     private String voucherNumber;
 
-    @Column(name = "FECHACOMPRO")
+    @Column(name = "fechacompro")
     @Temporal(TemporalType.DATE)
     private Date voucherDate;
 
-    @Column(name = "PAGODOCBANTIPODOC")
+    @Column(name = "pagodocbantipodoc")
     private String bankPaymentDocumentType;
 
-    @Column(name = "PAGODOCBANNODOC")
+    @Column(name = "pagodocbannodoc")
     private String bankPaymentDocumentNumber;
 
-    @Column(name = "PAGOCAJANODOC")
+    @Column(name = "pagocajanodoc")
     private String cashBoxPaymentDocumentNumber;
 
-    @Column(name = "PAGOCAJACUENTA")
+    @Column(name = "pagocajacuenta")
     private String cashBoxPaymentAccountNumber;
 
-    @Column(name = "PAGOCAJANOMBRE")
+    @Column(name = "pagocajanombre")
     private String cashBoxPaymentAccountName;
 
-    @Column(name = "COBRODOCBANTIPODOC")
+    @Column(name = "cobrodocbantipodoc")
     private String documentBankCollectionDocumentType;
 
-    @Column(name = "COBRODOCBANNODOC")
+    @Column(name = "cobrodocbannodoc")
     private String documentBankCollectionDocumentNumber;
 
-    @Column(name = "COBRODOCTIPODOC")
+    @Column(name = "cobrodoctipodoc")
     @Enumerated(EnumType.STRING)
     private CollectionDocumentType documentCollectionDocumentType;
 
-    @Column(name = "COBRODOCNODOC")
+    @Column(name = "cobrodocnodoc")
     private String documentCollectionDocumentNumber;
 
-    @Column(name = "COBROAJTCTACTBCUENTA")
+    @Column(name = "cobroajtctactbcuenta")
     private String cashAccountAdjustmentCollectionAccount;
 
-    @Column(name = "COBROAJTCTACTBNOMBRE")
+    @Column(name = "cobroajtctactbnombre")
     private String cashAccountAdjustmentCollectionNumber;
 
-    @Column(name = "COBROAJTDEPTIPODOC")
+    @Column(name = "cobroajtdeptipodoc")
     private String depositAdjustmentCollectionDocumentType;
 
-    @Column(name = "COBROAJTDEPNODOC")
+    @Column(name = "cobroajtdepnodoc")
     private String depositAdjustmentCollectionDocumentNumber;
 
-    @Column(name = "COBROOCNOORDEN")
+    @Column(name = "cobroocnoorden")
     private String purchaseOrderCollectionOrderNumber;
 
-    @Column(name = "COBROCTACAJACUENTA")
+    @Column(name = "cobroctacajacuenta")
     private String cashBoxCollectionAccountNumber;
 
-    @Column(name = "COBROCTACAJANOMBRE")
+    @Column(name = "cobroctacajanombre")
     private String cashBoxCollectionAccountName;
 
-    @Column(name = "COBROPLANOMBREGES")
+    @Column(name = "cobroplanombreges")
     private String payrollCollectionName;
 
-    @Column(name = "DESCRIPCION")
+    @Column(name = "descripcion")
     private String description;
 
-    @Column(name = "OBSERVACION")
+    @Column(name = "observacion")
     private String observation;
 
-    @Column(name = "MONEDAPAGO")
+    @Column(name = "monedapago")
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType paymentCurrency;
 
-    @Column(name = "MONTOPAGO", precision = 12, scale = 2)
+    @Column(name = "montopago", precision = 12, scale = 2)
     private BigDecimal paymentAmount;
 
-    @Column(name = "MONEDACOBRO")
+    @Column(name = "monedacobro")
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType collectionCurrency;
 
-    @Column(name = "MONTOCOBRO", precision = 12, scale = 2)
+    @Column(name = "montocobro", precision = 12, scale = 2)
     private BigDecimal collectionAmount;
 
-    @Column(name = "TIPOCAMBIO", precision = 12, scale = 2)
+    @Column(name = "tipocambio", precision = 12, scale = 2)
     private BigDecimal exchangeRate;
 
-    @Column(name = "ESTADO", nullable = false, length = 20)
+    @Column(name = "estado", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private RotatoryFundMovementState state;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDFONDOROTATORIO")
+    @JoinColumn(name = "idfondorotatorio")
     private RotatoryFund rotatoryFund;
 
-    @Column(name = "NOTRANS")
+    @Column(name = "notrans")
     private String transactionNumber;
 
     public Long getId() {

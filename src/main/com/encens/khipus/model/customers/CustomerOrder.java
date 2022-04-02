@@ -73,52 +73,52 @@ public class CustomerOrder implements BaseModel  {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean stockFlag = Boolean.FALSE;
 
-    @Column(name = "CV", nullable = false)
+    @Column(name = "cv", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean cvFlag = Boolean.FALSE;
 
     /* -- */
 
-    @Column(name = "FACTURA")
+    @Column(name = "factura")
     private String invoiceNumberCafc;
 
-    @Column(name = "DESCRIPCION")
+    @Column(name = "descripcion")
     private String description;
 
-    @Column(name = "FECHA_PEDIDO")
+    @Column(name = "fecha_pedido")
     @Temporal(TemporalType.DATE)
     private Date currentDate = new Date();
 
     @Basic(optional = false)
-    @Column(name = "FECHA_ENTREGA")
+    @Column(name = "fecha_entrega")
     @Temporal(TemporalType.DATE)
     private Date orderDate;
 
-    @Column(name = "OBSERVACION")
+    @Column(name = "observacion")
     private String observation;
 
-    @Column(name = "PORCENTAJECOMISION")
+    @Column(name = "porcentajecomision")
     private Double commissionPercentage = 0.0;
 
-    @Column(name = "PORCENTAJEGARANTIA")
+    @Column(name = "porcentajegarantia")
     private Double guaranteePercentage = 0.0;
 
-    @Column(name = "DESCUENTOPRODUCTO")
+    @Column(name = "descuentoproducto")
     private BigDecimal productDiscountValue = BigDecimal.ZERO;
 
-    @Column(name = "DESCUENTOADICIONAL")
+    @Column(name = "descuentoadicional")
     private BigDecimal additionalDiscountValue = BigDecimal.ZERO;
 
-    @Column(name = "VALORCOMISION")
+    @Column(name = "valorcomision")
     private Double commissionValue = 0.0;
 
-    @Column(name = "VALORGARANTIA")
+    @Column(name = "valorgarantia")
     private Double guaranteeValue = 0.0;
 
     @Column(name="codigo")
     private Long code;
 
-    @Column(name = "ESTADO")
+    @Column(name = "estado")
     @Enumerated(EnumType.STRING)
     private SaleStatus state;
 
@@ -159,7 +159,7 @@ public class CustomerOrder implements BaseModel  {
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "customerOrder")
     private Collection<ArticleOrder> articleOrderList;
 
-    @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDPERSONACLIENTE")
+    @JoinColumn(name = "idcliente", referencedColumnName = "idpersonacliente")
     @ManyToOne(optional = false)
     private Client client;
 
@@ -167,7 +167,7 @@ public class CustomerOrder implements BaseModel  {
     @ManyToOne(optional = true)
     private Movement movement;
 
-    @JoinColumn(name = "IDDISTRIBUIDOR", referencedColumnName = "IDDISTRIBUIDOR")
+    @JoinColumn(name = "iddistribuidor", referencedColumnName = "iddistribuidor")
     @ManyToOne(optional = true)
     private Distributor distributor;
 

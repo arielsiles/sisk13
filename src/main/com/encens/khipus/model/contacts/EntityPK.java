@@ -12,18 +12,18 @@ import java.io.Serializable;
  * @version $Id: EntityPK.java 2008-8-28 11:17:08 $
  */
 @TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ENTITY_GENERATOR",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "ENTIDAD",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "entidad",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Embeddable
 public class EntityPK implements Serializable {
-    @Column(name = "ID_ENTIDAD", nullable = false)
+    @Column(name = "id_entidad", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ENTITY_GENERATOR")
     private Long id;
 
-    @Column(name = "NO_IDENTIFICACION", nullable = false, length = 100)
+    @Column(name = "no_identificacion", nullable = false, length = 100)
     private String number;
 
     public EntityPK() {

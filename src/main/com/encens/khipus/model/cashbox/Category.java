@@ -16,18 +16,18 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "CATEGORIAS", schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "categorias", schema = Constants.CASHBOX_SCHEMA)
 public class Category implements BaseModel {
     @Id
-    @Column(name = "COD", nullable = false, length = 15)
+    @Column(name = "cod", nullable = false, length = 15)
     @Length(max = 15)
     private String id;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = 50)
+    @Column(name = "descripcion", nullable = false, length = 50)
     @Length(max = 50)
     private String description;
 
-    @Column(name = "ACTIVO", nullable = false)
+    @Column(name = "activo", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean active;
 

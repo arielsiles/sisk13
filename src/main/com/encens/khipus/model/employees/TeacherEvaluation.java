@@ -20,44 +20,44 @@ import javax.persistence.*;
 
 @Entity
 @EntityListeners(UpperCaseStringListener.class)
-@Table(name = "EVALUACIONDOCENTE", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "evaluaciondocente", schema = Constants.KHIPUS_SCHEMA)
 public class TeacherEvaluation {
 
     @Id
-    @Column(name = "IDEVALUACIONDOCENTE", updatable = false, insertable = false)
+    @Column(name = "idevaluaciondocente", updatable = false, insertable = false)
     private String id;
 
-    @Column(name = "UNIDADACADADM", updatable = false, insertable = false)
+    @Column(name = "unidadacadadm", updatable = false, insertable = false)
     private Integer administrativeAcademicUnit;
 
-    @Column(name = "SEDE", updatable = false, insertable = false)
+    @Column(name = "sede", updatable = false, insertable = false)
     private String city;
 
-    @Column(name = "CODEMPLEADO", updatable = false, insertable = false)
+    @Column(name = "codempleado", updatable = false, insertable = false)
     private Long employeeCode;
 
-    @Column(name = "DOCUMENTO", updatable = false, insertable = false)
+    @Column(name = "documento", updatable = false, insertable = false)
     private String idNumber;
 
-    @Column(name = "APELLIDO_PATERNO", updatable = false, insertable = false)
+    @Column(name = "apellido_paterno", updatable = false, insertable = false)
     private String lastName;
 
-    @Column(name = "APELLIDO_MATERNO", updatable = false, insertable = false)
+    @Column(name = "apellido_materno", updatable = false, insertable = false)
     private String maidenName;
 
-    @Column(name = "NOMBRES", updatable = false, insertable = false)
+    @Column(name = "nombres", updatable = false, insertable = false)
     private String firstName;
 
-    @Column(name = "CANT_ESTUDIANTES", updatable = false, insertable = false)
+    @Column(name = "cant_estudiantes", updatable = false, insertable = false)
     private Integer numberOfStudents;
 
-    @Column(name = "CANT_CARRERAS", updatable = false, insertable = false)
+    @Column(name = "cant_carreras", updatable = false, insertable = false)
     private Integer numberOfCareers;
 
-    @Column(name = "GESTION", updatable = false, insertable = false)
+    @Column(name = "gestion", updatable = false, insertable = false)
     private Integer gestion;
 
-    @Column(name = "PERIODO", updatable = false, insertable = false)
+    @Column(name = "periodo", updatable = false, insertable = false)
     private Integer period;
 
     public String getId() {

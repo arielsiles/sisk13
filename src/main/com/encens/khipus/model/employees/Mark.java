@@ -24,23 +24,23 @@ import java.util.List;
                         "order by mark.marRefCard, mark.marDate, mark.marTime ")
 )
 @Entity
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "VMARCADO")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "vmarcado")
 public class Mark implements BaseModel {
     @Id
-    @Column(name = "IDRHMARCADO", nullable = false, insertable = false, updatable = false)
+    @Column(name = "idrhmarcado", nullable = false, insertable = false, updatable = false)
     private Long id;
 
-    @Column(name = "MARFECHA", insertable = false, updatable = false)
+    @Column(name = "marfecha", insertable = false, updatable = false)
     @Temporal(TemporalType.DATE)
     private Date marDate;
 
-    @Column(name = "MARIPPC", insertable = false, updatable = false)
+    @Column(name = "marippc", insertable = false, updatable = false)
     private String marIpPc;
 
-    @Column(name = "MARPERID", insertable = false, updatable = false)
+    @Column(name = "marperid", insertable = false, updatable = false)
     private Integer marPerId;
 
-    @Column(name = "MARREFTARJETA", insertable = false, updatable = false)
+    @Column(name = "marreftarjeta", insertable = false, updatable = false)
     private String marRefCard;
 
     /*@Column(name = "MARESTADO", insertable = false, updatable = false)
@@ -55,11 +55,11 @@ public class Mark implements BaseModel {
     /*@Column(name = "MAR_IN_OUT", insertable = false, updatable = false)
     private Number marInOut;*/
 
-    @Column(name = "MARHORA", insertable = false, updatable = false)
+    @Column(name = "marhora", insertable = false, updatable = false)
     @Temporal(TemporalType.TIME)
     private Date marTime;
 
-    @Column(name = "CONTROL", insertable = false, updatable = false)
+    @Column(name = "control", insertable = false, updatable = false)
     private Integer control;
 
     @Transient

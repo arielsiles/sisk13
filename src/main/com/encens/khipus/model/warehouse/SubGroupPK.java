@@ -14,15 +14,15 @@ import java.io.Serializable;
 public class SubGroupPK implements Serializable {
 
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_GRU", nullable = false, length = 3)
+    @Column(name = "cod_gru", nullable = false, length = 3)
     @Length(max = 3)
     private String groupCode;
 
-    @Column(name = "COD_SUB", nullable = false, length = 3)
+    @Column(name = "cod_sub", nullable = false, length = 3)
     @Length(max = 3)
     private String subGroupCode;
 

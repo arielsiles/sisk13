@@ -6,27 +6,27 @@ import com.encens.khipus.model.BaseModel;
 import javax.persistence.*;
 
 @TableGenerator(name = "ProductProcessingSingle_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PRODUCTOSIMPLEPROCESADO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "productosimpleprocesado",
         allocationSize = 10)
 
 @Entity
-@Table(name = "PRODUCTOSIMPLEPROCESADO")
+@Table(name = "productosimpleprocesado")
 public class ProductProcessingSingle implements BaseModel {
 
     @Id
-    @Column(name = "IDPRODUCTOSIMPLEPROCESADO", nullable = false)
+    @Column(name = "idproductosimpleprocesado", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductProcessingSingle_Generator")
     private Long id;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDMETAPRODUCTOPRODUCCION", nullable = false, updatable = true, insertable = true)
+    @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = true, insertable = true)
     private MetaProduct metaProduct;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDPRODUCTOSIMPLE", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductosimple", nullable = false, updatable = false, insertable = true)
     private SingleProduct singleProduct;
 
     public Long getId() {

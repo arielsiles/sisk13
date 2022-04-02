@@ -20,20 +20,20 @@ import java.util.Collection;
 public class Ventaarticulo implements Serializable {
 
     @Id
-    @Column(name = "IDVENTAARTICULO")
+    @Column(name = "idventaarticulo")
     private Long idventaarticulo;
-    @Column(name = "PRECIO")
+    @Column(name = "precio")
     private Double precio;
-    @Column(name = "TIPO")
+    @Column(name = "tipo")
     private String tipo;
     @JoinColumns({
-        @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-        @JoinColumn(name = "COD_ART", referencedColumnName = "COD_ART")})
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_art", referencedColumnName = "cod_art")})
     @ManyToOne(optional = false)
     private ProductItem productItem;
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "ventaarticulo")
     private Collection<ArticulosPromocion> articulosPromocions;
-    @JoinColumn(name="IDPROMOCION",referencedColumnName = "IDPROMOCION")
+    @JoinColumn(name="idpromocion",referencedColumnName = "idpromocion")
     @ManyToOne
     private Promocion promocion;
 

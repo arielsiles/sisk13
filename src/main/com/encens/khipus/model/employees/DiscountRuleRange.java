@@ -39,48 +39,48 @@ import java.math.BigDecimal;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "RANGOREGLADESCUENTO",
+        pkColumnValue = "rangoregladescuento",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(name = "RANGOREGLADESCUENTO", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "rangoregladescuento", schema = Constants.KHIPUS_SCHEMA)
 public class DiscountRuleRange implements BaseModel {
 
     @Id
-    @Column(name = "IDRANGOREGLADESCUENTO", nullable = false)
+    @Column(name = "idrangoregladescuento", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "DiscountRuleRange.tableGenerator")
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     @NotEmpty
     @Length(max = 100)
     private String name;
 
-    @Column(name = "MONTO", precision = 13, scale = 2, nullable = false)
+    @Column(name = "monto", precision = 13, scale = 2, nullable = false)
     @NotNull
     private BigDecimal amount;
 
-    @Column(name = "RANGOINICIAL")
+    @Column(name = "rangoinicial")
     private Integer initRange;
 
-    @Column(name = "RANGOFINAL", nullable = true)
+    @Column(name = "rangofinal", nullable = true)
     private Integer endRange;
 
-    @Column(name = "SECUENCIA", nullable = false)
+    @Column(name = "secuencia", nullable = false)
     @NotNull
     private Long sequence;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDREGLADESCUENTO", nullable = false)
+    @JoinColumn(name = "idregladescuento", nullable = false)
     private DiscountRule discountRule;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

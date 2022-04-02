@@ -24,26 +24,26 @@ import java.util.Date;
 public class Promocion implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "IDPROMOCION")
+    @Column(name = "idpromocion")
     private Long idpromocion;
-    @Column(name = "NOMBRE")
+    @Column(name = "nombre")
     private String nombre;
-    @Column(name = "FECHAINICIO")
+    @Column(name = "fechainicio")
     @Temporal(TemporalType.DATE)
     private Date fechainicio;
-    @Column(name = "FECHAFIN")
+    @Column(name = "fechafin")
     @Temporal(TemporalType.DATE)
     private Date fechafin;
-    @Column(name = "ESTADO")
+    @Column(name = "estado")
     private String estado;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "TOTAL")
+    @Column(name = "total")
     private Double total;
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "promocion")
     private Collection<ArticulosPromocion> articulosPromocions;
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "COD_ART", referencedColumnName = "COD_ART")})
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_art", referencedColumnName = "cod_art")})
     @ManyToOne(optional = false)
     private ProductItem invArticulos;
 

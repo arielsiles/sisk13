@@ -12,13 +12,13 @@ import java.io.Serializable;
 @Embeddable
 public class HoraryPk implements Serializable {
 
-    @Column(name = "HORARIO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "horario", nullable = false, updatable = false, insertable = false)
     private Long horaryId;
 
-    @Column(name = "GESTION", nullable = false, updatable = false, insertable = false)
+    @Column(name = "gestion", nullable = false, updatable = false, insertable = false)
     private Integer gestion;
 
-    @Column(name = "PERIODO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "periodo", nullable = false, updatable = false, insertable = false)
     private Integer period;
 
     public HoraryPk() {

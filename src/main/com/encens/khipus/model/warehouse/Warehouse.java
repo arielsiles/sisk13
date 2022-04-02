@@ -31,41 +31,41 @@ public class Warehouse implements BaseModel {
     @EmbeddedId
     private WarehousePK id = new WarehousePK();
 
-    @Column(name = "DESCRI", nullable = true, length = 100)
+    @Column(name = "descri", nullable = true, length = 100)
     @Length(max = 100)
     private String name;
 
-    @Column(name = "ID_RESPONSABLE", updatable = false, insertable = false)
+    @Column(name = "id_responsable", updatable = false, insertable = false)
     private Long responsibleId;
 
-    @Column(name = "CUENTA",nullable = false)
+    @Column(name = "cuenta",nullable = false)
     @Length(max = 20)
     private String cashAccount;
 
-    @Column(name = "CTACOSTO",nullable = false)
+    @Column(name = "ctacosto",nullable = false)
     @Length(max = 20)
     private String cashAccountCost;
 
-    @Column(name = "TIPO")
+    @Column(name = "tipo")
     @Enumerated(EnumType.STRING)
     private WarehouseType warehouseType;
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount warehouseCashAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_RESPONSABLE", updatable = true, insertable = true)
+    @JoinColumn(name = "id_responsable", updatable = true, insertable = true)
     private Employee responsible;
 
-    @Column(name = "ESTADO", nullable = true, length = 3)
+    @Column(name = "estado", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
     private WarehouseState state;
 
-    @Column(name = "COD_ALM", nullable = false, insertable = false, updatable = false)
+    @Column(name = "cod_alm", nullable = false, insertable = false, updatable = false)
     private String warehouseCode;
 
     @Version
@@ -74,14 +74,14 @@ public class Warehouse implements BaseModel {
 
     @com.encens.khipus.validator.BusinessUnit
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", updatable = true, insertable = true)
     private BusinessUnit executorUnit;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "COD_EST")
+    @JoinColumn(name = "cod_est")
     private Branch branch;
 
-    @Column(name = "INV_EGR", nullable = false)
+    @Column(name = "inv_egr", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean defaultOutputWarehouse;
 

@@ -72,7 +72,7 @@ public class HoraryBand implements BaseModel {
     private Company company;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTIPOBANDAHORARIA", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idtipobandahoraria", nullable = true, updatable = false, insertable = true)
     private TypeHoraryBand typeHoraryBand;
 
     public HoraryBand() {

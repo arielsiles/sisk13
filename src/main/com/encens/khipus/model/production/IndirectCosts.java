@@ -16,51 +16,51 @@ import java.math.BigDecimal;
  * @version 1.2.1
  */
 @TableGenerator(name = "IndirectCosts.tableGenerator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "COSTOSINDIRECTOS",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "costosindirectos",
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "COSTOSINDIRECTOS")
+@Table(name = "costosindirectos")
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
 public class IndirectCosts implements BaseModel {
 
     @Id
-    @Column(name = "IDCOSTOSINDIRECTOS", nullable = false)
+    @Column(name = "idcostosindirectos", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "IndirectCosts.tableGenerator")
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = true)
+    @Column(name = "nombre", nullable = true)
     private String name;
 
-    @Column(name = "MONTOBS", nullable = false)
+    @Column(name = "montobs", nullable = false)
     private BigDecimal amountBs;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "IDPERIODOCOSTOINDIRECTO")
+    @JoinColumn(name = "idperiodocostoindirecto")
     private PeriodIndirectCost periodIndirectCost;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "IDORDENPRODUCCION")
+    @JoinColumn(name = "idordenproduccion")
     private ProductionOrder productionOrder;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "IDPRODUCTOSIMPLE")
+    @JoinColumn(name = "idproductosimple")
     private SingleProduct singleProduct;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "IDCOSTOSINDIRECTOSCONF")
+    @JoinColumn(name = "idcostosindirectosconf")
     private IndirectCostsConfig costsConifg;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

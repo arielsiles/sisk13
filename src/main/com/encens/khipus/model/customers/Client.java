@@ -36,84 +36,84 @@ import java.util.Date;
 public class Client implements BaseModel {
 
     @Id
-    @Column(name = "IDPERSONACLIENTE", nullable = false)
+    @Column(name = "idpersonacliente", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Client.tableGenerator")
     private Long id;
 
-    @Column(name = "NRO_DOC")
+    @Column(name = "nro_doc")
     private String idNumber;
 
-    @Column(name = "COMP")
+    @Column(name = "comp")
     private String complement;
 
-    @Column(name = "AP")
+    @Column(name = "ap")
     private String lastName;
 
-    @Column(name = "AM")
+    @Column(name = "am")
     private String maidenName;
 
-    @Column(name = "NOM")
+    @Column(name = "nom")
     private String name;
 
-    @Column(name = "SEXO")
+    @Column(name = "sexo")
     private String sexo;
 
-    @Column(name = "EST_CIVIL")
+    @Column(name = "est_civil")
     private String estCivil;
 
-    @Column(name = "FECHA_NAC")
+    @Column(name = "fecha_nac")
     @Temporal(TemporalType.DATE)
     private Date fechaNac;
 
-    @Column(name = "CEM_COD")
+    @Column(name = "cem_cod")
     private String cemCod;
 
-    @Column(name = "OCU_COD")
+    @Column(name = "ocu_cod")
     private String ocuCod;
 
-    @Column(name = "TDO_COD")
+    @Column(name = "tdo_cod")
     private String tdoCod;
 
-    @Column(name = "SIS_COD")
+    @Column(name = "sis_cod")
     private String sisCod;
 
-    @Column(name = "DIRECCION")
+    @Column(name = "direccion")
     private String address;
 
-    @Column(name = "TELEFONO")
+    @Column(name = "telefono")
     private Integer phone;
 
-    @Column(name = "EMAIL")
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "NIT")
+    @Column(name = "nit")
     private String nitNumber;
 
-    @Column(name = "RAZONSOCIAL")
+    @Column(name = "razonsocial")
     private String businessName;
 
-    @Column(name = "CODMETODOPAGOSIN")
+    @Column(name = "codmetodopagosin")
     private Integer paymentMethodTypeCode;
 
-    @Column(name = "DESCUENTO")
+    @Column(name = "descuento")
     private BigDecimal additionalDiscount = BigDecimal.ZERO;
 
-    @Column(name = "DESCUENTOPROD")
+    @Column(name = "descuentoprod")
     private BigDecimal productDiscount  = BigDecimal.ZERO;;
 
-    @Column(name = "PORCENTAJECOMISION")
+    @Column(name = "porcentajecomision")
     private Double commission;
 
-    @Column(name = "PORCENTAJEGARANTIA")
+    @Column(name = "porcentajegarantia")
     private Double guarantee;
 
-    @Column(name = "CODIGOCLIENTE")
+    @Column(name = "codigocliente")
     private String codigo;
 
-    @Column(name = "TIPO_PERSONA")
+    @Column(name = "tipo_persona")
     private String personType;
 
-    @Column(name = "ESPERSONA", nullable = true)
+    @Column(name = "espersona", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean personFlag = Boolean.TRUE;
 
@@ -129,7 +129,7 @@ public class Client implements BaseModel {
     @JoinColumn(name = "idcategoriacliente", referencedColumnName = "idcategoriacliente", nullable = true)
     private CustomerCategory customerCategory;
 
-    @JoinColumn(name = "IDTERRITORIOTRABAJO", referencedColumnName = "IDTERRITORIOTRABAJO")
+    @JoinColumn(name = "idterritoriotrabajo", referencedColumnName = "idterritoriotrabajo")
     @ManyToOne
     private Territoriotrabajo territoriotrabajo;
 

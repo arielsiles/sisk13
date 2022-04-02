@@ -30,7 +30,7 @@ import java.util.List;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "COBROFONDOROTA",
+        pkColumnValue = "cobrofondorota",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @NamedQueries({
@@ -72,198 +72,198 @@ import java.util.List;
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
-@Table(name = "COBROFONDOROTA", schema = Constants.KHIPUS_SCHEMA,
-        uniqueConstraints = @UniqueConstraint(columnNames = {"IDCOMPANIA", "CODIGO"}))
+@Table(name = "cobrofondorota", schema = Constants.KHIPUS_SCHEMA,
+        uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "codigo"}))
 @EntityListeners({CompanyListener.class, CompanyNumberListener.class, UpperCaseStringListener.class})
 public class RotatoryFundCollection implements BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RotatoryFundCollection.tableGenerator")
-    @Column(name = "IDCOBRO", nullable = false)
+    @Column(name = "idcobro", nullable = false)
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     @NotNull
     private Integer code;
 
-    @Column(name = "NOTRANS")
+    @Column(name = "notrans")
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "CUENTABANCO", length = 20)
+    @Column(name = "cuentabanco", length = 20)
     @Length(max = 20)
     private String bankAccountNumber;
 
-    @Column(name = "NUMERODEPOSITO", length = 20)
+    @Column(name = "numerodeposito", length = 20)
     @Length(max = 20)
     private String bankDepositNumber;
 
-    @Column(name = "ESTADO", nullable = false, length = 20)
+    @Column(name = "estado", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private RotatoryFundCollectionState state;
 
-    @Column(name = "DESCRIPCION", length = 1000)
+    @Column(name = "descripcion", length = 1000)
     @Length(max = 1000)
     private String description;
 
-    @Column(name = "MONEDAORIGEN", length = 20)
+    @Column(name = "monedaorigen", length = 20)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType sourceCurrency;
 
-    @Column(name = "MONEDACOBRO", nullable = false)
+    @Column(name = "monedacobro", nullable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType collectionCurrency;
 
-    @Column(name = "MONTOORIGEN", precision = 12, scale = 2)
+    @Column(name = "montoorigen", precision = 12, scale = 2)
     private BigDecimal sourceAmount;
 
-    @Column(name = "MONTOCOBRO", precision = 12, scale = 2, nullable = false)
+    @Column(name = "montocobro", precision = 12, scale = 2, nullable = false)
     private BigDecimal collectionAmount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "IDDOCUMENTOCOBRO")
+    @JoinColumn(name = "iddocumentocobro")
     private CollectionDocument collectionDocument;
 
-    @Column(name = "NOMBREBENEFICIARIO", length = 200)
+    @Column(name = "nombrebeneficiario", length = 200)
     @Length(max = 200)
     private String beneficiaryName;
 
-    @Column(name = "TIPOBENEFICIARIO")
+    @Column(name = "tipobeneficiario")
     @Enumerated(EnumType.STRING)
     private BeneficiaryType beneficiaryType;
 
-    @Column(name = "TIPOCAMBIO", precision = 12, scale = 2)
+    @Column(name = "tipocambio", precision = 12, scale = 2)
     private BigDecimal exchangeRate;
 
-    @Column(name = "TIPOCOBRO")
+    @Column(name = "tipocobro")
     @Enumerated(EnumType.STRING)
     private RotatoryFundCollectionType rotatoryFundCollectionType;
 
-    @Column(name = "FECHACREACION")
+    @Column(name = "fechacreacion")
     @Temporal(TemporalType.DATE)
     private Date creationDate;
 
-    @Column(name = "FECHACOBRO")
+    @Column(name = "fechacobro")
     @Temporal(TemporalType.DATE)
     private Date collectionDate;
 
-    @Column(name = "FECHAAPROBACION")
+    @Column(name = "fechaaprobacion")
     @Temporal(TemporalType.DATE)
     private Date approvalDate;
 
     @ManyToOne
-    @JoinColumn(name = "CREADOPOR")
+    @JoinColumn(name = "creadopor")
     private User registerEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "APROBADOPOR")
+    @JoinColumn(name = "aprobadopor")
     private User approvedByEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "ANULADOPOR")
+    @JoinColumn(name = "anuladopor")
     private User annulledByEmployee;
 
-    @Column(name = "NO_CIA", length = 2)
+    @Column(name = "no_cia", length = 2)
     @Length(max = 2)
     private String companyNumber;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private Long version;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTABANCO", referencedColumnName = "CTA_BCO", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentabanco", referencedColumnName = "cta_bco", updatable = false, insertable = false)
     })
     private FinancesBankAccount bankAccount;
 
     /* the cash box account*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTACAJA", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentacaja", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashBoxCashAccount;
 
     /* the cash box account code*/
-    @Column(name = "CUENTACAJA", length = 20)
+    @Column(name = "cuentacaja", length = 20)
     @Length(max = 20)
     private String cashBoxAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "IDFONDOROTATORIO", referencedColumnName = "IDFONDOROTATORIO")
+            @JoinColumn(name = "idfondorotatorio", referencedColumnName = "idfondorotatorio")
     })
     private RotatoryFund rotatoryFund;
 
     /*in case of a Collection by payroll*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "IDCUOTA", referencedColumnName = "IDCUOTA")
+            @JoinColumn(name = "idcuota", referencedColumnName = "idcuota")
     })
     private Quota quota;
 
     /*in case of a Collection by payroll to know how much was the residue at generating payroll time
-    * if the payroll generation detects any change so the algorithm of payroll generation will
-    * recreate all the Collections and will mark as outdated all the generated payrolls by the
-    * corresponding gestion payroll */
-    @Column(name = "SALDOCUOTA", precision = 13, scale = 2)
+     * if the payroll generation detects any change so the algorithm of payroll generation will
+     * recreate all the Collections and will mark as outdated all the generated payrolls by the
+     * corresponding gestion payroll */
+    @Column(name = "saldocuota", precision = 13, scale = 2)
     private BigDecimal quotaResidue;
 
     /*in case of a Collection by payroll*/
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDGESTIONPLANILLA", referencedColumnName = "idgestionplanilla")
+    @JoinColumn(name = "idgestionplanilla", referencedColumnName = "idgestionplanilla")
     private GestionPayroll gestionPayroll;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPAGOORDENCOMPRA", referencedColumnName = "IDPAGOORDENCOMPRA")
+    @JoinColumn(name = "idpagoordencompra", referencedColumnName = "idpagoordencompra")
     private PurchaseOrderPayment purchaseOrderPayment;
 
     @OneToMany(mappedBy = "rotatoryFundCollection", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<RotatoryFundCollectionSpendDistribution> rotatoryFundCollectionSpendDistributionList = new ArrayList<RotatoryFundCollectionSpendDistribution>(0);
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ENTREGADOA", referencedColumnName = "idempleado")
+    @JoinColumn(name = "entregadoa", referencedColumnName = "idempleado")
     private Employee receiver;
 
-    @Column(name = "OBSERVACION", length = 1000)
+    @Column(name = "observacion", length = 1000)
     @Length(max = 1000)
     private String observation;
 
     /* the cash account adjustment*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTAAJUSTE", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentaajuste", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashAccountAdjustment;
-    @Column(name = "CUENTAAJUSTE", length = 20)
+    @Column(name = "cuentaajuste", length = 20)
     @Length(max = 20)
     private String cashAccountCodeAdjustment;
 
-    @Column(name = "NO_TRANS_DEP", length = 10)
+    @Column(name = "no_trans_dep", length = 10)
     private String depositAdjustmentTransaction;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "NO_TRANS_DEP", referencedColumnName = "NO_TRANS", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "no_trans_dep", referencedColumnName = "no_trans", updatable = false, insertable = false)
     })
     private FinanceDocument depositAdjustment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NOTRANS", referencedColumnName = "NO_TRANS", insertable = false, updatable = false)
+    @JoinColumn(name = "notrans", referencedColumnName = "no_trans", insertable = false, updatable = false)
     private FinanceDocument financeDocument;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NOTRANS", referencedColumnName = "NO_TRANS", insertable = false, updatable = false)
+    @JoinColumn(name = "notrans", referencedColumnName = "no_trans", insertable = false, updatable = false)
     private PayableDocument payableDocument;
 
     public Long getId() {

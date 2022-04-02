@@ -23,13 +23,13 @@ public class CostCenterGroup implements BaseModel {
     @EmbeddedId
     CostCenterGroupPk id = new CostCenterGroupPk();
 
-    @Column(name = "NO_CIA", updatable = false, insertable = false)
+    @Column(name = "no_cia", updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "GRU_CC", updatable = false, insertable = false)
+    @Column(name = "gru_cc", updatable = false, insertable = false)
     private String code;
 
-    @Column(name = "DESCRI", nullable = false, length = 100)
+    @Column(name = "descri", nullable = false, length = 100)
     @Length(max = 100)
     @NotNull
     private String description;

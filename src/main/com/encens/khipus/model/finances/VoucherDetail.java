@@ -33,51 +33,51 @@ public class VoucherDetail implements BaseModel {
 
     /*@GeneratedValue(strategy = GenerationType.TABLE, generator = "VoucherDetail.tableGenerator")*/
     @Id
-    @Column(name = "ID_TMPDET", nullable = true)
+    @Column(name = "id_tmpdet", nullable = true)
     private Long id;
 
     //Fake ID, just to avoid duplicated in the EntityManager
-    @Column(name = "TIMEMILLIS", insertable = false, updatable = true)
+    @Column(name = "timemillis", insertable = false, updatable = true)
     private String idTime;
 
-    @Column(name = "NO_TRANS", nullable = true, insertable = true, updatable = true, length = 10)
+    @Column(name = "no_trans", nullable = true, insertable = true, updatable = true, length = 10)
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "NO_CIA", updatable = false, length = 2)
+    @Column(name = "no_cia", updatable = false, length = 2)
     @Length(max = 2)
     private String companyNumber = "01";
 
-    @Column(name = "COD_UNI", updatable = true)
+    @Column(name = "cod_uni", updatable = true)
     private String businessUnitCode;
 
-    @Column(name = "COD_CC", updatable = true)
+    @Column(name = "cod_cc", updatable = true)
     private String costCenterCode;
 
-    @Column(name = "CUENTA", updatable = false)
+    @Column(name = "cuenta", updatable = false)
     @Length(max = 31)
     private String account;
 
-    @Column(name = "DEBE", precision = 16, scale = 2, updatable = true)
+    @Column(name = "debe", precision = 16, scale = 2, updatable = true)
     private BigDecimal debit;
 
-    @Column(name = "HABER", precision = 16, scale = 2, updatable = true)
+    @Column(name = "haber", precision = 16, scale = 2, updatable = true)
     private BigDecimal credit;
 
-    @Column(name = "DEBEME", precision = 16, scale = 2, updatable = true)
+    @Column(name = "debeme", precision = 16, scale = 2, updatable = true)
     private BigDecimal debitMe;
 
-    @Column(name = "HABERME", precision = 16, scale = 2, updatable = true)
+    @Column(name = "haberme", precision = 16, scale = 2, updatable = true)
     private BigDecimal creditMe;
 
-    @Column(name = "MONEDA", updatable = false)
+    @Column(name = "moneda", updatable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency = FinancesCurrencyType.P;
 
-    @Column(name = "TC", precision = 10, scale = 6, updatable = true)
+    @Column(name = "tc", precision = 10, scale = 6, updatable = true)
     private BigDecimal exchangeAmount;
 
-    @Column(name = "GLOSA", updatable = true, length = 1000)
+    @Column(name = "glosa", updatable = true, length = 1000)
     @Length(max = 1000)
     private String gloss;
 
@@ -88,7 +88,7 @@ public class VoucherDetail implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
             //@JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "cuenta", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount cashAccount;
 
@@ -103,49 +103,49 @@ public class VoucherDetail implements BaseModel {
     private String fullCashAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPERSONACLIENTE", referencedColumnName = "IDPERSONACLIENTE")
+    @JoinColumn(name = "idpersonacliente", referencedColumnName = "idpersonacliente")
     private Client client;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_PROV", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_prov", updatable = false, insertable = false)
     })
     private Provider provider;
 
-    @Column(name = "COD_PROV", length = 6)
+    @Column(name = "cod_prov", length = 6)
     @Length(max = 6)
     private String providerCode;
 
-    @Column(name = "CANT_ART", nullable = true)
+    @Column(name = "cant_art", nullable = true)
     private BigDecimal quantityArt;
 
-    @Column(name = "COD_ART", length = 6)
+    @Column(name = "cod_art", length = 6)
     @Length(max = 6)
     private String productItemCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_ART", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_art", updatable = false, insertable = false)
     })
     private ProductItem productItem;
 
     @ManyToOne
-    @JoinColumn(name = "IDCUENTA", referencedColumnName = "IDCUENTA")
+    @JoinColumn(name = "idcuenta", referencedColumnName = "idcuenta")
     private Account partnerAccount;
 
     @ManyToOne
-    @JoinColumn(name = "IDSOCIO", referencedColumnName = "IDSOCIO")
+    @JoinColumn(name = "idsocio", referencedColumnName = "idsocio")
     private Partner partner;
 
     @ManyToOne
-    @JoinColumn(name = "IDCREDITO", referencedColumnName = "IDCREDITO")
+    @JoinColumn(name = "idcredito", referencedColumnName = "idcredito")
     private Credit creditPartner;
 
 
     @OneToOne
-    @JoinColumn(name = "IDDOCUMENTOCOMPRA", referencedColumnName = "IDDOCUMENTOCOMPRA")
+    @JoinColumn(name = "iddocumentocompra", referencedColumnName = "iddocumentocompra")
     private PurchaseDocument purchaseDocument;
 
     /*@ManyToOne

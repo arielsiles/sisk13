@@ -34,26 +34,26 @@ import javax.persistence.*;
 @Table(schema = com.encens.khipus.util.Constants.FINANCES_SCHEMA, name = "moduloprov")
 public class ModuleProvider implements BaseModel {
     @Id
-    @Column(name = "IDMODULOPROV", nullable = false)
+    @Column(name = "idmoduloprov", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ModuleProvider.tableGenerator")
     private Long id;
 
-    @Column(name = "NO_CIA", length = 2, nullable = false)
+    @Column(name = "no_cia", length = 2, nullable = false)
     private String companyNumber;
 
-    @Column(name = "COD_PROV", length = 6, nullable = false)
+    @Column(name = "cod_prov", length = 6, nullable = false)
     @Length(max = 6)
     @NotNull
     private String providerCode;
 
-    @Column(name = "MODULO")
+    @Column(name = "modulo")
     @Enumerated(EnumType.STRING)
     private ModuleProviderType moduleProviderType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_PROV", referencedColumnName = "COD_PROV", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_prov", referencedColumnName = "cod_prov", nullable = false, updatable = false, insertable = false)
     })
     private Provider provider;
 

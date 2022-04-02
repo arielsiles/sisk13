@@ -70,7 +70,7 @@ public class FixedAssetSubGroup implements BaseModel {
     @NotNull
     private String warehouseAccount;
 
-    @Column(name = "CTAMEJ", updatable = false)
+    @Column(name = "ctamej", updatable = false)
     @Length(max = 20)
     private String improvementAccount;
 
@@ -128,7 +128,7 @@ public class FixedAssetSubGroup implements BaseModel {
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false, referencedColumnName = "no_cia"),
-            @JoinColumn(name = "CTAMEJ", nullable = false, insertable = false, updatable = false, referencedColumnName = "cuenta")
+            @JoinColumn(name = "ctamej", nullable = false, insertable = false, updatable = false, referencedColumnName = "cuenta")
     })
     private CashAccount improvementCashAccount;
 

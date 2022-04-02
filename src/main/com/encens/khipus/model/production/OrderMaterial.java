@@ -19,66 +19,66 @@ import java.math.BigDecimal;
  */
 
 @TableGenerator(name = "OrderMaterial_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "ORDENMATERIAL",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "ordenmaterial",
         allocationSize = 10)
 
 @Entity
-@Table(name = "ORDENMATERIAL")
+@Table(name = "ordenmaterial")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 
 public class OrderMaterial implements BaseModel {
 
     @Id
-    @Column(name = "IDORDENMATERIAL", nullable = false)
+    @Column(name = "idordenmaterial", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "OrderMaterial_Generator")
     private Long id;
 
-    @Column(name = "CANTIDADPESOSOLICITADA", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "cantidadpesosolicitada", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double amountRequired = 0.0;
 
-    @Column(name = "CANTIDADUNIDADSOLICITADA", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "cantidadunidadsolicitada", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double amountRequiredUnit = 0.0;
 
-    @Column(name = "CANTIDADPESOUSADA", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "cantidadpesousada", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double amountUsed = 0.0;
 
-    @Column(name = "CANTIDADPESORETORNADA", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "cantidadpesoretornada", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double amountReturned = 0.0;
 
-    @Column(name = "COSTOTOTAL", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costototal", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal costTotal = new BigDecimal(0.0);
 
-    @Column(name = "COSTOUNITARIO", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costounitario", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal costUnit = new BigDecimal(0.0);
 
-    @Column(name = "COD_ART", insertable = false, updatable = false, nullable = false)
+    @Column(name = "cod_art", insertable = false, updatable = false, nullable = false)
     private String productItemCode;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false, nullable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false, nullable = false)
     @Length(max = 2)
     private String companyNumber;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "COD_ART", referencedColumnName = "COD_ART")
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_art", referencedColumnName = "cod_art")
     })
     private ProductItem productItem;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "IDORDENPRODUCCION", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idordenproduccion", nullable = true, updatable = false, insertable = true)
     private ProductionOrder productionOrder;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "IDPRODUCTOSIMPLE", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductosimple", nullable = true, updatable = false, insertable = true)
     private SingleProduct singleProduct;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

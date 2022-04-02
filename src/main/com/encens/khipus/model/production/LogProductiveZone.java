@@ -18,41 +18,41 @@ import java.util.Date;
  */
 
 @TableGenerator(name = "LogProductiveZone_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "LOGZONAPRODUCTIVA",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "logzonaproductiva",
         allocationSize = 10)
 
 @Entity
-@Table(name = "LOGZONAPRODUCTIVA")
+@Table(name = "logzonaproductiva")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class LogProductiveZone implements BaseModel {
 
     @Id
-    @Column(name = "IDLOGZONAPRODUCTIVA", nullable = false)
+    @Column(name = "idlogzonaproductiva", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "LogProductiveZone_Generator")
     private Long id;
 
-    @Column(name = "FECHA", nullable = false)
+    @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "ESTADO", nullable = true)
+    @Column(name = "estado", nullable = true)
     private String state;
 
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPRODUCTORMATERIAPRIMA", nullable = false)
+    @JoinColumn(name = "idproductormateriaprima", nullable = false)
     private RawMaterialProducer rawMaterialProducer;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDZONAPRODUCTIVA", nullable = false)
+    @JoinColumn(name = "idzonaproductiva", nullable = false)
     private ProductiveZone productiveZone;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 

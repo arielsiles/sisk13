@@ -98,7 +98,7 @@ public class Postulant implements BaseModel {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "TIPO", nullable = false, length = 20)
+    @Column(name = "tipo", nullable = false, length = 20)
     @NotNull
     @Enumerated(EnumType.STRING)
     private PostulantType postulantType;

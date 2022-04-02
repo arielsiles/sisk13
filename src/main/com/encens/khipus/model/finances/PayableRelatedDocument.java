@@ -37,19 +37,19 @@ public class PayableRelatedDocument implements BaseModel {
     @EmbeddedId
     private PayableRelatedDocumentPk id = new PayableRelatedDocumentPk();
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", insertable = false, updatable = false)
+    @Column(name = "no_trans", insertable = false, updatable = false)
     private String transactionNumber;
 
-    @Column(name = "NO_CONCI", insertable = false, updatable = false)
+    @Column(name = "no_conci", insertable = false, updatable = false)
     private String conciliationNumber;
 
-    @Column(name = "MONTO", precision = 16, scale = 2)
+    @Column(name = "monto", precision = 16, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "TC", precision = 10, scale = 2)
+    @Column(name = "tc", precision = 10, scale = 2)
     private BigDecimal exchangeRate;
 
     public PayableRelatedDocument() {

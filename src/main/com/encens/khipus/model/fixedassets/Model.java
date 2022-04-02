@@ -26,19 +26,19 @@ import javax.persistence.*;
 
 @Entity
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(name = "MODELO", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "modelo", schema = Constants.KHIPUS_SCHEMA)
 public class Model implements BaseModel {
 
     @Id
-    @Column(name = "IDMODELO", nullable = false, updatable = false)
+    @Column(name = "idmodelo", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Model.tableGenerator")
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 200)
+    @Column(name = "nombre", nullable = false, length = 200)
     private String name;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version

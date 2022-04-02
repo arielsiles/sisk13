@@ -36,19 +36,19 @@ import static com.encens.khipus.model.usertype.StringBooleanUserType.*;
 @Table(name = "configuracion", schema = Constants.FINANCES_SCHEMA)
 public class CompanyConfiguration {
     @Id
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "TITULO")
+    @Column(name = "titulo")
     private String title;
 
-    @Column(name = "SUBTITULO")
+    @Column(name = "subtitulo")
     private String subTitle;
 
-    @Column(name = "COMPANIA")
+    @Column(name = "compania")
     private String companyName;
 
-    @Column(name = "SISTEMA")
+    @Column(name = "sistema")
     private String systemName;
 
     @Column(name = "lugar")
@@ -111,195 +111,195 @@ public class CompanyConfiguration {
     @Column(name = "url_ping")
     private String connectionTestURL;
 
-    @Column(name = "CTADIFTIPCAM", length = 20, nullable = false)
+    @Column(name = "ctadiftipcam", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String balanceExchangeRateAccountCode;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTADIFTIPCAM", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctadiftipcam", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount balanceExchangeRateAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "IUE_RET", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "iue_ret", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount iueRetention;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "IT_RET", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "it_ret", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount itRetention;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTACOSTPT", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctacostpt", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaCostPT;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAALMPT", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaalmpt", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaAlmPT;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAALMPTAG", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaalmptag", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaAlmPTAG;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTACOSTPV", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctacostpv", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaCostPV;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAALMPV", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaalmpv", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaAlmPV;
 
-    @Column(name = "CTAANTPROVME", length = 20, nullable = false)
+    @Column(name = "ctaantprovme", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String advancePaymentForeignCurrencyAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAANTPROVME", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaantprovme", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount advancePaymentForeignCurrencyAccount;
 
-    @Column(name = "CTAANTPROVMN", length = 20, nullable = false)
+    @Column(name = "ctaantprovmn", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String advancePaymentNationalCurrencyAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAANTPROVMN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaantprovmn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount advancePaymentNationalCurrencyAccount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "CTADEPTRAME", referencedColumnName = "CUENTA", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "ctadeptrame", referencedColumnName = "cuenta", nullable = false, insertable = false, updatable = false)
     })
     private CashAccount depositInTransitForeignCurrencyAccount;
 
-    @Column(name = "CTADEPTRAME", length = 20, nullable = false)
+    @Column(name = "ctadeptrame", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String depositInTransitForeignCurrencyAccountCode;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "CTADEPTRAMN", referencedColumnName = "CUENTA", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "ctadeptramn", referencedColumnName = "cuenta", nullable = false, insertable = false, updatable = false)
     })
     private CashAccount depositInTransitNationalCurrencyAccount;
 
-    @Column(name = "CTADEPTRAMN", length = 20, nullable = false)
+    @Column(name = "ctadeptramn", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String depositInTransitNationalCurrencyAccountCode;
 
-    @Column(name = "CTAALMME", length = 20, nullable = false)
+    @Column(name = "ctaalmme", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String warehouseForeignCurrencyAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAALMME", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaalmme", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount warehouseForeignCurrencyAccount;
 
-    @Column(name = "CTAALMMN", length = 20, nullable = false)
+    @Column(name = "ctaalmmn", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String warehouseNationalCurrencyAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAALMMN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaalmmn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount warehouseNationalCurrencyAccount;
 
-    @Column(name = "CTATRANSALMME", length = 20, nullable = false)
+    @Column(name = "ctatransalmme", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String warehouseForeignCurrencyTransientAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTATRANSALMME", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctatransalmme", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount warehouseForeignCurrencyTransientAccount;
 
-    @Column(name = "CTATRANSALMMN", length = 20, nullable = false)
+    @Column(name = "ctatransalmmn", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String warehouseNationalCurrencyTransientAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTATRANSALMMN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctatransalmmn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount warehouseNationalCurrencyTransientAccount;
 
-    @Column(name = "CTATRANSALM1MN", length = 20, nullable = false)
+    @Column(name = "ctatransalm1mn", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String warehouseNationalCurrencyTransientAccount1Code;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTATRANSALM1MN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctatransalm1mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount warehouseNationalCurrencyTransientAccount1;
 
-    @Column(name = "CTATRANSALM2MN", length = 20, nullable = false)
+    @Column(name = "ctatransalm2mn", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String warehouseNationalCurrencyTransientAccount2Code;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTATRANSALM2MN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctatransalm2mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount warehouseNationalCurrencyTransientAccount2;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAAITB", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaaitb", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount adjustmentForInflationAccount;
 
-    @Column(name = "CTAAITB", length = 20, nullable = false)
+    @Column(name = "ctaaitb", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String adjustmentForInflationAccountCode;
@@ -307,12 +307,12 @@ public class CompanyConfiguration {
     /* account for iva fiscal credit (VAT=value-added tax) foreign currency*/
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAIVACREFIME", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaivacrefime", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount foreignCurrencyVATFiscalCreditAccount;
 
-    @Column(name = "CTAIVACREFIME", length = 20, nullable = false)
+    @Column(name = "ctaivacrefime", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String foreignCurrencyVATFiscalCreditAccountCode;
@@ -320,12 +320,12 @@ public class CompanyConfiguration {
     /* account for iva fiscal credit (VAT=value-added tax) national currency*/
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAIVACREFIMN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaivacrefimn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount nationalCurrencyVATFiscalCreditAccount;
 
-    @Column(name = "CTAIVACREFIMN", length = 20, nullable = false)
+    @Column(name = "ctaivacrefimn", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String nationalCurrencyVATFiscalCreditAccountCode;
@@ -333,295 +333,295 @@ public class CompanyConfiguration {
     /* account for iva fiscal credit (VAT=value-added tax) national currency*/
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAIVACREFITRMN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaivacrefitrmn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount nationalCurrencyVATFiscalCreditTransientAccount;
 
-    @Column(name = "CTAIVACREFITRMN", length = 20, nullable = false)
+    @Column(name = "ctaivacrefitrmn", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String nationalCurrencyVATFiscalCreditTransientAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAPROVOBU", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaprovobu", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount provisionByTangibleFixedAssetObsolescenceAccount;
 
-    @Column(name = "CTAPROVOBU", length = 20, nullable = false)
+    @Column(name = "ctaprovobu", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String provisionByTangibleFixedAssetObsolescenceAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAAFET", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaafet", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount fixedAssetInTransitAccount;
 
-    @Column(name = "CTAAFET", length = 20, nullable = false)
+    @Column(name = "ctaafet", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
     private String fixedAssetInTransitAccountCode;
 
-    @Column(name = "NO_USR_SIS", length = 4, nullable = false)
+    @Column(name = "no_usr_sis", length = 4, nullable = false)
     @Length(max = 4)
     @NotNull
     private String defaultSystemUserNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NO_USR_TESO", referencedColumnName = "NO_USR", nullable = false)
+    @JoinColumn(name = "no_usr_teso", referencedColumnName = "NO_USR", nullable = false)
     @NotNull
     private FinanceUser defaultTreasuryUser;
 
-    @Column(name = "NO_USR_RPAGOS", length = 4, nullable = false)
+    @Column(name = "no_usr_rpagos", length = 4, nullable = false)
     @NotNull
     private String defaultPurchaseOrderRemakePaymentUserNumber;
 
-    @Column(name = "ANIO_GEN_RPAGOS", length = 4, nullable = false)
+    @Column(name = "anio_gen_rpagos", length = 4, nullable = false)
     @NotNull
     private Integer defaultPurchaseOrderRemakeYear;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NO_USR_CONTA", referencedColumnName = "NO_USR", nullable = false)
+    @JoinColumn(name = "no_usr_conta", referencedColumnName = "no_usr", nullable = false)
     @NotNull
     private FinanceUser defaultAccountancyUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NO_USR_PRODUCCION", referencedColumnName = "NO_USR", nullable = false)
+    @JoinColumn(name = "no_usr_produccion", referencedColumnName = "no_usr", nullable = false)
     @NotNull
     private FinanceUser defaultAccountancyUserProduction;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "NO_USR_PAGAR", referencedColumnName = "NO_USR", nullable = false)
+    @JoinColumn(name = "no_usr_pagar", referencedColumnName = "no_usr", nullable = false)
     @NotNull
     private FinanceUser defaultPayableFinanceUser;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "PAGOCTABCOMN", referencedColumnName = "CTA_BCO", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "pagoctabcomn", referencedColumnName = "cta_bco", nullable = false, updatable = false, insertable = false)
     })
     private FinancesBankAccount nationalBankAccountForPayment;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "PAGOCTABCOME", referencedColumnName = "CTA_BCO", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "pagoctabcome", referencedColumnName = "cta_bco", nullable = false, updatable = false, insertable = false)
     })
     private FinancesBankAccount foreignBankAccountForPayment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCARGODOC", nullable = false)
+    @JoinColumn(name = "IDCARgODOC", nullable = false)
     private Charge defaultProfessorsCharge;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDDEFTIPODOC", nullable = false)
+    @JoinColumn(name = "iddeftipodoc", nullable = false)
     private DocumentType defaultDocumentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDDEFSALMUJ", nullable = false)
+    @JoinColumn(name = "iddefsalmuj", nullable = false)
     private Salutation defaultSalutationForWoman;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDDEFSALHOM", nullable = false)
+    @JoinColumn(name = "iddefsalhom", nullable = false)
     private Salutation defaultSalutationForMan;
 
-    @Column(name = "URLREDIREVALPROG", nullable = false)
+    @Column(name = "urlredirevalprog", nullable = false)
     private String scheduleEvaluationRedirectURL;
 
-    @Column(name = "URLREDIREVALPROGEST", nullable = false)
+    @Column(name = "urlredirevalprogest", nullable = false)
     private String studentScheduleEvaluationRedirectURL;
 
-    @Column(name = "URLREDIREVALPROGDOC", nullable = false)
+    @Column(name = "urlredirevalprogdoc", nullable = false)
     private String teacherScheduleEvaluationRedirectURL;
 
-    @Column(name = "URLREDIREVALPROGJC", nullable = false)
+    @Column(name = "urlredirevalprogjc", nullable = false)
     private String careerManagerScheduleEvaluationRedirectURL;
 
-    @Column(name = "URLREDIREVALPROGAE", nullable = false)
+    @Column(name = "urlredirevalprogae", nullable = false)
     private String autoEvaluationScheduleEvaluationRedirectURL;
 
-    @Column(name = "OCCODIFACTIVA", nullable = false)
+    @Column(name = "occodifactiva", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean purchaseOrderCodificationEnabled;
 
-    @Column(name = "RETENCIONPRESTAMOANTI", nullable = false)
+    @Column(name = "retencionprestamoanti", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean retentionForLoanAndAdvance;
 
-    @Column(name = "PRECIOUNITARIOLECHE",columnDefinition = "DECIMAL(5,2)",nullable = true)
+    @Column(name = "preciounitarioleche",columnDefinition = "DECIMAL(5,2)",nullable = true)
     private Double unitPriceMilk;
 
-    @Column(name = "IT",columnDefinition = "DECIMAL(3,2)",nullable = true)
+    @Column(name = "it",columnDefinition = "DECIMAL(3,2)",nullable = true)
     private Double it;
 
-    @Column(name = "IUE",columnDefinition = "DECIMAL(3,2)",nullable = true)
+    @Column(name = "iue",columnDefinition = "DECIMAL(3,2)",nullable = true)
     private Double iue;
 
-    @Column(name = "IVA_TAX", nullable = true)
+    @Column(name = "iva_tax", nullable = true)
     private BigDecimal ivaTaxValue;
 
-    @Column(name = "NET_VAL", nullable = true)
+    @Column(name = "net_val", nullable = true)
     private BigDecimal netValue;
 
-    @Column(name = "IT_TAX", nullable = true)
+    @Column(name = "it_tax", nullable = true)
     private BigDecimal itTaxValue;
 
-    @Column(name = "AUTOMODIFCONTRATO", nullable = false)
+    @Column(name = "automodifcontrato", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean contractModificationAuthorization;
 
-    @Column(name = "CODMODIFCONTRATO", nullable = false)
+    @Column(name = "codmodifcontrato", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     @NotNull
     private boolean contractModificationCode;
 
-    @Column(name = "ACTIVOAUTDOC_TESO", nullable = false)
+    @Column(name = "activoautdoc_teso", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME, parameters = {
             @Parameter(name = TRUE_PARAMETER, value = TRUE_VALUE),
             @Parameter(name = FALSE_PARAMETER, value = FALSE_VALUE)
     })
     private boolean treasuryDocumentsAuthorizationEnabled;
 
-    @Column(name = "ACTIVOAUTDOC_CXP", nullable = false)
+    @Column(name = "activoautdoc_cxp", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME, parameters = {
             @Parameter(name = TRUE_PARAMETER, value = TRUE_VALUE),
             @Parameter(name = FALSE_PARAMETER, value = FALSE_VALUE)
     })
     private boolean payablesDocumentsAuthorizationEnabled;
 
-    @Column(name = "AGUI_BASICO", nullable = false)
+    @Column(name = "agui_basico", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     @NotNull
     private boolean basicBasedChristmasPayroll;
 
-    @Column(name = "HRSDIALABORAL", precision = 10, scale = 2, nullable = false)
+    @Column(name = "hrsdialaboral", precision = 10, scale = 2, nullable = false)
     @NotNull
     private BigDecimal hrsWorkingDay;
 
-    @Column(name = "TIPO_DOC_CAJA")
+    @Column(name = "tipo_doc_caja")
     private String cashBoxDocumentTypeCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "TIPO_DOC_CAJA", referencedColumnName = "TIPO_DOC", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "tipo_doc_caja", referencedColumnName = "tipo_doc", nullable = false, insertable = false, updatable = false)
     })
     private PayableDocumentType cashBoxDocumentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCATEGORIAPUESTODLH", referencedColumnName = "idcategoriapuesto", nullable = false)
+    @JoinColumn(name = "idcategoriapuestodlh", referencedColumnName = "idcategoriapuesto", nullable = false)
     private JobCategory jobCategoryDLH;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCATEGORIAPUESTODTH", referencedColumnName = "idcategoriapuesto", nullable = false)
+    @JoinColumn(name = "idcategoriapuestodth", referencedColumnName = "idcategoriapuesto", nullable = false)
     private JobCategory jobCategoryDTH;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTIPOSUELDODLH", referencedColumnName = "idtiposueldo", nullable = false)
+    @JoinColumn(name = "idtiposueldodlh", referencedColumnName = "idtiposueldo", nullable = false)
     private KindOfSalary kindOfSalaryDLH;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTIPOSUELDODTH", referencedColumnName = "idtiposueldo", nullable = false)
+    @JoinColumn(name = "idtiposueldodth", referencedColumnName = "idtiposueldo", nullable = false)
     private KindOfSalary kindOfSalaryDTH;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter exchangeRateBalanceCostCenter;
 
-    @Column(name = "COD_CC", length = 8)
+    @Column(name = "cod_cc", length = 8)
     @Length(max = 8)
     private String costCenterCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAMERMABAJ", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctamermabaj", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount lowAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAREPROC", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctareproc", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount reworkAccount;
 
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CT_CAJAAHORRO", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ct_cajaahorro", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount SavingsBankAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CT_CAJAVETER", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ct_cajaveter", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount VeterinaryCashAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CAJAGRAL1MN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "CAJAgRAL1MN", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount generalCashAccountNational;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "I_PVIG_PF_MN", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "i_pvig_pf_mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount fixedTermInterestNationalCurrency;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAPROVAF", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaprovaf", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount fixedAssetProvidersAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAG_IT", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctag_it", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount transactionTaxExpense;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAP_DEBFISIVA", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctap_debfisiva", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount fiscalDebitLiability;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAP_ITXPAGAR", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctap_itxpagar", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount transactionTaxPayable;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAI_VENTAPRI", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctai_ventapri", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount primarySaleProduct;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTAI_VENTASEC", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctai_ventasec", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount secondarySaleProduct;
 
@@ -630,17 +630,17 @@ public class CompanyConfiguration {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CTACOMISION", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctacomision", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount commissionSalesCashAccount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", unique = true, nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public String getCompanyNumber() {

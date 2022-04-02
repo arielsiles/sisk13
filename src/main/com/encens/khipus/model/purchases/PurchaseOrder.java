@@ -54,105 +54,105 @@ public class PurchaseOrder implements BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PurchaseOrder.tableGenerator")
-    @Column(name = "ID_COM_ENCOC", nullable = false)
+    @Column(name = "id_com_encoc", nullable = false)
     private Long id;
 
-    @Column(name = "NO_CIA", length = 2, nullable = false)
+    @Column(name = "no_cia", length = 2, nullable = false)
     private String companyNumber;
 
-    @Column(name = "NO_ORDEN", length = 100, nullable = false)
+    @Column(name = "no_orden", length = 100, nullable = false)
     @NotNull
     @Length(max = 100)
     private String orderNumber;
 
-    @Column(name = "FECHA", nullable = false)
+    @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date date;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private PurchaseOrderState state;
 
-    @Column(name = "TIPO_RECEPCION")
+    @Column(name = "tipo_recepcion")
     @Enumerated(EnumType.STRING)
     private PurchaseOrderReceivedType receivedType;
 
-    @Column(name = "COD_ALM", length = 5)
+    @Column(name = "cod_alm", length = 5)
     @Length(max = 5)
     private String warehouseCode;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
-    @Column(name = "COD_CC", length = 6, nullable = false)
+    @Column(name = "cod_cc", length = 6, nullable = false)
     @Length(max = 6)
     private String costCenterCode;
 
-    @Column(name = "COD_PROV", length = 6, nullable = false)
+    @Column(name = "cod_prov", length = 6, nullable = false)
     @Length(max = 6)
     private String providerCode;
 
-    @Column(name = "GLOSA", length = 250, nullable = false)
+    @Column(name = "glosa", length = 250, nullable = false)
     @Length(max = 250)
     private String gloss;
 
-    @Column(name = "FECHA_RECEPCION")
+    @Column(name = "fecha_recepcion")
     @Temporal(TemporalType.DATE)
     private Date receptionDate;
 
-    @Column(name = "MES_CONSUMO", length = 20)
+    @Column(name = "mes_consumo", length = 20)
     @Enumerated(EnumType.STRING)
     private Month consumeMonth;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDLUGARRECEPCION", nullable = false)
+    @JoinColumn(name = "idlugarrecepcion", nullable = false)
     private ReceptionPlace receptionPlace;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCONDICIONPAGO", nullable = false)
+    @JoinColumn(name = "idcondicionpago", nullable = false)
     private PayConditions payConditions;
 
-    @Column(name = "SUB_TOTAL", precision = 16, scale = 2)
+    @Column(name = "sub_total", precision = 16, scale = 2)
     private BigDecimal subTotalAmount = BigDecimal.ZERO;
 
-    @Column(name = "PORC_DESC", precision = 7, scale = 4)
+    @Column(name = "porc_desc", precision = 7, scale = 4)
     private BigDecimal discountPercent = BigDecimal.ZERO;
 
-    @Column(name = "DESCUENTO", precision = 16, scale = 2)
+    @Column(name = "descuento", precision = 16, scale = 2)
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
-    @Column(name = "TOTAL", precision = 16, scale = 2)
+    @Column(name = "total", precision = 16, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    @Column(name = "NUMERO_FACTURA", nullable = true, length = 150)
+    @Column(name = "numero_factura", nullable = true, length = 150)
     @Length(max = 150)
     private String invoiceNumber;
 
-    @Column(name = "CONFACTURA",nullable = true,length = 50)
+    @Column(name = "confactura",nullable = true,length = 50)
     @Length(max = 50)
     private String withBill;
 
-    @Column(name = "TIPO", nullable = false, length = 25)
+    @Column(name = "tipo", nullable = false, length = 25)
     @Enumerated(EnumType.STRING)
     private PurchaseOrderType orderType;
 
-    @Column(name = "TIPODOCCOMPRA", nullable = false, length = 30)
+    @Column(name = "tipodoccompra", nullable = false, length = 30)
     @Enumerated(EnumType.STRING)
     private CollectionDocumentType documentType;
 
     @com.encens.khipus.validator.BusinessUnit
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", updatable = true, insertable = true)
     private BusinessUnit executorUnit;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @Transient
@@ -160,19 +160,19 @@ public class PurchaseOrder implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_PROV", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_prov", nullable = false, updatable = false, insertable = false)
     })
     private Provider provider;
 
     @ManyToOne
-    @JoinColumn(name = "ID_RESPONSABLE", nullable = false)
+    @JoinColumn(name = "id_responsable", nullable = false)
     private Employee responsible;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_ALM", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_alm", updatable = false, insertable = false)
     })
     private Warehouse warehouse;
 
@@ -188,14 +188,14 @@ public class PurchaseOrder implements BaseModel {
     private List<PurchaseOrderFixedAssetPart> purchaseOrderFixedAssetPartList = new ArrayList<PurchaseOrderFixedAssetPart>(0);
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCONTRATOPUESTOSOL", referencedColumnName = "idcontratopuesto")
+    @JoinColumn(name = "idcontratopuestosol", referencedColumnName = "idcontratopuesto")
     private JobContract petitionerJobContract;
 
-    @Column(name = "ESTADOPAGO", nullable = false)
+    @Column(name = "estadopago", nullable = false)
     @Enumerated(EnumType.STRING)
     private PurchaseOrderPaymentStatus paymentStatus;
 
-    @Column(name = "MONTOSALDO", nullable = false, precision = 16, scale = 2)
+    @Column(name = "montosaldo", nullable = false, precision = 16, scale = 2)
     private BigDecimal balanceAmount = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY)

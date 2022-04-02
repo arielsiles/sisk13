@@ -65,131 +65,131 @@ import java.util.List;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "FONDOROTATORIO",
+        pkColumnValue = "fondorotatorio",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "FONDOROTATORIO",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"IDCOMPANIA", "CODIGO"}))
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "fondorotatorio",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "codigo"}))
 public class RotatoryFund implements BaseModel {
 
     @Id
-    @Column(name = "IDFONDOROTATORIO", nullable = false, scale = 24)
+    @Column(name = "idfondorotatorio", nullable = false, scale = 24)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RotatoryFund.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     private Integer code;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTIPODOCFONDOROTA")
+    @JoinColumn(name = "idtipodocfondorota")
     @NotNull
     private RotatoryFundDocumentType documentType;
 
-    @Column(name = "FECHA", nullable = false)
+    @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "MONTO", nullable = false, precision = 12, scale = 2)
+    @Column(name = "monto", nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "RESIDUOPORCOBRAR", precision = 12, scale = 2)
+    @Column(name = "residuoporcobrar", precision = 12, scale = 2)
     private BigDecimal receivableResidue;
 
-    @Column(name = "RESIDUOPORPAGAR", precision = 12, scale = 2)
+    @Column(name = "residuoporpagar", precision = 12, scale = 2)
     private BigDecimal payableResidue;
 
-    @Column(name = "CUOTAS", nullable = false, precision = 12)
+    @Column(name = "cuotas", nullable = false, precision = 12)
     private Integer paymentsNumber;
 
     @ManyToOne
-    @JoinColumn(name = "IDEMPLEADO")
+    @JoinColumn(name = "idempleado")
     private Employee employee;
 
     @ManyToOne
-    @JoinColumn(name = "IDCONTRATOPUESTO", referencedColumnName = "idcontratopuesto")
+    @JoinColumn(name = "idcontratopuesto", referencedColumnName = "idcontratopuesto")
     private JobContract jobContract;
 
-    @Column(name = "MONEDAPAGO", nullable = false)
+    @Column(name = "monedapago", nullable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType payCurrency;
 
-    @Column(name = "TIPOCAMBIO", precision = 16, scale = 6)
+    @Column(name = "tipocambio", precision = 16, scale = 6)
     private BigDecimal exchangeRate;
 
-    @Column(name = "FECHAINICIO")
+    @Column(name = "fechainicio")
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
-    @Column(name = "FECHAVENCIMIENTO")
+    @Column(name = "fechavencimiento")
     @Temporal(TemporalType.DATE)
     private Date expirationDate;
 
-    @Column(name = "DESCRIPCION", length = 1000)
+    @Column(name = "descripcion", length = 1000)
     @Length(max = 1000)
     private String description;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private RotatoryFundState state;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idunidadnegocio", referencedColumnName = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
-    @Column(name = "COD_CC", length = 6, nullable = false)
+    @Column(name = "cod_cc", length = 6, nullable = false)
     @Length(max = 6)
     private String costCenterCode;
 
     @ManyToOne
-    @JoinColumn(name = "CREADOPOR")
+    @JoinColumn(name = "creadopor")
     private User registerEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "APROBADOPOR")
+    @JoinColumn(name = "aprobadopor")
     private User approvedByEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "ANULADOPOR")
+    @JoinColumn(name = "anuladopor")
     private User annulledByEmployee;
 
-    @Column(name = "PORPLANILLA")
+    @Column(name = "porplanilla")
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean discountByPayroll;
 
-    @Column(name = "NO_CIA", length = 2)
+    @Column(name = "no_cia", length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "CUENTACTB", length = 20)
+    @Column(name = "cuentactb", length = 20)
     @Length(max = 20)
     private String cashAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", insertable = false, updatable = false, referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "CUENTACTB", insertable = false, updatable = false, referencedColumnName = "CUENTA")
+            @JoinColumn(name = "no_cia", insertable = false, updatable = false, referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cuentactb", insertable = false, updatable = false, referencedColumnName = "cuenta")
     })
     private CashAccount cashAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_PROV", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_prov", updatable = false, insertable = false)
     })
     private Provider provider;
 
-    @Column(name = "COD_PROV", length = 6)
+    @Column(name = "cod_prov", length = 6)
     @Length(max = 6)
     private String providerCode;
 
@@ -203,12 +203,12 @@ public class RotatoryFund implements BaseModel {
     private List<RotatoryFundMovement> rotatoryFundMovementList = new ArrayList<RotatoryFundMovement>(0);
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

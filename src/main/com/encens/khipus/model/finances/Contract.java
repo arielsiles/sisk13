@@ -183,11 +183,11 @@ public class Contract implements BaseModel {
     @Length(max = 250)
     private String pensionFundRegistrationCode;
 
-    @Column(name = "AUTOMODIFCONTRATO", nullable = false)
+    @Column(name = "automodifcontrato", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean contractModificationAuthorization;
 
-    @Column(name = "CODMODIFCONTRATO", length = 6)
+    @Column(name = "codmodifcontrato", length = 6)
     @Length(min = 6, max = 6)
     private String modificationCode;
 
@@ -211,17 +211,17 @@ public class Contract implements BaseModel {
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
-    @Column(name = "MONTOGLOBALLABORAL", precision = 16, scale = 6)
+    @Column(name = "montogloballaboral", precision = 16, scale = 6)
     private BigDecimal occupationalGlobalAmount;
 
-    @Column(name = "HABERBASICOLABORAL", precision = 16, scale = 6)
+    @Column(name = "haberbasicolaboral", precision = 16, scale = 6)
     private BigDecimal occupationalBasicAmount;
 
-    @Column(name = "ACADEMICO")
+    @Column(name = "academico")
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean academic = false;
 
-    @Column(name = "ESPECIAL")
+    @Column(name = "especial")
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean special = false;
 

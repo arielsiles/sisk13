@@ -17,49 +17,49 @@ import java.util.List;
  */
 
 @TableGenerator(name = "ProductComposition_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "COMPOSICIONPRODUCTO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "composicionproducto",
         allocationSize = 10)
 
 @Entity
-@Table(name = "COMPOSICIONPRODUCTO")
+@Table(name = "composicionproducto")
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class ProductComposition implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDCOMPOSICIONPRODUCTO", columnDefinition = "DECIMAL(24,0)", nullable = false)
+    @Column(name = "idcomposicionproducto", columnDefinition = "DECIMAL(24,0)", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductComposition_Generator")
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "CANTIDADPRODUCIR", columnDefinition = "DECIMAL(24,0)", nullable = false)
+    @Column(name = "cantidadproducir", columnDefinition = "DECIMAL(24,0)", nullable = false)
     private Double producingAmount;
 
-    @Column(name = "PESOCONTENEDOR", columnDefinition = "DECIMAL(24,0)", nullable = false)
+    @Column(name = "pesocontenedor", columnDefinition = "DECIMAL(24,0)", nullable = false)
     private Double containerWeight;
 
-    @Column(name = "TEORICOOBTENIDO", columnDefinition = "DECIMAL(24,0)", nullable = false)
+    @Column(name = "teoricoobtenido", columnDefinition = "DECIMAL(24,0)", nullable = false)
     private Double supposedAmount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPRODUCTOPROCESADO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductoprocesado", nullable = false, updatable = false, insertable = true)
     private ProcessedProduct processedProduct;
 
     @OneToMany(mappedBy = "productComposition", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private List<ProductionIngredient> productionIngredientList = new ArrayList<ProductionIngredient>();
 
-    @Column(name = "ACTIVO", nullable = false)
+    @Column(name = "activo", nullable = false)
     @Type(type = "IntegerBoolean")
     private Boolean active;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     public Long getId() {

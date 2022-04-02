@@ -33,21 +33,21 @@ public class Group implements BaseModel {
     @EmbeddedId
     private GroupPK id = new GroupPK();
 
-    @Column(name = "COD_GRU", nullable = false, insertable = false, updatable = false)
+    @Column(name = "cod_gru", nullable = false, insertable = false, updatable = false)
     private String groupCode;
 
-    @Column(name = "DESCRI", nullable = true, length = 100)
+    @Column(name = "descri", nullable = true, length = 100)
     @Length(max = 100)
     private String name;
 
-    @Column(name = "CUENTA_INV", nullable = true, length = 31)
+    @Column(name = "cuenta_inv", nullable = true, length = 31)
     @Length(max = 31)
     private String inventoryAccount;
 
     @ManyToOne(optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA_INV", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta_inv", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount inventoryCashAccount;
 

@@ -238,7 +238,7 @@ public class GestionPayroll implements BaseModel {
     private JobCategory jobCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCICLOGENERACIONPLANILLA", referencedColumnName = "IDCICLOGENERACIONPLANILLA")
+    @JoinColumn(name = "idciclogeneracionplanilla", referencedColumnName = "idciclogeneracionplanilla")
     private PayrollGenerationCycle payrollGenerationCycle;
 
     @Column(name = "tipo", nullable = false, length = 20)

@@ -10,14 +10,14 @@ import javax.persistence.*;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "MATERIALPRODUCCION")
-@DiscriminatorValue("MATERIALPRODUCCION")
+@Table(name = "materialproduccion")
+@DiscriminatorValue("materialproduccion")
 @PrimaryKeyJoinColumns(value = {
-@PrimaryKeyJoinColumn(name = "IDMATERIALPRODUCCION", referencedColumnName = "IDMETAPRODUCTOPRODUCCION")})
+        @PrimaryKeyJoinColumn(name = "idmaterialproduccion", referencedColumnName = "idmetaproductoproduccion")})
 public class ProductionMaterial extends MetaProduct {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     public com.encens.khipus.model.admin.Company getCompany() {

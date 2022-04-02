@@ -10,51 +10,51 @@ import javax.persistence.*;
 
 @NamedQueries({
         @NamedQuery(name = "WarehouseSlot.findByProcessedProductAndFinishedGoodsWarehouse",
-                    query = "select warehouseSlot " +
-                            "from WarehouseSlot warehouseSlot " +
-                            "where warehouseSlot.metaProduct = :processedProduct and warehouseSlot.finishedGoodsWarehouse = :finishedGoodsWarehouse"),
+                query = "select warehouseSlot " +
+                        "from WarehouseSlot warehouseSlot " +
+                        "where warehouseSlot.metaProduct = :processedProduct and warehouseSlot.finishedGoodsWarehouse = :finishedGoodsWarehouse"),
         @NamedQuery(name = "WarehouseSlot.findByMetaProduct",
-                    query = "select warehouseSlot " +
-                            "from WarehouseSlot warehouseSlot " +
-                            "where warehouseSlot.metaProduct = :metaProduct " +
-                            "order by warehouseSlot.finishedGoodsWarehouse.name, warehouseSlot.code")
+                query = "select warehouseSlot " +
+                        "from WarehouseSlot warehouseSlot " +
+                        "where warehouseSlot.metaProduct = :metaProduct " +
+                        "order by warehouseSlot.finishedGoodsWarehouse.name, warehouseSlot.code")
 })
 
 @TableGenerator(name = "WarehouseSlot_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "AMBIENTEDEPOSITO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "ambientedeposito",
         allocationSize = 10)
 
 @Entity
-@Table(name = "AMBIENTEDEPOSITO", uniqueConstraints = @UniqueConstraint(columnNames = {"CODIGO", "IDCOMPANIA"}))
+@Table(name = "ambientedeposito", uniqueConstraints = @UniqueConstraint(columnNames = {"codigo", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class WarehouseSlot implements BaseModel {
 
     @Id
-    @Column(name = "IDAMBIENTEDEPOSITO", nullable = false)
+    @Column(name = "idambientedeposito", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "WarehouseSlot_Generator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false, length = 100)
+    @Column(name = "codigo", nullable = false, length = 100)
     private String code;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDDEPOSITOPRODUCTOTERMINADO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "iddepositoproductoterminado", nullable = false, updatable = false, insertable = true)
     private FinishedGoodsWarehouse finishedGoodsWarehouse;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDMETAPRODUCTOPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
     private MetaProduct metaProduct;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @Transient

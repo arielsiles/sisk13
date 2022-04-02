@@ -73,16 +73,16 @@ public class InventoryDetail implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = true, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ART", nullable = true, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = true, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_art", nullable = true, insertable = false, updatable = false)
     })
     private ProductItem productItem;
 

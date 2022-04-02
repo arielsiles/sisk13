@@ -24,21 +24,21 @@ import javax.persistence.*;
 })
 
 @Entity
-@Table(schema = Constants.ACADEMIC_SCHEMA, name = "GRUPOS_ASIGNATURAS")
+@Table(schema = Constants.ACADEMIC_SCHEMA, name = "grupos_asignaturas")
 public class AcademicSubjectGroup implements BaseModel {
 
     @EmbeddedId
     private AcademicSubjectGroupPK id;
 
-    @Column(name = "PERIODO", insertable = false, updatable = false)
+    @Column(name = "periodo", insertable = false, updatable = false)
     private Integer period;
 
-    @Column(name = "GRUPO_ASIGNATURA", length = 15, insertable = false, updatable = false)
+    @Column(name = "grupo_asignatura", length = 15, insertable = false, updatable = false)
     @Length(max = 15)
     @NotEmpty
     private String subjectGroup;
 
-    @Column(name = "TIPO_GRUPO", length = 5, insertable = false, updatable = false)
+    @Column(name = "tipo_grupo", length = 5, insertable = false, updatable = false)
     @Length(max = 5)
     @NotEmpty
     private String groupType;

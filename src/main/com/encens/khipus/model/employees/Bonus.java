@@ -35,48 +35,48 @@ import java.math.BigDecimal;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "TIPO", discriminatorType = DiscriminatorType.STRING, length = 20)
+@DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING, length = 20)
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "BONO")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "bono")
 public class Bonus implements BaseModel {
 
     @Id
-    @Column(name = "IDBONO", nullable = false)
+    @Column(name = "idbono", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Bonus.tableGenerator")
     private Long id;
 
     @Length(max = 255)
-    @Column(name = "NOMBRE", length = 255, nullable = false)
+    @Column(name = "nombre", length = 255, nullable = false)
     @NotNull
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTASASMN")
+    @JoinColumn(name = "idtasasmn")
     private SMNRate smnRate;
 
     @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "IDDESCRIPCION")
+    @JoinColumn(name = "iddescripcion")
     private Text description;
 
-    @Column(name = "MONTO", precision = 13, scale = 2)
+    @Column(name = "monto", precision = 13, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "ACTIVO")
+    @Column(name = "activo")
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean active;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "TIPOBONO", length = 30, nullable = false)
+    @Column(name = "tipobono", length = 30, nullable = false)
     @NotNull
     private BonusType bonusType;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private Long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

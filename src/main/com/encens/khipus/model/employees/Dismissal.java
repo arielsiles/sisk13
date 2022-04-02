@@ -29,57 +29,57 @@ import java.util.Date;
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE,
-        pkColumnValue = "RETIRO")
+        pkColumnValue = "retiro")
 
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = Constants.KHIPUS_SCHEMA, name = "RETIRO")
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "retiro")
 public class Dismissal implements BaseModel {
     @Id
-    @Column(name = "IDRETIRO", nullable = false)
+    @Column(name = "idretiro", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Dismissal.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     @NotNull
     private Long code;
 
-    @Column(name = "DIASTRABAJADOS")
+    @Column(name = "diastrabajados")
     private Integer workedDays;
 
-    @Column(name = "MONTO", precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
+    @Column(name = "monto", precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
     private BigDecimal amount;
 
-    @Column(name = "MONEDA")
+    @Column(name = "moneda")
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "FECHARETIRO")
+    @Column(name = "fecharetiro")
     @Temporal(TemporalType.DATE)
     private Date layOffDate;
 
-    @Column(name = "ESTADO", length = Constants.STRING_LENGTH_20, nullable = false)
+    @Column(name = "estado", length = Constants.STRING_LENGTH_20, nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private DismissalState state;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "IDARCHIVO", referencedColumnName = "idarchivo")
+    @JoinColumn(name = "idarchivo", referencedColumnName = "idarchivo")
     private File file;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = Constants.LONG_TEXT_LENGTH)
+    @Column(name = "descripcion", nullable = false, length = Constants.LONG_TEXT_LENGTH)
     @Length(max = Constants.LONG_TEXT_LENGTH)
     @NotEmpty
     private String description;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false)
     @NotNull
     private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCONTRATO", referencedColumnName = "idcontrato", nullable = false)
+    @JoinColumn(name = "idcontrato", referencedColumnName = "idcontrato", nullable = false)
     @NotNull
     private Contract contract;
 
@@ -87,7 +87,7 @@ public class Dismissal implements BaseModel {
     private Collection<DismissalDetail> dismissalDetailList;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

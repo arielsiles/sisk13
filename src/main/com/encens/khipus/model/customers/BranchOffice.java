@@ -26,35 +26,35 @@ import javax.persistence.*;
 public class BranchOffice implements BaseModel {
 
     @Id
-    @Column(name = "IDSUCURSAL", nullable = false)
+    @Column(name = "idsucursal", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "BranchOffice.tableGenerator")
     private Long id;
 
-    @Column(name="NOMBRE")
+    @Column(name="nombre")
     private String name;
 
     @Column(name="descripcion")
     private String description;
 
-    @Column(name="ACTIVIDAD")
+    @Column(name="actividad")
     private String activity;
 
-    @Column(name="NOMBRE_EMPRESA")
+    @Column(name="nombre_empresa")
     private String companyName;
 
-    @Column(name="NOMBRE_SUCURSAL")
+    @Column(name="nombre_sucursal")
     private String branchName;
 
-    @Column(name="NOMBRE_POS")
+    @Column(name="nombre_pos")
     private String posName;
 
-    @Column(name="TELEFONOS")
+    @Column(name="telefonos")
     private String phone;
 
-    @Column(name="LUGAR")
+    @Column(name="lugar")
     private String place;
 
-    @Column(name="DIRECCION")
+    @Column(name="direccion")
     private String address;
 
     @Column(name="codsuc")

@@ -36,33 +36,33 @@ import java.util.Collection;
 public class ProductInventory implements BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductInventory.tableGenerator")
-    @Column(name = "ID_INV_PROD", nullable = false)
+    @Column(name = "id_inv_prod", nullable = false)
     private Long id;
 
-    @Column(name = "NO_CIA", length = 2, nullable = false)
+    @Column(name = "no_cia", length = 2, nullable = false)
     private String companyNumber;
 
-    @Column(name = "COD_ALM", length = 6, nullable = false)
+    @Column(name = "cod_alm", length = 6, nullable = false)
     @Length(max = 6)
     private String warehouseCode;
 
-    @Column(name = "COD_ART", length = 6, nullable = false)
+    @Column(name = "cod_art", length = 6, nullable = false)
     @Length(max = 6)
     private String productItemCode;
 
-    @Column(name = "COD_CC", length = 8, nullable = false)
+    @Column(name = "cod_cc", length = 8, nullable = false)
     @Length(max = 8)
     private String costCenterCode;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", updatable = true, insertable = true)
     private BusinessUnit executorUnit;
 
-    @Column(name = "CANTIDAD", precision = 12, scale = 2)
+    @Column(name = "cantidad", precision = 12, scale = 2)
     private BigDecimal quantity;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
     @Transient

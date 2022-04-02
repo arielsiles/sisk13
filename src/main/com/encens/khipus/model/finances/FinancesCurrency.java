@@ -31,20 +31,20 @@ public class FinancesCurrency implements BaseModel {
     private FinancesCurrencyPk id = new FinancesCurrencyPk();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CLASE_CAMBIO")
+    @JoinColumn(name = "clase_cambio")
     private ExchangeKind exchangeKind;
 
-    @Column(name = "DESCRI", nullable = false, length = 100)
+    @Column(name = "descri", nullable = false, length = 100)
     @NotNull
     @Length(max = 100)
     private String description;
 
-    @Column(name = "ABREV", nullable = false, length = 10)
+    @Column(name = "abrev", nullable = false, length = 10)
     @NotNull
     @Length(max = 10)
     private String acronym;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyState state;
 

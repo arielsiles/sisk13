@@ -24,51 +24,51 @@ import javax.persistence.*;
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE,
-        pkColumnValue = "CAUSARETIRO")
+        pkColumnValue = "causaretiro")
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "CAUSARETIRO",
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "causaretiro",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"CODIGO", "IDCOMPANIA"}),
-                @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"})
+                @UniqueConstraint(columnNames = {"codigo", "idcompania"}),
+                @UniqueConstraint(columnNames = {"nombre", "idcompania"})
         })
 public class DismissalCause implements BaseModel {
     @Id
-    @Column(name = "IDCAUSARETIRO", nullable = false)
+    @Column(name = "idcausaretiro", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "DismissalCause.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     @NotNull
     private Long code;
 
-    @Column(name = "NOMBRE", length = 250, nullable = false)
+    @Column(name = "nombre", length = 250, nullable = false)
     @NotEmpty
     @Length(max = 250)
     private String name;
 
-    @Column(name = "PERMITEPAGOS", nullable = false)
+    @Column(name = "permitepagos", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
     @NotNull
     private Boolean payable;
 
-    @Column(name = "ACTIVO", nullable = false)
+    @Column(name = "activo", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
     @NotNull
     private Boolean active;
 
-    @Column(name = "DESCRIPCION", length = 1000)
+    @Column(name = "descripcion", length = 1000)
     @Length(max = 1000)
     private String description;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

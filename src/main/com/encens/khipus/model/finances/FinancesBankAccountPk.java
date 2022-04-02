@@ -14,10 +14,10 @@ import java.io.Serializable;
  */
 @Embeddable
 public class FinancesBankAccountPk implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "CTA_BCO", length = 20, nullable = false, updatable = false)
+    @Column(name = "cta_bco", length = 20, nullable = false, updatable = false)
     @Length(max = 20)
     private String accountNumber;
 

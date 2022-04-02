@@ -25,28 +25,28 @@ import javax.persistence.*;
 @Entity
 @org.hibernate.annotations.Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@javax.persistence.Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "RESPONSABLECOMPPNL")
+@javax.persistence.Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "responsablecomppnl")
 public class Responsible {
 
     @Id
-    @Column(name = "IDRESPONSABLECOMPPNL", nullable = false)
+    @Column(name = "idresponsablecomppnl", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Responsible.tableGenerator")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCONTRATOPUESTO")
+    @JoinColumn(name = "idcontratopuesto")
     private JobContract responsible;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO")
+    @JoinColumn(name = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private Long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 

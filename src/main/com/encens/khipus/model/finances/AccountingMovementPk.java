@@ -12,13 +12,13 @@ import java.io.Serializable;
  */
 @Embeddable
 public class AccountingMovementPk implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "TIPO_COMPRO", nullable = false, updatable = false)
+    @Column(name = "tipo_compro", nullable = false, updatable = false)
     private String voucherType;
 
-    @Column(name = "NO_COMPRO", nullable = false, updatable = false)
+    @Column(name = "no_compro", nullable = false, updatable = false)
     private String voucherNumber;
 
     public AccountingMovementPk() {

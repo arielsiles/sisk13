@@ -187,126 +187,126 @@ import java.util.Date;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "PLANILLAAGUINALDO",
+        pkColumnValue = "planillaaguinaldo",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "PLANILLAAGUINALDO")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "planillaaguinaldo")
 public class ChristmasPayroll implements GenericPayroll {
 
     @Id
-    @Column(name = "IDPLANILLAAGUINALDO", nullable = false)
+    @Column(name = "idplanillaaguinaldo", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ChristmasPayroll.tableGenerator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @NotNull
-    @JoinColumn(name = "IDEMPLEADO", referencedColumnName = "idempleado", nullable = false, updatable = false)
+    @JoinColumn(name = "idempleado", referencedColumnName = "idempleado", nullable = false, updatable = false)
     private Employee employee;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "FECHAINICIOCONTRATO")
+    @Column(name = "fechainiciocontrato")
     private Date contractInitDate;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "FECHAFINCONTRATO")
+    @Column(name = "fechafincontrato")
     private Date contractEndDate;
 
-    @Column(name = "DIASTRABAJADOS", precision = 13, scale = 2)
+    @Column(name = "diastrabajados", precision = 13, scale = 2)
     private BigDecimal workedDays;
 
-    @Column(name = "TOTALGANADOSEPTIEMBRE", precision = 13, scale = 2)
+    @Column(name = "totalganadoseptiembre", precision = 13, scale = 2)
     private BigDecimal septemberTotalIncome;
 
-    @Column(name = "TOTALGANADOOCTUBRE", precision = 13, scale = 2)
+    @Column(name = "totalganadooctubre", precision = 13, scale = 2)
     private BigDecimal octoberTotalIncome;
 
-    @Column(name = "TOTALGANADONOVIEMBRE", precision = 13, scale = 2)
+    @Column(name = "totalganadonoviembre", precision = 13, scale = 2)
     private BigDecimal novemberTotalIncome;
 
-    @Column(name = "SUELDO", nullable = false, precision = 13, scale = 2)
+    @Column(name = "sueldo", nullable = false, precision = 13, scale = 2)
     @NotNull
     private BigDecimal salary;
 
-    @Column(name = "SUELDOPROMEDIO", precision = 13, scale = 2)
+    @Column(name = "sueldopromedio", precision = 13, scale = 2)
     private BigDecimal averageSalary;
 
-    @Column(name = "SUELDOCOTIZABLE", precision = 13, scale = 2)
+    @Column(name = "sueldocotizable", precision = 13, scale = 2)
     private BigDecimal contributableSalary;
 
-    @Column(name = "LIQUIDOPAGABLE", precision = 13, scale = 2)
+    @Column(name = "liquidopagable", precision = 13, scale = 2)
     private BigDecimal liquid;
 
-    @Column(name = "CUENTABANCARIA", length = 255)
+    @Column(name = "cuentabancaria", length = 255)
     @Length(max = 255)
     private String bankAccount;
 
-    @Column(name = "MONEDACTABANCARIA", length = 100)
+    @Column(name = "monedactabancaria", length = 100)
     @Length(max = 100)
     private String bankAccountCurrency;
 
-    @Column(name = "CODIGOCLIENTE", length = 150)
+    @Column(name = "codigocliente", length = 150)
     @Length(max = 150)
     private String clientCode;
 
-    @Column(name = "AREA")
+    @Column(name = "area")
     private String area;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPLANILLAGENERADA", referencedColumnName = "idplanillagenerada", nullable = false, updatable = false)
+    @JoinColumn(name = "idplanillagenerada", referencedColumnName = "idplanillagenerada", nullable = false, updatable = false)
     @NotNull
     private GeneratedPayroll generatedPayroll;
 
-    @Column(name = "IDPLANILLAGENERADA", updatable = false, insertable = false)
+    @Column(name = "idplanillagenerada", updatable = false, insertable = false)
     private Long generatedPayrollId;
 
-    @Column(name = "REGISTROCONTABLE")
+    @Column(name = "registrocontable")
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean hasAccountingRecord = Boolean.FALSE;
 
-    @Column(name = "PAGOACTIVO")
+    @Column(name = "pagoactivo")
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean hasActivePayment = Boolean.FALSE;
 
-    @Column(name = "ACTIVOGENPLANFIS")
+    @Column(name = "activogenplanfis")
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean activeForTaxPayrollGeneration = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idunidadnegocio", referencedColumnName = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @NotNull
     @JoinColumns({
-            @JoinColumn(name = "NUMEROCOMPANIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false, nullable = false),
-            @JoinColumn(name = "CODIGOCENCOS", referencedColumnName = "COD_CC", updatable = false, insertable = false, nullable = false)
+            @JoinColumn(name = "numerocompania", referencedColumnName = "no_cia", updatable = false, insertable = false, nullable = false),
+            @JoinColumn(name = "codigocencos", referencedColumnName = "cod_cc", updatable = false, insertable = false, nullable = false)
     })
     private CostCenter costCenter;
 
-    @Column(name = "CODIGOCENCOS", length = 6)
+    @Column(name = "codigocencos", length = 6)
     @Length(max = 6)
     private String costCenterCode;
 
-    @Column(name = "NUMEROCOMPANIA")
+    @Column(name = "numerocompania")
     @Length(max = 2)
     private String companyNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCARGO", referencedColumnName = "idcargo", nullable = false)
+    @JoinColumn(name = "idcargo", referencedColumnName = "idcargo", nullable = false)
     private Charge charge;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCATEGORIAPUESTO", referencedColumnName = "idcategoriapuesto", nullable = false)
+    @JoinColumn(name = "idcategoriapuesto", referencedColumnName = "idcategoriapuesto", nullable = false)
     private JobCategory jobCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", referencedColumnName = "idcompania", nullable = false, updatable = false)
+    @JoinColumn(name = "idcompania", referencedColumnName = "idcompania", nullable = false, updatable = false)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
 

@@ -16,23 +16,23 @@ import javax.persistence.*;
 )
 
 @Entity
-@Table(name = "PERSONAS", schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "personas", schema = Constants.CASHBOX_SCHEMA)
 public class ClientPerson {
 
     @Id
-    @Column(name = "PI_ID", nullable = false, updatable = false)
+    @Column(name = "pi_id", nullable = false, updatable = false)
     private String id;
 
-    @Column(name = "NRO_DOC", nullable = false)
+    @Column(name = "nro_doc", nullable = false)
     private String documentNumber;
 
-    @Column(name = "AP", nullable = false)
+    @Column(name = "ap", nullable = false)
     private String lastName;
 
-    @Column(name = "AM", nullable = false)
+    @Column(name = "am", nullable = false)
     private String maidenName;
 
-    @Column(name = "NOM", nullable = false)
+    @Column(name = "nom", nullable = false)
     private String name;
 
 

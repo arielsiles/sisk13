@@ -42,74 +42,74 @@ public class Voucher implements BaseModel{
 
     //@GeneratedValue(strategy = GenerationType.TABLE, generator = "Voucher.tableGenerator")
     @Id
-    @Column(name = "ID_TMPENC", nullable = false)
+    @Column(name = "id_tmpenc", nullable = false)
     private Long id;
 
-    @Column(name = "NO_TRANS", nullable = true, length = 10)
+    @Column(name = "no_trans", nullable = true, length = 10)
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "NO_CIA", updatable = false, length = 20)
+    @Column(name = "no_cia", updatable = false, length = 20)
     @Length(max = 20)
     private String companyNumber = "01";
 
-    @Column(name = "FORMULARIO", updatable = true, length = 30)
+    @Column(name = "formulario", updatable = true, length = 30)
     @Length(max = 30)
     private String form;
 
-    @Column(name = "TIPO_DOC", updatable = true)
+    @Column(name = "tipo_doc", updatable = true)
     private String documentType = "TR";
 
     /*@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipo_doc", referencedColumnName = "nombre", nullable = true)
     private DocType docType;*/
 
-    @Column(name = "NO_DOC", length = 20)
+    @Column(name = "no_doc", length = 20)
     @Length(max = 20)
     private String documentNumber;
 
-    @Column(name = "FAC")
+    @Column(name = "fac")
     private Integer invoiceNumber;
 
-    @Column(name = "CTA_BCO", updatable = true, length = 20)
+    @Column(name = "cta_bco", updatable = true, length = 20)
     @Length(max = 20)
     private String bankAccountCode;
 
-    @Column(name = "BENEFICIARIO", updatable = true, length = 100)
+    @Column(name = "beneficiario", updatable = true, length = 100)
     @Length(max = 100)
     private String employeeName;
 
-    @Column(name = "PROCEDENCIA", updatable = true, length = 3)
+    @Column(name = "procedencia", updatable = true, length = 3)
     @Length(max = 3)
     private String source;
 
-    @Column(name = "MONTO", precision = 16, scale = 2, updatable = true)
+    @Column(name = "monto", precision = 16, scale = 2, updatable = true)
     private BigDecimal amount;
 
-    @Column(name = "MONEDA", updatable = true)
+    @Column(name = "moneda", updatable = true)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "TC", precision = 10, scale = 6, updatable = true)
+    @Column(name = "tc", precision = 10, scale = 6, updatable = true)
     private BigDecimal exchangeRateAmount;
 
-    @Column(name = "DESCRI", updatable = true, length = 1000)
+    @Column(name = "descri", updatable = true, length = 1000)
     @Length(max = 1000)
     private String description;
 
-    @Column(name = "FECHA", updatable = true)
+    @Column(name = "fecha", updatable = true)
     @Temporal(TemporalType.DATE)
     private Date date = new Date();
 
-    @Column(name = "ESTADO", updatable = true, length = 3)
+    @Column(name = "estado", updatable = true, length = 3)
     @Length(max = 3)
     private String state = "PEN";
 
-    @Column(name = "NO_USR", updatable = true, length = 4)
+    @Column(name = "no_usr", updatable = true, length = 4)
     @Length(max = 4)
     private String userNumber;
 
-    @Column(name = "GLOSA", updatable = true, length = 1000)
+    @Column(name = "glosa", updatable = true, length = 1000)
     @Length(max = 1000)
     private String gloss;
 
@@ -120,48 +120,48 @@ public class Voucher implements BaseModel{
     /* the cash account*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashAccount;
 
     /* the cash account code*/
-    @Column(name = "CUENTA", length = 20)
+    @Column(name = "cuenta", length = 20)
     @Length(max = 20)
     private String cashAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_PROV", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_prov", updatable = false, insertable = false)
     })
     private Provider provider;
 
-    @Column(name = "COD_PROV", length = 6)
+    @Column(name = "cod_prov", length = 6)
     @Length(max = 6)
     private String providerCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COD_ENTI", referencedColumnName = "COD_ENTI")
+    @JoinColumn(name = "cod_enti", referencedColumnName = "cod_enti")
     private FinancesEntity financesEntity;
 
-    @Column(name = "FECHA_VEN")
+    @Column(name = "fecha_ven")
     @Temporal(TemporalType.DATE)
     private Date expirationDate;
 
-    @Column(name = "ENTREGADO_A", length = 660)
+    @Column(name = "entregado_a", length = 660)
     @Length(max = 660)
     private String receiver;
 
-    @Column(name = "OBSERVACION", updatable = true, length = 1000)
+    @Column(name = "observacion", updatable = true, length = 1000)
     @Length(max = 1000)
     private String observation;
 
-    @Column(name = "NO_TRANS_REL", length = 10)
+    @Column(name = "no_trans_rel", length = 10)
     @Length(max = 10)
     private String relatedTransactionNumber;
 
-    @Column(name = "AGREGAR_CTA_PROV", updatable = true)
+    @Column(name = "agregar_cta_prov", updatable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME, parameters = {
             @Parameter(
                     name = com.encens.khipus.model.usertype.StringBooleanUserType.TRUE_PARAMETER,
@@ -174,11 +174,11 @@ public class Voucher implements BaseModel{
     })
     private Boolean addProviderAccount = true;
 
-    @Column(name = "SEDE_PAGO_CHQ", length = 8)
+    @Column(name = "sede_pago_chq", length = 8)
     @Length(max = 8)
     private String checkDestinationExecutorUnitCode;
 
-    @Column(name = "PENDIENTE_REGISTRO", length = 2)
+    @Column(name = "pendiente_registro", length = 2)
     @Length(max = 2)
     private String pendantRegistry;
 

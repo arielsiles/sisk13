@@ -39,67 +39,67 @@ import java.math.BigDecimal;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "DISTRIBUCIONGASTOCOBROFON",
+        pkColumnValue = "distribuciongastocobrofon",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(schema = Constants.KHIPUS_SCHEMA, name = "DISTRIBUCIONGASTOCOBROFON")
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "distribuciongastocobrofon")
 public class RotatoryFundCollectionSpendDistribution implements BaseModel {
 
     @Id
-    @Column(name = "IDDISTRIBUCIONGASTOCOBROFON", nullable = false, scale = 24)
+    @Column(name = "iddistribuciongastocobrofon", nullable = false, scale = 24)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RotatoryFundCollectionSpendDistribution.tableGenerator")
     private Long id;
 
-    @Column(name = "MONTO", precision = 12, scale = 2)
+    @Column(name = "monto", precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "PORCENTAJE", precision = 12, scale = 2)
+    @Column(name = "porcentaje", precision = 12, scale = 2)
     private BigDecimal percentage;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NUMEROCOMPANIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CODIGOCENCOS", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "numerocompania", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "codigocencos", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
-    @Column(name = "CODIGOCENCOS", length = 6)
+    @Column(name = "codigocencos", length = 6)
     @Length(max = 6)
     private String costCenterCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idunidadnegocio", referencedColumnName = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
-    @Column(name = "CUENTA", length = 20)
+    @Column(name = "cuenta", length = 20)
     @Length(max = 20)
     private String accountCode;
 
     @ManyToOne(optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NUMEROCOMPANIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "numerocompania", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOBRO", referencedColumnName = "IDCOBRO")
+    @JoinColumn(name = "idcobro", referencedColumnName = "idcobro")
     private RotatoryFundCollection rotatoryFundCollection;
 
-    @Column(name = "NUMEROCOMPANIA", updatable = false)
+    @Column(name = "numerocompania", updatable = false)
     @Length(max = 2)
     private String companyNumber;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

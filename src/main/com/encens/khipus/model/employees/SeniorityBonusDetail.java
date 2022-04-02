@@ -16,36 +16,36 @@ import java.math.BigDecimal;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "DetalleBonoAntiguedad",
+        pkColumnValue = "detallebonoantiguedad",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "DETALLEBONOANTIGUEDAD")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "detallebonoantiguedad")
 public class SeniorityBonusDetail implements BaseModel {
     @Id
-    @Column(name = "IDDETALLEBONOANTIGUEDAD", nullable = false)
+    @Column(name = "iddetallebonoantiguedad", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "SeniorityBonusDetail.tableGenerator")
     private Long id;
 
-    @Column(name = "ANIOINICIO", nullable = false)
+    @Column(name = "anioinicio", nullable = false)
     private Integer startYear;
 
-    @Column(name = "ANIOFIN")
+    @Column(name = "aniofin")
     private Integer endYear;
 
-    @Column(name = "PORCENTAJE", nullable = false, precision = 13, scale = 2)
+    @Column(name = "porcentaje", nullable = false, precision = 13, scale = 2)
     private BigDecimal percent;
 
-    @Column(name = "MONTO", nullable = false, precision = 13, scale = 2)
+    @Column(name = "monto", nullable = false, precision = 13, scale = 2)
     private BigDecimal amount;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

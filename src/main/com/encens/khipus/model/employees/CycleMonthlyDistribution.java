@@ -18,39 +18,39 @@ import javax.persistence.*;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "DISTMESCICLO",
+        pkColumnValue = "distmesciclo",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(name = "DISTMESCICLO")
+@Table(name = "distmesciclo")
 public class CycleMonthlyDistribution implements BaseModel {
     @Id
-    @Column(name = "IDDISTMESCICLO", nullable = false)
+    @Column(name = "iddistmesciclo", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "CycleMonthlyDistribution.tableGenerator")
     private Long id;
 
-    @Column(name = "DIASLABORALES")
+    @Column(name = "diaslaborales")
     @NotNull
     private Integer laboralDays;
 
-    @Column(name = "MES", nullable = false)
+    @Column(name = "mes", nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private Month month;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCICLO", nullable = false)
+    @JoinColumn(name = "idciclo", nullable = false)
     @NotNull
     private Cycle cycle;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

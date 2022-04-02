@@ -17,7 +17,7 @@ import java.math.BigDecimal;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "TasaIVA",
+        pkColumnValue = "tasaiva",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @NamedQueries({
         @NamedQuery(name = "IVARate.findByActiveIVARATE",
@@ -28,27 +28,27 @@ import java.math.BigDecimal;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "TASAIVA")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "tasaiva")
 public class IVARate implements BaseModel {
 
     @Id
-    @Column(name = "IDTASAIVA", nullable = false)
+    @Column(name = "idtasaiva", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "IVARate.tableGenerator")
     private Long id;
 
-    @Column(name = "TASA", nullable = false, precision = 13, scale = 2)
+    @Column(name = "tasa", nullable = false, precision = 13, scale = 2)
     private BigDecimal rate;
 
-    @Column(name = "ACTIVO", nullable = false)
+    @Column(name = "activo", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean active;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

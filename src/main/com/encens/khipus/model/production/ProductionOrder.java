@@ -3,7 +3,6 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.finances.Voucher;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 
@@ -20,88 +19,88 @@ import java.util.List;
         @NamedQuery(name = "ProductionOrder.findById", query = "Select p from ProductionOrder p where p.id=:id"),
 
         @NamedQuery(name = "ProductionOrder.findProductionOrdersByProductItem",
-                   query = "Select productionOrder " +
-                           "from ProductionOrder productionOrder " +
-                           "left join productionOrder.productionPlanning productionPlanning " +
-                           "left join productionOrder.productComposition.processedProduct.productItem productItem " +
-                           "where productionPlanning.date between :startDate and :endDate " +
-                           "and productItem.productItemCode =:productItemCode "),
+                query = "Select productionOrder " +
+                        "from ProductionOrder productionOrder " +
+                        "left join productionOrder.productionPlanning productionPlanning " +
+                        "left join productionOrder.productComposition.processedProduct.productItem productItem " +
+                        "where productionPlanning.date between :startDate and :endDate " +
+                        "and productItem.productItemCode =:productItemCode "),
 
         @NamedQuery(name = "ProductionOrder.findProductionOrders",
-                   query = "Select productionOrder " +
-                           "from ProductionOrder productionOrder " +
-                           "left join productionOrder.productionPlanning productionPlanning " +
-                           "where productionPlanning.date between :startDate and :endDate ")
+                query = "Select productionOrder " +
+                        "from ProductionOrder productionOrder " +
+                        "left join productionOrder.productionPlanning productionPlanning " +
+                        "where productionPlanning.date between :startDate and :endDate ")
 
 
 })
 
 @TableGenerator(name = "ProductionOrder_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "ORDENPRODUCCION",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "ordenproduccion",
         allocationSize = 10)
 
 @Entity
-@Table(name = "ORDENPRODUCCION", uniqueConstraints = @UniqueConstraint(columnNames = {"CODIGO", "IDCOMPANIA"}))
+@Table(name = "ordenproduccion", uniqueConstraints = @UniqueConstraint(columnNames = {"codigo", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class ProductionOrder implements BaseModel {
 
     @Id
-    @Column(name = "IDORDENPRODUCCION", nullable = false)
+    @Column(name = "idordenproduccion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionOrder_Generator")
     private Long id;
 
-    @Column(name = "CODIGO", length = 50, nullable = false)
+    @Column(name = "codigo", length = 50, nullable = false)
     private String code;
 
-    @Column(name = "ESTADOORDEN", length = 20, nullable = true)
+    @Column(name = "estadoorden", length = 20, nullable = true)
     @Enumerated(EnumType.STRING)
     private ProductionPlanningState estateOrder = ProductionPlanningState.PENDING;
 
-    @Column(name = "NO_VALE",nullable = true)
+    @Column(name = "no_vale",nullable = true)
     private String numberVoucher;
 
-    @Column(name = "NO_TRANS",nullable = true)
+    @Column(name = "no_trans",nullable = true)
     private String numberTransaction;
 
-    @Column(name = "CANTIDADESPERADA", nullable = false, columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "cantidadesperada", nullable = false, columnDefinition = "DECIMAL(24,0)")
     private Double expendAmount;
 
-    @Column(name = "PESOCONTENEDOR", nullable = false, columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "pesocontenedor", nullable = false, columnDefinition = "DECIMAL(24,0)")
     private Double containerWeight;
 
-    @Column(name = "CANTIDADPRODUCIDA", nullable = false, columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "cantidadproducida", nullable = false, columnDefinition = "DECIMAL(24,0)")
     private Double producedAmount = 0.0;
 
-    @Column(name = "CANTIDADPRODUCIDARESPONSABLE", nullable = true, columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "cantidadproducidaresponsable", nullable = true, columnDefinition = "DECIMAL(24,0)")
     private Double producedAmountResponsible = 0.0;
 
-    @Column(name = "PRECIOTOTALMATERIAL", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "preciototalmaterial", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double totalPriceMaterial = 0.0;
 
-    @Column(name = "PORCENTAJEGRASA",nullable = true,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "porcentajegrasa",nullable = true,columnDefinition = "DECIMAL(16,2)")
     private Double greasePercentage = 0.0;
 
-    @Column(name = "PRECIOTOTALINSUMO", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "preciototalinsumo", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double totalPriceInput = 0.0;
 
-    @Column(name = "PRECIOTOTALMANOOBRA", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "preciototalmanoobra", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double totalPriceJourney = 0.0;
 
-    @Column(name = "TOTALCOSTOINDIRECTO", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "totalcostoindirecto", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double totalIndirectCosts = 0.0;
 
-    @Column(name = "COSTOTOALPRODUCCION", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "costotoalproduccion", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double totalCostProduction = 0.0;
 
 
-    @Column(name = "COSTOUNITARIO", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costounitario", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal unitCost = BigDecimal.ZERO;
 
-    @Column(name = "COSTINSUMOPRINCIPAL", nullable = true,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "costinsumoprincipal", nullable = true,columnDefinition = "DECIMAL(16,2)")
     private Double totalCostInputMain = 0.0;
 
     @Transient
@@ -119,11 +118,11 @@ public class ProductionOrder implements BaseModel {
     private Long voucherId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "IDPLANIFICACIONPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idplanificacionproduccion", nullable = false, updatable = false, insertable = true)
     private ProductionPlanning productionPlanning;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionOrder", cascade = CascadeType.ALL)
@@ -143,11 +142,11 @@ public class ProductionOrder implements BaseModel {
     private List<OrderInput> orderInputs = new ArrayList<OrderInput>();
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "IDCOMPOSICIONPRODUCTO", nullable = false, updatable = true, insertable = true)
+    @JoinColumn(name = "idcomposicionproducto", nullable = false, updatable = true, insertable = true)
     private ProductComposition productComposition;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "PRODUCTOPADRE", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "productopadre", nullable = true, updatable = false, insertable = true)
     private ProductionOrder productMain;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionOrder", cascade = CascadeType.ALL)
@@ -345,8 +344,8 @@ public class ProductionOrder implements BaseModel {
 
     public List<IndirectCosts> getIndirectCostses() {
 
-            if(indirectCostses == null)
-                return new ArrayList<IndirectCosts>();
+        if(indirectCostses == null)
+            return new ArrayList<IndirectCosts>();
 
         return indirectCostses;
     }
@@ -354,7 +353,7 @@ public class ProductionOrder implements BaseModel {
     public void setIndirectCostses(List<IndirectCosts> indirectCostses) {
         this.indirectCostses.clear();
         if(indirectCostses != null)
-        this.indirectCostses.addAll(indirectCostses);
+            this.indirectCostses.addAll(indirectCostses);
     }
 
     public Double getGreasePercentage() {

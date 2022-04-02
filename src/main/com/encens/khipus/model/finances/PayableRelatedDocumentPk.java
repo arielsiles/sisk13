@@ -13,15 +13,15 @@ import java.io.Serializable;
 @Embeddable
 public class PayableRelatedDocumentPk implements Serializable {
 
-    @Column(name = "NO_CIA", updatable = false, length = 2)
+    @Column(name = "no_cia", updatable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", updatable = false, length = 10)
+    @Column(name = "no_trans", updatable = false, length = 10)
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "NO_CONCI", updatable = false, length = 10)
+    @Column(name = "no_conci", updatable = false, length = 10)
     @Length(max = 10)
     private String conciliationNumber;
 

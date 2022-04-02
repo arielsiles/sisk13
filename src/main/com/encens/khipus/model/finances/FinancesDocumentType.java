@@ -23,29 +23,29 @@ public class FinancesDocumentType implements BaseModel {
     @EmbeddedId
     private FinancesDocumentTypePk id = new FinancesDocumentTypePk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "TIPO_DOC", nullable = false, updatable = false, insertable = false)
+    @Column(name = "tipo_doc", nullable = false, updatable = false, insertable = false)
     @Length(max = 3)
     private String documentType;
 
-    @Column(name = "DESCRI", length = 100)
+    @Column(name = "descri", length = 100)
     private String description;
 
-    @Column(name = "TIPO_MOV", length = 1)
+    @Column(name = "tipo_mov", length = 1)
     @Enumerated(EnumType.STRING)
     private FinanceMovementType movementType;
 
-    @Column(name = "TIPO_COMPRO", length = 2)
+    @Column(name = "tipo_compro", length = 2)
     private String voucherType;
 
-    @Column(name = "DOSIFICADOR", nullable = false)
+    @Column(name = "dosificador", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean dispenser;
 
-    @Column(name = "ESTADO", length = 3)
+    @Column(name = "estado", length = 3)
     private String state;
 
     public FinancesDocumentTypePk getId() {

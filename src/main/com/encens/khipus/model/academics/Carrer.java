@@ -17,21 +17,21 @@ import javax.persistence.*;
 )
 
 @Entity
-@Table(name = "PLANES_ESTUDIOS", schema = Constants.ACADEMIC_SCHEMA)
+@Table(name = "planes_estudios", schema = Constants.ACADEMIC_SCHEMA)
 public class Carrer {
 
     @Id
-    @Column(name = "PLAN_ESTUDIO", nullable = false, updatable = false)
+    @Column(name = "plan_estudio", nullable = false, updatable = false)
     private String studyPlan;
 
-    @Column(name = "DESC_PLAN", nullable = false, updatable = false, insertable = false)
+    @Column(name = "desc_plan", nullable = false, updatable = false, insertable = false)
     private String name;
 
-    @Column(name = "UNIDAD", nullable = false)
+    @Column(name = "unidad", nullable = false)
     private Integer facultyId;
 
 
-    @Column(name = "UNIDAD_ACAD_ADM", nullable = false)
+    @Column(name = "unidad_acad_adm", nullable = false)
     private Integer executorUnitId;
 
 

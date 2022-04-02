@@ -73,11 +73,11 @@ public class DiscountComment implements BaseModel {
     private FixedAssetVoucher fixedAssetVoucher;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_COM_ENCOC", referencedColumnName = "ID_COM_ENCOC")
+    @JoinColumn(name = "id_com_encoc", referencedColumnName = "id_com_encoc")
     private PurchaseOrder purchaseOrder;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDFONDOROTATORIO", referencedColumnName = "IDFONDOROTATORIO")
+    @JoinColumn(name = "idfondorotatorio", referencedColumnName = "idfondorotatorio")
     private RotatoryFund rotatoryFund;
 
     @ManyToOne

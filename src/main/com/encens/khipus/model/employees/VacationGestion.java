@@ -40,37 +40,37 @@ import java.util.List;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "GESTIONVACACION",
+        pkColumnValue = "gestionvacacion",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(name = "GESTIONVACACION", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "gestionvacacion", schema = Constants.KHIPUS_SCHEMA)
 public class VacationGestion implements BaseModel {
 
     @Id
-    @Column(name = "IDGESTIONVACACION", nullable = false)
+    @Column(name = "idgestionvacacion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "VacationGestion.tableGenerator")
     private Long id;
 
-    @Column(name = "DIASLIBRES", nullable = false)
+    @Column(name = "diaslibres", nullable = false)
     @NotNull
     private Integer daysOff;
 
-    @Column(name = "DIASUSADOS", nullable = false)
+    @Column(name = "diasusados", nullable = false)
     @NotNull
     private Integer daysUsed;
 
-    @Column(name = "DIASVACACION", nullable = false)
+    @Column(name = "diasvacacion", nullable = false)
     @NotNull
     private Integer vacationDays;
 
-    @Column(name = "GESTION", nullable = false)
+    @Column(name = "gestion", nullable = false)
     @NotNull
     private Integer gestion;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPLANVACACION", nullable = false)
+    @JoinColumn(name = "idplanvacacion", nullable = false)
     @NotNull
     private VacationPlanning vacationPlanning;
 
@@ -79,11 +79,11 @@ public class VacationGestion implements BaseModel {
     private List<Vacation> vacationList = new ArrayList<Vacation>(0);
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

@@ -23,19 +23,19 @@ import javax.persistence.*;
 })
 
 @Entity
-@Table(name = "GESTIONPLANILLAADM", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "gestionplanillaadm", schema = Constants.KHIPUS_SCHEMA)
 public class AdministrativeGestionPayroll implements BaseModel {
     @Id
-    @Column(name = "IDGESTIONPLANILLAADM", nullable = false)
+    @Column(name = "idgestionplanillaadm", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "AdministrativeGestionPayroll.tableGenerator")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCONFPLANILLAFISCAL", insertable = true, updatable = false)
+    @JoinColumn(name = "idconfplanillafiscal", insertable = true, updatable = false)
     private ConfigurationTaxPayroll configuration;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDGESTIONPLANILLA", insertable = true, updatable = false)
+    @JoinColumn(name = "idgestionplanilla", insertable = true, updatable = false)
     private GestionPayroll administrativeGestionPayroll;
 
     public Long getId() {

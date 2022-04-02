@@ -10,10 +10,10 @@ import java.util.List;
 
 @NamedQueries({
         @NamedQuery(name = "CollectionForm.calculateWeightedAmountOnDateByMetaProduct",
-                    query = "select sum(collectionRecord.weightedAmount) " +
-                            "from CollectionRecord collectionRecord " +
-                            "where collectionRecord.collectionForm.date = :date " +
-                            "and collectionRecord.collectionForm.metaProduct = :metaProduct"),
+                query = "select sum(collectionRecord.weightedAmount) " +
+                        "from CollectionRecord collectionRecord " +
+                        "where collectionRecord.collectionForm.date = :date " +
+                        "and collectionRecord.collectionForm.metaProduct = :metaProduct"),
 
         @NamedQuery(name = "CollectionForm.calculateWeightedAmountBetweebDateByMetaProduct",
                 query = " select sum(collectionRecord.weightedAmount) " +
@@ -34,71 +34,71 @@ import java.util.List;
                         "and productionOrder.productionPlanning.state <> com.encens.khipus.model.production.ProductionPlanningState.PENDING " +
                         "and inputProductionVoucher.metaProduct = :metaProduct "),
         @NamedQuery(name = "CollectionForm.calculateWeightedAmountToDateByMetaProduct",
-                    query = "select sum(collectionRecord.weightedAmount) " +
-                            "from CollectionRecord collectionRecord " +
-                            "where collectionRecord.collectionForm.date <= :date " +
-                            "and collectionRecord.collectionForm.metaProduct = :metaProduct"),
+                query = "select sum(collectionRecord.weightedAmount) " +
+                        "from CollectionRecord collectionRecord " +
+                        "where collectionRecord.collectionForm.date <= :date " +
+                        "and collectionRecord.collectionForm.metaProduct = :metaProduct"),
         @NamedQuery(name = "CollectionForm.calculateUsedAmountToDateByMetaProduct",
-                    query = "select sum(inputProductionVoucher.amount) " +
-                            "from ProductionOrder productionOrder " +
-                            "left join productionOrder.inputProductionVoucherList inputProductionVoucher " +
-                            "where productionOrder.productionPlanning.date <= :date " +
-                            "and productionOrder.productionPlanning.state <> com.encens.khipus.model.production.ProductionPlanningState.PENDING " +
-                            "and inputProductionVoucher.metaProduct = :metaProduct"),
+                query = "select sum(inputProductionVoucher.amount) " +
+                        "from ProductionOrder productionOrder " +
+                        "left join productionOrder.inputProductionVoucherList inputProductionVoucher " +
+                        "where productionOrder.productionPlanning.date <= :date " +
+                        "and productionOrder.productionPlanning.state <> com.encens.khipus.model.production.ProductionPlanningState.PENDING " +
+                        "and inputProductionVoucher.metaProduct = :metaProduct"),
         @NamedQuery(name = "CollectionForm.calculateCollectedAmountOnDateByMetaProduct",
-                    query = "select collectedRawMaterial.rawMaterialCollectionSession.productiveZone.id, sum(collectedRawMaterial.amount) " +
-                            "from CollectedRawMaterial collectedRawMaterial " +
-                            "where collectedRawMaterial.rawMaterialCollectionSession.date = :date " +
-                            "and collectedRawMaterial.rawMaterialCollectionSession.metaProduct = :metaProduct " +
-                            "group by collectedRawMaterial.rawMaterialCollectionSession.productiveZone")
+                query = "select collectedRawMaterial.rawMaterialCollectionSession.productiveZone.id, sum(collectedRawMaterial.amount) " +
+                        "from CollectedRawMaterial collectedRawMaterial " +
+                        "where collectedRawMaterial.rawMaterialCollectionSession.date = :date " +
+                        "and collectedRawMaterial.rawMaterialCollectionSession.metaProduct = :metaProduct " +
+                        "group by collectedRawMaterial.rawMaterialCollectionSession.productiveZone")
 })
 
 
 @TableGenerator(name = "CollectionForm_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PLANILLAACOPIO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "planillaacopio",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "PLANILLAACOPIO", uniqueConstraints = @UniqueConstraint(columnNames = {"IDCOMPANIA", "FECHA"}))
+@Table(name = "planillaacopio", uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "fecha"}))
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class CollectionForm implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDPLANILLAACOPIO", nullable = false)
+    @Column(name = "idplanillaacopio", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "CollectionForm_Generator")
     private Long id;
 
-    @Column(name = "FECHA",columnDefinition = "DATE", nullable = false)
+    @Column(name = "fecha",columnDefinition = "DATE", nullable = false)
     private Date date;
 
-    @Column(name = "ESTADO", nullable = true, length = 3)
+    @Column(name = "estado", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
     private CollectionFormState state = CollectionFormState.PEN;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     @OneToMany(mappedBy = "collectionForm", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private List<CollectionRecord> collectionRecordList = new ArrayList<CollectionRecord>();
 
-    @Column(name = "PORCENTAJEGRASA",nullable = true,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "porcentajegrasa",nullable = true,columnDefinition = "DECIMAL(16,2)")
     private Double greasePercentage = 0.0;
 
-    @Column(name = "TOTALPESADO",nullable = true,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "totalpesado",nullable = true,columnDefinition = "DECIMAL(16,2)")
     private Double totalWeighed = 0.0;
 
     @OneToOne
-    @JoinColumn(name = "IDMETAPRODUCTOPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
     private MetaProduct metaProduct;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

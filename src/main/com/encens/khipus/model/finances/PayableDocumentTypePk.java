@@ -14,11 +14,11 @@ import java.io.Serializable;
 @Embeddable
 public class PayableDocumentTypePk implements Serializable {
 
-    @Column(name = "NO_CIA", length = 2, nullable = false, updatable = false)
+    @Column(name = "no_cia", length = 2, nullable = false, updatable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "TIPO_DOC", length = 3, nullable = false, updatable = false)
+    @Column(name = "tipo_doc", length = 3, nullable = false, updatable = false)
     @Length(max = 3)
     @NotNull
     private String documentType;

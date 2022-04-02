@@ -13,11 +13,11 @@ import java.io.Serializable;
  * To change this template use File | Settings | File Templates.
  */
 public class ArticleOrderPK implements Serializable {
-    @Column(name = "ID_CUENTA", nullable = false, length = 10)
+    @Column(name = "id_cuenta", nullable = false, length = 10)
     @Length(max = 10)
     private Long idAccount;
 
-    @Column(name = "ID", nullable = false, length = 20,columnDefinition = "VARCHAR2(20 BYTE)")
+    @Column(name = "id", nullable = false, length = 20,columnDefinition = "VARCHAR2(20 BYTE)")
     @Length(max = 20)
     private String orderID;
 

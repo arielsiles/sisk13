@@ -19,50 +19,50 @@ import java.util.Date;
 )
 
 @TableGenerator(name = "SalaryMovementProducer_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "MOVIMIENTOSALARIOPRODUCTOR",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "movimientosalarioproductor",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "MOVIMIENTOSALARIOPRODUCTOR", uniqueConstraints = @UniqueConstraint(columnNames = {"IDMOVIMIENTOSALARIOPRODUCTOR", "IDCOMPANIA"}))
+@Table(name = "movimientosalarioproductor", uniqueConstraints = @UniqueConstraint(columnNames = {"idmovimientosalarioproductor", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class SalaryMovementProducer implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDMOVIMIENTOSALARIOPRODUCTOR",nullable = false)
+    @Column(name = "idmovimientosalarioproductor",nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "SalaryMovementProducer_Generator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "IDPRODUCTORMATERIAPRIMA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductormateriaprima", nullable = false, updatable = false, insertable = true)
     private RawMaterialProducer rawMaterialProducer;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTIPOMOVIMIENTOPRODUCTOR", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idtipomovimientoproductor", nullable = false, updatable = false, insertable = true)
     private TypeMovementProducer typeMovementProducer;
 
-    @Column(name = "DESCRIPCION",nullable = true)
+    @Column(name = "descripcion",nullable = true)
     private String description;
 
-    @Column(name = "FECHA", nullable = false, columnDefinition = "DATE")
+    @Column(name = "fecha", nullable = false, columnDefinition = "DATE")
     private Date date;
 
-    @Column(name = "VALOR",columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "valor",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double valor;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductionCollectionState state = ProductionCollectionState.PENDING;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDZONAPRODUCTIVA", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idzonaproductiva", nullable = true, updatable = false, insertable = true)
     private ProductiveZone productiveZone;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

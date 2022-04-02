@@ -219,7 +219,7 @@ public class JobCategory implements BaseModel {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean active;
 
-    @Column(name = "POSICION")
+    @Column(name = "posicion")
     private Integer position;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

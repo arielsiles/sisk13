@@ -6,9 +6,9 @@ import com.encens.khipus.model.BaseModel;
 import javax.persistence.*;
 
 @TableGenerator(name = "ProducerTax_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
         pkColumnValue = "impuestoproductor",
         allocationSize = 10)
 
@@ -25,7 +25,7 @@ public class ProducerTax implements BaseModel {
     private String formNumber;
 
     @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    @JoinColumn(name = "IDPRODUCTORMATERIAPRIMA", columnDefinition = "NUMBER(24,0)", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductormateriaprima", columnDefinition = "NUMBER(24,0)", nullable = false, updatable = false, insertable = true)
     private RawMaterialProducer rawMaterialProducerTax;
 
     @ManyToOne(cascade = {CascadeType.MERGE})

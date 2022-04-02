@@ -13,11 +13,11 @@ import java.io.Serializable;
 
 @Embeddable
 public class WarehouseVoucherPK implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", nullable = false, length = 10)
+    @Column(name = "no_trans", nullable = false, length = 10)
     @Length(max = 10)
     private String transactionNumber;
 

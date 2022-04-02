@@ -18,46 +18,46 @@ import javax.persistence.*;
  */
 
 @TableGenerator(name = "ConfigGroup_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "CONFIGRUPO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "configrupo",
         allocationSize = 10)
 
 @Entity
-@Table(name = "CONFIGRUPO")
+@Table(name = "configrupo")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class ConfigGroup implements BaseModel {
 
     @Id
-    @Column(name = "IDCONFIGRUPO", nullable = false)
+    @Column(name = "idconfigrupo", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ConfigGroup_Generator")
     private Long id;
 
-    @Column(name = "TIPO", nullable = true)
+    @Column(name = "tipo", nullable = true)
     private String type;
 
-    @Column(name = "COD_GRU", insertable = false, updatable = false, nullable = false)
+    @Column(name = "cod_gru", insertable = false, updatable = false, nullable = false)
     private String groupCode;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false, nullable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false, nullable = false)
     @Length(max = 2)
     private String companyNumber;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "COD_GRU", referencedColumnName = "COD_GRU")
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_gru", referencedColumnName = "cod_gru")
     })
     private Group group;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

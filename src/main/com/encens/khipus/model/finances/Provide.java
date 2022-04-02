@@ -30,59 +30,59 @@ import java.util.List;
 
 @Entity
 @EntityListeners({CompanyNumberListener.class})
-@Table(name = "articulo_por_proveedor", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = {@UniqueConstraint(columnNames = {"NO_CIA", "COD_ART", "COD_PROV"})})
+@Table(name = "articulo_por_proveedor", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = {@UniqueConstraint(columnNames = {"no_cia", "cod_art", "cod_prov"})})
 public class Provide implements BaseModel {
 
     @Id
-    @Column(name = "ID_ARTICULO_POR_PROVEEDOR", nullable = false)
+    @Column(name = "id_articulo_por_proveedor", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Provide.tableGenerator")
     private Long id;
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_ART", nullable = false, length = 6)
+    @Column(name = "cod_art", nullable = false, length = 6)
     @Length(max = 6)
     private String productItemCode;
 
-    @Column(name = "COD_PROV", nullable = false, length = 6)
+    @Column(name = "cod_prov", nullable = false, length = 6)
     @Length(max = 6)
     private String providerCode;
 
-    @Column(name = "PRECIO_GRUPO", nullable = false, precision = 12, scale = 6)
+    @Column(name = "precio_grupo", nullable = false, precision = 12, scale = 6)
     private BigDecimal groupAmount;
 
-    @Column(name = "ENTREGA", nullable = false)
+    @Column(name = "entrega", nullable = false)
     private Integer delivery = 1;
 
-    @Column(name = "COD_MED_MAY", nullable = true, length = 6)
+    @Column(name = "cod_med_may", nullable = true, length = 6)
     @Length(max = 6)
     private String groupMeasureCode;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ART", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_art", nullable = false, insertable = false, updatable = false)
     })
     private ProductItem productItem;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_PROV", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_prov", nullable = false, insertable = false, updatable = false)
     })
     private Provider provider;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_MED_MAY", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_med_may", nullable = false, updatable = false, insertable = false)
     })
     private MeasureUnit groupMeasureUnit;
 

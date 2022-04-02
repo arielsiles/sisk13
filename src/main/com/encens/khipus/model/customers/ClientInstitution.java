@@ -17,17 +17,17 @@ import javax.persistence.*;
 )
 
 @Entity
-@Table(name = "INSTITUCIONES", schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "instituciones", schema = Constants.CASHBOX_SCHEMA)
 public class ClientInstitution {
 
     @Id
-    @Column(name = "PI_ID", nullable = false, updatable = false)
+    @Column(name = "pi_id", nullable = false, updatable = false)
     private String id;
 
-    @Column(name = "NRO_DOC", nullable = false)
+    @Column(name = "nro_doc", nullable = false)
     private String documentNumber;
 
-    @Column(name = "RAZON_SOC", nullable = false)
+    @Column(name = "razon_soc", nullable = false)
     private String name;
 
 

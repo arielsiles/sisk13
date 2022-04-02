@@ -3,14 +3,11 @@ package com.encens.khipus.model.warehouse;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
-import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.util.Constants;
 import org.hibernate.validator.Length;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author
@@ -44,35 +41,35 @@ public class InitialInventory implements BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "InitialInventory.tableGenerator")
-    @Column(name = "IDINVINICIO", nullable = true)
+    @Column(name = "idinvinicio", nullable = true)
     private Long id;
 
-    @Column(name = "COD_ART")
+    @Column(name = "cod_art")
     private String productItemCode;
 
-    @Column(name = "NOMBRE")
+    @Column(name = "nombre")
     private String productItemName;
 
-    @Column(name = "CANTIDAD")
+    @Column(name = "cantidad")
     private BigDecimal quantity;
 
-    @Column(name = "ALM")
+    @Column(name = "alm")
     private String warehouseCode;
 
-    @Column(name = "COSTO_UNI")
+    @Column(name = "costo_uni")
     private BigDecimal unitCost;
 
-    @Column(name = "GESTION")
+    @Column(name = "gestion")
     private String year;
 
-    @Column(name = "NO_CIA")
+    @Column(name = "no_cia")
     @Length(max = 2)
     private String companyNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ART", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_art", nullable = false, insertable = false, updatable = false)
     })
     private ProductItem productItem;
 

@@ -37,41 +37,41 @@ public class CostCenter implements BaseModel {
     @EmbeddedId
     CostCenterPk id = new CostCenterPk();
 
-    @Column(name = "NO_CIA", updatable = false, insertable = false)
+    @Column(name = "no_cia", updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "COD_CC", updatable = false, insertable = false)
+    @Column(name = "cod_cc", updatable = false, insertable = false)
     private String code;
 
-    @Column(name = "DESCRI", length = 100, nullable = false)
+    @Column(name = "descri", length = 100, nullable = false)
     @NotNull
     @Length(max = 100)
     private String description;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     private CostCenterState state;
 
-    @Column(name = "GRU_CC", length = 6)
+    @Column(name = "gru_cc", length = 6)
     @Length(max = 6)
     private String groupCode;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "GRU_CC", referencedColumnName = "GRU_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "gru_cc", referencedColumnName = "gru_cc", updatable = false, insertable = false)
     })
     private CostCenterGroup costCenterGroup;
 
-    @Column(name = "TIPO", nullable = false)
+    @Column(name = "tipo", nullable = false)
     @Enumerated(EnumType.STRING)
     private CostCenterType type;
 
-    @Column(name = "CONS_EXCL", nullable = false)
+    @Column(name = "cons_excl", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean exclusiveConsumption = false;
 
-    @Column(name = "IND_MOV", nullable = false)
+    @Column(name = "ind_mov", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean hasMovement = false;
 

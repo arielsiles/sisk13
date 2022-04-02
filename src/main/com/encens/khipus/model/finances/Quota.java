@@ -72,60 +72,60 @@ import java.util.Date;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "CUOTA",
+        pkColumnValue = "cuota",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "CUOTA")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "cuota")
 public class Quota implements BaseModel {
 
     @Id
-    @Column(name = "IDCUOTA", nullable = false, scale = 24)
+    @Column(name = "idcuota", nullable = false, scale = 24)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Quota.tableGenerator")
     private Long id;
 
-    @Column(name = "CANTIDAD", nullable = false, precision = 13, scale = 2)
+    @Column(name = "cantidad", nullable = false, precision = 13, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "SALDO", precision = 13, scale = 2)
+    @Column(name = "saldo", precision = 13, scale = 2)
     private BigDecimal residue;
 
-    @Column(name = "MONEDA", length = 20)
+    @Column(name = "moneda", length = 20)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "TIPOCAMBIO", precision = 16, scale = 6)
+    @Column(name = "tipocambio", precision = 16, scale = 6)
     private BigDecimal exchangeRate;
 
-    @Column(name = "FECHAVENCIMIENTO")
+    @Column(name = "fechavencimiento")
     @Temporal(TemporalType.DATE)
     private Date expirationDate;
 
-    @Column(name = "DESCRIPCION", length = 250)
+    @Column(name = "descripcion", length = 250)
     private String description;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private QuotaState state;
 
-    @Column(name = "PORPLANILLA")
+    @Column(name = "porplanilla")
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean discountByPayroll;
 
     @ManyToOne
-    @JoinColumn(name = "IDFONDOROTATORIO")
+    @JoinColumn(name = "idfondorotatorio")
     private RotatoryFund rotatoryFund;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

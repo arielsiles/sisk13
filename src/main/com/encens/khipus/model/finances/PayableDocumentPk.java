@@ -10,10 +10,10 @@ import java.io.Serializable;
  */
 @Embeddable
 public class PayableDocumentPk implements Serializable {
-    @Column(name = "NO_CIA", length = 2)
+    @Column(name = "no_cia", length = 2)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", length = 10)
+    @Column(name = "no_trans", length = 10)
     private String transactionNumber;
 
     public String getCompanyNumber() {

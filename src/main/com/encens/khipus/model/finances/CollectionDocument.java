@@ -26,10 +26,10 @@ import javax.persistence.*;
 })
 
 @EntityListeners(UpperCaseStringListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "DOCUMENTOCOBRO")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "documentocobro")
 public class CollectionDocument extends AccountingDocument {
 
-    @Column(name = "TIPODOCUMENTOCOBRO", nullable = false, length = 25)
+    @Column(name = "tipodocumentocobro", nullable = false, length = 25)
     @Enumerated(EnumType.STRING)
     private CollectionDocumentType collectionDocumentType;
 
@@ -37,11 +37,11 @@ public class CollectionDocument extends AccountingDocument {
     private RotatoryFundCollection rotatoryFundCollection;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDENTIDAD", referencedColumnName = "COD_ENTI")
+    @JoinColumn(name = "identidad", referencedColumnName = "cod_enti")
     private FinancesEntity financesEntity;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public CollectionDocumentType getCollectionDocumentType() {

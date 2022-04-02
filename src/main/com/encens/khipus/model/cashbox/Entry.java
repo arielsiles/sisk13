@@ -15,18 +15,18 @@ import javax.persistence.Table;
  * @version 2.17
  */
 @Entity
-@Table(name = "RUBROS", schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "rubros", schema = Constants.CASHBOX_SCHEMA)
 public class Entry implements BaseModel {
     @Id
-    @Column(name = "COD", nullable = false, length = 15)
+    @Column(name = "cod", nullable = false, length = 15)
     @Length(max = 15)
     private String id;
 
-    @Column(name = "DESCR", nullable = false, length = 50)
+    @Column(name = "descr", nullable = false, length = 50)
     @Length(max = 50)
     private String description;
 
-    @Column(name = "ACTIVO", nullable = false)
+    @Column(name = "activo", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean active;
 

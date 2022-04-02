@@ -14,14 +14,14 @@ import java.io.Serializable;
  */
 @Embeddable
 public class AccountingMovementDetailPk implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", nullable = false, insertable = true)
+    @Column(name = "no_trans", nullable = false, insertable = true)
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "NO_LINEA", nullable = false, insertable = true)
+    @Column(name = "no_linea", nullable = false, insertable = true)
     @Length(max = 10)
     private String detailNumber;
 

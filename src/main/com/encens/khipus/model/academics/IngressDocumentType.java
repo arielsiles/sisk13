@@ -12,19 +12,19 @@ import javax.persistence.Table;
  * @version 2.26
  */
 @Entity
-@Table(name = "TIPOS_DOCUMENTO_INGRESO", schema = Constants.ACADEMIC_SCHEMA)
+@Table(name = "tipos_documento_ingreso", schema = Constants.ACADEMIC_SCHEMA)
 public class IngressDocumentType {
     @Id
-    @Column(name = "TIPO_DOCUMENTO_INGRESO", nullable = false, updatable = false)
+    @Column(name = "tipo_documento_ingreso", nullable = false, updatable = false)
     private String ingressDocumentTypeId;
 
-    @Column(name = "DESCRIPCION", nullable = false, updatable = false, insertable = false)
+    @Column(name = "descripcion", nullable = false, updatable = false, insertable = false)
     private String description;
 
-    @Column(name = "SIGLA", nullable = true, updatable = false, insertable = false)
+    @Column(name = "sigla", nullable = true, updatable = false, insertable = false)
     private String acronym;
 
-    @Column(name = "OBLIGADO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "obligado", nullable = false, updatable = false, insertable = false)
     private String mandatory;
 
 

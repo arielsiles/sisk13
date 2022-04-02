@@ -34,79 +34,79 @@ import java.util.List;
 @Entity
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
-@Table(name = "CONFPLANILLAFISCAL", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "confplanillafiscal", schema = Constants.KHIPUS_SCHEMA)
 public class ConfigurationTaxPayroll implements BaseModel {
     @Id
-    @Column(name = "IDCONFPLANILLAFISCAL", nullable = false)
+    @Column(name = "idconfplanillafiscal", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ConfigurationTaxPayroll.tableGenerator")
     private Long id;
 
-    @Column(name = "DESCRIPCION", nullable = false)
+    @Column(name = "descripcion", nullable = false)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", updatable = true, insertable = true)
     private BusinessUnit businessUnit;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFP", updatable = true, insertable = true)
+    @JoinColumn(name = "idtasaafp", updatable = true, insertable = true)
     private AFPRate afpRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPPROFRISK", updatable = true, insertable = true)
+    @JoinColumn(name = "idtasaafpprofrisk", updatable = true, insertable = true)
     private AFPRate afpRateProfessionalRisk;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAAFPPROHOUS", updatable = true, insertable = true)
+    @JoinColumn(name = "idtasaafpprohous", updatable = true, insertable = true)
     private AFPRate afpRateProHousing;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASACNS", updatable = true, insertable = true)
+    @JoinColumn(name = "idtasacns", updatable = true, insertable = true)
     private CNSRate cnsRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASAIVA", updatable = true, insertable = true)
+    @JoinColumn(name = "idtasaiva", updatable = true, insertable = true)
     private IVARate ivaRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDTASASMN", updatable = true, insertable = true)
+    @JoinColumn(name = "idtasasmn", updatable = true, insertable = true)
     private SMNRate smnRate;
 
-    @Column(name = "FECHACREACION", nullable = false)
+    @Column(name = "fechacreacion", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date creationDate;
 
-    @Column(name = "FECHAINICIO", nullable = false)
+    @Column(name = "fechainicio", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
-    @Column(name = "FECHAFIN", nullable = false)
+    @Column(name = "fechafin", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDGESTION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idgestion", nullable = false, updatable = false, insertable = true)
     private Gestion gestion;
 
-    @Column(name = "MES", nullable = false, length = 20)
+    @Column(name = "mes", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private Month month;
 
-    @Column(name = "TIPOCAMBIOINICIALUFV", precision = 16, scale = 6, nullable = false)
+    @Column(name = "tipocambioinicialufv", precision = 16, scale = 6, nullable = false)
     private BigDecimal initialUfvExchangeRate = BigDecimal.ZERO;
 
-    @Column(name = "TIPOCAMBIOFINALUFV", precision = 16, scale = 6, nullable = false)
+    @Column(name = "tipocambiofinalufv", precision = 16, scale = 6, nullable = false)
     private BigDecimal finalUfvExchangeRate = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "configuration")
     private List<AdministrativeGestionPayroll> administrativePayrolls = new ArrayList<AdministrativeGestionPayroll>();
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
     public Long getId() {

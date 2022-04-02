@@ -16,12 +16,12 @@ import java.math.BigDecimal;
  */
 @NamedQueries({
         @NamedQuery(name  = "ArticleOrder.findCashSaleDetailByCodeAndDate",
-                    query = "select articleOrder " +
-                            "from ArticleOrder articleOrder " +
-                            "left join articleOrder.ventaDirecta cashSale " +
-                            "where articleOrder.codArt =:productItemCode " +
-                            "and cashSale.estado <> 'ANULADO' " +
-                            "and cashSale.fechaPedido between :startDate and :endDate "),
+                query = "select articleOrder " +
+                        "from ArticleOrder articleOrder " +
+                        "left join articleOrder.ventaDirecta cashSale " +
+                        "where articleOrder.codArt =:productItemCode " +
+                        "and cashSale.estado <> 'ANULADO' " +
+                        "and cashSale.fechaPedido between :startDate and :endDate "),
         @NamedQuery(name  = "ArticleOrder.findOrderDetailByCodeAndDate",
                 query = "select articleOrder " +
                         "from ArticleOrder articleOrder " +
@@ -53,7 +53,7 @@ import java.math.BigDecimal;
                         "from ArticleOrder articleOrder " +
                         "where articleOrder.customerOrder.state <> :annulledState " +
                         "and articleOrder.customerOrder.orderDate between :startDate and :endDate ")
-        })
+})
 
 @TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "ArticleOrder.tableGenerator",
         table = Constants.SEQUENCE_TABLE_NAME,
@@ -71,7 +71,7 @@ public class ArticleOrder {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ArticleOrder.tableGenerator")
     private Long id;
 
-    @Column(name = "COD_ART", nullable = false, length = 6,insertable=false,updatable=false)
+    @Column(name = "cod_art", nullable = false, length = 6,insertable=false,updatable=false)
     @Length(max = 6)
     private String codArt;
 
@@ -83,20 +83,20 @@ public class ArticleOrder {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "COD_ART", referencedColumnName = "COD_ART")
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_art", referencedColumnName = "cod_art")
     })
     private ProductItem productItem;
 
-    @JoinColumn(name = "IDPEDIDOS",referencedColumnName = "IDPEDIDOS")
+    @JoinColumn(name = "idpedidos",referencedColumnName = "idpedidos")
     @ManyToOne
     private CustomerOrder customerOrder;
 
-    @JoinColumn(name = "IDVENTADIRECTA",referencedColumnName = "IDVENTADIRECTA")
+    @JoinColumn(name = "idventadirecta",referencedColumnName = "idventadirecta")
     @ManyToOne
     private VentaDirecta ventaDirecta;
 
-    @Column(name = "CANTIDAD", nullable = true)
+    @Column(name = "cantidad", nullable = true)
     private Integer quantity;
 
     /*@ManyToOne(optional = true, fetch = FetchType.LAZY)
@@ -106,19 +106,19 @@ public class ArticleOrder {
     })
     private Warehouse warehouse;*/
 
-    @Column(name = "PRECIO",nullable = true )
+    @Column(name = "precio",nullable = true )
     private Double price;
 
-    @Column(name = "REPOSICION",nullable = true)
+    @Column(name = "reposicion",nullable = true)
     private Integer reposicion;
 
-    @Column(name = "TOTAL",nullable = true)
+    @Column(name = "total",nullable = true)
     private Integer total;
 
-    @Column(name = "PROMOCION",nullable = true)
+    @Column(name = "promocion",nullable = true)
     private Integer promotion;
 
-    @Column(name="TIPO")
+    @Column(name="tipo")
     private String tipo;
 
     @Column(name = "descuento",nullable = true )
@@ -127,7 +127,7 @@ public class ArticleOrder {
     @Column(name = "importe",nullable = true )
     private Double amount;
 
-    @Column(name = "NO_CIA", updatable = false, insertable = false, length = 2)
+    @Column(name = "no_cia", updatable = false, insertable = false, length = 2)
     @Length(max = 2)
     private String companyNumber = "01";
 

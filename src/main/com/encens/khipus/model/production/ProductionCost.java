@@ -11,7 +11,7 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "COSTOPRODUCCION")
+@Table(name = "costoproduccion")
 public class ProductionCost implements BaseModel {
 
     @Id
@@ -21,31 +21,31 @@ public class ProductionCost implements BaseModel {
     @Column(name = "id_tmpenc", insertable = false, updatable = false)
     private Long voucherId;
 
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     private Date date;
 
-    @Column(name = "TIPO_DOC")
+    @Column(name = "tipo_doc")
     private String documentType;
 
-    @Column(name = "NO_DOC")
+    @Column(name = "no_doc")
     private String documentNumber;
 
-    @Column(name = "NO_TRANS")
+    @Column(name = "no_trans")
     private String transactionNumber;
 
-    @Column(name = "CODIGO")
+    @Column(name = "codigo")
     private String code;
 
-    @Column(name = "CUENTA")
+    @Column(name = "cuenta")
     private String account;
 
-    @Column(name = "DESCRI")
+    @Column(name = "descri")
     private String description;
 
-    @Column(name = "DEBE")
+    @Column(name = "debe")
     private BigDecimal debit;
 
-    @Column(name = "HABER")
+    @Column(name = "haber")
     private BigDecimal credit;
 
     @Override

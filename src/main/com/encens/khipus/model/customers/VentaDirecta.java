@@ -41,49 +41,49 @@ public class VentaDirecta implements BaseModel  {
 
     //todo:revisar por q el id no es correlativo
     @Id
-    @Column(name = "IDVENTADIRECTA")
+    @Column(name = "idventadirecta")
     private Long idventadirecta;
 
-    @Column(name = "DESCRIPCION")
+    @Column(name = "descripcion")
     private String descripcion;
 
-    @Column(name = "FECHA_PEDIDO")
+    @Column(name = "fecha_pedido")
     @Temporal(TemporalType.DATE)
     private Date fechaPedido;
 
-    @Column(name = "OBSERVACION")
+    @Column(name = "observacion")
 
     private String observacion;
-    @Column(name = "ESTADO")
+    @Column(name = "estado")
 
     private String estado;
-    @Column(name = "TOTAL")
+    @Column(name = "total")
 
     private Double total = 0.0;
     //cantidad * precio de venta
 
     @Basic(optional = false)
-    @Column(name = "TOTALIMPORTE")
+    @Column(name = "totalimporte")
     private Double totalimporte = 0.0;
 
     @Column(name = "flagstock", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean stockFlag = Boolean.FALSE;
 
-    @Column(name = "CV", nullable = false)
+    @Column(name = "cv", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean cvFlag = Boolean.FALSE;
 
-    @Column(name = "IDUSUARIO")
+    @Column(name = "idusuario")
     private Long userId;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "ventaDirecta")
     private Collection<ArticleOrder> articulosPedidos ;
 
-    @Column(name="CODIGO",columnDefinition="BIGINT(20)")
+    @Column(name="codigo",columnDefinition="BIGINT(20)")
     private Long codigo;
 
-    @JoinColumn(name = "IDCLIENTE", referencedColumnName = "IDPERSONACLIENTE")
+    @JoinColumn(name = "idcliente", referencedColumnName = "idpersonacliente")
     @ManyToOne(optional = false)
     private Client cliente;
 

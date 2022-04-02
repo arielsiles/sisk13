@@ -19,58 +19,58 @@ import java.io.Serializable;
  * To change this template use File | Settings | File Templates.
  */
 @TableGenerator(name = "MetaProduct_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "METAPRODUCTOPRODUCCION",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "metaproductoproduccion",
         allocationSize = 10)
 
-@Table(name = "METAPRODUCTOPRODUCCION", uniqueConstraints = @UniqueConstraint(columnNames = {"CODIGO", "IDCOMPANIA"}))
+@Table(name = "metaproductoproduccion", uniqueConstraints = @UniqueConstraint(columnNames = {"codigo", "idcompania"}))
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "TIPO", discriminatorType = DiscriminatorType.STRING, length = 20)
+@DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING, length = 20)
 @javax.persistence.Entity
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class MetaProduct implements Serializable, BaseModel {
 
     @Id
-    @Column(name = "IDMETAPRODUCTOPRODUCCION", nullable = false)
+    @Column(name = "idmetaproductoproduccion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "MetaProduct_Generator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false, length = 50)
+    @Column(name = "codigo", nullable = false, length = 50)
     private String code;
 
-    @Column(name = "NOMBRE", nullable = false, length = 200)
+    @Column(name = "nombre", nullable = false, length = 200)
     private String name;
 
-    @Column(name = "DESCRIPCION", nullable = true, length = 500)
+    @Column(name = "descripcion", nullable = true, length = 500)
     private String description;
 
-    @Column(name = "ESACOPIABLE", nullable = false)
+    @Column(name = "esacopiable", nullable = false)
     @Type(type = "IntegerBoolean")
     private Boolean collectable = false;
 
-    @Column(name = "COD_ART", insertable = false, updatable = false, nullable = false)
+    @Column(name = "cod_art", insertable = false, updatable = false, nullable = false)
     private String productItemCode;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false, nullable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false, nullable = false)
     @Length(max = 2)
     private String companyNumber;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "COD_ART", referencedColumnName = "COD_ART")
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_art", referencedColumnName = "cod_art")
     })
     private ProductItem productItem;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADMEDIDAPRODUCCION", nullable = true, updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadmedidaproduccion", nullable = true, updatable = true, insertable = true)
     private MeasureUnitProduction measureUnitProduction;
 
     /*@ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
@@ -78,7 +78,7 @@ public class MetaProduct implements Serializable, BaseModel {
     private BaseProduct baseProduct;*/
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Company getCompany() {

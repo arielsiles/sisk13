@@ -2,11 +2,8 @@ package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.util.Constants;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,48 +14,48 @@ import java.util.List;
  */
 
 @TableGenerator(name = "ClientOrder_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PEDIDOS",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "per_insts",
         allocationSize = 10)
 
 @Entity
-@Table(name = "PER_INSTS",schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "per_insts",schema = Constants.CASHBOX_SCHEMA)
 //@Filter(name = "companyFilter")
 //@EntityListeners(CompanyListener.class)
 public class ClientOrder implements BaseModel {
 
     @Id
-    @Column(name = "ID", columnDefinition = "VARCHAR2(20 BYTE)", nullable = false)
+    @Column(name = "id", columnDefinition = "VARCHAR2(20 BYTE)", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ClientOrder_Generator")
     private Long id;
 
-    @Column(name = "TIPO", nullable = true)
+    @Column(name = "tipo", nullable = true)
     private String type;
 
-    @Column(name = "ACTIVO", nullable = true)
+    @Column(name = "activo", nullable = true)
     private String active;
 
-    @Column(name = "HST", nullable = false)
+    @Column(name = "hst", nullable = false)
     private String hst;
 
-    @Column(name = "NRO_DOC", nullable = false)
+    @Column(name = "nro_doc", nullable = false)
     private String numberDoc;
 
-    @Column(name = "MAIL", nullable = true)
+    @Column(name = "mail", nullable = true)
     private String mail;
 
-    @Column(name = "TEL_REF",nullable = true)
+    @Column(name = "tel_ref",nullable = true)
     private String referPhone;
 
-    @Column(name = "TDO_COD",nullable = true)
+    @Column(name = "tdo_cod",nullable = true)
     private String typeDoc;
 
-    @Column(name = "FACTURA",nullable = true)
+    @Column(name = "factura",nullable = true)
     private String invoice;
 
-    @Column(name = "SUPERVISOR",nullable = true )
+    @Column(name = "supervisor",nullable = true )
     private String supevisor;
 
     /*@OneToMany(mappedBy = "clientOrder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -67,11 +64,11 @@ public class ClientOrder implements BaseModel {
 
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID", nullable = false, updatable = false, insertable = false)
+    @JoinColumn(name = "id", nullable = false, updatable = false, insertable = false)
     private ClientPerson clientPerson;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID", nullable = false, updatable = false, insertable = false)
+    @JoinColumn(name = "id", nullable = false, updatable = false, insertable = false)
     private ClientInstitution clientInstitution;
 
     public Long getId() {
@@ -181,6 +178,6 @@ public class ClientOrder implements BaseModel {
     public String getFullName() {
         //return (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName + " " : "") + (firstName != null ? firstName : "");
         return (type.equals("P") ? clientPerson.getName() + " " + clientPerson.getLastName() + " " + clientPerson.getMaidenName()
-                                 : clientInstitution.getName() );
+                : clientInstitution.getName() );
     }
 }

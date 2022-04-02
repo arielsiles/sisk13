@@ -24,7 +24,7 @@ import java.util.Date;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "PLANILLAFISCALPORCATEGORIA",
+        pkColumnValue = "planillafiscalporcategoria",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @NamedQueries({
         @NamedQuery(name = "CategoryFiscalPayroll.findByGeneratedPayroll",
@@ -34,160 +34,160 @@ import java.util.Date;
 @Entity
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
-@Table(name = "PLANILLAFISCALPORCATEGORIA", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "planillafiscalporcategoria", schema = Constants.KHIPUS_SCHEMA)
 public class CategoryFiscalPayroll implements BaseModel {
 
     @Id
-    @Column(name = "IDPLANILLAFISCALPORCATEGORIA", nullable = false)
+    @Column(name = "idplanillafiscalporcategoria", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "CategoryFiscalPayroll.tableGenerator")
     private Long id;
 
-    @Column(name = "ANIOSANTIGUEDAD")
+    @Column(name = "aniosantiguedad")
     private Integer seniorityYears;
 
-    @Column(name = "BONOANTIGUEDAD", precision = 13, scale = 2, nullable = false)
+    @Column(name = "bonoantiguedad", precision = 13, scale = 2, nullable = false)
     private BigDecimal seniorityBonus;
 
-    @Column(name = "BONODOMINICAL", precision = 13, scale = 2, nullable = false)
+    @Column(name = "bonodominical", precision = 13, scale = 2, nullable = false)
     private BigDecimal sundayBonus;
 
-    @Column(name = "BONOPRODUCCION", precision = 13, scale = 2, nullable = false)
+    @Column(name = "bonoproduccion", precision = 13, scale = 2, nullable = false)
     private BigDecimal productionBonus;
 
-    @Column(name = "BONONOCTURNO", precision = 13, scale = 2, nullable = false)
+    @Column(name = "bononocturno", precision = 13, scale = 2, nullable = false)
     private BigDecimal nightWorkBonus;
 
-    @Column(name = "BONOPASAJE", precision = 13, scale = 2, nullable = false)
+    @Column(name = "bonopasaje", precision = 13, scale = 2, nullable = false)
     private BigDecimal transReturnBonus;
 
-    @Column(name = "BONOREFRIGERIO", precision = 13, scale = 2, nullable = false)
+    @Column(name = "bonorefrigerio", precision = 13, scale = 2, nullable = false)
     private BigDecimal refreshmentBonus;
 
-    @Column(name = "CI", nullable = false)
+    @Column(name = "ci", nullable = false)
     private String personalIdentifier;
 
-    @Column(name = "EXT", nullable = false)
+    @Column(name = "ext", nullable = false)
     private String extension;
 
-    @Column(name = "COSTOHORASEXTRA", precision = 13, scale = 2, nullable = false)
+    @Column(name = "costohorasextra", precision = 13, scale = 2, nullable = false)
     private BigDecimal extraHourCost;
 
-    @Column(name = "DIASTRABAJADOS", precision = 13, scale = 2, nullable = false)
+    @Column(name = "diastrabajados", precision = 13, scale = 2, nullable = false)
     private BigDecimal workedDays;
 
-    @Column(name = "DIASPAGADOS", precision = 13, scale = 2, nullable = false)
+    @Column(name = "diaspagados", precision = 13, scale = 2, nullable = false)
     private BigDecimal paidDays;
 
-    @Column(name = "FECHANACIMIENTO")
+    @Column(name = "fechanacimiento")
     @Temporal(TemporalType.DATE)
     private Date birthday;
 
-    @Column(name = "FECHAINGRESO")
+    @Column(name = "fechaingreso")
     @Temporal(TemporalType.DATE)
     private Date entranceDate;
 
-    @Column(name = "GENERO", length = 10)
+    @Column(name = "genero", length = 10)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "NOVEDAD", length = 10)
+    @Column(name = "novedad", length = 10)
     @Enumerated(EnumType.STRING)
     private NewnessType newnessType;
 
-    @Column(name = "HABERBASICO", precision = 13, scale = 2, nullable = false)
+    @Column(name = "haberbasico", precision = 13, scale = 2, nullable = false)
     private BigDecimal basicAmount;
 
-    @Column(name = "HORASDIAPAGADO", precision = 13, scale = 2, nullable = false)
+    @Column(name = "horasdiapagado", precision = 13, scale = 2, nullable = false)
     private BigDecimal hourDayPayment;
 
-    @Column(name = "HORASEXTRA", precision = 13, scale = 2, nullable = false)
+    @Column(name = "horasextra", precision = 13, scale = 2, nullable = false)
     private BigDecimal extraHour;
 
-    @Column(name = "LIQUIDACIONRETENCION", precision = 13, scale = 2, nullable = false)
+    @Column(name = "liquidacionretencion", precision = 13, scale = 2, nullable = false)
     private BigDecimal retentionClearance;
 
-    @Column(name = "LIQUIDOPAGABLE", precision = 13, scale = 2, nullable = false)
+    @Column(name = "liquidopagable", precision = 13, scale = 2, nullable = false)
     private BigDecimal liquidPayment;
 
-    @Column(name = "NUMERO", nullable = false)
+    @Column(name = "numero", nullable = false)
     private Long number;
 
-    @Column(name = "NOMBRE", nullable = false, length = 250)
+    @Column(name = "nombre", nullable = false, length = 250)
     private String name;
 
-    @Column(name = "NACIONALIDAD", length = 250)
+    @Column(name = "nacionalidad", length = 250)
     private String nationality;
 
-    @Column(name = "OCUPACION", nullable = false, length = 250)
+    @Column(name = "ocupacion", nullable = false, length = 250)
     private String occupation;
 
-    @Column(name = "OTROSBONOS", precision = 13, scale = 2, nullable = false)
+    @Column(name = "otrosbonos", precision = 13, scale = 2, nullable = false)
     private BigDecimal otherBonus;
 
-    @Column(name = "OTROSINGRESOS", precision = 13, scale = 2, nullable = false)
+    @Column(name = "otrosingresos", precision = 13, scale = 2, nullable = false)
     private BigDecimal otherIncomes;
 
-    @Column(name = "DESCUENTOPORMINUTOSATRASO", nullable = false, precision = 13, scale = 2)
+    @Column(name = "descuentoporminutosatraso", nullable = false, precision = 13, scale = 2)
     @NotNull
     private BigDecimal tardinessMinutesDiscount;
 
-    @Column(name = "DESCUENTOPORMINUTOSAUSENCIA", nullable = false, precision = 13, scale = 2)
+    @Column(name = "descuentoporminutosausencia", nullable = false, precision = 13, scale = 2)
     @NotNull
     private BigDecimal absenceMinutesDiscount;
 
-    @Column(name = "PRESTAMO", nullable = false, precision = 13, scale = 2)
+    @Column(name = "prestamo", nullable = false, precision = 13, scale = 2)
     @NotNull
     private BigDecimal loanDiscount;
 
-    @Column(name = "ANTICIPO", nullable = false, precision = 13, scale = 2)
+    @Column(name = "anticipo", nullable = false, precision = 13, scale = 2)
     @NotNull
     private BigDecimal advanceDiscount;
 
-    @Column(name = "WIN", nullable = false, precision = 13, scale = 2)
+    @Column(name = "win", nullable = false, precision = 13, scale = 2)
     @NotNull
     private BigDecimal winDiscount;
 
-    @Column(name = "OTROSDESCUENTOSMOVSAL", nullable = false, precision = 13, scale = 2)
+    @Column(name = "otrosdescuentosmovsal", nullable = false, precision = 13, scale = 2)
     @NotNull
     private BigDecimal otherSalaryMovementDiscount;
 
-    @Column(name = "OTROSDESCUENTOS", precision = 13, scale = 2, nullable = false)
+    @Column(name = "otrosdescuentos", precision = 13, scale = 2, nullable = false)
     private BigDecimal otherDiscount;
 
-    @Column(name = "RETENCIONAFP", precision = 13, scale = 2, nullable = false)
+    @Column(name = "retencionafp", precision = 13, scale = 2, nullable = false)
     private BigDecimal retentionAFP;
 
-    @Column(name = "AFPLAB_INDIVIDUAL", precision = 13, scale = 2, nullable = false)
+    @Column(name = "afplab_individual", precision = 13, scale = 2, nullable = false)
     private BigDecimal laborIndividualAFP;
 
-    @Column(name = "AFPLAB_RIESGOCOMUN", precision = 13, scale = 2, nullable = false)
+    @Column(name = "afplab_riesgocomun", precision = 13, scale = 2, nullable = false)
     @NotNull
     private BigDecimal laborCommonRiskAFP;
 
-    @Column(name = "AFPLAB_SOLIDARIO", precision = 13, scale = 2, nullable = false)
+    @Column(name = "afplab_solidario", precision = 13, scale = 2, nullable = false)
     @NotNull
     private BigDecimal laborSolidaryContributionAFP;
 
-    @Column(name = "AFPLAB_COMISION", precision = 13, scale = 2, nullable = false)
+    @Column(name = "afplab_comision", precision = 13, scale = 2, nullable = false)
     @NotNull
     private BigDecimal laborComissionAFP;
 
-    @Column(name = "AFPSOLIDARIO", precision = 13, scale = 2, nullable = false)
+    @Column(name = "afpsolidario", precision = 13, scale = 2, nullable = false)
     @NotNull
     private BigDecimal solidaryAFP;
 
-    @Column(name = "TOTALGANADO", precision = 13, scale = 2, nullable = false)
+    @Column(name = "totalganado", precision = 13, scale = 2, nullable = false)
     private BigDecimal totalGrained;
 
-    @Column(name = "TOTALDESCUENTOS", precision = 13, scale = 2, nullable = false)
+    @Column(name = "totaldescuentos", precision = 13, scale = 2, nullable = false)
     private BigDecimal totalDiscount;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", updatable = true, insertable = true)
     private BusinessUnit businessUnit;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -195,15 +195,15 @@ public class CategoryFiscalPayroll implements BaseModel {
     private GeneratedPayroll generatedPayroll;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDEMPLEADO", insertable = true, updatable = false, nullable = false)
+    @JoinColumn(name = "idempleado", insertable = true, updatable = false, nullable = false)
     private Employee employee;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCONTRATOPUESTO", insertable = true, updatable = false, nullable = false)
+    @JoinColumn(name = "idcontratopuesto", insertable = true, updatable = false, nullable = false)
     private JobContract jobContract;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPLANILLATRIBUTARIAPORCAT")
+    @JoinColumn(name = "idplanillatributariaporcat")
     private CategoryTributaryPayroll categoryTributaryPayroll;
 
     public Long getId() {

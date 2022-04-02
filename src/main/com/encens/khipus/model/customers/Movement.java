@@ -32,101 +32,101 @@ public class Movement implements BaseModel {
     private Long id;
 
     @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHA_FACTURA")
+    @Column(name = "fecha_factura")
     private Date date;
 
-    @Column(name = "GLOSA")
+    @Column(name = "glosa")
     private String gloss;
 
-    @Column(name = "ESTADO")
+    @Column(name = "estado")
     private String state;
 
     /*@Column(name = "TIPOEMISION")
     @Enumerated(EnumType.STRING)
     private InvoiceEmissionType emissionType;*/
 
-    @Column(name = "TIPOEMISION")
+    @Column(name = "tipoemision")
     private String emissionType;
 
-    @Column(name = "NROFACTURA")
+    @Column(name = "nrofactura")
     private Integer number;
 
-    @Column(name = "NIT_CLIENTE")
+    @Column(name = "nit_cliente")
     private String nit;
 
-    @Column(name = "RAZON_SOCIAL")
+    @Column(name = "razon_social")
     private String name;
 
-    @Column(name = "IMPORTE_TOTAL")
+    @Column(name = "importe_total")
     private BigDecimal amount;
 
-    @Column(name = "IMPORTE_ICE_IEHD_TASAS")
+    @Column(name = "importe_ice_iehd_tasas")
     private BigDecimal amountIce;
 
-    @Column(name = "EXPORT_EXENTAS")
+    @Column(name = "export_exentas")
     private BigDecimal exemptExport;
 
-    @Column(name = "VENTAS_GRAB_TASACERO")
+    @Column(name = "ventas_grab_tasacero")
     private BigDecimal taxedSalesZero;
 
-    @Column(name = "SUBTOTAL")
+    @Column(name = "subtotal")
     private BigDecimal subtotal;
 
-    @Column(name = "DESCUENTOS")
+    @Column(name = "descuentos")
     private BigDecimal discount;
 
-    @Column(name = "IMPORTE_PARA_DEBITO_FISCAL")
+    @Column(name = "importe_para_debito_fiscal")
     private BigDecimal amountFiscalDebit;
 
-    @Column(name = "DEBITO_FISCAL")
+    @Column(name = "debito_fiscal")
     private BigDecimal fiscalDebit;
 
-    @Column(name = "CODIGOCONTROL")
+    @Column(name = "codigocontrol")
     private String controlCode;
 
-    @Column(name = "TIPOPAGO")
+    @Column(name = "tipopago")
     private String paymentType;
 
     @Temporal(value = TemporalType.TIMESTAMP)
-    @Column(name = "FECHAREGISTRO")
+    @Column(name = "fecharegistro")
     private Date registrationDate;
 
-    @Column(name = "CODIGO_QR")
+    @Column(name = "codigo_qr")
     private String qrCode;
 
-    @Column(name = "NRO_AUTORIZACION")
+    @Column(name = "nro_autorizacion")
     private String authorizationNumber;
 
-    @Column(name = "CUF")
+    @Column(name = "cuf")
     private String cuf;
 
-    @Column(name = "FECHASIN")
+    @Column(name = "fechasin")
     private String fechaSin;
 
-    @Column(name = "LEYENDA")
+    @Column(name = "leyenda")
     private String leyenda;
 
-    @Column(name = "DESCRI")
+    @Column(name = "descri")
     private String descri;
 
-    @Column(name = "CODESTADO")
+    @Column(name = "codestado")
     private String codigoEstado;
 
-    @Column(name = "CODIGOREC")
+    @Column(name = "codigorec")
     private String codigoRecepcion;
 
-    @Column(name = "FACTURA")
+    @Column(name = "factura")
     @Lob
     private String factura;
 
     /** **/
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "ID_TMPDET", nullable = true, insertable = true, updatable = false)
+    @JoinColumn(name = "id_tmpdet", nullable = true, insertable = true, updatable = false)
     private VoucherDetail voucherDetailFiscalDebit;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPEDIDOS", nullable = true, insertable = true, updatable = false)
+    @JoinColumn(name = "idpedidos", nullable = true, insertable = true, updatable = false)
     private CustomerOrder customerOrder;
 
     public Long getId() {

@@ -41,45 +41,45 @@ import java.math.BigDecimal;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({UpperCaseStringListener.class, CompanyListener.class})
-@Table(name = "PARTEAFOC", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "parteafoc", schema = Constants.KHIPUS_SCHEMA)
 public class PurchaseOrderFixedAssetPart implements BaseModel {
 
     @Id
-    @Column(name = "IDPARTEAFOC", nullable = false)
+    @Column(name = "idparteafoc", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PurchaseOrderFixedAssetPart.tableGenerator")
     private Long id;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = 250)
+    @Column(name = "descripcion", nullable = false, length = 250)
     @Length(max = 250)
     private String description;
 
-    @Column(name = "PRECIOUNI", nullable = false, precision = 16, scale = 6)
+    @Column(name = "preciouni", nullable = false, precision = 16, scale = 6)
     private BigDecimal unitPrice;
 
 
-    @Column(name = "SERIE", nullable = true, length = 250)
+    @Column(name = "serie", nullable = true, length = 250)
     @Length(max = 250)
     private String serialNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDACTIVOFIJO", nullable = false, updatable = false)
+    @JoinColumn(name = "idactivofijo", nullable = false, updatable = false)
     private FixedAsset fixedAsset;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "ID_COM_ENCOC", referencedColumnName = "ID_COM_ENCOC", nullable = false, updatable = false)
+            @JoinColumn(name = "id_com_encoc", referencedColumnName = "id_com_encoc", nullable = false, updatable = false)
     })
     private PurchaseOrder purchaseOrder;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NUMEROCOMPANIA", nullable = false, updatable = true),
-            @JoinColumn(name = "UNIDADMEDIDA", nullable = false, updatable = true)
+            @JoinColumn(name = "numerocompania", nullable = false, updatable = true),
+            @JoinColumn(name = "unidadmedida", nullable = false, updatable = true)
     })
     private MeasureUnit measureUnit;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false)
     private Company company;
 
     @Version

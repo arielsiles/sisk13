@@ -36,46 +36,46 @@ import javax.persistence.*;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "REGLAVACACION",
+        pkColumnValue = "reglavacacion",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(name = "REGLAVACACION", schema = Constants.KHIPUS_SCHEMA, uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"CODIGO", "IDCOMPANIA"}),
-        @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"})})
+@Table(name = "reglavacacion", schema = Constants.KHIPUS_SCHEMA, uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"codigo", "idcompania"}),
+        @UniqueConstraint(columnNames = {"nombre", "idcompania"})})
 public class VacationRule implements BaseModel {
     @Id
-    @Column(name = "IDREGLAVACACION", nullable = false)
+    @Column(name = "idreglavacacion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "VacationRule.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     @NotNull
     private Long code;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     @NotEmpty
     @Length(max = 100)
     private String name;
 
-    @Column(name = "DIASVACACION", nullable = false)
+    @Column(name = "diasvacacion", nullable = false)
     @NotNull
     private Integer vacationDays;
 
-    @Column(name = "ANIOSINICIO", nullable = false)
+    @Column(name = "aniosinicio", nullable = false)
     @NotNull
     private Integer fromYears;
 
-    @Column(name = "ANIOSFIN", nullable = true)
+    @Column(name = "aniosfin", nullable = true)
     private Integer toYears;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

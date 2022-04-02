@@ -14,15 +14,15 @@ import java.io.Serializable;
  */
 public class CustomerOrderPK implements Serializable {
 
-    @Column(name = "PEDIDO", nullable = false, length = 10)
+    @Column(name = "pedido", nullable = false, length = 10)
     @Length(max = 10)
     private String order;
 
-    @Column(name = "ID", nullable = false, length = 20)
+    @Column(name = "id", nullable = false, length = 20)
     @Length(max = 20)
     private String orderID;
 
-    @Column(name = "ID1", nullable = false, length = 10)
+    @Column(name = "id1", nullable = false, length = 10)
     @Length(max = 10)
     private Integer orderID1;
 

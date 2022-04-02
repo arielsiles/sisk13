@@ -43,7 +43,7 @@ public class FormulationInput implements BaseModel {
     @Column(name = "cod_art")
     private String productItemCode;
 
-    @Column(name = "DEFECTO")
+    @Column(name = "defecto")
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean inputDefault = Boolean.FALSE;
 

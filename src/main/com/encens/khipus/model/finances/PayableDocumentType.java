@@ -22,34 +22,34 @@ public class PayableDocumentType implements BaseModel {
     @EmbeddedId
     private PayableDocumentTypePk id = new PayableDocumentTypePk();
 
-    @Column(name = "NO_CIA", length = 2, insertable = false, updatable = false)
+    @Column(name = "no_cia", length = 2, insertable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "TIPO_DOC", length = 3, insertable = false, updatable = false)
+    @Column(name = "tipo_doc", length = 3, insertable = false, updatable = false)
     private String documentType;
 
-    @Column(name = "DESCRI", length = 100, updatable = false)
+    @Column(name = "descri", length = 100, updatable = false)
     @Length(max = 100)
     private String description;
 
-    @Column(name = "TIPO_MOV", length = 1)
+    @Column(name = "tipo_mov", length = 1)
     @Enumerated(EnumType.STRING)
     private FinanceMovementType movementType;
 
     /*Todo this columna must be mapped with FinancesModule and it must follow that statement FOREIGN KEY ("NO_CIA", "MODULO") REFERENCES "WISEDEV"."SF_MODULOS" ("NO_CIA", "MODULO") */
-    @Column(name = "MODULO", length = 6, updatable = false)
+    @Column(name = "modulo", length = 6, updatable = false)
     @Length(max = 6)
     private String module;
 
-    @Column(name = "ESTADO", length = 3, updatable = false)
+    @Column(name = "estado", length = 3, updatable = false)
     @Enumerated(EnumType.STRING)
     private PayableDocumentTypeState state;
 
-    @Column(name = "CLASE_DOC", length = 3, updatable = false)
+    @Column(name = "clase_doc", length = 3, updatable = false)
     @Enumerated(EnumType.STRING)
     private PayableDocumentClass documentClass;
 
-    @Column(name = "REGISTRO_REQUERIDO", updatable = false)
+    @Column(name = "registro_requerido", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME, parameters = {
             @Parameter(
                     name = com.encens.khipus.model.usertype.StringBooleanUserType.TRUE_PARAMETER,

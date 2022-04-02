@@ -36,15 +36,15 @@ import java.math.BigDecimal;
 public class FinancesExchangeRate implements BaseModel {
     @EmbeddedId
     @AttributeOverrides({
-            @AttributeOverride(name = "CLASE_CAMBIO", column = @Column(name = "CLASE_CAMBIO", nullable = false, insertable = true))
+            @AttributeOverride(name = "clase_cambio", column = @Column(name = "clase_cambio", nullable = false, insertable = true))
     })
     private FinancesExchangeRatePk id = new FinancesExchangeRatePk();
 
-    @Column(name = "TIPO_CAMBIO", precision = 10, scale = 6)
+    @Column(name = "tipo_cambio", precision = 10, scale = 6)
     private BigDecimal rate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "CLASE_CAMBIO", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "clase_cambio", nullable = false, insertable = false, updatable = false)
     private ExchangeKind exchangeKind;
 
     public FinancesExchangeRatePk getId() {

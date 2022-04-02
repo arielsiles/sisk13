@@ -1,3 +1,4 @@
+-- SET GLOBAL log_bin_trust_function_creators = 1;
 -- 1. 
 delimiter $$
 create function `getNextSeq`(sSeqName varchar(50)) returns varchar(10) charset utf8

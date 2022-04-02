@@ -12,38 +12,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TableGenerator(name = "FinishedGoodsWarehouse_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "DEPOSITOPRODUCTOTERMINADO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "depositoproductoterminado",
         allocationSize = 10)
 
 @Entity
-@Table(name = "DEPOSITOPRODUCTOTERMINADO", uniqueConstraints = @UniqueConstraint(columnNames = {"CODIGO", "IDCOMPANIA"}))
+@Table(name = "depositoproductoterminado", uniqueConstraints = @UniqueConstraint(columnNames = {"codigo", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class FinishedGoodsWarehouse implements BaseModel {
 
     @Id
-    @Column(name = "IDDEPOSITOPRODUCTOTERMINADO", nullable = false)
+    @Column(name = "iddepositoproductoterminado", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FinishedGoodsWarehouse_Generator")
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "CODIGO", nullable = false, length = 50)
+    @Column(name = "codigo", nullable = false, length = 50)
     private String code;
 
-    @Column(name = "DESCRIPCION", nullable = true, length = 1500)
+    @Column(name = "descripcion", nullable = true, length = 1500)
     private String description;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 

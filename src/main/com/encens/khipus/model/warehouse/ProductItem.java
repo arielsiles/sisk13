@@ -46,91 +46,91 @@ public class ProductItem implements BaseModel {
     @EmbeddedId
     private ProductItemPK id = new ProductItemPK();
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_ART", insertable = false, updatable = false)
+    @Column(name = "cod_art", insertable = false, updatable = false)
     private String productItemCode;
 
-    @Column(name = "CODACT")
+    @Column(name = "codact")
     private String economicActivityCode;
 
-    @Column(name = "CODSIN")
+    @Column(name = "codsin")
     private Integer productSinCode;
 
-    @Column(name = "COD_MEDS")
+    @Column(name = "cod_meds")
     private Integer measureUnitSinCode;
 
-    @Column(name = "UNI_MEDS")
+    @Column(name = "uni_meds")
     private String measureUnitDescription;
 
-    @Column(name = "CODEQ", insertable = false, updatable = false)
+    @Column(name = "codeq", insertable = false, updatable = false)
     private String productItemCodeEq;
 
-    @Column(name = "COD_ALM")
+    @Column(name = "cod_alm")
     private String warehouseCode;
 
-    @Column(name = "DESCRI", nullable = true, length = 100)
+    @Column(name = "descri", nullable = true, length = 100)
     @Length(max = 100)
     private String name;
 
-    @Column(name = "NOMBRECORTO", nullable = true, length = 14)
+    @Column(name = "nombrecorto", nullable = true, length = 14)
     @Length(max = 14)
     private String nameShort;
 
-    @Column(name = "ESTADO", nullable = true, length = 3)
+    @Column(name = "estado", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
     private ProductItemState state;
 
-    @Column(name = "COD_MED", nullable = true, length = 6)
+    @Column(name = "cod_med", nullable = true, length = 6)
     @Length(max = 6)
     private String usageMeasureCode;
 
-    @Column(name = "COD_MED_MAY", nullable = true, length = 6)
+    @Column(name = "cod_med_may", nullable = true, length = 6)
     @Length(max = 6)
     private String groupMeasureCode;
 
-    @Column(name = "CANTIAD_EQUI", precision = 10, scale = 2, nullable = true)
+    @Column(name = "cantiad_equi", precision = 10, scale = 2, nullable = true)
     private BigDecimal equivalentQuantity;
 
-    @Column(name = "CONTROL_VALORADO", nullable = true)
+    @Column(name = "control_valorado", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean controlValued;
 
-    @Column(name = "CUENTA_ART", nullable = true, length = 31)
+    @Column(name = "cuenta_art", nullable = true, length = 31)
     @Length(max = 31)
     private String productItemAccount;
 
-    @Column(name = "SALDO_MON", precision = 20, scale = 6, nullable = true)
+    @Column(name = "saldo_mon", precision = 20, scale = 6, nullable = true)
     private BigDecimal investmentAmount;
 
-    @Column(name = "COSTO_UNI", precision = 16, scale = 6, nullable = true)
+    @Column(name = "costo_uni", precision = 16, scale = 6, nullable = true)
     private BigDecimal unitCost;
 
-    @Column(name = "PRECIO_VENTA", precision = 10, scale = 2, nullable = true)
+    @Column(name = "precio_venta", precision = 10, scale = 2, nullable = true)
     private BigDecimal  salePrice;
 
-    @Column(name = "CU", precision = 16, scale = 6, nullable = true)
+    @Column(name = "cu", precision = 16, scale = 6, nullable = true)
     private BigDecimal cu;
 
-    @Column(name = "CT", precision = 20, scale = 6, nullable = true)
+    @Column(name = "ct", precision = 20, scale = 6, nullable = true)
     private BigDecimal ct;
 
-    @Column(name = "COD_GRU", nullable = false, updatable = true, insertable = true, length = 3)
+    @Column(name = "cod_gru", nullable = false, updatable = true, insertable = true, length = 3)
     @Length(max = 3)
     private String groupCode;
 
-    @Column(name = "COD_SUB", nullable = false, updatable = true, insertable = true, length = 3)
+    @Column(name = "cod_sub", nullable = false, updatable = true, insertable = true, length = 3)
     @Length(max = 3)
     private String subGroupCode;
 
 
-    @Column(name = "VENDIBLE", nullable = true)
+    @Column(name = "vendible", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean saleable;
 
-    @Column(name = "fix")
+    @Column(name = "FIX")
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean fixSale = Boolean.FALSE;
 
@@ -154,30 +154,30 @@ public class ProductItem implements BaseModel {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ALM", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_alm", nullable = false, insertable = false, updatable = false)
     })
     private Warehouse warehouse;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_GRU", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_SUB", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_gru", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_sub", nullable = false, updatable = false, insertable = false)
     })
     private SubGroup subGroup;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_MED", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_med", nullable = false, updatable = false, insertable = false)
     })
     private MeasureUnit usageMeasureUnit;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_MED_MAY", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_med_may", nullable = false, updatable = false, insertable = false)
     })
     private MeasureUnit groupMeasureUnit;
 
@@ -192,15 +192,15 @@ public class ProductItem implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA_ART", referencedColumnName = "CUENTA", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta_art", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount cashAccount;
 
-    @Column(name = "STOCKMINIMO", precision = 16, scale = 6)
+    @Column(name = "stockminimo", precision = 16, scale = 6)
     private BigDecimal minimalStock;
 
-    @Column(name = "STOCKMAXIMO", precision = 16, scale = 6)
+    @Column(name = "stockmaximo", precision = 16, scale = 6)
     private BigDecimal maximumStock;
 
     public ProductItemPK getId() {

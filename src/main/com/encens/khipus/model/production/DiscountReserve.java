@@ -14,36 +14,36 @@ import java.util.Date;
  */
 
 @TableGenerator(name = "DiscountReserve_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "DESCUENTORESERVA",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "descuentoreserva",
         allocationSize = 10)
 
 @Entity
-@Table(name = "DESCUENTORESERVA")
+@Table(name = "descuentoreserva")
 public class DiscountReserve implements BaseModel {
 
     @Id
-    @Column(name = "IDDESCUENTORESERVA", nullable = false)
+    @Column(name = "iddescuentoreserva", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "DiscountReserve_Generator")
     private Long id;
 
-    @Column(name = "MONTO", columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "monto", columnDefinition = "DECIMAL(16,2)", nullable = false)
     private Double amount;
 
-    @Column(name = "FECHAINI",columnDefinition = "DATE",nullable = false)
+    @Column(name = "fechaini",columnDefinition = "DATE",nullable = false)
     private Date startDate;
 
-    @Column(name = "FECHAFIN",columnDefinition = "DATE",nullable = false)
+    @Column(name = "fechafin",columnDefinition = "DATE",nullable = false)
     private Date endDate;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDDESCUENTOPRODUCTOR", nullable = false, updatable = true, insertable = true)
+    @JoinColumn(name = "iddescuentoproductor", nullable = false, updatable = true, insertable = true)
     private DiscountProducer discountProducer;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDPRODUCTORMATERIAPRIMA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductormateriaprima", nullable = false, updatable = false, insertable = true)
     private RawMaterialProducer materialProducer;
 
     public Long getId() {

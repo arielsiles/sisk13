@@ -17,15 +17,15 @@ import javax.persistence.*;
 @Table(name = "usuarios", schema = Constants.FINANCES_SCHEMA)
 public class FinanceUser implements BaseModel {
     @Id
-    @Column(name = "NO_USR", nullable = false, length = 4)
+    @Column(name = "no_usr", nullable = false, length = 4)
     @Length(max = 4)
     private String id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 50)
+    @Column(name = "nombre", nullable = false, length = 50)
     @Length(max = 50)
     private String name;
 
-    @Column(name = "ORAUSER", length = 25)
+    @Column(name = "orauser", length = 25)
     @Length(max = 25)
     private String oracleUser;
 

@@ -23,18 +23,18 @@ public class FinancesExecutorUnit implements BaseModel {
     @EmbeddedId
     private FinancesExecutorUnitPk id = new FinancesExecutorUnitPk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_UEJ", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_uej", nullable = false, updatable = false, insertable = false)
     @Length(max = 6)
     private String executorUnitCode;
 
-    @Column(name = "DESCRI", length = 100)
+    @Column(name = "descri", length = 100)
     private String description;
 
-    @Column(name = "ESTADO", length = 3)
+    @Column(name = "estado", length = 3)
     private String state;
 
     public FinancesExecutorUnitPk getId() {

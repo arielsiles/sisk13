@@ -14,46 +14,46 @@ import java.util.Date;
  */
 
 @TableGenerator(name = "DiscountProducer_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "DESCUENTOPRODUCTOR",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "descuentoproductor",
         allocationSize = 10)
 
 @Entity
-@Table(name = "DESCUENTOPRODUCTOR")
+@Table(name = "descuentoproductor")
 public class DiscountProducer implements BaseModel {
 
     @Id
-    @Column(name = "IDDESCUENTOPRODUCTOR", nullable = false)
+    @Column(name = "iddescuentoproductor", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "DiscountProducer_Generator")
     private Long id;
 
-    @Column(name = "PROMEDIOLECHE",columnDefinition = "DECIMAL(16,2)",nullable = false)
+    @Column(name = "promedioleche",columnDefinition = "DECIMAL(16,2)",nullable = false)
     private Double average;
 
-    @Column(name = "RESERVA",columnDefinition = "DECIMAL(8,5)",nullable = false)
+    @Column(name = "reserva",columnDefinition = "DECIMAL(8,5)",nullable = false)
     private Double reserve;
 
-    @Column(name = "RESERVAQUICENTA",columnDefinition = "DECIMAL(8,5)",nullable = false)
+    @Column(name = "reservaquicenta",columnDefinition = "DECIMAL(8,5)",nullable = false)
     private Double reserveFortnight;
 
-    @Column(name = "FECHAINI",columnDefinition = "DATE",nullable = false)
+    @Column(name = "fechaini",columnDefinition = "DATE",nullable = false)
     private Date startDate;
 
-    @Column(name = "FECHAFIN",columnDefinition = "DATE",nullable = false)
+    @Column(name = "fechafin",columnDefinition = "DATE",nullable = false)
     private Date endDate;
 
-    @Column(name = "MONTOTOTALMN",columnDefinition = "DECIMAL(16,2)",nullable = false)
+    @Column(name = "montototalmn",columnDefinition = "DECIMAL(16,2)",nullable = false)
     private Double amountMN;
 
-    @Column(name = "MONTOTOTALME",columnDefinition = "DECIMAL(16,2)",nullable = false)
+    @Column(name = "montototalme",columnDefinition = "DECIMAL(16,2)",nullable = false)
     private Double amountME;
 
-    @Column(name = "TC",columnDefinition = "DECIMAL(5,2)",nullable = false)
+    @Column(name = "tc",columnDefinition = "DECIMAL(5,2)",nullable = false)
     private Double tc;
 
-    @Column(name = "ESTADO",columnDefinition = "VARCHAR(10)",nullable = false)
+    @Column(name = "estado",columnDefinition = "VARCHAR(10)",nullable = false)
     private String state;
 
     public Long getId() {

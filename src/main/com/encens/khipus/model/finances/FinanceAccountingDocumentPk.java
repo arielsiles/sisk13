@@ -11,16 +11,16 @@ import java.io.Serializable;
 
 @Embeddable
 public class FinanceAccountingDocumentPk implements Serializable {
-    @Column(name = "NO_CIA", length = 2, updatable = false, nullable = false)
+    @Column(name = "no_cia", length = 2, updatable = false, nullable = false)
     private String companyNumber;
 
-    @Column(name = "COD_ENTI", length = 6, updatable = false, nullable = false)
+    @Column(name = "cod_enti", length = 6, updatable = false, nullable = false)
     private String entityCode;
 
-    @Column(name = "NO_AUTO", updatable = false, nullable = false)
+    @Column(name = "no_auto", updatable = false, nullable = false)
     private String authorizationNumber;
 
-    @Column(name = "NO_FACT", length = 20, updatable = false, nullable = false)
+    @Column(name = "no_fact", length = 20, updatable = false, nullable = false)
     private String invoiceNumber;
 
     public String getCompanyNumber() {

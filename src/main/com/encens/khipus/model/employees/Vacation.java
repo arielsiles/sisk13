@@ -38,71 +38,71 @@ import java.util.Date;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "VACACION",
+        pkColumnValue = "vacacion",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(name = "VACACION", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "vacacion", schema = Constants.KHIPUS_SCHEMA)
 public class Vacation implements BaseModel {
 
     @Id
-    @Column(name = "IDVACACION", nullable = false)
+    @Column(name = "idvacacion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "Vacation.tableGenerator")
     private Long id;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = 200)
+    @Column(name = "descripcion", nullable = false, length = 200)
     @NotEmpty
     @Length(max = 200)
     private String description;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private VacationState state;
 
-    @Column(name = "FECHAINICIO", nullable = false)
+    @Column(name = "fechainicio", nullable = false)
     @Temporal(TemporalType.DATE)
     @NotNull
     private Date initDate;
 
-    @Column(name = "FECHAFIN", nullable = false)
+    @Column(name = "fechafin", nullable = false)
     @Temporal(TemporalType.DATE)
     @NotNull
     private Date endDate;
 
-    @Column(name = "TOTALDIAS", nullable = false)
+    @Column(name = "totaldias", nullable = false)
     @NotNull
     private Integer totalDays;
 
-    @Column(name = "DIASLIBRES", nullable = false)
+    @Column(name = "diaslibres", nullable = false)
     @NotNull
     private Integer daysOff;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDGESTIONVACACION", nullable = false)
+    @JoinColumn(name = "idgestionvacacion", nullable = false)
     @NotNull
     private VacationGestion vacationGestion;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUSUARIOCREADOR", updatable = false)
+    @JoinColumn(name = "idusuariocreador", updatable = false)
     @NotNull
     private User creatorUser;
 
-    @Column(name = "FECHACREACION", updatable = false)
+    @Column(name = "fechacreacion", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date creationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUSUARIOEDITOR")
+    @JoinColumn(name = "idusuarioeditor")
     private User updaterUser;
 
-    @Column(name = "FECHAMODIFICACION")
+    @Column(name = "fechamodificacion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
 
-    @Column(name = "USARPARAGENPLAN", nullable = false)
+    @Column(name = "usarparagenplan", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean useForPayrollGeneration;
 
@@ -110,11 +110,11 @@ public class Vacation implements BaseModel {
     private SpecialDate specialDate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @PrePersist

@@ -37,37 +37,37 @@ import java.util.List;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "ZONAPRODUCTIVA",
+        pkColumnValue = "zonaproductiva",
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table( schema = Constants.KHIPUS_SCHEMA,
-        name = "ZONAPRODUCTIVA",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"}))
+        name = "zonaproductiva",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"nombre", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class ProductiveZone implements BaseModel {
 
     @Id
-    @Column(name = "IDZONAPRODUCTIVA", nullable = false)
+    @Column(name = "idzonaproductiva", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductiveZone.tableGenerator")
     private Long id;
 
-    @Column(name = "NUMERO", nullable = false, length = 20)
+    @Column(name = "numero", nullable = false, length = 20)
     private String number;
 
-    @Column(name = "GRUPO", nullable = true, length = 20)
+    @Column(name = "grupo", nullable = true, length = 20)
     private String group;
 
-    @Column(name = "NOMBRE", nullable = false, length = 200)
+    @Column(name = "nombre", nullable = false, length = 200)
     private String name;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 

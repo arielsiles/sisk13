@@ -14,37 +14,37 @@ import org.hibernate.annotations.Filter;
 import javax.persistence.*;
 
 @TableGenerator(name = "TypeMovementProducer_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
         pkColumnValue = "",
         allocationSize = 10)
 @Entity
-@Table(name = "TIPOMOVIMIENTOPRODUCTOR", uniqueConstraints = @UniqueConstraint(columnNames = {"IDTIPOMOVIMIENTOPRODUCTOR", "IDCOMPANIA"}))
+@Table(name = "tipomovimientoproductor", uniqueConstraints = @UniqueConstraint(columnNames = {"idtipomovimientoproductor", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class TypeMovementProducer implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDTIPOMOVIMIENTOPRODUCTOR",nullable = false)
+    @Column(name = "idtipomovimientoproductor",nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TypeMovementProducer_Generator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
-    @Column(name = "NOMBRE", nullable = false)
+    @Column(name = "nombre", nullable = false)
     private String name;
 
-    @Column(name = "TIPO", nullable = false)
+    @Column(name = "tipo", nullable = false)
     @Enumerated(EnumType.STRING)
     private SalaryMovementProducerTypeEnum salaryMovementProducerTypeEnum;
 
-    @Column(name = "MONEDA", nullable = true)
+    @Column(name = "moneda", nullable = true)
     private String money;
 
-    @Column(name = "TIPOMOVIMIENTO", nullable = false)
+    @Column(name = "tipomovimiento", nullable = false)
     private String typeMovement;
 
     public Long getId() {

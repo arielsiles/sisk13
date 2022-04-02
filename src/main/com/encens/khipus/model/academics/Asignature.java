@@ -18,57 +18,57 @@ import java.util.Date;
 )
 
 @Entity
-@Table(name = "ASIGNATURAS", schema = Constants.ACADEMIC_SCHEMA)
+@Table(name = "asignaturas", schema = Constants.ACADEMIC_SCHEMA)
 public class Asignature {
 
     @Id
-    @Column(name = "ASIGNATURA", length = 200, nullable = false, updatable = false)
+    @Column(name = "asignatura", length = 200, nullable = false, updatable = false)
     private String asignature;
 
-    @Column(name = "NOMBRE", length = 200, nullable = false, updatable = false, insertable = false)
+    @Column(name = "nombre", length = 200, nullable = false, updatable = false, insertable = false)
     private String name;
 
-    @Column(name = "FECHA_CREACION", nullable = false, updatable = false, insertable = false)
+    @Column(name = "fecha_creacion", nullable = false, updatable = false, insertable = false)
     @Temporal(TemporalType.DATE)
     private Date creationDate;
 
-    @Column(name = "TIPO_ASIGNATURA", length = 100, nullable = false, updatable = false, insertable = false)
+    @Column(name = "tipo_asignatura", length = 100, nullable = false, updatable = false, insertable = false)
     private String asignatureType;
 
-    @Column(name = "UNIVERSIDAD", nullable = false, updatable = false, insertable = false)
+    @Column(name = "universidad", nullable = false, updatable = false, insertable = false)
     private Integer university;
 
-    @Column(name = "UNIDAD", nullable = false, updatable = false, insertable = false)
+    @Column(name = "unidad", nullable = false, updatable = false, insertable = false)
     private Integer unit;
 
-    @Column(name = "UNIDAD_ACAD_ADM", nullable = false, insertable = false, updatable = false)
+    @Column(name = "unidad_acad_adm", nullable = false, insertable = false, updatable = false)
     private Integer administrativeAcademicUnit;
 
-    @Column(name = "AREA_DE_CONOCIMIENTO", length = 100, updatable = false, insertable = false)
+    @Column(name = "area_de_conocimiento", length = 100, updatable = false, insertable = false)
     private String knowledgeArea;
 
-    @Column(name = "SIGLA", length = 100, updatable = false, insertable = false)
+    @Column(name = "sigla", length = 100, updatable = false, insertable = false)
     private String acronym;
 
-    @Column(name = "DESC_CORTA", length = 100, updatable = false, insertable = false)
+    @Column(name = "desc_corta", length = 100, updatable = false, insertable = false)
     private String shortDescription;
 
-    @Column(name = "CARGA_HORARIA", updatable = false, insertable = false)
+    @Column(name = "carga_horaria", updatable = false, insertable = false)
     private Integer scheduleCharge;
 
-    @Column(name = "CUOTA", updatable = false, insertable = false)
+    @Column(name = "cuota", updatable = false, insertable = false)
     private Integer quota;
 
-    @Column(name = "CREDITOS", updatable = false, insertable = false)
+    @Column(name = "creditos", updatable = false, insertable = false)
     private Integer credit;
 
-    @Column(name = "COSTO", updatable = false, insertable = false)
+    @Column(name = "costo", updatable = false, insertable = false)
     private Integer cost;
 
-    @Column(name = "CARGA_HTEORICA", updatable = false, insertable = false)
+    @Column(name = "carga_hteorica", updatable = false, insertable = false)
     private Integer theoreticalCharge;
 
-    @Column(name = "CARGA_HPRACTICA", updatable = false, insertable = false)
+    @Column(name = "carga_hpractica", updatable = false, insertable = false)
     private Integer practicalCharge;
 
     public String getAsignature() {

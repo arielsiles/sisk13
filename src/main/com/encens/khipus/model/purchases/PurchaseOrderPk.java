@@ -15,10 +15,10 @@ import java.io.Serializable;
  */
 @Embeddable
 public class PurchaseOrderPk implements Serializable {
-    @Column(name = "NO_CIA", length = 2, nullable = false, updatable = false)
+    @Column(name = "no_cia", length = 2, nullable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "NO_ORDEN", length = 10, nullable = false, updatable = false)
+    @Column(name = "no_orden", length = 10, nullable = false, updatable = false)
     @NotNull
     @Length(max = 10)
     private String orderNumber;

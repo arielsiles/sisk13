@@ -17,20 +17,20 @@ import javax.persistence.Table;
 @Table(name = "unidades", schema = Constants.ACADEMIC_SCHEMA)
 public class AcademicFaculty implements BaseModel {
     @Id
-    @Column(name = "UNIDAD", nullable = false)
+    @Column(name = "unidad", nullable = false)
     private Integer id;
 
-    @Column(name = "SIGLA", length = 10, nullable = false)
+    @Column(name = "sigla", length = 10, nullable = false)
     private String acronym;
 
-    @Column(name = "DESCRIPCION", length = 60, nullable = false)
+    @Column(name = "descripcion", length = 60, nullable = false)
     private String description;
 
-    @Column(name = "ACTIVA", nullable = true)
+    @Column(name = "activa", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean active;
 
-    @Column(name = "UNIDAD_ACAD_ADM", nullable = false)
+    @Column(name = "unidad_acad_adm", nullable = false)
     private Integer executorUnitId;
 
     public Object getId() {

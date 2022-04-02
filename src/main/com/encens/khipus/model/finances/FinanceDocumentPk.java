@@ -10,10 +10,10 @@ import java.io.Serializable;
  */
 @Embeddable
 public class FinanceDocumentPk implements Serializable {
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", nullable = false, updatable = false)
+    @Column(name = "no_trans", nullable = false, updatable = false)
     private String transactionNumber;
 
     public FinanceDocumentPk() {

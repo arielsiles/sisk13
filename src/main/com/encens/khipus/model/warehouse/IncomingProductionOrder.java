@@ -4,51 +4,52 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.production.OutputProductionVoucher;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
 
 
 @TableGenerator(name = "IncomingProductionOrder_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "ENTRADAORDENPRODUCCION",
+        table = Constants.SEQUENCE_TABLE_NAME,
+        pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
+        valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
+        pkColumnValue = "entradaordenproduccion",
         allocationSize = 10)
 
 @Entity
-@Table(name = "ENTRADAORDENPRODUCCION")
+@Table(name = "entradaordenproduccion")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class IncomingProductionOrder implements BaseModel {
 
     @Id
-    @Column(name = "IDENTRADAORDENPRODUCCION", nullable = false)
+    @Column(name = "identradaordenproduccion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "IncomingProductionOrder_Generator")
     private Long id;
 
-    @Column(name = "OBSERVACIONENTREGA", nullable = true, length = 1500)
+    @Column(name = "observacionentrega", nullable = true, length = 1500)
     private String deliveredObservation;
 
-    @Column(name = "OBSERVACIONRECEPCION", nullable = true, length = 1500)
+    @Column(name = "observacionrecepcion", nullable = true, length = 1500)
     private String receivedObservation;
 
-    @Column(name = "CANTIDADENTREGADA", nullable = false, columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "cantidadentregada", nullable = false, columnDefinition = "DECIMAL(24,0)")
     private double deliveredAmount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "IDINVENTARIOPRODUCTOTERMINADO", nullable = true, updatable = true, insertable = true)
+    @JoinColumn(name = "idinventarioproductoterminado", nullable = true, updatable = true, insertable = true)
     private FinishedGoodsInventory finishedGoodsInventory;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, mappedBy = "incomingProductionOrder")
     private OutputProductionVoucher outputProductionVoucher;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDREGISTROTRANSFERENCIAPRODUCT", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idregistrotransferenciaproduct", nullable = false, updatable = false, insertable = true)
     private ProductionTransferLog productionTransferLog;
 
     public Long getId() {

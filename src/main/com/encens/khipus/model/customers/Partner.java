@@ -10,8 +10,8 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
-import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -49,7 +49,7 @@ public class Partner implements BaseModel {
     private String idNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idexttipodocumento", referencedColumnName = "IDEXTTIPODOCUMENTO")
+    @JoinColumn(name = "idexttipodocumento", referencedColumnName = "idexttipodocumento")
     private Extension extensionSite;
 
     @ManyToOne(fetch = FetchType.LAZY)

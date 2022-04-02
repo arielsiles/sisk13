@@ -12,23 +12,23 @@ import javax.persistence.*;
  * @version 2.26
  */
 @Entity
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "INTERVALOCOMPPNL")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "intervalocomppnl")
 @DiscriminatorValue("intervalo")
 @PrimaryKeyJoinColumns(value = {
-        @PrimaryKeyJoinColumn(name = "IDINTERVALOCOMPPNL", referencedColumnName = "IDFILTROCOMPPNL")
+        @PrimaryKeyJoinColumn(name = "idintervalocomppnl", referencedColumnName = "idfiltrocomppnl")
 })
 public class Interval extends Filter {
 
-    @Column(name = "VALORMIN", nullable = false)
+    @Column(name = "valormin", nullable = false)
     @NotNull
     private Integer minValue;
 
-    @Column(name = "VALORMAX", nullable = false)
+    @Column(name = "valormax", nullable = false)
     @NotNull
     private Integer maxValue;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Integer getMinValue() {

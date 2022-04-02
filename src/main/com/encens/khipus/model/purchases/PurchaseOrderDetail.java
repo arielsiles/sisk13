@@ -43,69 +43,69 @@ import java.math.BigDecimal;
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(name = "com_detoc", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = @UniqueConstraint(columnNames = {"NO_CIA", "NO_ORDEN", "NRO"}))
+@Table(name = "com_detoc", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = @UniqueConstraint(columnNames = {"no_cia", "no_orden", "nro"}))
 public class PurchaseOrderDetail implements BaseModel {
 
     @Id
-    @Column(name = "ID_COM_DETOC", nullable = false, updatable = false)
+    @Column(name = "id_com_detoc", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PurchaseOrderDetail.tableGenerator")
     private Long id;
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     private String companyNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "ID_COM_ENCOC", nullable = false, updatable = false, insertable = true)
+            @JoinColumn(name = "id_com_encoc", nullable = false, updatable = false, insertable = true)
     })
     private PurchaseOrder purchaseOrder;
 
-    @Column(name = "COD_MED", nullable = true, length = 6)
+    @Column(name = "cod_med", nullable = true, length = 6)
     @Length(max = 6)
     private String purchaseMeasureCode;
 
-    @Column(name = "NO_ORDEN", nullable = false)
+    @Column(name = "no_orden", nullable = false)
     private String orderNumber;
 
-    @Column(name = "NRO", nullable = false, updatable = false)
+    @Column(name = "nro", nullable = false, updatable = false)
     private Long detailNumber;
 
-    @Column(name = "CANT_SOL", precision = 16, scale = 2, nullable = false)
+    @Column(name = "cant_sol", precision = 16, scale = 2, nullable = false)
     private BigDecimal requestedQuantity;
 
-    @Column(name = "COSTO_UNI", precision = 16, scale = 6)
+    @Column(name = "costo_uni", precision = 16, scale = 6)
     private BigDecimal unitCost;
 
-    @Column(name = "TOTAL", precision = 16, scale = 6)
+    @Column(name = "total", precision = 16, scale = 6)
     private BigDecimal totalAmount;
 
-    @Column(name = "ADVERTENCIA", length = 250)
+    @Column(name = "advertencia", length = 250)
     @Length(max = 250)
     private String warning;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_ART", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_art", nullable = false, updatable = false, insertable = false)
     })
     private ProductItem productItem;
 
-    @Column(name = "COD_ART", nullable = false)
+    @Column(name = "cod_art", nullable = false)
     private String productItemCode;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_MED", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_med", nullable = false, updatable = false, insertable = false)
     })
     private MeasureUnit purchaseMeasureUnit;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDHISTORIALARTICULOPROV")
+    @JoinColumn(name = "idhistorialarticuloprov")
     private ProductItemByProviderHistory productItemByProviderHistory;
 
     public Long getId() {

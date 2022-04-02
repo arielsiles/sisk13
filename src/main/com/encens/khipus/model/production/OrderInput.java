@@ -9,60 +9,60 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 @TableGenerator(name = "OrderInput_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "ORDENINSUMO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "ordeninsumo",
         allocationSize = 10)
 
 @Entity
-@Table(name = "ORDENINSUMO")
+@Table(name = "ordeninsumo")
 public class OrderInput implements BaseModel {
 
     @Id
-    @Column(name = "IDORDENINSUMO", nullable = false)
+    @Column(name = "idordeninsumo", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "OrderInput_Generator")
     private Long id;
 
-    @Column(name = "CANTIDAD", nullable = false, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "cantidad", nullable = false, columnDefinition = "DECIMAL(16,6)")
     private Double amount;
 
     /* TODO: cambiar nullable a false */
-    @Column(name = "CANTIDADSTOCK", nullable = true, columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "cantidadstock", nullable = true, columnDefinition = "DECIMAL(24,0)")
     private BigDecimal amountStock = new BigDecimal(0.0);
 
-    @Column(name = "COSTOUNITARIO", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costounitario", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal costUnit = new BigDecimal(0.0);
 
-    @Column(name = "COSTOTOTAL", nullable = true, columnDefinition = "DECIMAL(16,6)")
+    @Column(name = "costototal", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal costTotal = new BigDecimal(0.0);
 
-    @Column(name = "FORMULAMATEMATICA", nullable = true, length = 500)
+    @Column(name = "formulamatematica", nullable = true, length = 500)
     private String mathematicalFormula;
 
-    @Column(name = "TIPO",nullable = true)
+    @Column(name = "tipo",nullable = true)
     private String type = "FORMULATED";
 
-    @Column(name = "COD_ART", insertable = false, updatable = false, nullable = false)
+    @Column(name = "cod_art", insertable = false, updatable = false, nullable = false)
     private String productItemCode;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false, nullable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false, nullable = false)
     @Length(max = 2)
     private String companyNumber;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "COD_ART", referencedColumnName = "COD_ART")
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_art", referencedColumnName = "cod_art")
     })
     private ProductItem productItem;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDORDENPRODUCCION", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idordenproduccion", nullable = true, updatable = false, insertable = true)
     private ProductionOrder productionOrder;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDPRODUCTOBASE", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductobase", nullable = true, updatable = false, insertable = true)
     private BaseProduct baseProductInput;
 
     public Long getId() {

@@ -26,39 +26,39 @@ import java.math.BigDecimal;
 })
 
 @EntityListeners(UpperCaseStringListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "DOCUMENTODESCARGO")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "documentodescargo")
 public class DischargeDocument extends AccountingDocument {
-    @Column(name = "TIPO", nullable = false, length = 25)
+    @Column(name = "tipo", nullable = false, length = 25)
     @Enumerated(EnumType.STRING)
     private CollectionDocumentType type;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
-    @Column(name = "ESTADO", nullable = false, length = 25)
+    @Column(name = "estado", nullable = false, length = 25)
     @Enumerated(EnumType.STRING)
     private DischargeDocumentState state;
 
-    @Column(name = "MONEDA", updatable = false)
+    @Column(name = "moneda", updatable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "TIPOCAMBIO", precision = 16, scale = 6, updatable = true)
+    @Column(name = "tipocambio", precision = 16, scale = 6, updatable = true)
     private BigDecimal exchangeRate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDENTIDAD", referencedColumnName = "COD_ENTI", nullable = true, insertable = true, updatable = true)
+    @JoinColumn(name = "identidad", referencedColumnName = "cod_enti", nullable = true, insertable = true, updatable = true)
     private FinancesEntity financesEntity;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCONTRATOPUESTO", nullable = false, insertable = true, updatable = false)
+    @JoinColumn(name = "idcontratopuesto", nullable = false, insertable = true, updatable = false)
     private JobContract jobContract;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDGESTIONPLANILLA", nullable = false, insertable = true, updatable = false)
+    @JoinColumn(name = "idgestionplanilla", nullable = false, insertable = true, updatable = false)
     private GestionPayroll gestionPayroll;
 
     public CollectionDocumentType getType() {

@@ -26,37 +26,37 @@ public class WarehouseDocumentType implements BaseModel {
     @EmbeddedId
     private DocumentTypePK id = new DocumentTypePK();
 
-    @Column(name = "DESCRI", nullable = true, length = 100)
+    @Column(name = "descri", nullable = true, length = 100)
     @Length(max = 100)
     private String name;
 
-    @Column(name = "TIPO_VALE", nullable = false, length = 1)
+    @Column(name = "tipo_vale", nullable = false, length = 1)
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherType warehouseVoucherType;
 
-    @Column(name = "RESTRICCIONCAMPO", length = 100)
+    @Column(name = "restriccioncampo", length = 100)
     @Enumerated(EnumType.STRING)
     private WarehouseDocumentTypeFieldRestriction fieldRestriction;
 
-    @Column(name = "CTRACUENTAMN", length = 20)
+    @Column(name = "ctracuentamn", length = 20)
     @Length(max = 20)
     private String contraAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", insertable = false, updatable = false, referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "CTRACUENTAMN", insertable = false, updatable = false, referencedColumnName = "CUENTA")
+            @JoinColumn(name = "no_cia", insertable = false, updatable = false, referencedColumnName = "no_cia"),
+            @JoinColumn(name = "ctracuentamn", insertable = false, updatable = false, referencedColumnName = "cuenta")
     })
     private CashAccount contraAccount;
 
-    @Column(name = "ESTADO", nullable = false, length = 3)
+    @Column(name = "estado", nullable = false, length = 3)
     @Enumerated(EnumType.STRING)
     private DocumentTypeState state;
 
-    @Column(name = "COD_DOC", nullable = false, insertable = false, updatable = false)
+    @Column(name = "cod_doc", nullable = false, insertable = false, updatable = false)
     private String documentCode;
 
-    @Column(name = "DESC_DEF", length = 100)
+    @Column(name = "desc_def", length = 100)
     @Length(max = 100)
     private String defaultDescription;
 

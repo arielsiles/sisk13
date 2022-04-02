@@ -18,22 +18,22 @@ import java.util.Collection;
 public class Territoriotrabajo implements Serializable {
 
     @Id
-    @Column(name = "IDTERRITORIOTRABAJO")
+    @Column(name = "idterritoriotrabajo")
     private Long idterritoriotrabajo;
 
-    @Column(name = "NOMBRE")
+    @Column(name = "nombre")
     private String nombre;
 
-    @Column(name = "PAIS")
+    @Column(name = "pais")
     private String pais;
 
-    @Column(name = "DESCRIPCION")
+    @Column(name = "descripcion")
     private String descripcion;
 
     @OneToMany(mappedBy = "territoriotrabajo")
     private Collection<Client> clientes;
 
-    @JoinColumn(name = "IDDISTRIBUIDOR", referencedColumnName = "IDPERSONACLIENTE")
+    @JoinColumn(name = "iddistribuidor", referencedColumnName = "idpersonacliente")
     @ManyToOne
     private Client distribuidor;
 

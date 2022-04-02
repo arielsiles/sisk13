@@ -25,40 +25,40 @@ public class FinancesBankAccount implements BaseModel {
     @EmbeddedId
     private FinancesBankAccountPk id = new FinancesBankAccountPk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "CTA_BCO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cta_bco", nullable = false, updatable = false, insertable = false)
     private String accountNumber;
 
-    @Column(name = "DESCRI", length = 100)
+    @Column(name = "descri", length = 100)
     @Length(max = 100)
     private String description;
 
-    @Column(name = "COD_BCO", length = 6)
+    @Column(name = "cod_bco", length = 6)
     @Length(max = 6)
     private String bankCode;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "COD_BCO", nullable = false, updatable = false, insertable = false)
+    @JoinColumn(name = "cod_bco", nullable = false, updatable = false, insertable = false)
     private FinancesBank financesBank;
 
-    @Column(name = "CUENTA", length = 31)
+    @Column(name = "cuenta", length = 31)
     @Length(max = 31)
     private String accountingAccountCode;
 
     @ManyToOne(optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashAccount;
 
-    @Column(name = "MONEDA")
+    @Column(name = "moneda")
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "ESTADO", length = 3)
+    @Column(name = "estado", length = 3)
     @Length(max = 3)
     private String state;
 

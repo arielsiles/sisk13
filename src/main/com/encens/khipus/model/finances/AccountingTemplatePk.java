@@ -14,11 +14,11 @@ import java.io.Serializable;
 @Embeddable
 public class AccountingTemplatePk implements Serializable {
 
-    @Column(name = "NO_CIA", length = 2, nullable = false, updatable = false)
+    @Column(name = "no_cia", length = 2, nullable = false, updatable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_PLANTI", length = 6, nullable = false, updatable = false)
+    @Column(name = "cod_planti", length = 6, nullable = false, updatable = false)
     @Length(max = 6)
     @NotNull
     private String templateCode;

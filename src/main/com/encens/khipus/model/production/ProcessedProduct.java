@@ -23,24 +23,24 @@ import java.util.List;
 })
 
 @Entity
-@Table(name = "PRODUCTOPROCESADO")
-@DiscriminatorValue("PRODUCTOPROCESADO")
+@Table(name = "productoprocesado")
+@DiscriminatorValue("productoprocesado")
 @PrimaryKeyJoinColumns(value = {
-        @PrimaryKeyJoinColumn(name = "IDPRODUCTOPROCESADO", referencedColumnName = "IDMETAPRODUCTOPRODUCCION")})
+        @PrimaryKeyJoinColumn(name = "idproductoprocesado", referencedColumnName = "idmetaproductoproduccion")})
 public class ProcessedProduct extends MetaProduct {
 
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     @OneToMany(mappedBy = "processedProduct", fetch = FetchType.LAZY)
     private List<ProductComposition> productCompositionList = new ArrayList<ProductComposition>();
 
-    @Column(name = "UNIDADMEDIDATE", nullable = true, columnDefinition = "VARCHAR(4)")
+    @Column(name = "unidadmedidate", nullable = true, columnDefinition = "VARCHAR(4)")
     private String unidMeasure;
 
-    @Column(name = "CANTIDAD", nullable = true, columnDefinition = "DECIMAL(7,2)")
+    @Column(name = "cantidad", nullable = true, columnDefinition = "DECIMAL(7,2)")
     private Double amount;
 
     public List<ProductComposition> getProductCompositionList() {

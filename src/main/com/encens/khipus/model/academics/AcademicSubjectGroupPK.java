@@ -23,18 +23,18 @@ public class AcademicSubjectGroupPK implements Serializable {
     @Column(name = "gestion", nullable = false, insertable = false, updatable = false)
     private Integer gestion;
 
-    @Column(name = "PERIODO", nullable = false, insertable = false, updatable = false)
+    @Column(name = "periodo", nullable = false, insertable = false, updatable = false)
     private Integer period;
 
     @Column(name = "sistema", nullable = false, insertable = false, updatable = false)
     private Integer systemNumber;
 
-    @Column(name = "GRUPO_ASIGNATURA", length = 15, nullable = false, insertable = false, updatable = false)
+    @Column(name = "grupo_asignatura", length = 15, nullable = false, insertable = false, updatable = false)
     @Length(max = 15)
     @NotEmpty
     private String subjectGroup;
 
-    @Column(name = "TIPO_GRUPO", length = 5, nullable = false, insertable = false, updatable = false)
+    @Column(name = "tipo_grupo", length = 5, nullable = false, insertable = false, updatable = false)
     @Length(max = 5)
     @NotEmpty
     private String groupType;

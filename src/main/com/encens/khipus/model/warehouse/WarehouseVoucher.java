@@ -52,67 +52,67 @@ public class WarehouseVoucher implements BaseModel {
     @EmbeddedId
     private WarehouseVoucherPK id = new WarehouseVoucherPK();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", nullable = false, updatable = false, insertable = false, length = 10)
+    @Column(name = "no_trans", nullable = false, updatable = false, insertable = false, length = 10)
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "COD_DOC", nullable = true, length = 3)
+    @Column(name = "cod_doc", nullable = true, length = 3)
     @Length(max = 3)
     private String documentCode;
 
-    @Column(name = "NO_VALE", nullable = true, length = 20)
+    @Column(name = "no_vale", nullable = true, length = 20)
     @Length(max = 20)
     private String number;
 
-    @Column(name = "FECHA", nullable = true)
+    @Column(name = "fecha", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "ESTADO", nullable = true, length = 3)
+    @Column(name = "estado", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherState state;
 
-    @Column(name = "OPER", nullable = true)
+    @Column(name = "oper", nullable = true)
     @Enumerated(EnumType.STRING)
     private VoucherOperation operation;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "DEST", referencedColumnName = "NO_TRANS", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "dest", referencedColumnName = "no_trans", updatable = false, insertable = false)
     })
     private WarehouseVoucher destiny;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "ORIG", referencedColumnName = "NO_TRANS", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "orig", referencedColumnName = "no_trans", updatable = false, insertable = false)
     })
     private WarehouseVoucher origin;
 
-    @Column(name = "DEST")
+    @Column(name = "dest")
     private String notransDestiny;
 
-    @Column(name = "ORIG")
+    @Column(name = "orig")
     private String notransOrigin;
 
-    @Column(name = "NO_TRANS_REC", nullable = true, length = 10)
+    @Column(name = "no_trans_rec", nullable = true, length = 10)
     @Length(max = 10)
     private String receptionTransactionNumber;
 
-    @Column(name = "COD_ALM", nullable = false, length = 6)
+    @Column(name = "cod_alm", nullable = false, length = 6)
     @Length(max = 6)
     private String warehouseCode;
 
-    @Column(name = "COD_ALM_DEST", nullable = true, length = 6)
+    @Column(name = "cod_alm_dest", nullable = true, length = 6)
     @Length(max = 6)
     private String targetWarehouseCode;
 
-    @Column(name = "ID_COM_ENCOC", nullable = true, updatable = false, insertable = false)
+    @Column(name = "id_com_encoc", nullable = true, updatable = false, insertable = false)
     private Long purchaseOrderId;
 
 
@@ -121,112 +121,112 @@ public class WarehouseVoucher implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "DEST_COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "dest_cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter targetCostCenter;
 
-    @Column(name = "COD_CC", length = 8, nullable = false)
+    @Column(name = "cod_cc", length = 8, nullable = false)
     @Length(max = 8)
     private String costCenterCode;
 
-    @Column(name = "DEST_COD_CC", length = 8, nullable = true)
+    @Column(name = "dest_cod_cc", length = 8, nullable = true)
     @Length(max = 8)
     private String targetCostCenterCode;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_ALM", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_alm", nullable = false, updatable = false, insertable = false)
     })
     private Warehouse warehouse;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_ALM_DEST", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_alm_dest", nullable = false, updatable = false, insertable = false)
     })
     private Warehouse targetWarehouse;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_DOC", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_doc", nullable = false, updatable = false, insertable = false)
     })
     private WarehouseDocumentType documentType;
 
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "ID_COM_ENCOC", nullable = true, updatable = false, insertable = true)
+            @JoinColumn(name = "id_com_encoc", nullable = true, updatable = false, insertable = true)
     })
     private PurchaseOrder purchaseOrder;
 
-    @Column(name = "CONTRACUENTA", length = 20)
+    @Column(name = "contracuenta", length = 20)
     @Length(max = 20)
     private String contraAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", insertable = false, updatable = false, referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "CONTRACUENTA", insertable = false, updatable = false, referencedColumnName = "CUENTA")
+            @JoinColumn(name = "no_cia", insertable = false, updatable = false, referencedColumnName = "no_cia"),
+            @JoinColumn(name = "contracuenta", insertable = false, updatable = false, referencedColumnName = "cuenta")
     })
     private CashAccount contraAccount;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "ID_RESPONSABLE", nullable = true)
+    @JoinColumn(name = "id_responsable", nullable = true)
     private Employee responsible;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "ID_RESPONSABLE_DEST", nullable = true)
+    @JoinColumn(name = "id_responsable_dest", nullable = true)
     private Employee targetResponsible;
 
     @com.encens.khipus.validator.BusinessUnit
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", updatable = true, insertable = true)
     private BusinessUnit executorUnit;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDUNIDADNEGOCIO_DEST", updatable = true, insertable = true)
+    @JoinColumn(name = "idunidadnegocio_dest", updatable = true, insertable = true)
     private BusinessUnit targetExecutorUnit;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCONTRATOPUESTOSOL", referencedColumnName = "idcontratopuesto")
+    @JoinColumn(name = "idcontratopuestosol", referencedColumnName = "idcontratopuesto")
     private JobContract petitionerJobContract;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA_RAIZ", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "NO_TRANS_RAIZ", referencedColumnName = "NO_TRANS")
+            @JoinColumn(name = "no_cia_raiz", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "no_trans_raiz", referencedColumnName = "no_trans")
     })
     private WarehouseVoucher parentWarehouseVoucher;
 
     @OneToMany(mappedBy = "parentWarehouseVoucher", fetch = FetchType.LAZY)
     private List<WarehouseVoucher> partialWarehouseVoucherList;
 
-    @Column(name = "TIPORECEPCION", length = 2)
+    @Column(name = "tiporecepcion", length = 2)
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherReceptionType warehouseVoucherReceptionType;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDORDENPRODUCCION", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idordenproduccion", nullable = true, updatable = false, insertable = true)
     private ProductionOrder productionOrder;
 
     @OneToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDPRODUCTOBASE", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductobase", nullable = true, updatable = false, insertable = true)
     private BaseProduct baseProduct;
 
     @ManyToOne
@@ -234,7 +234,7 @@ public class WarehouseVoucher implements BaseModel {
     private Voucher voucher;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPEDIDOSTR", nullable = true)
+    @JoinColumn(name = "idpedidostr", nullable = true)
     private CustomerOrder transferCustomerOrder;
 
     public WarehouseVoucherPK getId() {

@@ -23,27 +23,27 @@ import javax.persistence.*;
 })
 
 @Entity
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "USUARIOUNIDADNEGOCIO")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "usuariounidadnegocio")
 @EntityListeners(CompanyListener.class)
 public class UserBusinessUnit implements BaseModel {
     @Id
-    @Column(name = "IDUSUARIOUNIDADNEGOCIO", nullable = false)
+    @Column(name = "idusuariounidadnegocio", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "UserBusinessUnit.tableGenerator")
     private Long id;
 
-    @Column(name = "IDUNIDADNEGOCIO", nullable = false, insertable = false, updatable = false)
+    @Column(name = "idunidadnegocio", nullable = false, insertable = false, updatable = false)
     private Long businessUnitId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUSUARIO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idusuario", nullable = false, updatable = false, insertable = true)
     private User user;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idunidadnegocio", nullable = false, updatable = false, insertable = true)
     private BusinessUnit businessUnit;
 
     public Long getId() {

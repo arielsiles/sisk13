@@ -16,11 +16,11 @@ import java.io.Serializable;
 @Embeddable
 public class CashAccountPk implements Serializable {
 
-    @Column(name = "NO_CIA", length = 2, nullable = false, updatable = false)
+    @Column(name = "no_cia", length = 2, nullable = false, updatable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "CUENTA", length = 20, nullable = false, updatable = false)
+    @Column(name = "cuenta", length = 20, nullable = false, updatable = false)
     @Length(max = 20)
     @NotNull
     private String accountCode;

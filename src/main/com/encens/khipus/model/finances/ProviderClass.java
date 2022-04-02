@@ -20,18 +20,18 @@ public class ProviderClass implements BaseModel {
     @EmbeddedId
     private ProviderClassPk id = new ProviderClassPk();
 
-    @Column(name = "NO_CIA", updatable = false, insertable = false)
+    @Column(name = "no_cia", updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "CLASE", updatable = false, insertable = false)
+    @Column(name = "clase", updatable = false, insertable = false)
     private String code;
 
-    @Column(name = "DESCRI", length = 100, nullable = false)
+    @Column(name = "descri", length = 100, nullable = false)
     @NotNull
     @Length(max = 100)
     private String description;
 
-    @Column(name = "TIPO", nullable = false)
+    @Column(name = "tipo", nullable = false)
     @Enumerated(EnumType.STRING)
     private ProviderClassType type;
 

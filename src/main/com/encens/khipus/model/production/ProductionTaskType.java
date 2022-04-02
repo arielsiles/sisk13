@@ -17,44 +17,44 @@ import javax.persistence.*;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "TIPOTAREAPROD",
+        pkColumnValue = "tipotareaprod",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "TIPOTAREAPROD", uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "nombre"}))
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "tipotareaprod", uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "nombre"}))
 public class ProductionTaskType implements BaseModel {
 
     @Id
-    @Column(name = "IDTIPOTAREAPROD", nullable = false)
+    @Column(name = "idtipotareaprod", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionTaskType.tableGenerator")
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String name;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
-    @Column(name = "COD_GRU", insertable = false, updatable = false, nullable = false)
+    @Column(name = "cod_gru", insertable = false, updatable = false, nullable = false)
     private String groupCode;
 
-    @Column(name = "NO_CIA", insertable = false, updatable = false, nullable = false)
+    @Column(name = "no_cia", insertable = false, updatable = false, nullable = false)
     @Length(max = 2)
     private String companyNumber;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "COD_GRU", referencedColumnName = "COD_GRU")
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cod_gru", referencedColumnName = "cod_gru")
     })
     private Group group;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

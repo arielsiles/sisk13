@@ -28,45 +28,45 @@ public class FinanceDocumentMovement implements BaseModel {
     @EmbeddedId
     private FinanceDocumentMovementPk id = new FinanceDocumentMovementPk();
 
-    @Column(name = "NO_CIA", length = 2, updatable = false, insertable = false)
+    @Column(name = "no_cia", length = 2, updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", length = 10, updatable = false, insertable = false)
+    @Column(name = "no_trans", length = 10, updatable = false, insertable = false)
     private String transactionNumber;
 
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "FECHA_CRE")
+    @Column(name = "fecha_cre")
     @Temporal(TemporalType.DATE)
     private Date createdOnDate;
 
-    @Column(name = "TIPO_MOV", length = 1, updatable = false)
+    @Column(name = "tipo_mov", length = 1, updatable = false)
     @Enumerated(EnumType.STRING)
     private FinanceMovementType movementType;
 
-    @Column(name = "DESCRI")
+    @Column(name = "descri")
     private String description;
 
-    @Column(name = "TIPO_COMPRO", length = 2)
+    @Column(name = "tipo_compro", length = 2)
     private String voucherType;
 
-    @Column(name = "NO_COMPRO", length = 10)
+    @Column(name = "no_compro", length = 10)
     private String voucherNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "TIPO_COMPRO", referencedColumnName = "TIPO_COMPRO", updatable = false, insertable = false),
-            @JoinColumn(name = "NO_COMPRO", referencedColumnName = "NO_COMPRO", updatable = false, insertable = false),
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false)
+            @JoinColumn(name = "tipo_compro", referencedColumnName = "tipo_compro", updatable = false, insertable = false),
+            @JoinColumn(name = "no_compro", referencedColumnName = "no_compro", updatable = false, insertable = false),
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false)
     })
     private AccountingMovement accountingMovement;
 
-    @Column(name = "NO_USR")
+    @Column(name = "no_usr")
     private String userNumber;
 
-    @Column(name = "ESTADO", insertable = false, updatable = false)
+    @Column(name = "estado", insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private FinanceDocumentState state;
 

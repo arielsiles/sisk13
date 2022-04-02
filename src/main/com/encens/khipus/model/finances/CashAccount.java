@@ -36,23 +36,23 @@ public class CashAccount implements BaseModel {
     @EmbeddedId
     private CashAccountPk id = new CashAccountPk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "CUENTA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cuenta", nullable = false, updatable = false, insertable = false)
     private String accountCode;
 
-    @Column(name = "DESCRI", length = 100, updatable = false)
+    @Column(name = "descri", length = 100, updatable = false)
     @Length(max = 100)
     private String description;
 
-    @Column(name = "CTA_RAIZ", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cta_raiz", nullable = false, updatable = false, insertable = false)
     private String rootAccountCode;
 
-    @Column(name = "CTA_NIV3", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cta_niv3", nullable = false, updatable = false, insertable = false)
     private String accountLevel3Code;
 
-    @Column(name = "EST", nullable = true, length = 3)
+    @Column(name = "est", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
     private CreditState state;
 
@@ -60,119 +60,119 @@ public class CashAccount implements BaseModel {
     @Length(max = 2)
     private String accountType;*/
 
-    @Column(name = "TIPO", updatable = false)
+    @Column(name = "tipo", updatable = false)
     @Enumerated(EnumType.STRING)
     private CashAccountType accountType;
 
 
-    @Column(name = "CLASE", length = 1, updatable = false)
+    @Column(name = "clase", length = 1, updatable = false)
     @Length(max = 1)
     private String accountClass;
 
-    @Column(name = "IND_MOV", updatable = false)
+    @Column(name = "ind_mov", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean movementAccount;
 
-    @Column(name = "IND_PRESUP", updatable = false)
+    @Column(name = "ind_presup", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean budgetAccount;
 
-    @Column(name = "DEBITOS", precision = 14, scale = 2, updatable = false)
+    @Column(name = "debitos", precision = 14, scale = 2, updatable = false)
     private BigDecimal debit;
 
-    @Column(name = "CREDITOS", precision = 14, scale = 2, updatable = false)
+    @Column(name = "creditos", precision = 14, scale = 2, updatable = false)
     private BigDecimal credit;
 
-    @Column(name = "SALDO_PER_ANT", precision = 15, scale = 2, updatable = false)
+    @Column(name = "saldo_per_ant", precision = 15, scale = 2, updatable = false)
     private BigDecimal nationalBalancePreviousPeriod;
 
-    @Column(name = "SALDO_MES_ANT", precision = 15, scale = 2, updatable = false)
+    @Column(name = "saldo_mes_ant", precision = 15, scale = 2, updatable = false)
     private BigDecimal nationalBalancePreviousMonth;
 
-    @Column(name = "MONEDA", updatable = false)
+    @Column(name = "moneda", updatable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
 
-            @JoinColumn(name = "CTA_RAIZ", referencedColumnName = "CUENTA", nullable = true, updatable = false, insertable = false)
+            @JoinColumn(name = "cta_raiz", referencedColumnName = "cuenta", nullable = true, updatable = false, insertable = false)
     })
     private CashAccount rootCashAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
 
-            @JoinColumn(name = "CTA_NIV3", referencedColumnName = "CUENTA", nullable = true, updatable = false, insertable = false)
+            @JoinColumn(name = "cta_niv3", referencedColumnName = "cuenta", nullable = true, updatable = false, insertable = false)
     })
     private CashAccount cashAccountLeve3;
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", insertable = false, updatable = false),
-            @JoinColumn(name = "MONEDA", referencedColumnName = "COD_MON", insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", insertable = false, updatable = false),
+            @JoinColumn(name = "moneda", referencedColumnName = "cod_mon", insertable = false, updatable = false)
     })
     private FinancesCurrency financesCurrency;
 
-    @Column(name = "ACTIVA", updatable = false)
+    @Column(name = "activa", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean active;
 
-    @Column(name = "F_INACTIVA", updatable = false)
+    @Column(name = "f_inactiva", updatable = false)
     @Temporal(TemporalType.DATE)
     private Date inactiveDate;
 
-    @Column(name = "PERMITE_IVA", updatable = false)
+    @Column(name = "permite_iva", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean allowIva;
 
-    @Column(name = "SALDO_PER_ANT_DOL", precision = 20, scale = 6, updatable = false)
+    @Column(name = "saldo_per_ant_dol", precision = 20, scale = 6, updatable = false)
     private BigDecimal foreignBalancePreviousPeriod;
 
-    @Column(name = "SALDO_MES_ANT_DOL", precision = 20, scale = 6, updatable = false)
+    @Column(name = "saldo_mes_ant_dol", precision = 20, scale = 6, updatable = false)
     private BigDecimal foreignBalancePreviousMonth;
 
-    @Column(name = "DEBITOS_DOL", precision = 20, scale = 6, updatable = false)
+    @Column(name = "debitos_dol", precision = 20, scale = 6, updatable = false)
     private BigDecimal foreignDebit;
 
-    @Column(name = "CREDITOS_DOL", precision = 20, scale = 6, updatable = false)
+    @Column(name = "creditos_dol", precision = 20, scale = 6, updatable = false)
     private BigDecimal foreignCredit;
 
     // contabilidad
-    @Column(name = "PERMISO_CON", updatable = false)
+    @Column(name = "permiso_con", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean hasAccountingPermission;
 
     //tessoreria
-    @Column(name = "PERMISO_CHE", updatable = false)
+    @Column(name = "permiso_che", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean hasTreasuryPermission;
 
     //cuentas por pagar
-    @Column(name = "PERMISO_CXP", updatable = false)
+    @Column(name = "permiso_cxp", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean hasPayableAccountsPermission;
 
     //activos fijos
-    @Column(name = "PERMISO_AFIJO", updatable = false)
+    @Column(name = "permiso_afijo", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean hasFixedAssetsPermission;
 
     //inventarios
-    @Column(name = "PERMISO_INV", updatable = false)
+    @Column(name = "permiso_inv", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean hasWarehousePermission;
 
     //cuentas por cobrar
-    @Column(name = "PERMISO_CXC", updatable = false)
+    @Column(name = "permiso_cxc", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean hasReceivableAccountsPermission;
 
-    @Column(name = "EXIJE_CC", updatable = false)
+    @Column(name = "exije_cc", updatable = false)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean hasCostCenter;
 
-    @Column(name = "GRU_CTA", length = 6, updatable = false)
+    @Column(name = "gru_cta", length = 6, updatable = false)
     @Length(max = 6)
     private String groupAccountCode;
 

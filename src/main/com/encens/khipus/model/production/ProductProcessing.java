@@ -6,33 +6,33 @@ import com.encens.khipus.model.BaseModel;
 import javax.persistence.*;
 
 @TableGenerator(name = "ProductProcessing_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PRODUCTOREPROCESADO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "productoreprocesado",
         allocationSize = 10)
 
 @Entity
-@Table(name = "PRODUCTOREPROCESADO")
+@Table(name = "productoreprocesado")
 public class ProductProcessing implements BaseModel {
 
     @Id
-    @Column(name = "IDPRODUCTOREPROCESADO", columnDefinition = "NUMBER(24,0)", nullable = false)
+    @Column(name = "idproductoreprocesado", columnDefinition = "NUMBER(24,0)", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductProcessing_Generator")
     private Long id;
 
-    @Column(name = "UNIDADES", nullable = true)
+    @Column(name = "unidades", nullable = true)
     private Integer units;
 
-    @Column(name = "VOLUMEN", nullable = true ,columnDefinition = "DECIMAL(8,2)")
+    @Column(name = "volumen", nullable = true ,columnDefinition = "DECIMAL(8,2)")
     private Double volume;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDMETAPRODUCTOPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
     private MetaProduct metaProduct;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDPRODUCTOBASE", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductobase", nullable = false, updatable = false, insertable = true)
     private BaseProduct baseProduct;
 
     public Long getId() {

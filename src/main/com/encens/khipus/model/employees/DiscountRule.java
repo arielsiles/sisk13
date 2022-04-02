@@ -56,61 +56,61 @@ import java.util.List;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "REGLADESCUENTO",
+        pkColumnValue = "regladescuento",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(name = "REGLADESCUENTO", schema = Constants.KHIPUS_SCHEMA)
+@Table(name = "regladescuento", schema = Constants.KHIPUS_SCHEMA)
 public class DiscountRule implements BaseModel {
 
     @Id
-    @Column(name = "IDREGLADESCUENTO", nullable = false)
+    @Column(name = "idregladescuento", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "DiscountRule.tableGenerator")
     private Long id;
 
-    @Column(name = "ACTIVO", nullable = false)
+    @Column(name = "activo", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     @NotNull
     private Boolean active = Boolean.FALSE;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     @NotEmpty
     @Length(max = 100)
     private String name;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = 1000)
+    @Column(name = "descripcion", nullable = false, length = 1000)
     @NotEmpty
     @Length(max = 1000)
     private String description;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCATEGORIAPUESTO", nullable = true)
+    @JoinColumn(name = "idcategoriapuesto", nullable = true)
     private JobCategory jobCategory;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDGESTION", nullable = true)
+    @JoinColumn(name = "idgestion", nullable = true)
     private Gestion gestion;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", nullable = true)
+    @JoinColumn(name = "idunidadnegocio", nullable = true)
     private BusinessUnit businessUnit;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDMONEDA", nullable = true)
+    @JoinColumn(name = "idmoneda", nullable = true)
     private Currency currency;
 
-    @Column(name = "TIPODESCUENTO", nullable = false, length = 20)
+    @Column(name = "tipodescuento", nullable = false, length = 20)
     @NotNull
     @Enumerated(EnumType.STRING)
     private DiscountRuleType discountRuleType;
 
-    @Column(name = "TIPOINTERVALO", nullable = false, length = 20)
+    @Column(name = "tipointervalo", nullable = false, length = 20)
     @NotNull
     @Enumerated(EnumType.STRING)
     private IntervalType intervalType;
 
-    @Column(name = "TIPOUNIDADDESCUENTO", length = 30, nullable = false)
+    @Column(name = "tipounidaddescuento", length = 30, nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private DiscountUnitType discountUnitType;
@@ -124,11 +124,11 @@ public class DiscountRule implements BaseModel {
     private List<DiscountRuleRange> discountRuleRangeList = new ArrayList<DiscountRuleRange>(0);
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

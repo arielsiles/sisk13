@@ -105,7 +105,7 @@ public class GeneratedPayroll implements BaseModel, Cloneable {
     private GestionPayroll gestionPayroll;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCICLOGENERACIONPLANILLA")
+    @JoinColumn(name = "idciclogeneracionplanilla")
     private PayrollGenerationCycle payrollGenerationCycle;
 
     @Column(name = "idgestionplanilla", updatable = false, insertable = false)

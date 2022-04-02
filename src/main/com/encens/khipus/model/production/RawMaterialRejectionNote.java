@@ -6,67 +6,67 @@ import javax.persistence.*;
 import java.util.Date;
 
 @TableGenerator(name = "RawMaterialRejectionNote_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "NOTARECHAZOMATERIAPRIMA",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "notarechazomateriaprima",
         allocationSize = 10)
 
 @Entity
-@Table(name = "NOTARECHAZOMATERIAPRIMA", uniqueConstraints = @UniqueConstraint(columnNames = {"IDCOMPANIA"}))
+@Table(name = "notarechazomateriaprima", uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class RawMaterialRejectionNote implements com.encens.khipus.model.BaseModel {
     @Id
-    @Column(name = "IDNOTARECHAZOMATERIAPRIMA", nullable = false)
+    @Column(name = "idnotarechazomateriaprima", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RawMaterialRejectionNote_Generator")
     private Long id;
 
-    @Column(name = "FECHA",columnDefinition = "DATE" , nullable = false)
+    @Column(name = "fecha",columnDefinition = "DATE" , nullable = false)
     private Date date;
 
-    @Column(name = "CANTIDADRECHAZADA", columnDefinition = "DECIMAL(15,0)", nullable = false, length = 1000)
+    @Column(name = "cantidadrechazada", columnDefinition = "DECIMAL(15,0)", nullable = false, length = 1000)
     private Double rejectedAmount;
 
-    @Column(name = "ACIDA", nullable = true, length = 1000)
+    @Column(name = "acida", nullable = true, length = 1000)
     private String acid;
 
-    @Column(name = "AGUADABAJOSNG", nullable = true, length = 1000)
+    @Column(name = "aguadabajosng", nullable = true, length = 1000)
     private String wateryLowSNG;
 
-    @Column(name = "SUCIA", nullable = true, length = 1000)
+    @Column(name = "sucia", nullable = true, length = 1000)
     private String dirty;
 
-    @Column(name = "CALOSTRO", nullable = true, length = 1000)
+    @Column(name = "calostro", nullable = true, length = 1000)
     private String colostrum;
 
-    @Column(name = "TACHOMALESTADO", nullable = true, length = 1000)
+    @Column(name = "tachomalestado", nullable = true, length = 1000)
     private String disrepairCan;
 
-    @Column(name = "OTROS", nullable = true, length = 1000)
+    @Column(name = "otros", nullable = true, length = 1000)
     private String other;
 
-    @Column(name = "OBSERVACIONES", nullable = true, length = 1000)
+    @Column(name = "observaciones", nullable = true, length = 1000)
     private String observations;
 
-    @Column(name = "ESTADO",nullable = false)
+    @Column(name = "estado",nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductionCollectionState state = ProductionCollectionState.PENDING;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private Long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPRODUCTORMATERIAPRIMA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductormateriaprima", nullable = false, updatable = false, insertable = true)
     private RawMaterialProducer rawMaterialProducer;
 
     @OneToOne
-    @JoinColumn(name = "IDMETAPRODUCTOPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
     private MetaProduct metaProduct;
 
     public Long getId() {

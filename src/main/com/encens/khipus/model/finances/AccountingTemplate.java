@@ -20,16 +20,16 @@ public class AccountingTemplate implements BaseModel {
     @EmbeddedId
     private AccountingTemplatePk id = new AccountingTemplatePk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "COD_PLANTI", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_planti", nullable = false, updatable = false, insertable = false)
     private String templateCode;
 
-    @Column(name = "DESCRI", length = 100)
+    @Column(name = "descri", length = 100)
     private String name;
 
-    @Column(name = "OBS", length = 600)
+    @Column(name = "obs", length = 600)
     private String observation;
 
     @OneToMany(mappedBy = "accountingTemplate", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

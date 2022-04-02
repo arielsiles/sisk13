@@ -20,59 +20,59 @@ import javax.persistence.*;
  * @version 1.2.1
  */
 @TableGenerator(name = "IndirectCostsConfig.tableGenerator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "COSTOSINDIRECTOSCONF",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "costosindirectosconf",
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "COSTOSINDIRECTOSCONF")
+@Table(name = "costosindirectosconf")
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
 public class IndirectCostsConfig implements BaseModel {
 
     @Id
-    @Column(name = "IDCOSTOSINDIRECTOSCONF", nullable = false)
+    @Column(name = "idcostosindirectosconf", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "IndirectCostsConfig.tableGenerator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
-    @Column(name = "COD_GRU", insertable = true, updatable = false, nullable = true)
+    @Column(name = "cod_gru", insertable = true, updatable = false, nullable = true)
     private String groupCode;
 
-    @Column(name = "NO_CIA", insertable = true, updatable = false, nullable = false)
+    @Column(name = "no_cia", insertable = true, updatable = false, nullable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "ESTADO")
+    @Column(name = "estado")
     private String estate;
 
-    @Column(name = "DESCRIPCION")
+    @Column(name = "descripcion")
     private String description;
 
-    @Column(name = "PREDEFINIDO")
+    @Column(name = "predefinido")
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean predefined;
 
-    @Column(name = "CUENTA", insertable = true, updatable = false, nullable = true)
+    @Column(name = "cuenta", insertable = true, updatable = false, nullable = true)
     @Length(max = 20)
     private String account;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA",insertable = false, updatable = false),
-            @JoinColumn(name = "COD_GRU", referencedColumnName = "COD_GRU",insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia",insertable = false, updatable = false),
+            @JoinColumn(name = "cod_gru", referencedColumnName = "cod_gru",insertable = false, updatable = false)
     })
     private Group group;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA",insertable = false, updatable = false),
-            @JoinColumn(name = "CUENTA", referencedColumnName = "CUENTA",insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia",insertable = false, updatable = false),
+            @JoinColumn(name = "cuenta", referencedColumnName = "cuenta",insertable = false, updatable = false)
     })
     private CashAccount cashAccount;
 

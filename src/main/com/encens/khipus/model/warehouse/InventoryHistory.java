@@ -20,16 +20,16 @@ public class InventoryHistory implements BaseModel {
     @EmbeddedId
     private InventoryHistoryPK id = new InventoryHistoryPK();
 
-    @Column(name = "UNIDAD_ENT", precision = 12, scale = 2, nullable = false)
+    @Column(name = "unidad_ent", precision = 12, scale = 2, nullable = false)
     private BigDecimal incomingQuantity;
 
-    @Column(name = "UNIDAD_SAL", precision = 12, scale = 2, nullable = false)
+    @Column(name = "unidad_sal", precision = 12, scale = 2, nullable = false)
     private BigDecimal outgoingQuantity;
 
-    @Column(name = "MONTO_ENT", precision = 16, scale = 6, nullable = false)
+    @Column(name = "monto_ent", precision = 16, scale = 6, nullable = false)
     private BigDecimal incomingAmount;
 
-    @Column(name = "MONTO_SAL", precision = 16, scale = 6, nullable = false)
+    @Column(name = "monto_sal", precision = 16, scale = 6, nullable = false)
     private BigDecimal outgoingAmount;
 
     @Version

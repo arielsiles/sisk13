@@ -26,16 +26,16 @@ import java.util.Date;
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE,
-        pkColumnValue = "DETPLANILLADOCENTELABORAL")
+        pkColumnValue = "detplanilladocentelaboral")
 
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = Constants.KHIPUS_SCHEMA, name = "DETPLANILLADOCENTELABORAL")
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "detplanilladocentelaboral")
 public class FiscalProfessorPayrollDetail implements BaseModel {
 
     @Id
-    @Column(name = "IDDETPLANILLADOCENTELABORAL", nullable = false)
+    @Column(name = "iddetplanilladocentelaboral", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FiscalProfessorPayrollDetail.tableGenerator")
     private Long id;
 

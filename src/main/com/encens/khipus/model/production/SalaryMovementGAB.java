@@ -8,7 +8,7 @@ import java.util.Date;
 
 @NamedQueries(
         {
-            @NamedQuery(name = "SalaryMovementGAB.getDiscount",
+                @NamedQuery(name = "SalaryMovementGAB.getDiscount",
                         query = " select salaryMovementGAB.valor, typeMovementGAB.typeMovement, typeMovementGAB.name " +
                                 " from SalaryMovementGAB salaryMovementGAB " +
                                 " join SalaryMovementGAB.typeMovementGAB typeMovementGAB" +
@@ -18,46 +18,46 @@ import java.util.Date;
 )
 
 @TableGenerator(name = "SalaryMovementGab_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "MOVIMIENTOSALARIOGAB",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "movimientosalariogab",
         allocationSize = 10)
 
 @Entity
-@Table(name = "MOVIMIENTOSALARIOGAB", uniqueConstraints = @UniqueConstraint(columnNames = {"IDMOVIMIENTOSALARIOGAB", "IDCOMPANIA"}))
+@Table(name = "movimientosalariogab", uniqueConstraints = @UniqueConstraint(columnNames = {"idmovimientosalariogab", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class SalaryMovementGAB implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDMOVIMIENTOSALARIOGAB",nullable = false)
+    @Column(name = "idmovimientosalariogab",nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "SalaryMovementGab_Generator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "IDZONAPRODUCTIVA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idzonaproductiva", nullable = false, updatable = false, insertable = true)
     private ProductiveZone productiveZone;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTIPOMOVIMIENTOGAB", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idtipomovimientogab", nullable = false, updatable = false, insertable = true)
     private TypeMovementGAB typeMovementGAB;
 
-    @Column(name = "DESCRIPCION",nullable = true)
+    @Column(name = "descripcion",nullable = true)
     private String description;
 
-    @Column(name = "ESTADO",nullable = false)
+    @Column(name = "estado",nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductionCollectionState state = ProductionCollectionState.PENDING;
 
-    @Column(name = "FECHA", nullable = false, columnDefinition = "DATE")
+    @Column(name = "fecha", nullable = false, columnDefinition = "DATE")
     private Date date;
 
-    @Column(name = "VALOR",columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "valor",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double valor;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

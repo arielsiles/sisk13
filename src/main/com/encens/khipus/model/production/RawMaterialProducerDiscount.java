@@ -6,84 +6,84 @@ import javax.persistence.*;
 
 @NamedQueries({
         @NamedQuery(name = "RawMaterialProducerDiscount.findWithGreatestCodeByRawMaterialProducer",
-                    query = "select rawMaterialProducerDiscount " +
-                            "from RawMaterialProducerDiscount rawMaterialProducerDiscount " +
-                            "left join fetch rawMaterialProducerDiscount.rawMaterialPayRecord " +
-                            "where rawMaterialProducerDiscount.rawMaterialProducer = :rawMaterialProducer and " +
-                            "rawMaterialProducerDiscount.code >= (" +
-                            "   select discount.code " +
-                            "   from RawMaterialProducerDiscount discount " +
-                            "   where discount.rawMaterialProducer = :rawMaterialProducer)"),
+                query = "select rawMaterialProducerDiscount " +
+                        "from RawMaterialProducerDiscount rawMaterialProducerDiscount " +
+                        "left join fetch rawMaterialProducerDiscount.rawMaterialPayRecord " +
+                        "where rawMaterialProducerDiscount.rawMaterialProducer = :rawMaterialProducer and " +
+                        "rawMaterialProducerDiscount.code >= (" +
+                        "   select discount.code " +
+                        "   from RawMaterialProducerDiscount discount " +
+                        "   where discount.rawMaterialProducer = :rawMaterialProducer)"),
         @NamedQuery(name = "RawMaterialProducerDiscount.findOpenByRawMaterialProducer",
-                    query = "select rawMaterialProducerDiscount " +
-                            "from RawMaterialProducerDiscount rawMaterialProducerDiscount " +
-                            "where rawMaterialProducerDiscount.rawMaterialProducer = :rawMaterialProducer and rawMaterialProducerDiscount.rawMaterialPayRecord is NULL")
+                query = "select rawMaterialProducerDiscount " +
+                        "from RawMaterialProducerDiscount rawMaterialProducerDiscount " +
+                        "where rawMaterialProducerDiscount.rawMaterialProducer = :rawMaterialProducer and rawMaterialProducerDiscount.rawMaterialPayRecord is NULL")
 })
 
 @TableGenerator(name = "RawMaterialProducerDiscount_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "DESCUENTPRODUCTMATERIAPRIMA",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "descuentproductmateriaprima",
         allocationSize = 10)
 
 @Entity
-@Table(name = "DESCUENTPRODUCTMATERIAPRIMA", uniqueConstraints = @UniqueConstraint(columnNames = {"CODIGO", "IDPRODUCTORMATERIAPRIMA", "IDCOMPANIA"}))
+@Table(name = "descuentproductmateriaprima", uniqueConstraints = @UniqueConstraint(columnNames = {"codigo", "idproductormateriaprima", "idcompania"}))
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class RawMaterialProducerDiscount implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDDESCUENTPRODUCTMATERIAPRIMA",nullable = false)
+    @Column(name = "iddescuentproductmateriaprima",nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RawMaterialProducerDiscount_Generator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "IDPRODUCTORMATERIAPRIMA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductormateriaprima", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.production.RawMaterialProducer rawMaterialProducer;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     private long code;
 
-    @Column(name = "YOGURT",columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "yogurt",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double yogurt = 0.0;
 
-    @Column(name = "VETERINARIO",columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "veterinario",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double veterinary = 0.0;
 
-    @Column(name = "CREDITO",columnDefinition = "DECIMAL(16,2)" , nullable = false)
+    @Column(name = "credito",columnDefinition = "DECIMAL(16,2)" , nullable = false)
     private double credit = 0.0;
 
-    @Column(name = "TACHOS",columnDefinition = "DECIMAL(16,2)" ,nullable = false)
+    @Column(name = "tachos",columnDefinition = "DECIMAL(16,2)" ,nullable = false)
     private double cans = 0.0;
 
-    @Column(name = "OTROSDESCUENTOS", nullable = false ,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "otrosdescuentos", nullable = false ,columnDefinition = "DECIMAL(16,2)")
     private double otherDiscount = 0.0;
 
-    @Column(name = "OTROSINGRESOS", nullable = false,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "otrosingresos", nullable = false,columnDefinition = "DECIMAL(16,2)")
     private double otherIncoming = 0.0;
 
-    @Column(name = "RETENCION", nullable = false,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "retencion", nullable = false,columnDefinition = "DECIMAL(16,2)")
     private double withholdingTax = 0.0;
 
-    @Column(name = "ALCOHOL", nullable = false,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "alcohol", nullable = false,columnDefinition = "DECIMAL(16,2)")
     private double alcohol = 0.0;
 
-    @Column(name = "CONCENTRADOS", nullable = false,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "concentrados", nullable = false,columnDefinition = "DECIMAL(16,2)")
     private double concentrated = 0.0;
 
-    @Column(name = "COMISION", nullable = false,columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "comision", nullable = false,columnDefinition = "DECIMAL(16,2)")
     private double commission = 0.0;
 
     @OneToOne(mappedBy = "rawMaterialProducerDiscount", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     private com.encens.khipus.model.production.RawMaterialPayRecord rawMaterialPayRecord;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     public Long getId() {

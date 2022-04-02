@@ -17,7 +17,7 @@ import java.math.BigDecimal;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "HorasExtra",
+        pkColumnValue = "horasextra",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @NamedQueries({
@@ -36,37 +36,37 @@ import java.math.BigDecimal;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "HORASEXTRA")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "horasextra")
 public class ExtraHoursWorked implements BaseModel {
     @Id
-    @Column(name = "IDHORASEXTRA", nullable = false)
+    @Column(name = "idhorasextra", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ExtraHoursWorked.tableGenerator")
     private Long id;
 
-    @Column(name = "HORASEXTRA", nullable = false, precision = 13, scale = 2)
+    @Column(name = "horasextra", nullable = false, precision = 13, scale = 2)
     private BigDecimal extraHours;
 
-    @Column(name = "TOTALPAGADO", nullable = false, precision = 13, scale = 2)
+    @Column(name = "totalpagado", nullable = false, precision = 13, scale = 2)
     private BigDecimal totalPaid;
 
 
-    @Column(name = "IDCONTRATOPUESTO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "idcontratopuesto", nullable = false, updatable = false, insertable = false)
     private Long jobContractId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCONTRATOPUESTO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcontratopuesto", nullable = false, updatable = false, insertable = true)
     private JobContract jobContract;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCICLOGENERACIONPLANILLA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idciclogeneracionplanilla", nullable = false, updatable = false, insertable = true)
     private PayrollGenerationCycle payrollGenerationCycle;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

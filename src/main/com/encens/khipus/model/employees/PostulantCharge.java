@@ -20,42 +20,42 @@ import javax.persistence.*;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "POSTULANTECARGO",
+        pkColumnValue = "postulantecargo",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "POSTULANTECARGO")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "postulantecargo")
 public class PostulantCharge implements BaseModel {
 
     @Id
-    @Column(name = "IDPOSTULANTECARGO", nullable = false)
+    @Column(name = "idpostulantecargo", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PostulantCharge.tableGenerator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCARGO", referencedColumnName = "idcargo", nullable = false)
+    @JoinColumn(name = "idcargo", referencedColumnName = "idcargo", nullable = false)
     @NotNull
     private Charge charge;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDPOSTULANTE", referencedColumnName = "idpostulante", nullable = false)
+    @JoinColumn(name = "idpostulante", referencedColumnName = "idpostulante", nullable = false)
     @NotNull
     private Postulant postulant;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio", nullable = false)
+    @JoinColumn(name = "idunidadnegocio", referencedColumnName = "idunidadnegocio", nullable = false)
     @NotNull
     private BusinessUnit businessUnit;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

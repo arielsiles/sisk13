@@ -18,26 +18,26 @@ import javax.persistence.Table;
 public class ExecutorUnit implements BaseModel {
 
     @Id
-    @Column(name = "UNIDAD_ACAD_ADM", nullable = false)
+    @Column(name = "unidad_acad_adm", nullable = false)
     private Integer id;
 
-    @Column(name = "SIGLA", length = 10, nullable = false)
+    @Column(name = "sigla", length = 10, nullable = false)
     private String acronym;
 
-    @Column(name = "DESCRIPCION", length = 60, nullable = false)
+    @Column(name = "descripcion", length = 60, nullable = false)
     private String description;
 
-    @Column(name = "ACTIVA", nullable = true)
+    @Column(name = "activa", nullable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean active;
 
-    @Column(name = "UNIVERSIDAD", nullable = false)
+    @Column(name = "universidad", nullable = false)
     private Integer code;
 
-    @Column(name = "TIPO_UNIDAD_ACAD_ADM", nullable = true)
+    @Column(name = "tipo_unidad_acad_adm", nullable = true)
     private Integer type;
 
-    @Column(name = "POSICION")
+    @Column(name = "posicion")
     private Integer position;
 
     public Integer getId() {

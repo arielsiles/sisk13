@@ -17,46 +17,46 @@ import java.math.BigDecimal;
 public class AccountingTemplateDetail implements BaseModel {
 
     @Id
-    @Column(name = "ID_CG_DETPLANTI", nullable = false)
+    @Column(name = "id_cg_detplanti", nullable = false)
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_PLANTI", referencedColumnName = "COD_PLANTI", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_planti", referencedColumnName = "cod_planti", updatable = false, insertable = false)
     })
     private AccountingTemplate accountingTemplate;
 
     @ManyToOne(optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTA", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuenta", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashAccount;
 
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_CC", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "COD_UNI", referencedColumnName = "COD_UEJ", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_uni", referencedColumnName = "cod_uej", updatable = false, insertable = false)
     })
     private FinancesExecutorUnit executorUnit;
 
-    @Column(name = "REF", length = 60)
+    @Column(name = "ref", length = 60)
     private String reference;
 
-    @Column(name = "DEBE", precision = 16, scale = 2)
+    @Column(name = "debe", precision = 16, scale = 2)
     private BigDecimal debit;
 
-    @Column(name = "HABER", precision = 16, scale = 2)
+    @Column(name = "haber", precision = 16, scale = 2)
     private BigDecimal credit;
 
     public Long getId() {

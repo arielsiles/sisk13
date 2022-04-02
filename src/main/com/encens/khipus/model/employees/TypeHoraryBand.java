@@ -5,11 +5,9 @@ import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.Company;
 import org.hibernate.annotations.Filter;
-import org.hibernate.validator.Length;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,11 +25,11 @@ import java.util.List;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "TIPOBANDAHORARIA")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "tipobandahoraria")
 public class TypeHoraryBand implements BaseModel {
 
     @Id
-    @Column(name = "IDTIPOBANDAHORARIA", nullable = false)
+    @Column(name = "idtipobandahoraria", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TypeHoraryBand.tableGenerator")
     private Long id;
 

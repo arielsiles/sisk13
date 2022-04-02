@@ -22,34 +22,34 @@ public class FinanceAccountingDocument implements BaseModel {
     @EmbeddedId
     private FinanceAccountingDocumentPk id = new FinanceAccountingDocumentPk();
 
-    @Column(name = "COD_CONTROL", length = 20)
+    @Column(name = "cod_control", length = 20)
     private String controlCode;
 
-    @Column(name = "FECHA", nullable = false)
+    @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "NIT", length = 20)
+    @Column(name = "nit", length = 20)
     @Length(max = 20)
     private String nit;
 
-    @Column(name = "RAZON_SOCIAL", length = 100)
+    @Column(name = "razon_social", length = 100)
     @Length(max = 100)
     private String socialName;
 
-    @Column(name = "IMPORTE", precision = 16, scale = 2)
+    @Column(name = "importe", precision = 16, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "EXENTO", precision = 16, scale = 2)
+    @Column(name = "exento", precision = 16, scale = 2)
     private BigDecimal exempt;
 
-    @Column(name = "ICE", precision = 16, scale = 2)
+    @Column(name = "ice", precision = 16, scale = 2)
     private BigDecimal ice;
 
-    @Column(name = "IMPUESTO", precision = 16, scale = 2)
+    @Column(name = "impuesto", precision = 16, scale = 2)
     private BigDecimal tax;
 
-    @Column(name = "NO_TRANS", nullable = false, insertable = true, updatable = false)
+    @Column(name = "no_trans", nullable = false, insertable = true, updatable = false)
     @Length(max = 10)
     private String transactionNumber;
 

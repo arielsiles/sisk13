@@ -15,10 +15,10 @@ import java.io.Serializable;
  */
 @Embeddable
 public class MeasureUnitPk implements Serializable {
-    @Column(name = "NO_CIA", length = 2, nullable = false, updatable = false)
+    @Column(name = "no_cia", length = 2, nullable = false, updatable = false)
     @Length(max = 2)
     private String companyNumber;
-    @Column(name = "COD_MED", length = 6, nullable = false)
+    @Column(name = "cod_med", length = 6, nullable = false)
     @NotNull
     @Length(max = 6)
     private String measureUnitCode;

@@ -10,29 +10,29 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "PRODUCCIONTOTAL")
+@Table(name = "producciontotal")
 public class TotalProduction implements BaseModel {
 
     @Id
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     private Date date;
 
-    @Column(name = "COD_ART")
+    @Column(name = "cod_art")
     private String articleCode;
 
-    @Column(name = "NOMBRE")
+    @Column(name = "nombre")
     private String name;
 
-    @Column(name = "CANTIDAD_SC", columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "cantidad_sc", columnDefinition = "DECIMAL(24,0)")
     private Double amountSC;
 
-    @Column(name = "CANTIDAD_SP", columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "cantidad_sp", columnDefinition = "DECIMAL(24,0)")
     private Double amountSP;
 
-    @Column(name = "REPROCESO_SC", columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "reproceso_sc", columnDefinition = "DECIMAL(24,0)")
     private Double reprocessSC;
 
-    @Column(name = "REPROCESO_SP", columnDefinition = "DECIMAL(24,0)")
+    @Column(name = "reproceso_sp", columnDefinition = "DECIMAL(24,0)")
     private Double reprocessSP;
 
 

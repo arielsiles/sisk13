@@ -12,36 +12,36 @@ import java.math.BigDecimal;
  */
 
 @TableGenerator(name = "ProductIngredient_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "INGREDIENTEPRODUCCION",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "ingredienteproduccion",
         allocationSize = 10)
 
 @Entity
-@Table(name = "INGREDIENTEPRODUCCION")
+@Table(name = "ingredienteproduccion")
 public class ProductionIngredient implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDINGREDIENTEPRODUCCION", nullable = false)
+    @Column(name = "idingredienteproduccion", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductIngredient_Generator")
     private Long id;
 
     @Transient
     private double amount;
 
-    @Column(name = "FORMULAMATEMATICA", nullable = false, length = 500)
+    @Column(name = "formulamatematica", nullable = false, length = 500)
     private String mathematicalFormula;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPOSICIONPRODUCTO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcomposicionproducto", nullable = false, updatable = false, insertable = true)
     private ProductComposition productComposition;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDMETAPRODUCTOPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
     private MetaProduct metaProduct;
 
-    @Column(name = "INGREDIENTEVERIFICABLE", nullable = true, length = 20)
+    @Column(name = "ingredienteverificable", nullable = true, length = 20)
     private String isVerifiably = "VERIFICABLE";
 
     @Transient

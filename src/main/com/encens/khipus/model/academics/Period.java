@@ -18,17 +18,17 @@ import javax.persistence.*;
 )
 
 @Entity
-@Table(name = "PERIODOS", schema = Constants.ACADEMIC_SCHEMA)
+@Table(name = "periodos", schema = Constants.ACADEMIC_SCHEMA)
 public class Period {
 
     @Id
-    @Column(name = "PERIODO", nullable = false, updatable = false)
+    @Column(name = "periodo", nullable = false, updatable = false)
     private Integer periodId;
 
-    @Column(name = "GESTION", nullable = false, updatable = false, insertable = false)
+    @Column(name = "gestion", nullable = false, updatable = false, insertable = false)
     private Integer gestion;
 
-    @Column(name = "NOMBRE", nullable = false, updatable = false, insertable = false)
+    @Column(name = "nombre", nullable = false, updatable = false, insertable = false)
     private String name;
 
     public Integer getPeriodId() {

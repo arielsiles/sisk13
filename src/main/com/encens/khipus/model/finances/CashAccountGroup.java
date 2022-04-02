@@ -25,26 +25,26 @@ import javax.persistence.*;
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.FINANCES_SCHEMA, name = "grupoctactb", uniqueConstraints = @UniqueConstraint(columnNames = {"IDCOMPANIA", "NOMBRE"}))
+@Table(schema = com.encens.khipus.util.Constants.FINANCES_SCHEMA, name = "grupoctactb", uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "nombre"}))
 public class CashAccountGroup implements BaseModel {
     @Id
-    @Column(name = "IDGRUPOCTACTB", nullable = false)
+    @Column(name = "idgrupoctactb", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "CashAccountGroup.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     private Long code;
 
-    @Column(name = "NOMBRE", nullable = false, length = 250)
+    @Column(name = "nombre", nullable = false, length = 250)
     private String name;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

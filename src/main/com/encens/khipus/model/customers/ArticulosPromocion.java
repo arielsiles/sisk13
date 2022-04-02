@@ -13,12 +13,12 @@ public class ArticulosPromocion implements Serializable {
     @Id
     @Column(name = "idarticulospromocion")
     private Long id;
-    @Column(name = "CANTIDAD")
+    @Column(name = "cantidad")
     private Integer cantidad;
-    @JoinColumn(name="IDPROMOCION",referencedColumnName = "IDPROMOCION")
+    @JoinColumn(name="idpromocion",referencedColumnName = "idpromocion")
     @ManyToOne(optional = false)
     private Promocion promocion;
-    @JoinColumn(name="IDVENTAARTICULO",referencedColumnName = "IDVENTAARTICULO")
+    @JoinColumn(name="idventaarticulo",referencedColumnName = "idventaarticulo")
     @ManyToOne(optional = false)
     private Ventaarticulo ventaarticulo;
 

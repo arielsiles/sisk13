@@ -55,7 +55,7 @@ public class FixedAssetDepreciationRecord implements BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FixedAssetDepreciationRecord.tableGenerator")
-    @Column(name = "IDHDEPRE", nullable = false, updatable = false)
+    @Column(name = "idhdepre", nullable = false, updatable = false)
     private Long id;
 
     @Column(name = "fecha_en_proceso", nullable = false, updatable = false)
@@ -68,7 +68,7 @@ public class FixedAssetDepreciationRecord implements BaseModel {
     private String companyNumber;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDACTIVO", referencedColumnName = "IDACTIVO", nullable = false)
+    @JoinColumn(name = "idactivo", referencedColumnName = "idactivo", nullable = false)
     private FixedAsset fixedAsset;
 
     @Column(name = "val_tot", precision = 12, scale = 2)
@@ -95,13 +95,13 @@ public class FixedAssetDepreciationRecord implements BaseModel {
 
     /*represents the executor unit*/
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idunidadnegocio", referencedColumnName = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "no_cia", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "cod_cc", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
@@ -113,10 +113,10 @@ public class FixedAssetDepreciationRecord implements BaseModel {
     @JoinColumn(name = "custodio", nullable = false)
     private Employee custodian;
 
-    @Column(name = "tasaBsSus", precision = 16, scale = 6)
+    @Column(name = "tasabssus", precision = 16, scale = 6)
     private BigDecimal bsSusRate;
 
-    @Column(name = "tasaBsUfv", nullable = false, precision = 16, scale = 6)
+    @Column(name = "tasabsufv", nullable = false, precision = 16, scale = 6)
     private BigDecimal bsUfvRate;
 
     /* the date in wich the FixedAsset was depreciated*/

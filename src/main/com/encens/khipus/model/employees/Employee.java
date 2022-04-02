@@ -108,7 +108,7 @@ public class Employee extends Person {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean retentionFlag = Boolean.FALSE;
 
-    @Column(name = "FLAGJUBILADO", nullable = false)
+    @Column(name = "flagjubilado", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     @NotNull
     private Boolean jubilateFlag = Boolean.FALSE;

@@ -19,30 +19,30 @@ import javax.persistence.*;
 )
 
 @Entity
-@Table(name = "HORARIOS", schema = Constants.ACADEMIC_SCHEMA)
+@Table(name = "horarios", schema = Constants.ACADEMIC_SCHEMA)
 public class Horary {
 
     @EmbeddedId
     private HoraryPk id = new HoraryPk();
 
-    @Column(name = "HORARIO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "horario", nullable = false, updatable = false, insertable = false)
     private Long horaryId;
 
-    @Column(name = "GESTION", nullable = false, updatable = false, insertable = false)
+    @Column(name = "gestion", nullable = false, updatable = false, insertable = false)
     private Integer gestion;
 
-    @Column(name = "PERIODO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "periodo", nullable = false, updatable = false, insertable = false)
     private Integer period;
 
-    @Column(name = "PLAN_ESTUDIO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "plan_estudio", nullable = false, updatable = false, insertable = false)
     private String studyPlan;
 
     @ManyToOne
-    @JoinColumn(name = "PLAN_ESTUDIO", nullable = false)
+    @JoinColumn(name = "plan_estudio", nullable = false)
     private Carrer carrer;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "PLAN_ESTUDIO", referencedColumnName = "planestudio", nullable = false, updatable = false, insertable = false)
+    @JoinColumn(name = "plan_estudio", referencedColumnName = "planestudio", nullable = false, updatable = false, insertable = false)
     private OrganizationalUnit organizationalUnit;
 
     public HoraryPk getId() {

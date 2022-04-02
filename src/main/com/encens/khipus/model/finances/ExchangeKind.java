@@ -26,11 +26,11 @@ import javax.persistence.*;
 public class ExchangeKind implements BaseModel {
 
     @Id
-    @Column(name = "CLASE_CAMBIO", nullable = false)
+    @Column(name = "clase_cambio", nullable = false)
     @Length(max = 2)
     private String id;
 
-    @Column(name = "DESCRIPCION")
+    @Column(name = "descripcion")
     @Length(max = 30)
     private String description;
 

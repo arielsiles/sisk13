@@ -14,44 +14,44 @@ import java.util.List;
 
 @NamedQueries({
         @NamedQuery(name = "RawMaterialCollectionSession.findMinimumDateOfCollectionSessionByMetaProductBetweenDates",
-                    query = "select Min(rawMaterialCollectionSession.date) " +
-                            "from RawMaterialCollectionSession rawMaterialCollectionSession " +
-                            "where rawMaterialCollectionSession.productiveZone = :productiveZone " +
-                            "and rawMaterialCollectionSession.metaProduct = :metaProduct " +
-                            "and rawMaterialCollectionSession.date between :startDate and :endDate ")
+                query = "select Min(rawMaterialCollectionSession.date) " +
+                        "from RawMaterialCollectionSession rawMaterialCollectionSession " +
+                        "where rawMaterialCollectionSession.productiveZone = :productiveZone " +
+                        "and rawMaterialCollectionSession.metaProduct = :metaProduct " +
+                        "and rawMaterialCollectionSession.date between :startDate and :endDate ")
 })
 
 @TableGenerator(name = "RawMaterialCollectionSession_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "SESIONACOPIO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "sesionacopio",
         allocationSize = 10)
 
 @Entity
-@Table(name = "SESIONACOPIO")
+@Table(name = "sesionacopio")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class RawMaterialCollectionSession implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDSESIONACOPIO", nullable = false)
+    @Column(name = "idsesionacopio", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RawMaterialCollectionSession_Generator")
     private Long id;
 
-    @Column(name = "FECHA",columnDefinition = "DATE" , nullable = false)
+    @Column(name = "fecha",columnDefinition = "DATE" , nullable = false)
     private Date date;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductionCollectionState state = ProductionCollectionState.PENDING;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDZONAPRODUCTIVA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idzonaproductiva", nullable = false, updatable = false, insertable = true)
     private ProductiveZone productiveZone;
 
     @OneToMany(mappedBy = "rawMaterialCollectionSession", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -59,11 +59,11 @@ public class RawMaterialCollectionSession implements com.encens.khipus.model.Bas
     private List<CollectedRawMaterial> collectedRawMaterialList = new ArrayList<CollectedRawMaterial>();
 
     @OneToOne
-    @JoinColumn(name = "IDMETAPRODUCTOPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
     private MetaProduct metaProduct;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

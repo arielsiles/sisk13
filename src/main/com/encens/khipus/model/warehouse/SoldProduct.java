@@ -50,85 +50,85 @@ import java.math.BigDecimal;
 @Table(name = "inv_ventart", schema = Constants.FINANCES_SCHEMA)
 public class SoldProduct implements BaseModel {
     @Id
-    @Column(name = "ID_MOV", nullable = false)
+    @Column(name = "id_mov", nullable = false)
     private Long id;
 
-    @Column(name = "NOMBRES", nullable = false, length = 100)
+    @Column(name = "nombres", nullable = false, length = 100)
     @Length(max = 100)
     private String names;
 
-    @Column(name = "APELLIDOPATERNO", nullable = false, length = 65)
+    @Column(name = "apellidopaterno", nullable = false, length = 65)
     @Length(max = 65)
     private String firstName;
 
-    @Column(name = "APELLIDOMATERNO", nullable = false, length = 65)
+    @Column(name = "apellidomaterno", nullable = false, length = 65)
     @Length(max = 65)
     private String secondName;
 
-    @Column(name = "CANTIDAD", nullable = false, precision = 12, scale = 2)
+    @Column(name = "cantidad", nullable = false, precision = 12, scale = 2)
     private BigDecimal quantity;
 
-    @Column(name = "COD_PER", nullable = false, length = 20)
+    @Column(name = "cod_per", nullable = false, length = 20)
     @Length(max = 20)
     private String personalCode;
 
-    @Column(name = "NODOC_PER", nullable = false, length = 20)
+    @Column(name = "nodoc_per", nullable = false, length = 20)
     @Length(max = 20)
     private String personalIdentification;
 
-    @Column(name = "COD_DOSI", nullable = false, length = 20)
+    @Column(name = "cod_dosi", nullable = false, length = 20)
     @Length(max = 20)
     private String dosificationCode;
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "ESTADO", nullable = false)
+    @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     private SoldProductState state;
 
-    @Column(name = "NO_FACT", nullable = false, length = 10)
+    @Column(name = "no_fact", nullable = false, length = 10)
     @Length(max = 10)
     private String invoiceNumber;
 
-    @Column(name = "PEDIDO", nullable = true, length = 10)
+    @Column(name = "pedido", nullable = true, length = 10)
     @Length(max = 10)
     private String orderNumber;
 
-    @Column(name = "NO_VALE", nullable = true, length = 20)
+    @Column(name = "no_vale", nullable = true, length = 20)
     @Length(max = 20)
     private String numberVoucher;
 
-    @Column(name = "COD_ALM", nullable = false, length = 6)
+    @Column(name = "cod_alm", nullable = false, length = 6)
     @Length(max = 6)
     private String warehouseCode;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_ALM", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_alm", nullable = false, updatable = false, insertable = false)
     })
     private Warehouse warehouse;
 
-    @Column(name = "COD_ART", nullable = false, length = 6)
+    @Column(name = "cod_art", nullable = false, length = 6)
     @Length(max = 6)
     private String productItemCode;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ART", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_art", nullable = false, insertable = false, updatable = false)
     })
     private ProductItem productItem;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "COD_EST")
+    @JoinColumn(name = "cod_est")
     private Branch branch;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "IDENTARTICULO")
+    @JoinColumn(name = "identarticulo")
     private ProductDelivery productDelivery;
 
     @Version

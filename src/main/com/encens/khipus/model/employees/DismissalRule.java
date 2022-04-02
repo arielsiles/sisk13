@@ -27,69 +27,69 @@ import java.math.BigDecimal;
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE,
-        pkColumnValue = "REGLARETIRO")
+        pkColumnValue = "reglaretiro")
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = Constants.KHIPUS_SCHEMA, name = "REGLARETIRO",
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "reglaretiro",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"CODIGO", "IDCOMPANIA"}),
-                @UniqueConstraint(columnNames = {"NOMBRE", "IDCOMPANIA"})
+                @UniqueConstraint(columnNames = {"codigo", "idcompania"}),
+                @UniqueConstraint(columnNames = {"nombre", "idcompania"})
         })
 public class DismissalRule implements BaseModel {
     @Id
-    @Column(name = "IDREGLARETIRO", nullable = false)
+    @Column(name = "idreglaretiro", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "DismissalRule.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     @NotNull
     private Long code;
 
-    @Column(name = "NOMBRE", length = 250, nullable = false)
+    @Column(name = "nombre", length = 250, nullable = false)
     @NotEmpty
     @Length(max = 250)
     private String name;
 
-    @Column(name = "ACTIVO", nullable = false)
+    @Column(name = "activo", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
     @NotNull
     private Boolean active;
 
-    @Column(name = "TIPO", nullable = false, length = 20)
+    @Column(name = "tipo", nullable = false, length = 20)
     @NotNull
     @Enumerated(EnumType.STRING)
     private DismissalRuleType dismissalRuleType;
 
-    @Column(name = "TIPOMONTO", nullable = false, length = 20)
+    @Column(name = "tipomonto", nullable = false, length = 20)
     @NotNull
     @Enumerated(EnumType.STRING)
     private AmountType amountType;
 
-    @Column(name = "MONTO", nullable = false, precision = 13, scale = 2)
+    @Column(name = "monto", nullable = false, precision = 13, scale = 2)
     @NotNull
     @Range(min = 0)
     private BigDecimal amount;
 
-    @Column(name = "OCURRENCIA")
+    @Column(name = "ocurrencia")
     @Range(min = 0)
     private Integer ocurrence;
 
-    @Column(name = "MONEDA")
+    @Column(name = "moneda")
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "DESCRIPCION", length = 1000)
+    @Column(name = "descripcion", length = 1000)
     @Length(max = 1000)
     private String description;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

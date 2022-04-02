@@ -67,24 +67,24 @@ public class SalaryMovementType implements BaseModel {
     @NotNull
     private MovementType movementType;
 
-    @Column(name = "NO_CIA", length = 2)
+    @Column(name = "no_cia", length = 2)
     @Length(max = 2)
     @NotNull
     private String companyNumber;
 
-    @Column(name = "CUENTACTB", length = 20)
+    @Column(name = "cuentactb", length = 20)
     @Length(max = 20)
     @NotNull
     private String cashAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", insertable = false, updatable = false, referencedColumnName = "NO_CIA"),
-            @JoinColumn(name = "CUENTACTB", insertable = false, updatable = false, referencedColumnName = "CUENTA")
+            @JoinColumn(name = "no_cia", insertable = false, updatable = false, referencedColumnName = "no_cia"),
+            @JoinColumn(name = "cuentactb", insertable = false, updatable = false, referencedColumnName = "cuenta")
     })
     private CashAccount cashAccount;
 
-    @Column(name = "PORDEFECTO", nullable = false)
+    @Column(name = "pordefecto", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean byDefault;
 

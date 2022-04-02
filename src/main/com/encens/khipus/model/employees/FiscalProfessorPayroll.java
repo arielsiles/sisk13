@@ -197,16 +197,16 @@ import java.util.Date;
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE,
-        pkColumnValue = "PLANILLADOCENTELABORAL")
+        pkColumnValue = "planilladocentelaboral")
 
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = Constants.KHIPUS_SCHEMA, name = "PLANILLADOCENTELABORAL")
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "planilladocentelaboral")
 public class FiscalProfessorPayroll implements GenericPayroll, FiscalInternalGeneralPayroll {
 
     @Id
-    @Column(name = "IDPLANILLADOCENTELABORAL", nullable = false)
+    @Column(name = "idplanilladocentelaboral", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FiscalProfessorPayroll.tableGenerator")
     private Long id;
 
@@ -394,7 +394,7 @@ public class FiscalProfessorPayroll implements GenericPayroll, FiscalInternalGen
     private String clientCod;
 
     @ManyToOne
-    @JoinColumn(name = "IDMONEDACUENTA", referencedColumnName = "IDMONEDA")
+    @JoinColumn(name = "idmonedacuenta", referencedColumnName = "idmoneda")
     private Currency currency;
 
     public Employee getEmployee() {

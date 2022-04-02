@@ -9,47 +9,47 @@ import org.hibernate.annotations.Filter;
 import javax.persistence.*;
 
 @TableGenerator(name = "OutputProductionVoucher_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "VALEPRODUCTOTERMINADO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "valeproductoterminado",
         allocationSize = 10)
 
 @Entity
-@Table(name = "VALEPRODUCTOTERMINADO")
+@Table(name = "valeproductoterminado")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class OutputProductionVoucher implements BaseModel {
 
     @Id
-    @Column(name = "IDVALEPRODUCTOTERMINADO", nullable = false)
+    @Column(name = "idvaleproductoterminado", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "OutputProductionVoucher_Generator")
     private Long id;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "IDORDENPRODUCCION", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idordenproduccion", nullable = false, updatable = false, insertable = true)
     private ProductionOrder productionOrder;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "IDPRODUCTOPROCESADO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idproductoprocesado", nullable = false, updatable = false, insertable = true)
     private ProcessedProduct processedProduct;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "IDENTRADAORDENPRODUCCION" ,nullable = true, updatable = true, insertable = true)
+    @JoinColumn(name = "identradaordenproduccion" ,nullable = true, updatable = true, insertable = true)
     private IncomingProductionOrder incomingProductionOrder;
 
-    @Column(name = "CANTIDADPRODUCIDA", nullable = false, columnDefinition="DECIMAL(24,0)")
+    @Column(name = "cantidadproducida", nullable = false, columnDefinition="DECIMAL(24,0)")
     private Double producedAmount;
 
-    @Column(name = "OBSERVACIONES", nullable = true, length = 1500)
+    @Column(name = "observaciones", nullable = true, length = 1500)
     private String observations;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private Long version;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

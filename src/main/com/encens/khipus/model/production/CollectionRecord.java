@@ -8,56 +8,56 @@ import javax.persistence.*;
 
 @NamedQueries({
         @NamedQuery(name = "CollectionRecord.findByDateAndProductiveZoneAndMetaProduct",
-                    query = "select collectionRecord " +
-                            "from CollectionRecord collectionRecord " +
-                            "where collectionRecord.collectionForm.date = :date " +
-                            "and collectionRecord.productiveZone = :productiveZone " +
-                            "and collectionRecord.collectionForm.metaProduct = :metaProduct "),
+                query = "select collectionRecord " +
+                        "from CollectionRecord collectionRecord " +
+                        "where collectionRecord.collectionForm.date = :date " +
+                        "and collectionRecord.productiveZone = :productiveZone " +
+                        "and collectionRecord.collectionForm.metaProduct = :metaProduct "),
         @NamedQuery(name = "CollectionRecord.calculateDeltaAmountByMetaProductAndProductiveZoneBetweenDates",
-                    query = "select sum(collectionRecord.weightedAmount) - sum(collectionRecord.receivedAmount) " +
-                            "from CollectionRecord collectionRecord " +
-                            "where collectionRecord.productiveZone = :productiveZone " +
-                            "and collectionRecord.collectionForm.metaProduct = :metaProduct " +
-                            "and collectionRecord.collectionForm.date between :startDate and :endDate")
+                query = "select sum(collectionRecord.weightedAmount) - sum(collectionRecord.receivedAmount) " +
+                        "from CollectionRecord collectionRecord " +
+                        "where collectionRecord.productiveZone = :productiveZone " +
+                        "and collectionRecord.collectionForm.metaProduct = :metaProduct " +
+                        "and collectionRecord.collectionForm.date between :startDate and :endDate")
 })
 
 @TableGenerator(name = "CollectionRecord_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "REGISTROACOPIO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "registroacopio",
         allocationSize = 10)
 
 @Entity
-@Table(name = "REGISTROACOPIO")
+@Table(name = "registroacopio")
 @Filter(name = "companyFilter")
 @EntityListeners(com.encens.khipus.model.CompanyListener.class)
 public class CollectionRecord implements com.encens.khipus.model.BaseModel {
 
     @Id
-    @Column(name = "IDREGISTROACOPIO", nullable = false)
+    @Column(name = "idregistroacopio", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "CollectionRecord_Generator")
     private Long id;
 
-    @Column(name = "CANTIDADRECIBIDA", columnDefinition = "DECIMAL(16,2)",nullable = false)
+    @Column(name = "cantidadrecibida", columnDefinition = "DECIMAL(16,2)",nullable = false)
     private Double receivedAmount;
 
-    @Column(name = "CANTIDADPESADA", columnDefinition = "DECIMAL(16,2)",nullable = false)
+    @Column(name = "cantidadpesada", columnDefinition = "DECIMAL(16,2)",nullable = false)
     private Double weightedAmount;
 
-    @Column(name = "CANTIDADRECHAZADA",columnDefinition = "DECIMAL(16,2)", nullable = false)
+    @Column(name = "cantidadrechazada",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private Double rejectedAmount;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "IDZONAPRODUCTIVA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idzonaproductiva", nullable = false, updatable = false, insertable = true)
     private ProductiveZone productiveZone;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "IDPLANILLAACOPIO", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idplanillaacopio", nullable = false, updatable = false, insertable = true)
     private CollectionForm collectionForm;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     public Long getId() {

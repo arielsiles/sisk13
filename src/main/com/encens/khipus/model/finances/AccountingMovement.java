@@ -32,47 +32,47 @@ public class AccountingMovement implements BaseModel {
     @EmbeddedId
     private AccountingMovementPk id = new AccountingMovementPk();
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "TIPO_COMPRO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "tipo_compro", nullable = false, updatable = false, insertable = false)
     private String voucherType;
 
-    @Column(name = "NO_COMPRO", nullable = false, updatable = false, insertable = false)
+    @Column(name = "no_compro", nullable = false, updatable = false, insertable = false)
     private String voucherNumber;
 
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date recordDate;
 
-    @Column(name = "FECHA_CRE")
+    @Column(name = "fecha_cre")
     @Temporal(TemporalType.DATE)
     private Date createDate;
 
-    @Column(name = "GLOSA", length = 1000)
+    @Column(name = "glosa", length = 1000)
     @Length(max = 1000)
     private String gloss;
 
-    @Column(name = "ORIGEN", length = 6)
+    @Column(name = "origen", length = 6)
     @Length(max = 6)
     private String sourceModule;
 
-    @Column(name = "NO_IMP", length = 6)
+    @Column(name = "no_imp", length = 6)
     @Length(max = 6)
     private String printerNumber;
 
-    @Column(name = "REGISTRADO", length = 3)
+    @Column(name = "registrado", length = 3)
     @Length(max = 3)
     private String recordType;
 
-    @Column(name = "NO_USR", length = 4)
+    @Column(name = "no_usr", length = 4)
     @Length(max = 4)
     private String userNumber;
 
-    @Column(name = "MONTO_TOTAL_MN", precision = 16, scale = 2)
+    @Column(name = "monto_total_mn", precision = 16, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "MAX_NO_TRANS")
+    @Column(name = "max_no_trans")
     @Length(max = 10)
     private String maximumTransactionNumber;
 

@@ -28,40 +28,40 @@ import java.util.Date;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "HISTORIALARTICULOPROV",
+        pkColumnValue = "historialarticuloprov",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "HISTORIALARTICULOPROV")
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "historialarticuloprov")
 
 public class ProductItemByProviderHistory implements BaseModel {
 
     @Id
-    @Column(name = "IDHISTORIALARTICULOPROV", nullable = false, scale = 24)
+    @Column(name = "idhistorialarticuloprov", nullable = false, scale = 24)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductItemByProviderHistory.tableGenerator")
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_ARTICULO_POR_PROVEEDOR", nullable = false)
+    @JoinColumn(name = "id_articulo_por_proveedor", nullable = false)
     private Provide provide;
 
-    @Column(name = "COSTO_UNI", precision = 16, scale = 6, nullable = false)
+    @Column(name = "costo_uni", precision = 16, scale = 6, nullable = false)
     @NotNull
     private BigDecimal unitCost;
 
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
 

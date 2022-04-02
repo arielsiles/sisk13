@@ -24,7 +24,7 @@ import java.util.Date;
         table = Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "employeeTimeCard",
+        pkColumnValue = "employeetimecard",
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 /*@NamedQueries(
@@ -34,68 +34,68 @@ import java.util.Date;
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = Constants.KHIPUS_SCHEMA, name = "TARJETATIEMPOEMPLEADO")
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "tarjetatiempoempleado")
 public class EmployeeTimeCard implements BaseModel {
 
     @Id
-    @Column(name = "IDTARJETATIEMPOEMPLEADO", nullable = false)
+    @Column(name = "idtarjetatiempoempleado", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "EmployeeTimeCard.tableGenerator")
     private Long id;
 
-    @Column(name = "FECHA", nullable = true)
+    @Column(name = "fecha", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "HORAINICIO", nullable = true)
+    @Column(name = "horainicio", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
 
-    @Column(name = "HORAFIN", nullable = true)
+    @Column(name = "horafin", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date endTime;
 
-    @Column(name = "FINJORNADA", nullable = true)
+    @Column(name = "finjornada", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDay;
 
-    @Column(name = "COSTOPORHORA", nullable = true, columnDefinition = "DECIMAL(16,2)")
+    @Column(name = "costoporhora", nullable = true, columnDefinition = "DECIMAL(16,2)")
     private Double costPerHour;
 
-    @Column(name = "DESCRIPCION", nullable = true)
+    @Column(name = "descripcion", nullable = true)
     @Lob
     private String description;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDEMPLEADO", nullable = false, updatable = false)
+    @JoinColumn(name = "idempleado", nullable = false, updatable = false)
     private Employee employee;
 
     //@Column(name = "NO_CIA", insertable = false, updatable = false)
-    @Column(name = "NO_CIA", nullable = false, insertable = true, updatable = true)
+    @Column(name = "no_cia", nullable = false, insertable = true, updatable = true)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_GRU", nullable = false, updatable = true, insertable = true, length = 3)
+    @Column(name = "cod_gru", nullable = false, updatable = true, insertable = true, length = 3)
     @Length(max = 3)
     private String groupCode;
 
-    @Column(name = "COD_SUB", nullable = false, updatable = true, insertable = true, length = 3)
+    @Column(name = "cod_sub", nullable = false, updatable = true, insertable = true, length = 3)
     @Length(max = 3)
     private String subGroupCode;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_GRU", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "COD_SUB", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_gru", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_sub", nullable = false, updatable = false, insertable = false)
     })
     private SubGroup subGroup;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDTIPOTAREAPROD", nullable = false, updatable = false)
+    @JoinColumn(name = "idtipotareaprod", nullable = false, updatable = false)
     private ProductionTaskType productionTaskType;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

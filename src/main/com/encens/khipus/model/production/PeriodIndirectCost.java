@@ -23,24 +23,24 @@ import java.util.List;
  */
 
 @TableGenerator(name = "PeriodIndirectCost_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "PERIODOCOSTOINDIRECTO",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "periodocostoindirecto",
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
-@Table(name = "PERIODOCOSTOINDIRECTO")
+@Table(name = "periodocostoindirecto")
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
 public class PeriodIndirectCost implements BaseModel {
 
     @Id
-    @Column(name = "IDPERIODOCOSTOINDIRECTO", nullable = false)
+    @Column(name = "idperiodocostoindirecto", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PeriodIndirectCost_Generator")
     private Long id;
 
-    @Column(name = "MES", nullable = true)
+    @Column(name = "mes", nullable = true)
     private Integer month;
 
     @Column(name = "procesado", nullable = false)
@@ -52,7 +52,7 @@ public class PeriodIndirectCost implements BaseModel {
     private Boolean accounting = Boolean.FALSE;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},optional = false)
-    @JoinColumn(name = "IDGESTION")
+    @JoinColumn(name = "idgestion")
     private Gestion gestion;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "periodIndirectCost", cascade = CascadeType.ALL)
@@ -60,7 +60,7 @@ public class PeriodIndirectCost implements BaseModel {
     private List<IndirectCosts> indirectCostList = new ArrayList<IndirectCosts>();
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public Long getId() {

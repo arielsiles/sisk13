@@ -59,83 +59,83 @@ public class PurchaseOrderPayment implements BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "PurchaseOrderPayment.tableGenerator")
-    @Column(name = "IDPAGOORDENCOMPRA", nullable = false)
+    @Column(name = "idpagoordencompra", nullable = false)
     private Long id;
 
-    @Column(name = "CUENTABANCO", length = 20)
+    @Column(name = "cuentabanco", length = 20)
     @Length(max = 20)
     private String bankAccountNumber;
 
-    @Column(name = "ESTADO", nullable = false, length = 20)
+    @Column(name = "estado", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private PurchaseOrderPaymentState state;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = 1000)
+    @Column(name = "descripcion", nullable = false, length = 1000)
     @Length(max = 1000)
     private String description;
 
-    @Column(name = "IDORDENCOMPRA", nullable = false, insertable = false, updatable = false)
+    @Column(name = "idordencompra", nullable = false, insertable = false, updatable = false)
     private Long purchaseOrderId;
 
-    @Column(name = "MONEDAORIGEN", length = 20)
+    @Column(name = "monedaorigen", length = 20)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType sourceCurrency;
 
-    @Column(name = "MONEDAPAGO", nullable = false)
+    @Column(name = "monedapago", nullable = false)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType payCurrency;
 
-    @Column(name = "MONTOORIGEN", precision = 12, scale = 2)
+    @Column(name = "montoorigen", precision = 12, scale = 2)
     private BigDecimal sourceAmount;
 
-    @Column(name = "MONTOPAGO", precision = 12, scale = 2, nullable = false)
+    @Column(name = "montopago", precision = 12, scale = 2, nullable = false)
     private BigDecimal payAmount;
 
-    @Column(name = "NO_CIA", nullable = false)
+    @Column(name = "no_cia", nullable = false)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "NOMBREBENEFICIARIO", length = 200)
+    @Column(name = "nombrebeneficiario", length = 200)
     @Length(max = 200)
     private String beneficiaryName;
 
-    @Column(name = "TIPOBENEFICIARIO")
+    @Column(name = "tipobeneficiario")
     @Enumerated(EnumType.STRING)
     private BeneficiaryType beneficiaryType;
 
-    @Column(name = "TIPOCAMBIO", precision = 12, scale = 2)
+    @Column(name = "tipocambio", precision = 12, scale = 2)
     private BigDecimal exchangeRate;
 
-    @Column(name = "TIPOPAGO")
+    @Column(name = "tipopago")
     @Enumerated(EnumType.STRING)
     private PurchaseOrderPaymentType paymentType;
 
-    @Column(name = "CLASEPAGO")
+    @Column(name = "clasepago")
     @Enumerated(EnumType.STRING)
     private PurchaseOrderPaymentKind purchaseOrderPaymentKind;
 
-    @Column(name = "FECHACREACION")
+    @Column(name = "fechacreacion")
     @Temporal(TemporalType.DATE)
     private Date creationDate;
 
-    @Column(name = "FECHAAPROBACION")
+    @Column(name = "fechaaprobacion")
     @Temporal(TemporalType.DATE)
     private Date approvalDate;
 
     @ManyToOne
-    @JoinColumn(name = "CREADOPOR")
+    @JoinColumn(name = "creadopor")
     private User registerEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "APROBADOPOR")
+    @JoinColumn(name = "aprobadopor")
     private User approvedByEmployee;
 
-    @Column(name = "NOTRANS")
+    @Column(name = "notrans")
     @Length(max = 10)
     private String transactionNumber;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private Long version;
 
     @Column(name = "id_tmpenc", nullable = true, updatable = false, insertable = false)
@@ -143,27 +143,27 @@ public class PurchaseOrderPayment implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTABANCO", referencedColumnName = "CTA_BCO", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentabanco", referencedColumnName = "cta_bco", updatable = false, insertable = false)
     })
     private FinancesBankAccount bankAccount;
 
     /* the cash box account*/
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "CUENTACAJA", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentacaja", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount cashBoxCashAccount;
 
     /* the cash box account code*/
-    @Column(name = "CUENTACAJA", length = 20)
+    @Column(name = "cuentacaja", length = 20)
     @Length(max = 20)
     private String cashBoxAccount;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "IDORDENCOMPRA", referencedColumnName = "ID_COM_ENCOC", nullable = false, updatable = false, insertable = true)
+            @JoinColumn(name = "idordencompra", referencedColumnName = "id_com_encoc", nullable = false, updatable = false, insertable = true)
     })
     private PurchaseOrder purchaseOrder;
 
@@ -171,11 +171,11 @@ public class PurchaseOrderPayment implements BaseModel {
     private RotatoryFundCollection rotatoryFundCollection;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDFONDOROTATORIO", referencedColumnName = "IDFONDOROTATORIO")
+    @JoinColumn(name = "idfondorotatorio", referencedColumnName = "idfondorotatorio")
     private RotatoryFund rotatoryFund;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDSEDEDESTINOCHEQUE", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idsededestinocheque", referencedColumnName = "idunidadnegocio")
     private BusinessUnit checkDestination;
 
     @ManyToOne

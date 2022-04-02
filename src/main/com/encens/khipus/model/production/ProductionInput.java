@@ -15,14 +15,14 @@ import javax.persistence.*;
 })
 
 @Entity
-@Table(name = "INSUMOPRODUCCION")
-@DiscriminatorValue("INSUMOPRODUCCION")
+@Table(name = "insumoproduccion")
+@DiscriminatorValue("insumoproduccion")
 @PrimaryKeyJoinColumns(value = {
-        @PrimaryKeyJoinColumn(name = "IDINSUMOPRODUCCION", referencedColumnName = "IDMETAPRODUCTOPRODUCCION")})
+        @PrimaryKeyJoinColumn(name = "idinsumoproduccion", referencedColumnName = "idmetaproductoproduccion")})
 public class ProductionInput extends MetaProduct {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA" , nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania" , nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     public com.encens.khipus.model.admin.Company getCompany() {

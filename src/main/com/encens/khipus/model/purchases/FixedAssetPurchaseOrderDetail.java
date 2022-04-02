@@ -43,45 +43,45 @@ import java.util.List;
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(name = "com_af_detoc", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = @UniqueConstraint(columnNames = {"NO_CIA", "NO_ORDEN", "NRO"}))
+@Table(name = "com_af_detoc", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = @UniqueConstraint(columnNames = {"no_cia", "no_orden", "nro"}))
 public class FixedAssetPurchaseOrderDetail implements BaseModel {
 
     @Id
-    @Column(name = "ID_COM_AF_DETOC", nullable = false, updatable = false)
+    @Column(name = "id_com_af_detoc", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FixedAssetPurchaseOrderDetail.tableGenerator")
     private Long id;
 
-    @Column(name = "NO_CIA", nullable = false, updatable = false)
+    @Column(name = "no_cia", nullable = false, updatable = false)
     @NotNull
     private String companyNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "ID_COM_ENCOC", referencedColumnName = "ID_COM_ENCOC", nullable = false, updatable = false, insertable = true)
+            @JoinColumn(name = "id_com_encoc", referencedColumnName = "id_com_encoc", nullable = false, updatable = false, insertable = true)
     })
     private PurchaseOrder purchaseOrder;
 
-    @Column(name = "NO_ORDEN", nullable = false)
+    @Column(name = "no_orden", nullable = false)
     @NotNull
     private String orderNumber;
 
     /* The number of the item in the list*/
-    @Column(name = "NRO", nullable = false, updatable = false)
+    @Column(name = "nro", nullable = false, updatable = false)
     @NotNull
     private Long detailNumber;
 
-    @Column(name = "CANT_SOL", precision = 16, scale = 2, nullable = false)
+    @Column(name = "cant_sol", precision = 16, scale = 2, nullable = false)
     @Range(min = 1, max = 1000)
     @NotNull
     private Integer requestedQuantity;
 
-    @Column(name = "TOTAL_BS", precision = 16, scale = 2)
+    @Column(name = "total_bs", precision = 16, scale = 2)
     private BigDecimal bsTotalAmount;
 
-    @Column(name = "TOTAL_SUS", precision = 16, scale = 2)
+    @Column(name = "total_sus", precision = 16, scale = 2)
     private BigDecimal susTotalAmount;
 
-    @Column(name = "TOTAL_UFV", precision = 16, scale = 2)
+    @Column(name = "total_ufv", precision = 16, scale = 2)
     private BigDecimal ufvTotalAmount;
 
     /* Individual detail for each fixedAsset*/
@@ -104,15 +104,15 @@ public class FixedAssetPurchaseOrderDetail implements BaseModel {
     @Length(max = 30)
     private String model;
 
-    @Column(name = "voBs", nullable = false, precision = 16, scale = 2)
+    @Column(name = "vobs", nullable = false, precision = 16, scale = 2)
     @NotNull
     private BigDecimal bsUnitPriceValue;
 
-    @Column(name = "voSus", nullable = false, precision = 16, scale = 2)
+    @Column(name = "vosus", nullable = false, precision = 16, scale = 2)
     @NotNull
     private BigDecimal susUnitPriceValue;
 
-    @Column(name = "voUfv", nullable = false, precision = 16, scale = 2)
+    @Column(name = "voufv", nullable = false, precision = 16, scale = 2)
     @NotNull
     private BigDecimal ufvUnitPriceValue;
 
@@ -122,7 +122,7 @@ public class FixedAssetPurchaseOrderDetail implements BaseModel {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumns({
             /*already defined in pk, so properties in null*/
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "grupo", referencedColumnName = "grupo", nullable = false, insertable = false, updatable = false),
             @JoinColumn(name = "subgrupo", referencedColumnName = "subgrupo", nullable = false, updatable = false, insertable = false)
     })
@@ -141,45 +141,45 @@ public class FixedAssetPurchaseOrderDetail implements BaseModel {
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType paymentCurrencyType;
 
-    @Column(name = "tasaBsSus", nullable = false, precision = 16, scale = 6)
+    @Column(name = "tasabssus", nullable = false, precision = 16, scale = 6)
     @NotNull
     private BigDecimal bsSusRate;
 
-    @Column(name = "tasaBsUfv", nullable = false, precision = 16, scale = 6)
+    @Column(name = "tasabsufv", nullable = false, precision = 16, scale = 6)
     @NotNull
     private BigDecimal bsUfvRate;
 
-    @Column(name = "MESESGARANTIA")
+    @Column(name = "mesesgarantia")
     @Range(min = 1, max = 999)
     private Integer monthsGuaranty;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDMARCA", nullable = true, updatable = true, insertable = true)
+    @JoinColumn(name = "idmarca", nullable = true, updatable = true, insertable = true)
     private Trademark trademarkEntity;
 
     @Transient
     private String trademarkName;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDMODELO", nullable = true, updatable = true, insertable = true)
+    @JoinColumn(name = "idmodelo", nullable = true, updatable = true, insertable = true)
     private Model modelEntity;
 
     @Transient
     private String modelName;
 
-    @Column(name = "DURACION_TOTAL", nullable = false, updatable = false)
+    @Column(name = "duracion_total", nullable = false, updatable = false)
     @NotNull
     private Integer totalDuration;
 
-    @Column(name = "DURACION_USADA", nullable = false, updatable = false)
+    @Column(name = "duracion_usada", nullable = false, updatable = false)
     @NotNull
     private Integer usageDuration;
 
-    @Column(name = "DURACION_NETA", nullable = false, updatable = false)
+    @Column(name = "duracion_neta", nullable = false, updatable = false)
     @NotNull
     private Integer netDuration;
 

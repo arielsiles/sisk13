@@ -15,71 +15,71 @@ import java.util.Date;
  */
 
 @TableGenerator(name = "RePrints_Generator",
-        table = "SECUENCIA",
-        pkColumnName = "TABLA",
-        valueColumnName = "VALOR",
-        pkColumnValue = "ILVA_REIMPRESIONES",
+        table = "secuencia",
+        pkColumnName = "tabla",
+        valueColumnName = "valor",
+        pkColumnValue = "ilva_reimpresiones",
         allocationSize = 10)
 
 @Entity
-@Table(name = "ILVA_REIMPRESIONES",schema = Constants.CASHBOX_SCHEMA)
+@Table(name = "ilva_reimpresiones",schema = Constants.CASHBOX_SCHEMA)
 public class RePrints implements BaseModel {
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RePrints_Generator")
     private Long id;
 
     @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHA_REIMP")
+    @Column(name = "fecha_reimp")
     private Date dateRePrint;
 
     @Temporal(value = TemporalType.DATE)
-    @Column(name = "FECHA_EMISION")
+    @Column(name = "fecha_emision")
     private Date dateEmission;
 
-    @Column(name = "USUA_ID_REIMP")
+    @Column(name = "usua_id_reimp")
     private Long idUsrRePint;
 
-    @Column(name = "USUA_ID_EMISION")
+    @Column(name = "usua_id_emision")
     private Long idUsrEmission;
 
-    @Column(name = "EST_COD",columnDefinition = "VARCHAR2(15 BYTE)")
+    @Column(name = "est_cod",columnDefinition = "VARCHAR2(15 BYTE)")
     private String stateCod;
 
-    @Column(name = "PI_ID",columnDefinition = "VARCHAR2(20 BYTE)")
+    @Column(name = "pi_id",columnDefinition = "VARCHAR2(20 BYTE)")
     private String piID;
 
-    @Column(name = "NROFACTURA",columnDefinition = "VARCHAR2(12 BYTE)")
+    @Column(name = "nrofactura",columnDefinition = "VARCHAR2(12 BYTE)")
     private Long numberInvoice;
 
-    @Column(name = "NIT",columnDefinition = "VARCHAR2(30 BYTE)")
+    @Column(name = "nit",columnDefinition = "VARCHAR2(30 BYTE)")
     private String nit;
 
-    @Column(name = "UNIDAD_ACAD_ADM",columnDefinition = "VARCHAR2(10 BYTE)")
+    @Column(name = "unidad_acad_adm",columnDefinition = "VARCHAR2(10 BYTE)")
     private String unitAcadAdm;
 
-    @Column(name = "PLAN_ESTUDIO",columnDefinition = "VARCHAR2(30 BYTE)")
+    @Column(name = "plan_estudio",columnDefinition = "VARCHAR2(30 BYTE)")
     private String planStudy;
 
-    @Column(name = "NUMERO_REIMP")
+    @Column(name = "numero_reimp")
     private Integer numberReImprent;
 
-    @Column(name = "ESTADO",columnDefinition = "VARCHAR2(5 BYTE)")
+    @Column(name = "estado",columnDefinition = "VARCHAR2(5 BYTE)")
     private String state;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "DOSI_ID")
+    @JoinColumn(name = "dosi_id")
     private Dosage dosage;
 
-    @Column(name = "GLOSA",columnDefinition = "VARCHAR2(200 BYTE)")
+    @Column(name = "glosa",columnDefinition = "VARCHAR2(200 BYTE)")
     private String gloss;
 
-    @Column(name = "MOTIVO",columnDefinition = "VARCHAR2(200 BYTE)")
+    @Column(name = "motivo",columnDefinition = "VARCHAR2(200 BYTE)")
     private String reason;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
-    @JoinColumn(name = "PEDIDO", columnDefinition = "VARCHAR2(15 BYTE)")
+    @JoinColumn(name = "pedido", columnDefinition = "VARCHAR2(15 BYTE)")
     private CustomerOrder customerOrder;
 
     public Long getId() {

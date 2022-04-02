@@ -83,13 +83,13 @@ public class FixedAsset implements BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "FixedAsset.tableGenerator")
-    @Column(name = "IDACTIVO", nullable = false, updatable = false)
+    @Column(name = "idactivo", nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "COD_ACTI")
+    @Column(name = "cod_acti")
     private Long fixedAssetCode;
 
-    @Column(name = "CODBARRAS")
+    @Column(name = "codbarras")
     private String barCode;
 
     @Column(name = "no_cia", length = 2, nullable = false, updatable = false)
@@ -147,13 +147,13 @@ public class FixedAsset implements BaseModel {
     @Column(name = "tasa_dep", nullable = false, precision = 7, scale = 2)
     private BigDecimal depreciationRate;
 
-    @Column(name = "voBs", nullable = false, precision = 12, scale = 2)
+    @Column(name = "vobs", nullable = false, precision = 12, scale = 2)
     private BigDecimal bsOriginalValue;
 
-    @Column(name = "voSus", nullable = false, precision = 12, scale = 2)
+    @Column(name = "vosus", nullable = false, precision = 12, scale = 2)
     private BigDecimal susOriginalValue;
 
-    @Column(name = "voUfv", nullable = false, precision = 12, scale = 2)
+    @Column(name = "voufv", nullable = false, precision = 12, scale = 2)
     private BigDecimal ufvOriginalValue;
 
     @Column(name = "mej", precision = 12, scale = 2)
@@ -170,8 +170,8 @@ public class FixedAsset implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "no_cia", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "cod_cc", referencedColumnName = "COD_CC", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc", updatable = false, insertable = false)
     })
     private CostCenter costCenter;
 
@@ -207,31 +207,31 @@ public class FixedAsset implements BaseModel {
 
     /*represents the executor unit*/
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDUNIDADNEGOCIO", referencedColumnName = "idunidadnegocio")
+    @JoinColumn(name = "idunidadnegocio", referencedColumnName = "idunidadnegocio")
     private BusinessUnit businessUnit;
 
-    @Column(name = "tasaBsSus", nullable = false, precision = 16, scale = 6)
+    @Column(name = "tasabssus", nullable = false, precision = 16, scale = 6)
     private BigDecimal bsSusRate;
 
-    @Column(name = "tasaBsUfv", nullable = false, precision = 16, scale = 6)
+    @Column(name = "tasabsufv", nullable = false, precision = 16, scale = 6)
     private BigDecimal bsUfvRate;
 
-    @Column(name = "ULTTASABSSUS", nullable = false, precision = 16, scale = 6)
+    @Column(name = "ulttasabssus", nullable = false, precision = 16, scale = 6)
     private BigDecimal lastBsSusRate;
 
-    @Column(name = "ULTTASABSUFV", nullable = false, precision = 16, scale = 6)
+    @Column(name = "ulttasabsufv", nullable = false, precision = 16, scale = 6)
     private BigDecimal lastBsUfvRate;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "ID_COM_ENCOC", referencedColumnName = "ID_COM_ENCOC", updatable = false, insertable = false)
+            @JoinColumn(name = "id_com_encoc", referencedColumnName = "id_com_encoc", updatable = false, insertable = false)
     })
     private PurchaseOrder purchaseOrder;
 
-    @Column(name = "ID_COM_ENCOC")
+    @Column(name = "id_com_encoc")
     private Long purchaseOrderCode;
 
-    @Column(name = "MESESGARANTIA")
+    @Column(name = "mesesgarantia")
     @Range(min = 1, max = 999)
     private Integer monthsGuaranty;
 
@@ -243,11 +243,11 @@ public class FixedAsset implements BaseModel {
     private List<FixedAssetMaintenanceRequest> fixedAssetMaintenanceRequestList;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "IDFOTO", referencedColumnName = "idarchivo")
+    @JoinColumn(name = "idfoto", referencedColumnName = "idarchivo")
     private File photo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDAFLOCALIZACION")
+    @JoinColumn(name = "idaflocalizacion")
     private FixedAssetLocation fixedAssetLocation;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "fixedAsset")

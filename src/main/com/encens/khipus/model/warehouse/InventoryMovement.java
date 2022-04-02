@@ -32,39 +32,39 @@ public class InventoryMovement implements BaseModel {
     @EmbeddedId
     private InventoryMovementPK id = new InventoryMovementPK();
 
-    @Column(name = "FECHA_MOV", nullable = true)
+    @Column(name = "fecha_mov", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date movementDate;
 
-    @Column(name = "DESCRI", nullable = true, length = 250)
+    @Column(name = "descri", nullable = true, length = 250)
     @Length(max = 250)
     private String description;
 
-    @Column(name = "TIPO_COMPRO", nullable = true, length = 2)
+    @Column(name = "tipo_compro", nullable = true, length = 2)
     @Length(max = 2)
     private String voucherType;
 
-    @Column(name = "NO_COMPRO", nullable = true, length = 10)
+    @Column(name = "no_compro", nullable = true, length = 10)
     @Length(max = 10)
     private String voucherNumber;
 
-    @Column(name = "NO_USR", nullable = false, length = 4)
+    @Column(name = "no_usr", nullable = false, length = 4)
     @Length(max = 4)
     @NotNull
     private String userNumber;
 
-    @Column(name = "FECHA_CRE", nullable = true)
+    @Column(name = "fecha_cre", nullable = true)
     @Temporal(TemporalType.DATE)
     private Date creationDate;
 
     @Version
-    @Column(name = "VERSION")
+    @Column(name = "version")
     private long version;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "NO_TRANS", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "no_trans", nullable = false, insertable = false, updatable = false)
     })
     private WarehouseVoucher warehouseVoucher;
 

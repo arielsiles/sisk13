@@ -25,31 +25,31 @@ import javax.persistence.*;
 
 @Entity
 @EntityListeners({CompanyListener.class, CompanyNumberListener.class, UpperCaseStringListener.class})
-@Table(name = "ENTIDADBENSOCIAL", schema = Constants.KHIPUS_SCHEMA)
-@PrimaryKeyJoinColumn(name = "IDENTIDADBENSOCIAL", referencedColumnName = "IDINSTITUCION")
+@Table(name = "entidadbensocial", schema = Constants.KHIPUS_SCHEMA)
+@PrimaryKeyJoinColumn(name = "identidadbensocial", referencedColumnName = "idinstitucion")
 public class SocialWelfareEntity extends Organization {
 
-    @Column(name = "NO_CIA", nullable = false, length = 2)
+    @Column(name = "no_cia", nullable = false, length = 2)
     @Length(max = 2)
     private String companyNumber;
 
-    @Column(name = "COD_PROV", nullable = false, length = 6)
+    @Column(name = "cod_prov", nullable = false, length = 6)
     @Length(max = 6)
     private String providerCode;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_PROV", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_prov", nullable = false, insertable = false, updatable = false)
     })
     private Provider provider;
 
-    @Column(name = "TIPO", nullable = false)
+    @Column(name = "tipo", nullable = false)
     @Enumerated(EnumType.STRING)
     private SocialWelfareEntityType type;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false, insertable = true)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
 
     public String getCompanyNumber() {

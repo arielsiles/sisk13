@@ -25,73 +25,73 @@ import java.math.BigDecimal;
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE,
-        pkColumnValue = "DETALLERETIRO")
+        pkColumnValue = "detalleretiro")
 
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
-@Table(schema = Constants.KHIPUS_SCHEMA, name = "DETALLERETIRO")
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "detalleretiro")
 public class DismissalDetail implements BaseModel {
 
     @Id
-    @Column(name = "IDDETALLERETIRO", nullable = false)
+    @Column(name = "iddetalleretiro", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "DismissalDetail.tableGenerator")
     private Long id;
 
-    @Column(name = "CODIGO", nullable = false)
+    @Column(name = "codigo", nullable = false)
     @NotNull
     private Long code;
 
-    @Column(name = "NOTRANS")
+    @Column(name = "notrans")
     @Length(max = 10)
     private String transactionNumber;
 
-    @Column(name = "ESTADO", length = Constants.STRING_LENGTH_20, nullable = false)
+    @Column(name = "estado", length = Constants.STRING_LENGTH_20, nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
     private DismissalDetailState state;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "IDCAUSARETIRO", referencedColumnName = "IDCAUSARETIRO", nullable = false)
+    @JoinColumn(name = "idcausaretiro", referencedColumnName = "IDCAUSARETIRO", nullable = false)
     @NotNull
     private DismissalCause cause;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "IDARCHIVO", referencedColumnName = "idarchivo")
+    @JoinColumn(name = "idarchivo", referencedColumnName = "idarchivo")
     private File file;
 
-    @Column(name = "DESCRIPCION", nullable = false, length = Constants.LONG_TEXT_LENGTH)
+    @Column(name = "descripcion", nullable = false, length = Constants.LONG_TEXT_LENGTH)
     @Length(max = Constants.LONG_TEXT_LENGTH)
     @NotEmpty
     private String description;
 
-    @Column(name = "MOTIVOREVERSION", length = Constants.LONG_TEXT_LENGTH)
+    @Column(name = "motivoreversion", length = Constants.LONG_TEXT_LENGTH)
     @Length(max = Constants.LONG_TEXT_LENGTH)
     private String reversionCause;
 
-    @Column(name = "MONTO", nullable = false, precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
+    @Column(name = "monto", nullable = false, precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
     @NotNull
     private BigDecimal amount;
 
-    @Column(name = "MONEDA", nullable = false, length = Constants.STRING_LENGTH_20)
+    @Column(name = "moneda", nullable = false, length = Constants.STRING_LENGTH_20)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "TIPOCAMBIO", precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
+    @Column(name = "tipocambio", precision = Constants.BIG_DECIMAL_DEFAULT_PRECISION, scale = Constants.BIG_DECIMAL_DEFAULT_SCALE)
     private BigDecimal exchangeRate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDRETIRO", nullable = false)
+    @JoinColumn(name = "idretiro", nullable = false)
     @NotNull
     private Dismissal dismissal;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "IDCOMPANIA", nullable = false, updatable = false)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false)
     @NotNull
     private Company company;
 
     @Version
-    @Column(name = "VERSION", nullable = false)
+    @Column(name = "version", nullable = false)
     private long version;
 
     public Long getId() {

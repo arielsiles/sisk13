@@ -30,125 +30,125 @@ import static com.encens.khipus.model.usertype.StringBooleanUserType.*;
 @Entity
 @EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
 @Table(name = "ck_docus", schema = Constants.FINANCES_SCHEMA, uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"NO_CIA", "CTA_BCO", "PROCEDENCIA", "TIPO_DOC", "NO_DOC"})
+        @UniqueConstraint(columnNames = {"no_cia", "cta_bco", "procedencia", "tipo_doc", "no_doc"})
 })
 public class FinanceDocument implements BaseModel {
 
     @EmbeddedId
     private FinanceDocumentPk id = new FinanceDocumentPk();
 
-    @Column(name = "NO_CIA", length = 2, updatable = false, insertable = false)
+    @Column(name = "no_cia", length = 2, updatable = false, insertable = false)
     private String companyNumber;
 
-    @Column(name = "NO_TRANS", length = 10, updatable = false, insertable = false)
+    @Column(name = "no_trans", length = 10, updatable = false, insertable = false)
     private String transactionNumber;
 
-    @Column(name = "CTA_BCO", length = 20)
+    @Column(name = "cta_bco", length = 20)
     private String bankAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "CTA_BCO", referencedColumnName = "CTA_BCO", updatable = false, insertable = false),
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false)
+            @JoinColumn(name = "cta_bco", referencedColumnName = "cta_bco", updatable = false, insertable = false),
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false)
     })
     private FinancesBankAccount bankAccount;
 
-    @Column(name = "PROCEDENCIA", length = 1)
+    @Column(name = "procedencia", length = 1)
     private String provenance;
 
-    @Column(name = "TIPO_DOC", length = 3)
+    @Column(name = "tipo_doc", length = 3)
     private String documentTypeCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "TIPO_DOC", referencedColumnName = "TIPO_DOC", updatable = false, insertable = false),
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false)
+            @JoinColumn(name = "tipo_doc", referencedColumnName = "tipo_doc", updatable = false, insertable = false),
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false)
     })
     private FinancesDocumentType documentType;
 
-    @Column(name = "NO_DOC", nullable = false, length = 20)
+    @Column(name = "no_doc", nullable = false, length = 20)
     private String documentNumber;
 
-    @Column(name = "FECHA")
+    @Column(name = "fecha")
     @Temporal(TemporalType.DATE)
     private Date date;
 
-    @Column(name = "BENEFICIARIO", length = 100)
+    @Column(name = "beneficiario", length = 100)
     private String beneficiaryName;
 
-    @Column(name = "MONTO", precision = 16, scale = 4)
+    @Column(name = "monto", precision = 16, scale = 4)
     private BigDecimal amount;
 
-    @Column(name = "MONEDA", length = 3)
+    @Column(name = "moneda", length = 3)
     @Enumerated(EnumType.STRING)
     private FinancesCurrencyType currency;
 
-    @Column(name = "TC", precision = 10, scale = 6)
+    @Column(name = "tc", precision = 10, scale = 6)
     private BigDecimal exchangeRate;
 
-    @Column(name = "NO_CONCI", length = 10)
+    @Column(name = "no_conci", length = 10)
     private String conciliationNumber;
 
-    @Column(name = "CUENTA", length = 31)
+    @Column(name = "cuenta", length = 31)
     private String cashAccountCode;
 
-    @Column(name = "TIPO_COMPRO", length = 2)
+    @Column(name = "tipo_compro", length = 2)
     private String voucherType;
 
-    @Column(name = "NO_COMPRO", length = 10)
+    @Column(name = "no_compro", length = 10)
     private String voucherNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "TIPO_COMPRO", referencedColumnName = "TIPO_COMPRO", updatable = false, insertable = false),
-            @JoinColumn(name = "NO_COMPRO", referencedColumnName = "NO_COMPRO", updatable = false, insertable = false),
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false)
+            @JoinColumn(name = "tipo_compro", referencedColumnName = "tipo_compro", updatable = false, insertable = false),
+            @JoinColumn(name = "no_compro", referencedColumnName = "no_compro", updatable = false, insertable = false),
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false)
     })
     private AccountingMovement accountingMovement;
 
-    @Column(name = "ORIGEN", length = 6)
+    @Column(name = "origen", length = 6)
     private String source;
 
-    @Column(name = "MOD_AUT", length = 3)
+    @Column(name = "mod_aut", length = 3)
     @Type(type = StringBooleanUserType.NAME, parameters = {
             @Parameter(name = TRUE_PARAMETER, value = TRUE_VALUE),
             @Parameter(name = FALSE_PARAMETER, value = FALSE_VALUE)
     })
     private Boolean hasUpdateAuthorization;
 
-    @Column(name = "COD_BENEF", length = 6)
+    @Column(name = "cod_benef", length = 6)
     private String beneficiaryCode;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "COD_BENEF", referencedColumnName = "COD_ENTI", updatable = false, insertable = false)
+    @JoinColumn(name = "cod_benef", referencedColumnName = "cod_enti", updatable = false, insertable = false)
     private FinancesEntity beneficiary;
 
-    @Column(name = "ENTREGADO", length = 20)
+    @Column(name = "entregado", length = 20)
     @Type(type = StringBooleanUserType.NAME, parameters = {
             @Parameter(name = TRUE_PARAMETER, value = TRUE_VALUE),
             @Parameter(name = FALSE_PARAMETER, value = FALSE_VALUE)
     })
     private Boolean isDelivered;
 
-    @Column(name = "FECHAENTREGA")
+    @Column(name = "fechaentrega")
     @Temporal(TemporalType.DATE)
     private Date deliveryDate;
 
-    @Column(name = "ENTREGADOPOR", length = 4)
+    @Column(name = "entregadopor", length = 4)
     private String deliveredByUserCode;
 
-    @Column(name = "OBSENTREGA", length = 4)
+    @Column(name = "obsentrega", length = 4)
     private String deliveryObservation;
 
-    @Column(name = "ESTADO", nullable = false, length = 3)
+    @Column(name = "estado", nullable = false, length = 3)
     @Enumerated(EnumType.STRING)
     private FinanceDocumentState state;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", updatable = false, insertable = false),
-            @JoinColumn(name = "NO_TRANS", referencedColumnName = "NO_TRANS", updatable = false, insertable = false),
-            @JoinColumn(name = "ESTADO", referencedColumnName = "ESTADO", updatable = false, insertable = false)
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "no_trans", referencedColumnName = "no_trans", updatable = false, insertable = false),
+            @JoinColumn(name = "estado", referencedColumnName = "estado", updatable = false, insertable = false)
     })
     private FinanceDocumentMovement financeDocumentMovement;
 

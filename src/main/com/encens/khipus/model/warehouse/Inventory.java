@@ -33,19 +33,19 @@ import java.math.BigDecimal;
 public class Inventory implements BaseModel {
     @EmbeddedId
     @AttributeOverrides({
-            @AttributeOverride(name = "companyNumber", column = @Column(name = "NO_CIA", nullable = false, insertable = true)),
-            @AttributeOverride(name = "warehouseCode", column = @Column(name = "COD_ALM", nullable = false, insertable = true)),
-            @AttributeOverride(name = "articleCode", column = @Column(name = "COD_ART", nullable = false, insertable = true))
+            @AttributeOverride(name = "companyNumber", column = @Column(name = "no_cia", nullable = false, insertable = true)),
+            @AttributeOverride(name = "warehouseCode", column = @Column(name = "cod_alm", nullable = false, insertable = true)),
+            @AttributeOverride(name = "articleCode", column = @Column(name = "cod_art", nullable = false, insertable = true))
     })
     private InventoryPK id;
 
-    @Column(name = "COD_ALM", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_alm", nullable = false, updatable = false, insertable = false)
     private String warehouseCode;
 
-    @Column(name = "COD_ART", nullable = false, updatable = false, insertable = false)
+    @Column(name = "cod_art", nullable = false, updatable = false, insertable = false)
     private String articleCode;
 
-    @Column(name = "SALDO_UNI", precision = 12, scale = 2)
+    @Column(name = "saldo_uni", precision = 12, scale = 2)
     private BigDecimal unitaryBalance;
 
     @Version
@@ -54,15 +54,15 @@ public class Inventory implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ALM", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_alm", nullable = false, insertable = false, updatable = false)
     })
     private Warehouse warehouse;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumns({
-            @JoinColumn(name = "NO_CIA", nullable = false, insertable = false, updatable = false),
-            @JoinColumn(name = "COD_ART", nullable = false, insertable = false, updatable = false)
+            @JoinColumn(name = "no_cia", nullable = false, insertable = false, updatable = false),
+            @JoinColumn(name = "cod_art", nullable = false, insertable = false, updatable = false)
     })
     private ProductItem productItem;
 
