@@ -88,6 +88,24 @@ public final class DateUtils {
 
 
     /**
+     * This method remove the date attributes del date object
+     * @param date Object parameter
+     * @return
+     */
+    public static Date removeDate(Date date){
+        if (date != null){
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(date.getTime());
+            cal.set(Calendar.HOUR_OF_DAY, date.getHours());
+            cal.set(Calendar.MINUTE, date.getMinutes());
+            cal.set(Calendar.SECOND, date.getSeconds());
+            cal.set(Calendar.MILLISECOND, 0);
+            return cal.getTime();
+        }
+        return null;
+    }
+
+    /**
      * This method sets the calendar argument to the the zero hours of the day
      *
      * @param calendar a given parameter

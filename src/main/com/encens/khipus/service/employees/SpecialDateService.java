@@ -2,6 +2,7 @@ package com.encens.khipus.service.employees;
 
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.employees.Employee;
+import com.encens.khipus.model.employees.SpecialDate;
 import com.encens.khipus.model.employees.TimeInterval;
 import com.encens.khipus.model.finances.OrganizationalUnit;
 
@@ -48,4 +49,7 @@ public interface SpecialDateService {
     Map<Date, List<TimeInterval>> getSpecialDateTimeRange(OrganizationalUnit organizationalUnit, Date initDate, Date endDate);
 
     Map<Date, List<TimeInterval>> getSpecialDateTimeRange(BusinessUnit businessUnit, Date initDate, Date endDate);
+
+    void createSpecialDates(List<SpecialDate> specialDateList);
+
 }

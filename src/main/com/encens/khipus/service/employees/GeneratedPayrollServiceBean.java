@@ -9,6 +9,7 @@ import com.encens.khipus.exception.employees.PayrollSelectItemsHasAccountingReco
 import com.encens.khipus.exception.employees.UpdateActivePaymentException;
 import com.encens.khipus.exception.finances.*;
 import com.encens.khipus.framework.service.GenericService;
+import com.encens.khipus.model.contacts.Gender;
 import com.encens.khipus.model.employees.Currency;
 import com.encens.khipus.model.employees.*;
 import com.encens.khipus.model.finances.*;
@@ -2014,11 +2015,22 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                 }
                                 if (bandAbsences == bandsNumber) {
                                     if (bandsNumber == 1) {
-                                        if (bandDuration >= (8 * 60)) {
-                                            dayAbsences++;
-                                        } else {
-                                            dayAbsences += 0.5;
+
+                                        if (employee.getGender().equals(Gender.MAN)) {
+                                            if (bandDuration >= (8 * 60)) {
+                                                dayAbsences++;
+                                            } else {
+                                                dayAbsences += 0.5;
+                                            }
                                         }
+                                        if (employee.getGender().equals(Gender.WOMAN)) {
+                                            if (bandDuration >= (7 * 60)) {
+                                                dayAbsences++;
+                                            } else {
+                                                dayAbsences += 0.5;
+                                            }
+                                        }
+
                                     } else {
                                         dayAbsences += 1;
                                     }
@@ -2766,7 +2778,9 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
         }
         String marcaciones = "";
         for (Date rhMarkDateTime : dateRhMarkList) {
-            marcaciones = marcaciones + " ; " + rhMarkDateTime.toString();
+            String mark = DateUtils.format(rhMarkDateTime, "dd/MM/yyyy HH:mm");
+            //marcaciones = marcaciones + " ; " + rhMarkDateTime.toString();
+            marcaciones = marcaciones + " | " + mark;
         }
         // drop the first semicolon
         if (marcaciones.length() > 3) {

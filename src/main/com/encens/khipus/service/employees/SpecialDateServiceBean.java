@@ -1,10 +1,7 @@
 package com.encens.khipus.service.employees;
 
 import com.encens.khipus.model.admin.BusinessUnit;
-import com.encens.khipus.model.employees.Employee;
-import com.encens.khipus.model.employees.SpecialDateTarget;
-import com.encens.khipus.model.employees.SpecialDateType;
-import com.encens.khipus.model.employees.TimeInterval;
+import com.encens.khipus.model.employees.*;
 import com.encens.khipus.model.finances.OrganizationalUnit;
 import com.encens.khipus.util.DateIterator;
 import org.jboss.seam.annotations.AutoCreate;
@@ -205,4 +202,14 @@ public class SpecialDateServiceBean implements SpecialDateService {
         }
         return result;
     }
+
+    public void createSpecialDates(List<SpecialDate> specialDateList){
+
+        for (SpecialDate specialDate : specialDateList){
+            em.persist(specialDate);
+            em.flush();
+        }
+
+    }
+
 }

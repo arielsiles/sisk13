@@ -7,6 +7,7 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,14 +22,14 @@ import java.util.List;
 public class ControlReportDataModel extends QueryDataModel<Long, ControlReport> {
 
 
-    private String idNumber;
+    private String idNumber = "0";
     private String lastName;
     private String maidenName;
     private String firstName;
 
     private static final String[] RESTRICTIONS = {
             "controlReport.generatedPayroll = #{controlReportAction.generatedPayroll}",
-            "controlReport.horaryBandContract.jobContract.contract.employee.idNumber like concat(#{controlReportDataModel.idNumber}, '%')",
+            "controlReport.horaryBandContract.jobContract.contract.employee.idNumber = #{controlReportDataModel.idNumber}",
             "lower(controlReport.horaryBandContract.jobContract.contract.employee.lastName) like concat('%', concat(lower(#{controlReportDataModel.lastName}), '%'))",
             "lower(controlReport.horaryBandContract.jobContract.contract.employee.maidenName) like concat('%', concat(lower(#{controlReportDataModel.maidenName}), '%'))",
             "lower(controlReport.horaryBandContract.jobContract.contract.employee.firstName) like concat('%', concat(lower(#{controlReportDataModel.firstName}), '%'))"};
@@ -48,6 +49,18 @@ public class ControlReportDataModel extends QueryDataModel<Long, ControlReport> 
                 " left join fetch jobContract.contract contract" +
                 " left join fetch contract.employee employee";
 
+    }
+
+    public List<ControlReport> getSelectedControlReportDates() {
+        List ids = super.getSelectedIdList();
+
+        List<ControlReport> result = new ArrayList<ControlReport>();
+        for (Object id : ids) {
+            ControlReport item = getEntityManager().find(ControlReport.class, id);
+            result.add(item);
+        }
+
+        return result;
     }
 
     @Override

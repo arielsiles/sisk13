@@ -61,6 +61,13 @@
 
 
             <div class="buttons">
+                <h:commandButton id="generateSpecialDateButtonId"
+                                 action="#{controlReportAction.generateSpecialDates(controlReportDataModel.selectedControlReportDates)}"
+                                 styleClass="button"
+                                 value="Generar" >
+
+                </h:commandButton>
+
                 <h:commandButton action="#{controlReportAction.cancel}" value="#{messages['Common.cancel']}"
                                  styleClass="button" immediate="true">
                 </h:commandButton>
@@ -71,6 +78,11 @@
                             width="100%">
                 <f:facet name="header">
                     <rich:columnGroup>
+
+                        <rich:column styleClass="center">
+                            <app:selectCheckboxHeader dataModel="#{controlReportDataModel}"
+                                                      reRender="controlReportList, dataScroller"/>
+                        </rich:column>
 
                         <rich:column>
                             #{messages['ControlReport.ci']}
@@ -115,6 +127,14 @@
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
+
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox id="selectCheckboxItem"
+                                             immediate="true"
+                                             value="#{controlReportDataModel.selectedList[controlReportDataModel.page][controlReportItem.id]}">
+                        <a4j:support event="onchange" reRender="selectCheckboxItem"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
 
                 <rich:column>
                     <h:outputText
