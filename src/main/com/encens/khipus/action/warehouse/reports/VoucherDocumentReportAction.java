@@ -6,10 +6,13 @@ import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.action.reports.ReportFormat;
 import com.encens.khipus.exception.EntryNotFoundException;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherNotFoundException;
 import com.encens.khipus.model.admin.User;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.WarehouseService;
 import com.encens.khipus.util.FormatUtils;
@@ -46,6 +49,8 @@ public class VoucherDocumentReportAction extends GenericReportAction {
     protected WarehouseService warehouseService;
     @In
     private MovementDetailService movementDetailService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     private WarehouseVoucher warehouseVoucher;
 
@@ -70,6 +75,17 @@ public class VoucherDocumentReportAction extends GenericReportAction {
         } else {
             params.putAll(getCommonDocumentParamsInfo(getWarehouseVoucher()));
         }
+
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        params.put("companyName", companyConfiguration.getCompanyName());
+        params.put("locationName", companyConfiguration.getLocationName());
+        params.put("systemName", companyConfiguration.getSystemName());
 
         setReportFormat(ReportFormat.PDF);
         //add sub report
