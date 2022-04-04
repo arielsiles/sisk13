@@ -79,47 +79,8 @@ public class PayrollBankUnisueldo2ReportAction extends GenericReportAction {
         return "SELECT " +
                 "categoryFiscalPayroll.number," +
                 "categoryFiscalPayroll.personalIdentifier," +
-                "contract.pensionFundRegistrationCode," +
                 "categoryFiscalPayroll.name," +
-                "pensionFundOrganization.name," +
-                "costCenter.code," +
-                "categoryFiscalPayroll.nationality," +
-                "categoryFiscalPayroll.birthday," +
-                "categoryFiscalPayroll.gender," +
-                "categoryFiscalPayroll.occupation," +
-                "categoryFiscalPayroll.newnessType," +
-                "categoryFiscalPayroll.entranceDate," +
-                "categoryFiscalPayroll.workedDays," +
-                "categoryFiscalPayroll.paidDays," +
-                "categoryFiscalPayroll.hourDayPayment," +
-                "categoryFiscalPayroll.basicAmount," +
-                "categoryFiscalPayroll.seniorityYears," +
-                "categoryFiscalPayroll.seniorityBonus," +
-                "categoryFiscalPayroll.extraHour," +
-                "categoryFiscalPayroll.extraHourCost," +
-                "categoryFiscalPayroll.productionBonus," +
-                "categoryFiscalPayroll.sundayBonus," +
-                "categoryFiscalPayroll.otherBonus," +
-                "categoryFiscalPayroll.totalGrained," +
-                "categoryFiscalPayroll.absenceMinutesDiscount," +
-                "categoryFiscalPayroll.tardinessMinutesDiscount," +
-                "categoryFiscalPayroll.loanDiscount," +
-                "categoryFiscalPayroll.advanceDiscount," +
-                "categoryFiscalPayroll.winDiscount," +
-                "categoryFiscalPayroll.retentionAFP," +
-                "categoryFiscalPayroll.retentionClearance," +
-                "categoryFiscalPayroll.otherDiscount," +
-                "categoryFiscalPayroll.totalDiscount," +
                 "categoryFiscalPayroll.liquidPayment," +
-                "categoryFiscalPayroll.laborIndividualAFP," +
-                "categoryFiscalPayroll.laborCommonRiskAFP," +
-                "categoryFiscalPayroll.laborSolidaryContributionAFP," +
-                "categoryFiscalPayroll.laborComissionAFP," +
-                "categoryFiscalPayroll.nightWorkBonus," +
-                "categoryFiscalPayroll.transReturnBonus," +
-                "categoryFiscalPayroll.refreshmentBonus," +
-                "categoryFiscalPayroll.solidaryAFP," +
-                "categoryFiscalPayroll.extension," +
                 "categoryFiscalPayroll.employee.id," +
                 "categoryFiscalPayroll.employee.paymentType" +
                 " FROM CategoryFiscalPayroll categoryFiscalPayroll" +
