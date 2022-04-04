@@ -334,6 +334,7 @@ public final class Constants {
     public static final String ACCOUNT_ACREEDORES_BIENESSERVICIOS = "2420910300";
     public static final String PROVIDER_CODE_PRODUCTORES = "433";
 
+    public static final String NIT_COMPANY = "1008741021";
 
     private Constants() {
     }
