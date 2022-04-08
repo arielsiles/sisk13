@@ -39,13 +39,13 @@ public class SalesBookReportAction extends GenericReportAction {
                 "movement.state, " +
                 "movement.nit, " +
                 "movement.name, " +
-                "movement.amount, " +
+                "movement.amount+movement.discount as amount, " +
                 "movement.amountIce, " +
                 "movement.exemptExport, " +
                 "movement.taxedSalesZero, " +
-                "movement.subtotal, " +
+                "movement.subtotal + movement.discount as subtotal, " +
                 "movement.discount, " +
-                "movement.amountFiscalDebit, " +
+                "movement.amountFiscalDebit + movement.discount as amountFiscalDebit, " +
                 "movement.fiscalDebit, " +
                 "movement.controlCode, " +
                 "movement.cuf " +

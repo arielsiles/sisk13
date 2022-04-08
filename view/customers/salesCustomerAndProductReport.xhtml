@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Customers.report.salesCustomerAndProduct.title']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="productInventoryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Customers.report.salesCustomerAndProduct.title']}
+                </f:facet>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Common.dateFrom']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{salesCustomersProductReportAction.startDate}"
+                                   popup="true"
+                                   required="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="1" reRender="startDateField">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Common.dateTo']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{salesCustomersProductReportAction.endDate}"
+                                   popup="true"
+                                   required="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input"
+                                   enableManualInput="true"
+                                   tabindex="2" reRender="endDateField">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CustomerOrder.saleType']}</ui:define>
+                    <h:selectOneMenu id="saleType" value="#{salesCustomersProductReportAction.saleType}"
+                                     styleClass="inputMedium" tabindex="4">
+                        <s:selectItems value="#{customerSaleTypes}" var="saleType" label="#{messages[saleType.resourceKey]}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+
+
+            </rich:panel>
+
+            <app:reportDefaultOptions reportAction="#{salesCustomersProductReportAction}" showPageFormat="false"
+                                      tabIndex="3"
+                                      showReportTitle="false"/>
+
+            <div class="buttons">
+                <h:commandButton action="#{salesCustomersProductReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+
+    </ui:define>
+</ui:composition>

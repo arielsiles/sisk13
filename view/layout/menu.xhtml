@@ -130,51 +130,60 @@
                 styleClass="tab-cell"
                 propagation="none"/>
 
-        <rich:dropDownMenu value="#{messages['menu.customers.report']}" rendered="#{s:hasPermission('CREDIT','VIEW')}">
+        <rich:dropDownMenu value="#{messages['menu.customers.report']}">
+
+            <!-- Reporte ventas -->
             <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/customers/salesCustomerAndProductReport.xhtml"
+                        value="#{messages['menu.customers.report.salesCustomerAndProduct']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <!-- -->
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/creditStatusReport.xhtml"
                         value="#{messages['menu.customers.report.creditStatus']}"
                         propagation="none"/>
             </rich:menuItem>
 
 
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/creditStatusZoneReport.xhtml"
                         value="#{messages['menu.customers.report.creditStatusByGab']}"
                         propagation="none"/>
             </rich:menuItem>
 
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/newCreditsReport.xhtml"
                         value="#{messages['menu.customers.report.newCredits']}"
                         propagation="none"/>
             </rich:menuItem>
 
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/creditRecoveryEvaluationZone.xhtml"
                         value="#{messages['menu.customers.report.recoveryEvaluationZone']}"
                         propagation="none"/>
             </rich:menuItem>
 
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/contributionStatusReport.xhtml"
                         value="#{messages['menu.customers.report.contributionStatus']}"
                         propagation="none"/>
             </rich:menuItem>
 
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/savingStatusReport.xhtml"
                         value="#{messages['menu.customers.report.savingStatus']}"
                         propagation="none"/>
             </rich:menuItem>
 
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/savingKardexReport.xhtml"
                         value="#{messages['menu.customers.report.savingKardex']}"
                         propagation="none"/>
             </rich:menuItem>
 
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/payrollGuarantorZoneReport.xhtml"
                         value="#{messages['menu.customers.report.payrollGuarantor']}"
                         propagation="none"/>
