@@ -34,9 +34,9 @@ import java.util.*;
  * @author
  * @version 3.0
  */
-@Name("salesCustomersProductReportAction")
+@Name("salesProductReportAction")
 @Scope(ScopeType.PAGE)
-public class SalesCustomersProductReportAction extends GenericReportAction {
+public class SalesProductReportAction extends GenericReportAction {
 
     private Date startDate;
     private Date endDate;
@@ -62,7 +62,7 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
 
     public void generateReport() {
 
-        String documentTitle = "VENTAS POR CLIENTE Y PRODUCTO";
+        String documentTitle = "VENTAS POR PRODUCTO";
         String period = DateUtils.format(startDate, "dd/MM/yyyy") + " - " + DateUtils.format(endDate, "dd/MM/yyyy");
 
         Collection<CollectionData> beanCollection = new ArrayList();
@@ -76,7 +76,7 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
         reportParameters.put("saleType", MessageUtils.getMessage(saleType.getResourceKey()));
 
         try{
-            File jasper = new File(JSFUtil.getRealPath("/customers/reports/salesCustomerProductReport.jasper"));
+            File jasper = new File(JSFUtil.getRealPath("/customers/reports/salesProductReport.jasper"));
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), reportParameters, new JRBeanCollectionDataSource(beanCollection));
             exportarExcel(jasperPrint);
         }catch (Exception e){
@@ -88,10 +88,10 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
     public Collection<CollectionData> calculateReport(){
 
         Collection<CollectionData> beanCollection = new ArrayList();
-        List<Object[]> objects = customerOrderService.getSalesCustomerProduct(startDate, endDate, saleType, warehouse);
+        List<Object[]> objects = customerOrderService.getSalesProduct(startDate, endDate, saleType, warehouse);
 
         for ( Object[] value : objects){
-            CollectionData data = new CollectionData((Long)value[0], (String)value[1], (String)value[2], (String) value[3], (Double) value[4], (Long) value[5]);
+            CollectionData data = new CollectionData((String)value[0], (String) value[1], (Double) value[2], (Long) value[3]);
             beanCollection.add(data);
         }
         return beanCollection;
@@ -100,7 +100,7 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
     public void exportarExcel(JasperPrint jasperPrint) throws IOException, JRException {
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-        response.addHeader("Content-disposition", "attachment; filename=VENTASxCLIENTExPRODUCTO.xlsx");
+        response.addHeader("Content-disposition", "attachment; filename=VENTASxPRODUCTO.xlsx");
         ServletOutputStream stream = response.getOutputStream();
         JRXlsxExporter exporter = new JRXlsxExporter();
         exporter.setParameter(JRTextExporterParameter.JASPER_PRINT, jasperPrint);
@@ -153,36 +153,24 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
 
     public class CollectionData{
 
-        private Long clientId;
-        private String doc;
-        private String name;
+        private String code;
         private String product;
         private Double amount;
         private Long quantity;
 
-        public CollectionData(Long clientId, String doc, String name, String product, Double amount, Long quantity) {
-            this.clientId = clientId;
-            this.doc = doc;
-            this.name = name;
+        public CollectionData(String code, String product, Double amount, Long quantity) {
+            this.code = code;
             this.product = product;
             this.amount = amount;
             this.quantity = quantity;
         }
 
-        public String getDoc() {
-            return doc;
+        public String getCode() {
+            return code;
         }
 
-        public void setDoc(String doc) {
-            this.doc = doc;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
+        public void setCode(String code) {
+            this.code = code;
         }
 
         public String getProduct() {
@@ -207,14 +195,6 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
 
         public void setQuantity(Long quantity) {
             this.quantity = quantity;
-        }
-
-        public Long getClientId() {
-            return clientId;
-        }
-
-        public void setClientId(Long clientId) {
-            this.clientId = clientId;
         }
     }
 }

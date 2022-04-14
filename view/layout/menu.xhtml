@@ -133,8 +133,20 @@
         <rich:dropDownMenu value="#{messages['menu.customers.report']}">
 
             <!-- Reporte ventas -->
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
-                <s:link view="/customers/salesCustomerAndProductReport.xhtml"
+            <rich:menuItem submitMode="none" rendered="#{s:hasPermission('SALES', 'VIEW')}" styleClass="main-menu-item">
+                <s:link view="/customers/salesCustomerReport.xhtml"
+                        value="#{messages['menu.customers.report.salesCustomer']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" rendered="#{s:hasPermission('SALES', 'VIEW')}" styleClass="main-menu-item">
+                <s:link view="/customers/salesProductReport.xhtml"
+                        value="#{messages['menu.customers.report.salesProduct']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" rendered="#{s:hasPermission('SALES', 'VIEW')}" styleClass="main-menu-item">
+                <s:link view="/customers/salesCustomerProductReport.xhtml"
                         value="#{messages['menu.customers.report.salesCustomerAndProduct']}"
                         propagation="none"/>
             </rich:menuItem>

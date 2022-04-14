@@ -4,7 +4,6 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
     <ui:define name="pageTitle">#{messages['Customers.report.salesCustomerAndProduct.title']}</ui:define>
@@ -51,6 +50,7 @@
                 <s:decorate id="saleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CustomerOrder.saleType']}</ui:define>
                     <h:selectOneMenu id="saleType" value="#{salesCustomersProductReportAction.saleType}"
+                                     required="true"
                                      styleClass="inputMedium" tabindex="4">
                         <s:selectItems value="#{customerSaleTypes}" var="saleType" label="#{messages[saleType.resourceKey]}"
                                        hideNoSelectionLabel="false"
@@ -59,13 +59,28 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehousePurchaseOrder.warehouse']}</ui:define>
+                    <h:selectOneMenu id="warehouseField"
+                                     value="#{salesCustomersProductReportAction.warehouse}"
+                                     required="true"
+                                     styleClass="input"
+                                     tabindex="13">
+                        <s:selectItems value="#{warehouseList.resultList}"
+                                       var="element"
+                                       label="#{element.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
 
 
             </rich:panel>
 
-            <app:reportDefaultOptions reportAction="#{salesCustomersProductReportAction}" showPageFormat="false"
+            <!--<app:reportDefaultOptions reportAction="#{salesCustomersProductReportAction}" showPageFormat="false"
                                       tabIndex="3"
-                                      showReportTitle="false"/>
+                                      showReportTitle="false"/>-->
 
             <div class="buttons">
                 <h:commandButton action="#{salesCustomersProductReportAction.generateReport}"

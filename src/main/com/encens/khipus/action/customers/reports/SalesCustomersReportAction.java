@@ -34,9 +34,9 @@ import java.util.*;
  * @author
  * @version 3.0
  */
-@Name("salesCustomersProductReportAction")
+@Name("salesCustomersReportAction")
 @Scope(ScopeType.PAGE)
-public class SalesCustomersProductReportAction extends GenericReportAction {
+public class SalesCustomersReportAction extends GenericReportAction {
 
     private Date startDate;
     private Date endDate;
@@ -62,7 +62,7 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
 
     public void generateReport() {
 
-        String documentTitle = "VENTAS POR CLIENTE Y PRODUCTO";
+        String documentTitle = "VENTAS POR CLIENTE";
         String period = DateUtils.format(startDate, "dd/MM/yyyy") + " - " + DateUtils.format(endDate, "dd/MM/yyyy");
 
         Collection<CollectionData> beanCollection = new ArrayList();
@@ -76,19 +76,18 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
         reportParameters.put("saleType", MessageUtils.getMessage(saleType.getResourceKey()));
 
         try{
-            File jasper = new File(JSFUtil.getRealPath("/customers/reports/salesCustomerProductReport.jasper"));
+            File jasper = new File(JSFUtil.getRealPath("/customers/reports/salesCustomerReport.jasper"));
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), reportParameters, new JRBeanCollectionDataSource(beanCollection));
             exportarExcel(jasperPrint);
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     public Collection<CollectionData> calculateReport(){
 
         Collection<CollectionData> beanCollection = new ArrayList();
-        List<Object[]> objects = customerOrderService.getSalesCustomerProduct(startDate, endDate, saleType, warehouse);
+        List<Object[]> objects = customerOrderService.getSalesCustomer(startDate, endDate, saleType, warehouse);
 
         for ( Object[] value : objects){
             CollectionData data = new CollectionData((Long)value[0], (String)value[1], (String)value[2], (String) value[3], (Double) value[4], (Long) value[5]);
@@ -100,11 +99,12 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
     public void exportarExcel(JasperPrint jasperPrint) throws IOException, JRException {
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-        response.addHeader("Content-disposition", "attachment; filename=VENTASxCLIENTExPRODUCTO.xlsx");
+        response.addHeader("Content-disposition", "attachment; filename=VENTASxCLIENTE.xlsx");
         ServletOutputStream stream = response.getOutputStream();
         JRXlsxExporter exporter = new JRXlsxExporter();
         exporter.setParameter(JRTextExporterParameter.JASPER_PRINT, jasperPrint);
         exporter.setParameter(JRTextExporterParameter.OUTPUT_STREAM, stream);
+        //exporter.setParameter(JRXlsExporterParameter.OUTPUT_FILE_NAME, "ReporteVentas01.xlsx");
         exporter.exportReport();
         stream.flush();
         stream.close();
@@ -156,15 +156,15 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
         private Long clientId;
         private String doc;
         private String name;
-        private String product;
+        private String zone;
         private Double amount;
         private Long quantity;
 
-        public CollectionData(Long clientId, String doc, String name, String product, Double amount, Long quantity) {
+        public CollectionData(Long clientId, String doc, String name, String zone, Double amount, Long quantity) {
             this.clientId = clientId;
             this.doc = doc;
             this.name = name;
-            this.product = product;
+            this.zone = zone;
             this.amount = amount;
             this.quantity = quantity;
         }
@@ -185,12 +185,12 @@ public class SalesCustomersProductReportAction extends GenericReportAction {
             this.name = name;
         }
 
-        public String getProduct() {
-            return product;
+        public String getZone() {
+            return zone;
         }
 
-        public void setProduct(String product) {
-            this.product = product;
+        public void setZone(String zone) {
+            this.zone = zone;
         }
 
         public Double getAmount() {
