@@ -1627,14 +1627,18 @@
                     propagation="begin"/>
         </rich:menuItem>
 
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       >
-
+        <rich:menuItem submitMode="none" styleClass="main-menu-item">
             <s:link view="/production/reports/rawMaterialPayRollReport.xhtml"
                     value="#{messages['menu.production.supplierPayments.reports.payRoll']}"
                     propagation="begin"/>
         </rich:menuItem>
+
+        <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <s:link view="/production/reports/rawMaterialGeneralPayRollReport.xhtml"
+                    value="#{messages['menu.production.supplierPayments.reports.generalPayRoll']}"
+                    propagation="begin"/>
+        </rich:menuItem>
+
         <rich:menuItem submitMode="none" styleClass="main-menu-item">
             <s:link view="/production/reports/voletasDePagoReport.xhtml"
                     value="#{messages['menu.production.supplierPayments.reports.boletasPago']}"
