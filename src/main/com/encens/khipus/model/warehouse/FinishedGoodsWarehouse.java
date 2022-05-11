@@ -3,6 +3,7 @@ package com.encens.khipus.model.warehouse;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
@@ -16,7 +17,7 @@ import java.util.List;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "depositoproductoterminado",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "depositoproductoterminado", uniqueConstraints = @UniqueConstraint(columnNames = {"codigo", "idcompania"}))

@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
@@ -23,7 +24,7 @@ import java.io.Serializable;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "metaproductoproduccion",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Table(name = "metaproductoproduccion", uniqueConstraints = @UniqueConstraint(columnNames = {"codigo", "idcompania"}))
 @Inheritance(strategy = InheritanceType.JOINED)

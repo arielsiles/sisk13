@@ -4,6 +4,7 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 
@@ -202,7 +203,7 @@ import java.util.List;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "planillapagomateriaprima",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "planillapagomateriaprima")

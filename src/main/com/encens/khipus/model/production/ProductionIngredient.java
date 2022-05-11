@@ -1,5 +1,7 @@
 package com.encens.khipus.model.production;
 
+import com.encens.khipus.util.Constants;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
@@ -16,7 +18,7 @@ import java.math.BigDecimal;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "ingredienteproduccion",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "ingredienteproduccion")

@@ -2,6 +2,7 @@ package com.encens.khipus.model.production;
 
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;
 
@@ -10,7 +11,7 @@ import javax.persistence.*;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "productoreprocesado",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "productoreprocesado")

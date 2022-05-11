@@ -1,5 +1,6 @@
 package com.encens.khipus.model.production;
 
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import java.util.Date;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "notarechazomateriaprima",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "notarechazomateriaprima", uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania"}))

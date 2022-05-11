@@ -22,7 +22,7 @@ import javax.persistence.*;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "costosindirectosconf",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "costosindirectosconf")

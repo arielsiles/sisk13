@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.warehouse.Group;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.Length;
 
@@ -22,7 +23,7 @@ import javax.persistence.*;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "configrupo",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "configrupo")

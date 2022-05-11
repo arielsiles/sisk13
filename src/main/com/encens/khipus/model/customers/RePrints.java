@@ -19,7 +19,7 @@ import java.util.Date;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "ilva_reimpresiones",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "ilva_reimpresiones",schema = Constants.CASHBOX_SCHEMA)

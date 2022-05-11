@@ -18,7 +18,7 @@ import javax.persistence.*;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "per_insts",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "per_insts",schema = Constants.CASHBOX_SCHEMA)

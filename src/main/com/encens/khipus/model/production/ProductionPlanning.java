@@ -3,6 +3,7 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.MessageUtils;
 import org.hibernate.annotations.Cascade;
@@ -45,7 +46,7 @@ import java.util.List;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "planificacionproduccion",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "planificacionproduccion", uniqueConstraints = @UniqueConstraint(columnNames = {"fecha", "idcompania"}))

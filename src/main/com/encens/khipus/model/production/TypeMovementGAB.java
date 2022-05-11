@@ -7,7 +7,9 @@ package com.encens.khipus.model.production;
  * Time: 20:15
  * To change this template use File | Settings | File Templates.
  */
+
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -17,7 +19,7 @@ import javax.persistence.*;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 @Entity
 @Table(name = "tipomovimientogab", uniqueConstraints = @UniqueConstraint(columnNames = {"idtipomovimientogab", "idcompania"}))
 @Filter(name = "companyFilter")

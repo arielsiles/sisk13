@@ -1,6 +1,7 @@
 package com.encens.khipus.model.production;
 
 
+import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 
@@ -12,7 +13,7 @@ import java.util.Date;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "registropagomateriaprima",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "registropagomateriaprima")

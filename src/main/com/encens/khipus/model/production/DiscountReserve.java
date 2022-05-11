@@ -1,6 +1,7 @@
 package com.encens.khipus.model.production;
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,7 +19,7 @@ import java.util.Date;
         pkColumnName = "tabla",
         valueColumnName = "valor",
         pkColumnValue = "descuentoreserva",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "descuentoreserva")

@@ -15,7 +15,7 @@ import javax.persistence.*;
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         pkColumnValue = "entradaordenproduccion",
-        allocationSize = 10)
+        allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Table(name = "entradaordenproduccion")
