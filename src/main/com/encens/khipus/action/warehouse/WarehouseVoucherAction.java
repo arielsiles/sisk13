@@ -148,6 +148,9 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
                         transferProducts.put(movementDetail.getProductItemCode(), movementDetail.getQuantity());
                 }
 
+                System.out.println("-------> Transferencia de pedidos de Almacen");
+                System.out.println(warehouseVoucher.getNumber() + " - " + warehouseVoucher.getDate());
+
                 for (ArticleOrder articleOrder : warehouseVoucher.getTransferCustomerOrder().getArticleOrderList()){
                     if (transferProductsPT.containsKey(articleOrder.getCodArt())){
                         BigDecimal quantity = transferProductsPT.get(articleOrder.getCodArt());

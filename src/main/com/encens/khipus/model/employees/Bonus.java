@@ -20,7 +20,7 @@ import java.math.BigDecimal;
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "Bono",
+        pkColumnValue = "bono",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @NamedQueries({
