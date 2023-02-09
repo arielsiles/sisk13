@@ -165,6 +165,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
                 String cod_art      = entry.getKey();
                 BigDecimal quantity = entry.getValue();
                 BigDecimal unitCost = unitCostMilkProducts.get(cod_art);
+                System.out.println("===> TRANSF: " + cod_art + " - " + unitCost);
                 BigDecimal amount = BigDecimalUtil.multiply(quantity, unitCost, 2);
 
                 VoucherDetail voucherDetailDebit = new VoucherDetail(ctaAlmPTAG, amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE, cod_art, quantity);

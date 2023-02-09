@@ -150,6 +150,23 @@
                         value="#{messages['menu.customers.report.salesCustomerAndProduct']}"
                         propagation="none"/>
             </rich:menuItem>
+
+            <rich:menuItem submitMode="none"
+                           rendered="#{s:hasPermission('SALES','VIEW')}"
+                           styleClass="main-menu-item">
+                <s:link view="/accounting/customerKardexReport.xhtml"
+                        value="#{messages['menu.finances.accounting.customerKardex']}"
+                        propagation="none" />
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none"
+                           rendered="#{s:hasPermission('SALES','VIEW')}"
+                           styleClass="main-menu-item">
+                <s:link view="/accounting/summaryClientStateReport.xhtml"
+                        value="#{messages['menu.finances.accounting.summaryClientState']}"
+                        propagation="none" />
+            </rich:menuItem>
+
             <!-- -->
 
             <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">

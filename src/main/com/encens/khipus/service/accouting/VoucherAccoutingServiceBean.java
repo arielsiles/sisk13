@@ -1476,6 +1476,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         String gestion = DateUtils.getCurrentYear(startDate).toString();
         String month = DateUtils.getCurrentMonth(startDate).toString();
 
+        System.out.println("----=====--->>>> " + gestion + " - " + month);
+
         List<Object[]> purchaseList = em.createNativeQuery("" +
                 "select z.cod_art, sum(z.monto) / sum(z.cantidad) from ( " +
                 " " + /** Inventario inicio de periodo **/

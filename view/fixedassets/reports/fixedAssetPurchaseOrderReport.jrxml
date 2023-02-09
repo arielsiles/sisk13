@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="fixedAssetPurchaseOrderReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="562" leftMargin="28" rightMargin="22" topMargin="28" bottomMargin="28">
-	<property name="ireport.zoom" value="1.948717100000005"/>
+	<property name="ireport.zoom" value="1.6105100000000039"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="118"/>
-	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/voucherReportStyles.jrtx")]]></template>
+	<property name="ireport.y" value="0"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="locationName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
@@ -417,9 +416,9 @@
 	<summary>
 		<band height="123" splitType="Stretch">
 			<frame>
-				<reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="0" width="562" height="36"/>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="562" height="36"/>
 				<frame>
-					<reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="0" width="405" height="12"/>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="405" height="12"/>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 						<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 						<box padding="1">
@@ -442,7 +441,7 @@
 					</textField>
 				</frame>
 				<frame>
-					<reportElement style="detailStyle" positionType="Float" mode="Transparent" x="0" y="12" width="405" height="12"/>
+					<reportElement positionType="Float" mode="Transparent" x="0" y="12" width="405" height="12"/>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 						<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="100" height="12"/>
 						<box padding="1">
@@ -532,7 +531,7 @@
 				</frame>
 			</frame>
 			<frame>
-				<reportElement style="detailStyle" positionType="Float" mode="Transparent" x="1" y="111" width="561" height="12"/>
+				<reportElement positionType="Float" mode="Transparent" x="1" y="111" width="561" height="12"/>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="26" y="0" width="135" height="12"/>
 					<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
