@@ -12,6 +12,7 @@ import com.encens.khipus.model.finances.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.SaleService;
+import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.UserCashBoxService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.SalaryMovementProducerService;
@@ -55,6 +56,8 @@ public class AccountingCreditSaleAction extends GenericAction {
     private VoucherAccoutingService voucherAccoutingService;
     @In
     private SalaryMovementProducerService salaryMovementProducerService;
+    @In
+    private CashAccountService cashAccountService;
 
 
     @End
@@ -94,7 +97,8 @@ public class AccountingCreditSaleAction extends GenericAction {
                 /** Ventas normales facturadas **/
                 if ((customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.NORMAL) ||
                      customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.MILK)   ||
-                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY)) && customerOrder.getAdditionalDiscountValue().doubleValue() == 0 ){
+                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.VETERINARY) ||
+                     customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REGULARIZE)) && customerOrder.getAdditionalDiscountValue().doubleValue() == 0 ){
 
                     if (customerOrder.getMovement() !=  null){
                         Voucher voucher = accountingCreditSale(customerOrder);
@@ -257,6 +261,14 @@ public class AccountingCreditSaleAction extends GenericAction {
                 cashBox.getType().getCashAccountIncome(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
 
         debitReceivable.setClient(customerOrder.getClient());
+
+        if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REGULARIZE)){
+            CashAccount cashAccountRegularize = cashAccountService.findByAccountCode(customerOrder.getClient().getRegularizeAccount());
+            debitReceivable = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
+                    cashAccountRegularize, BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), FinancesCurrencyType.D, BigDecimal.ONE);
+            debitReceivable.setClient(null);
+        }
+
         creditFiscalDebitIVA.setMovement(customerOrder.getMovement());
         voucher.setDocumentType(Constants.NE_VOUCHER_DOCTYPE);
         voucher.getDetails().add(debitReceivable);
@@ -294,10 +306,19 @@ public class AccountingCreditSaleAction extends GenericAction {
                 cashBox.getType().getCashAccountReceivable(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), FinancesCurrencyType.D, BigDecimal.ONE);
 
         BigDecimal amount = BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount());
+
         VoucherDetail creditPrimarySaleProduct = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
                 cashBox.getType().getCashAccountIncome(), amount, FinancesCurrencyType.D, BigDecimal.ONE);
 
         debitReceivable.setClient(customerOrder.getClient());
+
+        if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.REGULARIZE)){
+            CashAccount cashAccountRegularize = cashAccountService.findByAccountCode(customerOrder.getClient().getRegularizeAccount());
+            creditPrimarySaleProduct = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
+                    cashAccountRegularize, amount, FinancesCurrencyType.D, BigDecimal.ONE);
+            debitReceivable.setClient(null);
+        }
+
         voucher.setDocumentType(Constants.NE_VOUCHER_DOCTYPE);
         voucher.getDetails().add(debitReceivable);
         voucher.getDetails().add(creditPrimarySaleProduct);

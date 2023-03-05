@@ -737,16 +737,14 @@ public class SalesAction extends GenericAction {
         Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
                 MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
                         customerOrder.getCode() + " (F-" + movement.getNumber() + ") " + customerOrder.getClient().getFullName());
-        /*Voucher voucher = VoucherBuilder.newGeneralVoucher( null,
-                MessageUtils.getMessage("Voucher.creditSale.gloss") + " " +
-                        customerOrder.getCode() + " " + customerOrder.getClient().getFullName());*/
+
 
         CashAccount debitAccount = cashBox.getType().getCashAccountReceivable();
         Client client = customerOrder.getClient();
-        System.out.println("----------ZZZZz>>> Tipo Pedido: " + customerOrder.getCustomerOrderType().getType());
+
         if (customerOrder.getCustomerOrderType().getType().equals(CustomerOrderTypeEnum.SPECIAL)) {
-            System.out.println("----->>> TRUE");
-            debitAccount = cashBox.getType().getCashAccountIncome();
+            //debitAccount = cashBox.getType().getCashAccountIncome();
+            debitAccount =  cashAccountService.findByAccountCode(customerOrder.getClient().getRegularizeAccount());
             client = null;
         }
 
@@ -934,17 +932,16 @@ public class SalesAction extends GenericAction {
         CustomerOrder customerOrderBill = new CustomerOrder();
         List<ArticleOrder> articleOrderList = new ArrayList<ArticleOrder>();
         Double totalAmount = 0.0;
-        //String glossCodes = "";
+        String codeGloss = "";
 
         for (CustomerOrder customerOrder : customerOrderList){
             if (customerOrder.getState().equals(SaleStatus.CONTABILIZADO)){
-                System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
+                codeGloss += customerOrder.getCode() + ", ";
+                //System.out.println("==========> Venta seleccionada: " + customerOrder.getClient().getFullName() + " - Venta Nro: " + customerOrder.getCode() + " - Monto Bs: " + customerOrder.getTotalAmount());
 
                 for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
                     String articleOrderCode = articleOrder.getCodArt();
-
-                    System.out.println("...Pedido: " + customerOrder.getCode() + " - " + articleOrder.getProductItem().getFullName() + " - " + articleOrder.getQuantity() + " - " + articleOrder.getAmount());
-
+                    //System.out.println("...Pedido: " + customerOrder.getCode() + " - " + articleOrder.getProductItem().getFullName() + " - " + articleOrder.getQuantity() + " - " + articleOrder.getAmount());
                     if (productsArt.containsKey(articleOrderCode)){
 
                         System.out.println("==> add: " + products.get(articleOrderCode) + " ... " + articleOrder.getQuantity());
@@ -984,6 +981,7 @@ public class SalesAction extends GenericAction {
                     }
                 }
             }
+
         }
 
 
@@ -1003,7 +1001,6 @@ public class SalesAction extends GenericAction {
 
             System.out.println("---------PARA FACTURACION----------" + billingSpecialDate);
             for (ArticleOrder articleOrder : customerOrderBill.getArticleOrderList()) {
-                System.out.println("---> " + articleOrder.getCodArt() + " - " + articleOrder.getQuantity() + " - " + articleOrder.getPrice() + " - " + articleOrder.getAmount());
                 totalAmount = totalAmount + articleOrder.getAmount();
             }
 
@@ -1017,15 +1014,10 @@ public class SalesAction extends GenericAction {
             Movement movement = createInvoice(customerOrderBill);
             customerOrderBill.setMovement(movement);
 
-            /*for(CustomerOrder customerOrder : customerOrderList){
-                customerOrder.setMovement(movement);
-                saleService.updateCustomerOrder(customerOrder);
-            }*/
-
             // Para contabilizar el pedido para facturar fin de mes
             Voucher voucher = accountingCreditSale(customerOrderBill, movement);
             //voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + " (F-" + movement.getNumber() + ") " + customerOrderBill.getClient().getFullName());
-            voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + customerOrderBill.getClient().getFullName());
+            voucher.setGloss(MessageUtils.getMessage("Voucher.creditSale.gloss") + " " + codeGloss + customerOrderBill.getClient().getFullName());
             voucherAccoutingService.simpleUpdateVoucher(voucher);
 
             customerOrderBill.setVoucher(voucher);

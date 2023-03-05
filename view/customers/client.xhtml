@@ -217,7 +217,22 @@
             </h:selectOneMenu>
         </s:decorate>
 
-
+    <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.deferredCashAccount']}</ui:define>
+        <app:selectPopUp id="itemAccount"
+                         required="false"
+                         textValue="#{clientAction.regularizeCashAccount.fullName}"
+                         value="#{clientAction.regularizeCashAccount}"
+                         clearAction="clientAction.clearRegularizeAccount()"
+                         searchModalPanel="cashAccountListModalPanel"
+                         dataModel="#{cashAccountDataModel}"
+                         reRender="itemAccountField"
+                         tabindex="3">
+            <ui:define name="criteriaValues">
+                <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
+            </ui:define>
+        </app:selectPopUp>
+    </s:decorate>
 
     <!--</app:fieldset>-->
 
@@ -320,6 +335,20 @@
 </div>
 
 </h:form>
+
+<s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasWarehousePermission" value="true"/>
+    <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{clientAction.setRegularizeCashAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="itemAccountField"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
 
 <s:decorate template="/include/modalDialog.xhtml" rendered="#{clientAction.managed and s:hasPermission('CLIENT','DELETE')}">
     <ui:param name="dialogId" value="deleteConfirmation"/>

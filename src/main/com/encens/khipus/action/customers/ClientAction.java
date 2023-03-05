@@ -4,7 +4,9 @@ import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.customers.PaymentMethodSin;
+import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.service.customers.ClientService;
+import com.encens.khipus.service.finances.CashAccountService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
@@ -19,10 +21,13 @@ public class ClientAction extends GenericAction<Client> {
 
     @In
     private ClientService clientService;
+    @In
+    private CashAccountService cashAccountService;
 
     private String clientName;
     private Boolean personFlag = Boolean.TRUE;
     private PaymentMethodSin paymentMethodSin;
+    private CashAccount regularizeCashAccount;
 
     private boolean showNitExtension = false;
 
@@ -45,6 +50,10 @@ public class ClientAction extends GenericAction<Client> {
     public String select(Client instance) {
         String outCome = super.select(instance);
         setPaymentMethodSin(clientService.findPaymentMethodSin(instance.getPaymentMethodTypeCode()));
+
+        if (instance.getRegularizeAccount() != null)
+            setRegularizeCashAccount(cashAccountService.findByAccountCode(instance.getRegularizeAccount()));
+
         return outCome;
     }
 
@@ -66,6 +75,9 @@ public class ClientAction extends GenericAction<Client> {
         if (getInstance().getMaidenName() == null)
             getInstance().setMaidenName("");
 
+        if (regularizeCashAccount != null)
+            getInstance().setRegularizeAccount(regularizeCashAccount.getAccountCode());
+
         getInstance().setPaymentMethodTypeCode(this.paymentMethodSin.getCode());
 
         return super.create();
@@ -76,7 +88,14 @@ public class ClientAction extends GenericAction<Client> {
     @Override
     public String update() {
         getInstance().setPaymentMethodTypeCode(this.paymentMethodSin.getCode());
+        if (regularizeCashAccount != null)
+            getInstance().setRegularizeAccount(regularizeCashAccount.getAccountCode());
         return super.update();
+    }
+
+    public void clearRegularizeAccount() {
+        setRegularizeCashAccount(null);
+        getInstance().setRegularizeAccount(null);
     }
 
     public void updateShowNitExtension() {
@@ -127,5 +146,13 @@ public class ClientAction extends GenericAction<Client> {
 
     public void setPaymentMethodSin(PaymentMethodSin paymentMethodSin) {
         this.paymentMethodSin = paymentMethodSin;
+    }
+
+    public CashAccount getRegularizeCashAccount() {
+        return regularizeCashAccount;
+    }
+
+    public void setRegularizeCashAccount(CashAccount regularizeCashAccount) {
+        this.regularizeCashAccount = regularizeCashAccount;
     }
 }

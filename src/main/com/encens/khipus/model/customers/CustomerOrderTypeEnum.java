@@ -14,7 +14,8 @@ public enum CustomerOrderTypeEnum {
     MILK("CustomerOrderType.type.milk"),
     VETERINARY("CustomerOrderType.type.veterinary"),
     SPECIAL("CustomerOrderType.type.special"),
-    TRANSFER("CustomerOrderType.type.transfer");
+    TRANSFER("CustomerOrderType.type.transfer"),
+    REGULARIZE("CustomerOrderType.type.regularize");
 
     private String resourceKey;
 

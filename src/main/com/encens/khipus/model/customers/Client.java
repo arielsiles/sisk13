@@ -117,6 +117,9 @@ public class Client implements BaseModel {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean personFlag = Boolean.TRUE;
 
+    @Column(name = "ctaregula")
+    private String regularizeAccount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipocliente", referencedColumnName = "idtipocliente", nullable = false)
     private ClientType clientType;
@@ -417,4 +420,13 @@ public class Client implements BaseModel {
     public void setPaymentMethodTypeCode(Integer paymentMethodTypeCode) {
         this.paymentMethodTypeCode = paymentMethodTypeCode;
     }
+
+    public String getRegularizeAccount() {
+        return regularizeAccount;
+    }
+
+    public void setRegularizeAccount(String regularizeAccount) {
+        this.regularizeAccount = regularizeAccount;
+    }
+
 }
