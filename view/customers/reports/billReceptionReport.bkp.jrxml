@@ -305,15 +305,15 @@
 				<text><![CDATA[DESCUENTO]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="0" width="199" height="19"/>
+				<reportElement x="0" y="0" width="255" height="11"/>
 				<box leftPadding="3"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="18" width="199" height="11"/>
+				<reportElement x="0" y="10" width="199" height="11"/>
 				<box leftPadding="3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="true"/>
@@ -321,7 +321,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{branchName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="28" width="199" height="11"/>
+				<reportElement x="0" y="20" width="199" height="11"/>
 				<box leftPadding="3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
@@ -329,7 +329,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{posName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="57" width="199" height="11"/>
+				<reportElement x="0" y="49" width="199" height="11"/>
 				<box leftPadding="3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
@@ -337,7 +337,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{phone}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="67" width="199" height="11"/>
+				<reportElement x="0" y="59" width="199" height="11"/>
 				<box leftPadding="3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
@@ -353,7 +353,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{activity}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="35" y="38" width="140" height="20"/>
+				<reportElement x="35" y="30" width="140" height="20"/>
 				<box leftPadding="3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
