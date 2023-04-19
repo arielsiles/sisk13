@@ -316,7 +316,6 @@ public class AccountingCreditSaleAction extends GenericAction {
             CashAccount cashAccountRegularize = cashAccountService.findByAccountCode(customerOrder.getClient().getRegularizeAccount());
             creditPrimarySaleProduct = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
                     cashAccountRegularize, amount, FinancesCurrencyType.D, BigDecimal.ONE);
-            debitReceivable.setClient(null);
         }
 
         voucher.setDocumentType(Constants.NE_VOUCHER_DOCTYPE);
