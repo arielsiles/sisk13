@@ -140,7 +140,7 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
         return "SELECT " +
                 " productiveZone.name as gab," +
                 " rawMaterialProducer.idNumber," +
-                " rawMaterialProducer.firstName || rawMaterialProducer.lastName || rawMaterialProducer.maidenName as name," +
+                " rawMaterialProducer.firstName || ' ' || rawMaterialProducer.lastName || ' ' || rawMaterialProducer.maidenName as name," +
                 " rawMaterialPayRecord.totalAmount as quantity," +
                 " rawMaterialPayRecord.totalPayCollected as totalPay," +
                 " rawMaterialPayRecord.liquidPayable as liquidPay" +
