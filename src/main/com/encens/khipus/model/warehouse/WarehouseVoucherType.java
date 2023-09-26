@@ -18,7 +18,10 @@ public enum WarehouseVoucherType {
 
     R("WarehouseVoucherType.reception"),
     E("WarehouseVoucherType.input"),
-    S("WarehouseVoucherType.output");
+    S("WarehouseVoucherType.output"),
+
+    RT("WarehouseVoucherType.receptionByTransfer");
+
     private String resourceKey;
 
     WarehouseVoucherType(String resourceKey) {

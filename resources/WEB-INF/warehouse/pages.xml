@@ -684,4 +684,24 @@
         </navigation>
     </page>
 
+    <page view-id="/warehouse/destinationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{destinationAction.select(destinationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/destination.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/destination.xhtml" no-conversation-view-id="/warehouse/destinationList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/destinationList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/destinationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>        

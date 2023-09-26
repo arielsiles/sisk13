@@ -590,7 +590,7 @@
             </h:outputText>
         </s:decorate>
 
-        <s:decorate id="transferCustomerOrderField" template="/include/inputField.xhtml" styleClass="formRow">
+        <s:decorate id="transferCustomerOrderField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{s:hasPermission('ORDER_RELATIONSHIP','VIEW')}">
             <ui:define name="label">#{messages['CustomerOrder.order']}</ui:define>
             <h:outputText
                     value="#{warehouseVoucherUpdateAction.warehouseVoucher.transferCustomerOrder.code}"

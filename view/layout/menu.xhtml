@@ -816,6 +816,13 @@
                     value="#{messages['menu.warehouse.configuration.provider']}"
                     propagation="none"/>
         </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('DESTINATION','VIEW')}">
+            <s:link view="/warehouse/destinationList.xhtml"
+                    value="#{messages['menu.warehouse.configuration.destination']}"
+                    propagation="none"/>
+        </rich:menuItem>
     </rich:menuGroup>
 </rich:dropDownMenu>
 <rich:dropDownMenu value="#{messages['menu.finances.fixedAssets']}" rendered="#{

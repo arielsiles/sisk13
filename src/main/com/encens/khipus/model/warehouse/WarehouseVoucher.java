@@ -237,6 +237,10 @@ public class WarehouseVoucher implements BaseModel {
     @JoinColumn(name = "idpedidostr", nullable = true)
     private CustomerOrder transferCustomerOrder;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "iddestino", nullable = true)
+    private Destination destination;
+
     public WarehouseVoucherPK getId() {
         return id;
     }
@@ -408,6 +412,10 @@ public class WarehouseVoucher implements BaseModel {
 
     public boolean isReception() {
         return null != documentType && WarehouseVoucherType.R.equals(documentType.getWarehouseVoucherType());
+    }
+
+    public boolean isReceptionByTransfer() {
+        return null != documentType && WarehouseVoucherType.RT.equals(documentType.getWarehouseVoucherType());
     }
 
     public boolean isInput() {
@@ -650,5 +658,13 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setTransferCustomerOrder(CustomerOrder transferCustomerOrder) {
         this.transferCustomerOrder = transferCustomerOrder;
+    }
+
+    public Destination getDestination() {
+        return destination;
+    }
+
+    public void setDestination(Destination destination) {
+        this.destination = destination;
     }
 }

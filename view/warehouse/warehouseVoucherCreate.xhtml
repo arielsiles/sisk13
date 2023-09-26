@@ -26,7 +26,7 @@
 </c:if>
 
 <c:set var="mainComponentIdsToRerender"
-       value="documentTypeField, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
+       value="documentTypeField, transferorder, destination, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
 
 <c:set var="elementsToReRenderForPetitionerJobContractChange"
        value="petitionerJobContractPanel, executorUnitLeftSidePanel"/>
@@ -101,6 +101,7 @@
         <s:convertEntity/>
     </h:selectOneMenu>
 </s:decorate>
+
 <s:div id="petitionerJobContractPanel">
     <c:if test="#{warehouseVoucherCreateAction.output or warehouseVoucherCreateAction.consumption}">
         <s:decorate id="petitionerJobContractField"
@@ -142,6 +143,7 @@
         </s:decorate>
     </c:if>
 </s:div>
+
 <s:div id="executorUnitLeftSidePanel">
     <s:decorate id="executorUnitCodeField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:param name="validateId" value="executorUnitCode"/>
@@ -197,7 +199,8 @@
     <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">
             <h:outputText
-                    value="#{warehouseVoucherCreateAction.transference or warehouseVoucherCreateAction.executorUnitTransference ? messages['WarehouseVoucher.sourceWarehouse'] : messages['WarehouseVoucher.warehouse']}"/>
+                    value="#{warehouseVoucherCreateAction.transference or warehouseVoucherCreateAction.executorUnitTransference ? messages['WarehouseVoucher.sourceWarehouse']
+                                                                                                                                : messages['WarehouseVoucher.warehouse']}"/>
         </ui:define>
         <app:quickSearch id="quickSearchWarehouseField"
                          textValue="warehouseVoucherCreateAction.warehouseVoucher.warehouse.warehouseCode"
@@ -296,6 +299,7 @@
         <s:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
     </h:outputText>
 </s:decorate>
+
 </s:div>
 
 <s:div id="rightSidePanel">
@@ -456,19 +460,40 @@
         </h:inputTextarea>
     </s:decorate>
 
-    <s:decorate id="transferOrderField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label"><h:outputText value="#{messages['CustomerOrder.order']}"/></ui:define>
-        <app:selectPopUp id="transferOrderFieldId"
-                         required="false"
-                         textValue="#{warehouseVoucherCreateAction.warehouseVoucher.transferCustomerOrder.code}"
-                         value="#{warehouseVoucherCreateAction.warehouseVoucher.transferCustomerOrder}"
-                         clearAction="#{warehouseVoucherCreateAction.clearTransferCustomerOrder()}"
-                         searchModalPanel="customerOrderListModalPanel"
-                         dataModel="#{customerOrderDataModel}"
-                         reRender="transferOrderField"
-                         tabindex="12">
-        </app:selectPopUp>
-    </s:decorate>
+    <!--rendered="#{s:hasPermission('ORDER_RELATIONSHIP','VIEW')}"-->
+    <s:div id="transferorder">
+        <s:decorate id="transferOrderField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.receptionByTransfer}">
+            <ui:define name="label"><h:outputText value="#{messages['CustomerOrder.order']}"/></ui:define>
+            <app:selectPopUp id="transferOrderFieldId"
+                             required="true"
+                             textValue="#{warehouseVoucherCreateAction.warehouseVoucher.transferCustomerOrder.code}"
+                             value="#{warehouseVoucherCreateAction.warehouseVoucher.transferCustomerOrder}"
+                             clearAction="#{warehouseVoucherCreateAction.clearTransferCustomerOrder()}"
+                             searchModalPanel="customerOrderListModalPanel"
+                             dataModel="#{customerOrderDataModel}"
+                             reRender="transferOrderField"
+                             tabindex="12">
+            </app:selectPopUp>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="destination">
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+            <ui:define name="label">Destino</ui:define>
+            <h:selectOneMenu id="destination"
+                             value="#{warehouseVoucherCreateAction.warehouseVoucher.destination}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="13">
+                <s:selectItems value="#{warehouseDestinationList}"
+                               var="element"
+                               label="#{element.code} - #{element.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
 
 </s:div>
 </h:panelGrid>

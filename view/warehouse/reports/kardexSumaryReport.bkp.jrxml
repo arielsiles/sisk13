@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="574" leftMargin="19" rightMargin="19" topMargin="18" bottomMargin="18" scriptletClass="com.encens.khipus.action.warehouse.reports.KardexReportScriptlet">
-	<property name="ireport.zoom" value="2.3579476910000046"/>
+	<property name="ireport.zoom" value="1.9487171000000019"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
+	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
 	<field name="movementDetail.productItemCode" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -86,7 +87,7 @@
 			<band height="24">
 				<elementGroup>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1" y="0" width="150" height="12"/>
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1" y="0" width="150" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -100,7 +101,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$F{productItem.name}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="345" y="0" width="70" height="12"/>
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="345" y="0" width="70" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -114,7 +115,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.beforeResidueQuantity} + ":"]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="417" y="0" width="47" height="12"/>
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="417" y="0" width="47" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -128,7 +129,7 @@
 						<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{initialQuantityVar}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="464" y="0" width="60" height="12"/>
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="464" y="0" width="60" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -142,7 +143,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.beforeResidueAmount} + ":"]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="524" y="0" width="47" height="12"/>
+						<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="524" y="0" width="47" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
@@ -158,13 +159,9 @@
 				</elementGroup>
 				<elementGroup>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1" y="12" width="40" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1" y="12" width="40" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -172,13 +169,9 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{WarehouseVoucher.date}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="40" y="12" width="25" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="40" y="12" width="25" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -186,13 +179,9 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.warehouseCode}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="64" y="12" width="35" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="64" y="12" width="35" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -200,13 +189,9 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.warehouseVoucher}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="98" y="12" width="25" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="98" y="12" width="25" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -214,13 +199,9 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.docType}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="122" y="12" width="25" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="122" y="12" width="25" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -228,13 +209,9 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.unit}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="146" y="12" width="45" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="146" y="12" width="45" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -242,13 +219,9 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.inputQuantity}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="190" y="12" width="45" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="190" y="12" width="45" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -256,13 +229,9 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.outputQuantity}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="234" y="12" width="47" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="234" y="12" width="47" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -270,13 +239,9 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.residueQuantity}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="281" y="12" width="293" height="12"/>
-						<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
+						<reportElement style="headerStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="281" y="12" width="293" height="12"/>
+						<box padding="1">
+							<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Arial" size="6"/>
@@ -289,13 +254,9 @@
 		<groupFooter>
 			<band height="24">
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="146" y="0" width="45" height="12"/>
-					<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-						<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-						<topPen lineWidth="0.5"/>
-						<leftPen lineWidth="0.5"/>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="146" y="0" width="45" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="6"/>
@@ -303,13 +264,9 @@
 					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumInputQuantityVar}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="190" y="0" width="44" height="12"/>
-					<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-						<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-						<topPen lineWidth="0.5"/>
-						<leftPen lineWidth="0.5"/>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
+					<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="190" y="0" width="44" height="12"/>
+					<box padding="1">
+						<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="Arial" size="6"/>
@@ -322,7 +279,7 @@
 	<title>
 		<band height="39">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement key="" positionType="Float" x="201" y="15" width="179" height="13"/>
+				<reportElement key="" style="titleStyle" positionType="Float" x="201" y="15" width="179" height="13"/>
 				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<topPen lineWidth="0.0"/>
@@ -336,7 +293,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.kardex.summary.title}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1" y="28" width="573" height="11"/>
+				<reportElement style="headerStyleBlank" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1" y="28" width="573" height="11"/>
 				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<topPen lineWidth="0.0"/>
@@ -371,13 +328,9 @@
 	<detail>
 		<band height="12">
 			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1" y="0" width="40" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="1" y="0" width="40" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
@@ -385,13 +338,9 @@
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{movementDetail.movementDetailDate}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="40" y="0" width="25" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="40" y="0" width="25" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
@@ -399,13 +348,9 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{warehouse.warehouseCode}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="64" y="0" width="35" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="64" y="0" width="35" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
@@ -413,13 +358,9 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{warehouseVoucher.number}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="98" y="0" width="25" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="98" y="0" width="25" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
@@ -427,13 +368,9 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{documentType.documentCode}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="122" y="0" width="25" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="122" y="0" width="25" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
@@ -441,13 +378,9 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{measureUnit.measureUnitCode}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="146" y="0" width="45" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="146" y="0" width="45" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
@@ -455,13 +388,9 @@
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{inputQuantityVar}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="190" y="0" width="45" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="190" y="0" width="45" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
@@ -469,13 +398,9 @@
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{outputQuantityVar}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="234" y="0" width="47" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="234" y="0" width="47" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="6"/>
@@ -483,13 +408,9 @@
 				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{residueQuantityVar}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="281" y="0" width="293" height="12"/>
-				<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
-					<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+				<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="281" y="0" width="293" height="12"/>
+				<box padding="1">
+					<pen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="5"/>
@@ -503,37 +424,43 @@
 	</columnFooter>
 	<pageFooter>
 		<band height="13" splitType="Stretch">
-			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="100" height="12"/>
-				<box padding="1">
-					<pen lineStyle="Solid" lineColor="#000000"/>
+			<frame>
+				<reportElement style="detailStyle" positionType="Float" mode="Opaque" x="0" y="1" width="574" height="12"/>
+				<box padding="0">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Left">
-					<font fontName="Arial" size="6"/>
-				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="484" y="0" width="40" height="12"/>
-				<textElement textAlignment="Right">
-					<font fontName="Arial" size="6"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="524" y="0" width="10" height="12"/>
-				<textElement textAlignment="Center">
-					<font fontName="Arial" size="6"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["/"]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="534" y="0" width="40" height="12"/>
-				<textElement textAlignment="Left">
-					<font fontName="Arial" size="6"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
+				<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="100" height="12"/>
+					<box padding="1">
+						<pen lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="484" y="0" width="40" height="12"/>
+					<textElement textAlignment="Right">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="524" y="0" width="10" height="12"/>
+					<textElement textAlignment="Center">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA["/"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" evaluationTime="Report" isBlankWhenNull="true">
+					<reportElement style="detailStyle" stretchType="RelativeToTallestObject" mode="Opaque" x="534" y="0" width="40" height="12"/>
+					<textElement textAlignment="Left">
+						<font fontName="Arial" size="6"/>
+					</textElement>
+					<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+			</frame>
 		</band>
 	</pageFooter>
 	<summary>

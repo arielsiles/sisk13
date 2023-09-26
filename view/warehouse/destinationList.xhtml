@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Destination.list']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="global"/>
+    <ui:define name="body">
+        <h:form id="destinationSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Destination.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Destination.name']}</ui:define>
+                    <h:inputText id="name" value="#{destinationDataModel.criteria.name}"
+                                 maxlength="150" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{destinationDataModel.search}"
+                                       reRender="destinationList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/destination.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('DESTINATION','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{destinationDataModel}" var="destinationItem" id="destinationList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 60%, 20%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>#{messages['Destination.code']}</rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="destination.name" dataModel="#{destinationDataModel}"
+                                                   reRender="destinationList, dataScroller">
+                                #{messages['Destination.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{destinationItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{destinationItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('DESTINATION','VIEW')}"
+                                   action="#{destinationAction.select(destinationItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="destinationList" dataModel="#{destinationDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/destination.xhtml" styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('DESTINATION','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>
