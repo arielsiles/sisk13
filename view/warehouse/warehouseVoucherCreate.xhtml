@@ -479,7 +479,7 @@
 
     <s:div id="destination">
         <s:decorate template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
-            <ui:define name="label">Destino</ui:define>
+            <ui:define name="label">#{messages['WarehouseVoucher.destination']}</ui:define>
             <h:selectOneMenu id="destination"
                              value="#{warehouseVoucherCreateAction.warehouseVoucher.destination}"
                              styleClass="input"

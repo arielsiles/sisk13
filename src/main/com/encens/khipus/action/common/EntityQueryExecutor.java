@@ -23,4 +23,8 @@ public class EntityQueryExecutor {
     public List byBusinessUnit(String queryName) {
         return EntityQueryExecutorUtil.i.executeNamedQuery(queryName, Arrays.asList("businessUnitFilter"));
     }
+
+    public List byDestination(String queryName) {
+        return EntityQueryExecutorUtil.i.executeNamedQuery(queryName, Arrays.asList("warehouseDestinationFilter"));
+    }
 }

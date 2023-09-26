@@ -180,7 +180,7 @@
 
     <factory name="warehouseDestinationList" value="#{warehouseDestinationQuery}"/>
     <framework:entity-query name="warehouseDestinationQuery"
-                            ejbql="select destination from Destination destination">
+                            ejbql="select destination from Destination destination order by destination.name">
     </framework:entity-query>
 
     <!--Enumerations-->

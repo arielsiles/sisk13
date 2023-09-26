@@ -675,6 +675,23 @@
                              styleClass="input textarea"
                              tabindex="17"/>
         </s:decorate>
+
+        <s:decorate id="destinationField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+            <ui:define name="label">#{messages['WarehouseVoucher.destination']}</ui:define>
+            <h:selectOneMenu id="destination"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.destination}"
+                             styleClass="input"
+                             required="true"
+                             disabled="#{warehouseVoucherApproved}">
+                <s:selectItems value="#{entityQueryExecutor.byBusinessUnit('warehouseDestinationList')}"
+                               var="element"
+                               label="#{element.code} - #{element.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
     </s:div>
 </c:otherwise>
 </c:choose>
