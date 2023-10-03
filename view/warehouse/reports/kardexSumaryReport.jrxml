@@ -3,6 +3,9 @@
 	<property name="ireport.zoom" value="2.3579476910000046"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="locationName" class="java.lang.String"/>
+	<parameter name="systemName" class="java.lang.String"/>
 	<field name="movementDetail.productItemCode" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -350,18 +353,25 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{dateRangeParam}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1" y="0" width="199" height="10"/>
+				<reportElement x="1" y="0" width="200" height="10"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="7"/>
+					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{App.company.office1}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1" y="9" width="199" height="10"/>
+				<reportElement x="1" y="9" width="200" height="10"/>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="7"/>
+					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$R{App.company.office2}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="18" width="200" height="10"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

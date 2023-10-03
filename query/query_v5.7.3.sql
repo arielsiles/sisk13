@@ -7,7 +7,7 @@ VALUES(271, 'DESTINATION', 5, 15, 'Functionality.warehouse.destinationVoucher', 
 
 CREATE TABLE `inv_destino` (
     `iddestino` bigint(20) NOT NULL,
-    `codigo` varbinary(50) DEFAULT NULL,
+    `codigo` varchar(50) DEFAULT NULL,
     `nombre` varchar(255) DEFAULT NULL,
     `version` bigint(20) DEFAULT NULL,
     `idcompania` bigint(20) DEFAULT NULL,

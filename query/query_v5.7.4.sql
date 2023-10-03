@@ -1,9 +1,15 @@
 -- 25.09.2023
+/* OJO */
+/* Inserts and updates for Terdemol */
+
 ALTER TABLE inv_tipodocs MODIFY COLUMN tipo_vale VARCHAR(2) NULL;
 UPDATE inv_tipodocs SET `tipo_vale` = 'RT' WHERE cod_doc = 'RPT';
 
+ALTER TABLE inv_vales add column iddestino bigint(20);
+
 ALTER TABLE inv_vales ADD FOREIGN KEY (iddestino) REFERENCES inv_destino (iddestino);
 
+/* Inserts for Terdemol */
 -- insert into `inv_destino` (`iddestino`, `codigo`, `nombre`, `version`, `idcompania`) values('1','CP-1','CILO PULMON','0','1');
 -- insert into `inv_destino` (`iddestino`, `codigo`, `nombre`, `version`, `idcompania`) values('2','CD-1','CONO DISTRIBUIDOR ','0','1');
 INSERT INTO `inv_destino` (`iddestino`, `codigo`, `nombre`, `version`, `idcompania`) VALUES('3','AM-1','ALMACEN','0','1');

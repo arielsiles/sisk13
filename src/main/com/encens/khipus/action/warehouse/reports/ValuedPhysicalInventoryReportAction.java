@@ -1,9 +1,12 @@
 package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.WarehouseService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
@@ -52,6 +55,8 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
     private VoucherAccoutingService voucherAccoutingService;
     @In
     protected FacesMessages facesMessages;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     @Create
     public void init() {
@@ -70,10 +75,18 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
     public void generateReport() {
 
         log.debug("generating Product Inventory Report................................................");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
         Collection<CollectionData> beanCollection = calculateValuedInventory();
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("reportTitle", "REPORTE DE INVENTARIO FISICO - VALORADO");
+        paramMap.put("companyName", companyConfiguration.getCompanyName());
+        paramMap.put("systemName", companyConfiguration.getSystemName());
+        paramMap.put("locationName", companyConfiguration.getLocationName());
         paramMap.put("startDate", startDate);
         paramMap.put("endDate", endDate);
         paramMap.put("cashAccount", this.warehouse.getWarehouseCashAccount().getFullName());
@@ -107,6 +120,7 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
             BigDecimal output = (BigDecimal)value[6];
 
             System.out.println("=====> $$$$$$$$$$$$$$$$");
+            System.out.println("=====> COD_art: " + codArt);
             System.out.println("=====> INPUT: " + input);
             System.out.println("=====> OUTPUT: " + output);
             BigDecimal physicalBalance = BigDecimalUtil.subtract(input, output, 2);

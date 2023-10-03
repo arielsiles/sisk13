@@ -647,18 +647,8 @@
                 value="#{messages['menu.warehouse.inventory']}"
                 propagation="none"/>
     </rich:menuItem>
-    <rich:menuGroup value="#{messages['menu.warehouse.report']}" rendered="#{
-        s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW') or
-        s:hasPermission('KARDEXREPORT','VIEW') or
-        s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW') or
-        s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW') or
-        s:hasPermission('PRODUCTITEMBYPROVIDERHISTORYREPORT','VIEW') or
-        s:hasPermission('ARTICLESREPORT','VIEW') or
-        s:hasPermission('VALUEDWAREHOUSERESIDUEREPORT','VIEW') or
-        s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW') or
-        s:hasPermission('KARDEXSUMMARYREPORT','VIEW') or
-        s:hasPermission('ESTIMATIONSTOCKREPORT','VIEW') or
-        s:hasPermission('SUBGROUPREPORT','VIEW')}">
+
+    <rich:menuGroup value="#{messages['menu.warehouse.report']}">
 
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
@@ -695,32 +685,19 @@
 
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
-                       rendered="#{s:hasPermission('KARDEXREPORT','VIEW')}">
-            <s:link view="/warehouse/kardexReport.xhtml"
-                    value="#{messages['Reports.kardex.menu.title']}"
-                    propagation="none"/>
-        </rich:menuItem>
-
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
                        rendered="#{s:hasPermission('KARDEXSUMMARYREPORT','VIEW')}">
             <s:link view="/warehouse/kardexSumaryReport.xhtml"
                     value="#{messages['Reports.kardex.summary.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
 
+        <rich:menuSeparator/>
+
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
-                       rendered="#{s:hasPermission('GENERALVALUEDEVOLUTIONREPORT','VIEW')}">
-            <s:link view="/warehouse/generalValuedEvolutionReport.xhtml"
-                    value="#{messages['GeneralValuedEvolutionReport.report.menu.title']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW')}">
-            <s:link view="/warehouse/warehouseEvolutionReport.xhtml"
-                    value="#{messages['Reports.warehouseEvolution.menu.title']}"
+                       rendered="#{s:hasPermission('KARDEXREPORT','VIEW')}">
+            <s:link view="/warehouse/kardexReport.xhtml"
+                    value="#{messages['Reports.kardex.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
 
@@ -731,13 +708,7 @@
                     value="#{messages['ValuedWarehouseResidueReport.report.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW')}">
-            <s:link view="/warehouse/productItemProviderReport.xhtml"
-                    value="#{messages['Reports.productItemProvider.menu.title']}"
-                    propagation="none"/>
-        </rich:menuItem>
+
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('PRODUCTITEMBYPROVIDERHISTORYREPORT','VIEW')}">
@@ -745,6 +716,23 @@
                     value="#{messages['Reports.productItemByProviderHistory.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('GENERALVALUEDEVOLUTIONREPORT','VIEW')}">
+            <s:link view="/warehouse/generalValuedEvolutionReport.xhtml"
+                    value="#{messages['GeneralValuedEvolutionReport.report.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW')}">
+            <s:link view="/warehouse/warehouseEvolutionReport.xhtml"
+                    value="#{messages['Reports.warehouseEvolution.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('PENDINGSOLDPRODUCTDELIVERYREPORT','VIEW')}">
@@ -752,14 +740,16 @@
                     value="#{messages['Reports.pendingSoldProductDelivery.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
+
+        <rich:menuSeparator/>
+
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
-                       rendered="#{s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW')}">
-            <s:link view="/warehouse/warehouseVoucherReport.xhtml"
-                    value="#{messages['Reports.warehouseVoucherReport.menu.title']}"
+                       rendered="#{s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW')}">
+            <s:link view="/warehouse/productItemProviderReport.xhtml"
+                    value="#{messages['Reports.productItemProvider.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
-        <rich:menuSeparator/>
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('ARTICLESREPORT','VIEW')}">
@@ -772,6 +762,14 @@
                        rendered="#{s:hasPermission('SUBGROUPREPORT','VIEW')}">
             <s:link view="/warehouse/subGroupReport.xhtml"
                     value="#{messages['Reports.subGroup.menu.title']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW')}">
+            <s:link view="/warehouse/warehouseVoucherReport.xhtml"
+                    value="#{messages['Reports.warehouseVoucherReport.menu.title']}"
                     propagation="none"/>
         </rich:menuItem>
     </rich:menuGroup>

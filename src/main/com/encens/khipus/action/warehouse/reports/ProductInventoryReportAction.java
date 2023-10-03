@@ -1,13 +1,16 @@
 package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.production.SingleProduct;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.customers.ArticleOrderService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.ProductionOrderService;
 import com.encens.khipus.service.warehouse.InitialInventoryService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
@@ -26,6 +29,8 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
@@ -62,6 +67,10 @@ public class ProductInventoryReportAction extends GenericReportAction {
     private ProductInventoryService productInventoryService;
     @In
     private ProductionOrderService productionOrderService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
 
     @In(create = true)
     KardexProductMovementAction kardexProductMovementAction;
@@ -93,12 +102,19 @@ public class ProductInventoryReportAction extends GenericReportAction {
     public void generateReport() {
 
         log.debug("generating Product Inventory Report................................................");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
         Collection<CollectionData> beanCollection = calculateCollectionData2();
 
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("reportTitle", "REPORTE GENERAL DE INVENTARIO");
+        paramMap.put("companyName", companyConfiguration.getCompanyName());
+        paramMap.put("systemName", companyConfiguration.getSystemName());
+        paramMap.put("locationName", companyConfiguration.getLocationName());
         paramMap.put("startDate", startDate);
         paramMap.put("endDate", endDate);
         paramMap.put("warehouse", warehouse.getFullName());

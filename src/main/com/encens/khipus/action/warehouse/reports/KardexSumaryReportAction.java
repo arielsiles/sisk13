@@ -1,13 +1,16 @@
 package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.employees.Charge;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.model.warehouse.WarehouseVoucherState;
 import com.encens.khipus.service.finances.CostCenterService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.WarehouseService;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.MessageUtils;
@@ -17,6 +20,8 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.security.Restrict;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,15 +56,26 @@ public class KardexSumaryReportAction extends GenericReportAction {
 
     @In
     WarehouseService warehouseService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
 
     public void generateReport() {
         log.debug("Generate KardexReportAction......");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
         //add default filters
         //warehouse = warehouseService.findWarehouseByCode("2");
         //costCenter = costCenterService.findCostCenterByCode("0112");
         setWarehouseVoucherState(WarehouseVoucherState.APR);
 
         Map params = new HashMap();
+        params.put("companyName", companyConfiguration.getCompanyName());
+        params.put("systemName", companyConfiguration.getSystemName());
+        params.put("locationName", companyConfiguration.getLocationName());
         params.putAll(getReportParamsInfo());
 
         super.generateReport("kardexReport", "/warehouse/reports/kardexSumaryReport.jrxml", MessageUtils.getMessage("Reports.kardex.summary.title"), params);
@@ -151,14 +167,14 @@ public class KardexSumaryReportAction extends GenericReportAction {
 
         if (initDate != null) {
             //dateRangeInfo = dateRangeInfo + MessageUtils.getMessage("Common.dateFrom") + " " + DateUtils.format(initDate, MessageUtils.getMessage("patterns.date")) + " ";
-            dateRangeInfo = dateRangeInfo + MessageUtils.getMessage("Common.dateFrom") + " " + DateUtils.format(initDate, MessageUtils.getMessage("patterns.mark.date")) + " ";
+            dateRangeInfo = dateRangeInfo + MessageUtils.getMessage("Common.dateFrom") + " " + DateUtils.format(initDate, MessageUtils.getMessage("patterns.date")) + " ";
             //add init date param to calculate initial quantity values
             paramMap.put("initPeriodDateParam", initDate);
         }
 
         if (endDate != null) {
             //dateRangeInfo = dateRangeInfo + MessageUtils.getMessage("Common.dateTo") + " " + DateUtils.format(endDate, MessageUtils.getMessage("patterns.date"));
-            dateRangeInfo = dateRangeInfo + MessageUtils.getMessage("Common.dateTo") + " " + DateUtils.format(endDate, MessageUtils.getMessage("patterns.mark.date"));
+            dateRangeInfo = dateRangeInfo + MessageUtils.getMessage("Common.dateTo") + " " + DateUtils.format(endDate, MessageUtils.getMessage("patterns.date"));
         }
 
         paramMap.put("dateRangeParam", dateRangeInfo);

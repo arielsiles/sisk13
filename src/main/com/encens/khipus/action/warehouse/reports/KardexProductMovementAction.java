@@ -1,8 +1,10 @@
 package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.SaleTypeEnum;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.production.ProductionProduct;
@@ -11,6 +13,7 @@ import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.customers.ArticleOrderService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.ProductionOrderService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.ProductItemService;
@@ -27,6 +30,8 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
@@ -60,6 +65,10 @@ public class KardexProductMovementAction extends GenericReportAction {
     private ProductItemService productItemService;
     @In
     private ProductionOrderService productionOrderService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
 
     @Create
     public void init() {
@@ -74,6 +83,10 @@ public class KardexProductMovementAction extends GenericReportAction {
     public void generateReport() {
 
         log.debug("generating Kardex Product Movement................................................");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
         Collection<CollectionData> beanCollection = calculateCollectionData();
 
@@ -90,6 +103,9 @@ public class KardexProductMovementAction extends GenericReportAction {
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("reportTitle", "REPORTE DE MOVIMIENTOS");
+        paramMap.put("companyName", companyConfiguration.getCompanyName());
+        paramMap.put("systemName", companyConfiguration.getSystemName());
+        paramMap.put("locationName", companyConfiguration.getLocationName());
         paramMap.put("productItemName", productItem.getFullName());
         paramMap.put("unit", productItem.getUsageMeasureCode());
         paramMap.put("startDate", startDate);

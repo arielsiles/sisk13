@@ -3,16 +3,21 @@ package com.encens.khipus.action.warehouse.reports;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.warehouse.Group;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.MessageUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.security.Restrict;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Encens S.R.L.
@@ -28,10 +33,30 @@ public class SubGroupReportAction extends GenericReportAction {
 
     private Group group;
 
-    public void generateReport() {
-        Map params = new HashMap();
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
 
-        super.generateReport("subGroupReport", "/warehouse/reports/subGroupReport.jrxml", PageFormat.LETTER, PageOrientation.PORTRAIT, MessageUtils.getMessage("Reports.subGroup.title"), params);
+    public void generateReport() {
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        HashMap<String, Object> reportParameters = new HashMap<String, Object>();
+
+        reportParameters.put("companyName", companyConfiguration.getCompanyName());
+        reportParameters.put("systemName", companyConfiguration.getSystemName());
+        reportParameters.put("locationName", companyConfiguration.getLocationName());
+
+        super.generateReport(
+                "subGroupReport",
+                "/warehouse/reports/subGroupReport.jrxml",
+                PageFormat.LETTER,
+                PageOrientation.PORTRAIT,
+                MessageUtils.getMessage("Reports.subGroup.title").toUpperCase(),
+                reportParameters);
     }
 
     @Override
