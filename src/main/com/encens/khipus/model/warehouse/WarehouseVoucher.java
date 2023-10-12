@@ -309,6 +309,8 @@ public class WarehouseVoucher implements BaseModel {
 
             if (documentType.getWarehouseVoucherType().equals(WarehouseVoucherType.B))
                 setOperation(VoucherOperation.BA);
+            if (documentType.getWarehouseVoucherType().equals(WarehouseVoucherType.BV))
+                setOperation(VoucherOperation.BV);
             if (documentType.getWarehouseVoucherType().equals(WarehouseVoucherType.D))
                 setOperation(VoucherOperation.DE);
 
@@ -416,6 +418,10 @@ public class WarehouseVoucher implements BaseModel {
 
     public boolean isReceptionByTransfer() {
         return null != documentType && WarehouseVoucherType.RT.equals(documentType.getWarehouseVoucherType());
+    }
+
+    public boolean isSalesOutput() {
+        return null != documentType && WarehouseVoucherType.BV.equals(documentType.getWarehouseVoucherType());
     }
 
     public boolean isInput() {

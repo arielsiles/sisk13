@@ -68,6 +68,9 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             if (warehouseVoucher.getOperation().equals(VoucherOperation.BA)){
                 createAccountingForVoucherBA(warehouseVoucher, startDate, endDate);
             }
+            if (warehouseVoucher.getOperation().equals(VoucherOperation.BV)){
+                createAccountingForVoucherBV(warehouseVoucher, startDate, endDate);
+            }
             if (warehouseVoucher.getOperation().equals(VoucherOperation.DE)){
                 createAccountingForVoucherDE(warehouseVoucher, startDate, endDate);
             }
@@ -214,6 +217,40 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             VoucherDetail voucherDetailCredit = new VoucherDetail(movementDetail.getWarehouse().getCashAccount(),
             BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,
             movementDetail.getProductItemCode(), movementDetail.getQuantity());
+
+            voucher.getDetails().add(voucherDetailCredit);
+            totalAmount = BigDecimalUtil.sum(totalAmount, amount, 2);
+        }
+
+        voucherDetailDebit.setDebit(totalAmount);
+        voucherAccoutingService.saveVoucher(voucher);
+        warehouseVoucher.setVoucher(voucher);
+        approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
+    }
+
+    public void createAccountingForVoucherBV(WarehouseVoucher warehouseVoucher, Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
+        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
+
+        Voucher voucher = new Voucher();
+        voucher.setDate(endDate);
+        voucher.setDocumentType(Constants.SA_VOUCHER_DOCTYPE);
+        voucher.setGloss("BAJA POR VENTAS, " + warehouseVoucher.getInventoryMovementList().get(0).getDescription());
+
+        VoucherDetail voucherDetailDebit = new VoucherDetail(warehouseVoucher.getDocumentType().getCostAccountCode(), BigDecimal.ZERO, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,null, null);
+        voucher.getDetails().add(voucherDetailDebit);
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (MovementDetail movementDetail : warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList()){
+            System.out.println("=====> BAJA: " + movementDetail.getProductItem().getFullName());
+            BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
+            BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
+
+            //VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+            VoucherDetail voucherDetailCredit = new VoucherDetail(movementDetail.getWarehouse().getCashAccount(),
+                    BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,
+                    movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
             voucher.getDetails().add(voucherDetailCredit);
             totalAmount = BigDecimalUtil.sum(totalAmount, amount, 2);

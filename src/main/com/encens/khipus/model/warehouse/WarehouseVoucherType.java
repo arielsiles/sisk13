@@ -20,7 +20,8 @@ public enum WarehouseVoucherType {
     E("WarehouseVoucherType.input"),
     S("WarehouseVoucherType.output"),
 
-    RT("WarehouseVoucherType.receptionByTransfer");
+    RT("WarehouseVoucherType.receptionByTransfer"),
+    BV("WarehouseVoucherType.salesOuput");
 
     private String resourceKey;
 
@@ -41,7 +42,7 @@ public enum WarehouseVoucherType {
     }
 
     public static List<WarehouseVoucherType> getOutputTypes() {
-        return Arrays.asList(WarehouseVoucherType.C, WarehouseVoucherType.S, WarehouseVoucherType.B, WarehouseVoucherType.W);
+        return Arrays.asList(WarehouseVoucherType.C, WarehouseVoucherType.S, WarehouseVoucherType.B, WarehouseVoucherType.W, WarehouseVoucherType.BV);
     }
 
     public static boolean isSpecialVoucherType(WarehouseVoucherType warehouseVoucherType) {

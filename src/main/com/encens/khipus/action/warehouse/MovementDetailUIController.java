@@ -26,6 +26,7 @@ public class MovementDetailUIController {
     public boolean isShownAmountField() {
         return (voucher.isReception()
                 || voucher.isReceptionByTransfer()
+                || voucher.isSalesOutput()
                 || voucher.isInput()
                 || voucher.isOutput()
                 || voucher.isExecutorUnitTransfer()
@@ -38,6 +39,7 @@ public class MovementDetailUIController {
     public boolean isEnabledAmountField() {
         return (voucher.isReception()
                 || voucher.isReceptionByTransfer()
+                || voucher.isSalesOutput()
                 || voucher.isInput()
                 || voucher.isOutput()
                 || voucher.isDevolution());
@@ -47,6 +49,7 @@ public class MovementDetailUIController {
         return voucher.isConsumption()
                 || voucher.isReception()
                 || voucher.isReceptionByTransfer()
+                || voucher.isSalesOutput()
                 || voucher.isExecutorUnitTransfer()
                 || voucher.isDevolution()
                 || voucher.isInput()
@@ -58,6 +61,7 @@ public class MovementDetailUIController {
     public boolean isEnabledUnitCostField() {
         return voucher.isReception()
                 || voucher.isReceptionByTransfer()
+                || voucher.isSalesOutput()
                 || voucher.isInput()
                 || voucher.isOutput()
                 || voucher.isDevolution();

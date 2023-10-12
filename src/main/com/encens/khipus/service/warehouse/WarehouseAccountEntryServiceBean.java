@@ -1985,13 +1985,14 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         List<WarehouseVoucher> warehouseVoucherList = em.createQuery("" +
                 "select voucher from WarehouseVoucher voucher " +
-                " where voucher.operation in (:TP, :BA, :DE) " +
+                " where voucher.operation in (:TP, :BA, :DE, :BV) " +
                 " and voucher.date between :startDate and :endDate " +
                 " and voucher.state =:state " +
                 " and voucher.voucher is null ")
                 .setParameter("TP", VoucherOperation.TP)
                 .setParameter("BA", VoucherOperation.BA)
                 .setParameter("DE", VoucherOperation.DE)
+                .setParameter("BV", VoucherOperation.BV)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("state", WarehouseVoucherState.APR)

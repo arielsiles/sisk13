@@ -131,12 +131,12 @@ public class KardexProductMovementAction extends GenericReportAction {
         List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
         List<ArticleOrder> orderDetailList      = articleOrderService.findOrderDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
 
-        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItem.getProductItemCode(), startDate, endDate);
-        List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
+        //List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItem.getProductItemCode(), startDate, endDate);
+        //List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
 
         List<ProductionProduct> productionProductList = productionOrderService.findProductionByProductItem(productItem.getProductItemCode(), startDate, endDate);
 
-        for (ProductionOrder po:productionOrderList){
+        /*for (ProductionOrder po:productionOrderList){
             CollectionData collectionData = new CollectionData(
                     po.getProductionPlanning().getDate(),
                     po.getCode(),
@@ -145,11 +145,11 @@ public class KardexProductMovementAction extends GenericReportAction {
                     "E",
                     "ORDEN DE PRODUCCION NRO. " + po.getCode());
             datas.add(collectionData);
-        }
+        }*/
 
         for (ProductionProduct product : productionProductList){
             CollectionData collectionData = new CollectionData(
-                    product.getProductionPlan().getDate(),
+                    formatearFecha(product.getProductionPlan().getDate(), "E"),
                     product.getProductItemCode() ,
                     product.getQuantity() ,
                     BigDecimal.ZERO,
@@ -158,7 +158,7 @@ public class KardexProductMovementAction extends GenericReportAction {
             datas.add(collectionData);
         }
 
-        for (BaseProduct baseProduct:baseProductList){
+        /*for (BaseProduct baseProduct:baseProductList){
             for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
                 if (singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode().equals(productItem.getProductItemCode())){
                     CollectionData collectionData = new CollectionData(
@@ -171,12 +171,12 @@ public class KardexProductMovementAction extends GenericReportAction {
                     datas.add(collectionData);
                 }
             }
-        }
+        }*/
 
         for (MovementDetail md:movementDetailList){
             CollectionData collectionData = new CollectionData(
                     /*md.getMovementDetailDate(),*/
-                    md.getInventoryMovement().getWarehouseVoucher().getDate(),
+                    formatearFecha(md.getInventoryMovement().getWarehouseVoucher().getDate(), md.getMovementType().name()),
                     md.getInventoryMovement().getWarehouseVoucher().getNumber(),
                     md.getMovementType().name().equals("E") ? md.getQuantity() : BigDecimal.ZERO,
                     md.getMovementType().name().equals("S") ? md.getQuantity() : BigDecimal.ZERO,
@@ -190,7 +190,7 @@ public class KardexProductMovementAction extends GenericReportAction {
             if (ao.getVentaDirecta().getMovement() != null){
                 invoiceLabel = "F-" + ao.getVentaDirecta().getMovement().getNumber().toString() + " ";
             }
-            CollectionData collectionData = new CollectionData( ao.getVentaDirecta().getFechaPedido(),
+            CollectionData collectionData = new CollectionData( formatearFecha(ao.getVentaDirecta().getFechaPedido(), "S"),
                                                                 ao.getVentaDirecta().getCodigo().toString(),
                                                                 BigDecimal.ZERO,
                                                                 BigDecimalUtil.toBigDecimal(ao.getTotal()),
@@ -213,7 +213,7 @@ public class KardexProductMovementAction extends GenericReportAction {
             }
 
             CollectionData collectionData = new CollectionData(
-                                                                ao.getCustomerOrder().getOrderDate(),
+                                                                formatearFecha(ao.getCustomerOrder().getOrderDate(), "S"),
                                                                 ao.getCustomerOrder().getCode().toString(),
                                                                 BigDecimal.ZERO,
                                                                 BigDecimalUtil.toBigDecimal(ao.getTotal()),
@@ -225,7 +225,8 @@ public class KardexProductMovementAction extends GenericReportAction {
         Collections.sort(datas, new Comparator<CollectionData>() {
             @Override
             public int compare(CollectionData o1, CollectionData o2) {
-                return o1.getDate().toString().compareTo(o2.getDate().toString());
+                //return o1.getDate().toString().compareTo(o2.getDate().toString());
+                return o1.getDate().compareTo(o2.getDate());
             }
         });
 
@@ -235,6 +236,24 @@ public class KardexProductMovementAction extends GenericReportAction {
         }
 
         return beanCollection;
+    }
+
+    private Date formatearFecha(Date fechaOriginal, String movementType){
+
+        // Añadir horas, minutos y segundos
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(fechaOriginal);
+        if ( movementType.equals("E")){
+            calendar.set(Calendar.HOUR_OF_DAY, 1);
+            calendar.set(Calendar.MINUTE, 1);
+            calendar.set(Calendar.SECOND, 1);
+        } else {
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+        }
+        Date fechaHora = calendar.getTime();
+        return fechaHora;
     }
 
     public BigDecimal calculateInitialAmountToKardex(String productItemCode, Date initDate){

@@ -8,6 +8,7 @@ public enum VoucherOperation {
     OP("VoucherOperation.productOrder"),
     OC("VoucherOperation.purchaseOrder"),
     BA("VoucherOperation.productLow"),
+    BV("VoucherOperation.salesOuput"),
     DE("VoucherOperation.productReturn"),
     TP("VoucherOperation.productTransfer");
     private String resourceKey;

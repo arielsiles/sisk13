@@ -60,6 +60,17 @@ public class WarehouseDocumentType implements BaseModel {
     @Length(max = 100)
     private String defaultDescription;
 
+    @Column(name = "ctacosto", length = 20)
+    @Length(max = 20)
+    private String costAccountCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", insertable = false, updatable = false, referencedColumnName = "no_cia"),
+            @JoinColumn(name = "ctacosto", insertable = false, updatable = false, referencedColumnName = "cuenta")
+    })
+    private CashAccount costAccount;
+
     @Version
     @Column(name = "version")
     private long version;
@@ -163,5 +174,21 @@ public class WarehouseDocumentType implements BaseModel {
 
     public Boolean isContraAccountDefinedByUser() {
         return WarehouseDocumentTypeFieldRestriction.CONTRA_ACCOUNT_DEFINED_BY_USER.equals(getFieldRestriction());
+    }
+
+    public String getCostAccountCode() {
+        return costAccountCode;
+    }
+
+    public void setCostAccountCode(String costAccountCode) {
+        this.costAccountCode = costAccountCode;
+    }
+
+    public CashAccount getCostAccount() {
+        return costAccount;
+    }
+
+    public void setCostAccount(CashAccount costAccount) {
+        this.costAccount = costAccount;
     }
 }
