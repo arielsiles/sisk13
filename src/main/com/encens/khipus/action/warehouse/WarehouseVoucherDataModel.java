@@ -5,6 +5,7 @@ import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
 import com.encens.khipus.model.warehouse.WarehouseVoucherPK;
 import com.encens.khipus.util.ListEntityManagerName;
@@ -33,6 +34,7 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
     private ProductItem productItem;
     private String inventoryMovementDescription;
     private Employee responsible;
+    private Warehouse warehouse;
     private Date startDate = new Date();
     private Date endDate = new Date();;
 
@@ -40,6 +42,7 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
             "lower(warehouseVoucher.number) like concat(lower(#{warehouseVoucherDataModel.criteria.number}), '%')",
             "purchaseOrder.provider = #{warehouseVoucherDataModel.provider}",
             "warehouseVoucher.costCenter = #{warehouseVoucherDataModel.costCenter}",
+            "warehouseVoucher.warehouse = #{warehouseVoucherDataModel.warehouse}",
             "warehouseVoucher.documentType = #{warehouseVoucherDataModel.criteria.documentType}",
             "responsible = #{warehouseVoucherDataModel.responsible}",
             "warehouseVoucher.id.transactionNumber in (select distinct movementDetail.transactionNumber " +
@@ -190,5 +193,13 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
         setStartDate(null);
         setEndDate(null);
         super.clear();
+    }
+
+    public Warehouse getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
     }
 }

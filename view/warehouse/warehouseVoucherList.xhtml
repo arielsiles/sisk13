@@ -94,7 +94,21 @@
                                  reRender="costCenterCodeField"
                                  tabindex="5"/>
             </s:decorate>
-            <s:decorate id="responsbleField"
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WarehouseVoucher.warehouse']}</ui:define>
+                <h:selectOneMenu id="warehouseField"
+                                 value="#{warehouseVoucherDataModel.warehouse}"
+                                 styleClass="input"
+                                 tabindex="13">
+                    <s:selectItems value="#{warehouseList.resultList}"
+                                   var="element"
+                                   label="#{element.name}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <!--<s:decorate id="responsbleField"
                         template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['WarehouseVoucher.responsible']}</ui:define>
                 <app:selectPopUp id="employee"
@@ -105,7 +119,7 @@
                                  dataModel="#{generalEmployeeDataModel}"
                                  reRender="responsbleField"
                                  tabindex="6"/>
-            </s:decorate>
+            </s:decorate>-->
         </s:div>
         <s:div id="rightSidePanel">
             <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">

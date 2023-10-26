@@ -142,6 +142,35 @@ DELETE FROM sueldo;
 DELETE FROM cargo;
 DELETE FROM puesto;
 
+DELETE FROM `ordeninsumo`;
+DELETE FROM `descuentoreserva`;
+DELETE FROM `pagoordencompra`;
+
+DELETE FROM `moduloprov` 
+WHERE cod_prov NOT IN (1, 2, 3, 4);
+
+DELETE FROM tipocambio 
+WHERE idtipocambio NOT IN ( 910 );
+
+DELETE FROM `precioarticulo`;
+DELETE FROM `ordencomactivo`;
+DELETE FROM horasextra;
+
+DELETE FROM `zonaproductiva` WHERE `idzonaproductiva` NOT IN (1);
+
+DELETE FROM `pr_insumoformula`;
+DELETE FROM `pr_formula`;
+DELETE FROM `estadomarestadobh`;
+DELETE FROM `detallebonoantiguedad`;
+DELETE FROM `modelo`;
+DELETE FROM marca;
+DELETE FROM `bono`;
+DELETE FROM `texto`;
+DELETE FROM 
+DELETE FROM 
+DELETE FROM 
+DELETE FROM 
+
 
 -- REFERENCES
 ALTER TABLE contrato ADD FOREIGN KEY (idempleado) REFERENCES empleado (idempleado);
