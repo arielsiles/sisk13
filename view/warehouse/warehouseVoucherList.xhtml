@@ -228,11 +228,13 @@
 
     <s:button value="#{messages['Warehouse.button.postWarehouseOutput']}"
               view="/warehouse/postWarehouseOutput.xhtml" styleClass="button"
+              rendered="#{s:hasPermission('DAILYCLOSINGVOUCHER','VIEW')}"
               propagation="begin" />
 
 
     <h:commandButton action="#{warehouseVoucherCreateAction.closeCurrentMonthProcess}"
                      value="#{messages['Warehouse.button.closeProcessMonth']}"
+                     rendered="#{s:hasPermission('CLOSEPROCESSMONTH','VIEW')}"
                      styleClass="button"/>
 
     <s:button value="#{messages['Common.new']}"

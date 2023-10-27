@@ -16,7 +16,6 @@ import com.encens.khipus.util.query.EntityQueryCompoundCondition;
 import com.encens.khipus.util.query.EntityQuerySingleCondition;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.log.Log;
 
 import java.util.Arrays;
@@ -30,7 +29,6 @@ import java.util.List;
  */
 @Name("jobContractDataModel")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('JOBCONTRACT','VIEW')}")
 public class JobContractDataModel extends QueryDataModel<Long, JobContract> {
 
     @In(required = false)
