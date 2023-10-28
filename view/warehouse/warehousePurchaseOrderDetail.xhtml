@@ -153,10 +153,18 @@
                                  tabindex="2">
                         <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"
                                                  forId="unitCost"/>
-                        <app:keyUpEvent focus="unitCost"
+
+                        <!--<app:keyUpEvent focus="unitCost"
                                         reRender="totalAmountField, unitCostField, requestedQuantityField"
                                         rendered="#{warehousePurchaseOrderDetailAction.showCalculateLink and (isPurchaseOrderPending)}"
-                                        action="warehousePurchaseOrderDetailAction.calculateTotalAmount()"/>
+                                        action="warehousePurchaseOrderDetailAction.calculateTotalAmount()"/>-->
+
+                        <a4j:support event="onblur"
+                                     ajaxSingle="true"
+                                     reRender="totalAmountField, unitCostField, requestedQuantityField"
+                                     rendered="#{warehousePurchaseOrderDetailAction.showCalculateLink and (isPurchaseOrderPending)}"
+                                     action="#{warehousePurchaseOrderDetailAction.calculateTotalAmount()}"/>
+
                     </h:inputText>
                 </c:otherwise>
             </c:choose>
@@ -173,10 +181,18 @@
                      tabindex="3">
             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                      forId="requestedQuantity"/>
-            <app:keyUpEvent focus="requestedQuantity"
+
+            <!--<app:keyUpEvent focus="requestedQuantity"
                             reRender="totalAmountField, unitCostField, requestedQuantityField"
                             rendered="#{isPurchaseOrderPending}"
-                            action="warehousePurchaseOrderDetailAction.calculateTotalAmount()"/>
+                            action="warehousePurchaseOrderDetailAction.calculateTotalAmount()"/>-->
+
+            <a4j:support event="onblur"
+                         ajaxSingle="true"
+                         reRender="totalAmountField, unitCostField, requestedQuantityField"
+                         rendered="#{isPurchaseOrderPending}"
+                         action="#{warehousePurchaseOrderDetailAction.calculateTotalAmount()}"/>
+
         </h:inputText>
         <h:outputText value="#{warehousePurchaseOrderDetail.requestedQuantity}"
                       rendered="#{not isPurchaseOrderPending}">
@@ -198,10 +214,18 @@
                      tabindex="5">
             <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"
                                      forId="totalAmount"/>
-            <app:keyUpEvent focus="totalAmount"
+
+            <!--<app:keyUpEvent focus="totalAmount"
                             reRender="totalAmountField, unitCostField, requestedQuantityField, productItemField"
                             rendered="#{warehousePurchaseOrderDetailAction.showCalculateLink and (isPurchaseOrderPending)}"
-                            action="warehousePurchaseOrderDetailAction.calculateUnitCost()"/>
+                            action="warehousePurchaseOrderDetailAction.calculateUnitCost()"/>-->
+
+            <a4j:support event="onblur"
+                         ajaxSingle="true"
+                         reRender="totalAmountField, unitCostField, requestedQuantityField, productItemField"
+                         rendered="#{warehousePurchaseOrderDetailAction.showCalculateLink and (isPurchaseOrderPending)}"
+                         action="#{warehousePurchaseOrderDetailAction.calculateUnitCost()}"/>
+
         </h:inputText>
         <h:outputText value="#{warehousePurchaseOrderDetail.totalAmount}"
                       rendered="#{isPurchaseOrderApproved or isPurchaseOrderFinalized}">

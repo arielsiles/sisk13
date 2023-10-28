@@ -31,6 +31,12 @@ public final class Constants {
     public static final Long currencyIdBs = (long) 1;
     public static final Long currencyIdSus = (long) 2;
 
+    //Schema for KHIPUS - TERDEMOL
+    /*public static final String KHIPUS_SCHEMA    = "terdemol";
+    public static final String FINANCES_SCHEMA  = "terdemol";
+    public static final String CASHBOX_SCHEMA   = "terdemol";
+    public static final String ACADEMIC_SCHEMA  = "terdemol";*/
+
     //Schema for KHIPUS - F. CISC / ILVA
     public static final String KHIPUS_SCHEMA    = "khipus";
     public static final String FINANCES_SCHEMA  = "khipus";

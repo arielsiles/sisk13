@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="582" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30" isSummaryWithPageHeaderAndFooter="true">
-	<property name="ireport.zoom" value="1.9487171000000016"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="2.5937424601000028"/>
+	<property name="ireport.x" value="33"/>
+	<property name="ireport.y" value="74"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="locationName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
@@ -402,8 +402,15 @@
 			</subreport>
 			<frame>
 				<reportElement positionType="Float" x="0" y="119" width="386" height="12"/>
+				<staticText>
+					<reportElement x="0" y="0" width="25" height="12"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[Glosa: ]]></text>
+				</staticText>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="69" y="0" width="317" height="12"/>
+					<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="25" y="0" width="361" height="12"/>
 					<box padding="1" topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 						<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<topPen lineWidth="0.0"/>
@@ -546,13 +553,6 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$R{VoucherDocument.interested}]]></textFieldExpression>
 				</textField>
 			</frame>
-			<staticText>
-				<reportElement x="44" y="119" width="25" height="12"/>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8"/>
-				</textElement>
-				<text><![CDATA[Glosa: ]]></text>
-			</staticText>
 		</band>
 	</summary>
 </jasperReport>

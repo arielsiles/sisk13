@@ -166,9 +166,9 @@ DELETE FROM `modelo`;
 DELETE FROM marca;
 DELETE FROM `bono`;
 DELETE FROM `texto`;
-DELETE FROM 
-DELETE FROM 
-DELETE FROM 
+DELETE FROM `impresionfactura`;
+DELETE FROM `estadoahorro`;
+DELETE FROM `arcgtc` WHERE fecha NOT IN ('2016-05-01', '2019-12-31');
 DELETE FROM 
 
 
