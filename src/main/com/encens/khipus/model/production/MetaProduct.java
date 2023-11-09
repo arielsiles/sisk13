@@ -3,6 +3,7 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
@@ -11,6 +12,7 @@ import org.hibernate.validator.Length;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,11 +51,14 @@ public class MetaProduct implements Serializable, BaseModel {
     private String description;
 
     @Column(name = "esacopiable", nullable = false)
-    @Type(type = "IntegerBoolean")
-    private Boolean collectable = false;
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean collectable = Boolean.FALSE;
 
     @Column(name = "cod_art", insertable = false, updatable = false, nullable = false)
     private String productItemCode;
+
+    @Column(name = "precio", precision = 12, scale = 2, nullable = false)
+    private BigDecimal price;
 
     @Column(name = "no_cia", insertable = false, updatable = false, nullable = false)
     @Length(max = 2)
@@ -205,6 +210,14 @@ public class MetaProduct implements Serializable, BaseModel {
 
     public void setCompanyNumber(String companyNumber) {
         this.companyNumber = companyNumber;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     /*public BaseProduct getBaseProduct() {

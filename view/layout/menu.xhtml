@@ -1575,11 +1575,16 @@
                 propagation="none"/>
     </rich:menuItem>
     <rich:menuItem submitMode="none"
-                   styleClass="main-menu-item"
-
-            >
+                   styleClass="main-menu-item">
         <s:link view="/production/productionMaterialList.xhtml"
                 value="#{messages['menu.production.configuration.productionMaterial']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item" rendered="#{s:hasPermission('METAPRODUCT','VIEW')}">
+        <s:link view="/production/metaProductList.xhtml"
+                value="#{messages['menu.production.configuration.metaProductProduction']}"
                 propagation="none"/>
     </rich:menuItem>
 

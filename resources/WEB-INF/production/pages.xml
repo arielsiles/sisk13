@@ -649,4 +649,20 @@
 
     </page>
 
+    <page view-id="/production/metaProductList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{metaProductAction.select(metaProductItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/metaProduct.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/production/metaProduct.xhtml" no-conversation-view-id="/production/metaProductList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/production/metaProductList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>

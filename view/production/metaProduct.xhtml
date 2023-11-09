@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{metaProductAction.managed}">
+                #{messages['MetaProduct.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['MetaProduct.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="metaProductForm">
+            <div class="buttons">
+                <h:commandButton action="#{metaProductAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!metaProductAction.managed and s:hasPermission('METAPRODUCT','CREATE')}">
+
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{metaProductAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{metaProductAction.managed and s:hasPermission('METAPRODUCT','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{metaProductAction.managed and s:hasPermission('METAPRODUCT','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{metaProductAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{metaProductAction.managed}">
+                            #{messages['MetaProduct.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['MetaProduct.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MetaProduct.product']}</ui:define>
+                    <app:quickSearch id="productItemQuickSearch"
+                                     textValue="#{metaProduct.productItem.productItemCode}"
+                                     value="#{metaProduct.productItem}"
+                                     searchField="productItemCode"
+                                     alias="productItem"
+                                     reRender="productItemField"
+                                     tabindex="1">
+                        <ui:define name="restrictions">
+                            <app:restriction condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                        </ui:define>
+                    </app:quickSearch>
+                    <app:selectPopUp id="productItem"
+                                     textValue="#{metaProduct.productItem.name}"
+                                     required="true"
+                                     value="#{metaProduct.productItem}"
+                                     clearAction="#{metaProductAction.clearProductItem()}"
+                                     searchModalPanel="productItemListModalPanel"
+                                     dataModel="#{productItemSearchDataModel}"
+                                     reRender="productItemField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+
+                <s:decorate id="collectableField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['MetaProduct.productCollected']}</ui:define>
+                    <h:selectBooleanCheckbox id="collectable"
+                                             value="#{metaProduct.collectable}"
+                                             tabindex="2">
+                    </h:selectBooleanCheckbox>
+                </s:decorate>
+
+                <s:decorate id="priceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MetaProduct.price']}</ui:define>
+                    <h:inputText id="price" value="#{metaProduct.price}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="20"
+                                 tabindex="3">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="price"/>
+                        <a4j:support event="onblur" reRender="priceField"/>
+                    </h:inputText>
+                </s:decorate>
+
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{metaProductAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!metaProductAction.managed and s:hasPermission('METAPRODUCT','CREATE')}">
+
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{metaProductAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{metaProductAction.managed and s:hasPermission('METAPRODUCT','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{metaProductAction.managed and s:hasPermission('METAPRODUCT','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{metaProductAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{metaProductAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['MetaProduct.delete.confirmation']}">
+                        <f:param value="#{metaProduct.name}"/>
+                        <f:param value="#{metaProduct.code}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{metaProductAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{metaProductAction.assignProductItem(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="productItemField"
+                                   oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
