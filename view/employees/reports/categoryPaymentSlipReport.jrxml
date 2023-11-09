@@ -158,7 +158,7 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$R{Reports.paymentSlip.expressedInBolivianos}]]></textFieldExpression>
 					</textField>
 					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-						<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="322" height="12"/>
+						<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="400" height="12"/>
 						<box padding="1" topPadding="1" leftPadding="2" bottomPadding="1" rightPadding="1">
 							<pen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 							<topPen lineWidth="0.0"/>
