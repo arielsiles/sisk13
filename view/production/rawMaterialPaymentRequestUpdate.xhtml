@@ -1,0 +1,213 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        #{messages['RawMaterialPayment.edit']}
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="producerPriceForm">
+            <div class="buttons">
+                <h:commandButton action="#{rawMaterialPaymentAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{rawMaterialPaymentAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{rawMaterialPaymentAction.managed}">
+                            #{messages['RawMaterialPayment.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['RawMaterialPayment.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <h:panelGrid columns="2" width="100%" border="0">
+                    <s:div id="leftSidePanel">
+                        <s:decorate id="beneficiaryField" template="/include/viewField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.beneficiary']}</ui:define>
+                            <app:selectPopUp id="supplier"
+                                             required="true"
+                                             textValue="#{rawMaterialPayment.producer.fullName}"
+                                             value="#{rawMaterialPayment.producer}"
+                                             dataModel="#{producerPriceDataModel}"
+                                             clearAction="#{rawMaterialPaymentAction.clearRawMaterialProducer()}"
+                                             searchModalPanel="rawMaterialProducerListModalPanel"
+                                             reRender="beneficiaryField"
+                                             readOnly="#{rawMaterialPaymentAction.managed}"
+                                             hotKeySelect="alt+2"/>
+                        </s:decorate>
+
+                        <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.date']}</ui:define>
+                            <rich:calendar id="date"
+                                           enableManualInput="true"
+                                           value="#{rawMaterialPayment.date}"
+                                           datePattern="#{messages['patterns.date']}"
+                                           required="true"
+                                           tabindex="5">
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <s:decorate id="state1Field" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">Peso Total Kg:</ui:define>
+                            <h:outputText value="63,620.00"/>
+                        </s:decorate>
+
+                        <s:decorate id="state2Field" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">Importe Total Bs: </ui:define>
+                            <h:outputText value="12,067.40"/>
+                        </s:decorate>
+
+                    </s:div>
+
+                    <s:div id="rightSidePanel">
+                        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.state']}</ui:define>
+                            <h:outputText value="#{messages[rawMaterialPayment.state.resourceKey]}"/>
+                        </s:decorate>
+
+                        <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.gloss']}</ui:define>
+                            <h:inputTextarea id="gloss"
+                                             value="#{rawMaterialPayment.gloss}"
+                                             required="true"
+                                             styleClass="input textarea-small"
+                                             tabindex="10">
+                                <f:validateLength maximum="1000"/>
+                            </h:inputTextarea>
+                        </s:decorate>
+
+                    </s:div>
+                </h:panelGrid>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{rawMaterialPaymentAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{rawMaterialPaymentAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:spacer height="10px"/>
+
+            <s:div id="tabPanelDiv">
+                <rich:tabPanel id="tabPanel" switchType="ajax"><!--rows="#{sessionUser.rowsPerPage}"-->
+                    <rich:tab name="movementDetailTab"
+                              label="#{messages['RawMaterialPayment.detailTab']}" ajaxSingle="true">
+                        <rich:dataTable value="#{rawMaterialPayment.rawMaterialPaymentDetaiList}"
+                                        var="paymentDetailItem"
+                                        id="paymentDetailList"
+                                        width="100%"
+                                        columnsWidth="15%, 15%, 15%, 15%, 15%, 15%">
+
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['RawMaterialPayment.date']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialPayment.code']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialPayment.weight']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialPayment.price']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialPayment.amount']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column>
+                                <h:outputText value="#{paymentDetailItem.collectMaterial.date}"/>
+                            </rich:column>
+                            <rich:column>
+                                <h:outputText value="#{paymentDetailItem.collectMaterial.code}"/>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{paymentDetailItem.collectMaterial.balanceWeight}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{paymentDetailItem.collectMaterial.price}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <!--<h:outputText value="#{paymentDetailItem.collectMaterial.price}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>-->
+                            </rich:column>
+
+
+                            <rich:column styleClass="center">
+                                <!--<h:commandLink value="#{messages['Common.select']}"
+                                               immediate="true"
+                                               action="#{movementDetailAction.select(movementDetailItem)}"/>-->
+                            </rich:column>
+                        </rich:dataTable>
+                        <!--<app:dataScroller id="dataScroller" for="paymentDetailList" dataModel="#{rawMaterialPaymentDetailDataModel}"/>-->
+                    </rich:tab>
+
+                </rich:tabPanel>
+            </s:div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{rawMaterialPaymentAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['RawMaterialPayment.delete.confirmation']}">
+                        <f:param value="#{rawMaterialPayment.producer.fullName}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{rawMaterialPaymentAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="rawMaterialProdecerModalPanelContainer" template="/production/searchRawMaterialProducerModalPanel.xhtml"
+                    rendered="#{not rawMaterialPaymentAction.managed}">
+            <ui:param name="dialogId" value="rawMaterialProducerListModalPanel"/>
+            <ui:param name="dataModel" value="#{rawMaterialProducerDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{rawMaterialPaymentAction.assignBeneficiary(rawMaterialProducerItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="beneficiaryField"
+                                   oncomplete="Richfaces.hideModalPanel('rawMaterialProducerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

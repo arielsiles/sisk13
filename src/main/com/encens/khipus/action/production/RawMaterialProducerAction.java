@@ -14,7 +14,6 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -121,43 +120,42 @@ public class RawMaterialProducerAction extends GenericAction<RawMaterialProducer
         }
         if(getInstance().getProductiveZone() != productiveZoneConcurrent && showOptionsProductiveZone)
         {
-           //if(!moveSessions)
-           if(verifySessionsToRawMaterialProducer())
-           {
-              return Outcome.REDISPLAY;
-           }
 
-           //if(!moveDiscoints)
-           if(verifyDiscointToRawMaterialProducer())
-           {
-               return Outcome.REDISPLAY;
-           }
+            System.out.println("----> Producer: " + getInstance().getFullName());
+            Boolean hasCollect = collectedRawMaterialService.hasCollected(getInstance());
+            System.out.println("---->Tiene Acopio: " + hasCollect);
 
-          // if(moveDiscoints)
-          // {
-               try {
+            if (hasCollect){
+                if(verifySessionsToRawMaterialProducer()){
+                    return Outcome.REDISPLAY;
+                }
+
+                if(verifyDiscointToRawMaterialProducer()){
+                    return Outcome.REDISPLAY;
+                }
+
+
+                try {
                     salaryMovementProducerService.moveDiscountsProductor(getInstance(),new Date(), productiveZoneConcurrent);
-               } catch (SalaryMovementProducerException e) {
-                   addErrorHasRawMaterialPayRoll();
-                   return Outcome.REDISPLAY;
-               }
-          // }
+                } catch (SalaryMovementProducerException e) {
+                    addErrorHasRawMaterialPayRoll();
+                    return Outcome.REDISPLAY;
+                }
 
-         //  if(moveSessions)
-          // {
-               try {
-                   salaryMovementProducerService.moveSessionsProductor(getInstance(), new Date(), productiveZoneConcurrent);
-               } catch (SalaryMovementProducerException e) {
-                   addErrorHasRawMaterialPayRoll();
-                   return Outcome.REDISPLAY;
-               }
-         //  }
+                try {
+                    salaryMovementProducerService.moveSessionsProductor(getInstance(), new Date(), productiveZoneConcurrent);
+                } catch (SalaryMovementProducerException e) {
+                    addErrorHasRawMaterialPayRoll();
+                    return Outcome.REDISPLAY;
+                }
 
-           LogProductiveZone logProductiveZone = new LogProductiveZone();
-           logProductiveZone.setDate(new Date());
-           logProductiveZone.setProductiveZone(productiveZoneConcurrent);
-           logProductiveZone.setRawMaterialProducer(getInstance());
-           logProductiveZoneService.createLog(logProductiveZone);
+                LogProductiveZone logProductiveZone = new LogProductiveZone();
+                logProductiveZone.setDate(new Date());
+                logProductiveZone.setProductiveZone(productiveZoneConcurrent);
+                logProductiveZone.setRawMaterialProducer(getInstance());
+                logProductiveZoneService.createLog(logProductiveZone);
+            }
+
         }
         for(ProducerTax tax:producerTaxesDelete)
         {

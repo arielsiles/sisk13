@@ -21,3 +21,24 @@ CREATE TABLE precioproductor (
     
 )
 ENGINE = INNODB;
+
+--
+
+CREATE TABLE acopiomp (
+    `idacopiomp` BIGINT(20) NOT NULL,
+    `fecha` DATE NULL,
+    `codigo` VARCHAR(50) NULL,
+    `pesoneto` DECIMAL(12,2) NULL,
+    `pesobal` DECIMAL(12,2) NULL,
+    `precio` DECIMAL(12,2) NULL,
+    `boleta` VARCHAR(50) NULL,
+    `estado` VARCHAR(25) NULL,
+    `idproductormateriaprima` BIGINT(20) NOT NULL,
+    `idmetaproductoproduccion` BIGINT(20) NOT NULL,
+    `version` BIGINT(20) DEFAULT NULL,
+    `idcompania` BIGINT(20) DEFAULT NULL,
+    PRIMARY KEY (`idacopiomp`),
+    FOREIGN KEY (`idproductormateriaprima`) REFERENCES productormateriaprima (`idproductormateriaprima`),
+    FOREIGN KEY (`idmetaproductoproduccion`) REFERENCES metaproductoproduccion (`idmetaproductoproduccion`),
+    FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+)ENGINE = INNODB;

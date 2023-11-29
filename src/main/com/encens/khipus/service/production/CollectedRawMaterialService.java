@@ -30,4 +30,6 @@ public interface CollectedRawMaterialService {
     boolean getHasCollected(Date startDate, Date endDate, RawMaterialProducer rawMaterialProducer);
 
     boolean getHasDiscounts(Date startDate, Date endDate, RawMaterialProducer rawMaterialProducer);
+
+    boolean hasCollected(RawMaterialProducer rawMaterialProducer);
 }

@@ -152,7 +152,7 @@ public class MetaProduct implements Serializable, BaseModel {
         if (getCode() == null || getName() == null) {
             return "";
         } else {
-            return "[" + getCode() + "] " + getName();
+            return getCode() + "-" + getName();
         }
     }
 
@@ -165,7 +165,7 @@ public class MetaProduct implements Serializable, BaseModel {
         if (getCode() == null || getName() == null) {
             return "";
         } else {
-            return "[" + getCode() + "] " + getName() + printMeasureUnitProduction();
+            return getCode() + "-" + getName() + printMeasureUnitProduction();
         }
     }
 

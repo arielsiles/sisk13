@@ -111,6 +111,22 @@ public class CollectedRawMaterialServiceBean implements CollectedRawMaterialServ
     }
 
     @Override
+    public boolean hasCollected(RawMaterialProducer rawMaterialProducer) {
+
+        Boolean result = Boolean.FALSE;
+        Long count = 0L;
+        count = (Long) em.createQuery("select count(*) from CollectedRawMaterial collectedRawMaterial " +
+                    " where collectedRawMaterial.rawMaterialProducer = :rawMaterialProducer")
+                    .setParameter("rawMaterialProducer",rawMaterialProducer)
+                    .getSingleResult();
+
+        if ( count > 0 )
+            result = Boolean.TRUE;
+
+        return result;
+    }
+
+    @Override
     public void save(ProductiveZone productiveZone, List<CollectedRawMaterial> collectedRawMaterialList, Date date) throws ConcurrencyException, EntryDuplicatedException {
         new DataBaseExecutor(new SaveCommand(productiveZone, collectedRawMaterialList, date)).update();
     }

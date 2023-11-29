@@ -10,6 +10,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+
+
 @TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "ProducerPrice.tableGenerator",
         table = Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
@@ -17,10 +19,10 @@ import java.math.BigDecimal;
         pkColumnValue = "precioproductor",
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
-@Table(name = "precioproductor")
 @Entity
 @Filter(name = "companyFilter")
 @EntityListeners(CompanyListener.class)
+@Table(schema = Constants.KHIPUS_SCHEMA, name = "precioproductor", uniqueConstraints = @UniqueConstraint(columnNames = {"idproductormateriaprima", "idmetaproductoproduccion"}))
 public class ProducerPrice implements Serializable, BaseModel {
 
     @Id
