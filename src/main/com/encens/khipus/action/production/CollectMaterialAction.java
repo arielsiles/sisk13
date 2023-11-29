@@ -39,7 +39,7 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
 
         try {
             CollectMaterial collectMaterial = getInstance();
-            collectMaterial.setPrice(this.rawMaterialPrice);
+            //collectMaterial.setPrice(this.rawMaterialPrice);
 
             //collectMaterial.setProductiveZone(this.productiveZone);
             //ProductItem productItem = getInstance().getProductItem();
@@ -61,21 +61,17 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
 
     public void updateProducerPrice(){
         CollectMaterial instance = getInstance();
-        setRawMaterialPrice(instance.getMetaProduct().getPrice());
-
-        System.out.println("==> getInstance(): " + getInstance());
-        System.out.println("==> getProducer(): " + instance.getProducer());
-        System.out.println("=====> this.rawMaterialProducer: " + getRawMaterialProducer());
-        System.out.println("==> getProductiveZone(): " + instance.getProductiveZone());
-        System.out.println("=====> this.productiveZone: " + getProductiveZone());
+        //setRawMaterialPrice(instance.getMetaProduct().getPrice());
+        instance.setPrice(instance.getMetaProduct().getPrice());
 
         BigDecimal price = producerPriceService.findProducerPrice(instance.getMetaProduct(), instance.getProducer());
-        if ( price.doubleValue() > 0 )
-            setRawMaterialPrice(price);
+        if ( price.doubleValue() > 0 ) {
+            //setRawMaterialPrice(price);
+            instance.setPrice(price);
+        }
     }
 
     public void assignSupplier(RawMaterialProducer supplier){
-        System.out.println(".-.-.-.-.->>> RawMaterialProducer supplier: " + supplier);
         setRawMaterialProducer(supplier);
         getInstance().setProducer(supplier);
     }

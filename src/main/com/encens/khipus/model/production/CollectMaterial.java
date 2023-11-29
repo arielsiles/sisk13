@@ -48,9 +48,18 @@ public class CollectMaterial implements Serializable, BaseModel {
     @Column(name = "boleta", nullable = false)
     private String ticket;
 
+    @Column(name = "formulario", nullable = false)
+    private String form;
+
     @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     private CollectMaterialState state = CollectMaterialState.PEN;
+
+    @Column(name = "chofer", nullable = false)
+    private String driver;
+
+    @Column(name = "observacion", nullable = true)
+    private String observation;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -175,5 +184,29 @@ public class CollectMaterial implements Serializable, BaseModel {
 
     public void setProductiveZone(ProductiveZone productiveZone) {
         this.productiveZone = productiveZone;
+    }
+
+    public String getForm() {
+        return form;
+    }
+
+    public void setForm(String form) {
+        this.form = form;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
     }
 }

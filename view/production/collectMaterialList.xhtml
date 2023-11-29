@@ -21,24 +21,80 @@
         <h:form id="collectMaterialForm">
             <rich:simpleTogglePanel label="#{messages['CollectMaterial.search']}" switchType="client">
 
-                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['MetaProduct.code']}</ui:define>
-                    <h:inputText id="number" value="#{collectMaterialDataModel.criteria.code}"
-                                 maxlength="200" tabindex="1" styleClass="input">
-                    </h:inputText>
-                </s:decorate>
-                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['CollectMaterial.producer.name']}</ui:define>
-                    <h:inputText id="group" value="#{collectMaterialDataModel.name}"
-                                 maxlength="50" tabindex="2" styleClass="input">
-                    </h:inputText>
-                    <a4j:commandButton action="#{collectMaterialDataModel.search}"
-                                       reRender="collectMaterialList, dataScroller"
-                                       styleClass="button"
-                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
-                        <s:defaultAction/>
-                    </a4j:commandButton>
-                </s:decorate>
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div id="leftSidePanel">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['MetaProduct.code']}</ui:define>
+                            <h:inputText id="number" value="#{collectMaterialDataModel.criteria.code}"
+                                         maxlength="200" tabindex="1" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['CollectMaterial.producer.name']}</ui:define>
+                            <h:inputText id="name" value="#{collectMaterialDataModel.name}"
+                                         maxlength="50" tabindex="2" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['CollectMaterial.producer.lastName']}</ui:define>
+                            <h:inputText id="lastName" value="#{collectMaterialDataModel.lastName}"
+                                         maxlength="50" tabindex="3" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                    </s:div>
+
+                    <s:div id="rightSidePanel">
+
+                        <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                            <!--<ui:define name="label">#{messages['WarehouseVoucher.date']}</ui:define>-->
+                            <h:panelGrid columns="4" width="100%" columnClasses="top,top,top,top">
+                                <h:outputText value="#{messages['Common.dateFrom']}"/>
+                                <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                                    <rich:calendar id="startDate"
+                                                   value="#{collectMaterialDataModel.startDate}"
+                                                   inputClass="inputSmall"
+                                                   datePattern="#{messages['patterns.date']}"
+                                                   enableManualInput="true"
+                                                   tabindex="5">
+                                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                           timeZone="#{sessionUser.timeZone}"
+                                                           type="date"/>
+                                    </rich:calendar>
+                                </s:decorate>
+                                <h:outputText value="#{messages['Common.dateTo']}"/>
+                                <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                                    <rich:calendar id="endDate"
+                                                   value="#{collectMaterialDataModel.endDate}"
+                                                   inputClass="inputSmall"
+                                                   datePattern="#{messages['patterns.date']}"
+                                                   enableManualInput="true"
+                                                   tabindex="5">
+                                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                           timeZone="#{sessionUser.timeZone}"
+                                                           type="date"/>
+                                    </rich:calendar>
+                                </s:decorate>
+                            </h:panelGrid>
+                        </s:decorate>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <a4j:commandButton action="#{collectMaterialDataModel.search}"
+                                               reRender="collectMaterialList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+
+                    </s:div>
+
+                </h:panelGrid>
 
                 <rich:jQuery selector="#name" query="focus()" timing="onload"/>
             </rich:simpleTogglePanel>
@@ -51,7 +107,7 @@
 
             <rich:dataTable value="#{collectMaterialDataModel}" var="collectMaterialItem" id="collectMaterialList"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="7%, 10%, 15%, 20%, 10%, 12%, 10%, 10%, 10%, 6%">
+                            width="100%" columnsWidth="7%, 10%, 10%, 15%, 10%, 8%, 10%, 8%, 7%, 10%, 5%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -60,6 +116,7 @@
                         <rich:column>#{messages['CollectMaterial.origin']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.producer.name']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.ticketNumber']}</rich:column>
+                        <rich:column>#{messages['CollectMaterial.formNumber']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.rawMaterial']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.balanceWeight']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.price']}</rich:column>
@@ -85,6 +142,9 @@
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{collectMaterialItem.ticket}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{collectMaterialItem.form}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{collectMaterialItem.metaProduct.fullName}"/>

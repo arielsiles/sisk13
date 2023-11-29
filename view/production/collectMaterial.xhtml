@@ -77,7 +77,7 @@
                                    value="#{collectMaterial.date}"
                                    datePattern="#{messages['patterns.date']}"
                                    required="true"
-                                   tabindex="5">
+                                   tabindex="1">
                     </rich:calendar>
                 </s:decorate>
 
@@ -129,7 +129,25 @@
                     <h:inputText id="ticketNumber" value="#{collectMaterial.ticket}"
                                  styleClass="input"
                                  required="true"
-                                 tabindex="3">
+                                 tabindex="4">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="formField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.formNumber']}</ui:define>
+                    <h:inputText id="form" value="#{collectMaterial.form}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="driverField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.driver']}</ui:define>
+                    <h:inputText id="driver" value="#{collectMaterial.driver}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="6">
                     </h:inputText>
                 </s:decorate>
 
@@ -138,10 +156,11 @@
                     <h:inputText id="netWeight" value="#{collectMaterial.netWeight}"
                                  styleClass="input"
                                  required="true"
-                                 tabindex="3">
+                                 tabindex="7">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="netWeight"/>
                         <a4j:support event="onblur" reRender="netWeightField"/>
                     </h:inputText>
+                    <h:outputText value=" #{messages['Common.unit.kg']}"/>
                 </s:decorate>
 
                 <s:decorate id="balanceWeightField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -149,22 +168,35 @@
                     <h:inputText id="balanceWeight" value="#{collectMaterial.balanceWeight}"
                                  styleClass="input"
                                  required="true"
-                                 tabindex="3">
+                                 tabindex="8">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="balanceWeight"/>
                         <a4j:support event="onblur" reRender="balanceWeightField"/>
                     </h:inputText>
+                    <h:outputText value=" #{messages['Common.unit.kg']}"/>
                 </s:decorate>
 
                 <s:decorate id="priceField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CollectMaterial.price']}</ui:define>
-                    <h:inputText id="price" value="#{collectMaterialAction.rawMaterialPrice}"
+                    <h:inputText id="price" value="#{collectMaterial.price}"
                                  styleClass="input"
                                  required="true"
                                  maxlength="20"
-                                 tabindex="3">
+                                 tabindex="9">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="price"/>
                         <a4j:support event="onblur" reRender="priceField"/>
                     </h:inputText>
+                    <h:outputText value=" x Tonelada"/>
+                </s:decorate>
+
+                <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.observations']}</ui:define>
+                    <h:inputTextarea id="observation"
+                                     value="#{collectMaterial.observation}"
+                                     required="false"
+                                     styleClass="input textarea-medium"
+                                     tabindex="10">
+                        <f:validateLength maximum="1000"/>
+                    </h:inputTextarea>
                 </s:decorate>
 
             </rich:panel>
