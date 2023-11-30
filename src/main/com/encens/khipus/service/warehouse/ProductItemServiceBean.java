@@ -92,13 +92,15 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
             BusinessUnit businessUnit = businessUnitService.findBusinessUnitByExecutorUnitCode(companyConfiguration.getCompanyNumber());
 
             Inventory inventory = new Inventory();
-            inventory.setId(new InventoryPK(productItem.getId().getCompanyNumber(), productItem.getWarehouseCode(), productItem.getId().getProductItemCode()));
+            //inventory.setId(new InventoryPK(productItem.getId().getCompanyNumber(), productItem.getWarehouseCode(), productItem.getId().getProductItemCode()));
+            inventory.setId(new InventoryPK(productItem.getCompanyNumber(), productItem.getWarehouseCode(), productItem.getId().getProductItemCode()));
             inventory.setUnitaryBalance(BigDecimal.ZERO);
 
             InventoryDetail inventoryDetail = new InventoryDetail();
             inventoryDetail.setCostCenterCode(companyConfiguration.getExchangeRateBalanceCostCenter().getId().getCode());
             inventoryDetail.setCostCenter(companyConfiguration.getExchangeRateBalanceCostCenter());
-            inventoryDetail.setCompanyNumber(companyConfiguration.getCompanyNumber());
+            //inventoryDetail.setCompanyNumber(companyConfiguration.getCompanyNumber());
+            inventoryDetail.setCompanyNumber(productItem.getCompanyNumber());
             inventoryDetail.setWarehouseCode(productItem.getWarehouseCode());
             inventoryDetail.setProductItem(productItem);
             inventoryDetail.setProductItemCode(productItem.getId().getProductItemCode());
