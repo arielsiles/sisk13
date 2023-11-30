@@ -66,7 +66,6 @@
                                      clearAction="#{collectMaterialAction.clearRawMaterialProducer()}"
                                      searchModalPanel="rawMaterialProducerListModalPanel"
                                      reRender="supplierField"
-                                     readOnly="#{collectMaterialAction.managed}"
                                      hotKeySelect="alt+2"/>
                 </s:decorate>
 
@@ -91,7 +90,6 @@
                                      clearAction="#{collectMaterialAction.clearOrigin()}"
                                      searchModalPanel="productiveZoneModalPanel"
                                      reRender="productiveZoneField"
-                                     readOnly="#{collectMaterialAction.managed}"
                                      hotKeySelect="alt+2"/>
                 </s:decorate>
 
@@ -188,13 +186,26 @@
                     <h:outputText value=" x Tonelada"/>
                 </s:decorate>
 
+                <s:decorate id="employeeField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.receptionEmployee']}</ui:define>
+                    <app:selectPopUp id="employee"
+                                     required="true"
+                                     textValue="#{collectMaterial.receptionEmployee.fullName}"
+                                     value="#{collectMaterial.receptionEmployee}"
+                                     clearAction="#{collectMaterial.setReceptionEmployee(null)}"
+                                     searchModalPanel="generalEmployeeListModalPanel"
+                                     dataModel="#{generalEmployeeDataModel}"
+                                     reRender="employeeField"
+                                     tabindex="10"/>
+                </s:decorate>
+
                 <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CollectMaterial.observations']}</ui:define>
                     <h:inputTextarea id="observation"
                                      value="#{collectMaterial.observation}"
                                      required="false"
                                      styleClass="input textarea-medium"
-                                     tabindex="10">
+                                     tabindex="11">
                         <f:validateLength maximum="1000"/>
                     </h:inputTextarea>
                 </s:decorate>
@@ -269,6 +280,17 @@
                                    oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
                                    style="width:0.8em"/>
 
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer" template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" action="#{collectMaterialAction.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif" style="border:0" ajaxSingle="true"
+                                   reRender="formPanel"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
             </ui:define>
         </s:decorate>
 

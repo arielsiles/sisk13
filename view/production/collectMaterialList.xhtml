@@ -83,6 +83,19 @@
                             </h:panelGrid>
                         </s:decorate>
 
+                        <s:decorate id="metaProductField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['CollectMaterial.rawMaterial']}</ui:define>
+                            <h:selectOneMenu id="metaProduct" value="#{collectMaterialDataModel.metaProduct}"
+                                             disabled="false"
+                                             styleClass="input" required="false" tabindex="2">
+                                <s:selectItems value="#{collectableProductList}"
+                                               var="product"
+                                               label="#{product.fullNameRawMaterial}"
+                                               hideNoSelectionLabel="false" noSelectionLabel=""/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
                         <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                             <a4j:commandButton action="#{collectMaterialDataModel.search}"
                                                reRender="collectMaterialList, dataScroller"
@@ -147,7 +160,7 @@
                     <h:outputText value="#{collectMaterialItem.form}"/>
                 </rich:column>
                 <rich:column>
-                    <h:outputText value="#{collectMaterialItem.metaProduct.fullName}"/>
+                    <h:outputText value="#{collectMaterialItem.metaProduct.name}"/>
                 </rich:column>
                 <rich:column styleClass="right">
                     <h:outputText value="#{collectMaterialItem.balanceWeight}">

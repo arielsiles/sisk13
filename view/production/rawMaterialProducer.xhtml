@@ -11,10 +11,10 @@
 <ui:define name="pageTitle">
     <c:choose>
         <c:when test="#{rawMaterialProducerAction.managed}">
-            #{messages['ProductiveZone.edit']}
+            #{messages['Common.edit']}
         </c:when>
         <c:otherwise>
-            #{messages['ProductiveZone.new']}
+            #{messages['Common.new']}
         </c:otherwise>
     </c:choose>
 </ui:define>
@@ -47,10 +47,10 @@
     <f:facet name="header">
         <c:choose>
             <c:when test="#{rawMaterialProducerAction.managed}">
-                #{messages['RawMaterialProducer.edit']}
+                #{messages['Common.edit']}
             </c:when>
             <c:otherwise>
-                #{messages['RawMaterialProducer.new']}
+                #{messages['Common.new']}
             </c:otherwise>
         </c:choose>
     </f:facet>
@@ -192,6 +192,7 @@
 
     <rich:spacer height="10" />
 
+    <c:if test="#{s:hasPermission('RAWMATERIALPRODUCER_PRODUCTIVEZONE','VIEW')}">
     <app:fieldset id="productiveZoneFieldSet" title="#{messages['RawMaterialProducer.productiveZone']}">
 
         <s:decorate id="activeProducerField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -216,9 +217,11 @@
             </a4j:commandLink>
         </s:decorate>
     </app:fieldset>
+    </c:if>
 
     <rich:spacer height="10" />
 
+    <c:if test="#{s:hasPermission('RAWMATERIALPRODUCER_BANKACCOUNT','VIEW')}">
     <app:fieldset id="accountNumberFieldSet" title="#{messages['RawMaterialProducer.bankAccount']}">
         <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['RawMaterialProducer.accountNumber']}</ui:define>
@@ -231,6 +234,7 @@
                          tabindex="11" />
         </s:decorate>
     </app:fieldset>
+    </c:if>
 
     <rich:spacer height="10" />
     <!-- IMPUESTOS 2011
@@ -255,6 +259,7 @@
         </s:decorate>
     </app:fieldset>-->
 
+    <c:if test="#{s:hasPermission('RAWMATERIALPRODUCER_PRODUCERTAXES','VIEW')}">
     <app:fieldset id="taxFieldSet" title="#{messages['RawMaterialProducer.taxLicense']}">
         <!--<s:decorate id="codeTaxLicenseField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['RawMaterialProducer.codeTaxLicense']}</ui:define>
@@ -277,6 +282,7 @@
         </s:decorate>-->
             <ui:include src="/production/rawMaterialProducerGestionTaxListForm.xhtml"/>
     </app:fieldset>
+    </c:if>
 
     <!--<app:fieldset id="productiveZoneFieldOptions" title="#{messages['RawMaterialProducer.productiveZoneOptions']}" >
 

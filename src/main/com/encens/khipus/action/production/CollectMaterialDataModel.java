@@ -2,6 +2,7 @@ package com.encens.khipus.action.production;
 
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.production.CollectMaterial;
+import com.encens.khipus.model.production.MetaProduct;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -19,11 +20,13 @@ public class CollectMaterialDataModel extends QueryDataModel<Long, CollectMateri
     private String lastName;
     private Date startDate;
     private Date endDate;
+    private MetaProduct metaProduct;
 
     private static final String[] RESTRICTIONS = {
             "upper(collectMaterial.code) like concat(concat('%',upper(#{collectMaterialDataModel.criteria.code})), '%')",
             "upper(collectMaterial.producer.firstName) like concat(concat('%',upper(#{collectMaterialDataModel.name})), '%')",
             "upper(collectMaterial.producer.lastName) like concat(concat('%',upper(#{collectMaterialDataModel.lastName})), '%')",
+            "collectMaterial.metaProduct = #{collectMaterialDataModel.metaProduct}",
             "collectMaterial.date >= #{collectMaterialDataModel.startDate}",
             "collectMaterial.date <= #{collectMaterialDataModel.endDate}"
     };
@@ -74,5 +77,13 @@ public class CollectMaterialDataModel extends QueryDataModel<Long, CollectMateri
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public MetaProduct getMetaProduct() {
+        return metaProduct;
+    }
+
+    public void setMetaProduct(MetaProduct metaProduct) {
+        this.metaProduct = metaProduct;
     }
 }

@@ -48,11 +48,11 @@ public class RawMaterialProducer extends Person {
     @Column(name = "fechainicialicenciaimpuesto", columnDefinition = "DATE",nullable = true)
     private Date startDateTaxLicence;
 
-    @Column(name = "esresponsable", nullable = false)
+    @Column(name = "esresponsable", nullable = true)
     @Type(type = "IntegerBoolean")
     private Boolean responsible;
 
-    @Column(name = "activo", nullable = false)
+    @Column(name = "activo", nullable = true)
     @Type(type = "IntegerBoolean")
     private Boolean active;
 

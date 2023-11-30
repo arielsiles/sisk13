@@ -3,6 +3,7 @@ package com.encens.khipus.action.production;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.production.CollectMaterial;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialProducer;
@@ -87,6 +88,10 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
 
     public void clearOrigin() {
         getInstance().setProductiveZone(null);
+    }
+
+    public void assignEmployee(Employee employee) {
+        getInstance().setReceptionEmployee(employee);
     }
 
     public BigDecimal getRawMaterialPrice() {

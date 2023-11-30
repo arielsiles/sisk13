@@ -3,6 +3,7 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -76,6 +77,10 @@ public class CollectMaterial implements Serializable, BaseModel {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idmetaproductoproduccion", nullable = false)
     private MetaProduct metaProduct;
+
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idempleado", nullable = true, updatable = true, insertable = true)
+    private Employee receptionEmployee;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -208,5 +213,13 @@ public class CollectMaterial implements Serializable, BaseModel {
 
     public void setDriver(String driver) {
         this.driver = driver;
+    }
+
+    public Employee getReceptionEmployee() {
+        return receptionEmployee;
+    }
+
+    public void setReceptionEmployee(Employee receptionEmployee) {
+        this.receptionEmployee = receptionEmployee;
     }
 }
