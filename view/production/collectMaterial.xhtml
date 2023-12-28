@@ -31,12 +31,17 @@
 
                     <s:defaultAction/>
                 </h:commandButton>
-                <h:commandButton action="#{collectMaterialAction.update}" value="#{messages['Common.save']}"
+
+                <h:commandButton action="#{collectMaterialAction.approve}" value="#{messages['Common.approve']}"
                                  styleClass="button"
-                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE')}"/>
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE') and collectMaterialAction.pending}"/>
+
+                <h:commandButton action="#{collectMaterialAction.update}" value="#{messages['Common.saveChange']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE') and collectMaterialAction.pending}"/>
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','DELETE')}">
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','DELETE') and collectMaterialAction.pending}">
                     <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
                                            operation="show"/>
                 </h:commandButton>
@@ -55,6 +60,11 @@
                         </c:otherwise>
                     </c:choose>
                 </f:facet>
+
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.state']}</ui:define>
+                    <h:outputText value="#{messages[collectMaterial.state.resourceKey]}"/>
+                </s:decorate>
 
                 <s:decorate id="supplierField" template="/include/viewField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CollectMaterial.supplier']}</ui:define>
@@ -215,16 +225,21 @@
             <div class="buttons">
                 <h:commandButton action="#{collectMaterialAction.create}" value="#{messages['Common.save']}"
                                  styleClass="button"
-                                 rendered="#{!collectMaterialAction.managed and s:hasPermission('METAPRODUCT','CREATE')}">
+                                 rendered="#{!collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','CREATE')}">
 
                     <s:defaultAction/>
                 </h:commandButton>
-                <h:commandButton action="#{collectMaterialAction.update}" value="#{messages['Common.save']}"
+
+                <h:commandButton action="#{collectMaterialAction.approve}" value="#{messages['Common.approve']}"
                                  styleClass="button"
-                                 rendered="#{collectMaterialAction.managed and s:hasPermission('METAPRODUCT','UPDATE')}"/>
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE') and collectMaterialAction.pending}"/>
+
+                <h:commandButton action="#{collectMaterialAction.update}" value="#{messages['Common.saveChange']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE') and collectMaterialAction.pending}"/>
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{collectMaterialAction.managed and s:hasPermission('METAPRODUCT','DELETE')}">
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','DELETE') and collectMaterialAction.pending}">
                     <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
                                            operation="show"/>
                 </h:commandButton>

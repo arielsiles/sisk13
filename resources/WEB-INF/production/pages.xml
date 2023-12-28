@@ -674,6 +674,21 @@
         </navigation>
     </page>
     <page view-id="/production/collectMaterial.xhtml" no-conversation-view-id="/production/collectMaterialList.xhtml">
+        <navigation from-action="#{collectMaterialAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/collectMaterial.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{collectMaterialAction.approve}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/collectMaterial.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{collectMaterialAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/collectMaterial.xhtml"/>
+            </rule>
+        </navigation>
         <navigation>
             <rule>
                 <redirect view-id="/production/collectMaterialList.xhtml"/>
@@ -720,7 +735,27 @@
     </page>
 
     <page view-id="/production/rawMaterialPaymentRequestUpdate.xhtml" no-conversation-view-id="/production/rawMaterialPaymentRequestList.xhtml">
+        <navigation from-action="#{rawMaterialPaymentAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/rawMaterialPaymentRequestUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialPaymentAction.sendRequest}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/rawMaterialPaymentRequestList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialPaymentAction.liquidatePayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/rawMaterialPaymentRequestList.xhtml"/>
+            </rule>
+        </navigation>
         <navigation from-action="#{rawMaterialPaymentAction.cancel}">
+            <rule>
+                <redirect view-id="/production/rawMaterialPaymentRequestList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
             <rule>
                 <redirect view-id="/production/rawMaterialPaymentRequestList.xhtml"/>
             </rule>

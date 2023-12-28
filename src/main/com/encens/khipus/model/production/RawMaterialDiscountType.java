@@ -1,19 +1,18 @@
 package com.encens.khipus.model.production;
 
 /**
- * Enumeration of Type of RawMaterialPaymentType
- *
  * @author
- * @version 2.24
+ * @version 2.0
  */
-public enum RawMaterialPaymentType {
+public enum RawMaterialDiscountType {
 
-    PAYMENT_CASHBOX("RotatoryFundPaymentType.paymentWithCashBox"),
-    PAYMENT_BANK_ACCOUNT("RotatoryFundPaymentType.paymentToBankAccount");
+    RETENTION("RawMaterialDiscountType.retention"),
+    TAXES("RawMaterialDiscountType.taxes"),
+    OTHERS("RawMaterialDiscountType.otherDiscounts");
 
     private String resourceKey;
 
-    RawMaterialPaymentType(String resourceKey) {
+    RawMaterialDiscountType(String resourceKey) {
         this.resourceKey = resourceKey;
     }
 
@@ -24,4 +23,5 @@ public enum RawMaterialPaymentType {
     public void setResourceKey(String resourceKey) {
         this.resourceKey = resourceKey;
     }
+
 }

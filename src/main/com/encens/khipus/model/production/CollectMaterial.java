@@ -222,4 +222,23 @@ public class CollectMaterial implements Serializable, BaseModel {
     public void setReceptionEmployee(Employee receptionEmployee) {
         this.receptionEmployee = receptionEmployee;
     }
+
+    /*@Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        CollectMaterial objetoA = (CollectMaterial) obj;
+        return id == objetoA.id;
+    }*/
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof CollectMaterial && this.getId().equals(((CollectMaterial) obj).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
 }

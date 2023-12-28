@@ -7,7 +7,9 @@ package com.encens.khipus.model.production;
 public enum CollectMaterialState {
     APR("CollectMaterial.state.approved"),
     PEN("CollectMaterial.state.pending"),
-    ANL("CollectMaterial.state.nullfied");
+    ANL("CollectMaterial.state.nullfied"),
+    PAY("CollectMaterial.state.toPay"),
+    LIQ("CollectMaterial.state.liquidated");
 
     private String resourceKey;
 

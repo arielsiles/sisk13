@@ -8,7 +8,7 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-    <ui:define name="pageTitle">#{messages['ProducerPrice.list']}</ui:define>
+    <ui:define name="pageTitle">#{messages['RawMaterialPayment.list']}</ui:define>
     <ui:param name="bodyWidth" value="100%"/>
 
     <style type="text/css">
@@ -19,7 +19,7 @@
     <ui:param name="selectedTab" value="products"/>
     <ui:define name="body">
         <h:form id="producerPriceForm">
-            <rich:simpleTogglePanel label="#{messages['ProducerPrice.search']}" switchType="client">
+            <rich:simpleTogglePanel label="#{messages['RawMaterialPayment.list']}" switchType="client">
 
                 <h:panelGrid columns="2" width="100%">
                     <s:div>
@@ -38,6 +38,46 @@
                     </s:div>
 
                     <s:div>
+                        <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Common.dates']}</ui:define>
+                            <rich:calendar id="startDate"
+                                           value="#{rawMaterialPaymentDataModel.startDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="5">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+
+                            <rich:calendar id="endDate"
+                                           value="#{rawMaterialPaymentDataModel.endDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="5">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.state']}</ui:define>
+                            <h:selectOneMenu id="state"
+                                             value="#{rawMaterialPaymentDataModel.state}"
+                                             styleClass="input"
+                                             tabindex="1000">
+                                <s:selectItems value="#{rawMaterialPaymentStateEnum}"
+                                               var="element"
+                                               label="#{messages[element.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
                         <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                             <a4j:commandButton action="#{rawMaterialPaymentDataModel.search}"
                                                reRender="rawMaterialPaymentList, dataScroller"
@@ -62,25 +102,28 @@
 
             <rich:dataTable value="#{rawMaterialPaymentDataModel}" var="rawMaterialPaymentItem" id="rawMaterialPaymentList"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="10%, 15%, 15%, 15%, 15%, 15%, 15%">
+                            width="100%" columnsWidth="10%, 15%, 15%, 10%, 10%, 10%, 10%, 10%, 10%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
-                        <rich:column>Fecha Solicitud</rich:column>
+                        <rich:column>#{messages['RawMaterialPayment.requestDate']}</rich:column>
                         <rich:column>#{messages['ProducerPrice.producer.firstName']}</rich:column>
                         <rich:column>#{messages['ProducerPrice.producer.lastName']}</rich:column>
-                        <rich:column>Fecha de Aprobacion</rich:column>
-                        <rich:column>Estado</rich:column>
-                        <rich:column>Monto</rich:column>
-
+                        <rich:column>#{messages['RawMaterialPayment.approvalDate']}</rich:column>
+                        <rich:column>#{messages['RawMaterialPayment.state']}</rich:column>
+                        <rich:column>#{messages['RawMaterialPayment.amount']}</rich:column>
+                        <rich:column>#{messages['RawMaterialPayment.discounts']}</rich:column>
+                        <rich:column>#{messages['RawMaterialPayment.liquid']}</rich:column>
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
 
-                <rich:column>
-                    <h:outputText value="#{rawMaterialPaymentItem.date}"/>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{rawMaterialPaymentItem.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </h:outputText>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{rawMaterialPaymentItem.producer.firstName}"/>
@@ -89,8 +132,10 @@
                     <h:outputText value="#{rawMaterialPaymentItem.producer.lastName}"/>
                 </rich:column>
 
-                <rich:column>
-                    <h:outputText value="#{rawMaterialPaymentItem.approvalDate}"/>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{rawMaterialPaymentItem.approvalDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </h:outputText>
                 </rich:column>
 
                 <rich:column styleClass="center">
@@ -98,7 +143,21 @@
                 </rich:column>
 
                 <rich:column styleClass="right">
-                    <h:outputText value="#{rawMaterialPaymentItem.paymentAmount}"/>
+                    <h:outputText value="#{rawMaterialPaymentItem.paymentAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{rawMaterialPaymentItem.discountAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{rawMaterialPaymentItem.liquidAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
                 </rich:column>
 
                 <rich:column styleClass="center">

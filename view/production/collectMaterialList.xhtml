@@ -30,7 +30,7 @@
 
                     <s:div id="leftSidePanel">
                         <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['MetaProduct.code']}</ui:define>
+                            <ui:define name="label">#{messages['CollectMaterial.code']}</ui:define>
                             <h:inputText id="number" value="#{collectMaterialDataModel.criteria.code}"
                                          maxlength="200" tabindex="1" styleClass="input">
                             </h:inputText>
@@ -52,35 +52,28 @@
                     <s:div id="rightSidePanel">
 
                         <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
-                            <!--<ui:define name="label">#{messages['WarehouseVoucher.date']}</ui:define>-->
-                            <h:panelGrid columns="4" width="100%" columnClasses="top,top,top,top">
-                                <h:outputText value="#{messages['Common.dateFrom']}"/>
-                                <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
-                                    <rich:calendar id="startDate"
-                                                   value="#{collectMaterialDataModel.startDate}"
-                                                   inputClass="inputSmall"
-                                                   datePattern="#{messages['patterns.date']}"
-                                                   enableManualInput="true"
-                                                   tabindex="5">
-                                        <f:convertDateTime pattern="#{messages['patterns.date']}"
-                                                           timeZone="#{sessionUser.timeZone}"
-                                                           type="date"/>
-                                    </rich:calendar>
-                                </s:decorate>
-                                <h:outputText value="#{messages['Common.dateTo']}"/>
-                                <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
-                                    <rich:calendar id="endDate"
-                                                   value="#{collectMaterialDataModel.endDate}"
-                                                   inputClass="inputSmall"
-                                                   datePattern="#{messages['patterns.date']}"
-                                                   enableManualInput="true"
-                                                   tabindex="5">
-                                        <f:convertDateTime pattern="#{messages['patterns.date']}"
-                                                           timeZone="#{sessionUser.timeZone}"
-                                                           type="date"/>
-                                    </rich:calendar>
-                                </s:decorate>
-                            </h:panelGrid>
+                            <ui:define name="label">#{messages['Common.dates']}</ui:define>
+                            <rich:calendar id="startDate"
+                                           value="#{collectMaterialDataModel.startDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="5">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+
+                            <rich:calendar id="endDate"
+                                           value="#{collectMaterialDataModel.endDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="5">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
                         </s:decorate>
 
                         <s:decorate id="metaProductField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -132,7 +125,7 @@
                         <rich:column>#{messages['CollectMaterial.formNumber']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.rawMaterial']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.balanceWeight']}</rich:column>
-                        <rich:column>#{messages['CollectMaterial.price']}</rich:column>
+                        <rich:column>#{messages['CollectMaterial.tonPrice']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.state']}</rich:column>
 
                         <rich:column styleClass="center">
@@ -142,7 +135,9 @@
                 </f:facet>
 
                 <rich:column styleClass="center">
-                    <h:outputText value="#{collectMaterialItem.date}"/>
+                    <h:outputText value="#{collectMaterialItem.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                    </h:outputText>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{collectMaterialItem.code}"/>

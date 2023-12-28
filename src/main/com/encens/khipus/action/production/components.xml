@@ -109,4 +109,19 @@
     <factory name="productionCategoryList" value="#{productionCategoryQuery}"/>
     <framework:entity-query name="productionCategoryQuery" ejbql="select p from ProductionCategory p"/>
 
+    <factory name="rawMaterialDiscountTList" value="#{rawMaterialDiscountTQuery}"/>
+    <framework:entity-query name="rawMaterialDiscountTQuery"
+                            ejbql="select rawMaterialDiscountT from RawMaterialDiscountT rawMaterialDiscountT"/>
+
+    <!--Enumerations-->
+
+    <factory name="rawMaterialPaymentTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialPaymentType')}"/>
+
+    <factory name="rawMaterialPaymentStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialPaymentState')}"/>
+
+    <factory name="rawMaterialDiscountTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialDiscountType')}"/>
+
 </components>

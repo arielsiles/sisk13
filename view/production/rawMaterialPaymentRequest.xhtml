@@ -27,7 +27,6 @@
                 <h:commandButton action="#{rawMaterialPaymentAction.create}" value="#{messages['Common.save']}"
                                  styleClass="button"
                                  rendered="#{!rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','CREATE')}">
-                    <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton action="#{rawMaterialPaymentAction.cancel}" value="#{messages['Common.cancel']}"
@@ -61,14 +60,26 @@
                 </s:decorate>
 
                 <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['RawMaterialPayment.date']}</ui:define>
+                    <ui:define name="label">#{messages['RawMaterialPayment.requestDate']}</ui:define>
                     <rich:calendar id="date"
                                    enableManualInput="true"
                                    value="#{rawMaterialPayment.date}"
                                    datePattern="#{messages['patterns.date']}"
+                                   disabled="true"
                                    required="true"
                                    tabindex="5">
                     </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialPayment.gloss']}</ui:define>
+                    <h:inputTextarea id="gloss"
+                                     value="#{rawMaterialPayment.gloss}"
+                                     required="true"
+                                     styleClass="input textarea-medium"
+                                     tabindex="10">
+                        <f:validateLength maximum="1000"/>
+                    </h:inputTextarea>
                 </s:decorate>
 
             </rich:panel>

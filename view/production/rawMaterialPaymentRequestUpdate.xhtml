@@ -17,14 +17,23 @@
     <ui:define name="body">
         <h:form id="producerPriceForm">
             <div class="buttons">
+                <h:commandButton action="#{rawMaterialPaymentAction.liquidatePayment()}" value="#{messages['RawMaterialPayment.liquidate']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialPaymentAction.sent and s:hasPermission('RAWMATERIALPAYMENTREQUEST','UPDATE')
+                                                                           and s:hasPermission('PAYMENT_RAWMATERIALPRODUCER','VIEW')}"/>
+
+                <h:commandButton action="#{rawMaterialPaymentAction.sendRequest}" value="#{messages['Common.sendRequest']}"
+                                 styleClass="button"
+                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','UPDATE') and rawMaterialPaymentAction.pending}"/>
+
                 <h:commandButton action="#{rawMaterialPaymentAction.update}" value="#{messages['Common.save']}"
                                  styleClass="button"
-                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','UPDATE')}"/>
+                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','UPDATE') and !rawMaterialPaymentAction.liquidated}"/>
+
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','DELETE')}">
-                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
-                                           operation="show"/>
+                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','DELETE') and rawMaterialPaymentAction.pending}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
                 </h:commandButton>
                 <h:commandButton action="#{rawMaterialPaymentAction.cancel}" value="#{messages['Common.cancel']}"
                                  styleClass="button" immediate="true"/>
@@ -42,7 +51,13 @@
                     </c:choose>
                 </f:facet>
 
-                <h:panelGrid columns="2" width="100%" border="0">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent, width50percent">
+                <!--<h:panelGrid columns="2" width="100%" border="0">-->
                     <s:div id="leftSidePanel">
                         <s:decorate id="beneficiaryField" template="/include/viewField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['RawMaterialPayment.beneficiary']}</ui:define>
@@ -59,24 +74,38 @@
                         </s:decorate>
 
                         <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['RawMaterialPayment.date']}</ui:define>
-                            <rich:calendar id="date"
-                                           enableManualInput="true"
-                                           value="#{rawMaterialPayment.date}"
-                                           datePattern="#{messages['patterns.date']}"
-                                           required="true"
-                                           tabindex="5">
-                            </rich:calendar>
+                            <ui:define name="label">#{messages['RawMaterialPayment.requestDate']}</ui:define>
+                            <h:outputText id="date" value="#{rawMaterialPayment.date}">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                            </h:outputText>
                         </s:decorate>
 
-                        <s:decorate id="state1Field" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">Peso Total Kg:</ui:define>
-                            <h:outputText value="63,620.00"/>
+                        <s:decorate id="totalWeightField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.TotalWeightKg']}</ui:define>
+                            <h:outputText id="totalWeight" value="#{rawMaterialPaymentAction.totalWeight}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
                         </s:decorate>
 
-                        <s:decorate id="state2Field" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">Importe Total Bs: </ui:define>
-                            <h:outputText value="12,067.40"/>
+                        <s:decorate id="totalAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.totalAmountBs']}</ui:define>
+                            <h:outputText id="totalAmount" value="#{rawMaterialPaymentAction.totalAmount}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </s:decorate>
+
+                        <s:decorate id="totalDiscountField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.totalDiscountBs']}</ui:define>
+                            <h:outputText id="totalDiscount" value="#{rawMaterialPaymentAction.totalDiscount}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </s:decorate>
+
+                        <s:decorate id="liquidAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialPayment.payableLiquidBs']}</ui:define>
+                            <h:outputText id="liquidAmount" value="#{rawMaterialPaymentAction.liquidAmount}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
                         </s:decorate>
 
                     </s:div>
@@ -88,62 +117,89 @@
                         </s:decorate>
 
                         <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['RawMaterialPayment.gloss']}</ui:define>
+                            <ui:define name="label">#{messages['RawMaterialPayment.description']}</ui:define>
                             <h:inputTextarea id="gloss"
                                              value="#{rawMaterialPayment.gloss}"
                                              required="true"
-                                             styleClass="input textarea-small"
+                                             styleClass="input textarea-small2"
+                                             disabled="#{!rawMaterialPaymentAction.pending}"
                                              tabindex="10">
                                 <f:validateLength maximum="1000"/>
                             </h:inputTextarea>
                         </s:decorate>
 
                     </s:div>
+
                 </h:panelGrid>
+
+                <rich:spacer height="10"/>
+
+                <c:if test="#{(rawMaterialPaymentAction.sent or rawMaterialPaymentAction.liquidated) and s:hasPermission('PAYMENT_RAWMATERIALPRODUCER','VIEW')}">
+                    <ui:include src="/production/rawMaterialLiquidationPayment.xhtml"/>
+                </c:if>
+
 
             </rich:panel>
 
-            <div class="buttons">
-                <h:commandButton action="#{rawMaterialPaymentAction.update}" value="#{messages['Common.save']}"
-                                 styleClass="button"
-                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','UPDATE')}"/>
-                <h:commandButton value="#{messages['Common.delete']}"
-                                 styleClass="button"
-                                 rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','DELETE')}">
-                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
-                                           operation="show"/>
-                </h:commandButton>
-                <h:commandButton action="#{rawMaterialPaymentAction.cancel}" value="#{messages['Common.cancel']}"
-                                 styleClass="button" immediate="true"/>
+            <div class="buttonsRight">
+
+                <a4j:commandButton id="addcollectMaterialItemCommandButton"
+                                   action="#{collectMaterialDataModel.reset()}"
+                                   value="#{messages['RawMaterialPayment.addDetails']}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   oncomplete="Richfaces.showModalPanel('collectMaterialByProducerModalPanel');"
+                                   actionListener="#{selectPopUpAction.select}"
+                                   reRender="collectMaterialByProducerModalPanel"
+                                   rendered="#{rawMaterialPaymentAction.managed and s:hasPermission('RAWMATERIALPAYMENTREQUEST','UPDATE') and rawMaterialPaymentAction.pending}">
+                    <f:attribute name="entityManagerName" value=""/>
+                    <f:attribute name="dataModelObject" value="#{collectMaterialDataModel}"/>
+                </a4j:commandButton>
+
+                <a4j:commandButton id="addDiscountButton"
+                                   action="#{rawMaterialPaymentAction.addDiscount()}"
+                                   value="#{messages['RawMaterialPayment.addDiscounts']}"
+                                   styleClass="button"
+                                   ajaxSingle="true"
+                                   immediate="true"
+                                   reRender="discountList"
+                                   tabindex="1006"/>
             </div>
 
-            <rich:spacer height="10px"/>
-
             <s:div id="tabPanelDiv">
-                <rich:tabPanel id="tabPanel" switchType="ajax"><!--rows="#{sessionUser.rowsPerPage}"-->
+                <rich:tabPanel id="tabPanel" switchType="ajax">
                     <rich:tab name="movementDetailTab"
                               label="#{messages['RawMaterialPayment.detailTab']}" ajaxSingle="true">
-                        <rich:dataTable value="#{rawMaterialPayment.rawMaterialPaymentDetaiList}"
+                        <rich:dataTable value="#{rawMaterialPaymentAction.paymentDetails}"
                                         var="paymentDetailItem"
                                         id="paymentDetailList"
                                         width="100%"
-                                        columnsWidth="15%, 15%, 15%, 15%, 15%, 15%">
+                                        columnsWidth="5%, 15%, 15%, 25%, 15%, 15%, 10%">
 
                             <f:facet name="header">
                                 <rich:columnGroup>
+                                    <rich:column>Id</rich:column>
                                     <rich:column>#{messages['RawMaterialPayment.date']}</rich:column>
                                     <rich:column>#{messages['RawMaterialPayment.code']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialPayment.rawMaterial']}</rich:column>
                                     <rich:column>#{messages['RawMaterialPayment.weight']}</rich:column>
-                                    <rich:column>#{messages['RawMaterialPayment.price']}</rich:column>
-                                    <rich:column>#{messages['RawMaterialPayment.amount']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialPayment.tonPrice']}</rich:column>
                                     <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
                                 </rich:columnGroup>
                             </f:facet>
-                            <rich:column>
-                                <h:outputText value="#{paymentDetailItem.collectMaterial.date}"/>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{paymentDetailItem.id}"/>
                             </rich:column>
-                            <rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{paymentDetailItem.collectMaterial.date}">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                                </h:outputText>
+                            </rich:column>
+                            <rich:column styleClass="center">
                                 <h:outputText value="#{paymentDetailItem.collectMaterial.code}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{paymentDetailItem.collectMaterial.metaProduct.name}"/>
                             </rich:column>
                             <rich:column styleClass="right">
                                 <h:outputText value="#{paymentDetailItem.collectMaterial.balanceWeight}">
@@ -155,12 +211,6 @@
                                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                                 </h:outputText>
                             </rich:column>
-                            <rich:column styleClass="right">
-                                <!--<h:outputText value="#{paymentDetailItem.collectMaterial.price}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
-                                </h:outputText>-->
-                            </rich:column>
-
 
                             <rich:column styleClass="center">
                                 <!--<h:commandLink value="#{messages['Common.select']}"
@@ -169,6 +219,69 @@
                             </rich:column>
                         </rich:dataTable>
                         <!--<app:dataScroller id="dataScroller" for="paymentDetailList" dataModel="#{rawMaterialPaymentDetailDataModel}"/>-->
+                    </rich:tab>
+
+                    <rich:tab name="discountsTab"
+                              label="#{messages['RawMaterialPayment.discountTab']}" ajaxSingle="true">
+                        <rich:dataTable value="#{rawMaterialPaymentAction.discounts}"
+                                        var="discountItem"
+                                        id="discountList"
+                                        width="100%"
+                                        columnsWidth="10%, 40%, 20%, 20%, 10%">
+
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['RawMaterialDiscount.id']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialDiscount.description']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialDiscount.type']}</rich:column>
+                                    <rich:column>#{messages['RawMaterialDiscount.amount']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{discountItem.id}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:inputText id="description" value="#{discountItem.description}" styleClass="input" />
+                            </rich:column>
+                            <rich:column styleClass="center">
+
+                                <h:selectOneMenu id="discount"
+                                                 value="#{discountItem.type}"
+                                                 styleClass="input"
+                                                 required="false"
+                                                 rendered="#{discountItem.id == null}"
+                                                 tabindex="1002">
+                                    <s:selectItems value="#{rawMaterialDiscountTList}"
+                                                   var="discount"
+                                                   label="#{discount.name}"
+                                                   noSelectionLabel=""
+                                                   hideNoSelectionLabel="false"/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+
+                                <h:outputText value="#{discountItem.type.name}" rendered="#{discountItem.id != null}" />
+
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:inputText id="amount" value="#{discountItem.amount}" styleClass="inputNumberSmall"
+                                             required="true"
+                                             tabindex="7">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
+                                    <a4j:support event="onblur" action="#{rawMaterialPaymentAction.updateTotals()}" reRender="amount, totalDiscount, liquidAmount"/>
+                                </h:inputText>
+                            </rich:column>
+
+                            <rich:column styleClass="center">
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{rawMaterialPaymentAction.removeDiscount(discountItem)}"
+                                                 ajaxSingle="true"
+                                                 reRender="discountList, totalAmount, totalDiscount, liquidAmount">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
                     </rich:tab>
 
                 </rich:tabPanel>
@@ -205,6 +318,38 @@
                                    ajaxSingle="true"
                                    reRender="beneficiaryField"
                                    oncomplete="Richfaces.hideModalPanel('rawMaterialProducerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="collectMaterialByProducerModalPanelContainer"
+                    template="/production/collectMaterialByProducerModalPanel.xhtml">
+            <ui:param name="containerId" value="collectMaterialByProducerModalPanelContainer"/>
+            <ui:param name="dialogId" value="collectMaterialByProducerModalPanel"/>
+            <ui:define name="addButton">
+                <a4j:commandButton id="addButton"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   action="#{rawMaterialPaymentAction.addCollectMaterialItems(collectMaterialByProducerDataModel.selectedItems)}"
+                                   value="#{messages['Common.add']}"
+                                   reRender="paymentDetailList, totalWeight, totalAmount, totalDiscount, liquidAmount"
+                                   styleClass="button"
+                                   oncomplete="Richfaces.hideModalPanel('collectMaterialByProducerModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="cashBoxCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="accountType" value="A"/>
+            <ui:param name="accountClass" value="A"/>
+            <ui:param name="hasPayableAccountsPermission" value="true"/>
+            <ui:param name="containerId" value="cashBoxCashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashBoxCashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{rawMaterialPaymentAction.assignCashBoxCashAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="cashBoxCashAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashBoxCashAccountListModalPanel');"/>
             </ui:define>
         </s:decorate>
 

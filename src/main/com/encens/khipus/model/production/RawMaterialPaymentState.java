@@ -5,9 +5,12 @@ package com.encens.khipus.model.production;
  * @version 2.24
  */
 public enum RawMaterialPaymentState {
-    APPROVED("PurchaseOrderPaymentType.approved"),
-    PENDING("PurchaseOrderPaymentType.pending"),
-    NULLIFIED("PurchaseOrderPaymentType.nullified");
+    APPROVED("RawMaterialPaymentState.approved"),
+    PENDING("RawMaterialPaymentState.pending"),
+    PAY("RawMaterialPaymentState.toPay"),
+    NULLIFIED("RawMaterialPaymentState.nullified"),
+    LIQUIDATE("RawMaterialPaymentState.liquidate");
+
     private String resourceKey;
 
     RawMaterialPaymentState(String resourceKey) {

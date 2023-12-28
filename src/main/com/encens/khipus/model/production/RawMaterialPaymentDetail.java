@@ -8,7 +8,6 @@ import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 
 @TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "RawMaterialPaymentDetail.tableGenerator",
@@ -29,15 +28,6 @@ public class RawMaterialPaymentDetail implements Serializable, BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "RawMaterialPaymentDetail.tableGenerator")
     private Long id;
 
-    @Column(name = "peso", precision = 12, scale = 2, nullable = false)
-    private BigDecimal weight;
-
-    @Column(name = "precio", precision = 12, scale = 2, nullable = false)
-    private BigDecimal price;
-
-    @Column(name = "monto", precision = 12, scale = 2, nullable = false)
-    private BigDecimal amount;
-
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -46,10 +36,9 @@ public class RawMaterialPaymentDetail implements Serializable, BaseModel {
     @JoinColumn(name = "idpagoacopiomp", nullable = false)
     private RawMaterialPayment rawMaterialPayment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idacopiomp", nullable = false)
     private CollectMaterial collectMaterial;
-
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -61,30 +50,6 @@ public class RawMaterialPaymentDetail implements Serializable, BaseModel {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public BigDecimal getWeight() {
-        return weight;
-    }
-
-    public void setWeight(BigDecimal weight) {
-        this.weight = weight;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
     }
 
     public long getVersion() {
