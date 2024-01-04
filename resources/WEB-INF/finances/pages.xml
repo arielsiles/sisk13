@@ -662,4 +662,26 @@
             </rule>
         </navigation>
     </page>
+
+    <page view-id="/finances/cashAccountList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{cashAccountAction.select(cashAccountItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/cashAccount.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/cashAccount.xhtml" no-conversation-view-id="/finances/cashAccountList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/cashAccountList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <end-conversation/>
+                <redirect view-id="/finances/cashAccountList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>

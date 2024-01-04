@@ -552,6 +552,19 @@
                 propagation="begin" />
     </rich:menuItem>
 
+
+    <rich:menuGroup value="#{messages['menu.warehouse.configuration']}">
+
+        <rich:menuItem submitMode="none"
+                       rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                       styleClass="main-menu-item">
+            <s:link view="/finances/cashAccountList.xhtml"
+                    value="#{messages['menu.finances.cashAccount.accountingPlan']}"
+                    propagation="none" />
+        </rich:menuItem>
+
+    </rich:menuGroup>
+
 </rich:dropDownMenu>
 
 <rich:dropDownMenu value="#{messages['menu.finances.books']}" rendered="#{s:hasPermission('PURCHASEBOOKREPORT','VIEW')}">
