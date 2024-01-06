@@ -1097,6 +1097,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             throws CompanyConfigurationNotFoundException,
             FinancesCurrencyNotFoundException,
             FinancesExchangeRateNotFoundException {
+
         if (purchaseOrderPayment != null && !BigDecimalUtil.isZeroOrNull(purchaseOrderPayment.getPayAmount())
                 && !BigDecimalUtil.isZeroOrNull(purchaseOrderPayment.getSourceAmount())) {
             Voucher voucher = null;
@@ -1121,12 +1122,11 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             BigDecimal voucherAmountNationalAmount = BigDecimalUtil.multiply(purchaseOrderPayment.getSourceAmount(), payExchangeRate);
 
             if (PurchaseOrderPaymentType.PAYMENT_BANK_ACCOUNT.equals(purchaseOrderPayment.getPaymentType())) {
-                Long sequenceNumber = sequenceGeneratorService.nextValue(Constants.FIXEDASSET_PAYMENT_DOCUMENT_SEQUENCE);
+
                 voucher = VoucherBuilder.newBankAccountPaymentTypeVoucher(
                         Constants.BANKACCOUNT_VOUCHERTYPE_FORM,
-                        //Constants.BANKACCOUNT_VOUCHERTYPE_DEBITNOTE_DOCTYPE,
                         Constants.CP_VOUCHER_DOCTYPE,
-                        Constants.FIXEDASSET_PAYMENT_DOCNUMBER_PREFFIX + sequenceNumber,
+                        null,
                         purchaseOrderPayment.getBankAccountNumber(),
                         purchaseOrderPayment.getSourceAmount(),
                         purchaseOrderPayment.getSourceCurrency(),
@@ -1166,16 +1166,34 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                         rotatoryFundCashAccount.getCurrency(),
                         bankExchangeRate));
             }
+
             if (voucher != null) {
+
+                /** DEBIT for Voucher */
                 voucher.setUserNumber(companyConfiguration.getDefaultTreasuryUser().getId());
-                voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+                VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
                         executorUnitCode,
                         costCenterCode,
                         purchaseOrder.getProvider().getPayableAccount(),
                         purchaseOrderPayment.getPayAmount(),
                         purchaseOrder.getProvider().getPayableAccount().getCurrency(),
-                        financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), payExchangeRate)));
+                        financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), payExchangeRate));
+
+                voucherDetail.setProviderCode(purchaseOrder.getProviderCode());
+                voucher.addVoucherDetail(voucherDetail);
                 BigDecimal balanceAmount = BigDecimalUtil.subtract(purchaseOrderPayment.getPayAmount(), voucherAmountNationalAmount);
+
+                /** CREDIT for Voucher, PAYMENT_BANK_ACCOUNT */
+                if (purchaseOrderPayment.getPaymentType().equals(PurchaseOrderPaymentType.PAYMENT_BANK_ACCOUNT)) {
+                    voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail (
+                            executorUnitCode,
+                            costCenterCode,
+                            purchaseOrderPayment.getBankAccount().getCashAccount(),
+                            purchaseOrderPayment.getPayAmount(),
+                            purchaseOrder.getProvider().getPayableAccount().getCurrency(),
+                            financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), payExchangeRate)));
+                }
+
                 if (balanceAmount.doubleValue() > 0) {
                     voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                             executorUnitCode,
@@ -1200,6 +1218,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 getEntityManager().persist(purchaseOrderPayment);
                 getEntityManager().flush();
                 voucherAccoutingService.saveVoucher(voucher);
+                purchaseOrderPayment.setVoucher(voucher);
+                getEntityManager().flush();
             }
         }
     }

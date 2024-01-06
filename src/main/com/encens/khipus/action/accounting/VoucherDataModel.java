@@ -35,7 +35,7 @@ public class VoucherDataModel extends QueryDataModel<Long, Voucher> {
 
     @Create
     public void init() {
-        sortProperty = "voucher.date";
+        sortProperty = "voucher.date, voucher.id";
         sortAsc = false;
     }
 
