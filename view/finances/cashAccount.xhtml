@@ -6,6 +6,7 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">
@@ -27,51 +28,41 @@
 <c:set var="isProductItemInUse" value="#{productItemAction.inUse}" scope="page"/>
 
 <h:form id="productItemForm">
-<div class="buttons">
 
-    <!--<h:commandButton id="createButtonId"
-                     action="#{productItemAction.create}"
-                     value="#{messages['Common.save']}"
-                     styleClass="button"
-                     rendered="#{!productItemAction.managed and s:hasPermission('PRODUCTITEM','CREATE')}">
-        <s:defaultAction/>
-    </h:commandButton>
+    <div class="buttons">
+        <h:commandButton id="createButtonId"
+                         action="#{cashAccountAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!cashAccountAction.managed and s:hasPermission('ACCOUNTINGPLAN','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
 
+        <h:commandButton id="updateButtonId"
+                         action="#{cashAccountAction.update}"
+                         value="#{messages['Common.saveChange']}"
+                         styleClass="button"
+                         rendered="#{cashAccountAction.managed and s:hasPermission('ACCOUNTINGPLAN','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
 
-    <h:commandButton id="updateButtonId"
-                     action="#{productItemAction.update}"
-                     value="#{messages['Common.save']}"
-                     styleClass="button"
-                     rendered="#{productItemAction.managed and s:hasPermission('PRODUCTITEM','UPDATE')}">
-        <s:defaultAction/>
-    </h:commandButton>-->
+        <h:commandButton action="#{cashAccountAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"/>
+    </div>
 
-    <!--<h:commandButton value="#{messages['Common.delete']}"
-                     styleClass="button"
-                     rendered="#{productItemAction.managed and s:hasPermission('PRODUCTITEM','DELETE') and !isProductItemInUse}">
-        <rich:componentControl for="deleteConfirmation"
-                               event="onclick"
-                               disableDefault="true"
-                               operation="show"/>
-    </h:commandButton>-->
-
-    <h:commandButton action="#{cashAccountAction.cancel}"
-                     value="#{messages['Common.cancel']}"
-                     styleClass="button"
-                     immediate="true"/>
-</div>
-
-<rich:panel id="formPanel">
-<f:facet name="header">
-    <c:choose>
-        <c:when test="#{cashAccountAction.managed}">
-            #{messages['CashAccount.edit']}
-        </c:when>
-        <c:otherwise>
-            #{messages['CashAccount.new']}
-        </c:otherwise>
-    </c:choose>
-</f:facet>
+    <rich:panel id="formPanel">
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{cashAccountAction.managed}">
+                #{messages['CashAccount.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['CashAccount.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
 
 
     <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -89,7 +80,8 @@
         <h:inputText id="name"
                      value="#{cashAccount.description}"
                      styleClass="input"
-                     maxlength="14"
+                     required="true"
+                     maxlength="100"
                      tabindex="2"/>
     </s:decorate>
 
@@ -107,41 +99,75 @@
                            hideNoSelectionLabel="false"/>
             <s:convertEnum/>
         </h:selectOneMenu>
-
     </s:decorate>
 
+    <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['CashAccount.currency']}</ui:define>
+        <h:selectOneMenu id="currency"
+                         value="#{cashAccount.currency}"
+                         styleClass="input"
+                         required="true"
+                         tabindex="3">
+            <s:selectItems value="#{financesCurrencyTypes}"
+                           var="element"
+                           label="#{messages[element.resourceKey]}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <s:convertEnum/>
+        </h:selectOneMenu>
+    </s:decorate>
 
+    <s:decorate id="activeAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['CashAccount.activeAccount']}</ui:define>
+        <h:selectBooleanCheckbox id="activeAccount" value="#{cashAccount.active}"
+                                 tabindex="2003"/>
+    </s:decorate>
 
-</rich:panel>
+    <s:decorate id="movementField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['CashAccount.movement']}</ui:define>
+        <h:selectBooleanCheckbox id="movement" value="#{cashAccount.movementAccount}"
+                                 tabindex="2005"/>
+    </s:decorate>
 
-<div class="buttons">
-    <h:commandButton action="#{cashAccountAction.cancel}"
-                     value="#{messages['Common.cancel']}"
-                     styleClass="button"
-                     immediate="true"
-                     tabindex="19"/>
-</div>
+    <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['CashAccount.rootAccount']}:</ui:define>
+        <app:selectPopUp id="productItemAccount"
+                         required="true"
+                         textValue="#{cashAccount.rootCashAccount.fullName}"
+                         value="#{cashAccount.rootCashAccount}"
+                         clearAction="voucherCreateAction.clearAccount()"
+                         searchModalPanel="cashAccountListModalPanel"
+                         dataModel="#{cashAccountDataModel}"
+                         reRender="itemAccountField"
+                         tabindex="11" hotKeySelect="alt+1">
+        </app:selectPopUp>
+    </s:decorate>
+
+    </rich:panel>
+
+    <div class="buttons">
+        <h:commandButton action="#{cashAccountAction.create}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!cashAccountAction.managed and s:hasPermission('ACCOUNTINGPLAN','CREATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{cashAccountAction.update}"
+                         value="#{messages['Common.saveChange']}"
+                         styleClass="button"
+                         rendered="#{cashAccountAction.managed and s:hasPermission('ACCOUNTINGPLAN','UPDATE')}">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{cashAccountAction.cancel}"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true"/>
+    </div>
+
 </h:form>
 
-<s:decorate template="/include/modalDialog.xhtml"
-            rendered="#{productItemAction.managed and s:hasPermission('PRODUCTITEM','DELETE') and !isProductItemInUse}">
-    <ui:param name="dialogId" value="deleteConfirmation"/>
-    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
-    <ui:define name="dialogContent">
-        <p>
-            <h:outputFormat value="#{messages['ProductItem.delete.confirmation']}">
-                <f:param value="#{productItem.name}"/>
-            </h:outputFormat>
-        </p>
-    </ui:define>
-    <ui:define name="dialogOption">
-        <a4j:commandButton action="#{productItemAction.delete}"
-                           value="#{messages['Common.delete']}"
-                           rendered="#{s:hasPermission('PRODUCTITEM','DELETE')}"
-                           immediate="true"
-                           styleClass="button"/>
-    </ui:define>
-</s:decorate>
 
 <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
     <ui:param name="hasWarehousePermission" value="true"/>
@@ -149,10 +175,10 @@
     <ui:param name="dialogId" value="cashAccountListModalPanel"/>
     <ui:define name="assignButton">
         <a4j:commandButton id="assignButton"
-                           action="#{productItemAction.assignProductItemAccount(cashAccountItem)}"
+                           action="#{cashAccountAction.assignRootCashAccount(cashAccountItem)}"
                            image="/img/active.gif"
                            styleClass="select-image-middle"
-                           reRender="productItemAccountField"
+                           reRender="itemAccountField"
                            oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
     </ui:define>
 </s:decorate>

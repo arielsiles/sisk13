@@ -3,6 +3,7 @@ package com.encens.khipus.action.finances;
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CashAccountPk;
+import com.encens.khipus.model.finances.CashAccountType;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -21,34 +22,20 @@ import java.util.List;
 @Name("cashAccountDataModel")
 @Scope(ScopeType.PAGE)
 public class CashAccountDataModel extends QueryDataModel<CashAccountPk, CashAccount> {
-    /*private static final String[] RESTRICTIONS =
-            {"lower(cashAccount.accountCode) like  concat(lower(#{cashAccountDataModel.criteria.accountCode}), '%')",
-                    "lower(cashAccount.description) like  concat('%',concat(lower(#{cashAccountDataModel.criteria.description}), '%'))",
-                    "cashAccount.hasAccountingPermission = #{cashAccountDataModel.criteria.hasAccountingPermission}",
-                    "cashAccount.hasTreasuryPermission = #{cashAccountDataModel.criteria.hasTreasuryPermission}",
-                    "cashAccount.hasPayableAccountsPermission = #{cashAccountDataModel.criteria.hasPayableAccountsPermission}",
-                    "cashAccount.hasFixedAssetsPermission = #{cashAccountDataModel.criteria.hasFixedAssetsPermission}",
-                    "cashAccount.hasWarehousePermission = #{cashAccountDataModel.criteria.hasWarehousePermission}",
-                    "cashAccount.hasReceivableAccountsPermission = #{cashAccountDataModel.criteria.hasReceivableAccountsPermission}",
-                    "cashAccount.hasCostCenter = #{cashAccountDataModel.criteria.hasCostCenter}",
-                    "cashAccount.movementAccount = #{cashAccountDataModel.movementAccount}",
-                    "cashAccount.active = #{cashAccountDataModel.active}",
-                    "cashAccount.accountType = #{cashAccountDataModel.criteria.accountType}",
-                    "cashAccount.accountClass = #{cashAccountDataModel.criteria.accountClass}",
-                    "cashAccount.currency = #{cashAccountDataModel.criteria.currency}"};*/
 
     private static final String[] RESTRICTIONS =
             {"lower(cashAccount.accountCode) like  concat(lower(#{cashAccountDataModel.criteria.accountCode}), '%')",
              "lower(cashAccount.description) like  concat('%',concat(lower(#{cashAccountDataModel.criteria.description}), '%'))",
              "cashAccount.movementAccount = #{cashAccountDataModel.movementAccount}",
-             "cashAccount.active = #{cashAccountDataModel.active}",
-             "cashAccount.accountType = #{cashAccountDataModel.criteria.accountType}",
+             /*"cashAccount.active = #{cashAccountDataModel.active}",*/
+             "cashAccount.accountType = #{cashAccountDataModel.cashAccountType}",
              /*"cashAccount.accountClass = #{cashAccountDataModel.criteria.accountClass}",*/
              "cashAccount.currency = #{cashAccountDataModel.criteria.currency}"
             };
 
-    private Boolean movementAccount = Boolean.TRUE;
+    private Boolean movementAccount;
     private Boolean active = Boolean.TRUE;
+    private CashAccountType cashAccountType;
 
     @Create
     public void init() {
@@ -78,7 +65,7 @@ public class CashAccountDataModel extends QueryDataModel<CashAccountPk, CashAcco
     }
 
     public void setActive(Boolean active) {
-        this.active = active;
+        this.active = Boolean.TRUE.equals(active) ? active : null;
     }
 
     public void searchByAccountClass(String accountClass) {
@@ -97,5 +84,13 @@ public class CashAccountDataModel extends QueryDataModel<CashAccountPk, CashAcco
         getCriteria().setAccountClass(null);
         getCriteria().setCurrency(FinancesCurrencyType.valueOf(currency));
         updateAndSearch();
+    }
+
+    public CashAccountType getCashAccountType() {
+        return cashAccountType;
+    }
+
+    public void setCashAccountType(CashAccountType cashAccountType) {
+        this.cashAccountType = cashAccountType;
     }
 }

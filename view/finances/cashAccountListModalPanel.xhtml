@@ -86,7 +86,7 @@
                 <h:outputText value="#{cashAccountItem.description}"/>
             </rich:column>
             <rich:column styleClass="center">
-                <s:div rendered="#{cashAccountItem.movementAccount}">
+                <s:div rendered="#{cashAccountItem.movementAccount and cashAccountItem.active}">
                     <ui:insert name="assignButton"/>
                 </s:div>
                 <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide"
