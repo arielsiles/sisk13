@@ -118,6 +118,7 @@ UPDATE sf_tmpdet SET cuenta = 	'11200402'	 WHERE cuenta = 	'1420310100'	;
 UPDATE sf_tmpdet SET cuenta = 	'11300601'	 WHERE cuenta = 	'1580110200'	;
 UPDATE sf_tmpdet SET cuenta = 	'11100101'	 WHERE cuenta = 	'1110110100'	;
 UPDATE sf_tmpdet SET cuenta = 	'11300701'	 WHERE cuenta = 	'1580110400'	;
+UPDATE sf_tmpdet SET cuenta = 	'11100301'	 WHERE cuenta = 	'1130110401'	;
 
 
 UPDATE arcgms SET ind_mov = 'S';

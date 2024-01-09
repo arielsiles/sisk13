@@ -667,6 +667,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 && !BigDecimalUtil.isZeroOrNull(totalSourceAmount)) {
             Voucher voucher = null;
             CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+            String paymentDocumentOC = companyConfiguration.getPaymentDocumentOC();
 
             purchaseOrderPayment.setPayCurrency(FinancesCurrencyType.P);
             purchaseOrderPayment.setState(PurchaseOrderPaymentState.APPROVED);
@@ -690,7 +691,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 Long sequenceNumber = sequenceGeneratorService.nextValue(Constants.FIXEDASSET_PAYMENT_DOCUMENT_SEQUENCE);
                 voucher = VoucherBuilder.newBankAccountPaymentTypeVoucher(
                         Constants.BANKACCOUNT_VOUCHERTYPE_FORM,
-                        Constants.CP_VOUCHER_DOCTYPE,
+                        paymentDocumentOC,
                         Constants.FIXEDASSET_PAYMENT_DOCNUMBER_PREFFIX + sequenceNumber,
                         purchaseOrderPayment.getBankAccountNumber(),
                         totalSourceAmount,
@@ -700,7 +701,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             } else if (PurchaseOrderPaymentType.PAYMENT_WITH_CHECK.equals(purchaseOrderPayment.getPaymentType())) {
                 voucher = VoucherBuilder.newCheckPaymentTypeVoucher(
                         Constants.CHECK_VOUCHERTYPE_FORM,
-                        Constants.CP_VOUCHER_DOCTYPE,
+                        paymentDocumentOC,
                         purchaseOrderPayment.getBankAccountNumber(),
                         purchaseOrderPayment.getBeneficiaryName(),
                         totalSourceAmount,
@@ -711,7 +712,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             } else if (PurchaseOrderPaymentType.PAYMENT_CASHBOX.equals(purchaseOrderPayment.getPaymentType())) {
                 System.out.println("...........>>> PAYMENT_CASHBOX: " + voucherAmountNationalAmount);
                 voucher = VoucherBuilder.newGeneralVoucher(Constants.CASHBOX_PAYMENT_VOUCHER_FORM, purchaseOrderPayment.getDescription());
-                voucher.setDocumentType(Constants.CP_VOUCHER_DOCTYPE);
+                voucher.setDocumentType(paymentDocumentOC);
 
                 if(purchaseOrder.getWithBill().equals(Constants.WITHOUT_BILL)){
                     /** 1580110300 - MERCADERIAS EN TRANSITO **/
@@ -884,6 +885,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         if (purchaseOrderPayment != null && !BigDecimalUtil.isZeroOrNull(totalPayAmount) && !BigDecimalUtil.isZeroOrNull(totalSourceAmount)) {
             Voucher voucher = null;
             CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+            String documentTypeOC = companyConfiguration.getPaymentDocumentOC();
 
             purchaseOrderPayment.setPayCurrency(FinancesCurrencyType.P);
             purchaseOrderPayment.setState(PurchaseOrderPaymentState.APPROVED);
@@ -907,7 +909,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             if (PurchaseOrderPaymentType.PAYMENT_CASHBOX.equals(purchaseOrderPayment.getPaymentType())) {
                 System.out.println("...........>>> PAYMENT_CASHBOX: " + voucherAmountNationalAmount);
                 voucher = VoucherBuilder.newGeneralVoucher(Constants.CASHBOX_PAYMENT_VOUCHER_FORM, purchaseOrderPayment.getDescription());
-                voucher.setDocumentType(Constants.CP_VOUCHER_DOCTYPE);
+                voucher.setDocumentType(documentTypeOC);
 
                 /** Pago Sin Factura (Recibo) y al Contado **/
                 if(purchaseOrder.getWithBill().equals(Constants.WITHOUT_BILL) && purchaseOrder.getPayConditions().getName().equals(Constants.CONDITION_CASH)){
@@ -1102,6 +1104,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 && !BigDecimalUtil.isZeroOrNull(purchaseOrderPayment.getSourceAmount())) {
             Voucher voucher = null;
             CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+            String documentTypeOC = companyConfiguration.getPaymentDocumentOC();
 
             purchaseOrderPayment.setPayCurrency(FinancesCurrencyType.P);
             purchaseOrderPayment.setState(PurchaseOrderPaymentState.APPROVED);
@@ -1125,7 +1128,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
                 voucher = VoucherBuilder.newBankAccountPaymentTypeVoucher(
                         Constants.BANKACCOUNT_VOUCHERTYPE_FORM,
-                        Constants.CP_VOUCHER_DOCTYPE,
+                        documentTypeOC,
                         null,
                         purchaseOrderPayment.getBankAccountNumber(),
                         purchaseOrderPayment.getSourceAmount(),
@@ -1136,7 +1139,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 voucher = VoucherBuilder.newCheckPaymentTypeVoucher(
                         Constants.CHECK_VOUCHERTYPE_FORM,
                         //Constants.CHECK_VOUCHERTYPE_DOCTYPE,
-                        Constants.CP_VOUCHER_DOCTYPE,
+                        documentTypeOC,
                         purchaseOrderPayment.getBankAccountNumber(),
                         purchaseOrderPayment.getBeneficiaryName(),
                         purchaseOrderPayment.getSourceAmount(),
@@ -1146,7 +1149,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                         purchaseOrderPayment.getDescription());
             } else if (PurchaseOrderPaymentType.PAYMENT_CASHBOX.equals(purchaseOrderPayment.getPaymentType())) {
                 voucher = VoucherBuilder.newGeneralVoucher(Constants.CASHBOX_PAYMENT_VOUCHER_FORM, purchaseOrderPayment.getDescription());
-                voucher.setDocumentType(Constants.CP_VOUCHER_DOCTYPE);
+                voucher.setDocumentType(documentTypeOC);
                 voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                         executorUnitCode,
                         costCenterCode,

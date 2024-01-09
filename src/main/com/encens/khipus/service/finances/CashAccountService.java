@@ -25,4 +25,7 @@ public interface CashAccountService {
     public List<CashAccount> findCashAccountListByType(CashAccountType accountType);
 
     Boolean createCashAccount(CashAccount cashAccount);
+
+    public List<CashAccount> findCashAccountsUtil();
+
 }

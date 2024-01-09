@@ -542,7 +542,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void assignCashAccountVoucherDetail(){
 
         if (account != null){
-            if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
+            //if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
+            if (account.getAllowIva().equals(Boolean.TRUE)){
                 setFiscalCredit(true);
                 PurchaseDocument purchaseDocument = new PurchaseDocument();
                 purchaseDocument.setControlCode("0");
@@ -1291,6 +1292,11 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         setProvider(provider);
         purchaseDocumentAction.assignFinancesEntity(provider.getEntity());
     }
+
+    public List<CashAccount> accountsUtil() {
+        return cashAccountService.findCashAccountsUtil();
+    }
+
 
     public CashAccount getAccount() {
         return account;

@@ -53,95 +53,113 @@
     </div>
 
     <rich:panel id="formPanel">
-    <f:facet name="header">
-        <c:choose>
-            <c:when test="#{cashAccountAction.managed}">
-                #{messages['CashAccount.edit']}
-            </c:when>
-            <c:otherwise>
-                #{messages['CashAccount.new']}
-            </c:otherwise>
-        </c:choose>
-    </f:facet>
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{cashAccountAction.managed}">
+                    #{messages['CashAccount.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['CashAccount.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
 
 
-    <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['CashAccount.account']}</ui:define>
-        <h:inputText id="account"
-                     value="#{cashAccount.accountCode}"
-                     styleClass="input"
-                     required="true"
-                     maxlength="100"
-                     tabindex="1"/>
-    </s:decorate>
-
-    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['CashAccount.name']}</ui:define>
-        <h:inputText id="name"
-                     value="#{cashAccount.description}"
-                     styleClass="input"
-                     required="true"
-                     maxlength="100"
-                     tabindex="2"/>
-    </s:decorate>
-
-    <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['CashAccount.type']}</ui:define>
-        <h:selectOneMenu id="state"
-                         value="#{cashAccount.accountType}"
+        <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.account']}</ui:define>
+            <h:inputText id="account"
+                         value="#{cashAccount.accountCode}"
                          styleClass="input"
                          required="true"
-                         tabindex="3">
-            <s:selectItems value="#{cashAccountTypes}"
-                           var="element"
-                           label="#{messages[element.resourceKey]}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEnum/>
-        </h:selectOneMenu>
-    </s:decorate>
+                         maxlength="100"
+                         tabindex="1"/>
+        </s:decorate>
 
-    <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['CashAccount.currency']}</ui:define>
-        <h:selectOneMenu id="currency"
-                         value="#{cashAccount.currency}"
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.name']}</ui:define>
+            <h:inputText id="name"
+                         value="#{cashAccount.description}"
                          styleClass="input"
                          required="true"
-                         tabindex="3">
-            <s:selectItems value="#{financesCurrencyTypes}"
-                           var="element"
-                           label="#{messages[element.resourceKey]}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEnum/>
-        </h:selectOneMenu>
-    </s:decorate>
+                         maxlength="100"
+                         tabindex="2"/>
+        </s:decorate>
 
-    <s:decorate id="activeAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['CashAccount.activeAccount']}</ui:define>
-        <h:selectBooleanCheckbox id="activeAccount" value="#{cashAccount.active}"
-                                 tabindex="2003"/>
-    </s:decorate>
+        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.type']}</ui:define>
+            <h:selectOneMenu id="state"
+                             value="#{cashAccount.accountType}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="3">
+                <s:selectItems value="#{cashAccountTypes}"
+                               var="element"
+                               label="#{messages[element.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
 
-    <s:decorate id="movementField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['CashAccount.movement']}</ui:define>
-        <h:selectBooleanCheckbox id="movement" value="#{cashAccount.movementAccount}"
-                                 tabindex="2005"/>
-    </s:decorate>
+        <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.currency']}</ui:define>
+            <h:selectOneMenu id="currency"
+                             value="#{cashAccount.currency}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="3">
+                <s:selectItems value="#{financesCurrencyTypes}"
+                               var="element"
+                               label="#{messages[element.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
 
-    <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['CashAccount.rootAccount']}:</ui:define>
-        <app:selectPopUp id="productItemAccount"
+        <s:decorate id="activeAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.activeAccount']}</ui:define>
+            <h:selectBooleanCheckbox id="activeAccount" value="#{cashAccount.active}"
+                                     tabindex="2003"/>
+        </s:decorate>
+
+        <s:decorate id="movementField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.movement']}</ui:define>
+            <h:selectBooleanCheckbox id="movement" value="#{cashAccount.movementAccount}"
+                                     tabindex="2005"/>
+        </s:decorate>
+
+        <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.rootAccount']}:</ui:define>
+            <app:selectPopUp id="productItemAccount"
+                             required="true"
+                             textValue="#{cashAccount.rootCashAccount.fullName}"
+                             value="#{cashAccount.rootCashAccount}"
+                             clearAction="voucherCreateAction.clearAccount()"
+                             searchModalPanel="cashAccountListModalPanel"
+                             dataModel="#{cashAccountDataModel}"
+                             reRender="itemAccountField"
+                             tabindex="11" hotKeySelect="alt+1">
+            </app:selectPopUp>
+        </s:decorate>
+
+        <s:decorate id="utilAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.utilAccount']}</ui:define>
+            <h:selectBooleanCheckbox id="utilAccount" value="#{cashAccount.util}"
+                                     tabindex="2005"/>
+        </s:decorate>
+
+        <s:decorate id="utilNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['CashAccount.accountInitials']}</ui:define>
+            <h:inputText id="utilName"
+                         value="#{cashAccount.utilName}"
+                         styleClass="inputTiny"
                          required="true"
-                         textValue="#{cashAccount.rootCashAccount.fullName}"
-                         value="#{cashAccount.rootCashAccount}"
-                         clearAction="voucherCreateAction.clearAccount()"
-                         searchModalPanel="cashAccountListModalPanel"
-                         dataModel="#{cashAccountDataModel}"
-                         reRender="itemAccountField"
-                         tabindex="11" hotKeySelect="alt+1">
-        </app:selectPopUp>
-    </s:decorate>
+                         maxlength="4"
+                         tabindex="12"/>
+
+            <h:outputText value=" (4 digitos)" />
+        </s:decorate>
 
     </rich:panel>
 

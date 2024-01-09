@@ -155,14 +155,7 @@
                              reRender="itemAccountField, debitField, creditField"
                              tabindex="11" hotKeySelect="alt+1">
             </app:selectPopUp>
-            <!--<a4j:commandButton id="newRegisterId"
-                               action="#{voucherCreateAction.assignCashAccountVoucherDetail()}"
-                               rendered="#{voucherCreateAction.pending}"
-                               value=" + "
-                               styleClass="button"
-                               immediate="true"
-                               reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField">
-            </a4j:commandButton>-->
+
             <a4j:commandButton id="newRegisterId"
                                action="#{voucherCreateAction.assignInputVoucherDetail()}"
                                rendered="#{voucherCreateAction.pending}"
@@ -172,7 +165,7 @@
                                reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField, productItemField, accountField, partnerField">
             </a4j:commandButton>
 
-            <a4j:commandButton id="newNationalCurrencyBoxId"
+            <!--<a4j:commandButton id="newNationalCurrencyBoxId"
                                action="#{voucherCreateAction.assignCashAccountDefault('1110110100')}"
                                rendered="#{voucherCreateAction.pending}"
                                value="CN" title="1110110100 Caja General M.N."
@@ -206,8 +199,20 @@
                                styleClass="button"
                                immediate="true"
                                reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField">
-            </a4j:commandButton>
+            </a4j:commandButton>-->
 
+        </s:decorate>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <c:forEach items="#{voucherCreateAction.accountsUtil()}" var="cashAccount">
+                <a4j:commandButton action="#{voucherCreateAction.assignCashAccountDefault(cashAccount.accountCode)}"
+                                   value="#{cashAccount.utilName}"
+                                   title="#{cashAccount.fullName}"
+                                   rendered="#{voucherCreateAction.pending}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField" />
+            </c:forEach>
         </s:decorate>
 
         <s:decorate id="payNowConditionsField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -360,6 +365,18 @@
 </h:panelGrid>
 
     <rich:spacer height="5" />
+
+    <!--<s:div styleClass="left">
+        <c:forEach items="#{voucherCreateAction.accountsUtil()}" var="cashAccount">
+            <a4j:commandButton action="#{voucherCreateAction.assignCashAccountDefault(cashAccount.accountCode)}"
+                               value="#{cashAccount.utilName}"
+                               title="#{cashAccount.fullName}"
+                               rendered="#{voucherCreateAction.pending}"
+                               styleClass="button"
+                               immediate="true"
+                               reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField" />
+        </c:forEach>
+    </s:div>-->
 
     <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
         <s:div id="movementDetailListPanel">

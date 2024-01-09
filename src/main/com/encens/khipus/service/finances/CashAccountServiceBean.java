@@ -98,4 +98,23 @@ public class CashAccountServiceBean implements CashAccountService {
         }
     }
 
+    @Override
+    public List<CashAccount> findCashAccountsUtil() {
+        List<CashAccount> result;
+        try {
+            result = em.createNamedQuery("CashAccount.findAccountsUtil")
+                    .setParameter("util", Boolean.TRUE)
+                    .getResultList();
+        } catch (NoResultException e) {
+            result = new ArrayList<CashAccount>();
+        }
+
+        for (CashAccount cashAccount : result) {
+            System.out.println("===> Account util: " + cashAccount.getFullName());
+        }
+
+
+        return result;
+    }
+
 }

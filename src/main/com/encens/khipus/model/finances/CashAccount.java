@@ -26,6 +26,7 @@ import java.util.List;
         @NamedQuery(name = "CashAccount.findByAccountCode", query = "select ca from CashAccount ca where ca.accountCode=:accountCode"),
         @NamedQuery(name = "CashAccount.findCashAccountList", query = "select ca from CashAccount ca order by ca.accountCode"),
         @NamedQuery(name = "CashAccount.findCashAccountListByType", query = "select ca from CashAccount ca where ca.accountType=:accountType order by ca.accountCode"),
+        @NamedQuery(name = "CashAccount.findAccountsUtil", query = "select ca from CashAccount ca where ca.util =:util"),
         @NamedQuery(name = "CashAccount.findByActiveAccount", query = "select ca from CashAccount ca where ca.accountCode=:accountCode and ca.active=:active")
 })
 @Entity
@@ -117,6 +118,13 @@ public class CashAccount implements BaseModel {
     @Column(name = "activa", updatable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean active;
+
+    @Column(name = "util", updatable = true)
+    @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
+    private Boolean util;
+
+    @Column(name = "nomutil", updatable = true)
+    private String utilName;
 
     @Column(name = "f_inactiva")
     @Temporal(TemporalType.DATE)
@@ -498,6 +506,22 @@ public class CashAccount implements BaseModel {
 
     public void setState(CreditState state) {
         this.state = state;
+    }
+
+    public Boolean getUtil() {
+        return util;
+    }
+
+    public void setUtil(Boolean util) {
+        this.util = util;
+    }
+
+    public String getUtilName() {
+        return utilName;
+    }
+
+    public void setUtilName(String utilName) {
+        this.utilName = utilName;
     }
 
     /*public String getAccountType() {

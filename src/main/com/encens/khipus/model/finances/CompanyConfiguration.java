@@ -635,6 +635,9 @@ public class CompanyConfiguration {
     })
     private CashAccount commissionSalesCashAccount;
 
+    @Column(name = "doc_oc_pago")
+    private String paymentDocumentOC;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1653,5 +1656,13 @@ public class CompanyConfiguration {
 
     public void setOneLegend(String oneLegend) {
         this.oneLegend = oneLegend;
+    }
+
+    public String getPaymentDocumentOC() {
+        return paymentDocumentOC;
+    }
+
+    public void setPaymentDocumentOC(String paymentDocumentOC) {
+        this.paymentDocumentOC = paymentDocumentOC;
     }
 }
