@@ -127,6 +127,26 @@ UPDATE arcgms SET exije_cc = 'N';
 -- Actualizando cta bancos
 UPDATE `ck_ctas_bco` SET cuenta = '11100301' WHERE cuenta = '1130110401';
 
+--
+SELECT DISTINCT e.`tipo_doc`
+FROM sf_tmpenc e;
+
+UPDATE sf_tmpenc e SET e.`tipo_doc` = 'CE' WHERE e.`tipo_doc` = 'CP';
+
+DELETE FROM `tipodoc` WHERE NOMBRE = 'CP';
+DELETE FROM `tipodoc` WHERE NOMBRE = 'NE';
+DELETE FROM `tipodoc` WHERE NOMBRE = 'CT';
+DELETE FROM `tipodoc` WHERE NOMBRE = 'CV';
+DELETE FROM `tipodoc` WHERE NOMBRE = 'DB';
+DELETE FROM `tipodoc` WHERE NOMBRE = 'PD';
+DELETE FROM `tipodoc` WHERE NOMBRE = 'TR';
+
+
+
+
+
+
+
 
 
 

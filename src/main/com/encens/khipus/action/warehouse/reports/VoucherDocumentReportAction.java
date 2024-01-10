@@ -175,6 +175,7 @@ public class VoucherDocumentReportAction extends GenericReportAction {
         paramMap.put("voucherDateParam", warehouseVoucher.getDate());
         paramMap.put("descriptionParam", inventoryMovement != null ? paramAsString(inventoryMovement.getDescription()) : "");
         paramMap.put("numberParam", paramAsString(warehouseVoucher.getNumber()));
+        paramMap.put("destinationParam", warehouseVoucher.getDestination().getName());
         paramMap.putAll(getVoucherTotalsParams(warehouseVoucher));
 
         return paramMap;
