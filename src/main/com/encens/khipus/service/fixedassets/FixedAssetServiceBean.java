@@ -340,6 +340,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                     /* indicates to which date have been adjusted*/
                     fixedAsset.setAdjustDate(firstDayOfCurrentProcessMonth);
                     getEntityManager().merge(fixedAsset);
+                    System.out.println("====> AF: " + fixedAsset);
                     getEntityManager().flush();
                 }
             }
@@ -391,6 +392,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                         BigDecimalUtil.sum(fixedAsset.getAcumulatedDepreciation(), depreciate));
                 fixedAsset.setDepreciation(depreciate);
                 getEntityManager().merge(fixedAsset);
+                System.out.println("===> AF merge: " + fixedAsset.getFullName());
                 getEntityManager().flush();
 
                 /*createFixedAssetDepreciationRecord*/
@@ -1228,9 +1230,13 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                 result = BigDecimalUtil.divide(auxValue, BigDecimalUtil.toBigDecimal(FixedAssetDefaultConstants.DEPRECIATION_FUNCTION_DIVIDER));
             }
         } else {
-            BigDecimal totalOriginValue = BigDecimalUtil.sum(fixedAsset.getBsOriginalValue(), fixedAsset.getImprovement());
-            BigDecimal auxValue = BigDecimalUtil.multiply(totalOriginValue, fixedAsset.getDepreciationRate());
-            result = BigDecimalUtil.divide(auxValue, BigDecimalUtil.toBigDecimal(FixedAssetDefaultConstants.DEPRECIATION_FUNCTION_DIVIDER));
+            if (!fixedAsset.getRevaluation()) {
+                BigDecimal totalOriginValue = BigDecimalUtil.sum(fixedAsset.getBsOriginalValue(), fixedAsset.getImprovement());
+                BigDecimal auxValue = BigDecimalUtil.multiply(totalOriginValue, fixedAsset.getDepreciationRate());
+                result = BigDecimalUtil.divide(auxValue, BigDecimalUtil.toBigDecimal(FixedAssetDefaultConstants.DEPRECIATION_FUNCTION_DIVIDER));
+            } else
+                result = fixedAsset.getDepreciation();
+
         }
 
         return result;

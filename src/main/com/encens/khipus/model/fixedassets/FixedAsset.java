@@ -9,8 +9,10 @@ import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.purchases.PurchaseOrder;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 import org.hibernate.validator.Range;
@@ -108,25 +110,24 @@ public class FixedAsset implements BaseModel {
     private String detail;
 
     /* the dimensions of the fixedAsset */
-    @Column(name = "medida", length = 250, nullable = false)
+    @Column(name = "medida", length = 250)
     @Length(max = 250)
-    @NotNull
     private String measurement;
 
     @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     private FixedAssetState state;
 
-    @Column(name = "serie", length = 30)
-    @Length(max = 30)
+    @Column(name = "serie", length = 255)
+    @Length(max = 255)
     private String sequence;
 
-    @Column(name = "marca", length = 30)
-    @Length(max = 30)
+    @Column(name = "marca", length = 255)
+    @Length(max = 255)
     private String trademark;
 
-    @Column(name = "modelo", length = 30)
-    @Length(max = 30)
+    @Column(name = "modelo", length = 255)
+    @Length(max = 255)
     private String model;
 
     @Column(name = "fch_alta")
@@ -146,6 +147,10 @@ public class FixedAsset implements BaseModel {
 
     @Column(name = "tasa_dep", nullable = false, precision = 7, scale = 2)
     private BigDecimal depreciationRate;
+
+    @Column(name = "revaluo", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean revaluation = Boolean.FALSE;
 
     @Column(name = "vobs", nullable = false, precision = 12, scale = 2)
     private BigDecimal bsOriginalValue;
@@ -232,7 +237,7 @@ public class FixedAsset implements BaseModel {
     private Long purchaseOrderCode;
 
     @Column(name = "mesesgarantia")
-    @Range(min = 1, max = 999)
+    @Range(min = 0, max = 999)
     private Integer monthsGuaranty;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -609,7 +614,7 @@ public class FixedAsset implements BaseModel {
     }
 
     public String getFullName() {
-        return getBarCode() + " - " + getDetail();
+        return getId() + " - " + getBarCode() + " - " + getDetail();
     }
 
     @Override
@@ -620,5 +625,13 @@ public class FixedAsset implements BaseModel {
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
+    }
+
+    public Boolean getRevaluation() {
+        return revaluation;
+    }
+
+    public void setRevaluation(Boolean revaluation) {
+        this.revaluation = revaluation;
     }
 }
