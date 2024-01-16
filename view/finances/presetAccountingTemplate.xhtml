@@ -75,15 +75,15 @@
             <div class="buttons">
                 <a4j:commandButton id="addProductItemCommandButton"
                                    action="#{productItemByWarehouseDataModel.reset()}"
-                                   value="#{messages['WarehouseVoucher.button.addProductItem']}"
+                                   value="#{majorAccountingReportAction.cashAccount}"
                                    styleClass="button"
                                    immediate="true"
                                    rendered="#{presetAccountingTemplateAction.managed}"
-                                   oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
+                                   oncomplete="Richfaces.showModalPanel('cashAccountListModalPanel');"
                                    actionListener="#{selectPopUpAction.select}"
-                                   reRender="productItemsByWarehouseListModalPanel">
+                                   reRender="cashAccountListModalPanel">
                     <f:attribute name="entityManagerName" value=""/>
-                    <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+                    <f:attribute name="dataModelObject" value="#{cashAccountListModalPanel}"/>
                 </a4j:commandButton>
             </div>
 
@@ -122,6 +122,21 @@
                                    reRender="movementDetailListPanel"
                                    styleClass="button"
                                    oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="hasWarehousePermission" value="true"/>
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{majorAccountingReportAction.setCashAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="itemAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
             </ui:define>
         </s:decorate>
 
