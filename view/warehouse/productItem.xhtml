@@ -297,29 +297,7 @@
                              value="#{productItem.saleable}"
                              tabindex="10"/>
 </s:decorate>
-<s:decorate id="productItemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-    <ui:define name="label">#{messages['ProductItem.productItemAccount']}</ui:define>
-    <c:choose>
-        <c:when test="#{isProductItemInUse}">
-            <h:outputText value="#{productItem.cashAccount.fullName}"/>
-        </c:when>
-        <c:otherwise>
-            <app:selectPopUp id="productItemAccount"
-                             required="true"
-                             textValue="#{productItem.cashAccount.fullName}"
-                             value="#{productItem.cashAccount}"
-                             clearAction="productItemAction.clearProductItemAccount()"
-                             searchModalPanel="cashAccountListModalPanel"
-                             dataModel="#{cashAccountDataModel}"
-                             reRender="productItemAccountField"
-                             tabindex="11">
-                <ui:define name="criteriaValues">
-                    <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
-                </ui:define>
-            </app:selectPopUp>
-        </c:otherwise>
-    </c:choose>
-</s:decorate>
+
 <s:decorate id="subGroupField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['ProductItem.subGroup']}</ui:define>
     <app:selectPopUp id="subGroup"
@@ -332,6 +310,30 @@
                      reRender="subGroupField"
                      tabindex="12"/>
 </s:decorate>
+
+    <s:decorate id="productItemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['ProductItem.productItemAccount']}</ui:define>
+        <c:choose>
+            <c:when test="#{isProductItemInUse}">
+                <h:outputText value="#{productItem.cashAccount.fullName}"/>
+            </c:when>
+            <c:otherwise>
+                <app:selectPopUp id="productItemAccount"
+                                 required="true"
+                                 textValue="#{productItem.cashAccount.fullName}"
+                                 value="#{productItem.cashAccount}"
+                                 clearAction="productItemAction.clearProductItemAccount()"
+                                 searchModalPanel="cashAccountListModalPanel"
+                                 dataModel="#{cashAccountDataModel}"
+                                 reRender="productItemAccountField"
+                                 tabindex="11">
+                    <ui:define name="criteriaValues">
+                        <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
+                    </ui:define>
+                </app:selectPopUp>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
 
     <s:decorate id="basicMeasureField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['ProductItem.basicMeasure']}</ui:define>
@@ -523,7 +525,7 @@
                            action="#{productItemAction.assignSubGroup(subGroupItem)}"
                            image="/img/active.gif"
                            styleClass="select-image-middle"
-                           reRender="subGroupField"
+                           reRender="subGroupField, productItemAccountField"
                            oncomplete="Richfaces.hideModalPanel('subGroupListModalPanel');"/>
     </ui:define>
 </s:decorate>
