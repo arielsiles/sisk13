@@ -694,6 +694,12 @@
     </page>
 
     <page view-id="/finances/presetAccountingTemplate.xhtml" no-conversation-view-id="/finances/presetAccountingTemplateList.xhtml">
+        <navigation from-action="#{presetAccountingTemplateAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation join="true" flush-mode="manual"/>
+                <redirect view-id="/finances/presetAccountingTemplate.xhtml"/>
+            </rule>
+        </navigation>
         <navigation>
             <rule if-outcome="Success">
                 <redirect view-id="/finances/presetAccountingTemplate.xhtml"/>

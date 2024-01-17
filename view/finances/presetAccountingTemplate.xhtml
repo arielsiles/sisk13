@@ -6,7 +6,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">
         <c:choose>
@@ -74,16 +73,16 @@
             <s:div id="movementCashAccountListPanel">
             <div class="buttons">
                 <a4j:commandButton id="addTypePresetAccountingTemplateButton"
-                                   action="#{productItemByWarehouseDataModel.reset()}"
+                                   action="#{cashAccountDataModel.reset()}"
                                    value="Agregar Cuenta"
                                    styleClass="button"
                                    immediate="true"
-
+                                   rendered="#{presetAccountingTemplateAction.managed}"
                                    oncomplete="Richfaces.showModalPanel('cashAccountListModalPanel');"
                                    actionListener="#{selectPopUpAction.select}"
                                    reRender="cashAccountListModalPanel">
                     <f:attribute name="entityManagerName" value=""/>
-                    <f:attribute name="dataModelObject" value="#{cashAccountListModalPanel}"/>
+                    <f:attribute name="dataModelObject" value="#{cashAccountDataModel}"/>
                 </a4j:commandButton>
             </div>
                <!-- <c:if test="#{presetAccountingTemplateAction.managed}">-->

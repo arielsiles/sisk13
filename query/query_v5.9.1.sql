@@ -1,28 +1,22 @@
 CREATE TABLE `plantillacontablepredefinida` (
-  `idplantillacontablepredefinida` bigint NOT NULL DEFAULT '0',
+  `idplantillacontablepredefinida` bigint(20),
   `nombre` varchar(150) ,
   `version` bigint ,
   `idcompania` bigint ,
   PRIMARY KEY (`idplantillacontablepredefinida`)
 ) ;
 
+alter table plantillacontablepredefinida add foreign key (idcompania) references compania (idcompania);
+
 create table tipoplantillacontablepredefinida
 (
-    idtipoplantillacontablepredefinida   bigint         not null
-        primary key,
-    cuenta            varchar(20)     collate utf8mb3_bin default '' not null,
-    idplantillacontablepredefinida bigint         not null,
+    idtipoplantillacontablepredefinida   bigint(20) not null primary key,
+    cuenta            varchar(20) not null,
+    idplantillacontablepredefinida bigint(20) not null,
     no_cia             varchar(2)     not null,
     version            bigint         not null,
     idcompania         bigint         not null,
-    constraint tipoplantillacontablepredefinida_ibfk_1
-        foreign key (cuenta) references arcgms (cuenta),
-    constraint tipoplantillacontablepredefinida_ibfk_2
-        foreign key (idcompania) references compania (idcompania)
+    constraint tipoplantillacontablepredefinida_ibfk_2 foreign key (idcompania) references compania (idcompania)
 );
 
-create index cuenta
-    on tipoplantillacontablepredefinida (cuenta);
-
-create index idcompania
-    on tipoplantillacontablepredefinida (idcompania);
+alter table tipoplantillacontablepredefinida add foreign key (idplantillacontablepredefinida) references plantillacontablepredefinida (idplantillacontablepredefinida);

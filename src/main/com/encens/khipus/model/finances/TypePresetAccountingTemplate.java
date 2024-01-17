@@ -33,7 +33,7 @@ public class TypePresetAccountingTemplate implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "TypePresetAccountingTemplate.tableGenerator")
     private Long id;
 
-    @Column(name = "cuenta", insertable = false, updatable = false)
+    @Column(name = "cuenta", insertable = true, updatable = false)
     private String accountCode;
 
     @Column(name = "no_cia", insertable = true, updatable = true)

@@ -6,20 +6,14 @@ import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.ReferentialIntegrityException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.customers.CustomerCategory;
-import com.encens.khipus.model.customers.PriceItem;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CashAccountPk;
 import com.encens.khipus.model.finances.PresetAccountingTemplate;
 import com.encens.khipus.model.finances.TypePresetAccountingTemplate;
-import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.model.warehouse.ProductItemPK;
-import com.encens.khipus.service.customers.PriceItemService;
 import com.encens.khipus.service.finances.TypePresetAccountingTemplateService;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +91,6 @@ public class PresetAccountingTemplateAction extends GenericAction<PresetAccounti
             getService().create(getInstance());
             super.select(getInstance());
             addCreatedMessage();
-
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
@@ -124,7 +117,7 @@ public class PresetAccountingTemplateAction extends GenericAction<PresetAccounti
     public void setCashAccount(CashAccount cashAccount) {
         if (!selectedCashAccounts.contains(cashAccount.getId())) {
 
-        selectedCashAccounts.add(cashAccount.getId());
+            selectedCashAccounts.add(cashAccount.getId());
 
             TypePresetAccountingTemplate item = new TypePresetAccountingTemplate();
             item.setCashAccount(cashAccount);
