@@ -19,29 +19,29 @@
         </c:choose>
     </ui:define>
     <ui:param name="bodyWidth" value="50%"/>
-    <ui:param name="selectedTab" value="customers"/>
+    <ui:param name="selectedTab" value="presetAccountingTemplate"/>
     <ui:define name="body">
         <h:form id="presetAccountingTemplateForm">
             <div class="buttons">
                 <h:commandButton id="createButtonId"
                                  action="#{presetAccountingTemplateAction.create}"
                                  value="#{messages['Common.save']}"
-                                 rendered="#{!customerCategoryAction.managed and s:hasPermission('CUSTOMERCATEGORY','CREATE')}"
+                                 rendered="#{!presetAccountingTemplateAction.managed }"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton id="updateButtonId"
                                  action="#{presetAccountingTemplateAction.update}"
-                                 value="#{messages['Common.update']}"
-                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERCATEGORY','UPDATE')}"
+                                 value="Actualizar"
+                                 rendered="#{presetAccountingTemplateAction.managed }"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERCATEGORY','DELETE')}">
+                                 rendered="#{presetAccountingTemplateAction.managed }">
                     <rich:componentControl for="deleteConfirmation"
                                            event="onclick"
                                            disableDefault="true"
@@ -71,14 +71,14 @@
                                  maxlength="150" tabindex="1"/>
                 </s:decorate>
             </rich:panel>
-
+            <s:div id="movementCashAccountListPanel">
             <div class="buttons">
-                <a4j:commandButton id="addProductItemCommandButton"
+                <a4j:commandButton id="addTypePresetAccountingTemplateButton"
                                    action="#{productItemByWarehouseDataModel.reset()}"
-                                   value="#{majorAccountingReportAction.cashAccount}"
+                                   value="Agregar Cuenta"
                                    styleClass="button"
                                    immediate="true"
-                                   rendered="#{presetAccountingTemplateAction.managed}"
+
                                    oncomplete="Richfaces.showModalPanel('cashAccountListModalPanel');"
                                    actionListener="#{selectPopUpAction.select}"
                                    reRender="cashAccountListModalPanel">
@@ -86,17 +86,54 @@
                     <f:attribute name="dataModelObject" value="#{cashAccountListModalPanel}"/>
                 </a4j:commandButton>
             </div>
+               <!-- <c:if test="#{presetAccountingTemplateAction.managed}">-->
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                        <thead class="rich-table-thead">
+                        <tr class="rich-table-header">
+                            <th class="rich-table-headercell">Código</th>
+                            <th class="rich-table-headercell">Descripción</th>
+                            <th class="rich-table-headercell">#{messages['Common.action']}</th>
+                        </tr>
+                        </thead>
 
+                        <c:forEach var="instance" items="#{presetAccountingTemplateAction.typePresetAccountingTemplates}" varStatus="row">
+                            <c:set var="amountFieldId" value="amountField_#{row.index}"/>
+                            <c:set var="amountInputTextId" value="amountInputText_#{row.index}"/>
+
+                            <tr class="rich-table-row">
+                                <td class="rich-table-cell">
+                                    <h:outputText value="#{instance.cashAccount.accountCode}"/>
+                                </td>
+
+                                <td class="rich-table-cell">
+                                    <h:outputText value="#{instance.cashAccount.description}"/>
+                                </td>
+
+                                <td class="rich-table-cell center">
+                                    <a4j:commandLink immediate="true"
+                                                     title="#{messages['Common.remove']}"
+                                                     action="#{customerCategoryAction.removeCashAccount(instance)}"
+                                                     ajaxSingle="true"
+                                                     rendered="true"
+                                                     reRender="movementCashAccountListPanel">
+                                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                    </a4j:commandLink>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </table>
+                <!--</c:if>-->
+            </s:div>
         </h:form>
 
         <s:decorate template="/include/modalDialog.xhtml"
-                    rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}">
+                    rendered="#{presetAccountingTemplateAction.managed }">
             <ui:param name="dialogId" value="deleteConfirmation"/>
             <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
             <ui:define name="dialogContent">
                 <p>
-                    <h:outputFormat value="#{messages['PresetAccountingTemplate.delete.confirmation']}">
-                        <f:param value="#{customerCategory.name}"/>
+                    <h:outputFormat value="¿Esta seguro de eliminar la plantilla?">
+                        <f:param value="#{presetAccountingTemplate.name}"/>
                     </h:outputFormat>
                 </p>
             </ui:define>
@@ -104,26 +141,12 @@
                 <a4j:commandButton action="#{presetAccountingTemplateAction.delete}"
                                    value="#{messages['Common.delete']}"
                                    immediate="true"
-                                   rendered="#{customerCategoryAction.managed and s:hasPermission('CUSTOMERDISCOUNTRULE','DELETE')}"
+                                   rendered="#{presetAccountingTemplateAction.managed}"
                                    styleClass="button"/>
             </ui:define>
         </s:decorate>
 
-        <s:decorate id="productItemsByWarehouseListModalPanelContainer"
-                    template="/warehouse/productItemsByWarehouseListModalPanel.xhtml">
-            <ui:param name="containerId" value="productItemsByWarehouseListModalPanelContainer"/>
-            <ui:param name="dialogId" value="productItemsByWarehouseListModalPanel"/>
-            <ui:define name="addButton">
-                <a4j:commandButton id="addButton"
-                                   immediate="true"
-                                   ajaxSingle="true"
-                                   action="#{customerCategoryAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
-                                   value="#{messages['Common.add']}"
-                                   reRender="movementDetailListPanel"
-                                   styleClass="button"
-                                   oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
-            </ui:define>
-        </s:decorate>
+
 
 
         <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
@@ -132,10 +155,10 @@
             <ui:param name="dialogId" value="cashAccountListModalPanel"/>
             <ui:define name="assignButton">
                 <a4j:commandButton id="assignButton"
-                                   action="#{majorAccountingReportAction.setCashAccount(cashAccountItem)}"
+                                   action="#{presetAccountingTemplateAction.setCashAccount(cashAccountItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
-                                   reRender="itemAccountField"
+                                   reRender="movementCashAccountListPanel"
                                    oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
             </ui:define>
         </s:decorate>

@@ -41,9 +41,6 @@ public class CustomerCategory implements BaseModel {
     @Enumerated(EnumType.STRING)
     private CustomerCategoryType type;
 
-    /*@ManyToOne
-    @JoinColumn(name = "idtipocaja", nullable = true)
-    private CashBoxType cashBoxType;*/
 
     @OneToMany(mappedBy = "customerCategory", fetch = FetchType.LAZY)
     private List<PriceItem> priceItemList = new ArrayList<PriceItem>(0);

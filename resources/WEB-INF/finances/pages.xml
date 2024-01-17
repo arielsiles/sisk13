@@ -702,6 +702,10 @@
                 <end-conversation/>
                 <redirect view-id="/finances/presetAccountingTemplateList.xhtml"/>
             </rule>
+            <rule if-outcome="Next">
+                <end-conversation/>
+                <redirect view-id="/finances/presetAccountingTemplateList.xhtml"/>
+            </rule>
         </navigation>
     </page>
 

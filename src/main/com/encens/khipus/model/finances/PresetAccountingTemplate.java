@@ -3,11 +3,14 @@ package com.encens.khipus.model.finances;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.customers.PriceItem;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @TableGenerator(schema = Constants.KHIPUS_SCHEMA,name = "PresetAccountingTemplate.tableGenerator",
         table = Constants.SEQUENCE_TABLE_NAME,
@@ -28,6 +31,17 @@ public class PresetAccountingTemplate implements BaseModel {
 
     @Column(name = "nombre", nullable = false, length = 150)
     private String name;
+
+    @OneToMany(mappedBy = "presetAccountingTemplate", fetch = FetchType.LAZY)
+    private List<TypePresetAccountingTemplate> typePresetAccountingTemplateList = new ArrayList<TypePresetAccountingTemplate>(0);
+
+    public List<TypePresetAccountingTemplate> getTypePresetAccountingTemplateList() {
+        return typePresetAccountingTemplateList;
+    }
+
+    public void setTypePresetAccountingTemplateList(List<TypePresetAccountingTemplate> typePresetAccountingTemplateList) {
+        this.typePresetAccountingTemplateList = typePresetAccountingTemplateList;
+    }
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
