@@ -57,6 +57,10 @@ public class RawMaterialPayment implements Serializable, BaseModel {
     @Column(name = "montodescuento", precision = 12, scale = 2, nullable = true)
     private BigDecimal discountAmount;
 
+    @Column(name = "montodescuento", precision = 12, scale = 2, nullable = true)
+    private BigDecimal partialAmount;
+
+
     @Column(name = "montoliquido", precision = 12, scale = 2, nullable = true)
     private BigDecimal liquidAmount;
 
@@ -240,5 +244,13 @@ public class RawMaterialPayment implements Serializable, BaseModel {
 
     public void setLiquidAmount(BigDecimal liquidAmount) {
         this.liquidAmount = liquidAmount;
+    }
+
+    public BigDecimal getPartialAmount() {
+        return partialAmount;
+    }
+
+    public void setPartialAmount(BigDecimal partialAmount) {
+        this.partialAmount = partialAmount;
     }
 }

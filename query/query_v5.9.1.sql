@@ -23,3 +23,29 @@ alter table tipoplantillacontablepredefinida add foreign key (idplantillacontabl
 
 INSERT INTO terdemol.funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
 VALUES (445, 'ENABLE_EDIT_VOUCHER', null, 5, 1, 'Voucher.report.editing.approved', 1);
+
+create table pagoparcialacopiomp
+(
+    idpagoparcialacopiomp     bigint         not null
+        primary key,
+    descripcion             varchar(100)   null,
+    monto                   decimal(12, 2) null,
+    idpagoacopiomp          bigint         null,
+    version                 bigint         null,
+    idcompania              bigint         null,
+    constraint pagoparcialacopiomp_ibfk_1
+        foreign key (idcompania) references compania (idcompania),
+    constraint pagoparcialacopiomp_ibfk_2
+        foreign key (idpagoacopiomp) references pagoacopiomp (idpagoacopiomp)
+
+)
+    charset = utf8mb3;
+
+create index idcompania
+    on pagoparcialacopiomp (idcompania);
+
+create index idpagoacopiomp
+    on pagoparcialacopiomp (idpagoacopiomp);
+
+alter table pagoacopiomp
+    add montoparcial decimal(12, 2) null;

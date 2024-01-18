@@ -25,10 +25,14 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
     private List<CollectMaterial> selectedCollectMaterialItems = new ArrayList<CollectMaterial>();
     private List<RawMaterialDiscount> discounts = new ArrayList<RawMaterialDiscount>();
 
+    private List<PartialPaymentRawMaterial> partialPaymentRawMaterial = new ArrayList<PartialPaymentRawMaterial>();
+
     private BigDecimal totalWeight   = BigDecimal.ZERO;
     private BigDecimal totalAmount   = BigDecimal.ZERO;
     private BigDecimal totalDiscount = BigDecimal.ZERO;
     private BigDecimal liquidAmount = BigDecimal.ZERO;
+
+    private Boolean isPaymentView = false;
 
     private CollectMaterialState approvedStatus = CollectMaterialState.APR;
 
@@ -234,6 +238,10 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
     public boolean isBankPayment() {
         return getInstance().getPaymentType() != null &&
                 getInstance().getPaymentType().equals(RawMaterialPaymentType.PAYMENT_BANK_ACCOUNT);
+    }
+
+    public boolean isPaymentView() {
+        return isPaymentView;
     }
 
     public boolean isCashBoxPayment() {
