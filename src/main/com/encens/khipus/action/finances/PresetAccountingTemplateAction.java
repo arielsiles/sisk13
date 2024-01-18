@@ -54,14 +54,13 @@ public class PresetAccountingTemplateAction extends GenericAction<PresetAccounti
         return "name";
     }
 
-    @End
+    /*@End(beforeRedirect = true)*/
     @Override
     public String update(){
 
         Long currentVersion = (Long) getVersion(getInstance());
         try {
             typePresetAccountingTemplateService.updateTypePresetAccountingTemplates(typePresetAccountingTemplates);
-
             getService().update(getInstance());
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
@@ -76,8 +75,6 @@ public class PresetAccountingTemplateAction extends GenericAction<PresetAccounti
                 addNotFoundMessage();
                 return Outcome.FAIL;
             }
-            addUpdateConcurrencyMessage();
-            return Outcome.REDISPLAY;
         }
         addUpdatedMessage();
         return Outcome.SUCCESS;
