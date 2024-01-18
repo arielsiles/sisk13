@@ -20,3 +20,6 @@ create table tipoplantillacontablepredefinida
 );
 
 alter table tipoplantillacontablepredefinida add foreign key (idplantillacontablepredefinida) references plantillacontablepredefinida (idplantillacontablepredefinida);
+
+INSERT INTO terdemol.funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES (445, 'ENABLE_EDIT_VOUCHER', null, 5, 1, 'Voucher.report.editing.approved', 1);

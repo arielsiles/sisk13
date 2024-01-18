@@ -493,6 +493,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         return ANNUL_OUTCOME;
     }
 
+    public String changeVoucherState(){
+        voucher.setState(VoucherState.PEN.toString());
+        voucherAccoutingService.pendingVoucher(voucher);
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.pendingAccountingEntry");
+        return ANNUL_OUTCOME;
+    }
+
     public String approveVoucher(){
         voucher.setState(VoucherState.APR.toString());
 
@@ -515,6 +522,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public boolean isApproved() {
         return VoucherState.APR.toString().equals(voucher.getState());
+    }
+
+    public boolean isAnnuled() {
+        return VoucherState.ANL.toString().equals(voucher.getState());
     }
 
     public Boolean isFiscalCredit(VoucherDetail voucherDetail){
