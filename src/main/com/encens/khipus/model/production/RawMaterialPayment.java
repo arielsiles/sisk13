@@ -57,7 +57,7 @@ public class RawMaterialPayment implements Serializable, BaseModel {
     @Column(name = "montodescuento", precision = 12, scale = 2, nullable = true)
     private BigDecimal discountAmount;
 
-    @Column(name = "montodescuento", precision = 12, scale = 2, nullable = true)
+    @Column(name = "montoparcial", precision = 12, scale = 2, nullable = true)
     private BigDecimal partialAmount;
 
 

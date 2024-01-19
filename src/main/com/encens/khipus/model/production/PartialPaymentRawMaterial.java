@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 
-@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "RawMaterialDiscount.tableGenerator",
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "PartialPaymentRawMaterial.tableGenerator",
         table = Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
@@ -67,33 +67,5 @@ public class PartialPaymentRawMaterial implements Serializable, BaseModel {
         return company;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public RawMaterialPayment getRawMaterialPayment() {
-        return rawMaterialPayment;
-    }
-
-    public void setRawMaterialPayment(RawMaterialPayment rawMaterialPayment) {
-        this.rawMaterialPayment = rawMaterialPayment;
-    }
 
 }
