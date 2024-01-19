@@ -101,6 +101,13 @@
                             </h:outputText>
                         </s:decorate>
 
+                        <s:decorate id="totalPartialPaymentField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['PartialPayment.totalPartialBs']}</ui:define>
+                            <h:outputText id="totalPartialPayment" value="#{rawMaterialPaymentAction.totalPartialPayment}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </s:decorate>
+
                         <s:decorate id="liquidAmountField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['RawMaterialPayment.payableLiquidBs']}</ui:define>
                             <h:outputText id="liquidAmount" value="#{rawMaterialPaymentAction.liquidAmount}">
@@ -293,63 +300,47 @@
                         </rich:dataTable>
                     </rich:tab>
 
-                    <rich:tab name="discountsTab"
-                              label="#{messages['RawMaterialPayment.PaymentsTab']}" ajaxSingle="true">
-                        <rich:dataTable value="#{rawMaterialPaymentAction.discounts}"
-                                        var="discountItem"
-                                        id="discountList"
+                    <rich:tab name="partialPaymentRawMaterialTab"
+                              label="#{messages['PartialPaymentRawMaterial.PartialPaymentsTab']}" ajaxSingle="true">
+                        <rich:dataTable value="#{rawMaterialPaymentAction.partialPaymentRawMaterials}"
+                                        var="partialPaymentItem"
+                                        id="partialPaymentList"
                                         width="100%"
                                         columnsWidth="10%, 40%, 20%, 20%, 10%">
 
                             <f:facet name="header">
                                 <rich:columnGroup>
-                                    <rich:column>#{messages['RawMaterialDiscount.id']}</rich:column>
-                                    <rich:column>#{messages['RawMaterialDiscount.description']}</rich:column>
-                                    <rich:column>#{messages['RawMaterialDiscount.type']}</rich:column>
-                                    <rich:column>#{messages['RawMaterialDiscount.amount']}</rich:column>
+                                    <rich:column>#{messages['PartialPayment.id']}</rich:column>
+                                    <rich:column>#{messages['PartialPayment.description']}</rich:column>
+                                    <rich:column>#{messages['PartialPayment.date']}</rich:column>
+                                    <rich:column>#{messages['PartialPayment.amount']}</rich:column>
                                     <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
                                 </rich:columnGroup>
                             </f:facet>
                             <rich:column styleClass="center">
-                                <h:outputText value="#{discountItem.id}"/>
+                                <h:outputText value="#{partialPaymentItem.id}"/>
                             </rich:column>
                             <rich:column styleClass="center">
-                                <h:inputText id="description" value="#{discountItem.description}" styleClass="input" />
+                                <h:inputText id="description" value="#{partialPaymentItem.description}" styleClass="input" />
                             </rich:column>
                             <rich:column styleClass="center">
-
-                                <h:selectOneMenu id="discount"
-                                                 value="#{discountItem.type}"
-                                                 styleClass="input"
-                                                 required="false"
-                                                 rendered="#{discountItem.id == null}"
-                                                 tabindex="1002">
-                                    <s:selectItems value="#{rawMaterialDiscountTList}"
-                                                   var="discount"
-                                                   label="#{discount.name}"
-                                                   noSelectionLabel=""
-                                                   hideNoSelectionLabel="false"/>
-                                    <s:convertEntity/>
-                                </h:selectOneMenu>
-
-                                <h:outputText value="#{discountItem.type.name}" rendered="#{discountItem.id != null}" />
-
+                                <h:outputText value="#{partialPaymentItem.date}" />
                             </rich:column>
                             <rich:column styleClass="center">
-                                <h:inputText id="amount" value="#{discountItem.amount}" styleClass="inputNumberSmall"
+                                <h:inputText id="amount" value="#{partialPaymentItem.amount}" styleClass="inputNumberSmall"
                                              required="true"
                                              tabindex="7">
                                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
-                                    <a4j:support event="onblur" action="#{rawMaterialPaymentAction.updateTotals()}" reRender="amount, totalDiscount, liquidAmount"/>
+                                    <a4j:support event="onblur" action="#{rawMaterialPaymentAction.updateTotals()}" reRender="amount, totalPartialPayment, liquidAmount"/>
                                 </h:inputText>
                             </rich:column>
 
                             <rich:column styleClass="center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
-                                                 action="#{rawMaterialPaymentAction.removeDiscount(discountItem)}"
+                                                 action="#{rawMaterialPaymentAction.removePartialPayment(partialPaymentItem)}"
                                                  ajaxSingle="true"
-                                                 reRender="discountList, totalAmount, totalDiscount, liquidAmount">
+                                                 reRender="partialPaymentList, totalAmount, totalPartialPayment, liquidAmount">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
                             </rich:column>
@@ -360,7 +351,7 @@
             </s:div>
 
         </h:form>
-
+<!--TODO:preguntar como borrar-->
         <s:decorate template="/include/modalDialog.xhtml" rendered="#{rawMaterialPaymentAction.managed}">
             <ui:param name="dialogId" value="deleteConfirmation"/>
             <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>

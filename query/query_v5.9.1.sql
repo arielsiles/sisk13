@@ -26,26 +26,20 @@ VALUES (445, 'ENABLE_EDIT_VOUCHER', null, 5, 1, 'Voucher.report.editing.approved
 
 create table pagoparcialacopiomp
 (
-    idpagoparcialacopiomp     bigint         not null
+    idpagoparcialacopiomp     bigint(20)        not null
         primary key,
     descripcion             varchar(100)   null,
     monto                   decimal(12, 2) null,
-    idpagoacopiomp          bigint         null,
-    version                 bigint         null,
-    idcompania              bigint         null,
+    idpagoacopiomp          bigint(20)         null,
+    version                 bigint(20)         null,
+    idcompania              bigint(20)         null,
     constraint pagoparcialacopiomp_ibfk_1
         foreign key (idcompania) references compania (idcompania),
     constraint pagoparcialacopiomp_ibfk_2
         foreign key (idpagoacopiomp) references pagoacopiomp (idpagoacopiomp)
 
-)
-    charset = utf8mb3;
+);
 
-create index idcompania
-    on pagoparcialacopiomp (idcompania);
-
-create index idpagoacopiomp
-    on pagoparcialacopiomp (idpagoacopiomp);
 
 alter table pagoacopiomp
-    add montoparcial decimal(12, 2) null;
+    add montoparcial decimal(12, 2) null after montodescuento;
