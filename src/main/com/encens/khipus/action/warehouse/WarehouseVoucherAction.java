@@ -64,12 +64,14 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
         List<WarehouseVoucher> warehouseVoucherList = warehouseAccountEntryService.getVouchersWithoutAccounting(startDate, endDate);
         List<WarehouseVoucher> warehouseVoucherTPList = new ArrayList<WarehouseVoucher>();
 
+        HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
+
         for (WarehouseVoucher warehouseVoucher : warehouseVoucherList){
             if (warehouseVoucher.getOperation().equals(VoucherOperation.BA)){
                 createAccountingForVoucherBA(warehouseVoucher, startDate, endDate);
             }
             if (warehouseVoucher.getOperation().equals(VoucherOperation.BV)){
-                createAccountingForVoucherBV(warehouseVoucher, startDate, endDate);
+                createAccountingForVoucherBV(warehouseVoucher, startDate, endDate, unitCostMilkProducts);
             }
             if (warehouseVoucher.getOperation().equals(VoucherOperation.DE)){
                 createAccountingForVoucherDE(warehouseVoucher, startDate, endDate);
@@ -228,9 +230,9 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
         approvalWarehouseVoucherService.updateSimpleWarehouseVoucher(warehouseVoucher);
     }
 
-    public void createAccountingForVoucherBV(WarehouseVoucher warehouseVoucher, Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
+    public void createAccountingForVoucherBV(WarehouseVoucher warehouseVoucher, Date startDate, Date endDate, HashMap<String, BigDecimal> unitCostMilkProducts) throws CompanyConfigurationNotFoundException {
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
+        //HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
 
         Voucher voucher = new Voucher();
         voucher.setDate(endDate);
@@ -242,9 +244,10 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
+        System.out.println("==============>>>>>>>>> VALE: " + warehouseVoucher.getNumber() + " - " + warehouseVoucher.getGloss());
         for (MovementDetail movementDetail : warehouseVoucher.getInventoryMovementList().get(0).getMovementDetailList()){
-            System.out.println("=====> BAJA: " + movementDetail.getProductItem().getFullName());
             BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
+            System.out.println("=====> BAJA: " + movementDetail.getProductItem().getFullName() + " - " + unitCost);
             BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
 
             //VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
