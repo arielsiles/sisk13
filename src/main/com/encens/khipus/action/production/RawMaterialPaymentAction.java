@@ -66,9 +66,10 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
         RawMaterialPayment rawMaterialPayment = getInstance();
         rawMaterialPayment.setPaymentAmount(totalAmount);
         rawMaterialPayment.setDiscountAmount(totalDiscount);
+        rawMaterialPayment.setPartialAmount(totalPartialPayment);
         rawMaterialPayment.setLiquidAmount(liquidAmount);
 
-        rawMaterialPaymentService.saveRawMaterialPayment(rawMaterialPayment, paymentDetails, discounts);
+        rawMaterialPaymentService.saveRawMaterialPayment(rawMaterialPayment, paymentDetails, discounts,partialPaymentRawMaterials);
 
         return Outcome.SUCCESS;
     }
@@ -84,9 +85,11 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
 
         List<RawMaterialPaymentDetail> paymentDetails = rawMaterialPaymentService.getPaymentDetails(instance.getId());
         List<RawMaterialDiscount> discountList = rawMaterialPaymentService.getRawMaterialDiscounts(instance.getId());
+        List<PartialPaymentRawMaterial> partialPaymentRawMaterials = rawMaterialPaymentService.getPartialPaymentRawMaterials(instance.getId());
 
         setPaymentDetails(paymentDetails);
         setDiscounts(discountList);
+        setPartialPaymentRawMaterials(partialPaymentRawMaterials);
 
         loadCollectMaterialItems(paymentDetails);
 
@@ -110,9 +113,10 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
 
         rawMaterialPayment.setPaymentAmount(totalAmount);
         rawMaterialPayment.setDiscountAmount(totalDiscount);
+        rawMaterialPayment.setPartialAmount(totalPartialPayment);
         rawMaterialPayment.setLiquidAmount(liquidAmount);
 
-        rawMaterialPaymentService.saveRawMaterialPayment(rawMaterialPayment, paymentDetails, discounts);
+        rawMaterialPaymentService.saveRawMaterialPayment(rawMaterialPayment, paymentDetails, discounts,partialPaymentRawMaterials);
 
         return Outcome.SUCCESS;
 
@@ -166,6 +170,12 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
         this.discounts.add(discount);
     }
 
+    public void addPartialPayment(){
+        PartialPaymentRawMaterial partialPaymentRawMaterial = new PartialPaymentRawMaterial();
+        partialPaymentRawMaterial.setAmount(BigDecimal.ZERO);
+        this.partialPaymentRawMaterials.add(partialPaymentRawMaterial);
+    }
+
     public void removeDiscount(RawMaterialDiscount discount){
         boolean removido = discounts.remove(discount);
 
@@ -177,6 +187,11 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
         updateTotals();
     }
 
+
+    public void removePartialPayment(PartialPaymentRawMaterial partialPaymentRawMaterial){
+        partialPaymentRawMaterials.remove(partialPaymentRawMaterial);
+        updateTotals();
+    }
     public void updateTotals(){
 
         Double totalW = 0.0;
@@ -187,10 +202,12 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
         setTotalWeight(BigDecimalUtil.toBigDecimal(totalW));
 
         BigDecimal totalAmountAux   = calculateTotalAmount(paymentDetails);
+        BigDecimal totalPartialPaymentAux = calculateTotalPartialPayment();
         BigDecimal totalDiscountAux = calculateTotalDiscounts();
         BigDecimal liquidAmountAux  = BigDecimalUtil.subtract(totalAmountAux, totalDiscountAux);
 
         setTotalAmount(totalAmountAux);
+        setTotalPartialPayment(totalPartialPaymentAux);
         setTotalDiscount(totalDiscountAux);
         setLiquidAmount(liquidAmountAux);
     }
@@ -214,6 +231,16 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
 
         for (RawMaterialDiscount discount : this.discounts) {
             result = BigDecimalUtil.sum(result, discount.getAmount());
+        }
+        return result;
+    }
+
+    public BigDecimal calculateTotalPartialPayment(){
+
+        BigDecimal result = BigDecimal.ZERO;
+
+        for (PartialPaymentRawMaterial paymentDetail : this.partialPaymentRawMaterials) {
+            result = BigDecimalUtil.sum(result, paymentDetail.getAmount());
         }
         return result;
     }

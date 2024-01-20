@@ -9,6 +9,7 @@ import org.hibernate.annotations.Filter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 
 @TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "PartialPaymentRawMaterial.tableGenerator",
@@ -31,6 +32,10 @@ public class PartialPaymentRawMaterial implements Serializable, BaseModel {
 
     @Column(name = "descripcion", nullable = true)
     private String description;
+
+    @Column(name = "fecha")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date;
 
     @Column(name = "monto", precision = 12, scale = 2, nullable = false)
     private BigDecimal amount;
@@ -67,5 +72,39 @@ public class PartialPaymentRawMaterial implements Serializable, BaseModel {
         return company;
     }
 
+    public String getDescription() {
+        return description;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public RawMaterialPayment getRawMaterialPayment() {
+        return rawMaterialPayment;
+    }
+
+    public void setRawMaterialPayment(RawMaterialPayment rawMaterialPayment) {
+        this.rawMaterialPayment = rawMaterialPayment;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 }

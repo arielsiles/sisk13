@@ -173,12 +173,12 @@
                                    tabindex="1006"/>
 
                 <a4j:commandButton id="addPartialPaymentButton"
-                                   action="#{rawMaterialPaymentAction.addPartialPayment ()}"
+                                   action="#{rawMaterialPaymentAction.addPartialPayment()}"
                                    value="#{messages['RawMaterialPayment.addPartialPayment']}"
                                    styleClass="button"
                                    ajaxSingle="true"
                                    immediate="true"
-                                   reRender="discountList"
+                                   reRender="partialPaymentList"
                                    tabindex="1006"/>
             </div>
 
@@ -325,6 +325,16 @@
                             </rich:column>
                             <rich:column styleClass="center">
                                 <h:outputText value="#{partialPaymentItem.date}" />
+                                <rich:calendar id="partialPaymentDate"
+                                               value="#{partialPaymentItem.date}"
+                                               inputClass="inputSmall"
+                                               datePattern="#{messages['patterns.date']}"
+                                               enableManualInput="true"
+                                               tabindex="5">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                       timeZone="#{sessionUser.timeZone}"
+                                                       type="date"/>
+                                </rich:calendar>
                             </rich:column>
                             <rich:column styleClass="center">
                                 <h:inputText id="amount" value="#{partialPaymentItem.amount}" styleClass="inputNumberSmall"

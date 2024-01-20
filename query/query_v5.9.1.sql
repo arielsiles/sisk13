@@ -30,6 +30,7 @@ create table pagoparcialacopiomp
         primary key,
     descripcion             varchar(100)   null,
     monto                   decimal(12, 2) null,
+    fecha            timestamp default CURRENT_TIMESTAMP not null,
     idpagoacopiomp          bigint(20)         null,
     version                 bigint(20)         null,
     idcompania              bigint(20)         null,
