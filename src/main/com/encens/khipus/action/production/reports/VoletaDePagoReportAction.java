@@ -2,13 +2,16 @@ package com.encens.khipus.action.production.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.employees.GeneratedPayrollType;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.GestionPayroll;
 import com.encens.khipus.model.employees.Month;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.reports.GenerationReportData;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.BoletaPagoProductor;
 import com.encens.khipus.service.production.ProductiveZoneService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
@@ -18,6 +21,8 @@ import com.jatun.titus.reportgenerator.util.TypedReportData;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -40,7 +45,10 @@ import java.util.*;
 public class VoletaDePagoReportAction extends GenericReportAction {
     @In
     RawMaterialPayRollService rawMaterialPayRollService;
-
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
     @In
     ProductiveZoneService productiveZoneService;
 
@@ -135,8 +143,16 @@ public class VoletaDePagoReportAction extends GenericReportAction {
     }
 
     private void setParameters(Map params,BoletaPagoProductor boleta){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
         MoneyUtil moneyUtil = new MoneyUtil();
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        params.put("title", companyConfiguration.getTitle());
+        params.put("companyName", companyConfiguration.getCompanyName());
+
         params.put("fecha",new Date());
         params.put("hora",new Date());
         String periodo = "PERIODO DEL " +df.format(dateIni.getTime())+" AL "+df.format(dateEnd.getTime());
