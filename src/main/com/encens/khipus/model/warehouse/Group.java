@@ -55,7 +55,7 @@ public class Group implements BaseModel {
     })
     private CashAccount inventoryCashAccount;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
             @JoinColumn(name = "cta_costo", referencedColumnName = "cuenta", updatable = false, insertable = false)
