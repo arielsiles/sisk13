@@ -497,7 +497,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         voucher.setState(VoucherState.PEN.toString());
         voucherAccoutingService.pendingVoucher(voucher);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.pendingAccountingEntry");
-        return ANNUL_OUTCOME;
+        return Outcome.SUCCESS;
     }
 
     public String approveVoucher(){

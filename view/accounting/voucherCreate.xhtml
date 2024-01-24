@@ -32,7 +32,7 @@
 <div class="buttons">
 
     <h:commandButton action="#{voucherCreateAction.changeVoucherState}"
-                     value="#{messages['Voucher.report.editing.approved']}"
+                     value="#{messages['Voucher.enable']}"
                      styleClass="button"
                      rendered="#{voucherCreateAction.approved and voucherCreateAction.managed and s:hasPermission('ENABLE_EDIT_VOUCHER','VIEW')}"/>
 
