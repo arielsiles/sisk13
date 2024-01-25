@@ -2,7 +2,7 @@
                 xmlns:s="http://jboss.com/products/seam/taglib"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:app="http://encens.com/products/khipus/facelets">
+>
 
 <h:panelGrid columns="2"
              width="100%"
@@ -170,10 +170,10 @@
                              style="width:200px;height:50px;"/>
         </s:decorate>
 
-        <s:decorate id="cashAccountField"
+        <!--<s:decorate id="cashAccountField"
                     template="/include/inputField.xhtml"
                     styleClass="formRow">
-            <ui:param name="required" value="#{true}"/>
+            <ui:param name="required" value="#{false}"/>
             <ui:define name="label">
                 <h:outputText value="#{messages['FinanceProvider.cashAccount']}"/>
             </ui:define>
@@ -196,7 +196,7 @@
                     <app:restriction condition="payableAccount.movementAccount = #{true}"/>
                 </ui:define>
             </app:suggestionBox>
-        </s:decorate>
+        </s:decorate>-->
 
 
     </s:div>

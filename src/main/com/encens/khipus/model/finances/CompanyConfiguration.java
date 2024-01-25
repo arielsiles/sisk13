@@ -638,6 +638,13 @@ public class CompanyConfiguration {
     @Column(name = "doc_oc_pago")
     private String paymentDocumentOC;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cxp_provmn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountPayableSupplier;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1664,5 +1671,13 @@ public class CompanyConfiguration {
 
     public void setPaymentDocumentOC(String paymentDocumentOC) {
         this.paymentDocumentOC = paymentDocumentOC;
+    }
+
+    public CashAccount getAccountPayableSupplier() {
+        return accountPayableSupplier;
+    }
+
+    public void setAccountPayableSupplier(CashAccount accountPayableSupplier) {
+        this.accountPayableSupplier = accountPayableSupplier;
     }
 }

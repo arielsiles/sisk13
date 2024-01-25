@@ -3,14 +3,13 @@ package com.encens.khipus.action.finances;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.EntryNotFoundException;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.finances.FinancesEntity;
-import com.encens.khipus.model.finances.ModuleProviderType;
-import com.encens.khipus.model.finances.Provider;
-import com.encens.khipus.model.finances.ProviderPk;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.FinanceProviderService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.ELEvaluator;
 import com.encens.khipus.util.JSFUtil;
@@ -33,6 +32,9 @@ public class FinanceProviderAction extends GenericAction<Provider> {
 
     @In
     private CashAccountService cashAccountService;
+
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     @In(create = true)
     private ELEvaluator elEvaluator;
@@ -78,6 +80,8 @@ public class FinanceProviderAction extends GenericAction<Provider> {
     public void createFinanceProvider() {
         if (validate(getInstance())) {
             try {
+                CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+                getInstance().setPayableAccountCode(companyConfiguration.getAccountPayableSupplier().getAccountCode());
                 financeProviderService.createProvider(getInstance(), findModuleProviderType());
                 elEvaluator.evaluateMethodBinding(getPostCreateAction());
                 Manager.instance().endConversation(true);
@@ -112,14 +116,14 @@ public class FinanceProviderAction extends GenericAction<Provider> {
                     "FinanceProvider.message.duplicatedAcronym", provider.getEntity().getAcronym());
             valid = false;
         }
-        if (ValidatorUtil.isBlankOrNull(provider.getPayableAccountCode()) ||
+
+        /*if (ValidatorUtil.isBlankOrNull(provider.getPayableAccountCode()) ||
                 provider.getPayableAccount() == null ||
                 !cashAccountService.existsAccount(provider.getPayableAccountCode())) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                     "FinanceProvider.message.cashAccount");
             valid = false;
-        }
-
+        }*/
 
         return valid;
     }
@@ -158,5 +162,16 @@ public class FinanceProviderAction extends GenericAction<Provider> {
         }
 
         return moduleProviderType;
+    }
+
+    private CompanyConfiguration getCompanyConfiguration(){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+            return companyConfiguration;
+        } catch (CompanyConfigurationNotFoundException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");
+            return null;
+        }
     }
 }
