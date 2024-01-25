@@ -21,7 +21,7 @@ create table tipoplantillacontablepredefinida
 
 alter table tipoplantillacontablepredefinida add foreign key (idplantillacontablepredefinida) references plantillacontablepredefinida (idplantillacontablepredefinida);
 
-INSERT INTO terdemol.funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
 VALUES (445, 'ENABLE_EDIT_VOUCHER', null, 5, 1, 'Voucher.report.editing.approved', 1);
 
 create table pagoparcialacopiomp
@@ -44,3 +44,5 @@ create table pagoparcialacopiomp
 
 alter table pagoacopiomp
     add montoparcial decimal(12, 2) null after montodescuento;
+
+update funcionalidad set nombrerecurso = 'Functionality.finances.accounting.enableAccountingEntry' where idfuncionalidad = 445

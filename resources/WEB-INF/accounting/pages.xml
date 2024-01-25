@@ -141,6 +141,11 @@
                 <redirect view-id="/accounting/voucherCreate.xhtml"/>
             </rule>
         </navigation>
+        <navigation from-action="#{voucherCreateAction.changeVoucherState}">
+            <rule if-outcome="Success">
+                <redirect view-id="/accounting/voucherCreate.xhtml"/>
+            </rule>
+        </navigation>
     </page>
 
     <page view-id="/accounting/purchaseBookList.xhtml">
