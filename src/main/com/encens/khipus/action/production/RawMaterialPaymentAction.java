@@ -12,6 +12,8 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -204,6 +206,16 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
             partialPaymentRawMaterials.remove(partialPaymentRawMaterial);
         }else{
             partialPaymentRawMaterials.remove(partialPaymentRawMaterial);
+        }
+        updateTotals();
+    }
+
+    public void updatePartialPaymentTotals(PartialPaymentRawMaterial partialPaymentItem) {
+        if(calculateTotalPartialPayment().compareTo(liquidAmount) >  0){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No se puede liquidar un pago mayor a la deuda(Liquido Pagable).", null));
+            //partialPaymentItem.setAmount(liquidAmount);
+            partialPaymentItem.setAmount(BigDecimal.ZERO);
+            return;
         }
         updateTotals();
     }

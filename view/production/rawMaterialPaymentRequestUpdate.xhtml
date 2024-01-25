@@ -340,7 +340,7 @@
                                              required="true"
                                              tabindex="7">
                                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="amount"/>
-                                    <a4j:support event="onblur" action="#{rawMaterialPaymentAction.updateTotals()}" reRender="amount, totalPartialPayment, liquidAmount"/>
+                                    <a4j:support event="onblur" action="#{rawMaterialPaymentAction.updatePartialPaymentTotals(partialPaymentItem)}" reRender="amount, totalPartialPayment, liquidAmount"/>
                                 </h:inputText>
                             </rich:column>
 
@@ -360,7 +360,7 @@
             </s:div>
 
         </h:form>
-<!--TODO:preguntar como borrar-->
+
         <s:decorate template="/include/modalDialog.xhtml" rendered="#{rawMaterialPaymentAction.managed}">
             <ui:param name="dialogId" value="deleteConfirmation"/>
             <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
