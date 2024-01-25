@@ -17,6 +17,8 @@ public interface RawMaterialPaymentService {
 
     public void deleteRawMaterialPayment(RawMaterialPayment rawMaterialPayment);
 
+    public void deletePartialPayment(PartialPaymentRawMaterial partialPaymentRawMaterial);
+
     public List<RawMaterialPaymentDetail> getPaymentDetails(Long rawMaterialPaymentId);
 
     public List<RawMaterialDiscount> getRawMaterialDiscounts(Long rawMaterialPaymentId);

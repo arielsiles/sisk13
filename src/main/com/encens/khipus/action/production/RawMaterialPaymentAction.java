@@ -24,6 +24,7 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
     private List<RawMaterialPaymentDetail> paymentDetails = new ArrayList<RawMaterialPaymentDetail>();
     private List<CollectMaterial> selectedCollectMaterialItems = new ArrayList<CollectMaterial>();
     private List<RawMaterialDiscount> discounts = new ArrayList<RawMaterialDiscount>();
+    private PartialPaymentRawMaterial partialPaymentToRemove = new PartialPaymentRawMaterial();
 
     private List<PartialPaymentRawMaterial> partialPaymentRawMaterials = new ArrayList<PartialPaymentRawMaterial>();
 
@@ -122,6 +123,14 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
 
     }
 
+    public PartialPaymentRawMaterial getPartialPaymentToRemove() {
+        return partialPaymentToRemove;
+    }
+
+    public void setPartialPaymentToRemove(PartialPaymentRawMaterial partialPaymentToRemove) {
+        this.partialPaymentToRemove = partialPaymentToRemove;
+    }
+
     public boolean isPending(){
         return getInstance().getState().equals(RawMaterialPaymentState.PENDING);
     }
@@ -172,6 +181,7 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
 
     public void addPartialPayment(){
         PartialPaymentRawMaterial partialPaymentRawMaterial = new PartialPaymentRawMaterial();
+        partialPaymentRawMaterial.setDate( new Date());
         partialPaymentRawMaterial.setAmount(BigDecimal.ZERO);
         this.partialPaymentRawMaterials.add(partialPaymentRawMaterial);
     }
@@ -189,9 +199,15 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
 
 
     public void removePartialPayment(PartialPaymentRawMaterial partialPaymentRawMaterial){
-        partialPaymentRawMaterials.remove(partialPaymentRawMaterial);
+        if(partialPaymentRawMaterial.getId() != null){
+            rawMaterialPaymentService.deletePartialPayment(partialPaymentRawMaterial);
+            partialPaymentRawMaterials.remove(partialPaymentRawMaterial);
+        }else{
+            partialPaymentRawMaterials.remove(partialPaymentRawMaterial);
+        }
         updateTotals();
     }
+
     public void updateTotals(){
 
         Double totalW = 0.0;
@@ -204,7 +220,7 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
         BigDecimal totalAmountAux   = calculateTotalAmount(paymentDetails);
         BigDecimal totalPartialPaymentAux = calculateTotalPartialPayment();
         BigDecimal totalDiscountAux = calculateTotalDiscounts();
-        BigDecimal liquidAmountAux  = BigDecimalUtil.subtract(totalAmountAux, totalDiscountAux);
+        BigDecimal liquidAmountAux  = BigDecimalUtil.subtract(totalAmountAux, totalDiscountAux,totalPartialPaymentAux);
 
         setTotalAmount(totalAmountAux);
         setTotalPartialPayment(totalPartialPaymentAux);

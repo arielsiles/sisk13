@@ -97,6 +97,12 @@ public class RawMaterialPaymentServiceBean implements RawMaterialPaymentService 
     }
 
     @Override
+    public void deletePartialPayment(PartialPaymentRawMaterial partialPaymentRawMaterial) {
+        em.remove(partialPaymentRawMaterial);
+        em.flush();
+    }
+
+    @Override
     public List<RawMaterialPaymentDetail> getPaymentDetails(Long rawMaterialPaymentId) {
         try {
             return em.createQuery("select rawMaterialPaymentDetail " +

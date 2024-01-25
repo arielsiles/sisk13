@@ -112,6 +112,7 @@
                         <rich:column>#{messages['RawMaterialPayment.approvalDate']}</rich:column>
                         <rich:column>#{messages['RawMaterialPayment.state']}</rich:column>
                         <rich:column>#{messages['RawMaterialPayment.amount']}</rich:column>
+                        <rich:column>#{messages['RawMaterialPayment.amountPaid']}</rich:column>
                         <rich:column>#{messages['RawMaterialPayment.discounts']}</rich:column>
                         <rich:column>#{messages['RawMaterialPayment.liquid']}</rich:column>
                         <rich:column styleClass="center">
@@ -144,6 +145,12 @@
 
                 <rich:column styleClass="right">
                     <h:outputText value="#{rawMaterialPaymentItem.paymentAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{rawMaterialPaymentItem.partialAmount}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </rich:column>
