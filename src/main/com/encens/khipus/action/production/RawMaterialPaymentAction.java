@@ -211,7 +211,12 @@ public class RawMaterialPaymentAction extends GenericAction<RawMaterialPayment> 
     }
 
     public void updatePartialPaymentTotals(PartialPaymentRawMaterial partialPaymentItem) {
-        if(calculateTotalPartialPayment().compareTo(liquidAmount) >  0){
+        BigDecimal totalAmountAux   = calculateTotalAmount(paymentDetails);
+        BigDecimal totalPartialPaymentAux = calculateTotalPartialPayment();
+        BigDecimal totalDiscountAux = calculateTotalDiscounts();
+        System.out.println("totalAmountAux: " + BigDecimalUtil.subtract(totalAmountAux, totalDiscountAux,totalPartialPaymentAux));
+        System.out.println("resultado: " + BigDecimalUtil.subtract(totalAmountAux, totalDiscountAux,totalPartialPaymentAux).compareTo(BigDecimal.ZERO));
+        if(BigDecimalUtil.subtract(totalAmountAux, totalDiscountAux,totalPartialPaymentAux).compareTo(BigDecimal.ZERO) ==  -1){
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No se puede liquidar un pago mayor a la deuda(Liquido Pagable).", null));
             //partialPaymentItem.setAmount(liquidAmount);
             partialPaymentItem.setAmount(BigDecimal.ZERO);
