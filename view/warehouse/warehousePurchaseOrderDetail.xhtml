@@ -87,7 +87,7 @@
         <h:outputText value="#{warehousePurchaseOrderDetail.detailNumber}"/>
     </s:decorate>
 
-    <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+    <!--<s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">
             <h:outputText value="#{messages['WarehousePurchaseOrderDetail.productItem']}"/>
         </ui:define>
@@ -114,6 +114,31 @@
                 <app:criteriaValue fieldName="providerCode"
                                    value="#{warehousePurchaseOrderAction.purchaseOrder.provider.id.providerCode}"/>
             </ui:define>
+        </app:selectPopUp>
+    </s:decorate>-->
+    <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrderDetail.productItem']}"/>
+        </ui:define>
+        <app:quickSearch id="productItemSearch"
+                         textValue="warehousePurchaseOrderDetail.productItem.productItemCode"
+                         value="#{warehousePurchaseOrderDetail.productItem}"
+                         namedQuery="productItemNoSupplierQuickSearchList"
+                         postSearchAction="#{warehousePurchaseOrderDetailAction.updatePropertiesNoSupplier()}"
+                         reRender="productItemField, purchaseMeasureUnitPanel, unitPricePanel, totalAmountField"
+                         rendered="#{isPurchaseOrderPending}"
+                         tabindex="1"/>
+        <app:selectPopUp id="productItem"
+                         required="true"
+                         textValue="#{warehousePurchaseOrderDetail.productItem.fullName}"
+                         value="#{warehousePurchaseOrderDetail.productItem}"
+                         clearAction="#{warehousePurchaseOrderDetailAction.clearProductItem()}"
+                         searchModalPanel="productItemByProviderListModalPanel"
+                         dataModel="#{productItemSearchDataModel}"
+                         reRender="productItemField, purchaseMeasureUnitPanel, unitPricePanel, totalAmountField"
+                         selectLinkId="selectProductItemButton"
+                         readOnly="#{not isPurchaseOrderPending}"
+                         hotKeySelect="alt+1">
         </app:selectPopUp>
     </s:decorate>
     <s:div id="purchaseMeasureUnitPanel">

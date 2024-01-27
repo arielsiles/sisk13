@@ -336,6 +336,14 @@ public class WarehousePurchaseOrderDetailAction extends GenericAction<PurchaseOr
         getInstance().setTotalAmount(getInstance().getRequestedQuantity() != null ? BigDecimalUtil.multiply(getInstance().getRequestedQuantity(), getInstance().getUnitCost(), 6) : BigDecimal.ZERO);
     }
 
+    public void updatePropertiesNoSupplier() {
+        ProductItem productItem = getInstance().getProductItem();
+
+        getInstance().setPurchaseMeasureUnit(productItem.getUsageMeasureUnit());
+        getInstance().setUnitCost(productItem.getCu());
+        getInstance().setTotalAmount(getInstance().getRequestedQuantity() != null ? BigDecimalUtil.multiply(getInstance().getRequestedQuantity(), getInstance().getUnitCost(), 6) : BigDecimal.ZERO);
+    }
+
     public void clearProductItem() {
         productItemCompanyNumber = null;
         provide = null;
