@@ -65,4 +65,16 @@ public interface WarehousePurchaseOrderDetailService extends GenericService {
             DiscountAmountException,
             DuplicatedPurchaseOrderDetailException,
             PurchaseOrderLiquidatedException;
+
+    void createPurchaseOrderDetailBasic(PurchaseOrderDetail entity, BigDecimal unitPriceByProvider,
+                                   Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailUnderMinimalStockMap,
+                                   Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailOverMaximumStockMap,
+                                   List<PurchaseOrderDetail> purchaseOrderDetailWithoutWarnings)
+            throws PurchaseOrderApprovedException,
+            PurchaseOrderFinalizedException,
+            PurchaseOrderNullifiedException,
+            ConcurrencyException,
+            DiscountAmountException,
+            DuplicatedPurchaseOrderDetailException,
+            PurchaseOrderLiquidatedException;
 }

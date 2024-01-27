@@ -541,21 +541,22 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 BigDecimal amountVAT = BigDecimal.ZERO;
 
                 for (PurchaseDocument purchaseDocument : purchaseOrder.getPurchaseDocumentList()){
-                    amountVAT = BigDecimalUtil.sum(amountVAT, purchaseDocument.getIva());
-                    VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
-                            executorUnitCode,
-                            costCenterCode,
-                            companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
-                            purchaseDocument.getIva(),
-                            FinancesCurrencyType.P,
-                            BigDecimal.ONE);
+                    /** Toma solo facturas Aprobadas **/
+                    if (purchaseDocument.getState().equals(PurchaseDocumentState.APPROVED)) {
+                        amountVAT = BigDecimalUtil.sum(amountVAT, purchaseDocument.getIva());
+                        VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
+                                executorUnitCode,
+                                costCenterCode,
+                                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                                purchaseDocument.getIva(),
+                                FinancesCurrencyType.P,
+                                BigDecimal.ONE);
 
-                    voucherDetail.setPurchaseDocument(purchaseDocument);
-                    voucher.addVoucherDetail(voucherDetail);
-
+                        voucherDetail.setPurchaseDocument(purchaseDocument);
+                        voucher.addVoucherDetail(voucherDetail);
+                    }
                     //purchaseDocument.setVoucherDetailFiscalCredit(voucherDetail);
                     //purchaseDocument.setVoucher(voucher);
-
                 }
                 totalDebitAmount = BigDecimalUtil.sum(totalDebitAmount, amountVAT);
             }

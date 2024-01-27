@@ -55,7 +55,7 @@ public class WarehousePurchaseDocumentAction extends GenericAction<PurchaseDocum
     }
 
     @Override
-    @End(beforeRedirect = true)
+    @Begin(join = true, flushMode = FlushModeType.MANUAL)
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENT','CREATE')}")
     @BusinessUnitRestriction(value = "#{warehousePurchaseOrderAction.instance}")
     public String create() {
@@ -63,7 +63,7 @@ public class WarehousePurchaseDocumentAction extends GenericAction<PurchaseDocum
     }
 
     @Override
-    @End(beforeRedirect = true)
+    @Begin(join = true, flushMode = FlushModeType.MANUAL)
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENT','UPDATE')}")
     @BusinessUnitRestriction(value = "#{warehousePurchaseOrderAction.instance}")
     public String update() {
@@ -82,14 +82,14 @@ public class WarehousePurchaseDocumentAction extends GenericAction<PurchaseDocum
         return purchaseDocumentAction.delete();
     }
 
-    @End(beforeRedirect = true)
+    @Begin(join = true, flushMode = FlushModeType.MANUAL)
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENT','UPDATE')}")
     @BusinessUnitRestriction(value = "#{warehousePurchaseOrderAction.instance}")
     public String approve() {
         return purchaseDocumentAction.approve();
     }
 
-    @End(beforeRedirect = true)
+    @Begin(join = true, flushMode = FlushModeType.MANUAL)
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENT','UPDATE')}")
     @BusinessUnitRestriction(value = "#{warehousePurchaseOrderAction.instance}")
     public String nullify() {

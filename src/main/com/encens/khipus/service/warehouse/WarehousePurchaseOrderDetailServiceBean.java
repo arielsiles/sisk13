@@ -113,6 +113,67 @@ public class WarehousePurchaseOrderDetailServiceBean extends GenericServiceBean 
         }
     }
 
+    public void createPurchaseOrderDetailBasic(PurchaseOrderDetail entity, BigDecimal unitPriceByProvider,
+                                          Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailUnderMinimalStockMap,
+                                          Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailOverMaximumStockMap,
+                                          List<PurchaseOrderDetail> purchaseOrderDetailWithoutWarnings)
+            throws PurchaseOrderApprovedException,
+            PurchaseOrderFinalizedException,
+            PurchaseOrderNullifiedException,
+            ConcurrencyException,
+            DiscountAmountException,
+            DuplicatedPurchaseOrderDetailException,
+            PurchaseOrderLiquidatedException {
+
+        PurchaseOrder purchaseOrder = entity.getPurchaseOrder();
+        PurchaseOrderDetail purchaseOrderDetail = (PurchaseOrderDetail) entity;
+        if (!validateProductItemOnPurchaseOrder(entity)) {
+            throw new DuplicatedPurchaseOrderDetailException("Duplicated product item(" + entity.getProductItemCode() + ") on pruchase order(" + purchaseOrder.getOrderNumber() + ")");
+        }
+
+
+        if (warehousePurchaseOrderService.canChangePurchaseOrder(purchaseOrder)) {
+            Long detailNumber = getNextDetailNumber(purchaseOrder);
+
+            BigDecimal totalAmount = BigDecimalUtil.multiply(entity.getRequestedQuantity(), unitPriceByProvider, 6);
+            entity.setDetailNumber(detailNumber);
+            entity.setUnitCost(unitPriceByProvider);
+            entity.setTotalAmount(totalAmount);
+
+            /**ProductItemByProviderHistory productItemByProviderHistory = productItemByProviderHistoryService.findLastUnitCostByProductItem(purchaseOrder.getProvider(), purchaseOrderDetail.getProductItem(), null);
+            Provide dbProvide = provideService.findByProviderAndProductItem(purchaseOrder.getProvider(), purchaseOrderDetail.getProductItem(), listEm);
+            Provide provide = provideService.findByProviderAndProductItem(purchaseOrder.getProvider(), purchaseOrderDetail.getProductItem(), null);
+            if (purchaseOrderDetail.getUnitCost().compareTo(dbProvide.getGroupAmount()) != 0 && null == purchaseOrderDetail.getProductItemByProviderHistory()) {
+                //update group amount to the corresponding provide
+                provide.setGroupAmount(purchaseOrderDetail.getUnitCost());
+                if (!getEntityManager().contains(provide)) {
+                    getEntityManager().merge(provide);
+                }
+
+                productItemByProviderHistory = new ProductItemByProviderHistory();
+                productItemByProviderHistory.setDate(new Date());
+                productItemByProviderHistory.setProvide(provide);
+                productItemByProviderHistory.setUnitCost(purchaseOrderDetail.getUnitCost());
+                getEntityManager().persist(productItemByProviderHistory);
+                getEntityManager().flush();
+            }
+            entity.setProductItemByProviderHistory(productItemByProviderHistory);
+            */
+            try {
+                // update detail warnings
+                warehousePurchaseOrderService.fillPurchaseOrderDetail(entity,
+                        purchaseOrderDetailUnderMinimalStockMap,
+                        purchaseOrderDetailOverMaximumStockMap,
+                        purchaseOrderDetailWithoutWarnings);
+                super.create(entity);
+            } catch (EntryDuplicatedException e) {
+                throw new RuntimeException("Unexpected error was happen ", e);
+            }
+            getEntityManager().refresh(entity);
+            warehousePurchaseOrderService.updateWarehousePurchaseOrder(purchaseOrder);
+        }
+    }
+
     public PurchaseOrderDetail findPurchaseOrderDetail(Long id) throws PurchaseOrderDetailNotFoundException {
         findInDataBase(id);
         PurchaseOrderDetail purchaseOrderDetail = getEntityManager().find(PurchaseOrderDetail.class, id);
