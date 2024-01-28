@@ -661,9 +661,8 @@
         </navigation>
     </page>
 
-    <page view-id="/warehouse/warehousePurchaseDocument.xhtml"
-          no-conversation-view-id="/warehouse/warehousePurchaseOrderList.xhtml">
-        <navigation>
+    <page view-id="/warehouse/warehousePurchaseDocument.xhtml" no-conversation-view-id="/warehouse/warehousePurchaseOrderList.xhtml">
+        <!--<navigation>
             <rule if-outcome="Success">
                 <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
             </rule>
@@ -673,7 +672,20 @@
             <rule>
                 <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
             </rule>
+        </navigation>-->
+
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/warehousePurchaseDocument.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/warehouse/warehousePurchaseDocument.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>
+            </rule>
         </navigation>
+
     </page>
 
     <page view-id="/warehouse/postWarehouseOutput.xhtml" no-conversation-view-id="/warehouse/warehouseVoucherList.xhtml">

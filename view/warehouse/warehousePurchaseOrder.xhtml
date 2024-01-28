@@ -591,6 +591,22 @@
     </ui:define>
 </s:decorate>
 
+    <s:decorate id="productItemSearchModalPanelContainer"
+                template="/warehouse/productItemSearchModalPanel.xhtml">
+        <ui:param name="containerId" value="productItemSearchModalPanelContainer"/>
+        <ui:param name="dialogId" value="productItemSearchModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               immediate="true"
+                               ajaxSingle="true"
+                               action="#{warehousePurchaseOrderDetailListCreateAction.addProductItemsSearch(productItemSearchDataModel.selectedProductItems)}"
+                               value="#{messages['Common.add']}"
+                               reRender="purchaseOrderDetailsPanel"
+                               styleClass="button"
+                               oncomplete="Richfaces.hideModalPanel('productItemSearchModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
 <s:decorate id="purchaseOrderWithCheckListModalPanelContainer"
             template="/warehouse/warehousePurchaseOrderListModalPanel.xhtml">
     <ui:param name="containerId" value="purchaseOrderWithCheckListModalPanelContainer"/>

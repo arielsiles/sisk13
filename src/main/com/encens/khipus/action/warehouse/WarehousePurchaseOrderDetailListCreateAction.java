@@ -76,6 +76,32 @@ public class WarehousePurchaseOrderDetailListCreateAction implements Serializabl
         }
     }
 
+    public void addProductItemsSearch(List<ProductItem> productItems) {
+        for (ProductItem productItem : productItems) {
+            System.out.println("====> Items1: " +productItem.getFullName());
+            if (selectedProductItems.contains(productItem.getId())) {
+                continue;
+            }
+            System.out.println("====> Items2: " +productItem.getFullName());
+
+            selectedProductItems.add(productItem.getId());
+
+            PurchaseOrderDetail detail = new PurchaseOrderDetail();
+            detail.setProductItem(productItem);
+
+            detail.setPurchaseOrder(warehousePurchaseOrderAction.getPurchaseOrder());
+
+            //putDefaultValuesForSelectedProductItem(detail);
+            //instance.setUnitCost(provide.getGroupAmount());
+            //instance.setPurchaseMeasureUnit(provide.getGroupMeasureUnit());
+
+            detail.setPurchaseMeasureUnit(productItem.getUsageMeasureUnit());
+            updateTotalAmount(detail);
+
+            instances.add(detail);
+        }
+    }
+
     public void putDefaultValuesForSelectedProductItem(PurchaseOrderDetail instance) {
         Provide provide = warehousePurchaseOrderDetailService.findProvideElement(instance.getProductItem(),
                 warehousePurchaseOrderAction.getInstance().getProvider());
