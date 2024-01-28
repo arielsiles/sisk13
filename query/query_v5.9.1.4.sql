@@ -1,4 +1,5 @@
 -- 25.01.2024
+-- Ejecutar solo para Terdemol
 -- To Terdemol - Ejecutado
 -- delete from territoriotrabajo where IDTERRITORIOTRABAJO >= 1;
 -- delete from tipocliente where idtipocliente >= 1;
