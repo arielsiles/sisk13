@@ -80,6 +80,9 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
     private VoucherService voucherService;
 
     @In
+    private InventoryService inventoryService;
+
+    @In
     protected Map<String, String> messages;
 
     @In
@@ -1223,6 +1226,10 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
     private void addAtInventory(WarehouseVoucher warehouseVoucher, Warehouse warehouse, MovementDetail movementDetail) {
 
         Inventory inventory = getInventory(warehouse, movementDetail.getProductItem());
+
+        if (inventory == null)
+            inventory = inventoryService.findInventoryByProductItemCode(movementDetail.getProductItem().getProductItemCode());
+
         System.out.println("-----> inventory: " + inventory);
         if (null == inventory) {
             System.out.println("-----> (null == inventory)");

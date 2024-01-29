@@ -524,7 +524,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
+                    /*cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),*/
+                    cashAccountService.findByAccountCode(detail.getProductItem().getWarehouse().getCashAccount()),
                     detail.getAmount(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE,
@@ -1531,7 +1532,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     executorUnit.getExecutorUnitCode(),
                     costCenterCode,
                     //companyConfiguration.getWarehouseNationalCurrencyAccount(),
-                    cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
+                    //cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
+                    cashAccountService.findByAccountCode(detail.getProductItem().getWarehouse().getCashAccount()),
                     detail.getAmount(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE,

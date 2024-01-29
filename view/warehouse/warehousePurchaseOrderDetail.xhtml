@@ -87,7 +87,8 @@
         <h:outputText value="#{warehousePurchaseOrderDetail.detailNumber}"/>
     </s:decorate>
 
-    <!--<s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+    <!-- Para Articulos x Proveedor
+    <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">
             <h:outputText value="#{messages['WarehousePurchaseOrderDetail.productItem']}"/>
         </ui:define>
@@ -133,7 +134,7 @@
                          textValue="#{warehousePurchaseOrderDetail.productItem.fullName}"
                          value="#{warehousePurchaseOrderDetail.productItem}"
                          clearAction="#{warehousePurchaseOrderDetailAction.clearProductItem()}"
-                         searchModalPanel="productItemByProviderListModalPanel"
+                         searchModalPanel="productItemListModalPanel"
                          dataModel="#{productItemSearchDataModel}"
                          reRender="productItemField, purchaseMeasureUnitPanel, unitPricePanel, totalAmountField"
                          selectLinkId="selectProductItemButton"
@@ -329,8 +330,8 @@
     </ui:define>
 </s:decorate>
 
-<s:decorate id="productItemByProviderListModalPanelContainer"
-            template="/warehouse/productItemByProviderListModalPanel.xhtml">
+<!-- Articulos x Proveedor
+<s:decorate id="productItemByProviderListModalPanelContainer" template="/warehouse/productItemByProviderListModalPanel.xhtml">
     <ui:param name="containerId" value="productItemByProviderListModalPanelContainer"/>
     <ui:param name="dialogId" value="productItemByProviderListModalPanel"/>
     <ui:define name="assignButton">
@@ -342,7 +343,21 @@
                            reRender="productItemField, purchaseMeasureUnitPanel, unitPricePanel, totalAmountField"
                            oncomplete="Richfaces.hideModalPanel('productItemByProviderListModalPanel');document.getElementById('#{rich:clientId(requestedQuantityId)}').focus();"/>
     </ui:define>
-</s:decorate>
+</s:decorate>-->
+
+    <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemListModalPanel.xhtml">
+        <ui:param name="containerId" value="productItemListModalPanelContainer"/>
+        <ui:param name="dialogId" value="productItemListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{warehousePurchaseOrderDetailAction.assignProductItem(productItemItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="productItemField, purchaseMeasureUnitPanel, unitPricePanel, totalAmountField"
+                               oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
 
 
 <!--Set selector Id to enable focus-->

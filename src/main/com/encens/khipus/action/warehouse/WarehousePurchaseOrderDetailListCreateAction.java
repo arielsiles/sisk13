@@ -76,13 +76,12 @@ public class WarehousePurchaseOrderDetailListCreateAction implements Serializabl
         }
     }
 
+    /** Añadir Articulos Sin Proveedor **/
     public void addProductItemsSearch(List<ProductItem> productItems) {
         for (ProductItem productItem : productItems) {
-            System.out.println("====> Items1: " +productItem.getFullName());
             if (selectedProductItems.contains(productItem.getId())) {
                 continue;
             }
-            System.out.println("====> Items2: " +productItem.getFullName());
 
             selectedProductItems.add(productItem.getId());
 
@@ -91,11 +90,8 @@ public class WarehousePurchaseOrderDetailListCreateAction implements Serializabl
 
             detail.setPurchaseOrder(warehousePurchaseOrderAction.getPurchaseOrder());
 
-            //putDefaultValuesForSelectedProductItem(detail);
-            //instance.setUnitCost(provide.getGroupAmount());
-            //instance.setPurchaseMeasureUnit(provide.getGroupMeasureUnit());
-
             detail.setPurchaseMeasureUnit(productItem.getUsageMeasureUnit());
+            detail.setUnitCost(productItem.getCu());
             updateTotalAmount(detail);
 
             instances.add(detail);

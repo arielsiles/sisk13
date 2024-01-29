@@ -225,6 +225,9 @@
             <app:realNumberConverter minimum="0"
                                      pattern="#{messages['patterns.decimalNumber']}"
                                      forId="amountInputText"/>
+            <a4j:support event="onchange"
+                         reRender="amountField"
+                         ajaxSingle="true"/>
         </h:inputText>
         <h:outputText value="#{purchaseDocument.amount}"
                       rendered="#{isReadOnly}">
