@@ -31,6 +31,11 @@
 
 <div class="buttons">
 
+    <h:commandButton action="#{voucherCreateAction.changeVoucherState}"
+                     value="#{messages['Voucher.enable']}"
+                     styleClass="button"
+                     rendered="#{voucherCreateAction.approved and voucherCreateAction.managed and s:hasPermission('ENABLE_EDIT_VOUCHER','VIEW')}"/>
+
     <h:commandButton action="#{voucherCreateAction.annulVoucher}"
                      value="#{messages['Voucher.annul']}"
                      styleClass="button"

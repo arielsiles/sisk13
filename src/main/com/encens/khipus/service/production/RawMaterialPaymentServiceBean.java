@@ -1,9 +1,6 @@
 package com.encens.khipus.service.production;
 
-import com.encens.khipus.model.production.CollectMaterialState;
-import com.encens.khipus.model.production.RawMaterialDiscount;
-import com.encens.khipus.model.production.RawMaterialPayment;
-import com.encens.khipus.model.production.RawMaterialPaymentDetail;
+import com.encens.khipus.model.production.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -22,7 +19,7 @@ public class RawMaterialPaymentServiceBean implements RawMaterialPaymentService 
     private EntityManager em;
 
     @Override
-    public void saveRawMaterialPayment(RawMaterialPayment rawMaterialPayment, List<RawMaterialPaymentDetail> paymentDetails, List<RawMaterialDiscount> discountList) {
+    public void saveRawMaterialPayment(RawMaterialPayment rawMaterialPayment, List<RawMaterialPaymentDetail> paymentDetails, List<RawMaterialDiscount> discountList,List<PartialPaymentRawMaterial> partialPaymentRawMaterials) {
 
         em.merge(rawMaterialPayment);
         em.flush();
@@ -59,6 +56,17 @@ public class RawMaterialPaymentServiceBean implements RawMaterialPaymentService 
 
         }
 
+        for (PartialPaymentRawMaterial partialPaymentRawMaterial : partialPaymentRawMaterials) {
+            partialPaymentRawMaterial.setRawMaterialPayment(rawMaterialPayment);
+            if (em.contains(partialPaymentRawMaterial)){
+                em.merge(partialPaymentRawMaterial);
+                em.flush();
+            } else {
+                em.persist(partialPaymentRawMaterial);
+                em.flush();
+            }
+        }
+
     }
 
     @Override
@@ -89,6 +97,12 @@ public class RawMaterialPaymentServiceBean implements RawMaterialPaymentService 
     }
 
     @Override
+    public void deletePartialPayment(PartialPaymentRawMaterial partialPaymentRawMaterial) {
+        em.remove(partialPaymentRawMaterial);
+        em.flush();
+    }
+
+    @Override
     public List<RawMaterialPaymentDetail> getPaymentDetails(Long rawMaterialPaymentId) {
         try {
             return em.createQuery("select rawMaterialPaymentDetail " +
@@ -110,5 +124,17 @@ public class RawMaterialPaymentServiceBean implements RawMaterialPaymentService 
                     .getResultList();
         } catch (Exception e) { }
         return new ArrayList<RawMaterialDiscount>(0);
+    }
+
+    @Override
+    public List<PartialPaymentRawMaterial> getPartialPaymentRawMaterials(Long rawMaterialPaymentId) {
+        try {
+            return em.createQuery("select partialPaymentRawMaterial " +
+                    "from PartialPaymentRawMaterial partialPaymentRawMaterial " +
+                    "where partialPaymentRawMaterial.rawMaterialPayment.id =:rawMaterialPaymentId ")
+                    .setParameter("rawMaterialPaymentId", rawMaterialPaymentId)
+                    .getResultList();
+        } catch (Exception e) { }
+        return new ArrayList<PartialPaymentRawMaterial>(0);
     }
 }

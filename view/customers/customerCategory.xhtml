@@ -140,49 +140,7 @@
                 </table>
             </c:if>
 
-            <!--<c:if test="#{customerCategoryAction.managed}">
-                        <rich:dataTable id="priceItemListId"
-                                        value="#{priceItemDataModel}"
-                                        var="priceItem"
-                                        rows="#{sessionUser.rowsPerPage}"
-                                        width="100%"
-                                        columnsWidth="10%, 60%, 30%">
-                            <f:facet name="header">
-                                <rich:columnGroup>
-                                    <rich:column>
-                                        <h:outputText value="#{messages['CustomerCategory.productItem.code']}" />
-                                    </rich:column>
 
-                                    <rich:column>
-                                        <h:outputText value="#{messages['CustomerCategory.productItem.name']}" />
-                                    </rich:column>
-
-                                    <rich:column>
-                                        <h:outputText value="#{messages['CustomerCategory.productItem.price']}" />
-                                    </rich:column>
-
-                                </rich:columnGroup>
-                            </f:facet>
-
-                            <rich:column>
-                                <h:outputText value="#{priceItem.productItemCode}"/>
-                            </rich:column>
-
-                            <rich:column>
-                                <h:outputText value="#{priceItem.productItem.name}"/>
-                            </rich:column>
-
-                            <rich:column styleClass="right">
-                                <h:outputText value="#{priceItem.salePrice}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
-                                </h:outputText>
-                            </rich:column>
-
-                        </rich:dataTable>
-                        <app:dataScroller id="ListIdListDataScrollerId"
-                                          for="priceItemListId"
-                                          dataModel="#{priceItemDataModel}"/>
-            </c:if>-->
 
             </s:div>
 

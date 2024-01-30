@@ -684,4 +684,34 @@
         </navigation>
     </page>
 
+    <page view-id="/finances/presetAccountingTemplateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{presetAccountingTemplateAction.select(presetAccountingTemplateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/presetAccountingTemplate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/presetAccountingTemplate.xhtml" no-conversation-view-id="/finances/presetAccountingTemplateList.xhtml">
+        <navigation from-action="#{presetAccountingTemplateAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/finances/presetAccountingTemplate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{presetAccountingTemplateAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/presetAccountingTemplate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{presetAccountingTemplateAction.cancel}">
+            <rule>
+                <redirect view-id="/finances/presetAccountingTemplateList.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+
+
 </pages>

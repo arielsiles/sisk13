@@ -53,6 +53,7 @@ public interface VoucherAccoutingService extends GenericService {
 
     void annulVoucher(Voucher voucher);
 
+    void pendingVoucher(Voucher voucher);
     public Double getBalance(Date startDate, String cashAccountCode);
 
     public Double getBalanceProvider(Date startDate, String cashAccountCode, String providerCode);

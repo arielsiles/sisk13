@@ -563,6 +563,14 @@
                     propagation="none" />
         </rich:menuItem>
 
+        <rich:menuItem submitMode="none"
+                       rendered="#{s:hasPermission('ACCOUNTINGPLAN','VIEW')}"
+                       styleClass="main-menu-item">
+            <s:link view="/finances/presetAccountingTemplateList.xhtml"
+                    value="Planillas contables"
+                    propagation="none" />
+        </rich:menuItem>
+
     </rich:menuGroup>
 
 </rich:dropDownMenu>

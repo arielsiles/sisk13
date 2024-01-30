@@ -307,6 +307,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     }
 
     @Override
+    public void pendingVoucher(Voucher voucher){
+        em.merge(voucher);
+        em.flush();
+    }
+
+    @Override
     public List<VoucherDetail> getVoucherDetailList(String transactionNumber){
 
         List<VoucherDetail> voucherDetails = new ArrayList<VoucherDetail>();
