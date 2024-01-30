@@ -90,6 +90,10 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
 
     }
 
+    public void accounting(){
+
+    }
+
     public void updateProducerPrice(){
         CollectMaterial instance = getInstance();
         //setRawMaterialPrice(instance.getMetaProduct().getPrice());

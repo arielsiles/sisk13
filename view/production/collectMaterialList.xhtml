@@ -106,6 +106,9 @@
             </rich:simpleTogglePanel>
 
             <div class="buttons">
+                <s:button value="#{messages['Production.contabilization']}" view="/production/postRecordCollection.xhtml"
+                          styleClass="button"
+                          propagation="begin" rendered="#{s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE')}"/>
                 <s:button value="#{messages['Common.new']}" view="/production/collectMaterial.xhtml"
                           styleClass="button"
                           propagation="begin" rendered="#{s:hasPermission('MATERIALCOLLECTIONRECORD','CREATE')}"/>

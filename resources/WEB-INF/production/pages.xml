@@ -696,6 +696,19 @@
         </navigation>
     </page>
 
+    <page view-id="/production/postRecordCollection.xhtml" no-conversation-view-id="/production/collectMaterialList.xhtml">
+        <navigation from-action="#{collectMaterialAction.accounting}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/postRecordCollection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/production/collectMaterialList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/production/producerPriceList.xhtml">
         <end-conversation/>
         <navigation from-action="#{producerPriceAction.select(producerPriceItem)}">
