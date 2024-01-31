@@ -86,7 +86,7 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
 
             CashAccount cashAccountDev = companyConfiguration.getGeneralCashAccountNational();
             VoucherDetail supplierAccountOutput = VoucherDetailBuilder.newCreditVoucherDetail(
-                    null, null, companyConfiguration.getCommissionSalesCashAccount(), amount, FinancesCurrencyType.P, BigDecimal.ONE);
+                    null, null, companyConfiguration.getAccountPayableSupplier(), amount, FinancesCurrencyType.P, BigDecimal.ONE);
             supplierAccountOutput.setProviderCode(financesEntity.getIdNumber());
             supplierDetailCashAcounts.add(supplierAccountOutput);
 
