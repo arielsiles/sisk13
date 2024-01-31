@@ -136,6 +136,20 @@
         </framework:restrictions>
     </framework:entity-query>
 
+    <factory name="productItemNoSupplierQuickSearchList" value="#{productItemNoSupplierQuickSearchQuery}"/>
+    <framework:entity-query name="productItemNoSupplierQuickSearchQuery"
+                            ejbql="select productItem from ProductItem productItem">
+        <framework:restrictions>
+            <value>
+                productItem.id.productItemCode = #{quickSearchAction.searchValue}
+            </value>
+            <value>
+                productItem.state =
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}
+            </value>
+        </framework:restrictions>
+    </framework:entity-query>
+
 
     <factory name="productItemByWarehouseQuickSearchList" value="#{productItemByWarehouseQuickSearchQuery}"/>
     <framework:entity-query name="productItemByWarehouseQuickSearchQuery"

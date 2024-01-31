@@ -13,9 +13,21 @@
                  border="0">
         <s:div id="purchaseOrderDetailsPanel">
             <div class="buttons">
+                <a4j:commandButton id="addProductItem1CommandButton"
+                                   action="#{productItemSearchDataModel.reset()}"
+                                   value="#{messages['PurchaseOrderDetail.button.addProductItem']}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   oncomplete="Richfaces.showModalPanel('productItemSearchModalPanel');"
+                                   actionListener="#{selectPopUpAction.select}"
+                                   rendered="#{not empty warehousePurchaseOrderAction.instance.provider}"
+                                   reRender="productItemSearchModalPanel">
+                    <f:attribute name="dataModelObject" value="#{productItemSearchDataModel}"/>
+                </a4j:commandButton>
+
                 <a4j:commandButton id="addProductItemCommandButton"
                                    action="#{provideSearchDataModel.reset()}"
-                                   value="#{messages['PurchaseOrderDetail.button.addProductItem']}"
+                                   value="#{messages['PurchaseOrderDetail.button.addProductItemByProvider']}"
                                    styleClass="button"
                                    immediate="true"
                                    oncomplete="Richfaces.showModalPanel('productItemsByProviderListModalPanel');"

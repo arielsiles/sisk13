@@ -14,6 +14,7 @@ import com.encens.khipus.model.finances.Provide;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.purchases.PurchaseOrderDetail;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.service.warehouse.WarehousePurchaseOrderDetailService;
 import com.encens.khipus.service.warehouse.WarehousePurchaseOrderService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -48,6 +49,9 @@ public class WarehousePurchaseOrderDetailAction extends GenericAction<PurchaseOr
 
     @In(value = "warehousePurchaseOrderAction")
     private WarehousePurchaseOrderAction warehousePurchaseOrderAction;
+
+    @In
+    private ProductItemService productItemService;
 
     private Provide provide;
 
@@ -317,12 +321,21 @@ public class WarehousePurchaseOrderDetailAction extends GenericAction<PurchaseOr
     }
 
     public void assignProductItem(ProductItem productItem) {
-        productItemCompanyNumber = productItem.getId().getCompanyNumber();
-        provide = warehousePurchaseOrderDetailService.findProvideElement(productItem, getPurchaseOrder().getProvider());
+        //productItemCompanyNumber = productItem.getId().getCompanyNumber();
+        //provide = warehousePurchaseOrderDetailService.findProvideElement(productItem, getPurchaseOrder().getProvider());
+        //getInstance().setProductItem(productItem);
+        //getInstance().setPurchaseMeasureUnit(provide.getGroupMeasureUnit());
+        //getInstance().setUnitCost(provide.getGroupAmount());
+        //getInstance().setTotalAmount(getInstance().getRequestedQuantity() != null ? BigDecimalUtil.multiply(getInstance().getRequestedQuantity(), getInstance().getUnitCost(), 6) : BigDecimal.ZERO);
+
         getInstance().setProductItem(productItem);
-        getInstance().setPurchaseMeasureUnit(provide.getGroupMeasureUnit());
-        getInstance().setUnitCost(provide.getGroupAmount());
-        getInstance().setTotalAmount(getInstance().getRequestedQuantity() != null ? BigDecimalUtil.multiply(getInstance().getRequestedQuantity(), getInstance().getUnitCost(), 6) : BigDecimal.ZERO);
+
+        if (provide != null) {
+            updateProperties();
+        } else {
+            updatePropertiesNoSupplier();
+        }
+
     }
 
     public void updateProperties() {
@@ -333,6 +346,16 @@ public class WarehousePurchaseOrderDetailAction extends GenericAction<PurchaseOr
 
         getInstance().setPurchaseMeasureUnit(provide.getGroupMeasureUnit());
         getInstance().setUnitCost(provide.getGroupAmount());
+        getInstance().setTotalAmount(getInstance().getRequestedQuantity() != null ? BigDecimalUtil.multiply(getInstance().getRequestedQuantity(), getInstance().getUnitCost(), 6) : BigDecimal.ZERO);
+    }
+
+    /** Para Articulos Sin Proveedor **/
+    public void updatePropertiesNoSupplier() {
+        //ProductItem productItem = getInstance().getProductItem();
+        ProductItem productItem = productItemService.findProductItemByCode(getInstance().getProductItem().getProductItemCode());
+
+        getInstance().setPurchaseMeasureUnit(productItem.getUsageMeasureUnit());
+        getInstance().setUnitCost(productItem.getCu());
         getInstance().setTotalAmount(getInstance().getRequestedQuantity() != null ? BigDecimalUtil.multiply(getInstance().getRequestedQuantity(), getInstance().getUnitCost(), 6) : BigDecimal.ZERO);
     }
 

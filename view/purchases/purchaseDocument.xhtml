@@ -36,18 +36,18 @@
                      rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"/>
     <h:commandButton id="updateButtonId"
                      action="#{action.update}"
-                     value="#{messages['Common.save']}"
+                     value="#{messages['Common.saveChange']}"
                      styleClass="button"
                      rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}">
         <s:defaultAction/>
     </h:commandButton>
-    <h:commandButton id="postApprovedUpdateButtonId"
+    <!--<h:commandButton id="postApprovedUpdateButtonId"
                      action="#{action.postApprovedUpdate}"
                      value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{isPostApprovedUpdate}">
         <s:defaultAction/>
-    </h:commandButton>
+    </h:commandButton>-->
     <h:commandButton action="#{action.cancel}"
                      value="#{messages['Common.cancel']}"
                      styleClass="button"
@@ -225,6 +225,9 @@
             <app:realNumberConverter minimum="0"
                                      pattern="#{messages['patterns.decimalNumber']}"
                                      forId="amountInputText"/>
+            <a4j:support event="onchange"
+                         reRender="amountField"
+                         ajaxSingle="true"/>
         </h:inputText>
         <h:outputText value="#{purchaseDocument.amount}"
                       rendered="#{isReadOnly}">
@@ -475,15 +478,15 @@
                      rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"
                      tabindex="16"/>
     <h:commandButton action="#{action.update}"
-                     value="#{messages['Common.save']}"
+                     value="#{messages['Common.saveChange']}"
                      styleClass="button"
                      rendered="#{action.managed and isPurchaseDocumentPending and s:hasPermission('PURCHASEDOCUMENT','UPDATE')}"
                      tabindex="17"/>
-    <h:commandButton action="#{action.postApprovedUpdate}"
+    <!--<h:commandButton action="#{action.postApprovedUpdate}"
                      value="#{messages['Common.save']}"
                      styleClass="button"
                      rendered="#{isPostApprovedUpdate}"
-                     tabindex="18"/>
+                     tabindex="18"/>-->
     <h:commandButton action="#{action.cancel}"
                      value="#{messages['Common.cancel']}"
                      styleClass="button"

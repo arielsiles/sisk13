@@ -200,7 +200,12 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
             buildValidateQuantityMappings(purchaseOrderDetail);
         }
         try {
+            /** Crea tomando en cuenta Proveedor, History
             service.create(getInstance(), detailListCreateAction.getInstances(),
+                    purchaseOrderDetailUnderMinimalStockMap,
+                    purchaseOrderDetailOverMaximumStockMap,
+                    purchaseOrderDetailWithoutWarnings);*/
+            service.createBasic(getInstance(), detailListCreateAction.getInstances(),
                     purchaseOrderDetailUnderMinimalStockMap,
                     purchaseOrderDetailOverMaximumStockMap,
                     purchaseOrderDetailWithoutWarnings);

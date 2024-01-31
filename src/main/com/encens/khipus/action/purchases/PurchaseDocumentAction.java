@@ -142,6 +142,8 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
             updateAdjustmentValues();
             purchaseDocumentService.createDocument(getInstance());
             addCreatedMessage();
+            setOp(OP_UPDATE);
+            setInstance(getInstance());
             return Outcome.SUCCESS;
         } catch (PurchaseDocumentException e) {
             addPurchaseDocumentErrorMessages(e.getErrorTypes());
@@ -192,6 +194,7 @@ public class PurchaseDocumentAction extends GenericAction<PurchaseDocument> {
     public String update() {
         try {
             updateAdjustmentValues();
+            setOp(OP_UPDATE);
             purchaseDocumentService.updateDocument(getInstance());
             addUpdatedMessage();
             return Outcome.SUCCESS;

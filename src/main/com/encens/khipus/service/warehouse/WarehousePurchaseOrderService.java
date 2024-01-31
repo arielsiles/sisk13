@@ -28,6 +28,12 @@ import java.util.Map;
  */
 @Local
 public interface WarehousePurchaseOrderService extends PurchaseOrderService {
+    void createBasic(Object entity, List<PurchaseOrderDetail> purchaseOrderDetails,
+                     Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailUnderMinimalStockMap,
+                     Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailOverMaximumStockMap,
+                     List<PurchaseOrderDetail> purchaseOrderDetailWithoutWarnings)
+            throws EntryDuplicatedException,
+            DuplicatedPurchaseOrderDetailException;
     void create(Object entity, List<PurchaseOrderDetail> purchaseOrderDetails,
                 Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailUnderMinimalStockMap,
                 Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailOverMaximumStockMap,

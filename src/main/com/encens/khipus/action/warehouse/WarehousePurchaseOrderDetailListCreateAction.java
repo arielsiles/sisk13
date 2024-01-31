@@ -76,6 +76,28 @@ public class WarehousePurchaseOrderDetailListCreateAction implements Serializabl
         }
     }
 
+    /** Añadir Articulos Sin Proveedor **/
+    public void addProductItemsSearch(List<ProductItem> productItems) {
+        for (ProductItem productItem : productItems) {
+            if (selectedProductItems.contains(productItem.getId())) {
+                continue;
+            }
+
+            selectedProductItems.add(productItem.getId());
+
+            PurchaseOrderDetail detail = new PurchaseOrderDetail();
+            detail.setProductItem(productItem);
+
+            detail.setPurchaseOrder(warehousePurchaseOrderAction.getPurchaseOrder());
+
+            detail.setPurchaseMeasureUnit(productItem.getUsageMeasureUnit());
+            detail.setUnitCost(productItem.getCu());
+            updateTotalAmount(detail);
+
+            instances.add(detail);
+        }
+    }
+
     public void putDefaultValuesForSelectedProductItem(PurchaseOrderDetail instance) {
         Provide provide = warehousePurchaseOrderDetailService.findProvideElement(instance.getProductItem(),
                 warehousePurchaseOrderAction.getInstance().getProvider());

@@ -196,6 +196,55 @@ public class WarehousePurchaseOrderServiceBean extends PurchaseOrderServiceBean 
         }
     }
 
+    public void createBasic(Object entity, List<PurchaseOrderDetail> purchaseOrderDetails,
+                       Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailUnderMinimalStockMap,
+                       Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailOverMaximumStockMap,
+                       List<PurchaseOrderDetail> purchaseOrderDetailWithoutWarnings)
+            throws EntryDuplicatedException,
+            DuplicatedPurchaseOrderDetailException {
+        create(entity);
+        PurchaseOrder purchaseOrder = (PurchaseOrder) entity;
+        for (PurchaseOrderDetail purchaseOrderDetail : purchaseOrderDetails) {
+            try {
+                purchaseOrderDetail.setPurchaseOrder((PurchaseOrder) entity);
+                //Provide dbProvide = provideService.findByProviderAndProductItem(purchaseOrder.getProvider(), purchaseOrderDetail.getProductItem(), eventEm);
+                //Provide provide = provideService.findByProviderAndProductItem(purchaseOrder.getProvider(), purchaseOrderDetail.getProductItem(), null);
+                //ProductItemByProviderHistory productItemByProviderHistory = productItemByProviderHistoryService.findLastUnitCostByProductItem(provide.getProvider(), provide.getProductItem(), null);
+                /*if (productItemByProviderHistory == null || purchaseOrderDetail.getUnitCost().compareTo(dbProvide.getGroupAmount()) != 0) {
+                    *//*update group amount to the corresponding provide *//*
+                    provide.setGroupAmount(purchaseOrderDetail.getUnitCost());
+                    if (!getEntityManager().contains(provide)) {
+                        getEntityManager().merge(provide);
+                    }
+
+                    productItemByProviderHistory = new ProductItemByProviderHistory();
+                    productItemByProviderHistory.setDate(new Date());
+                    productItemByProviderHistory.setProvide(provide);
+                    productItemByProviderHistory.setUnitCost(purchaseOrderDetail.getUnitCost());
+                    getEntityManager().persist(productItemByProviderHistory);
+                    getEntityManager().flush();
+                }
+                purchaseOrderDetail.setProductItemByProviderHistory(productItemByProviderHistory);*/
+                purchaseOrderDetailService.createPurchaseOrderDetailBasic(purchaseOrderDetail, purchaseOrderDetail.getUnitCost(),
+                        purchaseOrderDetailUnderMinimalStockMap,
+                        purchaseOrderDetailOverMaximumStockMap,
+                        purchaseOrderDetailWithoutWarnings);
+            } catch (PurchaseOrderApprovedException e) {
+                //this exception never happen because the purchase order ist created
+            } catch (PurchaseOrderFinalizedException e) {
+                //this exception never happen because the purchase order ist created
+            } catch (PurchaseOrderNullifiedException e) {
+                //this exception never happen because the purchase order ist created
+            } catch (ConcurrencyException e) {
+                //this exception never happen because the purchase order ist created
+            } catch (DiscountAmountException e) {
+                //this exception never happen because the purchase order ist created
+            } catch (PurchaseOrderLiquidatedException e) {
+                //this exception never happen because the purchase order ist created
+            }
+        }
+    }
+
     public PurchaseOrder updateTotalAmountFields(PurchaseOrder purchaseOrder) {
         BigDecimal netTotalAmount = calculatePurchaseOrderNetTotalAmount(purchaseOrder);
         BigDecimal discountPercentage = purchaseOrder.getDiscountPercent();
