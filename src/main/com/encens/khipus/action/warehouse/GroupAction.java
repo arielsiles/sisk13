@@ -111,8 +111,16 @@ public class GroupAction extends GenericAction<Group> {
         getInstance().setInventoryAccount(null);
     }
 
+    public void clearCostAccount() {
+        getInstance().setCostAccount(null);
+    }
+
     public void assignInventoryAccount(CashAccount cashAccount) {
         getInstance().setInventoryAccount(cashAccount.getAccountCode());
+    }
+
+    public void assignCostAccount(CashAccount cashAccount) {
+        getInstance().setCostAccount(cashAccount.getAccountCode());
     }
 
     private String validate(String accountCode) {

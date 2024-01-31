@@ -26,10 +26,7 @@ import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 
@@ -1078,7 +1075,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "from ventas v " +
                 "where v.fecha between :startDate and :endDate " +
                 "and v.cod_alm =:cod_alm " +
-                "and v.idtipopedido in (1, 5) " +
+                "and v.idtipopedido in (1, 5, 9) " +
                 "group by v.cod_art ")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
@@ -1367,8 +1364,14 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 }
             }
         }
-        voucherDebit.setDebit(totalCost);
-        saveVoucher(voucher);
+
+        if (totalCost.compareTo(BigDecimal.ZERO) > 0){
+            voucherDebit.setDebit(totalCost);
+            saveVoucher(voucher);
+        } else {
+            voucher.setDetails(null);
+            voucher = null;
+        }
     }
 
     public void createVoucherDetailForCostOfSales(List<Object[]> sales, Voucher voucher, Warehouse warehouse, Date startDate, Date endDate)throws CompanyConfigurationNotFoundException {
@@ -1413,8 +1416,16 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 }
             }
         }
-        voucherDebit.setDebit(totalCost);
-        saveVoucher(voucher);
+        if (totalCost.compareTo(BigDecimal.ZERO) > 0){
+            voucherDebit.setDebit(totalCost);
+            saveVoucher(voucher);
+        } else {
+            voucher.setDetails(null);
+            voucher = null;
+        }
+
+        //voucherDebit.setDebit(totalCost);
+        //saveVoucher(voucher);
     }
 
     public void createCostOfSale_VeterinaryProducts(Date startDate, Date endDate) throws CompanyConfigurationNotFoundException {
@@ -1573,33 +1584,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "GROUP BY z.cod_art")
                 .setParameter("month", month).setParameter("gestion", gestion).setParameter("startDate", startDate).setParameter("endDate", endDate).getResultList();
 
-        System.out.println("----------CALCULANDO--UNITCOST--PT------------");
+
         for (Object[] product : productList){
             String codArt = (String) product[0];
             BigDecimal unitCost = (BigDecimal) product[1];
             result.put(codArt, unitCost);
-            /** Uncomment for test **/
-            System.out.println("----> MAP PRODUCT: |" + codArt + "|" + unitCost);
         }
-        System.out.println("---------------END------------");
-
-        //result.put("148", result.get("151")); // EDAM
-        //result.put("150", result.get("151")); // FRESCO
-        //result.put("643", result.get("118")); // FLUIDA // revisar, calcular cuando producen
-        //result.put("761", result.get("139")); // BEBIDA LACTEA FERMENTADA 100ML (FRUTILLA)/139 - YOGURT SACHET FRUTILLA 120 CC /
-        //result.put("760", result.get("154")); // BEBIDA LACTEA FERMENTADA 100ML (DURAZNO)/154 - YOGURT SACHET DURAZNO 120 CC
-        //result.put("762", result.get("157")); // BEBIDA LACTEA FERMENTADA 100ML (COCO)/154 - YOGURT SACHET COCO 120 CC
-        //result.put("763", result.get("588")); // 763-BEBIDA LACTEA 120ML (MANZANA) / 588 - ILFRUT MANZANA 120 ML
-        //result.put("764", result.get("589")); // 764-BEBIDA LACTEA 120ML (DURAZNO) / 589 - ILFRUT DURAZNO 120 ML
-
-        //if (result.get("643") == null)              // 643-LECHE FLUIDA UHT 946 ML
-        //    result.put("643", result.get("118"));   // 118-LECHE UHT 950ML
-
-        /*if (result.get("704") == null) //704-YOG BEBIBLE FAMILIAR DURAZNO 1L
-            result.put("704", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L
-
-        if (result.get("705") == null) //705-YOG BEBIBLE FAMILIAR coco 1L
-            result.put("705", result.get("703")); //703-YOG BEBIBLE FAMILIAR FRUTILLA 1L*/
 
         if (result.get("668") == null) //668-YOGURT BEBIBLE 1L DURAZNO
             result.put("668", result.get("704")); //704-YOG BEBIBLE FAMILIAR DURAZNO 1L
@@ -1618,11 +1608,35 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         result.put("521", BigDecimal.ZERO);
         result.put("693", BigDecimal.ZERO);
 
+        System.out.println("\n\n");
+        System.out.println("=============== LISTA C.U. INICIAL =============== ");
+        for (Map.Entry<String, BigDecimal> entry : result.entrySet()) {
+            String cod_art = entry.getKey();
+            BigDecimal value = entry.getValue();
+            System.out.println("======>>: " + cod_art + " - " + value);
+        }
+        /*for (Object[] product : productList){
+            String codArt = (String) product[0];
+            BigDecimal unitCost = (BigDecimal) product[1];
+            System.out.println("====> MAP PRODUCT: |" + codArt + "|" + unitCost);
+        }*/
+        System.out.println("===============END===============");
+
         /** Adicionando lista de productos equivalentes (Productos agencia) **/
         List<ProductItem> productItemEqList = getProductItemEqList();
+        System.out.println("=====> Añadiendo Produtos de Agencia : " + productItemEqList.size());
         for (ProductItem productItem : productItemEqList){
+            System.out.println("=====> Add Eq: " + productItem.getProductItemCodeEq() + " - " + result.get(productItem.getProductItemCode()));
             result.put(productItem.getProductItemCodeEq(), result.get(productItem.getProductItemCode()));
         }
+
+        System.out.println("=============== LISTA C.U. FINAL =============== ");
+        for (Map.Entry<String, BigDecimal> entry : result.entrySet()) {
+            String cod_art = entry.getKey();
+            BigDecimal value = entry.getValue();
+            System.out.println("======>>: " + cod_art + " >> " + value);
+        }
+        System.out.println("===============END===============");
 
         return result;
     }

@@ -238,6 +238,9 @@ public class ProductItemAction extends GenericAction<ProductItem> {
 
     public void assignSubGroup(SubGroup subGroup) {
         getInstance().setSubGroup(subGroup);
+
+        if (subGroup.getGroup().getCostCashAccount() != null)
+            assignProductItemAccount(subGroup.getGroup().getCostCashAccount());
     }
 
     public void assignWarehouse(Warehouse warehouse) {

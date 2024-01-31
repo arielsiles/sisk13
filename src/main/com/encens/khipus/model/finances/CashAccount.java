@@ -2,7 +2,6 @@ package com.encens.khipus.model.finances;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
-import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.customers.CreditState;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.FormatUtils;
@@ -30,7 +29,7 @@ import java.util.List;
         @NamedQuery(name = "CashAccount.findByActiveAccount", query = "select ca from CashAccount ca where ca.accountCode=:accountCode and ca.active=:active")
 })
 @Entity
-@EntityListeners({CompanyNumberListener.class, UpperCaseStringListener.class})
+@EntityListeners({CompanyNumberListener.class})
 @Table(name = "arcgms", schema = Constants.FINANCES_SCHEMA)
 public class CashAccount implements BaseModel {
 

@@ -32,7 +32,7 @@ public class SubGroupSearchDataModel extends QueryDataModel<SubGroupPK, SubGroup
 
     @Create
     public void init() {
-        sortProperty = "subGroup.name";
+        sortProperty = "subGroup.group.name, subGroup.name";
     }
 
     @Override

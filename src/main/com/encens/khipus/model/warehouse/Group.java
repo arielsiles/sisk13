@@ -44,12 +44,23 @@ public class Group implements BaseModel {
     @Length(max = 31)
     private String inventoryAccount;
 
+    @Column(name = "cta_costo", nullable = true, length = 31)
+    @Length(max = 31)
+    private String costAccount;
+
     @ManyToOne(optional = false)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
             @JoinColumn(name = "cuenta_inv", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount inventoryCashAccount;
+
+    @ManyToOne(optional = true)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cta_costo", referencedColumnName = "cuenta", updatable = false, insertable = false)
+    })
+    private CashAccount costCashAccount;
 
     @Version
     @Column(name = "version")
@@ -118,5 +129,21 @@ public class Group implements BaseModel {
 
     public String getFullName() {
         return getGroupCode() + " - " + getName();
+    }
+
+    public String getCostAccount() {
+        return costAccount;
+    }
+
+    public void setCostAccount(String costAccount) {
+        this.costAccount = costAccount;
+    }
+
+    public CashAccount getCostCashAccount() {
+        return costCashAccount;
+    }
+
+    public void setCostCashAccount(CashAccount costCashAccount) {
+        this.costCashAccount = costCashAccount;
     }
 }

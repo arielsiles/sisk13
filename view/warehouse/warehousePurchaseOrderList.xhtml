@@ -247,7 +247,7 @@
                 <app:commandSortHeader sortProperty="warehousePurchaseOrder.date"
                                        dataModel="#{warehousePurchaseOrderDataModel}"
                                        reRender="purchaseOrderList, dataScroller">
-                    #{messages['WarehousePurchaseOrder.date']}
+                    #{messages['WarehousePurchaseOrder.receptionDate']}
                 </app:commandSortHeader>
             </rich:column>
             <rich:column>
@@ -293,9 +293,9 @@
     <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
         <h:outputText value="#{purchaseOrderItem.payConditions.name}"/>
     </rich:column>
-    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
-        <h:outputText value="#{purchaseOrderItem.date}">
-            <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+    <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}, center">
+        <h:outputText value="#{purchaseOrderItem.receptionDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
                                timeZone="#{sessionUser.timeZone}"
                                type="date"/>
         </h:outputText>

@@ -65,6 +65,7 @@ public class FinanceProviderServiceBean extends GenericServiceBean implements Fi
     @TransactionAttribute(REQUIRES_NEW)
     public void createProvider(Provider provider, ModuleProviderType moduleProviderType) throws EntryDuplicatedException, ConcurrencyException {
         FinancesEntity financesEntity = provider.getEntity();
+        financesEntity.setAcronym(financesEntity.getAcronym().trim());
         super.create(financesEntity);
         provider.setEntity(financesEntity);
         provider.setId(new ProviderPk(Constants.defaultCompanyNumber, financesEntity.getId().toString()));
