@@ -24,4 +24,6 @@ public interface FinanceProviderService extends GenericService {
     Boolean validateAcronym(FinancesEntity financesEntity);
 
     Provider findById(ProviderPk id) throws EntryNotFoundException;
+
+    FinancesEntity findByIdNumber(String idNumber);
 }

@@ -6,6 +6,7 @@ import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -55,6 +56,10 @@ public class CollectMaterial implements Serializable, BaseModel {
     @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
     private CollectMaterialState state = CollectMaterialState.PEN;
+
+    @Column(name = "conta", nullable = false)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private Boolean accountigFlag = Boolean.FALSE;
 
     @Column(name = "chofer", nullable = false)
     private String driver;
@@ -241,4 +246,11 @@ public class CollectMaterial implements Serializable, BaseModel {
         return id != null ? id.hashCode() : 0;
     }
 
+    public Boolean getAccountigFlag() {
+        return accountigFlag;
+    }
+
+    public void setAccountigFlag(Boolean accountigFlag) {
+        this.accountigFlag = accountigFlag;
+    }
 }

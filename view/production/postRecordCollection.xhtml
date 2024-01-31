@@ -18,13 +18,13 @@
 
             <rich:panel>
                 <f:facet name="header">
-                    #{messages['WarehouseVoucher.postWarehouseOutput.title']}
+                    #{messages['CollectMaterial.acountingState']}
                 </f:facet>
 
                 <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Reports.kardex.movement.startDate']}</ui:define>
                     <rich:calendar id="startDate"
-                                   value="#{warehouseVoucherAction.startDate}"
+                                   value="#{collectMaterialAction.startDate}"
                                    datePattern="#{messages['patterns.date']}"
                                    enableManualInput="true"
                                    required="true"
@@ -38,7 +38,7 @@
                 <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Reports.kardex.movement.endDate']}</ui:define>
                     <rich:calendar id="endDate"
-                                   value="#{warehouseVoucherAction.endDate}"
+                                   value="#{collectMaterialAction.endDate}"
                                    datePattern="#{messages['patterns.date']}"
                                    enableManualInput="true"
                                    required="true"
@@ -56,9 +56,9 @@
                     <h:commandButton action="#{collectMaterialAction.cancel}" value="#{messages['Common.cancel']}"
                                      styleClass="button" immediate="true"/>
 
-                    <h:commandButton id="postWharehouseOutputId" styleClass="button"
+                    <h:commandButton id="postRecordCollectionId" styleClass="button"
                                      value="#{messages['Common.accounting']}"
-                                     action="#{warehouseVoucherAction.postWarehouseOuput}"
+                                     action="#{collectMaterialAction.accounting}"
                                      tabindex="2">
                     </h:commandButton>
 

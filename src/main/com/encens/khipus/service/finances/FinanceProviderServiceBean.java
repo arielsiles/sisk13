@@ -40,6 +40,18 @@ public class FinanceProviderServiceBean extends GenericServiceBean implements Fi
         }
     }
 
+    @Override
+    public FinancesEntity findByIdNumber(String idNumber) {
+        FinancesEntity entity;
+        try {
+             entity = (FinancesEntity) getEntityManager().createQuery("SELECT e FROM FinancesEntity e WHERE e.idNumber = :idNumber")
+                    .setParameter("idNumber", idNumber).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+        return entity;
+    }
+
     public Boolean validateAcronym(FinancesEntity financesEntity) {
         Long count = (Long) (financesEntity.getId() == null ?
                 eventEm.createNamedQuery("FinancesEntity.countByAcronym")

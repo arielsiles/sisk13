@@ -45,4 +45,7 @@ create table pagoparcialacopiomp
 alter table pagoacopiomp
     add montoparcial decimal(12, 2) null after montodescuento;
 
-update funcionalidad set nombrerecurso = 'Functionality.finances.accounting.enableAccountingEntry' where idfuncionalidad = 445
+update funcionalidad set nombrerecurso = 'Functionality.finances.accounting.enableAccountingEntry' where idfuncionalidad = 445;
+/** tarea: contabilizar acopios**/
+alter table acopiomp
+    add conta int null after estado;

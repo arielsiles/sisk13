@@ -2,6 +2,7 @@ package com.encens.khipus.action.production;
 
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
+import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.employees.Employee;
@@ -9,12 +10,16 @@ import com.encens.khipus.model.production.CollectMaterial;
 import com.encens.khipus.model.production.CollectMaterialState;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.warehouse.WarehouseVoucher;
+import com.encens.khipus.service.production.CollectMaterialService;
 import com.encens.khipus.service.production.ProducerPriceService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 @Name("collectMaterialAction")
 @Scope(ScopeType.CONVERSATION)
@@ -24,8 +29,14 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
     private ProductiveZone productiveZone;
     private BigDecimal rawMaterialPrice = BigDecimal.ZERO;
 
+    private Date startDate = new Date();
+    private Date endDate  = new Date();
+
     @In
     private ProducerPriceService producerPriceService;
+
+    @In
+    private CollectMaterialService collectMaterialService;
 
     @Factory(value = "collectMaterial", scope = ScopeType.STATELESS)
     public CollectMaterial initCollectMaterial() {
@@ -66,6 +77,30 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
         return outcome;
     }
 
+    public String update(CollectMaterial collectMaterial) {
+        Long currentVersion = (Long) getVersion(collectMaterial);
+        try {
+            getService().update(collectMaterial);
+        } catch (EntryDuplicatedException e) {
+            addDuplicatedMessage();
+            setVersion(getInstance(), currentVersion);
+            return Outcome.REDISPLAY;
+        } catch (ConcurrencyException e) {
+            concurrencyLog();
+            try {
+                setInstance(getService().findById(getEntityClass(), getId(getInstance()), true));
+            } catch (EntryNotFoundException e1) {
+                entryNotFoundLog();
+                addNotFoundMessage();
+                return Outcome.FAIL;
+            }
+            addUpdateConcurrencyMessage();
+            return Outcome.REDISPLAY;
+        }
+        addUpdatedMessage();
+        return Outcome.SUCCESS;
+    }
+
     @End
     public String approve(){
 
@@ -90,8 +125,23 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
 
     }
 
-    public void accounting(){
+    public String accounting(){
+        List<CollectMaterial> collectMaterialList = collectMaterialService.findCollectMaterialNoAccounting( this.startDate, this.endDate);
+        String outcome = Outcome.FAIL;
+        if (collectMaterialList.size() > 0) {
+            outcome = collectMaterialService.createCollectMaterialListAccounting(collectMaterialList,startDate,endDate);
+            for( CollectMaterial collectMaterial:collectMaterialList){
+                collectMaterial.setAccountigFlag(Boolean.TRUE); //set flag for accounting
+                // collectMaterial
+                update(collectMaterial);
+            }
+        }else{
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "No se encontraron registros para contabilizar");
+        }
+        if (outcome.equals(Outcome.SUCCESS))
+            addCreatedMessage();
 
+        return outcome;
     }
 
     public void updateProducerPrice(){
@@ -159,5 +209,21 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
     protected void addApprovedMessage() {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
                 "Common.message.approved", getDisplayPropertyValue());
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 }
