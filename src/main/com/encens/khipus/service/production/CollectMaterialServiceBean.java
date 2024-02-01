@@ -20,9 +20,7 @@ import org.jboss.seam.international.StatusMessage;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Stateless
 @Name("collectMaterialService")
@@ -86,15 +84,15 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             VoucherDetail supplierAccountOutput = VoucherDetailBuilder.newCreditVoucherDetail(
                     null, null, companyConfiguration.getAccountPayableSupplier(), amount, FinancesCurrencyType.P, BigDecimal.ONE);
 
-            voucher.getDetails().add(supplierAccountOutput);
+            //voucher.getDetails().add(supplierAccountOutput);
 
             supplierAccountOutput.setProviderCode(financesEntity.getId().toString());
-            //supplierDetailCashAcounts.add(supplierAccountOutput);
+            supplierDetailCashAcounts.add(supplierAccountOutput);
             //voucher.getDetails().add(voucherDetailDev);
 
         }
 
-        /*Collections.sort(supplierDetailCashAcounts, new Comparator<VoucherDetail>() {
+        Collections.sort(supplierDetailCashAcounts, new Comparator<VoucherDetail>() {
             @Override
             public int compare(VoucherDetail o1, VoucherDetail o2) {
                 return o1.getAccount().compareTo(o2.getAccount());
@@ -103,7 +101,7 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
 
         for (VoucherDetail voucherDetail:supplierDetailCashAcounts){
             voucher.getDetails().add(voucherDetail);
-        }*/
+        }
 
         voucher.setDate(new Date());
         voucherAccoutingService.saveVoucher(voucher);
