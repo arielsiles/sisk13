@@ -57,8 +57,9 @@
                                      styleClass="button" immediate="true"/>
 
                     <h:commandButton id="postRecordCollectionId" styleClass="button"
-                                     value="#{messages['Common.accounting']}"
+                                     value="#{messages['Production.contabilization']}"
                                      action="#{collectMaterialAction.accounting}"
+                                     rendered="#{s:hasPermission('ACCOUNTING_COLLECTMATERIAL','VIEW')}"
                                      tabindex="2">
                     </h:commandButton>
 
