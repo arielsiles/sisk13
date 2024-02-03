@@ -47,5 +47,9 @@ alter table pagoacopiomp
 
 update funcionalidad set nombrerecurso = 'Functionality.finances.accounting.enableAccountingEntry' where idfuncionalidad = 445;
 /** tarea: contabilizar acopios**/
-alter table acopiomp
-    add conta int null after estado;
+alter table acopiomp add conta int null after estado;
+
+update acopiomp a set a.conta = 0 where a.conta is null;
+update acopiomp a set a.estado = 'APR' where a.estado = 'PEN';
+update acopiomp a set a.estado = 'APR' where a.estado = 'LIQ';
+update acopiomp a set a.estado = 'APR' where a.estado = 'PAY';
