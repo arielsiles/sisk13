@@ -97,7 +97,7 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
             addUpdateConcurrencyMessage();
             return Outcome.REDISPLAY;
         }
-        addUpdatedMessage();
+        //addUpdatedMessage();
         return Outcome.SUCCESS;
     }
 
@@ -139,7 +139,7 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "No se encontraron registros para contabilizar");
         }
         if (outcome.equals(Outcome.SUCCESS))
-            addCreatedMessage();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "se contabilizó correctamente");
 
         return outcome;
     }
