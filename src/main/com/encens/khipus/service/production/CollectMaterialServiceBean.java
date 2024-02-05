@@ -7,10 +7,7 @@ import com.encens.khipus.model.production.CollectMaterial;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.FinanceProviderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
-import com.encens.khipus.util.BigDecimalUtil;
-import com.encens.khipus.util.Constants;
-import com.encens.khipus.util.VoucherBuilder;
-import com.encens.khipus.util.VoucherDetailBuilder;
+import com.encens.khipus.util.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -57,7 +54,11 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
     @Override
     public String createCollectMaterialListAccounting(List<CollectMaterial> collectMaterialList , Date startDate, Date endDate) {
         String result = Outcome.FAIL;
-        String gloss = "INGRESO ALMACEN DE MATERIAS PRIMAS DEL " +  startDate + " AL " + endDate;
+        String gloss = "";
+        if ( startDate.compareTo(endDate) == 0 )
+            gloss = "INGRESO ALMACEN DE MATERIAS PRIMAS DEL " + DateUtils.format(startDate, "dd/MM/yyyy");
+        else
+            gloss = "INGRESO ALMACEN DE MATERIAS PRIMAS DEL " + DateUtils.format(startDate, "dd/MM/yyyy") + " AL " + DateUtils.format(endDate, "dd/MM/yyyy");
 
         Voucher voucher = VoucherBuilder.newGeneralVoucher(null, gloss);
         voucher.setDocumentType(Constants.IA_VOUCHER_DOCTYPE);
@@ -68,7 +69,6 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
 
         for (CollectMaterial colMat:collectMaterialList) {
             financesEntity = financeProviderService.findByIdNumber(colMat.getProducer().getIdNumber());
-            System.out.println("----> financesEntity: " + financesEntity.getIdNumber());
 
             CashAccount warehouseCashAccount = colMat.getMetaProduct().getProductItem().getWarehouse().getWarehouseCashAccount();
             BigDecimal aux = BigDecimalUtil.divide(colMat.getBalanceWeight(),BigDecimalUtil.toBigDecimal(1000));
