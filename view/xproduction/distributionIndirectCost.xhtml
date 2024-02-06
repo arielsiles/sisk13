@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets" xmlns:a4j="http://richfaces.org/a4j"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['ProductionPlan.indirectCostDistribution']}</ui:define>
+<ui:param name="bodyWidth" value="50%"/>
+<ui:param name="selectedTab" value="production"/>
+<ui:define name="body">
+
+<h:form id="productionPlanForm">
+
+    <div class="buttons">
+        <h:commandButton action="#{productionPlanAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"
+                         tabindex="4">
+        </h:commandButton>
+    </div>
+
+    <rich:panel id="formPanel">
+
+        <f:facet name="header">#{messages['ProductionPlan.indirectCostDistribution']}</f:facet>
+
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+            <s:div>
+                <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                    <h:selectOneMenu id="gestion"
+                                     value="#{productionPlanAction.gestion}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{gestionList}"
+                                       var="gestion"
+                                       label="#{gestion.year}"
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Month.month']}</ui:define>
+                    <h:selectOneMenu id="month"
+                                     value="#{productionPlanAction.month}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="3">
+
+                        <s:selectItems value="#{monthsEnum}" var="month"
+                                       label="#{messages[month.resourceKey]}"
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+
+                <s:decorate id="totalIndirectCostField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionPlan.totalIndirectCost']}</ui:define>
+                    <h:outputText id="totalIndirectCost"
+                                  value="#{productionPlanAction.totalIndirectCost}"
+                                  styleClass="input">
+                        <app:realNumberConverter forId="totalIndirectCost" pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+
+                <s:decorate id="amountTransferButtonField" template="/include/inputField.xhtml" styleClass="formRow">
+
+                    <a4j:commandButton action="#{productionPlanAction.calculateTotalInditectCost()}"
+                                       value="#{messages['CashSale.calculate']}"
+                                       reRender="totalIndirectCostField,amountTransferButtonField"
+                                       styleClass="button"
+                                       tabindex="1">
+                    </a4j:commandButton>
+
+                    <a4j:commandButton value="#{messages['Common.process']}"
+                                       styleClass="button"
+                                       disabled="#{productionPlanAction.indirectCostProcesssed()}"
+                                       tabindex="2">
+                        <rich:componentControl for="processConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                    </a4j:commandButton>
+
+                    <a4j:commandButton value="#{messages['Common.accounting']}"
+                                       styleClass="button"
+                                       disabled="#{productionPlanAction.indirectCostAccounting()}"
+                                       tabindex="3">
+                        <rich:componentControl for="accountingConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+            </s:div>
+
+        </h:panelGrid>
+    </rich:panel>
+
+
+</h:form>
+
+    <s:decorate template="/include/modalDialog.xhtml" >
+        <ui:param name="dialogId" value="processConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['ProductionPlan.process.indirectCostDistribution.confirmation']}" />
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{productionPlanAction.processIndirectCostDistribution()}"
+                               value="#{messages['Common.process']}"
+                               immediate="true"
+                               styleClass="button"
+                               reRender="amountTransferButtonField"
+                               tabindex="1000">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </a4j:commandButton>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate template="/include/modalDialog.xhtml" >
+        <ui:param name="dialogId" value="accountingConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['ProductionPlan.process.accounting.confirmation']}" />
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{productionPlanAction.accountingProduction()}"
+                               value="#{messages['Common.process']}"
+                               immediate="true"
+                               styleClass="button"
+                               reRender="amountTransferButtonField"
+                               tabindex="1000">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </a4j:commandButton>
+        </ui:define>
+    </s:decorate>
+
+</ui:define>
+</ui:composition>

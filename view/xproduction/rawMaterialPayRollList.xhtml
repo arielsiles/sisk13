@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['RawMaterialPayRoll.list']}</ui:define>
+<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="body">
+    <h:form id="rawMaterialPayRollSearch">
+        <rich:simpleTogglePanel label="#{messages['RawMaterialPayRoll.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" columnClasses="top-aligned">
+
+                <s:div>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['RawMaterialCollectionSession.productiveZoneName']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRollDataModel.privateCriteria.productiveZone.name}"
+                                     maxlength="50" tabindex="1" styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['RawMaterialCollectionSession.productiveZoneGroup']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRollDataModel.privateCriteria.productiveZone.group}"
+                                     maxlength="50" tabindex="2" styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define
+                                name="label">#{messages['RawMaterialCollectionSession.productiveZoneNumber']}</ui:define>
+                        <h:inputText value="#{rawMaterialPayRollDataModel.privateCriteria.productiveZone.number}"
+                                     maxlength="50" tabindex="3" styleClass="input">
+                        </h:inputText>
+                    </s:decorate>
+
+                </s:div>
+
+                <s:div>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRoll.startDate']}</ui:define>
+                        <rich:calendar value="#{rawMaterialPayRollDataModel.privateCriteria.startDate}"
+                                       tabindex="5" styleClass="input">
+                        </rich:calendar>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRoll.endDate']}</ui:define>
+                        <rich:calendar value="#{rawMaterialPayRollDataModel.privateCriteria.endDate}"
+                                       tabindex="6" styleClass="input">
+                        </rich:calendar>
+                    </s:decorate>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialCollectionSession.state']}</ui:define>
+                        <h:selectOneMenu id="state"
+                                         value="#{rawMaterialPayRollDataModel.privateCriteria.state}"
+                                         styleClass="inputMedium"
+                                         tabindex="4">
+                            <s:selectItems value="#{statePayRollCollectionEnum}"
+                                           var="element"
+                                           label="#{messages[element.value]}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </h:selectOneMenu>
+
+                        <a4j:commandButton action="#{rawMaterialPayRollDataModel.search}"
+                                           reRender="rawMaterialPayRollList, dataScroller"
+                                           styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                           tabindex="7">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+
+                </s:div>
+
+
+            </h:panelGrid>
+
+        </rich:simpleTogglePanel>
+
+        <div class="buttons">
+            <s:button value="#{messages['RawMaterialPayRoll.new']}" action="#{rawMaterialPayRollAction.startNew}"
+                      styleClass="button"
+                      propagation="none" rendered="#{s:hasPermission('RAWMATERIALPAYROLL','CREATE')}"/>
+
+            <s:button value="#{messages['RawMaterialPayRoll.approve']}" action="#{rawMaterialPayRollAction.startNewApprove}"
+                      styleClass="button"
+                      propagation="none" rendered="#{s:hasPermission('RAWMATERIALPAYROLL','CREATE')}"/>
+
+            <!-- <s:button value="#{messages['Common.new']}" action="#{rawMaterialPayRollAction.generateResumen}" styleClass="button"
+            propagation="none" rendered="#{s:hasPermission('RAWMATERIALPAYROLL','VIEWRESUMENRAWMATERILPAYROLL')}" />
+            -->
+        </div>
+
+        <rich:dataTable value="#{rawMaterialPayRollDataModel}" var="rawMaterialPayRollItem" id="rawMaterialPayRollList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%" columnsWidth="30%, 30%">
+
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                            #{messages['RawMaterialPayRoll.productiveZone.fullName']}
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="rawMaterialPayRoll.startDate"
+                                               dataModel="#{rawMaterialPayRollDataModel}"
+                                               reRender="rawMaterialPayRollList, dataScroller">
+                            #{messages['RawMaterialPayRoll.startDate']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="rawMaterialPayRoll.endDate"
+                                               dataModel="#{rawMaterialPayRollDataModel}"
+                                               reRender="rawMaterialPayRollList,dataScroller">
+                            #{messages['RawMaterialPayRoll.endDate']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="rawMaterialPayRoll.state" dataModel="#{rawMaterialPayRollDataModel}"
+                                               reRender="rawMaterialPayRollList,dataScroller">
+                            #{messages['RawMaterialPayRoll.state']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.action']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{rawMaterialPayRollItem.productiveZone.getFullName()}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rawMaterialPayRollItem.startDate}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{rawMaterialPayRollItem.endDate}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText
+                        value="#{rawMaterialPayRollItem.state == 'PENDING'
+                            ? messages['RawMaterialCollectionSession.state.pending']
+                            : messages['RawMaterialCollectionSession.state.approved']}"
+                        />
+
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:commandLink value="#{messages['Common.select']}"
+                               action="#{rawMaterialPayRollAction.select(rawMaterialPayRollItem)}">
+                </h:commandLink>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="rawMaterialPayRollList" dataModel="#{rawMaterialPayRollDataModel}"/>
+
+        <rich:jQuery selector="#rawMaterialPayRollList tr"
+                     query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+        <rich:jQuery selector="#rawMaterialPayRollList tr"
+                     query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+        <div class="buttons">
+            <s:button value="#{messages['RawMaterialPayRoll.new']}" action="#{rawMaterialPayRollAction.startNew}"
+                      styleClass="button"
+                      rendered="#{s:hasPermission('RAWMATERIALPAYROLL','CREATE')}"/>
+            <!-- <s:button value="#{messages['Common.new']}" action="#{rawMaterialPayRollAction.generateResumen}" styleClass="button"
+            propagation="none" rendered="#{s:hasPermission('RAWMATERIALPAYROLL','VIEWRESUMENRAWMATERILPAYROLL')}" />
+            -->
+        </div>
+
+    </h:form>
+
+</ui:define>
+</ui:composition>

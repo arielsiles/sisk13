@@ -1,0 +1,267 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{productionTransferLogAction.managed}">
+                #{messages['ProductionTransferLog.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductionTransferLog.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <style type="text/css" >
+            .messageStyle {
+                color: brown;
+                font-size: small;
+                font-style: italic;
+            }
+        </style>
+
+        <h:form id="productionTransferLogForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{productionTransferLogAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!productionTransferLogAction.managed and s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{productionTransferLogAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productionTransferLogAction.managed and s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','UPDATE')
+                                             and (productionTransferLog.state eq 'DRAFT')}"
+                                 tabindex="2"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{productionTransferLogAction.managed and s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','DELETE')
+                                             and (productionTransferLog.state eq 'DRAFT')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{productionTransferLogAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{productionTransferLogAction.managed}">
+                            #{messages['ProductionTransferLog.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ProductionTransferLog.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <h:panelGrid columns="2" width="100%">
+                    <s:decorate id="deliveredDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ProductionTransferLog.deliveredDate']}</ui:define>
+                        <h:inputText id="deliveredDate"
+                                     value="#{productionTransferLog.deliveredDate}"
+                                     required="true" maxlength="200" styleClass="input" tabindex="5" readonly="true">
+                        </h:inputText>
+                    </s:decorate>
+                    <c:if test="#{productionTransferLogAction.managed}">
+                        <s:decorate id="stateField" template="/include/viewField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionTransferLog.state']}</ui:define>
+                            <h:outputText value="#{productionTransferLog.state eq 'DRAFT' ? messages['ProductionTransferLogState.draft'] :
+                                                (productionTransferLog.state eq 'DELIVERED' ? messages['ProductionTransferLogState.delivered'] :
+                                                messages['ProductionTransferLogState.received'])}"></h:outputText>
+                        </s:decorate>
+                    </c:if>
+                    <c:if test="#{productionTransferLog.state eq 'RECEIVED'}">
+                        <s:decorate id="receivedDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionTransferLog.receivedDate']}</ui:define>
+                            <h:inputText id="receivedDate"
+                                         value="#{productionTransferLog.receivedDate}" readonly="true"
+                                         required="false" maxlength="50" styleClass="input" tabindex="5">
+                            </h:inputText>
+                        </s:decorate>
+                    </c:if>
+                </h:panelGrid>
+
+                <rich:spacer height="10" />
+                <a4j:commandButton id="selectProductionOrder" ajaxSingle="true" immediate="true" tabindex="2"
+                                 onclick="Richfaces.showModalPanel('productionOrderModalPanel');"
+                                 value = "#{messages['Common.add']}" rendered="#{!productionTransferLogAction.managed}">
+                </a4j:commandButton>
+                <c:if test="#{productionTransferLogAction.managed}">
+                    <s:link id="outputProductionTransferLog" target="_blank" view="/production/reportOutputProductionTransferLog.xhtml">
+                        <f:param name="id" value="#{productionTransferLog.id}"/>
+                        <h:graphicImage value="/img/report-icon.png"/>
+                    </s:link>
+                    <rich:toolTip value="#{messages['ProductionTransferLog.report.outputTooltip']}" for="outputProductionTransferLog"/>
+                </c:if>
+
+            </rich:panel>
+            <rich:spacer height="10" />
+            <rich:dataTable value="#{productionTransferLog.incomingProductionOrderList}" var="incomingProductionOrderItem"
+                            id="incomingProductionOrderList" width="100%" columnsWidth="10%,10%,8%,8%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['IncommingProductionOrder.processedProduct']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['IncomingProductionOrder.productionOrderCode']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['IncomingProductionOrder.producedAmount']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['IncomingProductionOrder.deliveredAmount']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['IncomingProductionOrder.deliveredObservation']}
+                        </rich:column>
+                        <rich:column rendered="#{productionTransferLog.state eq 'RECEIVED'}">
+                            #{messages['IncomingProductionOrder.receivedAmount']}
+                        </rich:column>
+                        <rich:column rendered="#{productionTransferLog.state eq 'RECEIVED'}">
+                            #{messages['IncomingProductionOrder.receivedObservation']}
+                        </rich:column>
+                        <rich:column rendered="#{!productionTransferLogAction.managed}">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{incomingProductionOrderItem.outputProductionVoucher.processedProduct.name}" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{incomingProductionOrderItem.outputProductionVoucher.productionOrder.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{incomingProductionOrderItem.outputProductionVoucher.producedAmount}"/>
+                </rich:column>
+                <rich:column>
+                    <c:choose>
+                        <c:when test="#{!productionTransferLogAction.managed}">
+                            <h:inputText id="deliveredAmount" required="true" value="#{incomingProductionOrderItem.deliveredAmount}"
+                                         style="width:90%;">
+                                <a4j:support ajaxSingle="true" event="onblur" />
+                            </h:inputText>
+                            <rich:message for="deliveredAmount" styleClass="messageStyle"/>
+                        </c:when>
+                        <c:otherwise>
+                            <h:outputText  value="#{incomingProductionOrderItem.deliveredAmount}"/>
+                        </c:otherwise>
+                    </c:choose>
+
+                </rich:column>
+                <rich:column>
+                    <c:choose>
+                        <c:when test="#{!productionTransferLogAction.managed}">
+                            <h:inputTextarea id="deliveredObservation" value="#{incomingProductionOrderItem.deliveredObservation}"
+                                             style="width:95%;" required="false">
+                                <a4j:support ajaxSingle="true" event="onblur"/>
+                            </h:inputTextarea>
+                            <rich:message for="deliveredObservation" styleClass="messageStyle"/>
+                        </c:when>
+                        <c:otherwise>
+                            <h:outputText value="#{incomingProductionOrderItem.deliveredObservation}"/>
+                        </c:otherwise>
+                    </c:choose>
+                </rich:column>
+                <rich:column rendered="#{productionTransferLog.state eq 'RECEIVED'}">
+                    <h:outputText value="#{incomingProductionOrderItem.finishedGoodsInventory.amount}"/>
+                </rich:column>
+                <rich:column rendered="#{productionTransferLog.state eq 'RECEIVED'}">
+                    <h:outputText value="#{incomingProductionOrderItem.receivedObservation}" />
+                </rich:column>
+                <rich:column rendered="#{!productionTransferLogAction.managed}">
+                    <a4j:commandLink value="#{messages['Common.remove']}"
+                                     action="#{productionTransferLogAction.remove(incomingProductionOrderItem)}"
+                                     rendered="#{!productionTransferLogAction.managed}"
+                                     reRender="incomingProductionOrderList"/>
+                </rich:column>
+            </rich:dataTable>
+
+            <div class="buttons">
+                <h:commandButton action="#{productionTransferLogAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!productionTransferLogAction.managed and s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','CREATE')}"
+                                 tabindex="18"/>
+
+                <h:commandButton action="#{productionTransferLogAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productionTransferLogAction.managed and s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','UPDATE')
+                                             and (productionTransferLog.state eq 'DRAFT')}"
+                                 tabindex="2"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{productionTransferLogAction.managed and s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','DELETE')
+                                             and (productionTransferLog.state eq 'DRAFT')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{productionTransferLogAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" tabindex="21" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{productionTransferLogAction.managed and s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductionTransferLog.delete.confirmation']}">
+                        <f:param value="#{productionTransferLog.deliveredDate}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{productionTransferLogAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('DELIVERPRODUCTIONTRANSFERLOG','DELETE')}"
+                                   tabindex="1000"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="productionOrderModalPanelContainer" template="/production/productionOrderModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['ProductionTransferLog.searchProductionOrder']}" />
+            <ui:param name="searchPanelTitle" value="#{messages['ProductionTransferLog.searchProductionOrder']}" />
+            <ui:param name="dialogId" value="productionOrderModalPanel"/>
+            <ui:param name="dataModel" value="#{deliverableProductionOrdersDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{productionTransferLogAction.selectOutputProductionVoucher(outputProductionVoucherItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   ajaxSingle="true" reRender="incomingProductionOrderList"
+                                   oncomplete="Richfaces.hideModalPanel('productionOrderModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,102 @@
+<rich:modalPanel height="450" width="700" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}" onshow="focusFirstElement();">
+
+    <f:facet name="header"> <h:outputText value="#{listTitle}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="metaProductListForm">
+        <rich:simpleTogglePanel label="#{searchPanelTitle}" switchType="client">
+            <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MetaProduct.name']}</ui:define>
+                <h:inputText id="name" value="#{dataModel.criteria.name}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1" />
+            </s:decorate>
+            <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MetaProduct.code']}</ui:define>
+                <h:inputText id="code" value="#{dataModel.criteria.code}"
+                             maxlength="100" styleClass="input"
+                             tabindex="2"/>
+                <a4j:commandButton action="#{dataModel.search}"
+                                   reRender="metaProductList, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="5">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </s:decorate>
+        </rich:simpleTogglePanel>
+
+        <rich:spacer height="10" width="10" />
+
+        <rich:dataTable value="#{dataModel}" var="dataItem" id="metaProductList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="40%, 40%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="#{nameSortProperty}"
+                                               dataModel="#{dataModel}"
+                                               reRender="metaProductList, dataScroller">
+                            #{messages['MetaProduct.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column rendered="#{showMeasureUnit}">
+                        <app:commandSortHeader sortProperty="#{measureUnitSortProperty}"
+                                               dataModel="#{dataModel}"
+                                               reRender="metaProductList, dataScroller">
+                            #{messages['MetaProduct.measureUnit']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="#{codeSortProperty}"
+                                               dataModel="#{dataModel}"
+                                               reRender="metaProductList, dataScroller">
+                            #{messages['MetaProduct.code']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{dataItem.name}"/>
+            </rich:column>
+            <rich:column rendered="#{showMeasureUnit}">
+                <h:outputText value="#{dataItem.productItem.usageMeasureCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{dataItem.code}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="metaProductList" dataModel="#{dataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+
+    <rich:jQuery selector="#metaProductList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+    <rich:jQuery selector="#metaProductList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+    <!--
+    <c:set var="firstInputToFocusId" value="#{dialogId}-idNumber"/>
+    <script type="text/javascript">
+        function focusFirstElement() {
+            document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+        }
+    </script>
+    -->
+
+</rich:modalPanel>
+

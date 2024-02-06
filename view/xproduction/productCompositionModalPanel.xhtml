@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <rich:modalPanel id="productCompositionModalPanel" autosized="true" width="450">
+        <f:facet name="header">
+            <h:outputText value="#{messages['ProductComposition.selectProcessedProduct']}" />
+        </f:facet>
+        <f:facet name="controls">
+            <h:panelGroup>
+                <h:graphicImage value="/img/close.png" id="hidelink" styleClass="hidelink" />
+                <rich:componentControl for="productCompositionModalPanel" attachTo="hidelink" operation="hide" event="onclick" />
+            </h:panelGroup>
+        </f:facet>
+
+        <rich:messages style="color:red;"></rich:messages>
+
+        <h:form id="processedProductForm">
+            <a4j:outputPanel ajaxRendered="true">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductComposition.processedProduct']}</ui:define>
+                    <h:selectOneMenu id="InputType"
+                                     value="#{productCompositionAction.processedProduct}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="6">
+                        <s:selectItems value="#{processedProductList}" var="accesory"
+                                       label="#{accesory.code} - #{accesory.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <h:commandButton value="#{messages['Common.select']}"
+                                 actionListener="#{productCompositionAction.processedProductSelected}"
+                                 styleClass="button"
+                                 id="startCreateNewButton">
+                </h:commandButton>
+            </a4j:outputPanel>
+        </h:form>
+
+    </rich:modalPanel>
+</ui:composition>

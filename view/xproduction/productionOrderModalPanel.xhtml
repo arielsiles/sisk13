@@ -1,0 +1,114 @@
+<rich:modalPanel height="450" width="800" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}" onshow="focusFirstElement();">
+
+    <f:facet name="header">
+        <h:outputText value="#{listTitle}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="productionOrderListForm">
+        <rich:simpleTogglePanel label="#{searchPanelTitle}" switchType="client">
+            <h:panelGrid columns="2" width="100%">
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.startDate']}</ui:define>
+                    <rich:calendar id="startDate" value="#{dataModel.privateCriteria.startDate}"
+                                   styleClass="input" tabindex="1" />
+                </s:decorate>
+                <s:decorate id="productField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.processedProductName']}</ui:define>
+                    <h:inputText id="name" value="#{dataModel.privateCriteria.processedProduct.name}" maxlength="100"
+                                 styleClass="input" tabindex="1" />
+                </s:decorate>
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.endDate']}</ui:define>
+                    <rich:calendar id="endDate" value="#{dataModel.privateCriteria.endDate}"
+                                   styleClass="input" tabindex="1" />
+                </s:decorate>
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.code']}</ui:define>
+                    <h:inputText id="code" value="#{dataModel.criteria.code}" maxlength="100"
+                                 styleClass="input" tabindex="1" />
+                    <a4j:commandButton action="#{dataModel.search}" reRender="productionOrderList, dataScroller"
+                                       styleClass="button" value="#{messages['Common.search']}" id="searchButtonId" tabindex="5">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+
+        <rich:spacer height="10" width="10" />
+
+        <rich:dataTable value="#{dataModel}" var="outputProductionVoucherItem" id="productionOrderList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="30%, 25%, 15%, 20%, 10%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="productionOrder.productComposition.processedProduct.name"
+                                               productionOrderDataModel="#{dataModel}"
+                                               reRender="productionOrderList, dataScroller">
+                            #{messages['ProductionOrder.processedProductName']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="productionOrder.code"
+                                               productionOrderDataModel="#{dataModel}"
+                                               reRender="productionOrderList, dataScroller">
+                            #{messages['ProductionOrder.productionOrderCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                            #{messages['OutputProductionVoucher.producedAmount']}
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="productionOrder.productionPlanning.date"
+                                               productionOrderDataModel="#{dataModel}"
+                                               reRender="productionOrderList, dataScroller">
+                            #{messages['ProductionOrder.date']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        #{messages['Common.select']}
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{outputProductionVoucherItem.processedProduct.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{outputProductionVoucherItem.productionOrder.code}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{outputProductionVoucherItem.producedAmount}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{outputProductionVoucherItem.productionOrder.productionPlanning.date}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="productionOrderList" productionOrderDataModel="#{dataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+    </h:form>
+
+    <rich:jQuery selector="#productionOrderList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+    <rich:jQuery selector="#productionOrderList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+    <c:set var="firstInputToFocusId" value="code"/>
+    <script type="text/javascript">
+        function focusFirstElement() {
+            document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();
+        }
+    </script>
+</rich:modalPanel>
+

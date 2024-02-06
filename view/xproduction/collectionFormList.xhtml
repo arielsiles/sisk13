@@ -1,0 +1,156 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['CollectionForm.list']}</ui:define>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+
+        <h:form id="collectionFormSearch">
+            <rich:simpleTogglePanel label="#{messages['CollectionForm.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectionForm.startDate']}</ui:define>
+                    <rich:calendar value="#{collectionFormDataModel.privateCriteria.startDate}"/>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectionForm.endDate']}</ui:define>
+                    <rich:calendar value="#{collectionFormDataModel.privateCriteria.endDate}"/>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectionForm.state']}</ui:define>
+                    <h:selectOneMenu id="state"
+                                     value="#{collectionFormDataModel.privateCriteria.state}"
+                                     styleClass="inputMedium"
+                                     tabindex="3">
+                        <s:selectItems value="#{collectionFormStateEnum}"
+                                       var="element"
+                                       label="#{messages[element.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                    <a4j:commandButton action="#{collectionFormDataModel.search}"
+                                       reRender="collectionFormList, dataScroller"
+                                       styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                       tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+
+                <rich:jQuery selector="#startDate" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <h:commandButton
+                        styleClass="button"
+                        value="#{messages['Common.new']}"
+                        action="#{collectionFormAction.startCreate}"
+                        >
+                </h:commandButton>
+            </div>
+
+            <rich:dataTable id="collectionFormList"
+                            value="#{collectionFormDataModel}"
+                            var="collectionFormItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="20%, 20%, 20%, 20%, 20%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="collectionForm.date"
+                                                   dataModel="#{collectionFormDataModel}"
+                                                   reRender="collectionFormList, dataScroller">
+                                #{messages['CollectionForm.date']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="collectionForm.metaProduct.name"
+                                                   dataModel="#{collectionFormDataModel}"
+                                                   reRender="collectionFormList, dataScroller">
+                                #{messages['CollectionForm.rawMaterial']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            #{messages['CollectionForm.collectedAmount']}
+                        </rich:column>
+                        <!--<rich:column>
+                            #{messages['CollectionForm.availableAmount']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['CollectionForm.usedAmount']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['CollectionForm.remainingAmount']}
+                        </rich:column>-->
+                        <rich:column>
+                            #{messages['CollectionForm.state']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{collectionFormItem.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{collectionFormItem.metaProduct.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{collectedRawMaterialCalculator.calculateCollectedAmount(collectionFormItem)}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <!--<rich:column>
+                    <h:outputText
+                            value="#{collectedRawMaterialCalculator.calculateAvailableAmount(collectionFormItem)}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{collectedRawMaterialCalculator.calculateUsedAmount(collectionFormItem)}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{collectedRawMaterialCalculator.calculateRemainingAmount()}"/>
+                </rich:column>-->
+                <rich:column>
+                    <h:outputText value="#{messages[collectionFormItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{collectionFormAction.select(collectionFormItem)}">
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="collectionFormList" dataModel="#{collectionFormDataModel}"/>
+
+            <rich:jQuery selector="#collectionFormList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#collectionFormList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+            <div class="buttons">
+                <h:commandButton styleClass="button" value="#{messages['Common.new']}"
+                                 action="#{collectionFormAction.startCreate}"
+                                 >
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

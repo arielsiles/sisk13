@@ -1,0 +1,152 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">deinir</ui:define>
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{collectedRawMaterialAction.managed}">
+                #{messages['CollectedRawMaterial.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['CollectedRawMaterial.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:define name="body">
+
+        <rich:messages style="color:red; font-size:1em;" />
+
+        <h:form id="collectionFormForm">
+            <div class="buttons">
+                <h:commandButton action="#{collectedRawMaterialAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!collectedRawMaterialAction.managed and s:hasPermission('COLLECTEDRAWMATERIAL','CREATE')}" />
+                <h:commandButton action="#{collectedRawMaterialAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{collectedRawMaterialAction.managed and s:hasPermission('COLLECTEDRAWMATERIAL','UPDATE')}" />
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{collectedRawMaterialAction.managed and s:hasPermission('COLLECTEDRAWMATERIAL','DELETE')}" >
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show" />
+                </h:commandButton>
+                <h:commandButton action="#{collectedRawMaterialAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header"></f:facet>
+
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{collectedRawMaterialAction.managed}">
+                            #{messages['CollectedRawMaterial.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['CollectedRawMaterial.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="dateField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectedRawMaterial.date']}</ui:define>
+                    <h:outputText id="date" value="#{collectedRawMaterialAction.date}" />
+                </s:decorate>
+
+                <s:decorate id="totalAmountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectedRawMaterial.totalAmount']}</ui:define>
+                    <h:outputText id="totalAmount" value="#{collectedRawMaterialAction.totalAmount}" />
+                </s:decorate>
+            </rich:panel>
+
+            <rich:spacer height="10" />
+
+            <rich:dataTable value="#{collectedRawMaterialAction.collectedRawMaterialList}" var="collectedRawMaterialItem" id="collectedRawMaterialList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="50%,25%,25%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['CollectedRawMaterial.rawMaterialProducer']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['CollectedRawMaterial.amount']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['CollectedRawMaterial.cans']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{collectedRawMaterialItem.rawMaterialProducer.fullName}"/>
+                </rich:column>
+                <rich:column>
+                    <rich:inplaceInput layout="block" value="#{collectedRawMaterialItem.amount}"
+                                       converterMessage="#{messages['CollectedRawMaterial.error.columnWrongValue']}"
+                                       id="weightedAmount" required="true"
+                                       requiredMessage="#{messages['CollectedRawMaterial.error.columnRequired']}"
+                                       changedHoverClass="hover" viewHoverClass="hover"
+                                       viewClass="inplace" changedClass="inplace"
+                                       selectOnEdit="true" editEvent="onclick">
+
+                        <a4j:support event="onviewactivated" reRender="totalAmount" />
+                    </rich:inplaceInput>
+                </rich:column>
+                <rich:column>
+                    <rich:inplaceInput layout="block" value="#{collectedRawMaterialItem.cans}"
+                                       converterMessage="#{messages['CollectedRawMaterial.error.columnWrongValue']}"
+                                       id="cansNumber" required="false"
+                                       requiredMessage="#{messages['CollectedRawMaterial.error.columnRequired']}"
+                                       changedHoverClass="hover" viewHoverClass="hover"
+                                       viewClass="inplace" changedClass="inplace"
+                                       selectOnEdit="true" editEvent="onclick">
+
+                        <a4j:support event="onviewactivated" />
+                    </rich:inplaceInput>
+                </rich:column>
+            </rich:dataTable>
+
+            <div class="buttons">
+                <h:commandButton action="#{collectedRawMaterialAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!collectedRawMaterialAction.managed and s:hasPermission('COLLECTEDRAWMATERIAL','CREATE')}" />
+                <h:commandButton action="#{collectedRawMaterialAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{collectedRawMaterialAction.managed and s:hasPermission('COLLECTEDRAWMATERIAL','UPDATE')}" />
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{collectedRawMaterialAction.managed and s:hasPermission('COLLECTEDRAWMATERIAL','DELETE')}" >
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show" />
+                </h:commandButton>
+                <h:commandButton action="#{collectedRawMaterialAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{collectedRawMaterialAction.managed and s:hasPermission('COLLECTEDRAWMATERIAL','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['CollectedRawMaterial.delete.confirmation']}">
+                        <f:param value="#{collectedRawMaterialAction.productiveZone.name} GAB-#{collectedRawMaterialAction.productiveZone.number} (#{collectedRawMaterialAction.productiveZone.group})" />
+                        <f:param value="#{collectedRawMaterialAction.date}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{collectedRawMaterialAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,168 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{discountProducerAction.managed}">
+                #{messages['Common.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Common.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="discountProducerForm">
+            <div class="buttons">
+                <h:commandButton action="#{discountProducerAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!discountProducerAction.managed and s:hasPermission('RESERVPRODUCERMILK','CREATE')}"
+                                 id="createButtonId">
+
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{discountProducerAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{discountProducerAction.managed and s:hasPermission('RESERVPRODUCERMILK','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{discountProducerAction.managed and s:hasPermission('RESERVPRODUCERMILK','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{discountProducerAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{discountProducerAction.managed}">
+                            #{messages['Common.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Common.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:div id="startDateDiv">
+                    <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['DiscountProducer.startDate']}"/>
+                        </ui:define>
+                        <rich:calendar id="startDate"
+                                       value="#{discountProducer.startDate}"
+                                       popup="true"
+                                       datePattern="#{messages['patterns.date']}"
+                                       styleClass="input"
+                                       enableManualInput="true"
+                                       required="true"
+                                       tabindex="1">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                </s:div>
+
+                <s:div id="endDateDiv">
+                    <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['DiscountProducer.endDate']}"/>
+                        </ui:define>
+                        <rich:calendar id="endDate"
+                                       value="#{discountProducer.endDate}"
+                                       popup="true"
+                                       datePattern="#{messages['patterns.date']}"
+                                       styleClass="input"
+                                       enableManualInput="true"
+                                       required="true"
+                                       tabindex="2">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                    </s:decorate>
+                </s:div>
+
+                <s:div id="reserveDiv">
+                    <s:decorate id="paymentsNumberField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['DiscountProducer.reserv']}</ui:define>
+                        <rich:inputNumberSpinner id="reserveNumber" value="#{discountProducer.reserve}"
+                                                 step="0.0001"
+                                                 styleClass="inputSmall"
+                                                 required="true"
+                                                 minValue="0.0001"
+                                                 maxValue="0.1"
+                                                 tabindex="3">
+
+                        </rich:inputNumberSpinner>
+                    </s:decorate>
+                </s:div>
+
+                <!--<s:div id="stateDiv">
+                    <s:decorate id="redistributePaymentField"
+                                template="/include/inputField.xhtml"
+                                styleClass="formRow">
+                        <ui:define name="label">#{messages['DiscountProducer.state']}</ui:define>
+                        <h:selectBooleanCheckbox id="stateField"
+                                                 value="#{discountProducerAction.state}"
+                                                 tabindex="4">
+                            <a4j:support event="onclick" ajaxSingle="true" reRender="stateDiv"/>
+                        </h:selectBooleanCheckbox>
+                    </s:decorate>
+                </s:div>-->
+
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{discountProducerAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!discountProducerAction.managed and s:hasPermission('RESERVPRODUCERMILK','CREATE')}"/>
+                <h:commandButton action="#{discountProducerAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{discountProducerAction.managed and s:hasPermission('RESERVPRODUCERMILK','UPDATE') and discountProducer.state == 'ENABLE'}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{discountProducerAction.managed and s:hasPermission('RESERVPRODUCERMILK','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{discountProducerAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{discountProducerAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DiscountProducer.delete.confirmation']}">
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{discountProducerAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+
+    </ui:define>
+</ui:composition>

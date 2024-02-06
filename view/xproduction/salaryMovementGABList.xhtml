@@ -1,0 +1,177 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['menu.production.salaryMovementGAB']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="salaryMovementGABSearch">
+            <rich:simpleTogglePanel label="#{messages['SalaryMovementGAB.search']}" switchType="client">
+                <h:panelGrid columns="2" width="100%">
+
+                    <s:div>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialCollectionSession.startDate']}</ui:define>
+                            <rich:calendar value="#{salaryMovementGABDataModel.privateCriteria.startDate}"
+                                           tabindex="1" styleClass="input">
+                            </rich:calendar>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialCollectionSession.endDate']}</ui:define>
+                            <rich:calendar value="#{salaryMovementGABDataModel.privateCriteria.endDate}"
+                                           tabindex="2" styleClass="input">
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialCollectionSession.state']}</ui:define>
+                            <h:selectOneMenu id="state"
+                                             value="#{salaryMovementGABDataModel.privateCriteria.state}"
+                                             styleClass="inputMedium"
+                                             tabindex="3">
+                                <s:selectItems value="#{productionCollentionStateEnum}"
+                                               var="element"
+                                               label="#{messages[element.resourceKey]}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                    </s:div>
+
+                    <s:div>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductiveZone.number']}</ui:define>
+                            <h:inputText id="firstName" value="#{salaryMovementGABDataModel.criteria.productiveZone.number}"
+                                         maxlength="100" tabindex="4" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductiveZone.group']}</ui:define>
+                            <h:inputText id="lastName" value="#{salaryMovementGABDataModel.criteria.productiveZone.group}"
+                                         maxlength="100" tabindex="5" styleClass="input">
+                            </h:inputText>
+                        </s:decorate>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
+                            <h:inputText id="maidenName" value="#{salaryMovementGABDataModel.criteria.productiveZone.name}"
+                                         maxlength="100" tabindex="6" styleClass="input">
+                            </h:inputText>
+                            <a4j:commandButton action="#{salaryMovementGABDataModel.search}" reRender="salaryMovementGABList, dataScroller"
+                                               styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                               tabindex="7">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#group" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <rich:spacer height="15"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/salaryMovementGAB.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('SALARYMOVEMENTDISCOUNTGAB','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{salaryMovementGABDataModel}" var="salaryMovementGABItem" id="salaryMovementGABList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="15%,15%,15%,15%,5%,5%,15%,15%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                                #{messages['SalaryMovementGAB.productiveZone']}
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="salaryMovementGAB.date" dataModel="#{salaryMovementGABDataModel}"
+                                                   reRender="salaryMovementGABList, dataScroller">
+                                #{messages['SalaryMovementGAB.date']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                                #{messages['SalaryMovementGAB.description']}
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="salaryMovementGAB.valor" dataModel="#{salaryMovementGABDataModel}"
+                                                   reRender="salaryMovementGABList, dataScroller">
+                                #{messages['SalaryMovementGAB.value']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="salaryMovementGAB.typeMovementGAB.name" dataModel="#{salaryMovementGABDataModel}"
+                                                   reRender="salaryMovementGABList, dataScroller">
+                                #{messages['SalaryMovementGAB.concept']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="salaryMovementGAB.state"
+                                                   dataModel="#{salaryMovementGABDataModel}"
+                                                   reRender="salaryMovementGABList,dataScroller">
+                                #{messages['SalaryMovementGAB.state']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{salaryMovementGABItem.productiveZone.getFullName()}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{salaryMovementGABItem.date}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{salaryMovementGABItem.description}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{salaryMovementGABItem.valor}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{salaryMovementGABItem.typeMovementGAB.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText
+                            value="#{salaryMovementGABItem.state == 'PENDING'
+                            ? messages['RawMaterialCollectionSession.state.pending']
+                            : messages['RawMaterialCollectionSession.state.approved']}"
+                            />
+
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{salaryMovementGABAction.select(salaryMovementGABItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/salaryMovementGAB.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('SALARYMOVEMENTDISCOUNTGAB','CREATE')}"/>
+            </div>
+
+            <app:dataScroller id="dataScroller" for="salaryMovementGABList" dataModel="#{salaryMovementGABDataModel}"/>
+
+            <rich:jQuery selector="#salaryMovementGABList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#salaryMovementGABList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

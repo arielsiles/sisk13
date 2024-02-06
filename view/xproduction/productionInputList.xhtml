@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductionInput.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <style type="text/css">
+        .special tr[id]{
+            display:none;
+        }
+    </style>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="productionInputSearch">
+            <rich:simpleTogglePanel label="#{messages['ProductionInput.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionInput.name']}</ui:define>
+                    <h:inputText id="name" value="#{productionInputDataModel.criteria.name}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionInput.code']}</ui:define>
+                    <h:inputText id="code" value="#{productionInputDataModel.criteria.code}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionInput.description']}</ui:define>
+                    <h:inputText id="description" value="#{productionInputDataModel.criteria.description}"
+                                 maxlength="100" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{productionInputDataModel.search}"
+                                       reRender="productionInputList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/productionInput.xhtml" styleClass="button"
+                          propagation="none"
+
+                        />
+            </div>
+            <rich:dataTable value="#{productionInputDataModel}" var="productionInputItem" id="productionInputList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 20%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productionInput.code" dataModel="#{productionInputDataModel}"
+                                                   reRender="productionInputList, dataScroller">
+                                #{messages['ProductionInput.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productionInput.name" dataModel="#{productionInputDataModel}"
+                                                   reRender="productionInputList, dataScroller">
+                                #{messages['ProductionInput.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productionInput.description" dataModel="#{productionInputDataModel}"
+                                                   reRender="productionInputList, dataScroller">
+                                #{messages['ProductionInput.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            #{messages['MetaProduct.measureUnit']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{productionInputItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productionInputItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productionInputItem.description}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productionInputItem.productItem.usageMeasureCode}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{productionInputAction.select(productionInputItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="productionInputList" dataModel="#{productionInputDataModel}"/>
+
+
+            <rich:jQuery selector="#productionInputList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#productionInputList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/productionInput.xhtml" styleClass="button"
+                          propagation="none" rendered="#{s:hasPermission('PRODUCTIONINPUT','CREATE')}"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

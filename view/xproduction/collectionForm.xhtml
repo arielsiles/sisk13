@@ -1,0 +1,274 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['RawMaterialCollectionSession.new']}</ui:define>
+
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="pageTitle">
+    <c:choose>
+        <c:when test="#{collectionFormAction.managed}">
+            #{messages['CollectionForm.edit']}
+        </c:when>
+        <c:otherwise>
+            #{messages['CollectionForm.new']}
+        </c:otherwise>
+    </c:choose>
+</ui:define>
+
+
+<ui:define name="body">
+
+<style type="text/css">
+    .single-error {
+        color: brown;
+        font-style: italic;
+    }
+
+    .top-aligned {
+        vertical-align: top;
+    }
+</style>
+
+<h:form id="collectionFormForm">
+    <div class="buttons">
+        <h:commandButton value="#{messages['CollectionForm.approve']}"
+                         styleClass="button"
+                         rendered="#{collectionFormAction.managed and collectionFormAction.pending
+                         }">
+            <rich:componentControl for="approveConfirmation" event="onclick" disableDefault="true" operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{collectionFormAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!collectionFormAction.managed
+                         }"/>
+
+        <h:commandButton action="#{collectionFormAction.update}"
+                         value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{collectionFormAction.managed
+                             and collectionFormAction.pending}"/>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{collectionFormAction.managed  and collectionFormAction.pending}">
+
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{collectionFormAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"/>
+    </div>
+
+    <rich:panel id="formPanel">
+        <f:facet name="header">Form titulo</f:facet>
+
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{collectionFormAction.managed}">
+                    #{messages['CollectionForm.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['CollectionForm.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <h:panelGrid columns="2" width="100%" columnClasses="top-aligned">
+            <s:div styleClass="formRow">
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectionForm.date']}</ui:define>
+                    <rich:calendar id="date" value="#{collectionForm.date}" required="true">
+                        <a4j:support actionListener="#{collectionFormAction.recalculateTotalAmounts}"
+                                     event="onchanged" ajaxSingle="true"
+                                     reRender="formPanel, collectionRecordList" process="metaProduct"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="greasePercentageField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectionForm.greasePercentage']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{collectionForm.greasePercentage}"
+                                 required="true"
+                                 maxlength="50"
+                                 styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+
+                <c:choose>
+                    <c:when test="#{!collectionFormAction.managed}">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['CollectionForm.rawMaterial']}</ui:define>
+                            <h:selectOneMenu id="metaProduct" value="#{collectionForm.metaProduct}"
+                                             styleClass="input" required="true" tabindex="2">
+                                <s:selectItems value="#{collectableProductList}"
+                                               var="product"
+                                               label="#{product.fullNameRawMaterial}"
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                                <a4j:support event="onchanged" ajaxSingle="true"
+                                             actionListener="#{collectionFormAction.recalculateTotalAmounts}"
+                                             reRender="formPanel, collectionRecordList" process="date"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </c:when>
+                    <c:otherwise>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['CollectionForm.rawMaterial']}</ui:define>
+                            <h:inputText id="metaProduct" value="#{collectionForm.metaProduct.fullNameRawMaterial}"
+                                         styleClass="input"
+                                         maxlength="150" tabindex="1" required="false" readonly="true">
+                            </h:inputText>
+                        </s:decorate>
+                    </c:otherwise>
+                </c:choose>
+            </s:div>
+            <s:div styleClass="formRow">
+                <s:decorate id="receivedAmountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectionForm.receivedAmount']}</ui:define>
+                    <h:outputText id="receivedAmountTotal" value="#{collectionFormAction.totalReceivedAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate id="weighedAmountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectionForm.weightedAmount']}</ui:define>
+                    <h:outputText id="weighedAmountTotal" value="#{collectionFormAction.totalWeightedAmount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+
+                </s:decorate>
+                <rich:spacer width="50"/>
+                <!--<s:decorate id="rejectedAmountField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectionForm.rejectedAmount']}</ui:define>
+                    <h:outputText id="rejectedAmountTotal" value="#{collectionFormAction.totalRejectedAmount}" />
+                </s:decorate>-->
+            </s:div>
+        </h:panelGrid>
+    </rich:panel>
+
+    <rich:spacer height="10" width="10"/>
+
+    <rich:dataTable value="#{collectionForm.collectionRecordList}" var="collectionRecordItem"
+                    id="collectionRecordList"
+                    width="100%" columnsWidth="20%, 20%, 20%, 20%, 20%">
+
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column>
+                    #{messages['ProductiveZone.number']}
+                </rich:column>
+                <rich:column>
+                    #{messages['ProductiveZone.name']}
+                </rich:column>
+                <rich:column>
+                    #{messages['CollectionRecord.receivedAmount']}
+                </rich:column>
+                <rich:column>
+                    #{messages['CollectionRecord.weightedAmount']}
+                </rich:column>
+                <rich:column>
+                    #{messages['CollectionRecord.difference']}
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column>
+            <h:outputText value="#{collectionRecordItem.productiveZone.number}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{collectionRecordItem.productiveZone.name}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{collectionRecordItem.receivedAmount}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column align="center">
+            <h:inputText value="#{collectionRecordItem.weightedAmount}"
+                         id="weightedAmount"
+                         required="true"
+                         disabled="#{!collectionFormAction.pending}" style="color:darkblue">
+                <a4j:support event="onblur" ajaxSingle="true" reRender="weighedAmountTotal, weighedAmountField"/>
+            </h:inputText>
+            <rich:message for="weightedAmount" styleClass="single-error"/>
+        </rich:column>
+        <rich:column align="center">
+            <h:outputText value="#{collectionRecordItem.receivedAmount - collectionRecordItem.weightedAmount}"
+                          id="weighedAmountTotal">
+
+            </h:outputText>
+        </rich:column>
+    </rich:dataTable>
+
+    <div class="buttons">
+        <h:commandButton value="#{messages['CollectionForm.approve']}"
+                         styleClass="button"
+                         rendered="#{collectionFormAction.managed and collectionFormAction.pending
+                         }">
+            <rich:componentControl for="approveConfirmation" event="onclick" disableDefault="true" operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{collectionFormAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!collectionFormAction.managed
+                         }"/>
+        <h:commandButton action="#{collectionFormAction.update}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{collectionFormAction.managed and collectionFormAction.pending
+                         }"/>
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{collectionFormAction.managed and collectionFormAction.pending
+                         }">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+        <h:commandButton action="#{collectionFormAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"/>
+    </div>
+</h:form>
+
+<s:decorate template="/include/modalDialog.xhtml">
+    <ui:param name="dialogId" value="deleteConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['CollectionForm.delete.confirmation']}">
+                <f:param value="#{collectionForm.date}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{collectionFormAction.delete}"
+                           value="#{messages['Common.delete']}" immediate="true" styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate template="/include/modalDialog.xhtml">
+    <ui:param name="dialogId" value="approveConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['Common.approve.confirmation']}</ui:define>
+    <ui:define name="dialogContent">
+        <p>
+            <h:outputFormat value="#{messages['CollectionForm.approve.confirmation']}">
+                <f:param value="#{collectionForm.date}"/>
+            </h:outputFormat>
+        </p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{collectionFormAction.createVoucherApproved}"
+                           value="#{messages['CollectionForm.approve']}" immediate="true" styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<rich:jQuery selector="#name" query="focus()" timing="onload"/>
+</ui:define>
+</ui:composition>

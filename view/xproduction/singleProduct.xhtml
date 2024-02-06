@@ -1,0 +1,146 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:rich="http://richfaces.org/rich">
+    <s:div rendered="#{productionPlanningAction.showSingleProduct}" id = "detailSingleProduct">
+
+        <h:form id="singleProductionPlanningForm">
+        <app:fieldset id="singleProductDetailFields" title="#{messages['SingleProduct.product']}">
+            <h:panelGrid columns="1"
+                         width="100%"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0"
+                         columnClasses="width50percent, width50percent">
+
+                <s:decorate id="singleProductField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionPlanning.processedProduct']}</ui:define>
+                    <h:inputText id="singleProduct" value="#{singleProduct.productProcessingSingle.metaProduct.fullName}"
+                                 required="true" maxlength="500" styleClass="input" tabindex="5"
+                                 >
+                    </h:inputText>
+                    <a4j:commandLink id="selectSingleProduct" ajaxSingle="true" immediate="true"
+                                     tabindex="2"
+                                     title="#{messages['ProductionPlanning.selectProcessedProduct']}"
+                                     onclick="Richfaces.showModalPanel('singleProductListModalPanel');"
+                                     >
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+
+                <!--<s:decorate id="singleProductAmounField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SingleProduct.amount']}</ui:define>
+                    <h:inputText value="#{singleProduct.amount}" required="false"/>
+                </s:decorate>-->
+
+            </h:panelGrid>
+
+        </app:fieldset>
+
+        <app:fieldset id="detailSingleProductInput" title="#{messages['SingleProduct.mateial']}">
+                <h:panelGrid columns="1"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0">
+
+                        <div class="buttons">
+
+                            <a4j:commandButton id="addProductSingleCommandButton"
+                                               action="#{productItemInputSearchDataModel.reset()}"
+                                               value="#{messages['SingleProduct.addMaterial']}"
+                                               styleClass="button"
+                                               immediate="true"
+                                               oncomplete="Richfaces.showModalPanel('singleProductMaterialListModalPanel');"
+                                               actionListener="#{selectPopUpAction.select}"
+                                               reRender="productItemsListModalPanel">
+                                <f:attribute name="entityManagerName" value=""/>
+                                <f:attribute name="dataModelObject" value="#{productItemInputSearchDataModel}"/>
+                            </a4j:commandButton>
+
+                        </div>
+
+                        <rich:dataTable value="#{productionPlanningAction.orderSingleMaterial}"
+                                        var="productionMaterialItem"
+                                        id="productionMaterialList" styleClass="formRow" width="100%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>
+                                        #{messages['MovementDetail.productItem']}
+                                    </rich:column>
+                                    <rich:column>
+                                        #{messages['MovementDetail.measureUnit']}
+                                    </rich:column>
+                                    <rich:column>
+                                        #{messages['MovementDetail.amountRequired']}
+                                    </rich:column>
+                                    <rich:column>
+                                        #{messages['MovementDetail.amountUsed']}
+                                    </rich:column>
+                                    <rich:column>
+                                        #{messages['Common.action']}
+                                    </rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            
+                            <rich:column>
+                                <h:outputText value="#{productionMaterialItem.productItem.name}"/>
+                            </rich:column>
+
+                            <rich:column>
+                                <h:outputText value="#{productionMaterialItem.productItem.usageMeasureUnit.name}"/>
+                            </rich:column>
+                            
+                            <rich:column>
+                                <h:inputText value="#{productionMaterialItem.amountRequired}"
+                                             styleClass="input"
+                                             required="true">
+                                </h:inputText>
+                            </rich:column>
+                            
+                            <rich:column>
+                                <h:inputText value="#{productionMaterialItem.amountUsed}"
+                                             styleClass="input"
+                                             required="true">
+                                </h:inputText>
+                            </rich:column>                            
+
+                            <rich:column>
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{productionPlanningAction.removeMaterial(productionMaterialItem)}"
+                                                 ajaxSingle="true"
+                                                 reRender="detailSingleProductInput">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </rich:column>
+
+                        </rich:dataTable>
+
+
+                </h:panelGrid>
+            </app:fieldset>
+
+            <div class="buttons">
+                <a4j:commandButton action="#{productionPlanningAction.saveSingleProduct}"
+                                   value="#{messages['Common.save']}"
+                                   reRender="formulaSet,containerCreateButton,ruleBotton2,ruleBotton1,baseProductionList,productionOrderList,productionList"/>
+                <rich:spacer width="20"/>
+
+                <a4j:commandButton action="#{productionPlanningAction.cancelSingleProduct}"
+                                   value="#{messages['Common.cancel']}"
+                                   ajaxSingle="true"
+                                   reRender="formulaSet,containerCreateButton,ruleBotton2,ruleBotton1,baseProductionList,productionOrderList,productionList"/>
+            </div>
+
+        </h:form>
+
+    </s:div>
+
+    </ui:composition>
+

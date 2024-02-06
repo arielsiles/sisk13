@@ -1,0 +1,115 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProductComposition.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <style type="text/css">
+        .special tr[id]{
+            display:none;
+        }
+    </style>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="productCompositionSearch">
+            <rich:simpleTogglePanel label="#{messages['ProductComposition.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductComposition.processedProduct.name']}</ui:define>
+                    <h:inputText id="name" value="#{productCompositionDataModel.criteria.processedProduct.name}"
+                                 maxlength="200" tabindex="1" styleClass="input">
+                    </h:inputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductComposition.processedProduct.code']}</ui:define>
+                    <h:inputText id="code" value="#{productCompositionDataModel.criteria.processedProduct.code}"
+                                 maxlength="50" tabindex="1" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{productCompositionDataModel.search}"
+                                       reRender="productCompositionList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <h:commandButton value="#{messages['Common.new']}" action="#{productCompositionAction.startCreateNew}" styleClass="button"
+                          rendered="#{s:hasPermission('PRODUCTCOMPOSITION','CREATE')}">
+                </h:commandButton>
+            </div>
+            <rich:dataTable value="#{productCompositionDataModel}" var="productCompositionItem" id="productCompositionList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="20%, 20%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productComposition.name" dataModel="#{productCompositionDataModel}"
+                                                   reRender="productCompositionList, dataScroller">
+                                #{messages['ProductComposition.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productComposition.processedProduct.name" dataModel="#{productCompositionDataModel}"
+                                                   reRender="productCompositionList, dataScroller">
+                                #{messages['ProductComposition.processedProduct.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productComposition.processedProduct.code" dataModel="#{productCompositionDataModel}"
+                                                   reRender="productCompositionList, dataScroller">
+                                #{messages['ProductComposition.processedProduct.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            #{messages['ProductComposition.rawMaterialAmount']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{productCompositionItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productCompositionItem.processedProduct.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productCompositionItem.processedProduct.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{productCompositionItem.producingAmount}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{productCompositionAction.select(productCompositionItem)}">
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="productCompositionList" dataModel="#{productCompositionDataModel}"/>
+
+
+            <rich:jQuery selector="#productCompositionList tr" query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#productCompositionList tr" query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+
+            <div class="buttons">
+                <h:commandButton value="#{messages['Common.new']}" action="#{productCompositionAction.startCreateNew}" styleClass="button"
+                                 rendered="#{s:hasPermission('PRODUCTCOMPOSITION','CREATE')}">
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,314 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{collectMaterialAction.managed}">
+                #{messages['CollectMaterial.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['CollectMaterial.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="metaProductForm">
+            <div class="buttons">
+                <h:commandButton action="#{collectMaterialAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','CREATE')}">
+
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{collectMaterialAction.approve}" value="#{messages['Common.approve']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE') and collectMaterialAction.pending}"/>
+
+                <h:commandButton action="#{collectMaterialAction.update}" value="#{messages['Common.saveChange']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE') and collectMaterialAction.pending}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','DELETE') and collectMaterialAction.pending}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{collectMaterialAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{collectMaterialAction.managed}">
+                            #{messages['MetaProduct.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['MetaProduct.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.state']}</ui:define>
+                    <h:outputText value="#{messages[collectMaterial.state.resourceKey]}"/>
+                </s:decorate>
+
+                <s:decorate id="supplierField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.supplier']}</ui:define>
+                    <app:selectPopUp id="supplier"
+                                     required="true"
+                                     textValue="#{collectMaterial.producer.fullName}"
+                                     value="#{collectMaterial.producer}"
+                                     dataModel="#{rawMaterialProducerDataModel}"
+                                     clearAction="#{collectMaterialAction.clearRawMaterialProducer()}"
+                                     searchModalPanel="rawMaterialProducerListModalPanel"
+                                     reRender="supplierField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.date']}</ui:define>
+                    <rich:calendar id="date"
+                                   enableManualInput="true"
+                                   value="#{collectMaterial.date}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   required="true"
+                                   tabindex="1">
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="productiveZoneField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.origin']}</ui:define>
+                    <app:selectPopUp id="productiveZone"
+                                     required="true"
+                                     textValue="#{collectMaterial.productiveZone.fullName}"
+                                     value="#{collectMaterial.productiveZone}"
+                                     dataModel="#{collectMaterialDataModel}"
+                                     clearAction="#{collectMaterialAction.clearOrigin()}"
+                                     searchModalPanel="productiveZoneModalPanel"
+                                     reRender="productiveZoneField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+
+                <s:decorate id="metaProductField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.rawMaterial']}</ui:define>
+                    <h:selectOneMenu id="metaProduct" value="#{collectMaterial.metaProduct}"
+                                     disabled="false"
+                                     styleClass="input" required="true" tabindex="2">
+                        <s:selectItems value="#{collectableProductList}"
+                                       var="product"
+                                       label="#{product.fullNameRawMaterial}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+
+                        <a4j:support event="onchange"
+                                     action="#{collectMaterialAction.updateProducerPrice()}"
+                                     reRender="priceField"
+                                     ajaxSingle="true"/>
+
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.code']}</ui:define>
+                    <h:inputText id="code" value="#{collectMaterial.code}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="50"
+                                 tabindex="3">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="ticketNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.ticketNumber']}</ui:define>
+                    <h:inputText id="ticketNumber" value="#{collectMaterial.ticket}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="4">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="formField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.formNumber']}</ui:define>
+                    <h:inputText id="form" value="#{collectMaterial.form}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="driverField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.driver']}</ui:define>
+                    <h:inputText id="driver" value="#{collectMaterial.driver}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="6">
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="netWeightField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.netWeight']}</ui:define>
+                    <h:inputText id="netWeight" value="#{collectMaterial.netWeight}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="7">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="netWeight"/>
+                        <a4j:support event="onblur" reRender="netWeightField"/>
+                    </h:inputText>
+                    <h:outputText value=" #{messages['Common.unit.kg']}"/>
+                </s:decorate>
+
+                <s:decorate id="balanceWeightField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.balanceWeight']}</ui:define>
+                    <h:inputText id="balanceWeight" value="#{collectMaterial.balanceWeight}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="8">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="balanceWeight"/>
+                        <a4j:support event="onblur" reRender="balanceWeightField"/>
+                    </h:inputText>
+                    <h:outputText value=" #{messages['Common.unit.kg']}"/>
+                </s:decorate>
+
+                <s:decorate id="priceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.price']}</ui:define>
+                    <h:inputText id="price" value="#{collectMaterial.price}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="20"
+                                 tabindex="9">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="price"/>
+                        <a4j:support event="onblur" reRender="priceField"/>
+                    </h:inputText>
+                    <h:outputText value=" x Tonelada"/>
+                </s:decorate>
+
+                <s:decorate id="employeeField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.receptionEmployee']}</ui:define>
+                    <app:selectPopUp id="employee"
+                                     required="true"
+                                     textValue="#{collectMaterial.receptionEmployee.fullName}"
+                                     value="#{collectMaterial.receptionEmployee}"
+                                     clearAction="#{collectMaterial.setReceptionEmployee(null)}"
+                                     searchModalPanel="generalEmployeeListModalPanel"
+                                     dataModel="#{generalEmployeeDataModel}"
+                                     reRender="employeeField"
+                                     tabindex="10"/>
+                </s:decorate>
+
+                <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.observations']}</ui:define>
+                    <h:inputTextarea id="observation"
+                                     value="#{collectMaterial.observation}"
+                                     required="false"
+                                     styleClass="input textarea-medium"
+                                     tabindex="11">
+                        <f:validateLength maximum="1000"/>
+                    </h:inputTextarea>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{collectMaterialAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','CREATE')}">
+
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{collectMaterialAction.approve}" value="#{messages['Common.approve']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE') and collectMaterialAction.pending}"/>
+
+                <h:commandButton action="#{collectMaterialAction.update}" value="#{messages['Common.saveChange']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','UPDATE') and collectMaterialAction.pending}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('MATERIALCOLLECTIONRECORD','DELETE') and collectMaterialAction.pending}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{collectMaterialAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{collectMaterialAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['MetaProduct.delete.confirmation']}">
+                        <f:param value="#{collectMaterial.code}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{collectMaterialAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="rawMaterialProdecerModalPanelContainer"
+                    template="/production/searchRawMaterialProducerModalPanel.xhtml"
+                    rendered="#{not collectMaterialAction.managed}">
+            <ui:param name="dialogId" value="rawMaterialProducerListModalPanel"/>
+            <ui:param name="dataModel" value="#{rawMaterialProducerDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{collectMaterialAction.assignSupplier(rawMaterialProducerItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="supplierField"
+                                   oncomplete="Richfaces.hideModalPanel('rawMaterialProducerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+            <ui:param name="searchPanelTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+            <ui:param name="dialogId" value="productiveZoneModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{collectMaterialAction.assignOrigin(productiveZoneItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="productiveZoneField"
+                                   oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer" template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" action="#{collectMaterialAction.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif" style="border:0" ajaxSingle="true"
+                                   reRender="formPanel"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="582" leftMargin="15" rightMargin="15" topMargin="30" bottomMargin="30">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="30"/>
+	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+	<field name="name_producer" class="java.lang.String"/>
+	<field name="gab" class="java.lang.String"/>
+	<field name="prizeUnit" class="java.lang.String"/>
+	<field name="ci" class="java.lang.String"/>
+	<field name="birthDay" class="java.lang.String"/>
+	<field name="isRetention" class="java.lang.String"/>
+	<field name="concept" class="java.lang.String"/>
+	<field name="period" class="java.lang.String"/>
+	<field name="totalCollection" class="java.lang.String"/>
+	<field name="birthPlace" class="java.lang.String"/>
+	<field name="totalPay" class="java.lang.String"/>
+	<field name="otherIncome" class="java.lang.String"/>
+	<field name="differences" class="java.lang.String"/>
+	<field name="alcohol" class="java.lang.String"/>
+	<field name="concentrated" class="java.lang.String"/>
+	<field name="yogurt" class="java.lang.String"/>
+	<field name="veterinary" class="java.lang.String"/>
+	<field name="credit" class="java.lang.String"/>
+	<field name="cans" class="java.lang.String"/>
+	<field name="retention" class="java.lang.String"/>
+	<field name="discounts" class="java.lang.String"/>
+	<field name="totalDiscounts" class="java.lang.String"/>
+	<field name="totalIncome" class="java.lang.String"/>
+	<field name="totalLiquid" class="java.lang.String"/>
+	<field name="productiveZoneAdjustment" class="java.lang.String"/>
+	<group name="rowGroup">
+		<groupExpression><![CDATA[]]></groupExpression>
+		<groupHeader>
+			<band height="24">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement key="date_text" style="titleStyle" positionType="Float" x="72" y="0" width="450" height="18"/>
+					<box padding="1">
+						<pen lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitleParam}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="resumen_principal">
+		<groupExpression><![CDATA[$V{PAGE_NUMBER}]]></groupExpression>
+		<groupHeader>
+			<band height="481">
+				<textField>
+					<reportElement x="92" y="35" width="211" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{name_producer}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="25" y="11" width="47" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Periodo]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="34" width="59" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Productor]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="60" width="31" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[GAB]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="84" width="67" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Total Acopio]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="133" width="59" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Concepto]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="108" width="67" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Precio Unit]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="363" y="11" width="21" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[C.I.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="314" y="35" width="70" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Fecha Nac.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="330" y="60" width="54" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Retencion]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="92" y="11" width="254" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{period}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="92" y="60" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{gab}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="103" y="84" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{totalCollection}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="103" y="108" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{prizeUnit}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="92" y="133" width="363" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{concept}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="396" y="11" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{ci}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="396" y="36" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{birthDay}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="397" y="60" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{isRetention}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="94" y="154" width="361" height="1"/>
+				</line>
+				<rectangle>
+					<reportElement x="25" y="161" width="238" height="20"/>
+				</rectangle>
+				<rectangle>
+					<reportElement x="263" y="161" width="233" height="20"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="25" y="161" width="238" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[INGRESOS]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="263" y="161" width="233" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[DESCUENTOS]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="186" width="118" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Acopio de leche cruda]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="206" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Otros Ingresos]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="186" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Diferencias]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="206" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Alcohol]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="226" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Concentrados]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="246" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Yogurt]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="266" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Veterinario]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="286" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Creditos]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="306" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Tachos]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="326" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Retencion]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="346" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Otros Descuentos]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="385" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Total Ingresos]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="266" y="385" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Total Descuentos]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="25" y="410" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[LIQUIDO PAGABLE]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="143" y="186" width="123" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{totalPay}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="143" y="206" width="123" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{otherIncome}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="206" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{alcohol}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="246" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{yogurt}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="226" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{concentrated}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="266" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{veterinary}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="286" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{credit}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="306" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{cans}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="326" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{retention}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="346" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{discounts}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="366" y="385" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{totalDiscounts}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="143" y="385" width="120" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{totalIncomePay}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="143" y="410" width="120" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{totalLiquid}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="41" y="453" width="181" height="1"/>
+				</line>
+				<line>
+					<reportElement x="303" y="453" width="193" height="1"/>
+				</line>
+				<staticText>
+					<reportElement x="56" y="454" width="136" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Responsable]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="330" y="454" width="136" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Productor]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="366" y="366" width="130" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{productiveZoneAdjustment}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="266" y="366" width="100" height="20"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[Ajuste de Zona]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band/>
+	</pageFooter>
+</jasperReport>

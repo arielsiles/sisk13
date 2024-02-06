@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['GestionTax.list']}</ui:define>
+    <style type="text/css">
+        .special tr[id] {
+            display: none;
+        }
+    </style>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="gestionTaxSearch">
+            <rich:simpleTogglePanel label="#{messages['GestionTax.search']}" switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['GestionTax.startDate']}</ui:define>
+                        <rich:calendar value="#{gestionTaxSearchDataModel.startDate}"
+                                       tabindex="1" styleClass="input">
+                        </rich:calendar>
+                    </s:decorate>
+                    <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['GestionTax.endDate']}</ui:define>
+                        <rich:calendar value="#{gestionTaxSearchDataModel.endDate}"
+                                       tabindex="2" styleClass="input">
+                        </rich:calendar>
+                        <a4j:commandButton action="#{gestionTaxSearchDataModel.search}"
+                                           reRender="gestionTaxList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="3">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </s:decorate>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+            <br/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/gestionTax.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('GESTIONTAX','CREATE')}"/>
+            </div>
+            <rich:dataTable value="#{gestionTaxSearchDataModel}" var="gestionTaxItem" id="gestionTaxList"
+                            width="100%" columnsWidth="40%, 40%, 20%"
+                            rows="#{sessionUser.rowsPerPage}">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            #{messages['GestionTax.startDate']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['GestionTax.endDate']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{gestionTaxItem.startDate}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{gestionTaxItem.endDate}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{gestionTaxAction.select(gestionTaxItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="gestionTaxList" dataModel="#{gestionTaxSearchDataModel}"/>
+
+
+            <rich:jQuery selector="#gestionTaxList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#gestionTaxList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/gestionTax.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('GESTIONTAX','CREATE')}"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

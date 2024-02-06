@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{productionOrderAction.managed}">
+                #{messages['ProductionOrder.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductionOrder.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:define name="body">
+
+        <h:form id="productionOrderForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{productionOrderAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productionOrderAction.managed and s:hasPermission('PRODUCTIONORDER','UPDATE')}"
+                                 tabindex="2"/>
+
+                <h:commandButton action="#{productionOrderAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4">
+                </h:commandButton>
+            </div>
+
+            <rich:panel id="formPanel">
+
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{productionOrderAction.managed}">
+                            #{messages['ProductionOrder.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ProductionOrder.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="codeField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.code']}</ui:define>
+                    <h:outputText value="#{productionOrder.code}" />
+                </s:decorate>
+
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.date']}</ui:define>
+                    <rich:calendar value="#{productionOrder.productionPlanning.date}" readonly="true" />
+                </s:decorate>
+
+                <s:decorate id="producedAmountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionOrder.producedAmount']}</ui:define>
+                    <h:inputText id="producedAmount"
+                                 value="#{productionOrder.producedAmount}"
+                                 required="true" styleClass="input" tabindex="5">
+                    </h:inputText>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{productionOrderAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productionOrderAction.managed and s:hasPermission('PRODUCTIONORDER','UPDATE')}"
+                                 tabindex="19"/>
+
+                <h:commandButton action="#{productionOrderAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" tabindex="21" immediate="true"/>
+            </div>
+        </h:form>
+
+        <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+
+    </ui:define>
+</ui:composition>

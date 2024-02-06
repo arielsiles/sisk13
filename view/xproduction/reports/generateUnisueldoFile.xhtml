@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich" xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define
+        name="pageTitle">#{messages['menu.production.rawmaterialpayroll']}
+</ui:define>
+<ui:param name="selectedTab" value="products"/>
+<ui:define name="body">
+    <h:form id="grawMaterilPaySummaryReportSearch" prependId="false">
+
+        <rich:simpleTogglePanel id="grawMaterilPaySummaryReportSearchPanel" label="Boletas de pago productores lecheros"
+                                switchType="client">
+            <h:panelGrid columns="2"
+                         width="70%"
+                         columnClasses="width55percent,width45percent"
+                         cellpadding="0"
+                         cellspacing="0"
+                         border="0">
+                <h:panelGroup>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['RawMaterialPayRoll.rawMaterial']}</ui:define>
+                        <h:selectOneMenu id="metaProduct" value="#{generateUnisueldoProducerReportAction.metaProduct}"
+                                         styleClass="input" required="true" tabindex="2">
+                            <s:selectItems value="#{collectableProductList}"
+                                           var="product"
+                                           label="#{product.fullNameRawMaterial}"
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
+                        <h:selectOneMenu id="gestion"
+                                         value="#{generateUnisueldoProducerReportAction.gestion}"
+                                         styleClass="input"
+                                         required="true"
+                                         tabindex="3">
+                            <s:selectItems value="#{gestionList}"
+                                           var="gestion"
+                                           label="#{gestion.year}"
+                                           hideNoSelectionLabel="false"/>
+                            <a4j:support event="onchange"
+                                         action="#{generateUnisueldoProducerReportAction.cleanGestionList}"
+                                         reRender="gestionField, gestionPayrollListField" ajaxSingle="true"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                </h:panelGroup>
+                <h:panelGroup>
+
+                    <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Month.month']}</ui:define>
+                        <h:selectOneMenu id="month"
+                                         value="#{generateUnisueldoProducerReportAction.month}"
+                                         styleClass="input"
+                                         required="true">
+
+                            <s:selectItems value="#{monthEnumBoleta}" var="month"
+                                           label="#{messages[month.resourceKey]}"
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate id="periodoField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Reports.controlReport.period']}</ui:define>
+                        <h:selectOneMenu id="periodo"
+                                         value="#{generateUnisueldoProducerReportAction.periodo}"
+                                         styleClass="input" required="true">
+
+                            <s:selectItems value="#{periodosBoleta}" var="periodos"
+                                           label="#{messages[periodos.resourceKey]}"
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                </h:panelGroup>
+            </h:panelGrid>
+
+        </rich:simpleTogglePanel>
+
+        <app:reportDefaultOptions reportAction="#{generateUnisueldoProducerReportAction}" showPageFormat="false"
+                                  showReportTitle="false"/>
+
+        <div class="buttons">
+            <h:commandButton action="#{generateUnisueldoProducerReportAction.generateReport}"
+                             styleClass="button"
+                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="2">
+                <s:defaultAction/>
+            </h:commandButton>
+        </div>
+
+    </h:form>
+
+
+    <!--<s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
+        <ui:param name="listTitle" value="#{messages['RawMaterialPayRoll.searchProductiveZone']}" />
+        <ui:param name="searchPanelTitle" value="#{messages['RawMaterialPayRoll.searchProductiveZone']}" />
+        <ui:param name="dialogId" value="productiveZoneModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{generateUnisueldoProducerReportAction.selectProductiveZone(productiveZoneItem)}"
+                               image="/img/active.gif" styleClass="select-image-middle"
+                               ajaxSingle="true" reRender="productiveZoneField"
+                               oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
+                               style="width:0.8em"/>
+        </ui:define>
+    </s:decorate>-->
+    <!--<s:decorate id="rawMaterialProdecerModalPanelContainer"
+                template="/production/searchRawMaterialProducerModalPanel.xhtml"
+                rendered="#{not salaryMovementProducerAction.managed}">
+        <ui:param name="dialogId" value="rawMaterialProducerListModalPanel"/>
+        <ui:param name="dataModel" value="#{rawMaterialProducerDataModel}"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{generateUnisueldoProducerReportAction.selectRawMaterialProducer(rawMaterialProducerItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               ajaxSingle="true"
+                               reRender="rawMaterialProducerField"
+                               oncomplete="Richfaces.hideModalPanel('rawMaterialProducerListModalPanel');"/>
+        </ui:define>
+    </s:decorate>-->
+</ui:define>
+</ui:composition>

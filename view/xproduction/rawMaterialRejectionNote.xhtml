@@ -1,0 +1,214 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{rawMaterialRejectionNoteAction.managed}">
+                #{messages['RawMaterialRejectionNote.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['RawMaterialRejectionNote.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+
+        <h:form id="rawMaterialRejectionNoteForm">
+            <div class="buttons">
+                <h:commandButton action="#{rawMaterialRejectionNoteAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!rawMaterialRejectionNoteAction.managed and s:hasPermission('RAWMATERIALREJECTIONNOTE','CREATE')}"/>
+                <h:commandButton action="#{rawMaterialRejectionNoteAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{rawMaterialRejectionNoteAction.managed and rawMaterialRejectionNoteAction.pending and s:hasPermission('RAWMATERIALREJECTIONNOTE','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{rawMaterialRejectionNoteAction.managed and rawMaterialRejectionNoteAction.pending and s:hasPermission('RAWMATERIALREJECTIONNOTE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{rawMaterialRejectionNoteAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{rawMaterialRejectionNoteAction.managed}">
+                            #{messages['RawMaterialRejectionNote.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['RawMaterialRejectionNote.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.rawMaterialProducer']}</ui:define>
+                    <h:inputText value="#{rawMaterialRejectionNote.fullNameOfRawMaterialProducer}" styleClass="input"
+                                 maxlength="150" tabindex="1" required="true"
+                                 readonly="#{rawMaterialRejectionNoteAction.managed}">
+                    </h:inputText>
+                    <a4j:commandLink ajaxSingle="true" immediate="true" tabindex="2"
+                                     title="#{messages['RawMaterialCollectionSession.selectProductiveZone']}"
+                                     onclick="Richfaces.showModalPanel('rawMaterialProducerModalPanel');"
+                                     rendered="#{!rawMaterialRejectionNoteAction.managed}">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+
+                <c:choose>
+                    <c:when test="#{!rawMaterialRejectionNoteAction.managed}">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialRejectionNote.rawMaterial']}</ui:define>
+                            <h:selectOneMenu value="#{rawMaterialRejectionNote.metaProduct}"
+                                             styleClass="input" required="true" tabindex="2">
+                                <s:selectItems value="#{collectableProductList}"
+                                               var="product"
+                                               label="#{product.fullNameRawMaterial}"
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </c:when>
+                    <c:otherwise>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['RawMaterialRejectionNote.rawMaterial']}</ui:define>
+                            <h:inputText value="#{rawMaterialRejectionNote.metaProduct.fullNameRawMaterial}" styleClass="input"
+                                         maxlength="150" tabindex="1" required="false" readonly="true" >
+                            </h:inputText>
+                        </s:decorate>
+                    </c:otherwise>
+                </c:choose>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.date']}</ui:define>
+                    <rich:calendar value="#{rawMaterialRejectionNote.date}" required="true">
+                        <a4j:support event="onchanged" ajaxSingle="true" reRender="formPanel" />
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.rejectedAmount']}</ui:define>
+                    <h:inputText value="#{rawMaterialRejectionNote.rejectedAmount}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="1">
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="formPanel" />
+                    </h:inputText>
+                </s:decorate>
+
+                <rich:spacer height="15" />
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.acid']}</ui:define>
+                    <h:inputTextarea value="#{rawMaterialRejectionNote.acid}" styleClass="input" required="false"
+                                     tabindex="1">
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="formPanel" />
+                    </h:inputTextarea>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.wateryLowSNG']}</ui:define>
+                    <h:inputTextarea value="#{rawMaterialRejectionNote.wateryLowSNG}" styleClass="input" required="false"
+                                     tabindex="1" >
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="formPanel" />
+                    </h:inputTextarea>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.dirty']}</ui:define>
+                    <h:inputTextarea value="#{rawMaterialRejectionNote.dirty}" styleClass="input" required="false"
+                                     tabindex="1">
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="formPanel" />
+                    </h:inputTextarea>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.colostrum']}</ui:define>
+                    <h:inputTextarea value="#{rawMaterialRejectionNote.colostrum}" styleClass="input" required="false"
+                                     tabindex="1">
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="formPanel" />
+                    </h:inputTextarea>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.disrepairCan']}</ui:define>
+                    <h:inputTextarea value="#{rawMaterialRejectionNote.disrepairCan}" styleClass="input" required="false"
+                                     tabindex="1">
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="formPanel" />
+                    </h:inputTextarea>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.other']}</ui:define>
+                    <h:inputTextarea value="#{rawMaterialRejectionNote.other}" styleClass="input" required="false"
+                                     tabindex="1">
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="formPanel" />
+                    </h:inputTextarea>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RawMaterialRejectionNote.observations']}</ui:define>
+                    <h:inputTextarea value="#{rawMaterialRejectionNote.observations}" styleClass="input" required="false"
+                                     tabindex="1">
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="formPanel" />
+                    </h:inputTextarea>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{rawMaterialRejectionNoteAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{!rawMaterialRejectionNoteAction.managed and s:hasPermission('RAWMATERIALREJECTIONNOTE','CREATE')}"/>
+                <h:commandButton action="#{rawMaterialRejectionNoteAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button" rendered="#{rawMaterialRejectionNoteAction.managed and rawMaterialRejectionNoteAction.pending and s:hasPermission('RAWMATERIALREJECTIONNOTE','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button" rendered="#{rawMaterialRejectionNoteAction.managed and rawMaterialRejectionNoteAction.pending and s:hasPermission('RAWMATERIALREJECTIONNOTE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{rawMaterialRejectionNoteAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{rawMaterialRejectionNoteAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['RawMaterialRejectionNote.delete.confirmation']}">
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{rawMaterialRejectionNoteAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchRawMaterialProducerModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['RawMaterialRejectionNote.titleRawMaterialProducer']}" />
+            <ui:param name="searchPanelTitle" value="#{messages['RawMaterialRejectionNote.searchRawMaterialProducer']}" />
+            <ui:param name="dialogId" value="rawMaterialProducerModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{rawMaterialRejectionNoteAction.selectRawMaterialProducer(rawMaterialProducerItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   ajaxSingle="true" reRender="rawMaterialRejectionNoteForm"
+                                   oncomplete="Richfaces.hideModalPanel('rawMaterialProducerModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>
