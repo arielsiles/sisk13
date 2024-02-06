@@ -1493,6 +1493,124 @@
     </h:panelGrid>
 </rich:tab>
 
+    <rich:tab id="xproduction"
+              label="#{messages['menu.xproduction']}"
+              disabled="#{disableMenu}"
+              rendered="#{s:hasPermission('PRODUCT','VIEW')}">
+        <h:panelGrid columns="7" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator">
+
+            <s:link view="/xproduction/productionPlanningList.xhtml"
+                    value="#{messages['menu.xproduction.planification.distribution']}"
+                    styleClass="tab-cell"
+                    propagation="none"/>
+
+            <s:link view="/xproduction/productionPlanList.xhtml"
+                    value="#{messages['menu.xproduction.productionPlan']}"
+                    styleClass="tab-cell"
+                    propagation="none"/>
+
+            <s:link view="/xproduction/formulationList.xhtml"
+                    value="#{messages['menu.xproduction.formulations']}"
+                    styleClass="tab-cell"
+                    propagation="none"/>
+
+            <rich:dropDownMenu value="#{messages['menu.xproduction.process']}" >
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item">
+
+                    <s:link view="/xproduction/distributionIndirectCost.xhtml"
+                            value="#{messages['menu.xproduction.process.distributionIndirectCost']}"
+                            propagation="begin"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                               styleClass="main-menu-item">
+                    <s:link view="/warehouse/processVouchersWithoutAccounting.xhtml"
+                            value="#{messages['menu.finances.accounting.processVouchersPT']}"
+                            propagation="none" />
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                               styleClass="main-menu-item">
+                    <s:link view="/accounting/generateCostOfSales.xhtml"
+                            value="#{messages['menu.finances.accounting.generateCostOfSales']}"
+                            propagation="none" />
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                               styleClass="main-menu-item">
+                    <s:link view="/accounting/generateCostOfSalesByWarehouse.xhtml"
+                            value="#{messages['menu.finances.accounting.generateCostOfSalesByWarehouse']}"
+                            propagation="none" />
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                               styleClass="main-menu-item">
+                    <s:link view="/accounting/generateClosingProductionCostAccounts.xhtml"
+                            value="#{messages['menu.finances.accounting.closingProductionCostAccounts']}"
+                            propagation="none" />
+                </rich:menuItem>
+
+            </rich:dropDownMenu>
+
+            <rich:dropDownMenu value="#{messages['menu.xproduction.planification.Reportes']}" >
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTMILKRAW','VIEW')}">
+
+                    <s:link view="/xproduction/reports/rawMilkReport.xhtml"
+                            value="#{messages['menu.production.planification.ReportMilkRaw']}"
+                            propagation="begin"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTPRODUCTPRODUCED','VIEW')}">
+                    <s:link view="/xproduction/totalProductionReport.xhtml"
+                            value="#{messages['menu.xproduction.planification.totalProduction']}"
+                            propagation="begin"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTPRODUCCTIONBALANCE','VIEW')}">
+
+                    <s:link view="/xproduction/reports/productionBalanceReport.xhtml"
+                            value="#{messages['menu.xproduction.planification.reportProductionBalance']}"
+                            propagation="begin"/>
+                </rich:menuItem>
+            </rich:dropDownMenu>
+
+            <rich:dropDownMenu value="#{messages['menu.xproduction.configuration']}"
+                               rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item">
+
+                    <s:link view="/xproduction/materialConfigurationList.xhtml"
+                            value="#{messages['menu.xproduction.inputMaterialConfiguration']}"
+                            propagation="begin"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item">
+                    <s:link view="/xproduction/indirectCostConfigList.xhtml"
+                            value="#{messages['menu.xproduction.configuration.indirectCostParameters']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item">
+                    <s:link view="/xproduction/indirectCostsList.xhtml"
+                            value="#{messages['menu.xproduction.configuration.indirectCostRegistration']}"
+                            propagation="none"/>
+                </rich:menuItem>
+            </rich:dropDownMenu>
+
+        </h:panelGrid>
+    </rich:tab>
 
 <rich:tab id="products"
           label="#{messages['menu.products']}"
