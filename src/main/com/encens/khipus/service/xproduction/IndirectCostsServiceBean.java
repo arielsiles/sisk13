@@ -1,7 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.SubGroup;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;

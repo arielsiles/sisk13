@@ -1,8 +1,8 @@
 package com.encens.khipus.model.xproduction;
 
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.ProductionCollectionState;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.ProductionCollectionState;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -67,11 +67,11 @@ public class RawMaterialRejectionNote implements com.encens.khipus.model.BaseMod
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproductormateriaprima", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.RawMaterialProducer rawMaterialProducer;
+    private com.encens.khipus.model.xproduction.RawMaterialProducer rawMaterialProducer;
 
     @OneToOne
     @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.MetaProduct metaProduct;
+    private com.encens.khipus.model.xproduction.MetaProduct metaProduct;
 
     public Long getId() {
         return id;
@@ -169,7 +169,7 @@ public class RawMaterialRejectionNote implements com.encens.khipus.model.BaseMod
         this.company = company;
     }
 
-    public com.encens.khipus.model.production.RawMaterialProducer getRawMaterialProducer() {
+    public com.encens.khipus.model.xproduction.RawMaterialProducer getRawMaterialProducer() {
         return rawMaterialProducer;
     }
 
@@ -186,7 +186,7 @@ public class RawMaterialRejectionNote implements com.encens.khipus.model.BaseMod
 
     }
 
-    public com.encens.khipus.model.production.MetaProduct getMetaProduct() {
+    public com.encens.khipus.model.xproduction.MetaProduct getMetaProduct() {
         return metaProduct;
     }
 

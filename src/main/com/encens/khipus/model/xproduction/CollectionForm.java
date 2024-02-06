@@ -1,8 +1,8 @@
 package com.encens.khipus.model.xproduction;
 
-import com.encens.khipus.model.production.CollectionFormState;
-import com.encens.khipus.model.production.CollectionRecord;
-import com.encens.khipus.model.production.MetaProduct;
+import com.encens.khipus.model.xproduction.CollectionFormState;
+import com.encens.khipus.model.xproduction.CollectionRecord;
+import com.encens.khipus.model.xproduction.MetaProduct;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 
@@ -34,7 +34,7 @@ import java.util.List;
                         "from ProductionOrder productionOrder " +
                         "left join productionOrder.inputProductionVoucherList inputProductionVoucher " +
                         "where productionOrder.productionPlanning.date = :date " +
-                        "and productionOrder.productionPlanning.state <> com.encens.khipus.model.production.ProductionPlanningState.PENDING " +
+                        "and productionOrder.productionPlanning.state <> com.encens.khipus.model.xproduction.ProductionPlanningState.PENDING " +
                         "and inputProductionVoucher.metaProduct = :metaProduct "),
         @NamedQuery(name = "CollectionForm.calculateWeightedAmountToDateByMetaProduct",
                 query = "select sum(collectionRecord.weightedAmount) " +
@@ -46,7 +46,7 @@ import java.util.List;
                         "from ProductionOrder productionOrder " +
                         "left join productionOrder.inputProductionVoucherList inputProductionVoucher " +
                         "where productionOrder.productionPlanning.date <= :date " +
-                        "and productionOrder.productionPlanning.state <> com.encens.khipus.model.production.ProductionPlanningState.PENDING " +
+                        "and productionOrder.productionPlanning.state <> com.encens.khipus.model.xproduction.ProductionPlanningState.PENDING " +
                         "and inputProductionVoucher.metaProduct = :metaProduct"),
         @NamedQuery(name = "CollectionForm.calculateCollectedAmountOnDateByMetaProduct",
                 query = "select collectedRawMaterial.rawMaterialCollectionSession.productiveZone.id, sum(collectedRawMaterial.amount) " +
@@ -80,7 +80,7 @@ public class CollectionForm implements com.encens.khipus.model.BaseModel {
 
     @Column(name = "estado", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.CollectionFormState state = com.encens.khipus.model.production.CollectionFormState.PEN;
+    private com.encens.khipus.model.xproduction.CollectionFormState state = com.encens.khipus.model.xproduction.CollectionFormState.PEN;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -88,7 +88,7 @@ public class CollectionForm implements com.encens.khipus.model.BaseModel {
 
     @OneToMany(mappedBy = "collectionForm", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private List<com.encens.khipus.model.production.CollectionRecord> collectionRecordList = new ArrayList<com.encens.khipus.model.production.CollectionRecord>();
+    private List<com.encens.khipus.model.xproduction.CollectionRecord> collectionRecordList = new ArrayList<com.encens.khipus.model.xproduction.CollectionRecord>();
 
     @Column(name = "porcentajegrasa",nullable = true,columnDefinition = "DECIMAL(16,2)")
     private Double greasePercentage = 0.0;
@@ -98,7 +98,7 @@ public class CollectionForm implements com.encens.khipus.model.BaseModel {
 
     @OneToOne
     @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.MetaProduct metaProduct;
+    private com.encens.khipus.model.xproduction.MetaProduct metaProduct;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -128,7 +128,7 @@ public class CollectionForm implements com.encens.khipus.model.BaseModel {
         this.company = company;
     }
 
-    public List<com.encens.khipus.model.production.CollectionRecord> getCollectionRecordList() {
+    public List<com.encens.khipus.model.xproduction.CollectionRecord> getCollectionRecordList() {
         return collectionRecordList;
     }
 
@@ -144,7 +144,7 @@ public class CollectionForm implements com.encens.khipus.model.BaseModel {
         this.version = version;
     }
 
-    public com.encens.khipus.model.production.MetaProduct getMetaProduct() {
+    public com.encens.khipus.model.xproduction.MetaProduct getMetaProduct() {
         return metaProduct;
     }
 
@@ -152,7 +152,7 @@ public class CollectionForm implements com.encens.khipus.model.BaseModel {
         this.metaProduct = metaProduct;
     }
 
-    public com.encens.khipus.model.production.CollectionFormState getState() {
+    public com.encens.khipus.model.xproduction.CollectionFormState getState() {
         return state;
     }
 

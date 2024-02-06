@@ -2,8 +2,8 @@ package com.encens.khipus.model.xproduction;
 
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.production.ProcessedProduct;
-import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.xproduction.ProcessedProduct;
+import com.encens.khipus.model.xproduction.ProductionOrder;
 import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;
@@ -30,7 +30,7 @@ public class ProductOrder implements BaseModel {
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idordenproduccion", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductionOrder productionOrder;
+    private com.encens.khipus.model.xproduction.ProductionOrder productionOrder;
 
     @Column(name = "nombreproducto",nullable = false,columnDefinition = "VARCHAR2(100 BYTE)")
     private String fullName;
@@ -51,7 +51,7 @@ public class ProductOrder implements BaseModel {
         this.processedProduct = processedProduct;
     }
 
-    public com.encens.khipus.model.production.ProductionOrder getProductionOrder() {
+    public com.encens.khipus.model.xproduction.ProductionOrder getProductionOrder() {
         return productionOrder;
     }
 

@@ -3,7 +3,7 @@ package com.encens.khipus.action.xproduction;
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.Month;
-import com.encens.khipus.model.production.IndirectCosts;
+import com.encens.khipus.model.xproduction.IndirectCosts;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.Name;

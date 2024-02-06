@@ -2,8 +2,8 @@ package com.encens.khipus.model.xproduction;
 
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.production.GestionTax;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.GestionTax;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;

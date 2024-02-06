@@ -3,10 +3,10 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.FormulationInput;
-import com.encens.khipus.model.production.Production;
-import com.encens.khipus.model.production.ProductionProduct;
-import com.encens.khipus.model.production.SupplyType;
+import com.encens.khipus.model.xproduction.FormulationInput;
+import com.encens.khipus.model.xproduction.Production;
+import com.encens.khipus.model.xproduction.ProductionProduct;
+import com.encens.khipus.model.xproduction.SupplyType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;
 
@@ -57,15 +57,15 @@ public class Supply implements BaseModel {
 
     @Column(name = "tipo", nullable = true)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.SupplyType type;
+    private com.encens.khipus.model.xproduction.SupplyType type;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idinsumoformula", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.FormulationInput formulationInput;
+    private com.encens.khipus.model.xproduction.FormulationInput formulationInput;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproducto", nullable = true, updatable = true, insertable = true)
-    private com.encens.khipus.model.production.ProductionProduct productionProduct;
+    private com.encens.khipus.model.xproduction.ProductionProduct productionProduct;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproduccion", nullable = false, updatable = false, insertable = true)
@@ -153,7 +153,7 @@ public class Supply implements BaseModel {
         this.company = company;
     }
 
-    public com.encens.khipus.model.production.SupplyType getType() {
+    public com.encens.khipus.model.xproduction.SupplyType getType() {
         return type;
     }
 
@@ -161,7 +161,7 @@ public class Supply implements BaseModel {
         this.type = type;
     }
 
-    public com.encens.khipus.model.production.FormulationInput getFormulationInput() {
+    public com.encens.khipus.model.xproduction.FormulationInput getFormulationInput() {
         return formulationInput;
     }
 
@@ -169,7 +169,7 @@ public class Supply implements BaseModel {
         this.formulationInput = formulationInput;
     }
 
-    public com.encens.khipus.model.production.ProductionProduct getProductionProduct() {
+    public com.encens.khipus.model.xproduction.ProductionProduct getProductionProduct() {
         return productionProduct;
     }
 

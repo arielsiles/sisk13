@@ -4,8 +4,8 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.ProductionOrder;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -36,11 +36,11 @@ public class InputProductionVoucher implements BaseModel {
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.MetaProduct metaProduct;
+    private com.encens.khipus.model.xproduction.MetaProduct metaProduct;
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idordenproduccion", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductionOrder productionOrder;
+    private com.encens.khipus.model.xproduction.ProductionOrder productionOrder;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -66,7 +66,7 @@ public class InputProductionVoucher implements BaseModel {
         this.amount = amount;
     }
 
-    public com.encens.khipus.model.production.MetaProduct getMetaProduct() {
+    public com.encens.khipus.model.xproduction.MetaProduct getMetaProduct() {
         return metaProduct;
     }
 
@@ -74,7 +74,7 @@ public class InputProductionVoucher implements BaseModel {
         this.metaProduct = metaProduct;
     }
 
-    public com.encens.khipus.model.production.ProductionOrder getProductionOrder() {
+    public com.encens.khipus.model.xproduction.ProductionOrder getProductionOrder() {
         return productionOrder;
     }
 

@@ -3,8 +3,8 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.RawMaterialCollectionSession;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.RawMaterialCollectionSession;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 

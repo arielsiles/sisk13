@@ -1,7 +1,7 @@
 package com.encens.khipus.model.xproduction;
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.production.RawMaterialDiscountType;
+import com.encens.khipus.model.xproduction.RawMaterialDiscountType;
 import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;
@@ -28,7 +28,7 @@ public class RawMaterialDiscountT implements BaseModel {
 
     @Column(name = "tipo", nullable = true)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.RawMaterialDiscountType type;
+    private com.encens.khipus.model.xproduction.RawMaterialDiscountType type;
 
     public Long getId() {
         return id;
@@ -46,7 +46,7 @@ public class RawMaterialDiscountT implements BaseModel {
         this.name = name;
     }
 
-    public com.encens.khipus.model.production.RawMaterialDiscountType getType() {
+    public com.encens.khipus.model.xproduction.RawMaterialDiscountType getType() {
         return type;
     }
 

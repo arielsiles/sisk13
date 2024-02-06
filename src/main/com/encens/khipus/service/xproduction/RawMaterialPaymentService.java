@@ -1,9 +1,9 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.PartialPaymentRawMaterial;
-import com.encens.khipus.model.production.RawMaterialDiscount;
-import com.encens.khipus.model.production.RawMaterialPayment;
-import com.encens.khipus.model.production.RawMaterialPaymentDetail;
+import com.encens.khipus.model.xproduction.PartialPaymentRawMaterial;
+import com.encens.khipus.model.xproduction.RawMaterialDiscount;
+import com.encens.khipus.model.xproduction.RawMaterialPayment;
+import com.encens.khipus.model.xproduction.RawMaterialPaymentDetail;
 
 import javax.ejb.Local;
 import java.util.List;

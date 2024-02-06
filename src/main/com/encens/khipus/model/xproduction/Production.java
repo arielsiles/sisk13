@@ -4,12 +4,12 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.production.Formulation;
-import com.encens.khipus.model.production.ProductionPlan;
-import com.encens.khipus.model.production.ProductionProduct;
-import com.encens.khipus.model.production.ProductionState;
-import com.encens.khipus.model.production.ProductionTank;
-import com.encens.khipus.model.production.Supply;
+import com.encens.khipus.model.xproduction.Formulation;
+import com.encens.khipus.model.xproduction.ProductionPlan;
+import com.encens.khipus.model.xproduction.ProductionProduct;
+import com.encens.khipus.model.xproduction.ProductionState;
+import com.encens.khipus.model.xproduction.ProductionTank;
+import com.encens.khipus.model.xproduction.Supply;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -47,7 +47,7 @@ public class Production implements BaseModel {
 
     @Column(name = "estado", nullable = true)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.ProductionState state;
+    private com.encens.khipus.model.xproduction.ProductionState state;
 
     @Column(name = "costototal")
     private BigDecimal totalCost;
@@ -60,21 +60,21 @@ public class Production implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idformula", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.Formulation formulation;
+    private com.encens.khipus.model.xproduction.Formulation formulation;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idtanque", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductionTank productionTank;
+    private com.encens.khipus.model.xproduction.ProductionTank productionTank;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idplan", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductionPlan productionPlan;
+    private com.encens.khipus.model.xproduction.ProductionPlan productionPlan;
 
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
-    private List<com.encens.khipus.model.production.Supply> supplyList = new ArrayList<com.encens.khipus.model.production.Supply>(0);
+    private List<com.encens.khipus.model.xproduction.Supply> supplyList = new ArrayList<com.encens.khipus.model.xproduction.Supply>(0);
 
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
-    private List<com.encens.khipus.model.production.ProductionProduct> productionProductList = new ArrayList<com.encens.khipus.model.production.ProductionProduct>(0);
+    private List<com.encens.khipus.model.xproduction.ProductionProduct> productionProductList = new ArrayList<com.encens.khipus.model.xproduction.ProductionProduct>(0);
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tmpenc")
@@ -112,7 +112,7 @@ public class Production implements BaseModel {
         this.description = description;
     }
 
-    public com.encens.khipus.model.production.Formulation getFormulation() {
+    public com.encens.khipus.model.xproduction.Formulation getFormulation() {
         return formulation;
     }
 
@@ -120,7 +120,7 @@ public class Production implements BaseModel {
         this.formulation = formulation;
     }
 
-    public com.encens.khipus.model.production.ProductionTank getProductionTank() {
+    public com.encens.khipus.model.xproduction.ProductionTank getProductionTank() {
         return productionTank;
     }
 
@@ -128,7 +128,7 @@ public class Production implements BaseModel {
         this.productionTank = productionTank;
     }
 
-    public com.encens.khipus.model.production.ProductionPlan getProductionPlan() {
+    public com.encens.khipus.model.xproduction.ProductionPlan getProductionPlan() {
         return productionPlan;
     }
 
@@ -152,7 +152,7 @@ public class Production implements BaseModel {
         this.company = company;
     }
 
-    public List<com.encens.khipus.model.production.Supply> getSupplyList() {
+    public List<com.encens.khipus.model.xproduction.Supply> getSupplyList() {
         return supplyList;
     }
 
@@ -160,7 +160,7 @@ public class Production implements BaseModel {
         this.supplyList = supplyList;
     }
 
-    public com.encens.khipus.model.production.ProductionState getState() {
+    public com.encens.khipus.model.xproduction.ProductionState getState() {
         return state;
     }
 
@@ -168,7 +168,7 @@ public class Production implements BaseModel {
         this.state = state;
     }
 
-    public List<com.encens.khipus.model.production.ProductionProduct> getProductionProductList() {
+    public List<com.encens.khipus.model.xproduction.ProductionProduct> getProductionProductList() {
         return productionProductList;
     }
 

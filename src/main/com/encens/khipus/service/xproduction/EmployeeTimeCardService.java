@@ -1,7 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.model.employees.Employee;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.Group;
 
 import javax.ejb.Local;

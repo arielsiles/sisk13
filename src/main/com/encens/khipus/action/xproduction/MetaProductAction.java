@@ -4,7 +4,7 @@ import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.production.MetaProduct;
+import com.encens.khipus.model.xproduction.MetaProduct;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;

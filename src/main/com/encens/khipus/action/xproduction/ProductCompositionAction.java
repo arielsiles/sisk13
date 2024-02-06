@@ -5,11 +5,11 @@ import com.encens.khipus.exception.production.ProductCompositionException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.ProcessedProduct;
-import com.encens.khipus.model.production.ProductComposition;
-import com.encens.khipus.model.production.ProductionIngredient;
-import com.encens.khipus.service.production.EvaluatorMathematicalExpressionsService;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.ProcessedProduct;
+import com.encens.khipus.model.xproduction.ProductComposition;
+import com.encens.khipus.model.xproduction.ProductionIngredient;
+import com.encens.khipus.service.xproduction.EvaluatorMathematicalExpressionsService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 

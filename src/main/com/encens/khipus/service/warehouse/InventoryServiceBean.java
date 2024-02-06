@@ -101,6 +101,24 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
     }
 
     @Override
+    public void updateInventoryForProduction(com.encens.khipus.model.xproduction.ProductionProduct product){
+
+        Inventory inventory = findInventoryByProductItemCode(product.getProductItemCode());
+        System.out.println("-----------> **** ACTUALIZANDO PRODUCTO PARA PRODUCCION Inventory: " + inventory.getProductItem().getFullName());
+        BigDecimal requiredQuantity = BigDecimalUtil.toBigDecimal(product.getQuantity());
+        BigDecimal availableQuantity = inventory.getUnitaryBalance();
+        BigDecimal newAvailableQuantity = BigDecimalUtil.sum(availableQuantity, requiredQuantity);
+        inventory.setUnitaryBalance(newAvailableQuantity);
+        eventEm.merge(inventory);
+        eventEm.flush();
+
+        InventoryDetail inventoryDetail = findInventoryDetailByProductItemCode(product.getProductItemCode());
+        inventoryDetail.setQuantity(inventory.getUnitaryBalance());
+        eventEm.merge(inventoryDetail);
+        eventEm.flush();
+    }
+
+    @Override
     public void updateInventoryForSalesAnnuled(CustomerOrder customerOrder) {
 
         for (ArticleOrder articleOrder : customerOrder.getArticleOrderList()){
@@ -124,6 +142,24 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
 
     @Override
     public void updateInventoryRemoveFromProduction(ProductionProduct product){
+
+        Inventory inventory = findInventoryByProductItemCode(product.getProductItemCode());
+        System.out.println("-----------> **** REMOVE PRODUCTO PRODUCCION Inventory: " + inventory.getProductItem().getFullName());
+        BigDecimal requiredQuantity = BigDecimalUtil.toBigDecimal(product.getQuantity());
+        BigDecimal availableQuantity = inventory.getUnitaryBalance();
+        BigDecimal newAvailableQuantity = BigDecimalUtil.subtract(availableQuantity, requiredQuantity);
+        inventory.setUnitaryBalance(newAvailableQuantity);
+        eventEm.merge(inventory);
+        eventEm.flush();
+
+        InventoryDetail inventoryDetail = findInventoryDetailByProductItemCode(product.getProductItemCode());
+        inventoryDetail.setQuantity(inventory.getUnitaryBalance());
+        eventEm.merge(inventoryDetail);
+        eventEm.flush();
+    }
+
+    @Override
+    public void updateInventoryRemoveFromProduction(com.encens.khipus.model.xproduction.ProductionProduct product){
 
         Inventory inventory = findInventoryByProductItemCode(product.getProductItemCode());
         System.out.println("-----------> **** REMOVE PRODUCTO PRODUCCION Inventory: " + inventory.getProductItem().getFullName());

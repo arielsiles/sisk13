@@ -1,7 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.ProcessedProduct;
-import com.encens.khipus.model.production.ProductComposition;
+import com.encens.khipus.model.xproduction.ProcessedProduct;
+import com.encens.khipus.model.xproduction.ProductComposition;
 import com.encens.khipus.model.warehouse.ProductItem;
 
 import javax.ejb.Local;

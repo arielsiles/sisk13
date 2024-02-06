@@ -4,7 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.Gestion;
-import com.encens.khipus.model.production.IndirectCosts;
+import com.encens.khipus.model.xproduction.IndirectCosts;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
@@ -58,7 +58,7 @@ public class PeriodIndirectCost implements BaseModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "periodIndirectCost", cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private List<com.encens.khipus.model.production.IndirectCosts> indirectCostList = new ArrayList<com.encens.khipus.model.production.IndirectCosts>();
+    private List<com.encens.khipus.model.xproduction.IndirectCosts> indirectCostList = new ArrayList<com.encens.khipus.model.xproduction.IndirectCosts>();
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -88,7 +88,7 @@ public class PeriodIndirectCost implements BaseModel {
         this.gestion = gestion;
     }
 
-    public List<com.encens.khipus.model.production.IndirectCosts> getIndirectCostList() {
+    public List<com.encens.khipus.model.xproduction.IndirectCosts> getIndirectCostList() {
         return indirectCostList;
     }
 

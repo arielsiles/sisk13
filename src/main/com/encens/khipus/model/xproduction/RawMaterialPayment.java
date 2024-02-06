@@ -7,10 +7,10 @@ import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesBankAccount;
 import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.production.RawMaterialPaymentDetail;
-import com.encens.khipus.model.production.RawMaterialPaymentState;
-import com.encens.khipus.model.production.RawMaterialPaymentType;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.RawMaterialPaymentDetail;
+import com.encens.khipus.model.xproduction.RawMaterialPaymentState;
+import com.encens.khipus.model.xproduction.RawMaterialPaymentType;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 

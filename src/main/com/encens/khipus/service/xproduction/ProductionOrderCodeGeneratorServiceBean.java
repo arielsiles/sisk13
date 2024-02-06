@@ -1,7 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.BaseProduct;
-import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.xproduction.BaseProduct;
+import com.encens.khipus.model.xproduction.ProductionOrder;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;

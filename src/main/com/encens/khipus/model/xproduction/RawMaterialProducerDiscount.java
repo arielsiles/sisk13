@@ -1,7 +1,7 @@
 package com.encens.khipus.model.xproduction;
 
-import com.encens.khipus.model.production.RawMaterialPayRecord;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.RawMaterialPayRecord;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -43,7 +43,7 @@ public class RawMaterialProducerDiscount implements com.encens.khipus.model.Base
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idproductormateriaprima", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.RawMaterialProducer rawMaterialProducer;
+    private com.encens.khipus.model.xproduction.RawMaterialProducer rawMaterialProducer;
 
     @Column(name = "codigo", nullable = false)
     private long code;
@@ -79,7 +79,7 @@ public class RawMaterialProducerDiscount implements com.encens.khipus.model.Base
     private double commission = 0.0;
 
     @OneToOne(mappedBy = "rawMaterialProducerDiscount", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    private com.encens.khipus.model.production.RawMaterialPayRecord rawMaterialPayRecord;
+    private com.encens.khipus.model.xproduction.RawMaterialPayRecord rawMaterialPayRecord;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -185,7 +185,7 @@ public class RawMaterialProducerDiscount implements com.encens.khipus.model.Base
         this.company = company;
     }
 
-    public com.encens.khipus.model.production.RawMaterialPayRecord getRawMaterialPayRecord() {
+    public com.encens.khipus.model.xproduction.RawMaterialPayRecord getRawMaterialPayRecord() {
         return rawMaterialPayRecord;
     }
 

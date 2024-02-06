@@ -3,11 +3,11 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.BaseProduct;
-import com.encens.khipus.model.production.IndirectCosts;
-import com.encens.khipus.model.production.OrderMaterial;
-import com.encens.khipus.model.production.ProductProcessingSingle;
-import com.encens.khipus.model.production.ProductionPlanningState;
+import com.encens.khipus.model.xproduction.BaseProduct;
+import com.encens.khipus.model.xproduction.IndirectCosts;
+import com.encens.khipus.model.xproduction.OrderMaterial;
+import com.encens.khipus.model.xproduction.ProductProcessingSingle;
+import com.encens.khipus.model.xproduction.ProductionPlanningState;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
@@ -52,7 +52,7 @@ public class SingleProduct implements BaseModel {
 
     @Column(name = "estado", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.ProductionPlanningState state = com.encens.khipus.model.production.ProductionPlanningState.PENDING;
+    private ProductionPlanningState state = ProductionPlanningState.PENDING;
 
     /*@OneToOne(fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumn(name = "IDMETAPRODUCTOPRODUCCION")
@@ -72,7 +72,7 @@ public class SingleProduct implements BaseModel {
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "singleProduct", cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private com.encens.khipus.model.production.ProductProcessingSingle productProcessingSingle;
+    private ProductProcessingSingle productProcessingSingle;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "singleProduct", cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -101,7 +101,7 @@ public class SingleProduct implements BaseModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "singleProduct", cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private List<com.encens.khipus.model.production.IndirectCosts> indirectCostses;
+    private List<IndirectCosts> indirectCostses;
 
     public Long getId() {
         return id;
@@ -151,7 +151,7 @@ public class SingleProduct implements BaseModel {
         this.totalInput = totalInput;
     }
 
-    public com.encens.khipus.model.production.ProductionPlanningState getState() {
+    public ProductionPlanningState getState() {
         return state;
     }
 
@@ -221,10 +221,10 @@ public class SingleProduct implements BaseModel {
         this.indirectCostses = indirectCostses;
     }*/
 
-    public List<com.encens.khipus.model.production.IndirectCosts> getIndirectCostses() {
+    public List<IndirectCosts> getIndirectCostses() {
 
         if(indirectCostses == null)
-            return new ArrayList<com.encens.khipus.model.production.IndirectCosts>();
+            return new ArrayList<IndirectCosts>();
 
         return indirectCostses;
     }
@@ -235,7 +235,7 @@ public class SingleProduct implements BaseModel {
         this.indirectCostses.addAll(indirectCostses);
     }
 
-    public com.encens.khipus.model.production.ProductProcessingSingle getProductProcessingSingle() {
+    public ProductProcessingSingle getProductProcessingSingle() {
         return productProcessingSingle;
     }
 

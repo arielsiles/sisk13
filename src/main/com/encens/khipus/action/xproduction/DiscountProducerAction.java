@@ -1,8 +1,8 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
-import com.encens.khipus.model.production.DiscountProducer;
-import com.encens.khipus.service.production.RawMaterialPayRollService;
+import com.encens.khipus.model.xproduction.DiscountProducer;
+import com.encens.khipus.service.xproduction.RawMaterialPayRollService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;

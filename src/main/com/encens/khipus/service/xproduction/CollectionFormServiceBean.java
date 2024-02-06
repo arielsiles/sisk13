@@ -2,9 +2,9 @@ package com.encens.khipus.service.xproduction;
 
 
 import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
-import com.encens.khipus.model.production.CollectionForm;
-import com.encens.khipus.model.production.CollectionRecord;
-import com.encens.khipus.model.production.ProductiveZone;
+import com.encens.khipus.model.xproduction.CollectionForm;
+import com.encens.khipus.model.xproduction.CollectionRecord;
+import com.encens.khipus.model.xproduction.ProductiveZone;
 import com.encens.khipus.model.warehouse.WarehouseDocumentType;
 import com.encens.khipus.model.warehouse.WarehouseVoucherType;
 import com.encens.khipus.util.Constants;

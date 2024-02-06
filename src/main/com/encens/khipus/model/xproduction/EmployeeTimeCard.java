@@ -5,7 +5,7 @@ import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.Employee;
-import com.encens.khipus.model.production.ProductionTaskType;
+import com.encens.khipus.model.xproduction.ProductionTaskType;
 import com.encens.khipus.model.warehouse.SubGroup;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;

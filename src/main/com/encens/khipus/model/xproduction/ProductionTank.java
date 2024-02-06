@@ -3,7 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.MeasurementUnit;
+import com.encens.khipus.model.xproduction.MeasurementUnit;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;

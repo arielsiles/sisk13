@@ -5,7 +5,7 @@ import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.production.RawMaterialPayRollException;
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 
 import javax.ejb.Local;
 import java.util.Calendar;

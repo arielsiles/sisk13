@@ -1,7 +1,7 @@
 package com.encens.khipus.model.xproduction;
 
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.ProductComposition;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.ProductComposition;
 
 import javax.persistence.*;
 import java.util.ArrayList;

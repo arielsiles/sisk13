@@ -1,7 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.Formulation;
-import com.encens.khipus.model.production.FormulationInput;
+import com.encens.khipus.model.xproduction.Formulation;
+import com.encens.khipus.model.xproduction.FormulationInput;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;

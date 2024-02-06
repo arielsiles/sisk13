@@ -1,7 +1,7 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.production.ProductionProduct;
+import com.encens.khipus.model.xproduction.ProductionProduct;
 import com.encens.khipus.model.warehouse.Inventory;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.jboss.seam.ScopeType;

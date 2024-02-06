@@ -1,7 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.Formulation;
-import com.encens.khipus.model.production.FormulationInput;
+import com.encens.khipus.model.xproduction.Formulation;
+import com.encens.khipus.model.xproduction.FormulationInput;
 
 import javax.ejb.Local;
 import java.util.List;

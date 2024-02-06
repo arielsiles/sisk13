@@ -1,8 +1,8 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.CollectionForm;
-import com.encens.khipus.model.production.ProductionPlan;
-import com.encens.khipus.model.production.ProductionProduct;
+import com.encens.khipus.model.xproduction.CollectionForm;
+import com.encens.khipus.model.xproduction.ProductionPlan;
+import com.encens.khipus.model.xproduction.ProductionProduct;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;

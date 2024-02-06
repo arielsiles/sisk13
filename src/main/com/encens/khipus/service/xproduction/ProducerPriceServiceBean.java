@@ -1,8 +1,8 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.ProducerPrice;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.ProducerPrice;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;

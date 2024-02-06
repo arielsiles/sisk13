@@ -4,10 +4,10 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.Employee;
-import com.encens.khipus.model.production.CollectMaterialState;
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.ProductiveZone;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.CollectMaterialState;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.ProductiveZone;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
@@ -59,7 +59,7 @@ public class CollectMaterial implements Serializable, BaseModel {
 
     @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.CollectMaterialState state = com.encens.khipus.model.production.CollectMaterialState.PEN;
+    private com.encens.khipus.model.xproduction.CollectMaterialState state = com.encens.khipus.model.xproduction.CollectMaterialState.PEN;
 
     @Column(name = "conta", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
@@ -176,7 +176,7 @@ public class CollectMaterial implements Serializable, BaseModel {
         this.metaProduct = metaProduct;
     }
 
-    public com.encens.khipus.model.production.CollectMaterialState getState() {
+    public com.encens.khipus.model.xproduction.CollectMaterialState getState() {
         return state;
     }
 

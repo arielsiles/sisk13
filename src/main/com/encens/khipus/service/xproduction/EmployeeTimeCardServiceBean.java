@@ -3,7 +3,7 @@ package com.encens.khipus.service.xproduction;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.JobContract;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.Group;
 import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.util.Constants;

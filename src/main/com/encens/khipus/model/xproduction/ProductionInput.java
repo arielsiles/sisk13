@@ -1,6 +1,6 @@
 package com.encens.khipus.model.xproduction;
 
-import com.encens.khipus.model.production.MetaProduct;
+import com.encens.khipus.model.xproduction.MetaProduct;
 
 import javax.persistence.*;
 

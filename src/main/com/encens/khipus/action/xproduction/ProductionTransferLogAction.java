@@ -2,7 +2,7 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.production.ProductionPlanning;
+import com.encens.khipus.model.xproduction.ProductionPlanning;
 import com.encens.khipus.service.warehouse.ProductionTransferLogService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;

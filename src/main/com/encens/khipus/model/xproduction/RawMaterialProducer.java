@@ -1,10 +1,10 @@
 package com.encens.khipus.model.xproduction;
 
 import com.encens.khipus.model.contacts.Person;
-import com.encens.khipus.model.production.CollectedRawMaterial;
-import com.encens.khipus.model.production.DiscountReserve;
-import com.encens.khipus.model.production.ProducerTax;
-import com.encens.khipus.model.production.ProductiveZone;
+import com.encens.khipus.model.xproduction.CollectedRawMaterial;
+import com.encens.khipus.model.xproduction.DiscountReserve;
+import com.encens.khipus.model.xproduction.ProducerTax;
+import com.encens.khipus.model.xproduction.ProductiveZone;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 
@@ -66,17 +66,17 @@ public class RawMaterialProducer extends Person {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idzonaproductiva", nullable = true, updatable = true, insertable = true)
-    private com.encens.khipus.model.production.ProductiveZone productiveZone;
+    private com.encens.khipus.model.xproduction.ProductiveZone productiveZone;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private com.encens.khipus.model.admin.Company company;
 
     @OneToMany(mappedBy = "rawMaterialProducer", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    private List<com.encens.khipus.model.production.CollectedRawMaterial> collectedRawMaterialList = new ArrayList<com.encens.khipus.model.production.CollectedRawMaterial>(0);
+    private List<com.encens.khipus.model.xproduction.CollectedRawMaterial> collectedRawMaterialList = new ArrayList<com.encens.khipus.model.xproduction.CollectedRawMaterial>(0);
 
     @OneToMany(mappedBy = "rawMaterialProducerTax", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
-    private List<com.encens.khipus.model.production.ProducerTax> producerTaxes = new ArrayList<com.encens.khipus.model.production.ProducerTax>(0);
+    private List<com.encens.khipus.model.xproduction.ProducerTax> producerTaxes = new ArrayList<com.encens.khipus.model.xproduction.ProducerTax>(0);
 
     @OneToMany(mappedBy = "materialProducer", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     private List<DiscountReserve> discountReserves = new ArrayList<DiscountReserve>(0);
@@ -105,7 +105,7 @@ public class RawMaterialProducer extends Person {
         this.responsible = responsible;
     }
 
-    public com.encens.khipus.model.production.ProductiveZone getProductiveZone() {
+    public com.encens.khipus.model.xproduction.ProductiveZone getProductiveZone() {
         return productiveZone;
     }
 
@@ -122,7 +122,7 @@ public class RawMaterialProducer extends Person {
         this.company = company;
     }
 
-    public List<com.encens.khipus.model.production.CollectedRawMaterial> getCollectedRawMaterialList() {
+    public List<com.encens.khipus.model.xproduction.CollectedRawMaterial> getCollectedRawMaterialList() {
         return collectedRawMaterialList;
     }
 
@@ -178,7 +178,7 @@ public class RawMaterialProducer extends Person {
         this.discountReserves = discountReserves;
     }
 
-    public List<com.encens.khipus.model.production.ProducerTax> getProducerTaxes() {
+    public List<com.encens.khipus.model.xproduction.ProducerTax> getProducerTaxes() {
         return producerTaxes;
     }
 

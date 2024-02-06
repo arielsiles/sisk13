@@ -1,8 +1,8 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
-import com.encens.khipus.model.production.ProducerPrice;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.ProducerPrice;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.Name;

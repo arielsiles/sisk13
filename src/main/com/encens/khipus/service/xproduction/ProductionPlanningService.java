@@ -3,7 +3,7 @@ package com.encens.khipus.service.xproduction;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.WarehouseDocumentType;
 

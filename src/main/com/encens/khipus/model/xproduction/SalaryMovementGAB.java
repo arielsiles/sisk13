@@ -1,9 +1,9 @@
 package com.encens.khipus.model.xproduction;
 
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.ProductionCollectionState;
-import com.encens.khipus.model.production.ProductiveZone;
-import com.encens.khipus.model.production.TypeMovementGAB;
+import com.encens.khipus.model.xproduction.ProductionCollectionState;
+import com.encens.khipus.model.xproduction.ProductiveZone;
+import com.encens.khipus.model.xproduction.TypeMovementGAB;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 

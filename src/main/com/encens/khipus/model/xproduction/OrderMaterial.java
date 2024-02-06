@@ -3,8 +3,8 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.ProductionOrder;
-import com.encens.khipus.model.production.SingleProduct;
+import com.encens.khipus.model.xproduction.ProductionOrder;
+import com.encens.khipus.model.xproduction.SingleProduct;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
@@ -74,11 +74,11 @@ public class OrderMaterial implements BaseModel {
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "idordenproduccion", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductionOrder productionOrder;
+    private com.encens.khipus.model.xproduction.ProductionOrder productionOrder;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "idproductosimple", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.SingleProduct singleProduct;
+    private com.encens.khipus.model.xproduction.SingleProduct singleProduct;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -148,7 +148,7 @@ public class OrderMaterial implements BaseModel {
         this.productItem = productItem;
     }
 
-    public com.encens.khipus.model.production.ProductionOrder getProductionOrder() {
+    public com.encens.khipus.model.xproduction.ProductionOrder getProductionOrder() {
         return productionOrder;
     }
 
@@ -180,7 +180,7 @@ public class OrderMaterial implements BaseModel {
         this.costUnit = costUnit;
     }
 
-    public com.encens.khipus.model.production.SingleProduct getSingleProduct() {
+    public com.encens.khipus.model.xproduction.SingleProduct getSingleProduct() {
         return singleProduct;
     }
 

@@ -2,11 +2,11 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.common.SequenceService;
-import com.encens.khipus.service.production.ProductionPlanService;
-import com.encens.khipus.service.production.ProductionService;
+import com.encens.khipus.service.xproduction.ProductionPlanService;
+import com.encens.khipus.service.xproduction.ProductionService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;

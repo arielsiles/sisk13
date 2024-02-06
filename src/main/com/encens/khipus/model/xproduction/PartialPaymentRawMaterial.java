@@ -3,7 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.RawMaterialPayment;
+import com.encens.khipus.model.xproduction.RawMaterialPayment;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -43,7 +43,7 @@ public class PartialPaymentRawMaterial implements Serializable, BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idpagoacopiomp", nullable = false)
-    private com.encens.khipus.model.production.RawMaterialPayment rawMaterialPayment;
+    private com.encens.khipus.model.xproduction.RawMaterialPayment rawMaterialPayment;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -89,7 +89,7 @@ public class PartialPaymentRawMaterial implements Serializable, BaseModel {
         this.amount = amount;
     }
 
-    public com.encens.khipus.model.production.RawMaterialPayment getRawMaterialPayment() {
+    public com.encens.khipus.model.xproduction.RawMaterialPayment getRawMaterialPayment() {
         return rawMaterialPayment;
     }
 

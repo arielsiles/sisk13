@@ -2,11 +2,11 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.production.Formulation;
-import com.encens.khipus.model.production.FormulationInput;
-import com.encens.khipus.model.production.FormulationState;
+import com.encens.khipus.model.xproduction.Formulation;
+import com.encens.khipus.model.xproduction.FormulationInput;
+import com.encens.khipus.model.xproduction.FormulationState;
 import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.service.production.FormulationService;
+import com.encens.khipus.service.xproduction.FormulationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 

@@ -1,7 +1,7 @@
 package com.encens.khipus.model.xproduction;
 
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.ProductComposition;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.ProductComposition;
 import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;
@@ -39,11 +39,11 @@ public class ProductionIngredient implements com.encens.khipus.model.BaseModel {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcomposicionproducto", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductComposition productComposition;
+    private ProductComposition productComposition;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idmetaproductoproduccion", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.MetaProduct metaProduct;
+    private MetaProduct metaProduct;
 
     @Column(name = "ingredienteverificable", nullable = true, length = 20)
     private String isVerifiably = "VERIFICABLE";
@@ -67,7 +67,7 @@ public class ProductionIngredient implements com.encens.khipus.model.BaseModel {
         this.amount = amount;
     }
 
-    public com.encens.khipus.model.production.ProductComposition getProductComposition() {
+    public ProductComposition getProductComposition() {
         return productComposition;
     }
 
@@ -75,7 +75,7 @@ public class ProductionIngredient implements com.encens.khipus.model.BaseModel {
         this.productComposition = productComposition;
     }
 
-    public com.encens.khipus.model.production.MetaProduct getMetaProduct() {
+    public MetaProduct getMetaProduct() {
         return metaProduct;
     }
 

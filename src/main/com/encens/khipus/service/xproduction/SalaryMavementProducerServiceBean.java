@@ -5,7 +5,7 @@ import com.encens.khipus.exception.production.SalaryMovementProducerException;
 import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.customers.CustomerOrderTypeEnum;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.MessageUtils;

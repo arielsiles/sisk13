@@ -1,7 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.SalaryMovementProducerTypeEnum;
-import com.encens.khipus.model.production.TypeMovementProducer;
+import com.encens.khipus.model.xproduction.SalaryMovementProducerTypeEnum;
+import com.encens.khipus.model.xproduction.TypeMovementProducer;
 
 import javax.ejb.Local;
 

@@ -3,10 +3,10 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.BaseProduct;
-import com.encens.khipus.model.production.ProductionOrder;
-import com.encens.khipus.model.production.ProductionPlanningState;
-import com.encens.khipus.model.production.SingleProduct;
+import com.encens.khipus.model.xproduction.BaseProduct;
+import com.encens.khipus.model.xproduction.ProductionOrder;
+import com.encens.khipus.model.xproduction.ProductionPlanningState;
+import com.encens.khipus.model.xproduction.SingleProduct;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.MessageUtils;
@@ -78,7 +78,7 @@ public class ProductionPlanning implements BaseModel {
 
     @Column(name = "estado", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.ProductionPlanningState state = com.encens.khipus.model.production.ProductionPlanningState.PENDING;
+    private ProductionPlanningState state = ProductionPlanningState.PENDING;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -87,7 +87,7 @@ public class ProductionPlanning implements BaseModel {
     @OneToMany(mappedBy = "productionPlanning", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     @OrderBy("code desc")
-    private List<com.encens.khipus.model.production.ProductionOrder> productionOrderList = new ArrayList<com.encens.khipus.model.production.ProductionOrder>();
+    private List<ProductionOrder> productionOrderList = new ArrayList<ProductionOrder>();
 
     @OneToMany(mappedBy = "productionPlanningBase", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -149,7 +149,7 @@ public class ProductionPlanning implements BaseModel {
         this.observations = observations;
     }
 
-    public List<com.encens.khipus.model.production.ProductionOrder> getProductionOrderList() {
+    public List<ProductionOrder> getProductionOrderList() {
         return productionOrderList;
     }
 
@@ -157,7 +157,7 @@ public class ProductionPlanning implements BaseModel {
         this.productionOrderList = productionOrderList;
     }
 
-    public com.encens.khipus.model.production.ProductionPlanningState getState() {
+    public ProductionPlanningState getState() {
         return state;
     }
 

@@ -2,7 +2,7 @@ package com.encens.khipus.model.xproduction;
 
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.production.ProducerTax;
+import com.encens.khipus.model.xproduction.ProducerTax;
 import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;
@@ -35,7 +35,7 @@ public class GestionTax implements BaseModel {
     private Date endDate;
 
     @OneToMany(mappedBy = "gestionTax", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    private List<com.encens.khipus.model.production.ProducerTax> producerTaxes = new ArrayList<com.encens.khipus.model.production.ProducerTax>(0);
+    private List<com.encens.khipus.model.xproduction.ProducerTax> producerTaxes = new ArrayList<com.encens.khipus.model.xproduction.ProducerTax>(0);
 
     public Long getId() {
         return id;
@@ -61,7 +61,7 @@ public class GestionTax implements BaseModel {
         this.endDate = endDate;
     }
 
-    public List<com.encens.khipus.model.production.ProducerTax> getProducerTaxes() {
+    public List<com.encens.khipus.model.xproduction.ProducerTax> getProducerTaxes() {
         return producerTaxes;
     }
 

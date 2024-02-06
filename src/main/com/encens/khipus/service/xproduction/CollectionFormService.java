@@ -1,7 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.production.CollectionForm;
+import com.encens.khipus.model.xproduction.CollectionForm;
 import com.encens.khipus.model.warehouse.WarehouseDocumentType;
 
 import javax.ejb.Local;

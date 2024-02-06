@@ -2,7 +2,7 @@ package com.encens.khipus.model.xproduction;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.CollectionRecord;
+import com.encens.khipus.model.xproduction.CollectionRecord;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;

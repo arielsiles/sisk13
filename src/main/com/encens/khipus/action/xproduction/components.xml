@@ -73,21 +73,21 @@
     <!--Enumerations-->
 
     <factory name="statePayRollCollectionEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.StatePayRoll')}"/>
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.StatePayRoll')}"/>
 
     <factory name="productionCollentionStateEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.ProductionCollectionState')}"/>
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.ProductionCollectionState')}"/>
 
     <factory name="collectionFormStateEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.CollectionFormState')}"/>
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.CollectionFormState')}"/>
 
 
     <!-- 19.04.2019 -->
     <factory name="MeasurementUnitEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.MeasurementUnit')}"/>
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.MeasurementUnit')}"/>
 
     <factory name="SupplyTypeEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.SupplyType')}"/>
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.SupplyType')}"/>
 
     <factory name="productionTankList" value="#{productionTankQuery}"/>
     <framework:entity-query name="productionTankQuery" ejbql="select p from ProductionTank p"/>
@@ -95,7 +95,7 @@
     <factory name="formulationList" value="#{formulationQuery}"/>
     <framework:entity-query name="formulationQuery" ejbql="select p from Formulation p">
         <framework:restrictions>
-            <value>p.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.production.FormulationState', 'APR')}</value>
+            <value>p.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.xproduction.FormulationState', 'APR')}</value>
         </framework:restrictions>
     </framework:entity-query>
 
@@ -116,12 +116,12 @@
     <!--Enumerations-->
 
     <factory name="rawMaterialPaymentTypeEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialPaymentType')}"/>
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.RawMaterialPaymentType')}"/>
 
     <factory name="rawMaterialPaymentStateEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialPaymentState')}"/>
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.RawMaterialPaymentState')}"/>
 
     <factory name="rawMaterialDiscountTypeEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialDiscountType')}"/>
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.RawMaterialDiscountType')}"/>
 
 </components>

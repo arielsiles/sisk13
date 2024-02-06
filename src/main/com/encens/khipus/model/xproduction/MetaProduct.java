@@ -3,7 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.MeasureUnitProduction;
+import com.encens.khipus.model.xproduction.MeasureUnitProduction;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
@@ -78,7 +78,7 @@ public class MetaProduct implements Serializable, BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idunidadmedidaproduccion", nullable = true, updatable = true, insertable = true)
-    private com.encens.khipus.model.production.MeasureUnitProduction measureUnitProduction;
+    private MeasureUnitProduction measureUnitProduction;
 
     /*@ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
     @JoinColumn(name = "IDPRODUCTOBASE", columnDefinition = "NUMBER(24,0)", nullable = false, updatable = false, insertable = true)
@@ -96,7 +96,7 @@ public class MetaProduct implements Serializable, BaseModel {
         this.company = company;
     }
 
-    public com.encens.khipus.model.production.MeasureUnitProduction getMeasureUnitProduction() {
+    public MeasureUnitProduction getMeasureUnitProduction() {
         return measureUnitProduction;
     }
 

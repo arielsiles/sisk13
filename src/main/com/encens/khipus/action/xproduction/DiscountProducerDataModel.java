@@ -1,7 +1,7 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.production.DiscountProducer;
+import com.encens.khipus.model.xproduction.DiscountProducer;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;

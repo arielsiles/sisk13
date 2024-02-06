@@ -1,10 +1,10 @@
 package com.encens.khipus.model.xproduction;
 
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.ProductionCollectionState;
-import com.encens.khipus.model.production.ProductiveZone;
-import com.encens.khipus.model.production.RawMaterialProducer;
-import com.encens.khipus.model.production.TypeMovementProducer;
+import com.encens.khipus.model.xproduction.ProductionCollectionState;
+import com.encens.khipus.model.xproduction.ProductiveZone;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.TypeMovementProducer;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;

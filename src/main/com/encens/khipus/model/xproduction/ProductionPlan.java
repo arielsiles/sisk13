@@ -3,9 +3,9 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.Production;
-import com.encens.khipus.model.production.ProductionPlanState;
-import com.encens.khipus.model.production.ProductionProduct;
+import com.encens.khipus.model.xproduction.Production;
+import com.encens.khipus.model.xproduction.ProductionPlanState;
+import com.encens.khipus.model.xproduction.ProductionProduct;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;

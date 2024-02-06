@@ -3,10 +3,10 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.IndirectCostsConfig;
-import com.encens.khipus.model.production.PeriodIndirectCost;
-import com.encens.khipus.model.production.ProductionOrder;
-import com.encens.khipus.model.production.SingleProduct;
+import com.encens.khipus.model.xproduction.IndirectCostsConfig;
+import com.encens.khipus.model.xproduction.PeriodIndirectCost;
+import com.encens.khipus.model.xproduction.ProductionOrder;
+import com.encens.khipus.model.xproduction.SingleProduct;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 

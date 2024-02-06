@@ -1,8 +1,8 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.production.RawMaterialPayment;
-import com.encens.khipus.model.production.RawMaterialPaymentState;
+import com.encens.khipus.model.xproduction.RawMaterialPayment;
+import com.encens.khipus.model.xproduction.RawMaterialPaymentState;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;

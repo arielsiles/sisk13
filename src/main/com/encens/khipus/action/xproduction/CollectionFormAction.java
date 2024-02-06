@@ -18,7 +18,7 @@ import com.encens.khipus.model.production.CollectionRecord;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.admin.BusinessUnitService;
 import com.encens.khipus.service.finances.CostCenterService;
-import com.encens.khipus.service.production.CollectionFormService;
+import com.encens.khipus.service.xproduction.CollectionFormService;
 import com.encens.khipus.service.warehouse.MonthProcessService;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.service.warehouse.WarehousePurchaseOrderService;

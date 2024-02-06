@@ -3,11 +3,11 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.OrderInput;
-import com.encens.khipus.model.production.ProductProcessing;
-import com.encens.khipus.model.production.ProductionPlanning;
-import com.encens.khipus.model.production.ProductionPlanningState;
-import com.encens.khipus.model.production.SingleProduct;
+import com.encens.khipus.model.xproduction.OrderInput;
+import com.encens.khipus.model.xproduction.ProductProcessing;
+import com.encens.khipus.model.xproduction.ProductionPlanning;
+import com.encens.khipus.model.xproduction.ProductionPlanningState;
+import com.encens.khipus.model.xproduction.SingleProduct;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
@@ -61,7 +61,7 @@ public class BaseProduct implements BaseModel {
 
     @Column(name = "estado", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.ProductionPlanningState state = com.encens.khipus.model.production.ProductionPlanningState.PENDING;
+    private ProductionPlanningState state = ProductionPlanningState.PENDING;
 
     @Column(name = "id_tmpenc")
     private Long voucherId;
@@ -77,11 +77,11 @@ public class BaseProduct implements BaseModel {
 
     @OneToMany(mappedBy = "baseProduct", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private List<com.encens.khipus.model.production.ProductProcessing> productProcessings = new ArrayList<com.encens.khipus.model.production.ProductProcessing>();
+    private List<ProductProcessing> productProcessings = new ArrayList<ProductProcessing>();
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
     @JoinColumn(name = "idplanificacionproduccion", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductionPlanning productionPlanningBase;
+    private ProductionPlanning productionPlanningBase;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -90,7 +90,7 @@ public class BaseProduct implements BaseModel {
 
     @OneToMany(mappedBy = "baseProduct", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private List<com.encens.khipus.model.production.SingleProduct> singleProducts = new ArrayList<com.encens.khipus.model.production.SingleProduct>();
+    private List<SingleProduct> singleProducts = new ArrayList<SingleProduct>();
 
     @Column(name = "costototalinsumos", nullable = true, columnDefinition = "DECIMAL(16,6)")
     private BigDecimal totalInput = new BigDecimal(0.0);
@@ -126,7 +126,7 @@ public class BaseProduct implements BaseModel {
         this.volume = volume;
     }
 
-    public List<com.encens.khipus.model.production.ProductProcessing> getProductProcessings() {
+    public List<ProductProcessing> getProductProcessings() {
         return productProcessings;
     }
 
@@ -134,7 +134,7 @@ public class BaseProduct implements BaseModel {
         this.productProcessings = productProcessings;
     }
 
-    public com.encens.khipus.model.production.ProductionPlanning getProductionPlanningBase() {
+    public ProductionPlanning getProductionPlanningBase() {
         return productionPlanningBase;
     }
 
@@ -150,7 +150,7 @@ public class BaseProduct implements BaseModel {
         this.company = company;
     }
 
-    public List<com.encens.khipus.model.production.SingleProduct> getSingleProducts() {
+    public List<SingleProduct> getSingleProducts() {
         return singleProducts;
     }
 
@@ -182,7 +182,7 @@ public class BaseProduct implements BaseModel {
         this.code = code;
     }
 
-    public com.encens.khipus.model.production.ProductionPlanningState getState() {
+    public ProductionPlanningState getState() {
         return state;
     }
 

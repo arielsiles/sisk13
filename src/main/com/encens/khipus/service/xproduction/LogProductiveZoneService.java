@@ -1,6 +1,6 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.LogProductiveZone;
+import com.encens.khipus.model.xproduction.LogProductiveZone;
 
 import javax.ejb.Local;
 

@@ -2,8 +2,8 @@ package com.encens.khipus.model.xproduction;
 
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.SingleProduct;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.SingleProduct;
 import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;

@@ -1,8 +1,8 @@
 package com.encens.khipus.model.xproduction;
 
 
-import com.encens.khipus.model.production.CollectionForm;
-import com.encens.khipus.model.production.ProductiveZone;
+import com.encens.khipus.model.xproduction.CollectionForm;
+import com.encens.khipus.model.xproduction.ProductiveZone;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -53,7 +53,7 @@ public class CollectionRecord implements com.encens.khipus.model.BaseModel {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "idzonaproductiva", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductiveZone productiveZone;
+    private com.encens.khipus.model.xproduction.ProductiveZone productiveZone;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "idplanillaacopio", nullable = false, updatable = false, insertable = true)
@@ -87,7 +87,7 @@ public class CollectionRecord implements com.encens.khipus.model.BaseModel {
         this.weightedAmount = weightedAmount;
     }
 
-    public com.encens.khipus.model.production.ProductiveZone getProductiveZone() {
+    public com.encens.khipus.model.xproduction.ProductiveZone getProductiveZone() {
         return productiveZone;
     }
 

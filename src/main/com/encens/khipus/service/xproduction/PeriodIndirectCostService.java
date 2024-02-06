@@ -2,8 +2,8 @@ package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.Month;
-import com.encens.khipus.model.production.IndirectCostsConfig;
-import com.encens.khipus.model.production.PeriodIndirectCost;
+import com.encens.khipus.model.xproduction.IndirectCostsConfig;
+import com.encens.khipus.model.xproduction.PeriodIndirectCost;
 
 import javax.ejb.Local;
 import java.util.List;

@@ -3,9 +3,9 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.FormulationInput;
-import com.encens.khipus.model.production.FormulationState;
-import com.encens.khipus.model.production.ProductionCategory;
+import com.encens.khipus.model.xproduction.FormulationInput;
+import com.encens.khipus.model.xproduction.FormulationState;
+import com.encens.khipus.model.xproduction.ProductionCategory;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -57,7 +57,7 @@ public class Formulation implements BaseModel {
     private ProductionCategory category;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "formulation")
-    private List<com.encens.khipus.model.production.FormulationInput> formulationInputList = new ArrayList<com.encens.khipus.model.production.FormulationInput>(0);
+    private List<com.encens.khipus.model.xproduction.FormulationInput> formulationInputList = new ArrayList<com.encens.khipus.model.xproduction.FormulationInput>(0);
 
     @Version
     @Column(name = "version", nullable = false)
@@ -107,7 +107,7 @@ public class Formulation implements BaseModel {
         this.version = version;
     }
 
-    public List<com.encens.khipus.model.production.FormulationInput> getFormulationInputList() {
+    public List<com.encens.khipus.model.xproduction.FormulationInput> getFormulationInputList() {
         return formulationInputList;
     }
 

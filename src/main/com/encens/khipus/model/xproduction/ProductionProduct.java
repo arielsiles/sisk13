@@ -3,8 +3,8 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.Production;
-import com.encens.khipus.model.production.ProductionPlan;
+import com.encens.khipus.model.xproduction.Production;
+import com.encens.khipus.model.xproduction.ProductionPlan;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;
 
@@ -82,7 +82,7 @@ public class ProductionProduct implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idplan", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductionPlan productionPlan;
+    private com.encens.khipus.model.xproduction.ProductionPlan productionPlan;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -132,7 +132,7 @@ public class ProductionProduct implements BaseModel {
         this.production = production;
     }
 
-    public com.encens.khipus.model.production.ProductionPlan getProductionPlan() {
+    public com.encens.khipus.model.xproduction.ProductionPlan getProductionPlan() {
         return productionPlan;
     }
 

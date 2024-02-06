@@ -2,7 +2,7 @@ package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.exception.production.ProductCompositionException;
 import com.encens.khipus.framework.service.ExtendedGenericServiceBean;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.RoundUtil;
 import com.encens.khipus.util.TopologicalSorting;

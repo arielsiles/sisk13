@@ -1,10 +1,10 @@
 package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.production.IndirectCosts;
-import com.encens.khipus.model.production.PeriodIndirectCost;
-import com.encens.khipus.model.production.ProductionOrder;
-import com.encens.khipus.model.production.SingleProduct;
+import com.encens.khipus.model.xproduction.IndirectCosts;
+import com.encens.khipus.model.xproduction.PeriodIndirectCost;
+import com.encens.khipus.model.xproduction.ProductionOrder;
+import com.encens.khipus.model.xproduction.SingleProduct;
 import com.encens.khipus.model.warehouse.SubGroup;
 
 import javax.ejb.Local;

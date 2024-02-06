@@ -1,6 +1,6 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;

@@ -1,10 +1,10 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.production.ProductionCollectionState;
-import com.encens.khipus.model.production.ProductiveZone;
-import com.encens.khipus.model.production.RawMaterialCollectionSession;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.ProductionCollectionState;
+import com.encens.khipus.model.xproduction.ProductiveZone;
+import com.encens.khipus.model.xproduction.RawMaterialCollectionSession;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;

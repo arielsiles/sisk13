@@ -1,10 +1,10 @@
 package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.exception.production.ProductCompositionException;
-import com.encens.khipus.model.production.OrderInput;
-import com.encens.khipus.model.production.ProductComposition;
-import com.encens.khipus.model.production.ProductionIngredient;
-import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.xproduction.OrderInput;
+import com.encens.khipus.model.xproduction.ProductComposition;
+import com.encens.khipus.model.xproduction.ProductionIngredient;
+import com.encens.khipus.model.xproduction.ProductionOrder;
 import com.encens.khipus.model.warehouse.ProductItem;
 
 import javax.ejb.Local;

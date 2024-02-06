@@ -1,7 +1,8 @@
 package com.encens.khipus.model.xproduction;
 
-import com.encens.khipus.model.production.ProcessedProduct;
-import com.encens.khipus.model.production.ProductionIngredient;
+import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.xproduction.ProcessedProduct;
+import com.encens.khipus.model.xproduction.ProductionIngredient;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
@@ -51,7 +52,7 @@ public class ProductComposition implements com.encens.khipus.model.BaseModel {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproductoprocesado", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProcessedProduct processedProduct;
+    private ProcessedProduct processedProduct;
 
     @OneToMany(mappedBy = "productComposition", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -63,7 +64,7 @@ public class ProductComposition implements com.encens.khipus.model.BaseModel {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.admin.Company company;
+    private Company company;
 
     public Long getId() {
         return id;
@@ -81,7 +82,7 @@ public class ProductComposition implements com.encens.khipus.model.BaseModel {
         this.producingAmount = producingAmount;
     }
 
-    public com.encens.khipus.model.production.ProcessedProduct getProcessedProduct() {
+    public ProcessedProduct getProcessedProduct() {
         return processedProduct;
     }
 
@@ -89,11 +90,11 @@ public class ProductComposition implements com.encens.khipus.model.BaseModel {
         this.processedProduct = processedProduct;
     }
 
-    public com.encens.khipus.model.admin.Company getCompany() {
+    public Company getCompany() {
         return company;
     }
 
-    public void setCompany(com.encens.khipus.model.admin.Company company) {
+    public void setCompany(Company company) {
         this.company = company;
     }
 

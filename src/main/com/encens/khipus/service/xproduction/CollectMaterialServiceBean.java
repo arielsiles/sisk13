@@ -3,7 +3,7 @@ package com.encens.khipus.service.xproduction;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.finances.*;
-import com.encens.khipus.model.production.CollectMaterial;
+import com.encens.khipus.model.xproduction.CollectMaterial;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.FinanceProviderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;

@@ -3,9 +3,9 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.*;
-import com.encens.khipus.model.production.IndirectCosts;
-import com.encens.khipus.model.production.OutputProductionVoucher;
+import com.encens.khipus.model.xproduction.*;
+import com.encens.khipus.model.xproduction.IndirectCosts;
+import com.encens.khipus.model.xproduction.OutputProductionVoucher;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
@@ -135,7 +135,7 @@ public class ProductionOrder implements BaseModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionOrder", cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private List<com.encens.khipus.model.production.OutputProductionVoucher> outputProductionVoucherList = new ArrayList<com.encens.khipus.model.production.OutputProductionVoucher>();
+    private List<OutputProductionVoucher> outputProductionVoucherList = new ArrayList<OutputProductionVoucher>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionOrder", cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -155,7 +155,7 @@ public class ProductionOrder implements BaseModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionOrder", cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-    private List<com.encens.khipus.model.production.IndirectCosts> indirectCostses = new ArrayList<com.encens.khipus.model.production.IndirectCosts>();
+    private List<IndirectCosts> indirectCostses = new ArrayList<IndirectCosts>();
 
     @OneToMany(mappedBy = "productionOrder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -217,7 +217,7 @@ public class ProductionOrder implements BaseModel {
         this.inputProductionVoucherList = inputProductionVoucherList;
     }
 
-    public List<com.encens.khipus.model.production.OutputProductionVoucher> getOutputProductionVoucherList() {
+    public List<OutputProductionVoucher> getOutputProductionVoucherList() {
         return outputProductionVoucherList;
     }
 
@@ -346,10 +346,10 @@ public class ProductionOrder implements BaseModel {
         this.unitCost = unitCost;
     }
 
-    public List<com.encens.khipus.model.production.IndirectCosts> getIndirectCostses() {
+    public List<IndirectCosts> getIndirectCostses() {
 
         if(indirectCostses == null)
-            return new ArrayList<com.encens.khipus.model.production.IndirectCosts>();
+            return new ArrayList<IndirectCosts>();
 
         return indirectCostses;
     }

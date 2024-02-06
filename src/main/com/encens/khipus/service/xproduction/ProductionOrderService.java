@@ -2,9 +2,9 @@ package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
-import com.encens.khipus.model.production.BaseProduct;
-import com.encens.khipus.model.production.ProductionOrder;
-import com.encens.khipus.model.production.ProductionProduct;
+import com.encens.khipus.model.xproduction.BaseProduct;
+import com.encens.khipus.model.xproduction.ProductionOrder;
+import com.encens.khipus.model.xproduction.ProductionProduct;
 
 import javax.ejb.Local;
 import java.util.Date;

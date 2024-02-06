@@ -1,8 +1,8 @@
 package com.encens.khipus.model.xproduction;
 
 
-import com.encens.khipus.model.production.RawMaterialPayRoll;
-import com.encens.khipus.model.production.RawMaterialProducerDiscount;
+import com.encens.khipus.model.xproduction.RawMaterialPayRoll;
+import com.encens.khipus.model.xproduction.RawMaterialProducerDiscount;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
@@ -35,7 +35,7 @@ public class RawMaterialPayRecord {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idplanillapagomateriaprima", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.RawMaterialPayRoll rawMaterialPayRoll;
+    private com.encens.khipus.model.xproduction.RawMaterialPayRoll rawMaterialPayRoll;
 
     @Column(name = "cantidadtotal", columnDefinition = "DECIMAL(24,2)" ,nullable = false)
     private double totalAmount = 0.0;
@@ -139,7 +139,7 @@ public class RawMaterialPayRecord {
         this.company = company;
     }
 
-    public com.encens.khipus.model.production.RawMaterialPayRoll getRawMaterialPayRoll() {
+    public com.encens.khipus.model.xproduction.RawMaterialPayRoll getRawMaterialPayRoll() {
         return rawMaterialPayRoll;
     }
 

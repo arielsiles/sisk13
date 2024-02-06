@@ -3,8 +3,8 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.CollectMaterial;
-import com.encens.khipus.model.production.RawMaterialPayment;
+import com.encens.khipus.model.xproduction.CollectMaterial;
+import com.encens.khipus.model.xproduction.RawMaterialPayment;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -36,11 +36,11 @@ public class RawMaterialPaymentDetail implements Serializable, BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idpagoacopiomp", nullable = false)
-    private com.encens.khipus.model.production.RawMaterialPayment rawMaterialPayment;
+    private com.encens.khipus.model.xproduction.RawMaterialPayment rawMaterialPayment;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idacopiomp", nullable = false)
-    private com.encens.khipus.model.production.CollectMaterial collectMaterial;
+    private com.encens.khipus.model.xproduction.CollectMaterial collectMaterial;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -62,7 +62,7 @@ public class RawMaterialPaymentDetail implements Serializable, BaseModel {
         this.version = version;
     }
 
-    public com.encens.khipus.model.production.RawMaterialPayment getRawMaterialPayment() {
+    public com.encens.khipus.model.xproduction.RawMaterialPayment getRawMaterialPayment() {
         return rawMaterialPayment;
     }
 
@@ -70,7 +70,7 @@ public class RawMaterialPaymentDetail implements Serializable, BaseModel {
         this.rawMaterialPayment = rawMaterialPayment;
     }
 
-    public com.encens.khipus.model.production.CollectMaterial getCollectMaterial() {
+    public com.encens.khipus.model.xproduction.CollectMaterial getCollectMaterial() {
         return collectMaterial;
     }
 

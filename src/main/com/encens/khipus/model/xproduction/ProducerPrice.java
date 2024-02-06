@@ -3,8 +3,8 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.MetaProduct;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.MetaProduct;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -45,7 +45,7 @@ public class ProducerPrice implements Serializable, BaseModel {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idmetaproductoproduccion", nullable = false)
-    private com.encens.khipus.model.production.MetaProduct metaProduct;
+    private com.encens.khipus.model.xproduction.MetaProduct metaProduct;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -91,7 +91,7 @@ public class ProducerPrice implements Serializable, BaseModel {
         this.rawMaterialProducer = rawMaterialProducer;
     }
 
-    public com.encens.khipus.model.production.MetaProduct getMetaProduct() {
+    public com.encens.khipus.model.xproduction.MetaProduct getMetaProduct() {
         return metaProduct;
     }
 

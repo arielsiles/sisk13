@@ -1,7 +1,7 @@
 package com.encens.khipus.action.xproduction;
 
 
-import com.encens.khipus.service.production.ProductionOrderCodeGeneratorService;
+import com.encens.khipus.service.xproduction.ProductionOrderCodeGeneratorService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 

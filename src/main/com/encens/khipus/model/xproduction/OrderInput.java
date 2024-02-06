@@ -2,8 +2,8 @@ package com.encens.khipus.model.xproduction;
 
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.production.BaseProduct;
-import com.encens.khipus.model.production.ProductionOrder;
+import com.encens.khipus.model.xproduction.BaseProduct;
+import com.encens.khipus.model.xproduction.ProductionOrder;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.Constants;
 import org.hibernate.validator.Length;
@@ -62,11 +62,11 @@ public class OrderInput implements BaseModel {
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idordenproduccion", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.ProductionOrder productionOrder;
+    private com.encens.khipus.model.xproduction.ProductionOrder productionOrder;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idproductobase", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.BaseProduct baseProductInput;
+    private com.encens.khipus.model.xproduction.BaseProduct baseProductInput;
 
     public Long getId() {
         return id;
@@ -92,7 +92,7 @@ public class OrderInput implements BaseModel {
         this.productItem = productItem;
     }
 
-    public com.encens.khipus.model.production.ProductionOrder getProductionOrder() {
+    public com.encens.khipus.model.xproduction.ProductionOrder getProductionOrder() {
         return productionOrder;
     }
 
@@ -148,7 +148,7 @@ public class OrderInput implements BaseModel {
         this.costTotal = costTotal;
     }
 
-    public com.encens.khipus.model.production.BaseProduct getBaseProductInput() {
+    public com.encens.khipus.model.xproduction.BaseProduct getBaseProductInput() {
         return baseProductInput;
     }
 

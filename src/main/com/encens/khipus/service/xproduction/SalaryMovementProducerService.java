@@ -4,7 +4,7 @@ import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.production.SalaryMovementProducerException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.CustomerOrder;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 
 import javax.ejb.Local;
 import java.util.Date;

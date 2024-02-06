@@ -17,7 +17,7 @@ import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.admin.BusinessUnitService;
 import com.encens.khipus.service.employees.JobContractService;
@@ -25,7 +25,7 @@ import com.encens.khipus.service.finances.CostCenterService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.finances.VoucherServiceBean;
-import com.encens.khipus.service.production.*;
+import com.encens.khipus.service.xproduction.*;
 import com.encens.khipus.service.warehouse.*;
 import com.encens.khipus.util.*;
 import com.encens.khipus.util.query.QueryUtils;
@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.encens.khipus.model.production.ProductionPlanningState.*;
+import static com.encens.khipus.model.xproduction.ProductionPlanningState.*;
 import static org.jboss.seam.international.StatusMessage.Severity.ERROR;
 
 

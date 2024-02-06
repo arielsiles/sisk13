@@ -3,7 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.Formulation;
+import com.encens.khipus.model.xproduction.Formulation;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;

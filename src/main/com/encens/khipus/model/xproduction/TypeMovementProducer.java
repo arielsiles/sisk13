@@ -9,7 +9,7 @@ package com.encens.khipus.model.xproduction;
  */
 
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.SalaryMovementProducerTypeEnum;
+import com.encens.khipus.model.xproduction.SalaryMovementProducerTypeEnum;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 
@@ -41,7 +41,7 @@ public class TypeMovementProducer implements com.encens.khipus.model.BaseModel {
 
     @Column(name = "tipo", nullable = false)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.SalaryMovementProducerTypeEnum salaryMovementProducerTypeEnum;
+    private com.encens.khipus.model.xproduction.SalaryMovementProducerTypeEnum salaryMovementProducerTypeEnum;
 
     @Column(name = "moneda", nullable = true)
     private String money;
@@ -89,7 +89,7 @@ public class TypeMovementProducer implements com.encens.khipus.model.BaseModel {
         this.typeMovement = typeMovement;
     }
 
-    public com.encens.khipus.model.production.SalaryMovementProducerTypeEnum getSalaryMovementProducerTypeEnum() {
+    public com.encens.khipus.model.xproduction.SalaryMovementProducerTypeEnum getSalaryMovementProducerTypeEnum() {
         return salaryMovementProducerTypeEnum;
     }
 

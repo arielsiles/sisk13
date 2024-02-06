@@ -1,8 +1,8 @@
 package com.encens.khipus.model.xproduction;
 
 import com.encens.khipus.model.BaseModel;
-import com.encens.khipus.model.production.DiscountProducer;
-import com.encens.khipus.model.production.RawMaterialProducer;
+import com.encens.khipus.model.xproduction.DiscountProducer;
+import com.encens.khipus.model.xproduction.RawMaterialProducer;
 import com.encens.khipus.util.Constants;
 
 import javax.persistence.*;
@@ -43,11 +43,11 @@ public class DiscountReserve implements BaseModel {
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "iddescuentoproductor", nullable = false, updatable = true, insertable = true)
-    private com.encens.khipus.model.production.DiscountProducer discountProducer;
+    private com.encens.khipus.model.xproduction.DiscountProducer discountProducer;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "idproductormateriaprima", nullable = false, updatable = false, insertable = true)
-    private com.encens.khipus.model.production.RawMaterialProducer materialProducer;
+    private com.encens.khipus.model.xproduction.RawMaterialProducer materialProducer;
 
     public Long getId() {
         return id;
@@ -81,7 +81,7 @@ public class DiscountReserve implements BaseModel {
         this.endDate = endDate;
     }
 
-    public com.encens.khipus.model.production.DiscountProducer getDiscountProducer() {
+    public com.encens.khipus.model.xproduction.DiscountProducer getDiscountProducer() {
         return discountProducer;
     }
 
@@ -89,7 +89,7 @@ public class DiscountReserve implements BaseModel {
         this.discountProducer = discountProducer;
     }
 
-    public com.encens.khipus.model.production.RawMaterialProducer getMaterialProducer() {
+    public com.encens.khipus.model.xproduction.RawMaterialProducer getMaterialProducer() {
         return materialProducer;
     }
 

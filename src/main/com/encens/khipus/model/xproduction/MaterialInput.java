@@ -3,7 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.production.SupplyType;
+import com.encens.khipus.model.xproduction.SupplyType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
@@ -59,7 +59,7 @@ public class MaterialInput implements BaseModel {
 
     @Column(name = "tipo", nullable = true)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.production.SupplyType type;
+    private com.encens.khipus.model.xproduction.SupplyType type;
 
     @Column(name = "vol1")
     private BigDecimal volumeOne;
@@ -144,7 +144,7 @@ public class MaterialInput implements BaseModel {
         this.quantityFlag = quantityFlag;
     }
 
-    public com.encens.khipus.model.production.SupplyType getType() {
+    public com.encens.khipus.model.xproduction.SupplyType getType() {
         return type;
     }
 
