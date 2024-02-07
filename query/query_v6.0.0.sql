@@ -2,21 +2,6 @@
 INSERT INTO ilva.modulo (idmodulo, descripcion, nombrerecurso, idcompania)
 VALUES (11, 'modulo de produccion de TERDEMOL', 'productionx', 1);
 ---clonando
-create table xproductobase
-(
-    idproductobase            bigint(20)    not null
-        primary key,
-    codigo                    varchar(50)   null,
-    id_tmpenc                 bigint        null,
-    no_trans                  varchar(255)  null,
-    no_vale                   varchar(255)  null,
-    estado                    varchar(20)   null,
-    costototalinsumos         decimal(16, 6)  null,
-    unidades                  int            null,
-    volumen                   decimal(8, 2) null,
-    idcompania                bigint(20)    null,
-    idplanificacionproduccion bigint(20)    null
-);
 
 ------------------
 
