@@ -92,8 +92,9 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
         paramMap.put("cashAccount", this.warehouse.getWarehouseCashAccount().getFullName());
         parameters.putAll(paramMap);
 
+        System.out.println("|Codigo|Articulo|Unidad|Costo Unit|Saldo Fis|Saldo Val");
         for (CollectionData data : beanCollection){
-            System.out.println("|"+ data.getCodeArt() +"|"+ data.getName() +"|"+ data.getUnitCost() +"|"+ data.getQuantity() + "|" + data.getAmount());
+            System.out.println("|"+ data.getCodeArt() +"|"+ data.getName() +"|"+ data.getUnit() +"|"+ data.getUnitCost() +"|"+ data.getQuantity() + "|" + data.getAmount());
         }
         try{
             File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/valuedPhysicalInventory.jasper"));

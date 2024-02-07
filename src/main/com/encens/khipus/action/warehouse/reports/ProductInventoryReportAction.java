@@ -121,8 +121,9 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         parameters.putAll(paramMap);
 
+        System.out.println("|Codigo|Articulo|Unidad|Inv Inicial|Entradas|Salidas|Saldo");
         for (CollectionData data : beanCollection){
-            System.out.println("|"+ data.getCode() +"|"+ data.getProductName() +"|"+ data.getInitialAmount() +"|"+ data.getUnitCost() +"|"+ data.getBalance());
+            System.out.println("|"+ data.getCode() +"|"+ data.getProductName() +"|"+ data.getUnit() +"|"+ data.getInitialAmount() +"|"+ data.getEntryAmount() +"|"+ data.getOutputAmount() +"|"+ data.getBalance());
         }
 
         try{
