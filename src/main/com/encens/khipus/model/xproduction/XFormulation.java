@@ -3,9 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.xproduction.FormulationInput;
-import com.encens.khipus.model.xproduction.FormulationState;
-import com.encens.khipus.model.xproduction.ProductionCategory;
+import com.encens.khipus.model.production.FormulationState;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -21,22 +19,22 @@ import java.util.List;
 
 @NamedQueries({})
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "Formulation.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XFormulation.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_formula",
+        pkColumnValue = "xpr_formula",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_formula")
-public class Formulation implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_formula")
+public class XFormulation implements BaseModel {
 
     @Id
     @Column(name = "idformula")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Formulation.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XFormulation.tableGenerator")
     private Long id;
 
     @Column(name = "nombre", nullable = false)
@@ -54,10 +52,10 @@ public class Formulation implements BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcategoria", nullable = true, updatable = false, insertable = true)
-    private ProductionCategory category;
+    private XProductionCategory category;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "formulation")
-    private List<com.encens.khipus.model.xproduction.FormulationInput> formulationInputList = new ArrayList<com.encens.khipus.model.xproduction.FormulationInput>(0);
+    private List<XFormulationInput> formulationInputList = new ArrayList<XFormulationInput>(0);
 
     @Version
     @Column(name = "version", nullable = false)
@@ -107,19 +105,19 @@ public class Formulation implements BaseModel {
         this.version = version;
     }
 
-    public List<com.encens.khipus.model.xproduction.FormulationInput> getFormulationInputList() {
+    public List<XFormulationInput> getFormulationInputList() {
         return formulationInputList;
     }
 
-    public void setFormulationInputList(List<FormulationInput> formulationInputList) {
+    public void setFormulationInputList(List<XFormulationInput> formulationInputList) {
         this.formulationInputList = formulationInputList;
     }
 
-    public ProductionCategory getCategory() {
+    public XProductionCategory getCategory() {
         return category;
     }
 
-    public void setCategory(ProductionCategory category) {
+    public void setCategory(XProductionCategory category) {
         this.category = category;
     }
 

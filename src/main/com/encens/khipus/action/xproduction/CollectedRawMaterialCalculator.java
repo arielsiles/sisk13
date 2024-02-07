@@ -1,7 +1,7 @@
 package com.encens.khipus.action.xproduction;
 
 
-import com.encens.khipus.model.production.CollectionForm;
+import com.encens.khipus.model.xproduction.CollectionForm;
 import com.encens.khipus.service.xproduction.CollectedRawMaterialCalculatorService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;

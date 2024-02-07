@@ -3,7 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.xproduction.MeasurementUnit;
+import com.encens.khipus.model.production.MeasurementUnit;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -19,22 +19,22 @@ import java.math.BigDecimal;
 
 })
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionTank.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XProductionTank.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_tanque",
+        pkColumnValue = "xpr_tanque",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_tanque")
-public class ProductionTank implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_tanque")
+public class XProductionTank implements BaseModel {
 
     @Id
     @Column(name = "idtanque")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionTank.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XProductionTank.tableGenerator")
     private Long id;
 
     @Column(name = "nombre", nullable = false)
@@ -45,7 +45,7 @@ public class ProductionTank implements BaseModel {
 
     @Column(name = "codmed")
     @Enumerated(EnumType.STRING)
-    private MeasurementUnit measureUnit;
+    private com.encens.khipus.model.production.MeasurementUnit measureUnit;
 
     @Version
     @Column(name = "version", nullable = false)

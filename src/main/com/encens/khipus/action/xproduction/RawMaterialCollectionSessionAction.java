@@ -5,7 +5,7 @@ import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.framework.service.GenericService;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.service.xproduction.RawMaterialCollectionSessionService;
 import com.encens.khipus.service.xproduction.RawMaterialProducerService;
 import com.encens.khipus.util.DateUtils;

@@ -1,9 +1,9 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.production.ProductionCollectionState;
-import com.encens.khipus.model.production.ProductiveZone;
-import com.encens.khipus.model.production.SalaryMovementGAB;
+import com.encens.khipus.model.xproduction.ProductionCollectionState;
+import com.encens.khipus.model.xproduction.ProductiveZone;
+import com.encens.khipus.model.xproduction.SalaryMovementGAB;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;

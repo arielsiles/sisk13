@@ -8,7 +8,7 @@ import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.xproduction.IndirectCosts;
 import com.encens.khipus.model.xproduction.IndirectCostsConfig;
-import com.encens.khipus.model.production.PeriodIndirectCost;
+import com.encens.khipus.model.xproduction.PeriodIndirectCost;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.employees.GestionService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;

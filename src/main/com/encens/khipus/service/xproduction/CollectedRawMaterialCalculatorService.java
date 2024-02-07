@@ -13,7 +13,7 @@ public interface CollectedRawMaterialCalculatorService {
 
     public double calculateCollectedAmountBetweenDates(Date startDate,Date endDate, MetaProduct rawMaterial);
 
-    public double calculateCollectedAmount(Date date, MetaProduct rawMaterial);
+    public double   calculateCollectedAmount(Date date, MetaProduct rawMaterial);
 
     public double calculateAvailableAmount(Date date, MetaProduct rawMaterial);
 

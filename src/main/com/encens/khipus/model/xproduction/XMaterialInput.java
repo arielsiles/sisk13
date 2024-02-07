@@ -3,7 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.xproduction.SupplyType;
+import com.encens.khipus.model.production.SupplyType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
@@ -21,18 +21,18 @@ import java.math.BigDecimal;
 
 })
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "MaterialInput.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XMaterialInput.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_material",
+        pkColumnValue = "xpr_material",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_material")
-public class MaterialInput implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_material")
+public class XMaterialInput implements BaseModel {
 
     @Id
     @Column(name = "idmaterial")
@@ -59,7 +59,7 @@ public class MaterialInput implements BaseModel {
 
     @Column(name = "tipo", nullable = true)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.xproduction.SupplyType type;
+    private com.encens.khipus.model.production.SupplyType type;
 
     @Column(name = "vol1")
     private BigDecimal volumeOne;
@@ -144,7 +144,7 @@ public class MaterialInput implements BaseModel {
         this.quantityFlag = quantityFlag;
     }
 
-    public com.encens.khipus.model.xproduction.SupplyType getType() {
+    public SupplyType getType() {
         return type;
     }
 

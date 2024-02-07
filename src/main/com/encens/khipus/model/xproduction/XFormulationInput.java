@@ -3,7 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.xproduction.Formulation;
+import com.encens.khipus.model.xproduction.XFormulation;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;
@@ -20,22 +20,22 @@ import java.math.BigDecimal;
 
 @NamedQueries({})
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "FormulationInput.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XFormulationInput.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_insumoformula",
+        pkColumnValue = "xpr_insumoformula",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_insumoformula")
-public class FormulationInput implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_insumoformula")
+public class XFormulationInput implements BaseModel {
 
     @Id
     @Column(name = "idinsumoformula")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "FormulationInput.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XFormulationInput.tableGenerator")
     private Long id;
 
     @Column(name = "cantidad")
@@ -57,11 +57,11 @@ public class FormulationInput implements BaseModel {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idformula", nullable = false, updatable = false, insertable = true)
-    private Formulation formulation;
+    private XFormulation formulation;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idform", nullable = true, updatable = true, insertable = true)
-    private Formulation secondFormulation;
+    private XFormulation secondFormulation;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -127,11 +127,11 @@ public class FormulationInput implements BaseModel {
         this.productItem = productItem;
     }
 
-    public Formulation getFormulation() {
+    public XFormulation getFormulation() {
         return formulation;
     }
 
-    public void setFormulation(Formulation formulation) {
+    public void setFormulation(XFormulation formulation) {
         this.formulation = formulation;
     }
 
@@ -143,11 +143,11 @@ public class FormulationInput implements BaseModel {
         this.inputDefault = inputDefault;
     }
 
-    public Formulation getSecondFormulation() {
+    public XFormulation getSecondFormulation() {
         return secondFormulation;
     }
 
-    public void setSecondFormulation(Formulation secondFormulation) {
+    public void setSecondFormulation(XFormulation secondFormulation) {
         this.secondFormulation = secondFormulation;
     }
 }

@@ -3,8 +3,6 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.xproduction.Production;
-import com.encens.khipus.model.xproduction.ProductionPlan;
 import com.encens.khipus.model.warehouse.ProductItem;
 import org.hibernate.annotations.Filter;
 
@@ -18,31 +16,31 @@ import java.math.BigDecimal;
  */
 
 @NamedQueries({
-        @NamedQuery(name = "ProductionProduct.findProductionByProductItem",
+        @NamedQuery(name = "XProductionProduct.findProductionByProductItem",
                 query = "Select productionProduct " +
-                        "from ProductionProduct productionProduct " +
+                        "from XProductionProduct productionProduct " +
                         "left join productionProduct.productionPlan productionPlan " +
                         "where productionPlan.date between :startDate and :endDate " +
                         "and productionProduct.productItemCode =:productItemCode "),
-        @NamedQuery(name = "ProductionProduct.findProductionByDates",
+        @NamedQuery(name = "XProductionProduct.findProductionByDates",
                 query = "Select productionProduct " +
-                        "from ProductionProduct productionProduct " +
+                        "from XProductionProduct productionProduct " +
                         "left join productionProduct.productionPlan productionPlan " +
                         "where productionPlan.date between :startDate and :endDate ")
 })
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionProduct.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XProductionProduct.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_producto",
+        pkColumnValue = "xpr_producto",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_producto")
-public class ProductionProduct implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_producto")
+public class XProductionProduct implements BaseModel {
 
     @Id
     @Column(name = "idproducto")
@@ -82,7 +80,7 @@ public class ProductionProduct implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idplan", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.xproduction.ProductionPlan productionPlan;
+    private ProductionPlan productionPlan;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -132,7 +130,7 @@ public class ProductionProduct implements BaseModel {
         this.production = production;
     }
 
-    public com.encens.khipus.model.xproduction.ProductionPlan getProductionPlan() {
+    public ProductionPlan getProductionPlan() {
         return productionPlan;
     }
 

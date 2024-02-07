@@ -1765,7 +1765,7 @@ public class ProductionPlanningAction extends GenericAction<ProductionPlanning> 
             for (MovementDetail movementDetail : movementDetailSelect) {
                 buildValidateQuantityMappings(movementDetail);
             }
-            approvalWarehouseVoucherService.approveWarehouseVoucherOrderProduction(
+            approvalWarehouseVoucherService.approveWarehouseVoucherOrderXProduction(
                     warehouseVoucherSelect.getId(),
                     getGlossMessage(inventoryMovement),
                     movementDetailUnderMinimalStockMap,

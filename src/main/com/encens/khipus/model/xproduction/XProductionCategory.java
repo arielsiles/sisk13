@@ -17,22 +17,22 @@ import javax.persistence.*;
 
 })
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionCategory.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XProductionCategory.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_categoria",
+        pkColumnValue = "xpr_categoria",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_categoria")
-public class ProductionCategory implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_categoria")
+public class XProductionCategory implements BaseModel {
 
     @Id
     @Column(name = "idcategoria")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionCategory.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XProductionCategory.tableGenerator")
     private Long id;
 
     @Column(name = "nombre", nullable = false)

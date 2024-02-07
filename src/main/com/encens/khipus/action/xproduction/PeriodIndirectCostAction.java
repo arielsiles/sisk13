@@ -1,7 +1,7 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
-import com.encens.khipus.model.production.PeriodIndirectCost;
+import com.encens.khipus.model.xproduction.PeriodIndirectCost;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.Name;

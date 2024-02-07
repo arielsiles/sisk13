@@ -3,10 +3,8 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.xproduction.Production;
-import com.encens.khipus.model.xproduction.ProductionPlanState;
-import com.encens.khipus.model.xproduction.ProductionProduct;
 import org.hibernate.annotations.Filter;
+import com.encens.khipus.model.production.ProductionPlanState;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -21,22 +19,22 @@ import java.util.List;
 
 @NamedQueries({})
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionPlan.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XProductionPlan.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_plan",
+        pkColumnValue = "xpr_plan",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_plan")
-public class ProductionPlan implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_plan")
+public class XProductionPlan implements BaseModel {
 
     @Id
     @Column(name = "idplan")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionPlan.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XProductionPlan.tableGenerator")
     private Long id;
 
     @Column(name = "nombre")
@@ -50,10 +48,10 @@ public class ProductionPlan implements BaseModel {
     private ProductionPlanState state;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "productionPlan")
-    private List<Production> productionList = new ArrayList<Production>(0);
+    private List<XProduction> productionList = new ArrayList<XProduction>(0);
 
     @OneToMany(mappedBy = "productionPlan", fetch = FetchType.LAZY)
-    private List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>(0);
+    private List<XProductionProduct> productionProductList = new ArrayList<XProductionProduct>(0);
 
     @Version
     @Column(name = "version", nullable = false)
@@ -104,23 +102,23 @@ public class ProductionPlan implements BaseModel {
         this.date = date;
     }
 
-    public List<Production> getProductionList() {
+    public List<XProduction> getProductionList() {
         return productionList;
     }
 
-    public void setProductionList(List<Production> productionList) {
+    public void setProductionList(List<XProduction> productionList) {
         this.productionList = productionList;
     }
 
-    public List<ProductionProduct> getProductionProductList() {
+    public List<XProductionProduct> getProductionProductList() {
         return productionProductList;
     }
 
-    public void setProductionProductList(List<ProductionProduct> productionProductList) {
+    public void setProductionProductList(List<XProductionProduct> productionProductList) {
         this.productionProductList = productionProductList;
     }
 
-    public ProductionPlanState getState() {
+    public com.encens.khipus.model.production.ProductionPlanState getState() {
         return state;
     }
 

@@ -4,12 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.xproduction.Formulation;
-import com.encens.khipus.model.xproduction.ProductionPlan;
-import com.encens.khipus.model.xproduction.ProductionProduct;
-import com.encens.khipus.model.xproduction.ProductionState;
-import com.encens.khipus.model.xproduction.ProductionTank;
-import com.encens.khipus.model.xproduction.Supply;
+import com.encens.khipus.model.production.ProductionState;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -25,29 +20,29 @@ import java.util.List;
 
 @NamedQueries({})
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "Production.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XProduction.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_produccion",
+        pkColumnValue = "xpr_produccion",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_produccion")
-public class Production implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_produccion")
+public class XProduction implements BaseModel {
 
     @Id
     @Column(name = "idproduccion")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Production.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XProduction.tableGenerator")
     private Long id;
 
     @Column(name = "codigo") private Integer code;
 
     @Column(name = "estado", nullable = true)
     @Enumerated(EnumType.STRING)
-    private com.encens.khipus.model.xproduction.ProductionState state;
+    private ProductionState state;
 
     @Column(name = "costototal")
     private BigDecimal totalCost;
@@ -60,21 +55,21 @@ public class Production implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idformula", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.xproduction.Formulation formulation;
+    private XFormulation formulation;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idtanque", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.xproduction.ProductionTank productionTank;
+    private XProductionTank productionTank;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idplan", nullable = true, updatable = false, insertable = true)
-    private com.encens.khipus.model.xproduction.ProductionPlan productionPlan;
+    private XProductionPlan productionPlan;
 
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
-    private List<com.encens.khipus.model.xproduction.Supply> supplyList = new ArrayList<com.encens.khipus.model.xproduction.Supply>(0);
+    private List<XSupply> supplyList = new ArrayList<XSupply>(0);
 
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
-    private List<com.encens.khipus.model.xproduction.ProductionProduct> productionProductList = new ArrayList<com.encens.khipus.model.xproduction.ProductionProduct>(0);
+    private List<XProductionProduct> productionProductList = new ArrayList<XProductionProduct>(0);
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tmpenc")
@@ -112,27 +107,27 @@ public class Production implements BaseModel {
         this.description = description;
     }
 
-    public com.encens.khipus.model.xproduction.Formulation getFormulation() {
+    public XFormulation getFormulation() {
         return formulation;
     }
 
-    public void setFormulation(Formulation formulation) {
+    public void setFormulation(XFormulation formulation) {
         this.formulation = formulation;
     }
 
-    public com.encens.khipus.model.xproduction.ProductionTank getProductionTank() {
+    public XProductionTank getProductionTank() {
         return productionTank;
     }
 
-    public void setProductionTank(ProductionTank productionTank) {
+    public void setProductionTank(XProductionTank productionTank) {
         this.productionTank = productionTank;
     }
 
-    public com.encens.khipus.model.xproduction.ProductionPlan getProductionPlan() {
+    public XProductionPlan getProductionPlan() {
         return productionPlan;
     }
 
-    public void setProductionPlan(ProductionPlan productionPlan) {
+    public void setProductionPlan(XProductionPlan productionPlan) {
         this.productionPlan = productionPlan;
     }
 
@@ -152,15 +147,15 @@ public class Production implements BaseModel {
         this.company = company;
     }
 
-    public List<com.encens.khipus.model.xproduction.Supply> getSupplyList() {
+    public List<XSupply> getSupplyList() {
         return supplyList;
     }
 
-    public void setSupplyList(List<Supply> supplyList) {
+    public void setSupplyList(List<XSupply> supplyList) {
         this.supplyList = supplyList;
     }
 
-    public com.encens.khipus.model.xproduction.ProductionState getState() {
+    public ProductionState getState() {
         return state;
     }
 
@@ -168,11 +163,11 @@ public class Production implements BaseModel {
         this.state = state;
     }
 
-    public List<com.encens.khipus.model.xproduction.ProductionProduct> getProductionProductList() {
+    public List<XProductionProduct> getProductionProductList() {
         return productionProductList;
     }
 
-    public void setProductionProductList(List<ProductionProduct> productionProductList) {
+    public void setProductionProductList(List<XProductionProduct> productionProductList) {
         this.productionProductList = productionProductList;
     }
 

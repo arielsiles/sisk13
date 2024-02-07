@@ -3,8 +3,6 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.xproduction.ProductionProduct;
-import com.encens.khipus.model.xproduction.Supply;
 import org.hibernate.annotations.Filter;
 
 import javax.persistence.*;
@@ -29,31 +27,31 @@ import javax.persistence.*;
                         "where productionPlan.date between :startDate and :endDate ")*/
 })
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductAffected.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "XProductAffected.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "pr_prodafectado",
+        pkColumnValue = "xpr_prodafectado",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "pr_prodafectado")
-public class ProductAffected implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_prodafectado")
+public class XProductAffected implements BaseModel {
 
     @Id
     @Column(name = "idprodafectado")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductAffected.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XProductAffected.tableGenerator")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idinsumo", nullable = false, updatable = false, insertable = true)
-    private Supply supply;
+    private XSupply supply;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproducto", nullable = false, updatable = false, insertable = true)
-    private ProductionProduct productionProduct;
+    private XProductionProduct productionProduct;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -71,11 +69,11 @@ public class ProductAffected implements BaseModel {
         this.id = id;
     }
 
-    public Supply getSupply() {
+    public XSupply getSupply() {
         return supply;
     }
 
-    public void setSupply(Supply supply) {
+    public void setSupply(XSupply supply) {
         this.supply = supply;
     }
 
@@ -95,11 +93,11 @@ public class ProductAffected implements BaseModel {
         this.company = company;
     }
 
-    public ProductionProduct getProductionProduct() {
+    public XProductionProduct getProductionProduct() {
         return productionProduct;
     }
 
-    public void setProductionProduct(ProductionProduct productionProduct) {
+    public void setProductionProduct(XProductionProduct productionProduct) {
         this.productionProduct = productionProduct;
     }
 }
