@@ -34,7 +34,7 @@ import java.util.List;
 
 @Name("xproductionPlanAction")
 @Scope(ScopeType.CONVERSATION)
-public class XProductionPlanAction extends GenericAction<ProductionPlan> {
+public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
     @In(create = true)
     private ProductionAction productionAction;
@@ -53,7 +53,7 @@ public class XProductionPlanAction extends GenericAction<ProductionPlan> {
     @In
     private CashAccountService cashAccountService;
 
-    private List<ProductionProduct> productList = new ArrayList<ProductionProduct>();
+    private List<XProductionProduct> productList = new ArrayList<XProductionProduct>();
 
     /*private Date startDate;
     private Date endDate;*/
@@ -63,16 +63,16 @@ public class XProductionPlanAction extends GenericAction<ProductionPlan> {
     private Gestion gestion;
     private Month month;
 
-    private ProductionProduct previousProduct;
-    private ProductionProduct productToRemove;
-    private ProductionProduct productToSum;
-    private ProductionProduct productToSubtract;
+    private XProductionProduct previousProduct;
+    private XProductionProduct productToRemove;
+    private XProductionProduct productToSum;
+    private XProductionProduct productToSubtract;
     private BigDecimal quantitySum;
     private BigDecimal quantitySubtract;
     private String gloss;
 
-    @Factory(value = "productionPlan", scope = ScopeType.STATELESS)
-    public ProductionPlan initProductionPlan() {
+    @Factory(value = "xproductionPlan", scope = ScopeType.STATELESS)
+    public XProductionPlan initProductionPlan() {
         return getInstance();
     }
 
