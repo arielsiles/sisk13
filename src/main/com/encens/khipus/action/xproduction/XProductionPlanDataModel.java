@@ -1,7 +1,7 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.production.ProductionPlan;
+import com.encens.khipus.model.xproduction.XProductionPlan;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Name("xproductionPlanDataModel")
 @Scope(ScopeType.PAGE)
-public class XProductionPlanDataModel extends QueryDataModel<Long, ProductionPlan> {
+public class XProductionPlanDataModel extends QueryDataModel<Long, XProductionPlan> {
 
     private Date startDate;
     private Date endDate;
@@ -33,7 +33,7 @@ public class XProductionPlanDataModel extends QueryDataModel<Long, ProductionPla
 
     @Override
     public String getEjbql() {
-        return "select productionPlan from ProductionPlan productionPlan";
+        return "select productionPlan from XProductionPlan productionPlan";
     }
 
     @Override

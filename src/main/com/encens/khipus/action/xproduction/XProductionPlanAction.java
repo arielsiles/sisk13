@@ -1,6 +1,6 @@
 package com.encens.khipus.action.xproduction;
 
-import com.encens.khipus.action.production.ProductionAction;
+
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
@@ -15,8 +15,8 @@ import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.IndirectCostsService;
 import com.encens.khipus.service.production.PeriodIndirectCostService;
-import com.encens.khipus.service.production.ProductionPlanService;
-import com.encens.khipus.service.production.ProductionService;
+import com.encens.khipus.service.xproduction.XProductionPlanService;
+import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
@@ -37,9 +37,9 @@ import java.util.List;
 public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
     @In(create = true)
-    private ProductionAction productionAction;
+    private XProductionAction productionAction;
     @In
-    private ProductionPlanService productionPlanService;
+    private XProductionPlanService productionPlanService;
     @In
     private PeriodIndirectCostService periodIndirectCostService;
     @In
@@ -47,7 +47,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
     @In
     private VoucherAccoutingService voucherAccoutingService;
     @In
-    private ProductionService productionService;
+    private XProductionService productionService;
     @In
     private CompanyConfigurationService companyConfigurationService;
     @In
@@ -78,17 +78,17 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
     @Override
     @Begin(nested=true, ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
-    public String select(ProductionPlan instance) {
+    public String select(XProductionPlan instance) {
         String outCome = super.select(instance);
         setProductList(getInstance().getProductionProductList());
 
         return outCome;
     }
 
-    @Factory(value = "monthsEnum")
+   /* @Factory(value = "xmonthsEnum")
     public Month[] getMonthEnum() {
         return Month.values();
-    }
+    }*/
 
     @Override
     @Begin(nested=true, ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
@@ -114,17 +114,17 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         return Outcome.SUCCESS;
     }
 
-    public void assignProductToSum(ProductionProduct productionProduct) {
+    public void assignProductToSum(XProductionProduct productionProduct) {
         setPreviousProduct(productionProduct);
-        productToSum = new ProductionProduct();
+        productToSum = new XProductionProduct();
         productToSum.setProductItem(productionProduct.getProductItem());
         productToSum.setProductItemCode(productionProduct.getProductItem().getProductItemCode());
         productToSum.setQuantity(BigDecimal.ZERO);
     }
 
-    public void assignProductToSubtract(ProductionProduct productionProduct) {
+    public void assignProductToSubtract(XProductionProduct productionProduct) {
         setPreviousProduct(productionProduct);
-        productToSubtract = new ProductionProduct();
+        productToSubtract = new XProductionProduct();
         productToSubtract.setProductItem(productionProduct.getProductItem());
         productToSubtract.setProductItemCode(productionProduct.getProductItem().getProductItemCode());
         productToSubtract.setQuantity(BigDecimal.ZERO);
@@ -183,9 +183,9 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
         Date startDate = DateUtils.getFirstDayOfMonth(this.month.getValueAsPosition(), this.gestion.getYear(), 0);
         Date endDate   = DateUtils.getLastDayOfMonth(startDate);
-        List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+        List<XProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
 
-        for (ProductionPlan productionPlan : productionPlanList){
+        for (XProductionPlan productionPlan : productionPlanList){
             if (!productionPlan.getState().equals(ProductionPlanState.FIN)){
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Production.message.unfinishedProduction");
                 return;
@@ -211,9 +211,9 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         }
 
         /** Calcula el valor total de costos indirectos, segun productos y porcentajes anteriores **/ // ??? no es necesario
-        for (ProductionPlan productionPlan : productionPlanList){
-            for (Production production : productionPlan.getProductionList()){
-                for (ProductionProduct product : production.getProductionProductList()){
+        for (XProductionPlan productionPlan : productionPlanList){
+            for (XProduction production : productionPlan.getProductionList()){
+                for (XProductionProduct product : production.getProductionProductList()){
                     for (IndirectAux indirectAux : indirectAuxList){
                         BigDecimal percentageDec = BigDecimalUtil.divide(indirectAux.getPercentage(), BigDecimalUtil.toBigDecimal(100), 6);
                         BigDecimal value = BigDecimalUtil.multiply(product.getCostC(), percentageDec, 6);
@@ -235,8 +235,8 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         List<DataVoucherDetail> dataVoucherDetailList = new ArrayList<DataVoucherDetail>();
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
 
-        for (ProductionPlan productionPlan : productionPlanList){
-            for (Production production : productionPlan.getProductionList()){
+        for (XProductionPlan productionPlan : productionPlanList){
+            for (XProduction production : productionPlan.getProductionList()){
 
                 /** ---- */
                 Voucher voucher = new Voucher();
@@ -245,7 +245,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
                 voucher.setDate(production.getProductionPlan().getDate());
                 /** ---- */
 
-                for (ProductionProduct product : production.getProductionProductList()){
+                for (XProductionProduct product : production.getProductionProductList()){
                     BigDecimal productionCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 6);
                                productionCost = BigDecimalUtil.sum(productionCost, product.getCostC(), 6);
 
@@ -263,19 +263,19 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
                 }
 
-                for (Supply supply : production.getSupplyList()){
+                for (XSupply supply : production.getSupplyList()){
 
                     if (supply.hasFormula() && supply.getFormulationInput().hasSecondFormula()){
 
                             BigDecimal quantityParam = supply.getQuantity();
-                            Formulation formulation = supply.getFormulationInput().getSecondFormulation();
+                            XFormulation formulation = supply.getFormulationInput().getSecondFormulation();
                             HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
-                            for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+                            for (XFormulationInput formulationInput : formulation.getFormulationInputList()){
                                 BigDecimal quantityVal = formulationInput.getQuantity();
                                 formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
                             }
 
-                            for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+                            for (XFormulationInput formulationInput : formulation.getFormulationInputList()){
                                 BigDecimal quantityFormulationInput = formulationInputMap.get(formulationInput.getProductItemCode());
                                 BigDecimal newQuantity = BigDecimalUtil.multiply(quantityParam, quantityFormulationInput, 6);
                                 newQuantity = BigDecimalUtil.divide(newQuantity, formulation.getTotalEquivalent(), 6);
@@ -314,7 +314,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
                 for (IndirectAux indirect : indirectAuxList){
                     BigDecimal percentage = BigDecimalUtil.divide(indirect.getPercentage(), BigDecimalUtil.ONE_HUNDRED, 6);
                     BigDecimal totalCostC     = BigDecimal.ZERO;
-                    for (ProductionProduct product : production.getProductionProductList()){
+                    for (XProductionProduct product : production.getProductionProductList()){
                         totalCostC = BigDecimalUtil.sum(totalCostC, product.getCostC(), 6);
                     }
 
@@ -362,7 +362,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
                 voucherAccoutingService.saveVoucher(voucher);
                 production.setVoucher(voucher);
-                productionService.updateProduction(production, new ArrayList<Supply>(), new ArrayList<Supply>());
+                productionService.updateProduction(production, new ArrayList<XSupply>(), new ArrayList<XSupply>());
             }
             productionPlan.setState(ProductionPlanState.SUS);
             productionPlanService.updateProductionPlan(productionPlan);
@@ -424,13 +424,13 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         // 1. Obtener las producciones del mes
         // Calcula el Volumen total por Plan de produccion (x dia)
         // 2. Calcular el volumen Total de las produccion del mes
-        List<ProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+        List<XProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
 
         BigDecimal totalVolume = BigDecimal.ZERO;
         Boolean flagState = Boolean.TRUE;
         /** Para verificar si las ordenes de produccion estan aprobadas **/
         /** Calcula el total de volumen **/
-        for (ProductionPlan productionPlan : productionPlanList){
+        for (XProductionPlan productionPlan : productionPlanList){
             totalVolume = BigDecimalUtil.sum(totalVolume, calculateTotalVolumePlan(productionPlan), 2);
             if (!productionPlan.getState().equals(ProductionPlanState.APR)){
                 flagState = Boolean.FALSE;
@@ -446,8 +446,8 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
 
         /**  test **/
-        for (ProductionPlan productionPlan : productionPlanList){
-            for (Production production : productionPlan.getProductionList()){
+        for (XProductionPlan productionPlan : productionPlanList){
+            for (XProduction production : productionPlan.getProductionList()){
                 productionAction.select(production);
                 productionAction.approve();
                 System.out.println("-------> aprobando: " + production.getCode());
@@ -461,7 +461,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         System.out.println("=-=-=-=---> TotalVolumePlan: " + totalVolumePeriod);
         // 3. Calcular los porcentajes por dia de produccion
         BigDecimal totalDistribution = BigDecimal.ZERO;
-        for (ProductionPlan productionPlan : productionPlanList){
+        for (XProductionPlan productionPlan : productionPlanList){
             BigDecimal volumeDay = calculateTotalVolumePlan(productionPlan);
             BigDecimal percentageDay = BigDecimalUtil.multiply(volumeDay, BigDecimalUtil.toBigDecimal(100), 2);
                        percentageDay = BigDecimalUtil.divide(percentageDay, totalVolumePeriod, 2);
@@ -478,12 +478,12 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         // 5. Distribuir costos por producto
         // ----------------------------------
         /** Actualizando el costo unitario de los productos **/
-        List<Supply> emptyList = new ArrayList<Supply>();
-        for (ProductionPlan productionPlan : productionPlanList){
+        List<XSupply> emptyList = new ArrayList<XSupply>();
+        for (XProductionPlan productionPlan : productionPlanList){
             System.out.println("-.-.-.-.-.-.-.-.-.----> Plan: " + productionPlan.getDate());
-            for (Production production : productionPlan.getProductionList()){
+            for (XProduction production : productionPlan.getProductionList()){
                 BigDecimal productionTotalCost = BigDecimal.ZERO;
-                for (ProductionProduct product : production.getProductionProductList()){
+                for (XProductionProduct product : production.getProductionProductList()){
                     BigDecimal  productCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 2);
                                 productCost = BigDecimalUtil.sum(productCost, product.getCostC(), 2);
 
@@ -496,18 +496,18 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
                 productionService.updateProduction(production, emptyList, emptyList);
             }
             productionPlan.setState(ProductionPlanState.FIN);
-            productionPlanService.updateProductionPlan(productionPlan, new ArrayList<ProductionProduct>());
+            productionPlanService.updateProductionPlan(productionPlan, new ArrayList<XProductionProduct>());
         }
         periodIndirectCost.setProcessed(Boolean.TRUE);
         periodIndirectCostService.updatePeriodIndirectCost(periodIndirectCost);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.indirectCostsCompleted");
     }
     /** Proceso Distribucion de costos indirectos (2) **/
-    public void distributionCostByDay(ProductionPlan productionPlan, BigDecimal distributionDay){
+    public void distributionCostByDay(XProductionPlan productionPlan, BigDecimal distributionDay){
 
         BigDecimal volumePlan = calculateTotalVolumePlan(productionPlan);
         BigDecimal totalDistribution = BigDecimal.ZERO;
-        for (Production production : productionPlan.getProductionList()){
+        for (XProduction production : productionPlan.getProductionList()){
             BigDecimal volumeProduction = productionAction.calculateTotalVolume(production);
             BigDecimal percentage = BigDecimalUtil.multiply(volumeProduction, BigDecimalUtil.toBigDecimal(100), 2);
                        percentage = BigDecimalUtil.divide(percentage, volumePlan, 2);
@@ -520,11 +520,11 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         System.out.println("-------==============> Total Dist: " + totalDistribution);
     }
     /** Proceso Distribucion de costos indirectos (3) **/
-    public void distributionCostbyProduction(Production production, BigDecimal distributionProduction){
+    public void distributionCostbyProduction(XProduction production, BigDecimal distributionProduction){
 
         BigDecimal volumeProduction = productionAction.calculateTotalVolume(production);
         BigDecimal totalDistribution = BigDecimal.ZERO;
-        for (ProductionProduct product : production.getProductionProductList()){
+        for (XProductionProduct product : production.getProductionProductList()){
             BigDecimal volumeProduct = BigDecimalUtil.multiply(product.getQuantity(), product.getProductItem().getBasicQuantity(), 2);
             BigDecimal percentage = BigDecimalUtil.multiply(volumeProduct, BigDecimalUtil.toBigDecimal(100), 2);
                        percentage = BigDecimalUtil.divide(percentage, volumeProduction, 2);
@@ -539,25 +539,25 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
     /** End Proceso Distribucion de costos indirectos **/
 
 
-    public BigDecimal calculateTotalVolumePlan(ProductionPlan productionPlan){
+    public BigDecimal calculateTotalVolumePlan(XProductionPlan productionPlan){
 
         BigDecimal result = BigDecimal.ZERO;
-        for (Production production : productionPlan.getProductionList()){
+        for (XProduction production : productionPlan.getProductionList()){
             result = BigDecimalUtil.sum(result, productionAction.calculateTotalVolume(production), 2);
         }
         return result;
     }
 
-    public void changePlanStatus(ProductionPlan productionPlan){
+    public void changePlanStatus(XProductionPlan productionPlan){
         ProductionPlanState result = ProductionPlanState.APR;
-        for (Production production : productionPlan.getProductionList()){
+        for (XProduction production : productionPlan.getProductionList()){
             if (!production.getState().equals(ProductionState.APR)) {
                 result = ProductionPlanState.PEN;
                 break;
             }
         }
 
-        for (ProductionProduct product : productionPlan.getProductionProductList()){
+        for (XProductionProduct product : productionPlan.getProductionProductList()){
             if (!hasProduction2(product)){
                 result = ProductionPlanState.PEN;
                 break;
@@ -566,18 +566,18 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         productionPlan.setState(result);
     }
 
-    public List<ProductionProduct> getProductList() {
+    public List<XProductionProduct> getProductList() {
         return productList;
     }
 
-    public void setProductList(List<ProductionProduct> productList) {
+    public void setProductList(List<XProductionProduct> productList) {
         this.productList = productList;
     }
 
     public void addProductItems(List<ProductItem> productItems){
 
         for (ProductItem productItem : productItems) {
-            ProductionProduct product = new ProductionProduct();
+            XProductionProduct product = new XProductionProduct();
             product.setUnitCost(BigDecimal.ZERO);
             product.setCostA(BigDecimal.ZERO);
             product.setCostB(BigDecimal.ZERO);
@@ -593,7 +593,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
     @In
     private InventoryService inventoryService;
 
-    public void removeProduct(ProductionProduct product){
+    public void removeProduct(XProductionProduct product){
 
         if (product.getId() != null){
             System.out.println("-----------------------------Z>>> Removing product: " + product.getProductItem().getFullName());
@@ -606,7 +606,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         }
     }
 
-    public String hasProduction(ProductionProduct productionProduct){
+    public String hasProduction(XProductionProduct productionProduct){
 
         String result = "NO";
         if (productionProduct.getProduction() != null)
@@ -615,7 +615,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         return  result;
     }
 
-    public Boolean hasProduction2(ProductionProduct productionProduct){
+    public Boolean hasProduction2(XProductionProduct productionProduct){
 
         Boolean result = Boolean.FALSE;
         if (productionProduct.getProduction() != null)
@@ -633,22 +633,22 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         return result;
     }
 
-    public BigDecimal getDestinedMilk(Production production){
+    public BigDecimal getDestinedMilk(XProduction production){
 
         BigDecimal result = BigDecimal.ZERO;
 
-        for (Supply supply : production.getSupplyList()){
+        for (XSupply supply : production.getSupplyList()){
             if (supply.getProductItemCode().equals(Constants.ID_ART_RAW_MILK))
                 result = BigDecimalUtil.sum(result, supply.getQuantity(), 2);
         }
         return result;
     }
 
-    public BigDecimal calculateTotalRawMaterial(ProductionPlan productionPlan){
+    public BigDecimal calculateTotalRawMaterial(XProductionPlan productionPlan){
 
         BigDecimal result = BigDecimal.ZERO;
 
-        for (Production production : productionPlan.getProductionList()){
+        for (XProduction production : productionPlan.getProductionList()){
             productionAction.setInstance(production);
             productionAction.setIngredientSupplyList(production.getSupplyList());
             result = BigDecimalUtil.sum(result, productionAction.calculateRawMaterial(), 2);
@@ -657,18 +657,18 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
     }
 
-    public double getTotalWeighed(ProductionPlan productionPlan){
+    public double getTotalWeighed(XProductionPlan productionPlan){
 
         double result = productionPlanService.findTotalWeighed(productionPlan.getDate());
         return result;
 
     }
 
-    public List<ProductionProduct> getProductionProductList(ProductionPlan productionPlan){
+    public List<XProductionProduct> getProductionProductList(XProductionPlan productionPlan){
 
-        List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>();
+        List<XProductionProduct> productionProductList = new ArrayList<XProductionProduct>();
         //System.out.println("=====> Plan: " + productionPlan.getDate());
-        for (ProductionProduct product : productionPlan.getProductionProductList()){
+        for (XProductionProduct product : productionPlan.getProductionProductList()){
             //System.out.println("---------->>>> Plan Product:" + productionPlan.getDate() + " - " + product.getProductItem().getFullName() + " - " + product.getQuantity());
             productionProductList.add(product);
         }
@@ -709,11 +709,11 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         this.totalVolumePeriod = totalVolumePeriod;
     }
 
-    public ProductionProduct getProductToRemove() {
+    public XProductionProduct getProductToRemove() {
         return productToRemove;
     }
 
-    public void setProductToRemove(ProductionProduct productToRemove) {
+    public void setProductToRemove(XProductionProduct productToRemove) {
         this.productToRemove = productToRemove;
     }
 
@@ -722,11 +722,11 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         setProductToRemove(null);
     }
 
-    public ProductionProduct getProductToSum() {
+    public XProductionProduct getProductToSum() {
         return productToSum;
     }
 
-    public void setProductToSum(ProductionProduct productToSum) {
+    public void setProductToSum(XProductionProduct productToSum) {
         this.productToSum = productToSum;
     }
 
@@ -754,19 +754,19 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         this.gloss = gloss;
     }
 
-    public ProductionProduct getProductToSubtract() {
+    public XProductionProduct getProductToSubtract() {
         return productToSubtract;
     }
 
-    public void setProductToSubtract(ProductionProduct productToSubtract) {
+    public void setProductToSubtract(XProductionProduct productToSubtract) {
         this.productToSubtract = productToSubtract;
     }
 
-    public ProductionProduct getPreviousProduct() {
+    public XProductionProduct getPreviousProduct() {
         return previousProduct;
     }
 
-    public void setPreviousProduct(ProductionProduct previousProduct) {
+    public void setPreviousProduct(XProductionProduct previousProduct) {
         this.previousProduct = previousProduct;
     }
 

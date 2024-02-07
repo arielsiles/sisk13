@@ -1,7 +1,7 @@
-package com.encens.khipus.service.production;
+package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.model.production.*;
-import com.encens.khipus.model.xproduction.XProduction;
+import com.encens.khipus.model.xproduction.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -18,26 +18,26 @@ import java.util.List;
  * @version $Id: ProductServiceBean.java 2008-9-11 13:50:57 $
  */
 @Stateless
-@Name("productionService")
+@Name("xproductionService")
 @AutoCreate
-public class ProductionServiceBean implements ProductionService {
+public class XProductionServiceBean implements XProductionService {
 
     @In(value = "#{entityManager}")
     private EntityManager em;
 
 
-    public void createProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList){
+    public void createProduction(XProduction production, List<XSupply> ingredientSupplyList, List<XSupply> materialSupplyList){
 
         em.persist(production);
         em.flush();
-        for (Supply supply : ingredientSupplyList){
+        for (XSupply supply : ingredientSupplyList){
             supply.setProduction(production);
             supply.setType(SupplyType.INGREDIENT);
             em.persist(supply);
             em.flush();
         }
 
-        for (Supply supply : materialSupplyList){
+        for (XSupply supply : materialSupplyList){
             supply.setProduction(production);
             supply.setType(SupplyType.MATERIAL);
             em.persist(supply);
@@ -45,10 +45,10 @@ public class ProductionServiceBean implements ProductionService {
         }
     }
 
-    public void updateProduction(Production production, List<Supply> ingredientSupplyList, List<Supply> materialSupplyList){
+    public void updateProduction(XProduction production, List<XSupply> ingredientSupplyList, List<XSupply> materialSupplyList){
 
         //System.out.println("----> Estado Produccion: " + production.getState());
-        for (Supply supply : ingredientSupplyList){
+        for (XSupply supply : ingredientSupplyList){
             if (supply.getId() == null){
                 supply.setProduction(production);
                 supply.setType(SupplyType.INGREDIENT);
@@ -60,7 +60,7 @@ public class ProductionServiceBean implements ProductionService {
             }
         }
 
-        for (Supply supply : materialSupplyList){
+        for (XSupply supply : materialSupplyList){
             if (supply.getId() == null){
                 supply.setProduction(production);
                 supply.setType(SupplyType.MATERIAL);
@@ -72,7 +72,7 @@ public class ProductionServiceBean implements ProductionService {
             }
         }
 
-        for (ProductionProduct product : production.getProductionProductList()){
+        for (XProductionProduct product : production.getProductionProductList()){
             em.merge(product);
             em.flush();
         }
@@ -85,15 +85,15 @@ public class ProductionServiceBean implements ProductionService {
     }
 
     @Override
-    public void deleteProduction(Production production) {
+    public void deleteProduction(XProduction production) {
 
-        for (ProductionProduct product : production.getProductionProductList()){
+        for (XProductionProduct product : production.getProductionProductList()){
             product.setProduction(null);
             em.merge(product);
             em.flush();
         }
 
-        for (Supply supply : production.getSupplyList()){
+        for (XSupply supply : production.getSupplyList()){
             em.remove(supply);
             em.flush();
         }
@@ -102,7 +102,7 @@ public class ProductionServiceBean implements ProductionService {
         em.flush();
     }
 
-    public void assignProduct(Production production, ProductionProduct product){
+    public void assignProduct(XProduction production, XProductionProduct product){
         product.setProduction(production);
         em.merge(product);
         em.flush();
@@ -110,7 +110,7 @@ public class ProductionServiceBean implements ProductionService {
         em.flush();
     }
 
-    public void assignMaterial(Production production, Supply supply){
+    public void assignMaterial(XProduction production, XSupply supply){
         supply.setProduction(production);
         if (supply.getId() == null){
             //supply.setType(SupplyType.MATERIAL);
@@ -123,9 +123,9 @@ public class ProductionServiceBean implements ProductionService {
 
     }
 
-    public List<Supply> getSupplyList(Production production, SupplyType type) {
+    public List<XSupply> getSupplyList(XProduction production, SupplyType type) {
 
-        List<Supply> supplyList = em.createQuery("select supply from Supply supply " +
+        List<XSupply> supplyList = em.createQuery("select supply from XSupply supply " +
                 " where supply.production = :production " +
                 " and supply.type = :type ")
                 .setParameter("production", production)
@@ -135,7 +135,7 @@ public class ProductionServiceBean implements ProductionService {
         return supplyList;
     }
 
-    public void removeProductionProduct(ProductionProduct product, Production production){
+    public void removeProductionProduct(XProductionProduct product, XProduction production){
         product.setProduction(null);
         em.merge(product);
         em.flush();
@@ -143,7 +143,7 @@ public class ProductionServiceBean implements ProductionService {
         em.flush();
     }
 
-    public void removeSupply(Supply supply){
+    public void removeSupply(XSupply supply){
 
         if (em.contains(supply)){
             em.remove(supply);
@@ -152,11 +152,11 @@ public class ProductionServiceBean implements ProductionService {
     }
 
     @Override
-    public List<Object[]> getAllProductionSuplies(Production production) {
+    public List<Object[]> getAllProductionSuplies(XProduction production) {
 
         List<Object[]> result = new ArrayList<Object[]>();
 
-        result = em.createQuery("select supply.productItemCode,  from Supply supply " +
+        result = em.createQuery("select supply.productItemCode,  from XSupply supply " +
                             " where supply.production = :production " +
                             " group by ")
                 .getResultList();
@@ -177,12 +177,12 @@ public class ProductionServiceBean implements ProductionService {
         return materialInputList;
     }
 
-    public List<MaterialInput> getIngredientOrMaterialInput(String productItemCode, SupplyType type){
+    public List<XMaterialInput> getIngredientOrMaterialInput(String productItemCode, SupplyType type){
 
-        List<MaterialInput> resultInputList = new ArrayList<MaterialInput>();
+        List<XMaterialInput> resultInputList = new ArrayList<XMaterialInput>();
 
-        resultInputList = (List<MaterialInput>)em.createQuery(
-                "select m from MaterialInput m " +
+        resultInputList = (List<XMaterialInput>)em.createQuery(
+                "select m from XMaterialInput m " +
                         "where m.productItemCode =:productItemCode " +
                         "and m.type =:type")
                 .setParameter("productItemCode", productItemCode)

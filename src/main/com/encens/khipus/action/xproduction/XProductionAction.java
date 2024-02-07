@@ -9,7 +9,8 @@ import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.XProduction;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.production.ProductionPlanService;
-import com.encens.khipus.service.production.ProductionService;
+import com.encens.khipus.service.xproduction.XProductionPlanService;
+import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
@@ -42,9 +43,9 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XProductionPlanAction productionPlanAction;
 
     @In
-    private ProductionService productionService;
+    private XProductionService productionService;
     @In
-    private ProductionPlanService productionPlanService;
+    private XProductionPlanService productionPlanService;
     @In
     private SequenceService sequenceService;
 
@@ -343,7 +344,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         addMaterialDefault(product, product.getQuantity());
     }
 
-    public void assignSupply(Supply supply){
+    public void assignSupply(XSupply supply){
         setSupplyAssign(supply);
     }
 
@@ -358,7 +359,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         List<XMaterialInput> materialInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.MATERIAL);
         List<XMaterialInput> ingredientInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.INGREDIENT);
 
-        for (MaterialInput materialInput : materialInputList){
+        for (XMaterialInput materialInput : materialInputList){
             XSupply supply = new XSupply();
             supply.setProductItemCode(materialInput.getProductItemMaterialCode());
             supply.setProductItem(materialInput.getProductItemMaterial());
@@ -468,20 +469,20 @@ public class XProductionAction extends GenericAction<XProduction> {
     }
 
 
-    public BigDecimal calculateCost_compoundSupply(Supply supplyDetail){
+    public BigDecimal calculateCost_compoundSupply(XSupply supplyDetail){
 
         BigDecimal quantityParam = supplyDetail.getQuantity();
         System.out.println("=======> Supply quantityParam: " + supplyDetail.getProductItem().getFullName() + " - Q: " + quantityParam);
-        Formulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
+        XFormulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
 
         HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
-        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+        for (XFormulationInput formulationInput : formulation.getFormulationInputList()){
             BigDecimal quantityVal = formulationInput.getQuantity();
             formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
         }
 
         BigDecimal totalCost = BigDecimal.ZERO;
-        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+        for (XFormulationInput formulationInput : formulation.getFormulationInputList()){
             BigDecimal quantityFormulationInput = formulationInputMap.get(formulationInput.getProductItemCode());
             BigDecimal newQuantity = BigDecimalUtil.multiply(quantityParam, quantityFormulationInput, 6);
                        newQuantity = BigDecimalUtil.divide(newQuantity, formulation.getTotalEquivalent(), 6);
@@ -497,19 +498,19 @@ public class XProductionAction extends GenericAction<XProduction> {
         return BigDecimalUtil.divide(totalCost, quantityParam, 6);
     }
 
-    public BigDecimal calculateTotalRawMaterial_compoundSupply(Supply supplyDetail){
+    public BigDecimal calculateTotalRawMaterial_compoundSupply(XSupply supplyDetail){
 
         BigDecimal quantityParam = supplyDetail.getQuantity();
-        Formulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
+        XFormulation formulation = supplyDetail.getFormulationInput().getSecondFormulation();
 
         HashMap<String, BigDecimal> formulationInputMap = new HashMap<String, BigDecimal>();
-        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+        for (XFormulationInput formulationInput : formulation.getFormulationInputList()){
             BigDecimal quantityVal = formulationInput.getQuantity();
             formulationInputMap.put(formulationInput.getProductItemCode(), quantityVal);
         }
 
         BigDecimal totalRawMaterial = BigDecimal.ZERO;
-        for (FormulationInput formulationInput : formulation.getFormulationInputList()){
+        for (XFormulationInput formulationInput : formulation.getFormulationInputList()){
             BigDecimal quantityFormulationInput = formulationInputMap.get(formulationInput.getProductItemCode());
             BigDecimal newQuantity = BigDecimalUtil.multiply(quantityParam, quantityFormulationInput, 6);
             newQuantity = BigDecimalUtil.divide(newQuantity, formulation.getTotalEquivalent(), 6);

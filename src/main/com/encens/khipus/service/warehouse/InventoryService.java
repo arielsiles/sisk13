@@ -4,6 +4,7 @@ import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.model.xproduction.XProductionProduct;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -29,6 +30,9 @@ public interface InventoryService extends GenericService {
     void updateInventoryForSales(CustomerOrder customerOrder);
     void updateInventoryForProduction(ProductionProduct product);
 
+    void updateInventoryForProduction(XProductionProduct product);
+
     void updateInventoryForSalesAnnuled(CustomerOrder customerOrder);
     void updateInventoryRemoveFromProduction(ProductionProduct product);
+    void updateInventoryRemoveFromProduction(XProductionProduct product);
 }
