@@ -1,43 +1,39 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.xproduction.GestionTax;
+import com.encens.khipus.model.production.ProductionPlan;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
- * @author
- * @version 2.2
+ *
  */
-
-@Name("gestionTaxSearchDataModel")
+@Name("xproductionPlanDataModel")
 @Scope(ScopeType.PAGE)
-public class GestionTaxSearchDataModel extends QueryDataModel<Long, GestionTax> {
+public class XProductionPlanDataModel extends QueryDataModel<Long, ProductionPlan> {
 
     private Date startDate;
     private Date endDate;
 
-    private static final String[] RESTRICTIONS =
-            {
-                    "gestionTax.startDate = #{gestionTaxSearchDataModel.startDate} ",
-                    "gestionTax.endDate = #{gestionTaxSearchDataModel.endDate} "
-            };
+    private static final String[] RESTRICTIONS = {"" +
+            "productionPlan.date >= #{productionPlanDataModel.startDate}",
+            "productionPlan.date <= #{productionPlanDataModel.endDate}"};
 
     @Create
     public void init() {
-        sortProperty = "gestionTax.endDate";
+        sortProperty = "productionPlan.date";
+        sortAsc = false;
     }
 
     @Override
     public String getEjbql() {
-        return "select gestionTax from GestionTax gestionTax";
+        return "select productionPlan from ProductionPlan productionPlan";
     }
 
     @Override
@@ -59,16 +55,5 @@ public class GestionTaxSearchDataModel extends QueryDataModel<Long, GestionTax> 
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-    public List<GestionTax> getSelectedGestionTaxs() {
-        List ids = super.getSelectedIdList();
-
-        List<GestionTax> result = new ArrayList<GestionTax>();
-        for (Object id : ids) {
-            result.add(getEntityManager().find(GestionTax.class, id));
-        }
-
-        return result;
     }
 }

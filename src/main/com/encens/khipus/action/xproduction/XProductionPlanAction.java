@@ -1,20 +1,22 @@
 package com.encens.khipus.action.xproduction;
 
+import com.encens.khipus.action.production.ProductionAction;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
+import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
-import com.encens.khipus.service.xproduction.IndirectCostsService;
-import com.encens.khipus.service.xproduction.PeriodIndirectCostService;
-import com.encens.khipus.service.xproduction.ProductionPlanService;
-import com.encens.khipus.service.xproduction.ProductionService;
+import com.encens.khipus.service.production.IndirectCostsService;
+import com.encens.khipus.service.production.PeriodIndirectCostService;
+import com.encens.khipus.service.production.ProductionPlanService;
+import com.encens.khipus.service.production.ProductionService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
@@ -30,9 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 
 
-@Name("productionPlanAction")
+@Name("xproductionPlanAction")
 @Scope(ScopeType.CONVERSATION)
-public class ProductionPlanAction extends GenericAction<ProductionPlan> {
+public class XProductionPlanAction extends GenericAction<ProductionPlan> {
 
     @In(create = true)
     private ProductionAction productionAction;

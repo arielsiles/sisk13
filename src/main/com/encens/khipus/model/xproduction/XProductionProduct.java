@@ -44,7 +44,7 @@ public class XProductionProduct implements BaseModel {
 
     @Id
     @Column(name = "idproducto")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionProduct.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XProductionProduct.tableGenerator")
     private Long id;
 
     @Column(name = "cod_art")
@@ -76,11 +76,11 @@ public class XProductionProduct implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproduccion", nullable = true, updatable = true, insertable = true)
-    private Production production;
+    private XProduction production;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idplan", nullable = true, updatable = false, insertable = true)
-    private ProductionPlan productionPlan;
+    private XProductionPlan productionPlan;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -122,19 +122,19 @@ public class XProductionProduct implements BaseModel {
         this.quantity = quantity;
     }
 
-    public Production getProduction() {
+    public XProduction getProduction() {
         return production;
     }
 
-    public void setProduction(Production production) {
+    public void setProduction(XProduction production) {
         this.production = production;
     }
 
-    public ProductionPlan getProductionPlan() {
+    public XProductionPlan getProductionPlan() {
         return productionPlan;
     }
 
-    public void setProductionPlan(ProductionPlan productionPlan) {
+    public void setProductionPlan(XProductionPlan productionPlan) {
         this.productionPlan = productionPlan;
     }
 

@@ -28,8 +28,7 @@ public interface InventoryService extends GenericService {
     public Warehouse findWarehouseByItemArticle(ProductItem productItem);
     void updateInventoryForSales(CustomerOrder customerOrder);
     void updateInventoryForProduction(ProductionProduct product);
-    void updateInventoryForProduction(com.encens.khipus.model.xproduction.ProductionProduct product);
+
     void updateInventoryForSalesAnnuled(CustomerOrder customerOrder);
-    void updateInventoryRemoveFromProduction(com.encens.khipus.model.xproduction.ProductionProduct product);
     void updateInventoryRemoveFromProduction(ProductionProduct product);
 }

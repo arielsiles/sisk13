@@ -36,7 +36,7 @@ public class XMaterialInput implements BaseModel {
 
     @Id
     @Column(name = "idmaterial")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "MaterialInput.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XMaterialInput.tableGenerator")
     private Long id;
 
     @Column(name = "cod_art")

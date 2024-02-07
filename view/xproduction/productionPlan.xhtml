@@ -10,7 +10,7 @@
 
 <ui:define name="pageTitle">
     <c:choose>
-        <c:when test="#{productionPlanAction.managed}">
+        <c:when test="#{xproductionPlanAction.managed}">
             #{messages['ProductionPlan.edit']}
         </c:when>
         <c:otherwise>
@@ -31,7 +31,7 @@
                            value="#{messages['ProductionPlan.addProduct']}"
                            styleClass="button"
                            immediate="true"
-                           rendered="#{productionPlanAction.managed and productionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"
+                           rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"
                            oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
                            reRender="productItemsByWarehouseListModalPanel">
@@ -39,27 +39,27 @@
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
         </a4j:commandButton>
 
-        <h:commandButton action="#{productionPlanAction.addProduction}"
+        <h:commandButton action="#{xproductionPlanAction.addProduction}"
                          value="#{messages['ProductionPlan.addProduction']}"
                          styleClass="button"
                          immediate="true"
-                         rendered="#{productionPlanAction.managed and productionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"/>
+                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"/>
 
-        <h:commandButton action="#{productionPlanAction.update}" value="#{messages['Common.update']}"
+        <h:commandButton action="#{xproductionPlanAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
-                         rendered="#{productionPlanAction.managed and productionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"
+                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{productionPlanAction.create}" value="#{messages['Common.save']}"
+        <h:commandButton action="#{xproductionPlanAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
-                         rendered="#{!productionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
+                         rendered="#{!xproductionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{productionPlanAction.cancel}" value="#{messages['Common.cancel']}"
+        <h:commandButton action="#{xproductionPlanAction.cancel}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true"
                          tabindex="4">
         </h:commandButton>
@@ -69,7 +69,7 @@
 
         <f:facet name="header">
             <c:choose>
-                <c:when test="#{productionPlanAction.managed}">
+                <c:when test="#{xproductionPlanAction.managed}">
                     #{messages['ProductionPlan.edit']}
                 </c:when>
                 <c:otherwise>
@@ -87,7 +87,7 @@
                                    popup="true"
                                    datePattern="#{messages['patterns.date']}"
                                    styleClass="input"
-                                   disabled="#{!productionPlanAction.pending and productionPlanAction.managed}"
+                                   disabled="#{!xproductionPlanAction.pending and xproductionPlanAction.managed}"
                                    enableManualInput="true"
                                    tabindex="9">
                         <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
@@ -96,7 +96,7 @@
 
                 <s:decorate id="totalWeighedField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.milkWeighing']}</ui:define>
-                    <h:outputText value="#{productionPlanAction.getTotalWeighed(productionPlan)}">
+                    <h:outputText value="#{xproductionPlanAction.getTotalWeighed(productionPlan)}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                     <span class="spacer"></span>
@@ -105,7 +105,7 @@
 
                 <s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.usedMilk']}</ui:define>
-                    <h:outputText value="#{productionPlanAction.calculateTotalRawMaterial(productionPlan)}">
+                    <h:outputText value="#{xproductionPlanAction.calculateTotalRawMaterial(productionPlan)}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                     <span class="spacer"></span>
@@ -120,12 +120,12 @@
         </h:panelGrid>
     </rich:panel>
 
-    <c:if test="#{productionPlanAction.managed}">
+    <c:if test="#{xproductionPlanAction.managed}">
     <rich:tabPanel switchType="ajax" selectedTab="productionTab">
 
         <rich:tab name="productionTab" label="#{messages['ProductionPlan.production']}" ajaxSingle="true" immediate="true">
             <rich:dataTable id="productionListId"
-                            value="#{productionDataModel}"
+                            value="#{xproductionDataModel}"
                             var="productionItem"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
@@ -165,13 +165,13 @@
 
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}" immediate="true"
-                                   action="#{productionAction.select(productionItem)}"
+                                   action="#{xproductionAction.select(productionItem)}"
                                    rendered="#{s:hasPermission('PRODUCTION','VIEW')}" />
                 </rich:column>
             </rich:dataTable>
             <app:dataScroller id="productionListDataScrollerId"
                               for="productionListId"
-                              dataModel="#{productionDataModel}"/>
+                              dataModel="#{xproductionDataModel}"/>
         </rich:tab>
 
         <rich:tab name="productsTab" label="#{messages['ProductionPlan.products']}" ajaxSingle="true" immediate="true">
@@ -186,7 +186,7 @@
                         <th class="rich-table-headercell">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
-                    <c:forEach var="productItem" items="#{productionPlanAction.productList}" varStatus="row">
+                    <c:forEach var="productItem" items="#{xproductionPlanAction.productList}" varStatus="row">
                         <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
 
                         <tr class="rich-table-row">
@@ -200,7 +200,7 @@
 
                                 <a4j:commandLink title="#{messages['Common.remove']}"
                                                  immediate="true"
-                                                 action="#{productionPlanAction.assignProductToSubtract(productItem)}"
+                                                 action="#{xproductionPlanAction.assignProductToSubtract(productItem)}"
                                                  ajaxSingle="true"
                                                  oncomplete="Richfaces.showModalPanel('removeProductQuantityModalPanel');"
                                                  reRender="productsPanel, removeProductQuantityModalPanel">
@@ -209,7 +209,7 @@
 
                                 <rich:spacer width="5"/>
 
-                                <c:if test="#{!productionPlanAction.hasProduction2(productItem)}">
+                                <c:if test="#{!xproductionPlanAction.hasProduction2(productItem)}">
                                 <h:inputText id="#{quantityInputFieldId}"
                                              value="#{productItem.quantity}"
                                              disabled="#{productItem.id != null}"
@@ -218,7 +218,7 @@
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="productsPanel" />
                                 </h:inputText>
                                 </c:if>
-                                <c:if test="#{productionPlanAction.hasProduction2(productItem)}">
+                                <c:if test="#{xproductionPlanAction.hasProduction2(productItem)}">
                                     <h:outputText value="#{productItem.quantity}"
                                                   styleClass="inputSmall right" >
                                         <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimalNumber']}" forId="#{quantityInputFieldId}"/>
@@ -229,7 +229,7 @@
 
                                 <a4j:commandLink title="#{messages['Common.add']}"
                                                  immediate="true"
-                                                 action="#{productionPlanAction.assignProductToSum(productItem)}"
+                                                 action="#{xproductionPlanAction.assignProductToSum(productItem)}"
                                                  ajaxSingle="true"
                                                  oncomplete="Richfaces.showModalPanel('addProductQuantityModalPanel');"
                                                  reRender="productsPanel, addProductQuantityModalPanel">
@@ -238,14 +238,14 @@
 
                             </td>
                             <td class="rich-table-cell" align="center">
-                                <h:outputText value="#{productionPlanAction.hasProduction(productItem)}"/>
+                                <h:outputText value="#{xproductionPlanAction.hasProduction(productItem)}"/>
                             </td>
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
-                                                 action="#{productionPlanAction.setProductToRemove(productItem)}"
+                                                 action="#{xproductionPlanAction.setProductToRemove(productItem)}"
                                                  ajaxSingle="true"
-                                                 rendered="#{!productionPlanAction.hasProduction2(productItem)}"
+                                                 rendered="#{!xproductionPlanAction.hasProduction2(productItem)}"
                                                  reRender="productsPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                     <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
@@ -279,7 +279,7 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{productionPlanAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               action="#{xproductionPlanAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
                                value="#{messages['Common.add']}"
                                reRender="productsPanel"
                                styleClass="button"
@@ -296,7 +296,7 @@
             </p>
         </ui:define>
         <ui:define name="dialogOption">
-            <a4j:commandButton action="#{productionPlanAction.removeProductionProduct()}"
+            <a4j:commandButton action="#{xproductionPlanAction.removeProductionProduct()}"
                                value="#{messages['Common.delete']}"
                                immediate="true"
                                styleClass="button"
