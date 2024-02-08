@@ -83,7 +83,7 @@
             <s:div>
                 <s:decorate id="birthDayField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.date']}</ui:define>
-                    <rich:calendar value="#{productionPlan.date}"
+                    <rich:calendar value="#{xproductionPlan.date}"
                                    popup="true"
                                    datePattern="#{messages['patterns.date']}"
                                    styleClass="input"
@@ -96,7 +96,7 @@
 
                 <s:decorate id="totalWeighedField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.milkWeighing']}</ui:define>
-                    <h:outputText value="#{xproductionPlanAction.getTotalWeighed(productionPlan)}">
+                    <h:outputText value="#{xproductionPlanAction.getTotalWeighed(xproductionPlan)}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                     <span class="spacer"></span>
@@ -105,7 +105,7 @@
 
                 <s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.usedMilk']}</ui:define>
-                    <h:outputText value="#{xproductionPlanAction.calculateTotalRawMaterial(productionPlan)}">
+                    <h:outputText value="#{xproductionPlanAction.calculateTotalRawMaterial(xproductionPlan)}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                     <span class="spacer"></span>
