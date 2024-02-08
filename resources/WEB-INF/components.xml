@@ -58,6 +58,7 @@
             <value>/WEB-INF/dashboard/pages.xml</value>
             <value>/WEB-INF/treasury/pages.xml</value>
             <value>/WEB-INF/production/pages.xml</value>
+            <value>/WEB-INF/xproduction/pages.xml</value>
             <value>/WEB-INF/accounting/pages.xml</value>
 
         </navigation:resources>
