@@ -37,9 +37,9 @@ import java.util.List;
 public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
     @In(create = true)
-    private XProductionAction productionAction;
+    private XProductionAction xproductionAction;
     @In
-    private XProductionPlanService productionPlanService;
+    private XProductionPlanService xproductionPlanService;
     @In
     private PeriodIndirectCostService periodIndirectCostService;
     @In
@@ -47,7 +47,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
     @In
     private VoucherAccoutingService voucherAccoutingService;
     @In
-    private XProductionService productionService;
+    private XProductionService xproductionService;
     @In
     private CompanyConfigurationService companyConfigurationService;
     @In
@@ -101,15 +101,15 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
     @Override
     public String update() {
-        productionPlanService.updateProductionPlan(getInstance(), productList);
+        xproductionPlanService.updateProductionPlan(getInstance(), productList);
         addUpdatedMessage();
         return Outcome.SUCCESS;
     }
 
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)
     public String addProduction() {
-        productionAction.clearAction();
-        productionAction.setProductionPlan(getInstance());
+        xproductionAction.clearAction();
+        xproductionAction.setProductionPlan(getInstance());
         /*setOp(OP_UPDATE);*/
         return Outcome.SUCCESS;
     }
@@ -136,7 +136,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         previousProduct.setQuantity(BigDecimalUtil.sum(previousProduct.getQuantity(), quantitySum));
 
         //Actualizar ProductItem
-        productionPlanService.updateProductForProduction(productToSum);
+        xproductionPlanService.updateProductForProduction(productToSum);
         //Actualizar inventario
         inventoryService.updateInventoryForProduction(productToSum);
 
@@ -149,7 +149,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         previousProduct.setQuantity(BigDecimalUtil.subtract(previousProduct.getQuantity(), quantitySubtract));
 
         //Actualizar ProductItem
-        productionPlanService.updateProductItemRemoveFromProduction(productToSubtract);
+        xproductionPlanService.updateProductItemRemoveFromProduction(productToSubtract);
         //Actualizar inventario
         inventoryService.updateInventoryRemoveFromProduction(productToSubtract);
 
@@ -183,7 +183,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
         Date startDate = DateUtils.getFirstDayOfMonth(this.month.getValueAsPosition(), this.gestion.getYear(), 0);
         Date endDate   = DateUtils.getLastDayOfMonth(startDate);
-        List<XProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+        List<XProductionPlan> productionPlanList = xproductionPlanService.getProductionPlanList(startDate, endDate);
 
         for (XProductionPlan productionPlan : productionPlanList){
             if (!productionPlan.getState().equals(ProductionPlanState.FIN)){
@@ -362,10 +362,10 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
                 voucherAccoutingService.saveVoucher(voucher);
                 production.setVoucher(voucher);
-                productionService.updateProduction(production, new ArrayList<XSupply>(), new ArrayList<XSupply>());
+                xproductionService.updateProduction(production, new ArrayList<XSupply>(), new ArrayList<XSupply>());
             }
             productionPlan.setState(ProductionPlanState.SUS);
-            productionPlanService.updateProductionPlan(productionPlan);
+            xproductionPlanService.updateProductionPlan(productionPlan);
         }
         periodIndirectCost.setAccounting(Boolean.TRUE);
         periodIndirectCostService.updatePeriodIndirectCost(periodIndirectCost);
@@ -424,7 +424,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         // 1. Obtener las producciones del mes
         // Calcula el Volumen total por Plan de produccion (x dia)
         // 2. Calcular el volumen Total de las produccion del mes
-        List<XProductionPlan> productionPlanList = productionPlanService.getProductionPlanList(startDate, endDate);
+        List<XProductionPlan> productionPlanList = xproductionPlanService.getProductionPlanList(startDate, endDate);
 
         BigDecimal totalVolume = BigDecimal.ZERO;
         Boolean flagState = Boolean.TRUE;
@@ -448,8 +448,8 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         /**  test **/
         for (XProductionPlan productionPlan : productionPlanList){
             for (XProduction production : productionPlan.getProductionList()){
-                productionAction.select(production);
-                productionAction.approve();
+                xproductionAction.select(production);
+                xproductionAction.approve();
                 System.out.println("-------> aprobando: " + production.getCode());
             }
         }
@@ -493,10 +493,10 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
                 }
                 production.setState(ProductionState.FIN);
                 production.setTotalCost(productionTotalCost);
-                productionService.updateProduction(production, emptyList, emptyList);
+                xproductionService.updateProduction(production, emptyList, emptyList);
             }
             productionPlan.setState(ProductionPlanState.FIN);
-            productionPlanService.updateProductionPlan(productionPlan, new ArrayList<XProductionProduct>());
+            xproductionPlanService.updateProductionPlan(productionPlan, new ArrayList<XProductionProduct>());
         }
         periodIndirectCost.setProcessed(Boolean.TRUE);
         periodIndirectCostService.updatePeriodIndirectCost(periodIndirectCost);
@@ -508,7 +508,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         BigDecimal volumePlan = calculateTotalVolumePlan(productionPlan);
         BigDecimal totalDistribution = BigDecimal.ZERO;
         for (XProduction production : productionPlan.getProductionList()){
-            BigDecimal volumeProduction = productionAction.calculateTotalVolume(production);
+            BigDecimal volumeProduction = xproductionAction.calculateTotalVolume(production);
             BigDecimal percentage = BigDecimalUtil.multiply(volumeProduction, BigDecimalUtil.toBigDecimal(100), 2);
                        percentage = BigDecimalUtil.divide(percentage, volumePlan, 2);
 
@@ -522,7 +522,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
     /** Proceso Distribucion de costos indirectos (3) **/
     public void distributionCostbyProduction(XProduction production, BigDecimal distributionProduction){
 
-        BigDecimal volumeProduction = productionAction.calculateTotalVolume(production);
+        BigDecimal volumeProduction = xproductionAction.calculateTotalVolume(production);
         BigDecimal totalDistribution = BigDecimal.ZERO;
         for (XProductionProduct product : production.getProductionProductList()){
             BigDecimal volumeProduct = BigDecimalUtil.multiply(product.getQuantity(), product.getProductItem().getBasicQuantity(), 2);
@@ -543,7 +543,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
         BigDecimal result = BigDecimal.ZERO;
         for (XProduction production : productionPlan.getProductionList()){
-            result = BigDecimalUtil.sum(result, productionAction.calculateTotalVolume(production), 2);
+            result = BigDecimalUtil.sum(result, xproductionAction.calculateTotalVolume(production), 2);
         }
         return result;
     }
@@ -598,9 +598,9 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         if (product.getId() != null){
             System.out.println("-----------------------------Z>>> Removing product: " + product.getProductItem().getFullName());
             productList.remove(product);
-            productionPlanService.removeProduct(product);
+            xproductionPlanService.removeProduct(product);
             inventoryService.updateInventoryRemoveFromProduction(product);
-            productionPlanService.updateProductItemRemoveFromProduction(product);
+            xproductionPlanService.updateProductItemRemoveFromProduction(product);
         }else {
             productList.remove(product);
         }
@@ -649,9 +649,9 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
         BigDecimal result = BigDecimal.ZERO;
 
         for (XProduction production : productionPlan.getProductionList()){
-            productionAction.setInstance(production);
-            productionAction.setIngredientSupplyList(production.getSupplyList());
-            result = BigDecimalUtil.sum(result, productionAction.calculateRawMaterial(), 2);
+            xproductionAction.setInstance(production);
+            xproductionAction.setIngredientSupplyList(production.getSupplyList());
+            result = BigDecimalUtil.sum(result, xproductionAction.calculateRawMaterial(), 2);
         }
         return result;
 
@@ -659,7 +659,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
     public double getTotalWeighed(XProductionPlan productionPlan){
 
-        double result = productionPlanService.findTotalWeighed(productionPlan.getDate());
+        double result = xproductionPlanService.findTotalWeighed(productionPlan.getDate());
         return result;
 
     }

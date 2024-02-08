@@ -1,6 +1,6 @@
 package com.encens.khipus.action.xproduction;
 
-import com.encens.khipus.action.xproduction.XProductionPlanAction;
+
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.production.*;
@@ -8,7 +8,6 @@ import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.XProduction;
 import com.encens.khipus.service.common.SequenceService;
-import com.encens.khipus.service.production.ProductionPlanService;
 import com.encens.khipus.service.xproduction.XProductionPlanService;
 import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -40,12 +39,12 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XSupply supplyAssign;
 
     @In
-    private XProductionPlanAction productionPlanAction;
+    private XProductionPlanAction xProductionPlanAction;
 
     @In
-    private XProductionService productionService;
+    private XProductionService xProductionService;
     @In
-    private XProductionPlanService productionPlanService;
+    private XProductionPlanService xProductionPlanService;
     @In
     private SequenceService sequenceService;
 
@@ -61,8 +60,8 @@ public class XProductionAction extends GenericAction<XProduction> {
         String outCome = super.select(instance);
         setFormulation(getInstance().getFormulation());
         setProductionTank(getInstance().getProductionTank());
-        setIngredientSupplyList(productionService.getSupplyList(getInstance(), SupplyType.INGREDIENT));
-        setMaterialSupplyList(productionService.getSupplyList(getInstance(), SupplyType.MATERIAL));
+        setIngredientSupplyList(xProductionService.getSupplyList(getInstance(), SupplyType.INGREDIENT));
+        setMaterialSupplyList(xProductionService.getSupplyList(getInstance(), SupplyType.MATERIAL));
 
         return outCome;
     }
@@ -78,7 +77,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
         Long seq = sequenceService.createOrUpdateNextSequenceValue(Constants.PRODUCTION_CODE);
         production.setCode(seq.intValue());
-        productionService.createProduction(production, ingredientSupplyList, materialSupplyList);
+        xProductionService.createProduction(production, ingredientSupplyList, materialSupplyList);
 
         /*setOp(OP_UPDATE);*/
         super.select(production);
@@ -95,14 +94,14 @@ public class XProductionAction extends GenericAction<XProduction> {
         //System.out.println("-------> Update Total mil: " + calculateRawMaterial());
         production.setTotalCost(calculateTotalCost());
         production.setTotalRawMaterial(calculateRawMaterial());
-        productionService.updateProduction(production, ingredientSupplyList, materialSupplyList);
+        xProductionService.updateProduction(production, ingredientSupplyList, materialSupplyList);
 
         return Outcome.SUCCESS;
     }
 
     @Override
     public String delete() {
-        productionService.deleteProduction(getInstance());
+        xProductionService.deleteProduction(getInstance());
         addDeletedMessage();
         return Outcome.SUCCESS;
     }
@@ -116,8 +115,8 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void disapprove(){
         getInstance().setState(ProductionState.PEN);
-        productionPlanAction.changePlanStatus(getInstance().getProductionPlan());
-        productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
+        xProductionPlanAction.changePlanStatus(getInstance().getProductionPlan());
+        xProductionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.disapproveProduction");
     }
     /**
@@ -206,9 +205,9 @@ public class XProductionAction extends GenericAction<XProduction> {
 
         updateUnitCostProducts(getInstance());
         getInstance().setState(ProductionState.APR);
-        productionPlanAction.changePlanStatus(getInstance().getProductionPlan());
+        xProductionPlanAction.changePlanStatus(getInstance().getProductionPlan());
 
-        productionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
+        xProductionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
     }
 
@@ -327,7 +326,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
 
     public List<XProductionProduct> getProductionProductList(){
-        List<XProductionProduct> productionProductList = productionPlanService.getProductionProductList(getInstance().getProductionPlan());
+        List<XProductionProduct> productionProductList = xProductionPlanService.getProductionProductList(getInstance().getProductionPlan());
         return  productionProductList;
     }
 
@@ -340,7 +339,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     }
 
     public void assignProduct(XProductionProduct product){
-        productionService.assignProduct(getInstance(), product);
+        xProductionService.assignProduct(getInstance(), product);
         addMaterialDefault(product, product.getQuantity());
     }
 
@@ -356,8 +355,8 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     private void addMaterialDefault(XProductionProduct product, BigDecimal quantity){
 
-        List<XMaterialInput> materialInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.MATERIAL);
-        List<XMaterialInput> ingredientInputList = productionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.INGREDIENT);
+        List<XMaterialInput> materialInputList = xProductionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.MATERIAL);
+        List<XMaterialInput> ingredientInputList = xProductionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.INGREDIENT);
 
         for (XMaterialInput materialInput : materialInputList){
             XSupply supply = new XSupply();
@@ -373,7 +372,7 @@ public class XProductionAction extends GenericAction<XProduction> {
             supply.setType(SupplyType.MATERIAL);
 
             materialSupplyList.add(supply);
-            productionService.assignMaterial(getInstance(), supply);
+            xProductionService.assignMaterial(getInstance(), supply);
         }
 
         for (XMaterialInput ingredientInput : ingredientInputList){
@@ -401,13 +400,13 @@ public class XProductionAction extends GenericAction<XProduction> {
             supply.setType(SupplyType.INGREDIENT);
 
             ingredientSupplyList.add(supply);
-            productionService.assignMaterial(getInstance(), supply);
+            xProductionService.assignMaterial(getInstance(), supply);
         }
 
     }
 
     public void removeSupply(XSupply supply){
-        productionService.removeSupply(supply);
+        xProductionService.removeSupply(supply);
         if (supply.getType().equals(SupplyType.INGREDIENT))
             ingredientSupplyList.remove(supply);
         if (supply.getType().equals(SupplyType.MATERIAL))
@@ -415,7 +414,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     }
 
     public void removeProductionProduct(XProductionProduct product){
-        productionService.removeProductionProduct(product, getInstance());
+        xProductionService.removeProductionProduct(product, getInstance());
     }
 
     public boolean hasFormula(XSupply supply){

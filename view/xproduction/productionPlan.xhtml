@@ -10,7 +10,7 @@
 
 <ui:define name="pageTitle">
     <c:choose>
-        <c:when test="#{productionPlanAction.managed}">
+        <c:when test="#{xproductionPlanAction.managed}">
             #{messages['ProductionPlan.edit']}
         </c:when>
         <c:otherwise>
