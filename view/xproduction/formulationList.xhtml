@@ -17,11 +17,11 @@
             <rich:simpleTogglePanel id="productionPlanSearchPanel" label="#{messages['Formulation.search']}" switchType="client">
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Formulation.name']}</ui:define>
-                    <h:inputText id="name" value="#{formulationDataModel.criteria.name}"
+                    <h:inputText id="name" value="#{xformulationDataModel.criteria.name}"
                                  tabindex="1"
                                  styleClass="input">
                     </h:inputText>
-                    <a4j:commandButton action="#{formulationDataModel.search}"
+                    <a4j:commandButton action="#{xformulationDataModel.search}"
                                        reRender="formulationListId, dataScroller"
                                        styleClass="button"
                                        value="#{messages['Common.search']}"
@@ -35,14 +35,14 @@
 
             <div class="buttons">
                 <s:button value="#{messages['Common.new']}"
-                          view="/production/formulation.xhtml"
+                          view="/xproduction/formulation.xhtml"
                           styleClass="button"
                           rendered="#{s:hasPermission('FORMULATION','CREATE')}"
                           propagation="none"
                           tabindex="4"/>
             </div>
 
-            <rich:dataTable value="#{formulationDataModel}" var="formulationItem" id="formulationListId"
+            <rich:dataTable value="#{xformulationDataModel}" var="formulationItem" id="formulationListId"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%" columnsWidth="50%, 20%, 15%, 15%">
                 <f:facet name="header">
@@ -72,12 +72,12 @@
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"
                                    immediate="true"
-                                   action="#{formulationAction.select(formulationItem)}">
+                                   action="#{xformulationAction.select(formulationItem)}">
                         <s:conversationPropagation value="begin"/>
                     </h:commandLink>
                 </rich:column>
             </rich:dataTable>
-            <app:dataScroller id="dataScroller" for="formulationListId" dataModel="#{formulationDataModel}"/>
+            <app:dataScroller id="dataScroller" for="formulationListId" dataModel="#{xformulationDataModel}"/>
 
         </h:form>
     </ui:define>

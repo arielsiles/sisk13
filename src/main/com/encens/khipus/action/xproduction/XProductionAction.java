@@ -3,7 +3,9 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.production.MeasurementUnit;
+import com.encens.khipus.model.production.ProductionState;
+import com.encens.khipus.model.production.SupplyType;
 import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.XProduction;

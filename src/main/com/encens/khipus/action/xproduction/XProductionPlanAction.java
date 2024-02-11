@@ -7,12 +7,16 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
-import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.production.IndirectCosts;
+import com.encens.khipus.model.production.PeriodIndirectCost;
+import com.encens.khipus.model.production.ProductionPlanState;
+import com.encens.khipus.model.production.ProductionState;
 import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+
 import com.encens.khipus.service.production.IndirectCostsService;
 import com.encens.khipus.service.production.PeriodIndirectCostService;
 import com.encens.khipus.service.xproduction.XProductionPlanService;

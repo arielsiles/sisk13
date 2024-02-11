@@ -515,7 +515,7 @@
 
     <page view-id="/xproduction/formulationList.xhtml">
         <end-conversation/>
-        <navigation from-action="#{formulationAction.select(formulationItem)}">
+        <navigation from-action="#{xformulationAction.select(formulationItem)}">
             <rule if-outcome="Success">
                 <redirect view-id="/xproduction/formulation.xhtml"/>
             </rule>
@@ -532,17 +532,17 @@
     </page>
 
     <page view-id="/xproduction/formulation.xhtml" no-conversation-view-id="/xproduction/formulationList.xhtml">
-        <navigation from-action="#{formulationAction.create}">
+        <navigation from-action="#{xformulationAction.create}">
             <rule if-outcome="Success">
                 <redirect view-id="/xproduction/formulationList.xhtml"/>
             </rule>
         </navigation>
-        <navigation from-action="#{formulationAction.select(formulationItem)}">
+        <navigation from-action="#{xformulationAction.select(formulationItem)}">
             <rule if-outcome="Success">
                 <redirect view-id="/xproduction/formulation.xhtml"/>
             </rule>
         </navigation>
-        <navigation from-action="#{formulationAction.update}">
+        <navigation from-action="#{xformulationAction.update}">
             <rule if-outcome="Success">
                 <redirect view-id="/xproduction/formulation.xhtml"/>
             </rule>

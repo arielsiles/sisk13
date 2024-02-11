@@ -5,75 +5,166 @@ VALUES (11, 'modulo de produccion de TERDEMOL', 'productionx', 1);
 
 ------------------
 
---
--- Table structure for table `xpr_insumoformula`
---
+/*
+SQLyog Ultimate v12.09 (64 bit)
+MySQL - 5.6.10 : Database - khipus
+*********************************************************************
+*/
 
-DROP TABLE IF EXISTS `xpr_insumoformula`;
 
-CREATE TABLE `xpr_insumoformula` (
-                                     `idinsumoformula` bigint NOT NULL,
-                                     `cantidad` decimal(20,6) NOT NULL,
-                                     `cod_art` varchar(6) NOT NULL,
-                                     `defecto` int DEFAULT NULL,
-                                     `idformula` bigint NOT NULL,
-                                     `idform` bigint DEFAULT NULL,
-                                     `VERSION` bigint NOT NULL,
-                                     `idcompania` bigint NOT NULL,
-                                     PRIMARY KEY (`idinsumoformula`),
-                                     KEY `idformula` (`idformula`),
-                                     KEY `idform` (`idform`)
+/*!40101 SET NAMES utf8 */;
 
-);
+/*!40101 SET SQL_MODE=''*/;
 
---
--- Table structure for table `xpr_categoria`
---
-
-DROP TABLE IF EXISTS `xpr_categoria`;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/*Table structure for table `xpr_categoria` */
 
 CREATE TABLE `xpr_categoria` (
-                                 `idcategoria` bigint NOT NULL,
+                                 `idcategoria` bigint(20) NOT NULL,
                                  `nombre` varchar(100) DEFAULT NULL,
-                                 `VERSION` bigint NOT NULL,
-                                 `idcompania` bigint NOT NULL,
+                                 `VERSION` bigint(20) NOT NULL,
+                                 `idcompania` bigint(20) NOT NULL,
                                  PRIMARY KEY (`idcategoria`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/*Table structure for table `pr_formula` */
 
---
--- Table structure for table `xpr_produccion`
---
+CREATE TABLE `xpr_formula` (
+                               `idformula` bigint(20) NOT NULL,
+                               `nombre` varchar(100) NOT NULL,
+                               `estado` varchar(3) DEFAULT NULL,
+                               `totaleq` decimal(16,2) NOT NULL,
+                               `capacidad` decimal(16,2) DEFAULT NULL,
+                               `activo` int(1) DEFAULT NULL,
+                               `idcategoria` bigint(20) DEFAULT NULL,
+                               `VERSION` bigint(20) NOT NULL,
+                               `idcompania` bigint(20) NOT NULL,
+                               PRIMARY KEY (`idformula`),
+                               KEY `idcategoria` (`idcategoria`),
+                               CONSTRAINT `xpr_formula_ibfk_1` FOREIGN KEY (`idcategoria`) REFERENCES `xpr_categoria` (`idcategoria`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `xpr_produccion`;
+/*Table structure for table `pr_insumo` */
+
+CREATE TABLE `xpr_insumo` (
+                              `idinsumo` bigint(20) NOT NULL,
+                              `cod_art` varchar(6) DEFAULT NULL,
+                              `cantidad` decimal(16,6) NOT NULL DEFAULT '0.000000',
+                              `costouni` decimal(16,6) DEFAULT NULL,
+                              `tipo` varchar(15) DEFAULT NULL,
+                              `idinsumoformula` bigint(20) DEFAULT NULL,
+                              `idproduccion` bigint(20) NOT NULL,
+                              `idproducto` bigint(20) DEFAULT NULL,
+                              `VERSION` bigint(20) NOT NULL,
+                              `idcompania` bigint(20) NOT NULL,
+                              PRIMARY KEY (`idinsumo`),
+                              KEY `idproduccion` (`idproduccion`),
+                              KEY `idinsumoformula` (`idinsumoformula`),
+                              KEY `idproducto` (`idproducto`),
+                              CONSTRAINT `xpr_insumo_ibfk_1` FOREIGN KEY (`idproduccion`) REFERENCES `pr_produccion` (`idproduccion`),
+                              CONSTRAINT `xpr_insumo_ibfk_2` FOREIGN KEY (`idinsumoformula`) REFERENCES `xpr_insumoformula` (`idinsumoformula`),
+                              CONSTRAINT `xpr_insumo_ibfk_3` FOREIGN KEY (`idproducto`) REFERENCES `xpr_producto` (`idproducto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Table structure for table `xpr_insumoformula` */
+
+CREATE TABLE `xpr_insumoformula` (
+                                     `idinsumoformula` bigint(20) NOT NULL,
+                                     `cantidad` decimal(20,6) NOT NULL,
+                                     `cod_art` varchar(6) NOT NULL,
+                                     `defecto` int(1) DEFAULT NULL,
+                                     `idformula` bigint(20) NOT NULL,
+                                     `idform` bigint(20) DEFAULT NULL,
+                                     `VERSION` bigint(20) NOT NULL,
+                                     `idcompania` bigint(20) NOT NULL,
+                                     PRIMARY KEY (`idinsumoformula`),
+                                     KEY `idformula` (`idformula`),
+                                     KEY `idform` (`idform`),
+                                     CONSTRAINT `xpr_insumoformula_ibfk_1` FOREIGN KEY (`idformula`) REFERENCES `xpr_formula` (`idformula`),
+                                     CONSTRAINT `xpr_insumoformula_ibfk_2` FOREIGN KEY (`idform`) REFERENCES `xpr_formula` (`idformula`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Table structure for table `pr_material` */
+
+CREATE TABLE `xpr_material` (
+                                `idmaterial` bigint(20) NOT NULL,
+                                `cod_art` varchar(6) NOT NULL,
+                                `cod_art_mat` varchar(6) NOT NULL,
+                                `descri` varchar(100) DEFAULT NULL,
+                                `flag_cant` int(1) DEFAULT NULL,
+                                `tipo` varchar(15) DEFAULT NULL,
+                                `vol1` decimal(10,2) DEFAULT NULL,
+                                `peso1` decimal(10,2) DEFAULT NULL,
+                                `VERSION` bigint(20) NOT NULL,
+                                `idcompania` bigint(20) NOT NULL,
+                                PRIMARY KEY (`idmaterial`),
+                                KEY `cod_art` (`cod_art`),
+                                KEY `cod_art_mat` (`cod_art_mat`),
+                                CONSTRAINT `xpr_material_ibfk_1` FOREIGN KEY (`cod_art`) REFERENCES `inv_articulos` (`cod_art`),
+                                CONSTRAINT `xpr_material_ibfk_2` FOREIGN KEY (`cod_art_mat`) REFERENCES `inv_articulos` (`cod_art`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Table structure for table `pr_plan` */
+
+CREATE TABLE `xpr_plan` (
+                            `idplan` bigint(20) NOT NULL,
+                            `nombre` varchar(100) DEFAULT NULL,
+                            `fecha` date NOT NULL,
+                            `estado` varchar(5) DEFAULT NULL,
+                            `VERSION` bigint(20) NOT NULL,
+                            `idcompania` bigint(20) NOT NULL,
+                            PRIMARY KEY (`idplan`),
+                            UNIQUE KEY `fecha` (`fecha`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Table structure for table `pr_prodafectado` */
+
+CREATE TABLE `xpr_prodafectado` (
+                                    `idprodafectado` bigint(20) NOT NULL,
+                                    `idinsumo` bigint(20) NOT NULL,
+                                    `idproducto` bigint(20) NOT NULL,
+                                    `VERSION` bigint(20) NOT NULL,
+                                    `idcompania` bigint(20) NOT NULL,
+                                    PRIMARY KEY (`idprodafectado`),
+                                    KEY `idinsumo` (`idinsumo`),
+                                    KEY `idproducto` (`idproducto`),
+                                    KEY `idcompania` (`idcompania`),
+                                    CONSTRAINT `xpr_prodafectado_ibfk_1` FOREIGN KEY (`idinsumo`) REFERENCES `xpr_insumo` (`idinsumo`),
+                                    CONSTRAINT `xpr_prodafectado_ibfk_2` FOREIGN KEY (`idproducto`) REFERENCES `xpr_producto` (`idproducto`),
+                                    CONSTRAINT `xpr_prodafectado_ibfk_3` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Table structure for table `pr_produccion` */
 
 CREATE TABLE `xpr_produccion` (
-                                  `idproduccion` bigint NOT NULL,
-                                  `codigo` int DEFAULT NULL,
+                                  `idproduccion` bigint(20) NOT NULL,
+                                  `codigo` int(11) DEFAULT NULL,
                                   `estado` varchar(5) DEFAULT NULL,
                                   `costototal` decimal(16,2) DEFAULT '0.00',
                                   `totalmp` decimal(16,2) DEFAULT '0.00',
                                   `descripcion` varchar(255) DEFAULT NULL,
-                                  `idformula` bigint DEFAULT NULL,
-                                  `idtanque` bigint DEFAULT NULL,
-                                  `idplan` bigint DEFAULT NULL,
-                                  `id_tmpenc` bigint DEFAULT NULL,
-                                  `version` bigint NOT NULL,
-                                  `idcompania` bigint NOT NULL,
+                                  `idformula` bigint(20) DEFAULT NULL,
+                                  `idtanque` bigint(20) DEFAULT NULL,
+                                  `idplan` bigint(20) DEFAULT NULL,
+                                  `id_tmpenc` bigint(20) DEFAULT NULL,
+                                  `version` bigint(20) NOT NULL,
+                                  `idcompania` bigint(20) NOT NULL,
                                   PRIMARY KEY (`idproduccion`),
                                   KEY `idformula` (`idformula`),
                                   KEY `idtanque` (`idtanque`),
-                                  KEY `idplan` (`idplan`)
-);
+                                  KEY `idplan` (`idplan`),
+                                  CONSTRAINT `xpr_produccion_ibfk_1` FOREIGN KEY (`idformula`) REFERENCES `xpr_formula` (`idformula`),
+                                  CONSTRAINT `xpr_produccion_ibfk_2` FOREIGN KEY (`idtanque`) REFERENCES `xpr_tanque` (`idtanque`),
+                                  CONSTRAINT `xpr_produccion_ibfk_3` FOREIGN KEY (`idplan`) REFERENCES `xpr_plan` (`idplan`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `xpr_producto`
---
-
-DROP TABLE IF EXISTS `xpr_producto`;
+/*Table structure for table `xpr_producto` */
 
 CREATE TABLE `xpr_producto` (
-                                `idproducto` bigint NOT NULL,
+                                `idproducto` bigint(20) NOT NULL,
                                 `cod_art` varchar(6) DEFAULT NULL,
                                 `cantidad` decimal(16,2) DEFAULT NULL,
                                 `costo` decimal(16,2) DEFAULT '0.00',
@@ -81,127 +172,31 @@ CREATE TABLE `xpr_producto` (
                                 `costo_a` decimal(16,2) DEFAULT '0.00',
                                 `costo_b` decimal(16,2) DEFAULT '0.00',
                                 `costo_c` decimal(16,2) DEFAULT '0.00',
-                                `idproduccion` bigint DEFAULT NULL,
-                                `idplan` bigint DEFAULT NULL,
-                                `VERSION` bigint NOT NULL,
-                                `idcompania` bigint NOT NULL,
+                                `idproduccion` bigint(20) DEFAULT NULL,
+                                `idplan` bigint(20) DEFAULT NULL,
+                                `VERSION` bigint(20) NOT NULL,
+                                `idcompania` bigint(20) NOT NULL,
                                 PRIMARY KEY (`idproducto`),
                                 KEY `idproduccion` (`idproduccion`),
-                                KEY `idplan` (`idplan`)
-);
+                                KEY `idplan` (`idplan`),
+                                CONSTRAINT `xpr_producto_ibfk_1` FOREIGN KEY (`idproduccion`) REFERENCES `xpr_produccion` (`idproduccion`),
+                                CONSTRAINT `xpr_producto_ibfk_2` FOREIGN KEY (`idproduccion`) REFERENCES `xpr_produccion` (`idproduccion`),
+                                CONSTRAINT `xpr_producto_ibfk_3` FOREIGN KEY (`idplan`) REFERENCES `xpr_plan` (`idplan`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `xpr_tanque`
---
-
---
--- Table structure for table `xpr_formula`
---
-
-DROP TABLE IF EXISTS `xpr_formula`;
-
-CREATE TABLE `xpr_formula` (
-                               `idformula` bigint NOT NULL,
-                               `nombre` varchar(100) NOT NULL,
-                               `estado` varchar(3) DEFAULT NULL,
-                               `totaleq` decimal(16,2) NOT NULL,
-                               `capacidad` decimal(16,2) DEFAULT NULL,
-                               `activo` int DEFAULT NULL,
-                               `idcategoria` bigint DEFAULT NULL,
-                               `VERSION` bigint NOT NULL,
-                               `idcompania` bigint NOT NULL,
-                               PRIMARY KEY (`idformula`),
-                               KEY `idcategoria` (`idcategoria`)
-);
-
---
--- Table structure for table `xpr_insumo`
---
-
-DROP TABLE IF EXISTS `xpr_insumo`;
-
-CREATE TABLE `xpr_insumo` (
-                              `idinsumo` bigint NOT NULL,
-                              `cod_art` varchar(6) DEFAULT NULL,
-                              `cantidad` decimal(16,6) NOT NULL DEFAULT '0.000000',
-                              `costouni` decimal(16,6) DEFAULT NULL,
-                              `tipo` varchar(15) DEFAULT NULL,
-                              `idinsumoformula` bigint DEFAULT NULL,
-                              `idproduccion` bigint NOT NULL,
-                              `idproducto` bigint DEFAULT NULL,
-                              `VERSION` bigint NOT NULL,
-                              `idcompania` bigint NOT NULL,
-                              PRIMARY KEY (`idinsumo`),
-                              KEY `idproduccion` (`idproduccion`),
-                              KEY `idinsumoformula` (`idinsumoformula`),
-                              KEY `idproducto` (`idproducto`)
-) ;
-
---
--- Table structure for table `xpr_material`
---
-
-DROP TABLE IF EXISTS `xpr_material`;
-
-CREATE TABLE `xpr_material` (
-                                `idmaterial` bigint NOT NULL,
-                                `cod_art` varchar(6) NOT NULL,
-                                `cod_art_mat` varchar(6) NOT NULL,
-                                `descri` varchar(100) DEFAULT NULL,
-                                `flag_cant` int DEFAULT NULL,
-                                `tipo` varchar(15) DEFAULT NULL,
-                                `vol1` decimal(10,2) DEFAULT NULL,
-                                `peso1` decimal(10,2) DEFAULT NULL,
-                                `VERSION` bigint NOT NULL,
-                                `idcompania` bigint NOT NULL,
-                                PRIMARY KEY (`idmaterial`),
-                                KEY `cod_art` (`cod_art`),
-                                KEY `cod_art_mat` (`cod_art_mat`)
-);
-
---
--- Table structure for table `xpr_plan`
---
-
-DROP TABLE IF EXISTS `xpr_plan`;
-
-CREATE TABLE `xpr_plan` (
-                            `idplan` bigint NOT NULL,
-                            `nombre` varchar(100) DEFAULT NULL,
-                            `fecha` date NOT NULL,
-                            `estado` varchar(5) DEFAULT NULL,
-                            `VERSION` bigint NOT NULL,
-                            `idcompania` bigint NOT NULL,
-                            PRIMARY KEY (`idplan`),
-                            UNIQUE KEY `fecha` (`fecha`)
-);
---
--- Table structure for table `xpr_prodafectado`
---
-
-DROP TABLE IF EXISTS `xpr_prodafectado`;
-
-CREATE TABLE `xpr_prodafectado` (
-                                    `idprodafectado` bigint NOT NULL,
-                                    `idinsumo` bigint NOT NULL,
-                                    `idproducto` bigint NOT NULL,
-                                    `VERSION` bigint NOT NULL,
-                                    `idcompania` bigint NOT NULL,
-                                    PRIMARY KEY (`idprodafectado`),
-                                    KEY `idinsumo` (`idinsumo`),
-                                    KEY `idproducto` (`idproducto`),
-                                    KEY `idcompania` (`idcompania`)
-);
-
-
-DROP TABLE IF EXISTS `xpr_tanque`;
+/*Table structure for table `xpr_tanque` */
 
 CREATE TABLE `xpr_tanque` (
-                              `idtanque` bigint NOT NULL,
+                              `idtanque` bigint(20) NOT NULL,
                               `nombre` varchar(255) NOT NULL,
                               `capacidad` decimal(16,2) NOT NULL,
                               `codmed` varchar(6) DEFAULT NULL,
-                              `VERSION` bigint NOT NULL,
-                              `idcompania` bigint NOT NULL,
+                              `VERSION` bigint(20) NOT NULL,
+                              `idcompania` bigint(20) NOT NULL,
                               PRIMARY KEY (`idtanque`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

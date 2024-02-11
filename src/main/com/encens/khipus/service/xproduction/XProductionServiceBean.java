@@ -1,6 +1,8 @@
 package com.encens.khipus.service.xproduction;
 
-import com.encens.khipus.model.production.*;
+
+import com.encens.khipus.model.xproduction.XMaterialInput;
+import com.encens.khipus.model.production.SupplyType;
 import com.encens.khipus.model.xproduction.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -164,11 +166,11 @@ public class XProductionServiceBean implements XProductionService {
         return null;
     }
 
-    public List<MaterialInput> getMaterialInput(String productItemCode){
+    public List<XMaterialInput> getMaterialInput(String productItemCode){
 
-        List<MaterialInput> materialInputList = new ArrayList<MaterialInput>();
+        List<XMaterialInput> materialInputList = new ArrayList<XMaterialInput>();
 
-        materialInputList = (List<MaterialInput>)em.createQuery(
+        materialInputList = (List<XMaterialInput>)em.createQuery(
                 "select m from MaterialInput m " +
                    "where m.productItemCode =:productItemCode ")
                 .setParameter("productItemCode", productItemCode)

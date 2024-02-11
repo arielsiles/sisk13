@@ -11,7 +11,7 @@
 
     <ui:define name="pageTitle">
         <c:choose>
-            <c:when test="#{formulationAction.managed}">
+            <c:when test="#{xformulationAction.managed}">
                 #{messages['Formulation.edit']}
             </c:when>
             <c:otherwise>
@@ -27,35 +27,35 @@
 
     <div class="buttons">
 
-        <h:commandButton action="#{formulationAction.annulFormulation}" value="#{messages['Common.annul']}"
+        <h:commandButton action="#{xformulationAction.annulFormulation}" value="#{messages['Common.annul']}"
                          styleClass="button"
-                         rendered="#{formulationAction.managed and formulationAction.approved and s:hasPermission('FORMULATION','UPDATE')}"
+                         rendered="#{xformulationAction.managed and xformulationAction.approved and s:hasPermission('FORMULATION','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{formulationAction.approveFormulation}" value="#{messages['Common.approve']}"
+        <h:commandButton action="#{xformulationAction.approveFormulation}" value="#{messages['Common.approve']}"
                          styleClass="button"
-                         rendered="#{formulationAction.managed and formulationAction.pending and s:hasPermission('FORMULATION','UPDATE')}"
+                         rendered="#{xformulationAction.managed and xformulationAction.pending and s:hasPermission('FORMULATION','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{formulationAction.update}" value="#{messages['Common.update']}"
+        <h:commandButton action="#{xformulationAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
-                         rendered="#{formulationAction.managed and formulationAction.pending and s:hasPermission('FORMULATION','UPDATE')}"
+                         rendered="#{xformulationAction.managed and xformulationAction.pending and s:hasPermission('FORMULATION','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{formulationAction.create}" value="#{messages['Common.save']}"
+        <h:commandButton action="#{xformulationAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
-                         rendered="#{!formulationAction.managed and s:hasPermission('FORMULATION','CREATE')}"
+                         rendered="#{!xformulationAction.managed and s:hasPermission('FORMULATION','CREATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{formulationAction.cancel}" value="#{messages['Common.cancel']}"
+        <h:commandButton action="#{xformulationAction.cancel}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true"
                          tabindex="4">
         </h:commandButton>
@@ -65,7 +65,7 @@
 
     <f:facet name="header">
         <c:choose>
-            <c:when test="#{formulationAction.managed}">
+            <c:when test="#{xformulationAction.managed}">
                 #{messages['Formulation.edit']}
             </c:when>
             <c:otherwise>
@@ -83,20 +83,20 @@
 
         <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Formulation.name']}</ui:define>
-            <h:inputText id="name" value="#{formulation.name}" styleClass="inputLarge" required="true" tabindex="1">
+            <h:inputText id="name" value="#{xformulation.name}" styleClass="inputLarge" required="true" tabindex="1">
             </h:inputText>
         </s:decorate>
 
         <s:decorate id="categoryField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Formulation.category']}</ui:define>
             <h:selectOneMenu id="categoryId"
-                             value="#{formulation.category}"
+                             value="#{xformulation.category}"
                              styleClass="input"
                              required="false"
                              tabindex="7">
-                <s:selectItems value="#{productionCategoryList}"
-                               var="productionCategory"
-                               label="#{productionCategory.name}"
+                <s:selectItems value="#{xproductionCategoryList}"
+                               var="xproductionCategory"
+                               label="#{xproductionCategory.name}"
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <s:convertEntity/>
@@ -106,7 +106,7 @@
         <s:decorate id="totalEquivalentIdField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Formulation.totalEquivalent']}</ui:define>
             <h:inputText id="totalEquivalentId"
-                         value="#{formulation.totalEquivalent}"
+                         value="#{xformulation.totalEquivalent}"
                          styleClass="inputSmall right">
                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="totalEquivalentId"/>
             </h:inputText>
@@ -124,7 +124,7 @@
                                immediate="true"
                                oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
                                actionListener="#{selectPopUpAction.select}"
-                               rendered="#{formulationAction.managed}"
+                               rendered="#{xformulationAction.managed}"
                                reRender="productItemsByWarehouseListModalPanel">
                 <f:attribute name="entityManagerName" value=""/>
                 <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
@@ -137,8 +137,8 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('ingredientItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           disabled="#{formulationAction.approved or formulationAction.annulled}"
-                           rendered="#{formulationAction.managed}"
+                           disabled="#{xformulationAction.approved or xformulationAction.annulled}"
+                           rendered="#{xformulationAction.managed}"
                            reRender="ingredientItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
@@ -147,7 +147,7 @@
 
     <rich:dataTable></rich:dataTable>
 
-    <c:if test="#{formulationAction.managed}">
+    <c:if test="#{xformulationAction.managed}">
     <!--<rich:tabPanel selectedTab="ingredientTab">
         <rich:tab name="ingredientTab" label="#{messages['Production.ingredient']}">-->
             <s:div id="ingredientPanel">
@@ -161,7 +161,7 @@
                         <th class="rich-table-headercell" width="10%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
-                    <c:forEach var="formulationInput" items="#{formulationAction.formulationInputList}" varStatus="row">
+                    <c:forEach var="formulationInput" items="#{xformulationAction.formulationInputList}" varStatus="row">
                         <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
 
                         <tr class="rich-table-row">
@@ -171,7 +171,7 @@
                             <td class="rich-table-cell center">
                                 <h:outputText value="#{formulationInput.productItem.usageMeasureCode}"/>
                             </td>
-                            <c:if test="#{formulationAction.pending}">
+                            <c:if test="#{xformulationAction.pending}">
                             <td class="rich-table-cell" align="center">
                                 <h:inputText id="#{quantityInputFieldId}" value="#{formulationInput.quantity}" styleClass="inputSmall right">
                                     <app:realNumberConverter minimum="0" pattern="#{messages['patterns.decimal4FNumber']}" forId="#{quantityInputFieldId}"/>
@@ -179,7 +179,7 @@
                                 </h:inputText>
                             </td>
                             </c:if>
-                            <c:if test="#{!formulationAction.pending}">
+                            <c:if test="#{!xformulationAction.pending}">
                                 <td class="rich-table-cell" align="right">
                                     <h:outputText value="#{formulationInput.quantity}" >
                                         <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}" />
@@ -198,9 +198,9 @@
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
-                                                 action="#{formulationAction.removeInput(formulationInput)}"
+                                                 action="#{xformulationAction.removeInput(formulationInput)}"
                                                  ajaxSingle="true"
-                                                 rendered="#{formulationAction.pending}"
+                                                 rendered="#{xformulationAction.pending}"
                                                  reRender="ingredientPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -263,7 +263,7 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{productionAction.addMaterialProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               action="#{xproductionAction.addMaterialProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
                                value="#{messages['Common.add']}"
                                reRender="materialPanel"
                                styleClass="button"
@@ -279,7 +279,7 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{formulationAction.addIngredientItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               action="#{xformulationAction.addIngredientItems(productItemByWarehouseDataModel.selectedProductItems)}"
                                value="#{messages['Common.add']}"
                                reRender="ingredientPanel"
                                styleClass="button"

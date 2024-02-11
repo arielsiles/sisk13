@@ -21,7 +21,7 @@ public interface XProductionService {
     void assignProduct(XProduction production, XProductionProduct product);
     void removeProductionProduct(XProductionProduct product, XProduction production);
 
-    List<MaterialInput> getMaterialInput(String productItemCode);
+    List<XMaterialInput> getMaterialInput(String productItemCode);
     List<XMaterialInput> getIngredientOrMaterialInput(String productItemCode, SupplyType type);
 
     void assignMaterial(XProduction production, XSupply supply);

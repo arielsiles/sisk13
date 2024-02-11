@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+                 http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd">
+
+
+    <factory name="xmeasureUnitProductionList" value="#{xmeasureUnitProductionQuery}"/>
+    <framework:entity-query name="xmeasureUnitProductionQuery" ejbql="select mu from MeasureUnitProduction mu"/>
+
+    <factory name="xinputAndMaterialForProductionList" value="#{xinputAndMaterialProductionQuery}"/>
+    <framework:entity-query name="xinputAndMaterialProductionQuery"
+                            ejbql="select metaProduct
+                                   from MetaProduct metaProduct
+                                   where metaProduct not in (
+                                        select processedProduct
+                                        from ProcessedProduct processedProduct)"/>
+
+    <factory name="xprocessedProductList" value="#{xprocessedProductQuery}"/>
+    <framework:entity-query name="xprocessedProductQuery"
+                            ejbql="select processedProduct from ProcessedProduct processedProduct"/>
+
+    <factory name="xproductCompositionList" value="#{xproductCompositionQuery}"/>
+    <framework:entity-query name="xproductCompositionQuery"
+                            ejbql="select productComposition from ProductComposition productComposition">
+        <framework:restrictions>
+            <value>productComposition.active = #{true}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="xcollectableProductList" value="#{xcollectableProductQuery}"/>
+    <framework:entity-query name="xcollectableProductQuery" ejbql="select metaProduct from MetaProduct metaProduct">
+        <framework:restrictions>
+            <value>metaProduct.collectable = #{true}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <framework:entity-query name="xtypeMovementProducerList"
+                            ejbql="select typeMovementProducer from TypeMovementProducer typeMovementProducer "/>
+    <framework:entity-query name="xtypeMovementGABList"
+                            ejbql="select typeMovementGAB from TypeMovementGAB typeMovementGAB "/>
+
+    <factory name="xproductionPlanningList" value="#{xproductionPlanningQuery}"/>
+    <framework:entity-query name="xproductionPlanningQuery"
+                            ejbql="select pp from ProductionPlanning pp order by pp.date desc "/>
+
+    <factory name="xproductionOrderList" value="#{xproductionOrderQuery}"/>
+    <framework:entity-query name="xproductionOrderQuery"
+                            ejbql="select productionOrder from ProductionOrder productionOrder">
+        <framework:restrictions>
+            <value>productionOrder.productionPlanning = #{employeeTimeCardAction.productionPlanning}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="xproductionTaskTypeList" value="#{xproductionTaskTypeQuery}"/>
+    <framework:entity-query name="xproductionTaskTypeQuery"
+                            ejbql="select productionTaskType from ProductionTaskType productionTaskType ">
+        <framework:restrictions>
+            <value>productionTaskType.group = #{employeeTimeCardAction.selectGroup}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+
+    <factory name="xsubGroupListProduction" value="#{xsubGroupQueryProduction}"/>
+    <framework:entity-query name="xsubGroupQueryProduction"
+                            ejbql="select subGroup from SubGroup subGroup">
+        <framework:restrictions>
+            <value>subGroup.group = #{employeeTimeCardAction.selectGroup}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <!--Enumerations-->
+
+    <factory name="xtatePayRollCollectionEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.StatePayRoll')}"/>
+
+    <factory name="xproductionCollentionStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.ProductionCollectionState')}"/>
+
+    <factory name="xcollectionFormStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.CollectionFormState')}"/>
+
+
+    <!-- 19.04.2019 -->
+    <factory name="xMeasurementUnitEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.MeasurementUnit')}"/>
+
+    <factory name="xSupplyTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.SupplyType')}"/>
+
+    <factory name="xproductionTankList" value="#{pxroductionTankQuery}"/>
+    <framework:entity-query name="xproductionTankQuery" ejbql="select p from XProductionTank p"/>
+
+    <factory name="xformulationList" value="#{formulationQuery}"/>
+    <framework:entity-query name="xformulationQuery" ejbql="select p from XFormulation p">
+        <framework:restrictions>
+            <value>p.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.production.FormulationState', 'APR')}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="xproductionProductList" value="#{xproductionProductQuery}"/>
+    <framework:entity-query name="xproductionProductQuery" ejbql="select p from XProductionProduct p">
+        <framework:restrictions>
+            <value>p.production = #{production}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="xproductionCategoryList" value="#{xproductionCategoryQuery}"/>
+    <framework:entity-query name="xproductionCategoryQuery" ejbql="select p from XProductionCategory p"/>
+
+    <factory name="xrawMaterialDiscountTList" value="#{xrawMaterialDiscountTQuery}"/>
+    <framework:entity-query name="xrawMaterialDiscountTQuery"
+                            ejbql="select rawMaterialDiscountT from RawMaterialDiscountT rawMaterialDiscountT"/>
+
+    <!--Enumerations-->
+
+    <factory name="xrawMaterialPaymentTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialPaymentType')}"/>
+
+    <factory name="xrawMaterialPaymentStateEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialPaymentState')}"/>
+
+    <factory name="xrawMaterialDiscountTypeEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialDiscountType')}"/>
+
+</components>
