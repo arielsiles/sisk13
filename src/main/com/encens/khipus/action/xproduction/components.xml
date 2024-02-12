@@ -89,10 +89,10 @@
     <factory name="xSupplyTypeEnum"
              value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.SupplyType')}"/>
 
-    <factory name="xproductionTankList" value="#{pxroductionTankQuery}"/>
+    <factory name="xproductionTankList" value="#{xproductionTankQuery}"/>
     <framework:entity-query name="xproductionTankQuery" ejbql="select p from XProductionTank p"/>
 
-    <factory name="xformulationList" value="#{formulationQuery}"/>
+    <factory name="xformulationList" value="#{xformulationQuery}"/>
     <framework:entity-query name="xformulationQuery" ejbql="select p from XFormulation p">
         <framework:restrictions>
             <value>p.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.production.FormulationState', 'APR')}</value>

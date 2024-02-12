@@ -1,9 +1,23 @@
---nuevo modulo de produccion de terdemol
-INSERT INTO ilva.modulo (idmodulo, descripcion, nombrerecurso, idcompania)
+-- nuevo modulo de produccion de terdemol
+INSERT INTO modulo (idmodulo, descripcion, nombrerecurso, idcompania)
 VALUES (11, 'modulo de produccion de TERDEMOL', 'productionx', 1);
----clonando
+-- clonando
 
-------------------
+-- ----------------
+
+-- drop table `xpr_categoria`;
+-- drop table `xpr_formula`;
+-- drop table `xpr_insumo`;
+-- drop table `xpr_insumoformula`;
+-- drop table `xpr_maquina`;
+-- drop table `xpr_material`;
+-- drop table `xpr_plan`;
+-- drop table `xpr_proceso`;
+-- drop table `xpr_prodafectado`;
+-- drop table `xpr_produccion`;
+-- drop table `xpr_produccionmaquina`;
+-- drop table `xpr_producto`;
+-- drop table `xpr_tanque`;
 
 /*
 SQLyog Ultimate v12.09 (64 bit)
@@ -64,7 +78,7 @@ CREATE TABLE `xpr_insumo` (
                               KEY `idproduccion` (`idproduccion`),
                               KEY `idinsumoformula` (`idinsumoformula`),
                               KEY `idproducto` (`idproducto`),
-                              CONSTRAINT `xpr_insumo_ibfk_1` FOREIGN KEY (`idproduccion`) REFERENCES `pr_produccion` (`idproduccion`),
+                              CONSTRAINT `xpr_insumo_ibfk_1` FOREIGN KEY (`idproduccion`) REFERENCES `xpr_produccion` (`idproduccion`),
                               CONSTRAINT `xpr_insumo_ibfk_2` FOREIGN KEY (`idinsumoformula`) REFERENCES `xpr_insumoformula` (`idinsumoformula`),
                               CONSTRAINT `xpr_insumo_ibfk_3` FOREIGN KEY (`idproducto`) REFERENCES `xpr_producto` (`idproducto`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

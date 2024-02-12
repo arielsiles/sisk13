@@ -17,7 +17,7 @@ import java.util.List;
 @Scope(ScopeType.PAGE)
 public class XProductionDataModel extends QueryDataModel<Long, XProduction> {
 
-    private static final String[] RESTRICTIONS = {"production.productionPlan = #{productionPlan}"};
+    private static final String[] RESTRICTIONS = {"production.productionPlan = #{xproductionPlan}"};
 
     @Create
     public void init() {}

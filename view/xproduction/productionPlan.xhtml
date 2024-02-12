@@ -19,7 +19,7 @@
     </c:choose>
 </ui:define>
 <ui:param name="bodyWidth" value="70%"/>
-<ui:param name="selectedTab" value="production"/>
+<ui:param name="selectedTab" value="xproduction"/>
 <ui:define name="body">
 
 <h:form id="productionPlanForm">
@@ -94,23 +94,23 @@
                     </rich:calendar>
                 </s:decorate>
 
-                <!--<s:decorate id="totalWeighedField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:decorate id="totalWeighedField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.milkWeighing']}</ui:define>
                     <h:outputText value="#{xproductionPlanAction.getTotalWeighed(xproductionPlan)}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                     <span class="spacer"></span>
                     <h:outputText value="#{messages['MeasureUnit.LT']}" />
-                </s:decorate>-->
+                </s:decorate>
 
-                <!--<s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.usedMilk']}</ui:define>
                     <h:outputText value="#{xproductionPlanAction.calculateTotalRawMaterial(xproductionPlan)}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                     <span class="spacer"></span>
                     <h:outputText value="#{messages['MeasureUnit.LT']}" />
-                </s:decorate>-->
+                </s:decorate>
 
 
             </s:div>

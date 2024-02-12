@@ -11,7 +11,7 @@
 
 <ui:define name="pageTitle">
     <c:choose>
-        <c:when test="#{productionAction.managed}">
+        <c:when test="#{xproductionAction.managed}">
             #{messages['Production.edit']}
         </c:when>
         <c:otherwise>
@@ -20,7 +20,7 @@
     </c:choose>
 </ui:define>
 <ui:param name="bodyWidth" value="90%"/>
-<ui:param name="selectedTab" value="production"/>
+<ui:param name="selectedTab" value="xproduction"/>
 <ui:define name="body">
 
 <h:form id="productionForm">
@@ -29,12 +29,12 @@
 
 
         <a4j:commandButton id="recalculateCommandButton"
-                           action="#{productionAction.recalculateSupplies()}"
+                           action="#{xproductionAction.recalculateSupplies()}"
                            value="#{messages['Production.recalculate']}"
                            styleClass="button"
                            ajaxSingle="true"
                            immediate="true"
-                           rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="ingredientPanel, totalCostField, totalRawMaterialField">
         </a4j:commandButton>
 
@@ -45,7 +45,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('productItemsByAssignmentListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="productItemsByAssignmentListModalPanel">
             <f:attribute name="dataModelObject" value="#{productionProductAssignedDataModel}"/>
         </a4j:commandButton>-->
@@ -57,7 +57,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="productItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
@@ -70,47 +70,47 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('ingredientItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                            reRender="ingredientItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
         </a4j:commandButton>
 
-        <h:commandButton action="#{productionAction.update}" value="#{messages['Common.update']}"
+        <h:commandButton action="#{xproductionAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
-                         rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                         rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
-        <h:commandButton action="#{productionAction.create}" value="#{messages['Common.save']}"
+        <h:commandButton action="#{xproductionAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
-                         rendered="#{!productionAction.managed and s:hasPermission('PRODUCTION','CREATE')}">
+                         rendered="#{!xproductionAction.managed and s:hasPermission('PRODUCTION','CREATE')}">
         </h:commandButton>
 
-        <!--!productionAction.existProductionProducts() and-->
-        <h:commandButton action="#{productionAction.approve}" value="#{messages['Common.approve']}"
+        <!--!xproductionAction.existProductionProducts() and-->
+        <h:commandButton action="#{xproductionAction.approve}" value="#{messages['Common.approve']}"
                          styleClass="button"
-                         rendered="#{productionAction.managed and
-                                     productionAction.pending and
+                         rendered="#{xproductionAction.managed and
+                                     xproductionAction.pending and
                                      s:hasPermission('PRODUCTION','UPDATE')}"
                          tabindex="2">
         </h:commandButton>
 
         <h:commandButton value="#{messages['Common.delete']}"
                          styleClass="button"
-                         rendered="#{productionAction.managed and productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}">
+                         rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}">
             <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
                                    operation="show"/>
         </h:commandButton>
 
-        <h:commandButton action="#{productionAction.disapprove}" value="#{messages['Common.disapprove']}"
+        <h:commandButton action="#{xproductionAction.disapprove}" value="#{messages['Common.disapprove']}"
                          styleClass="button"
-                         rendered="#{productionAction.approved}"
+                         rendered="#{xproductionAction.approved}"
                          tabindex="2">
         </h:commandButton>
 
-        <h:commandButton action="#{productionAction.cancel}" value="#{messages['Common.cancel']}"
+        <h:commandButton action="#{xproductionAction.cancel}" value="#{messages['Common.cancel']}"
                          styleClass="button" immediate="true">
         </h:commandButton>
     </div>
@@ -119,7 +119,7 @@
 
         <f:facet name="header">
             <c:choose>
-                <c:when test="#{productionAction.managed}">
+                <c:when test="#{xproductionAction.managed}">
                     <h:outputFormat value="{0, date, dd/MMMM/yyyy}">
                         <f:param value="#{productionPlan.date}"/>
                     </h:outputFormat>
@@ -156,12 +156,12 @@
                 <s:decorate id="productionTankField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.productionTank']}</ui:define>
                     <h:selectOneMenu id="productionTank"
-                                     value="#{productionAction.productionTank}"
+                                     value="#{xproductionAction.productionTank}"
                                      styleClass="input"
                                      required="true"
-                                     disabled="#{productionAction.approved or productionAction.managed}"
+                                     disabled="#{xproductionAction.approved or xproductionAction.managed}"
                                      tabindex="7">
-                        <s:selectItems value="#{productionTankList}"
+                        <s:selectItems value="#{xproductionTankList}"
                                        var="productionTank"
                                        label="#{productionTank.name}"
                                        noSelectionLabel=""
@@ -173,12 +173,12 @@
                 <s:decorate id="formulationField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.formulation']}</ui:define>
                     <h:selectOneMenu id="formulationTank"
-                                     value="#{productionAction.formulation}"
+                                     value="#{xproductionAction.formulation}"
                                      styleClass="input"
                                      required="true"
-                                     disabled="#{productionAction.approved or productionAction.managed}"
+                                     disabled="#{xproductionAction.approved or xproductionAction.managed}"
                                      tabindex="7">
-                        <s:selectItems value="#{formulationList}"
+                        <s:selectItems value="#{xformulationList}"
                                        var="formulation"
                                        label="#{formulation.name}"
                                        noSelectionLabel=""
@@ -186,7 +186,7 @@
                         <s:convertEntity/>
 
                         <a4j:support event="onchange"
-                                     action="#{productionAction.loadSupplies()}"
+                                     action="#{xproductionAction.loadSupplies()}"
                                      reRender="ingredientPanel"
                                      ajaxSingle="true"/>
 
@@ -195,14 +195,14 @@
 
                 <s:decorate id="totalCostField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Production.totalCost']}</ui:define>
-                    <h:outputText value="#{productionAction.calculateTotalCost()}">
+                    <h:outputText value="#{xproductionAction.calculateTotalCost()}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                 </s:decorate>
 
                 <s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.usedMilk']}</ui:define>
-                    <h:outputText value="#{productionAction.calculateRawMaterial()}">
+                    <h:outputText value="#{xproductionAction.calculateRawMaterial()}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                     <span class="spacer"></span>
@@ -212,8 +212,8 @@
             </s:div>
 
             <s:div id="assignProductionProduct">
-                <c:if test="#{productionAction.managed}">
-                <rich:dataTable value="#{productionAction.productionProductList}"
+                <c:if test="#{xproductionAction.managed}">
+                <rich:dataTable value="#{xproductionAction.productionProductList}"
                                 var="productionProduct"
                                 id="productionProductList"
                                 width="100%" columnsWidth="65%, 20%, 15%">
@@ -233,8 +233,8 @@
                         <a4j:commandLink id="assignCommandLink" value="#{messages['Common.assign']}"
                                          ajaxSingle="true"
                                          immediate="true"
-                                         action="#{productionAction.assignProduct(productionProduct)}"
-                                         rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                                         action="#{xproductionAction.assignProduct(productionProduct)}"
+                                         rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
                                          reRender="assignProductionProduct, ingredientPanel, materialPanel, finalProductList">
                         </a4j:commandLink>
                     </rich:column>
@@ -262,13 +262,13 @@
                         <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
-                    <c:forEach var="supplyDetail" items="#{productionAction.ingredientSupplyList}" varStatus="row">
+                    <c:forEach var="supplyDetail" items="#{xproductionAction.ingredientSupplyList}" varStatus="row">
                         <c:set var="quantityInputFieldId" value="quantityInputField_#{row.index}"/>
                         <c:set var="productInputFieldId" value="productInputField_#{row.index}"/>
                         <c:set var="productItemsByAssignmentListModalPanelContainerFieldId" value="productItemsByAssignmentListModalPanelContainerField_#{row.index}"/>
                         <c:set var="addButtonFieldId" value="addButtonField_#{row.index}"/>
 
-                        <tr class="rich-table-row" style="#{productionAction.hasFormula(supplyDetail)?'background-color: lightyellow':'' }">
+                        <tr class="rich-table-row" style="#{xproductionAction.hasFormula(supplyDetail)?'background-color: lightyellow':'' }">
                             <td class="rich-table-cell">
                                 <h:outputText value="#{supplyDetail.productItem.fullName}"/>
                             </td>
@@ -278,7 +278,7 @@
                             <td class="rich-table-cell" align="center">
                                 <h:inputText id="#{quantityInputFieldId}"
                                              value="#{supplyDetail.quantity}"
-                                             readonly="#{productionAction.approved}"
+                                             readonly="#{xproductionAction.approved}"
                                              styleClass="inputSmall right">
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimal4FNumber']}"
@@ -289,7 +289,7 @@
                             </td>
 
                             <td class="rich-table-cell" align="right">
-                                <h:outputText value="#{productionAction.getSupplyUnitCost(supplyDetail)}">
+                                <h:outputText value="#{xproductionAction.getSupplyUnitCost(supplyDetail)}">
                                     <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}" />
                                 </h:outputText>
                             </td>
@@ -298,9 +298,9 @@
                                 <h:selectOneMenu id="#{productInputFieldId}"
                                                  value="#{supplyDetail.productionProduct}"
                                                  styleClass="input250"
-                                                 rendered="#{!productionAction.hasFormula(supplyDetail)}"
+                                                 rendered="#{!xproductionAction.hasFormula(supplyDetail)}"
                                                  required="false"
-                                                 disabled="#{productionAction.approved}"
+                                                 disabled="#{xproductionAction.approved}"
                                                  tabindex="7">
                                     <s:selectItems value="#{productionProductList}"
                                                    var="product"
@@ -310,10 +310,10 @@
                                     <s:convertEntity/>
                                 </h:selectOneMenu>
 
-                                <c:if test="#{productionAction.managed}">
+                                <c:if test="#{xproductionAction.managed}">
                                     <!-- TEST -->
                                     <!--<a4j:commandButton
-                                            action="#{productionAction.assignSupply(supplyDetail)}"
+                                            action="#{xproductionAction.assignSupply(supplyDetail)}"
                                             value="Add product"
                                             styleClass="button"
                                             immediate="true"
@@ -331,7 +331,7 @@
                                         <a4j:commandButton id="addButton"
                                                            immediate="true"
                                                            ajaxSingle="true"
-                                                           action="#{productionAction.assignProductAffect(supplyDetail)}"
+                                                           action="#{xproductionAction.assignProductAffect(supplyDetail)}"
                                                            value="#{messages['Common.add']}"
                                                            reRender="materialPanel"
                                                            styleClass="button"
@@ -343,9 +343,9 @@
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
-                                                 action="#{productionAction.removeSupply(supplyDetail)}"
+                                                 action="#{xproductionAction.removeSupply(supplyDetail)}"
                                                  ajaxSingle="true"
-                                                 rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                                 rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
                                                  reRender="ingredientPanel, totalCostField, totalRawMaterialField">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -372,7 +372,7 @@
                         <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
-                    <c:forEach var="materialDetail" items="#{productionAction.materialSupplyList}" varStatus="row">
+                    <c:forEach var="materialDetail" items="#{xproductionAction.materialSupplyList}" varStatus="row">
                         <c:set var="quantityMaterialInputFieldId" value="quantityMaterialInputField_#{row.index}"/>
                         <c:set var="productMaterialInputFieldId" value="productMaterialInputField_#{row.index}"/>
                         <c:set var="removeMaterialInputFieldId" value="removeMaterialInputField_#{row.index}"/>
@@ -388,7 +388,7 @@
                                 <h:inputText id="#{quantityMaterialInputFieldId}"
                                              value="#{materialDetail.quantity}"
                                              required="true"
-                                             readonly="#{productionAction.approved}"
+                                             readonly="#{xproductionAction.approved}"
                                              styleClass="inputSmall right">
                                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{quantityMaterialInputFieldId}"/>
@@ -407,9 +407,9 @@
                                 <h:selectOneMenu id="#{productMaterialInputFieldId}"
                                                  value="#{materialDetail.productionProduct}"
                                                  styleClass="input250"
-                                                 rendered="#{!productionAction.hasFormula(materialDetail)}"
+                                                 rendered="#{!xproductionAction.hasFormula(materialDetail)}"
                                                  required="false"
-                                                 disabled="#{productionAction.approved}"
+                                                 disabled="#{xproductionAction.approved}"
                                                  tabindex="7">
                                 <s:selectItems value="#{productionProductList}"
                                                var="product"
@@ -425,8 +425,8 @@
                                                  title="#{messages['Common.remove']}"
                                                  ajaxSingle="true"
                                                  immediate="true"
-                                                 action="#{productionAction.removeSupply(materialDetail)}"
-                                                 rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                                 action="#{xproductionAction.removeSupply(materialDetail)}"
+                                                 rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
                                                  reRender="materialPanel, totalCostField">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -481,8 +481,8 @@
                                  title="#{messages['Common.remove']}"
                                  ajaxSingle="true"
                                  immediate="true"
-                                 action="#{productionAction.removeProductionProduct(product)}"
-                                 rendered="#{productionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                 action="#{xproductionAction.removeProductionProduct(product)}"
+                                 rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
                                  reRender="finalProductList, ingredientPanel, materialPanel, assignProductionProduct">
                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                 </a4j:commandLink>
@@ -498,7 +498,7 @@
 </h:form>
 
     <!-- Test -->
-    <c:if test="#{productionAction.managed}">
+    <c:if test="#{xproductionAction.managed}">
     <s:decorate id="productItemsByAssignmentListModalPanelContainer"
                 template="/production/productItemsByAssignmentListModalPanel.xhtml">
         <ui:param name="containerId" value="productItemsByAssignmentListModalPanelContainer"/>
@@ -507,7 +507,7 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{productionAction.assignProductAffect()}"
+                               action="#{xproductionAction.assignProductAffect()}"
                                value="#{messages['Common.add']}"
                                reRender="materialPanel"
                                styleClass="button"
@@ -526,7 +526,7 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{productionAction.addMaterialProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               action="#{xproductionAction.addMaterialProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
                                value="#{messages['Common.add']}"
                                reRender="materialPanel"
                                styleClass="button"
@@ -542,7 +542,7 @@
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{productionAction.addIngredientItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               action="#{xproductionAction.addIngredientItems(productItemByWarehouseDataModel.selectedProductItems)}"
                                value="#{messages['Common.add']}"
                                reRender="ingredientPanel"
                                styleClass="button"
@@ -559,7 +559,7 @@
             </p>
         </ui:define>
         <ui:define name="dialogOption">
-            <a4j:commandButton action="#{productionAction.delete}"
+            <a4j:commandButton action="#{xproductionAction.delete}"
                                value="#{messages['Common.delete']}"
                                immediate="true"
                                styleClass="button"/>
