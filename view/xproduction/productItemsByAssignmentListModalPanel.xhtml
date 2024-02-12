@@ -15,46 +15,12 @@
         <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
     </f:facet>
     <h:form id="productItemByWarehouseListForm">
-
-        <!--<rich:simpleTogglePanel label="#{messages['ProductItem.search']}" switchType="client">
-            <h:panelGrid columns="2"
-                         width="100%"
-                         cellpadding="0"
-                         cellspacing="0"
-                         border="0"
-                         columnClasses="width50percent,width50percent">
-                <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
-                    <h:inputText id="productItemCode"
-                                 value="#{productItemByWarehouseDataModel.productItemCode}"
-                                 maxlength="150"
-                                 tabindex="1"
-                                 styleClass="input"/>
-                </s:decorate>
-                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
-                    <h:inputText id="name"
-                                 value="#{productItemByWarehouseDataModel.productItemName}"
-                                 maxlength="150"
-                                 tabindex="2"
-                                 styleClass="input"/>
-                    <a4j:commandButton action="#{productItemByWarehouseDataModel.search}"
-                                       reRender="productItemList, dataScroller"
-                                       styleClass="button"
-                                       value="#{messages['Common.search']}"
-                                       id="searchButtonId"
-                                       tabindex="3">
-                        <s:defaultAction/>
-                    </a4j:commandButton>
-                </s:decorate>
-            </h:panelGrid>
-        </rich:simpleTogglePanel>-->
         <br/>
 
         <div class="buttons">
             <ui:insert name="addButton"/>
         </div>
-        <rich:dataTable value="#{productionProductAssignedDataModel}"
+        <rich:dataTable value="#{xproductionProductAssignedDataModel}"
                         var="productionProductItem"
                         id="productionProductItemList"
                         rows="#{sessionUser.rowsPerPage}"
@@ -63,7 +29,7 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column styleClass="center">
-                        <app:selectCheckboxHeader dataModel="#{productionProductAssignedDataModel}" reRender="productionProductItemList, dataScroller"/>
+                        <app:selectCheckboxHeader dataModel="#{xproductionProductAssignedDataModel}" reRender="productionProductItemList, dataScroller"/>
                     </rich:column>
                     <rich:column>#{messages['ProductItem.name']}</rich:column>
                     <rich:column>#{messages['ProductItem.productItemCode']}</rich:column>
@@ -72,7 +38,7 @@
             <rich:column styleClass="center">
                 <h:selectBooleanCheckbox id="selectCheckboxItem"
                                          immediate="true"
-                                         value="#{productionProductAssignedDataModel.selectedList[productionProductAssignedDataModel.page][productionProductItem.id]}">
+                                         value="#{xproductionProductAssignedDataModel.selectedList[xproductionProductAssignedDataModel.page][productionProductItem.id]}">
                     <a4j:support event="onchange"
                                  reRender="selectCheckboxItem"/>
                 </h:selectBooleanCheckbox>
@@ -88,7 +54,7 @@
 
         <app:dataScroller id="dataScroller"
                           for="productionProductItemList"
-                          dataModel="#{productionProductAssignedDataModel}"/>
+                          dataModel="#{xproductionProductAssignedDataModel}"/>
 
         <rich:componentControl for="#{dialogId}"
                                attachTo="closeLink, addButton"

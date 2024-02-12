@@ -102,7 +102,7 @@
     <factory name="xproductionProductList" value="#{xproductionProductQuery}"/>
     <framework:entity-query name="xproductionProductQuery" ejbql="select p from XProductionProduct p">
         <framework:restrictions>
-            <value>p.production = #{production}</value>
+            <value>p.production = #{xproduction}</value>
         </framework:restrictions>
     </framework:entity-query>
 
