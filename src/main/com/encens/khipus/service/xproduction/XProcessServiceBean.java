@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Stateless
-@Name("xProcessServiceService")
+@Name("xProcessService")
 @AutoCreate
 public class XProcessServiceBean extends GenericServiceBean implements XProcessService {
 

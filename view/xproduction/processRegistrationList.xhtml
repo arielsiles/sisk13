@@ -16,11 +16,11 @@
             <rich:simpleTogglePanel label="#{messages['PresetAccountingTemplate.search']}" switchType="cliente">
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['PresetAccountingTemplate.name']}</ui:define>
-                    <h:inputText id="name" value="#{presetAccountingTemplateDataModel.criteria.name}"
+                    <h:inputText id="name" value="#{processRegistrationDataModel.criteria.name}"
                                  maxlength="150" tabindex="2" styleClass="input">
                     </h:inputText>
-                    <a4j:commandButton action="#{presetAccountingTemplateDataModel.search}"
-                                       reRender="presetAccountingTemplateList"
+                    <a4j:commandButton action="#{processRegistrationDataModel.search}"
+                                       reRender="processRegistrationList"
                                        styleClass="button" id="searchButtonId" tabindex="2"
                                        value="#{messages['Common.search']}">
                         <s:defaultAction/>
@@ -31,21 +31,21 @@
 
             <div class="buttons">
                 <s:button value="#{messages['Common.new']}"
-                          view="/finances/presetAccountingTemplate.xhtml"
+                          view="/xproduction/processRegistration.xhtml"
                           styleClass="button"
                           propagation="begin"
                           rendered="true"/>
             </div>
 
-            <rich:dataTable value="#{presetAccountingTemplateDataModel}" var="presetAccountingTemplateItem"
-                            id="presetAccountingTemplateList" rows="#{sessionUser.rowsPerPage}"
+            <rich:dataTable value="#{processRegistrationDataModel}" var="processRegistrationItem"
+                            id="processRegistrationList" rows="#{sessionUser.rowsPerPage}"
                             width="100%" columnsWidth="80%, 20%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>
-                            <app:commandSortHeader sortProperty="presetAccountingTemplate.name"
-                                                   dataModel="#{presetAccountingTemplateDataModel}"
-                                                   reRender="presetAccountingTemplateList, dataScroller">
+                            <app:commandSortHeader sortProperty="processRegistration.name"
+                                                   dataModel="#{processRegistrationDataModel}"
+                                                   reRender="processRegistrationList, dataScroller">
                                 #{messages['PresetAccountingTemplate.name']}
                             </app:commandSortHeader>
                         </rich:column>
@@ -55,22 +55,22 @@
                     </rich:columnGroup>
                 </f:facet>
                 <rich:column>
-                    <h:outputText value="#{presetAccountingTemplateItem.name}"/>
+                    <h:outputText value="#{processRegistrationItem.name}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"
                                    immediate="true"
-                                   action="#{presetAccountingTemplateAction.select(presetAccountingTemplateItem)}"
+                                   action="#{xprocessAction.select(processRegistrationItem)}"
                                    rendered="true">
                         <s:conversationPropagation value="none"/>
                     </h:commandLink>
                 </rich:column>
             </rich:dataTable>
-            <app:dataScroller id="dataScroller" for="presetAccountingTemplateList" dataModel="#{presetAccountingTemplateDataModel}"/>
+            <app:dataScroller id="dataScroller" for="processRegistrationList" dataModel="#{processRegistrationDataModel}"/>
 
             <div class="buttons">
                 <s:button value="#{messages['Common.new']}"
-                          view="/finances/presetAccountingTemplate.xhtml"
+                          view="/xproduction/processRegistration.xhtml"
                           styleClass="button"
                           propagation="none"
                           rendered="true"/>

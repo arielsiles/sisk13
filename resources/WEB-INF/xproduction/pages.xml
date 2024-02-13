@@ -725,6 +725,35 @@
         </navigation>
     </page>
 
+    <page view-id="/xproduction/processRegistrationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{xprocessAction.select(presetAccountingTemplateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/processRegistration.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/processRegistration.xhtml" no-conversation-view-id="/xproduction/processRegistrationList.xhtml">
+        <navigation from-action="#{xprocessAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/xproduction/processRegistration.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xprocessAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/processRegistration.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xprocessAction.cancel}">
+            <rule>
+                <redirect view-id="/xproduction/processRegistrationList.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+
     <page view-id="/xproduction/rawMaterialPaymentRequestList.xhtml">
         <end-conversation/>
         <navigation from-action="#{rawMaterialPaymentAction.select(rawMaterialPaymentItem)}">

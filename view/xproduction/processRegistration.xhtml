@@ -9,7 +9,7 @@
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">
         <c:choose>
-            <c:when test="#{presetAccountingTemplateAction.managed}">
+            <c:when test="#{xprocessAction.managed}">
                 #{messages['PresetAccountingTemplate.edit']}
             </c:when>
             <c:otherwise>
@@ -23,30 +23,30 @@
         <h:form id="presetAccountingTemplateForm">
             <div class="buttons">
                 <h:commandButton id="createButtonId"
-                                 action="#{presetAccountingTemplateAction.create}"
+                                 action="#{xprocessAction.create}"
                                  value="#{messages['Common.save']}"
-                                 rendered="#{!presetAccountingTemplateAction.managed }"
+                                 rendered="#{!xprocessAction.managed }"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton id="updateButtonId"
-                                 action="#{presetAccountingTemplateAction.update}"
+                                 action="#{xprocessAction.update}"
                                  value="#{messages['Common.saveChange']}"
-                                 rendered="#{presetAccountingTemplateAction.managed }"
+                                 rendered="#{xprocessAction.managed }"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{presetAccountingTemplateAction.managed }">
+                                 rendered="#{xprocessAction.managed }">
                     <rich:componentControl for="deleteConfirmation"
                                            event="onclick"
                                            disableDefault="true"
                                            operation="show"/>
                 </h:commandButton>
-                <h:commandButton action="#{presetAccountingTemplateAction.cancel}"
+                <h:commandButton action="#{xprocessAction.cancel}"
                                  styleClass="button"
                                  value="#{messages['Common.cancel']}"
                                  immediate="true"/>
@@ -55,7 +55,7 @@
             <rich:panel id="formPanel">
                 <f:facet name="header">
                     <c:choose>
-                        <c:when test="#{presetAccountingTemplateAction.managed}">
+                        <c:when test="#{xprocessAction.managed}">
                             #{messages['PresetAccountingTemplate.edit']}
                         </c:when>
                         <c:otherwise>
@@ -70,77 +70,72 @@
                                  maxlength="150" tabindex="1"/>
                 </s:decorate>
             </rich:panel>
-            <s:div id="movementCashAccountListPanel">
-            <div class="buttons">
-                <a4j:commandButton id="addTypePresetAccountingTemplateButton"
-                                   action="#{cashAccountDataModel.reset()}"
-                                   value="Agregar Cuenta"
-                                   styleClass="button"
-                                   immediate="true"
-                                   rendered="#{presetAccountingTemplateAction.managed}"
-                                   oncomplete="Richfaces.showModalPanel('cashAccountListModalPanel');"
-                                   actionListener="#{selectPopUpAction.select}"
-                                   reRender="cashAccountListModalPanel">
-                    <f:attribute name="entityManagerName" value=""/>
-                    <f:attribute name="dataModelObject" value="#{cashAccountDataModel}"/>
-                </a4j:commandButton>
-            </div>
-               <!-- <c:if test="#{presetAccountingTemplateAction.managed}">-->
-                    <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
-                        <thead class="rich-table-thead">
-                        <tr class="rich-table-header">
-                            <th class="rich-table-headercell">Código</th>
-                            <th class="rich-table-headercell">Descripción</th>
-                            <th class="rich-table-headercell">#{messages['Common.action']}</th>
+            <s:div id="machineListPanel">
+                <div class="buttons">
+                    <a4j:commandButton id="addProcessMachineButton"
+                                       action="#{cashAccountDataModel.reset()}"
+                                       value="Agregar Cuenta"
+                                       styleClass="button"
+                                       immediate="true"
+                                       rendered="#{xprocessAction.managed}"
+                                       oncomplete="Richfaces.showModalPanel('machineListModalPanel');"
+                                       actionListener="#{selectPopUpAction.select}"
+                                       reRender="machineListModalPanel">
+                        <f:attribute name="entityManagerName" value=""/>
+                        <f:attribute name="dataModelObject" value="#{cashAccountDataModel}"/>
+                    </a4j:commandButton>
+                </div>
+                <!-- <c:if test="#{xprocessAction.managed}">-->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                    <thead class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-headercell">Nombre</th>
+                        <th class="rich-table-headercell">#{messages['Common.action']}</th>
+                    </tr>
+                    </thead>
+
+                    <c:forEach var="instance" items="#{xprocessAction.xMachineProcesses}" varStatus="row">
+                        <c:set var="amountFieldId" value="amountField_#{row.index}"/>
+                        <c:set var="amountInputTextId" value="amountInputText_#{row.index}"/>
+
+                        <tr class="rich-table-row">
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{instance.xmachine.name}"/>
+                            </td>
+
+                            <td class="rich-table-cell center">
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{customerCategoryAction.removeCashAccount(instance)}"
+                                                 ajaxSingle="true"
+                                                 rendered="true"
+                                                 reRender="machineListPanel">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </td>
                         </tr>
-                        </thead>
-
-                        <c:forEach var="instance" items="#{presetAccountingTemplateAction.typePresetAccountingTemplates}" varStatus="row">
-                            <c:set var="amountFieldId" value="amountField_#{row.index}"/>
-                            <c:set var="amountInputTextId" value="amountInputText_#{row.index}"/>
-
-                            <tr class="rich-table-row">
-                                <td class="rich-table-cell">
-                                    <h:outputText value="#{instance.cashAccount.accountCode}"/>
-                                </td>
-
-                                <td class="rich-table-cell">
-                                    <h:outputText value="#{instance.cashAccount.description}"/>
-                                </td>
-
-                                <td class="rich-table-cell center">
-                                    <a4j:commandLink immediate="true"
-                                                     title="#{messages['Common.remove']}"
-                                                     action="#{customerCategoryAction.removeCashAccount(instance)}"
-                                                     ajaxSingle="true"
-                                                     rendered="true"
-                                                     reRender="movementCashAccountListPanel">
-                                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                                    </a4j:commandLink>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </table>
+                    </c:forEach>
+                </table>
                 <!--</c:if>-->
             </s:div>
         </h:form>
 
         <s:decorate template="/include/modalDialog.xhtml"
-                    rendered="#{presetAccountingTemplateAction.managed }">
+                    rendered="#{xprocessAction.managed }">
             <ui:param name="dialogId" value="deleteConfirmation"/>
             <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
             <ui:define name="dialogContent">
                 <p>
-                    <h:outputFormat value="¿Esta seguro de eliminar la plantilla?">
-                        <f:param value="#{presetAccountingTemplate.name}"/>
+                    <h:outputFormat value="¿Esta seguro de eliminar el proceso?">
+                        <f:param value="#{xProcess.name}"/>
                     </h:outputFormat>
                 </p>
             </ui:define>
             <ui:define name="dialogOption">
-                <a4j:commandButton action="#{presetAccountingTemplateAction.delete}"
+                <a4j:commandButton action="#{xprocessAction.delete}"
                                    value="#{messages['Common.delete']}"
                                    immediate="true"
-                                   rendered="#{presetAccountingTemplateAction.managed}"
+                                   rendered="#{xprocessAction.managed}"
                                    styleClass="button"/>
             </ui:define>
         </s:decorate>
@@ -148,17 +143,16 @@
 
 
 
-        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
-            <ui:param name="hasWarehousePermission" value="true"/>
-            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
-            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+        <s:decorate id="machineListModalPanelContainer" template="/xproduction/machineListModalPanel.xhtml">
+            <ui:param name="containerId" value="machineListModalPanelContainer"/>
+            <ui:param name="dialogId" value="machineListModalPanel"/>
             <ui:define name="assignButton">
                 <a4j:commandButton id="assignButton"
-                                   action="#{presetAccountingTemplateAction.setCashAccount(cashAccountItem)}"
+                                   action="#{xprocessAction.setMachine(machineItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
-                                   reRender="movementCashAccountListPanel"
-                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+                                   reRender="machineListPanel"
+                                   oncomplete="Richfaces.hideModalPanel('machineListModalPanel');"/>
             </ui:define>
         </s:decorate>
 

@@ -40,10 +40,10 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
 
     @Factory(value ="xProcess", scope = ScopeType.STATELESS)
     //@Restrict("#{s:hasPermission('CUSTOMERCATEGORY','VIEW')}")
-    public XProcess initPresetAccountingTemplate() {
+    public XProcess initXProcess() {
         //typePresetAccountingTemplates = typePresetAccountingTemplateService.getTypePresetAccountingTemplates(getInstance());
         return getInstance();
-}
+    }
 
     @Override
     @Begin(flushMode = FlushModeType.MANUAL)
@@ -131,11 +131,4 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
         this.selectedMachines = selectedMachines;
     }
 
-    public XProcessService getxProcessService() {
-        return xProcessService;
-    }
-
-    public void setxProcessService(XProcessService xProcessService) {
-        this.xProcessService = xProcessService;
-    }
 }
