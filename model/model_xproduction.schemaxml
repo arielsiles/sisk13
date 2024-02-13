@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="utf8" collation="utf8_general_ci">terdemol</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="xpr_produccion" view="colnames">
+<left>377</left>
+<top>141</top>
+<width>201</width>
+<height>299</height>
+<sql_create_table>CREATE TABLE `xpr_produccion` (
+  `idproduccion` bigint(20) NOT NULL,
+  `codigo` int(11) DEFAULT NULL,
+  `estado` varchar(5) DEFAULT NULL,
+  `costototal` decimal(16,2) DEFAULT '0.00',
+  `totalmp` decimal(16,2) DEFAULT '0.00',
+  `descripcion` varchar(255) DEFAULT NULL,
+  `idformula` bigint(20) DEFAULT NULL,
+  `idtanque` bigint(20) DEFAULT NULL,
+  `idplan` bigint(20) DEFAULT NULL,
+  `idproceso` bigint(20) DEFAULT NULL,
+  `id_tmpenc` bigint(20) DEFAULT NULL,
+  `version` bigint(20) NOT NULL,
+  `idcompania` bigint(20) NOT NULL,
+  PRIMARY KEY (`idproduccion`),
+  KEY `idformula` (`idformula`),
+  KEY `idtanque` (`idtanque`),
+  KEY `idplan` (`idplan`),
+  KEY `idproceso` (`idproceso`),
+  CONSTRAINT `xpr_produccion_ibfk_4` FOREIGN KEY (`idproceso`) REFERENCES `xpr_proceso` (`idproceso`),
+  CONSTRAINT `xpr_produccion_ibfk_1` FOREIGN KEY (`idformula`) REFERENCES `xpr_formula` (`idformula`),
+  CONSTRAINT `xpr_produccion_ibfk_2` FOREIGN KEY (`idtanque`) REFERENCES `xpr_tanque` (`idtanque`),
+  CONSTRAINT `xpr_produccion_ibfk_3` FOREIGN KEY (`idplan`) REFERENCES `xpr_plan` (`idplan`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="xpr_proceso" view="colnames">
+<left>103</left>
+<top>490</top>
+<width>176</width>
+<height>146</height>
+<sql_create_table>CREATE TABLE `xpr_proceso` (
+  `idproceso` bigint(20) NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `idcompania` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`idproceso`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="xpr_plan" view="colnames">
+<left>105</left>
+<top>232</top>
+<width>147</width>
+<height>180</height>
+<sql_create_table>CREATE TABLE `xpr_plan` (
+  `idplan` bigint(20) NOT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `fecha` date NOT NULL,
+  `estado` varchar(5) DEFAULT NULL,
+  `VERSION` bigint(20) NOT NULL,
+  `idcompania` bigint(20) NOT NULL,
+  PRIMARY KEY (`idplan`),
+  UNIQUE KEY `fecha` (`fecha`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="xpr_formula" view="colnames">
+<left>810</left>
+<top>90</top>
+<width>169</width>
+<height>231</height>
+<sql_create_table>CREATE TABLE `xpr_formula` (
+  `idformula` bigint(20) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `estado` varchar(3) DEFAULT NULL,
+  `totaleq` decimal(16,2) NOT NULL,
+  `capacidad` decimal(16,2) DEFAULT NULL,
+  `activo` int(1) DEFAULT NULL,
+  `idcategoria` bigint(20) DEFAULT NULL,
+  `VERSION` bigint(20) NOT NULL,
+  `idcompania` bigint(20) NOT NULL,
+  PRIMARY KEY (`idformula`),
+  KEY `idcategoria` (`idcategoria`),
+  CONSTRAINT `xpr_formula_ibfk_1` FOREIGN KEY (`idcategoria`) REFERENCES `xpr_categoria` (`idcategoria`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="xpr_tanque" view="colnames">
+<left>105</left>
+<top>12</top>
+<width>151</width>
+<height>180</height>
+<sql_create_table>CREATE TABLE `xpr_tanque` (
+  `idtanque` bigint(20) NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `capacidad` decimal(16,2) NOT NULL,
+  `codmed` varchar(6) DEFAULT NULL,
+  `VERSION` bigint(20) NOT NULL,
+  `idcompania` bigint(20) NOT NULL,
+  PRIMARY KEY (`idtanque`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>

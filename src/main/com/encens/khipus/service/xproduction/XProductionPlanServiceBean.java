@@ -1,10 +1,9 @@
-package com.encens.khipus.service.production;
+package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.model.production.CollectionForm;
-import com.encens.khipus.model.production.ProductionPlan;
-import com.encens.khipus.model.production.ProductionProduct;
+import com.encens.khipus.model.xproduction.XProductionPlan;
+import com.encens.khipus.model.xproduction.XProductionProduct;
 import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.annotations.AutoCreate;
@@ -26,9 +25,9 @@ import java.util.List;
  * @version $Id:
  */
 @Stateless
-@Name("productionPlanService")
+@Name("xproductionPlanService")
 @AutoCreate
-public class ProductionPlanServiceBean implements ProductionPlanService {
+public class XProductionPlanServiceBean implements XProductionPlanService {
 
     @In(value = "#{entityManager}")
     private EntityManager em;
@@ -36,9 +35,9 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
     @In
     private InventoryService inventoryService;
 
-    public void updateProductionPlan(ProductionPlan productionPlan, List<ProductionProduct> productList){
+    public void updateProductionPlan(XProductionPlan productionPlan, List<XProductionProduct> productList){
 
-        for (ProductionProduct product : productList){
+        for (XProductionProduct product : productList){
             if (product.getId() == null){
                 product.setProductionPlan(productionPlan);
                 em.persist(product);
@@ -56,21 +55,21 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
         em.flush();
     }
 
-    public void updateProductionPlan(ProductionPlan productionPlan){
+    public void updateProductionPlan(XProductionPlan productionPlan){
         em.merge(productionPlan);
         em.flush();
     }
 
-    public void removeProduct(ProductionProduct product){
+    public void removeProduct(XProductionProduct product){
         em.remove(product);
         em.flush();
     }
 
-    public List<ProductionProduct> getProductionProductList(ProductionPlan productionPlan){
+    public List<XProductionProduct> getProductionProductList(XProductionPlan productionPlan){
 
-        List<ProductionProduct> productionProductList = new ArrayList<ProductionProduct>();
+        List<XProductionProduct> productionProductList = new ArrayList<XProductionProduct>();
 
-        productionProductList =  (List<ProductionProduct>) em.createQuery("select p from ProductionProduct p " +
+        productionProductList =  (List<XProductionProduct>) em.createQuery("select p from XProductionProduct p " +
                 " where p.productionPlan =:productionPlan " +
                 " and p.production is null ")
                 .setParameter("productionPlan", productionPlan)
@@ -98,9 +97,9 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
         return result;
     }
 
-    public List<ProductionPlan> getProductionPlanList(Date startDate, Date endDate){
+    public List<XProductionPlan> getProductionPlanList(Date startDate, Date endDate){
 
-        List<ProductionPlan> productionPlanList = (List<ProductionPlan>) em.createQuery("select p from ProductionPlan p " +
+        List<XProductionPlan> productionPlanList = (List<XProductionPlan>) em.createQuery("select p from ProductionPlan p " +
                 "where p.date between :startDate and :endDate")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
@@ -109,7 +108,7 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
     }
 
     @Override
-    public void updateProductForProduction(ProductionProduct product) {
+    public void updateProductForProduction(XProductionProduct product) {
 
         ProductItem productItem = em.find(ProductItem.class, product.getProductItem().getId());
 
@@ -129,7 +128,7 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
     }
 
     @Override
-    public void updateProductItemRemoveFromProduction(ProductionProduct product) {
+    public void updateProductItemRemoveFromProduction(XProductionProduct product) {
 
         ProductItem productItem = em.find(ProductItem.class, product.getProductItem().getId());
 

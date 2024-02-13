@@ -1,0 +1,64 @@
+<rich:modalPanel height="520" width="620" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:productItemByWarehouseListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+    <f:facet name="header">
+        <h:outputText>#{messages['ProductItem.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="productItemByWarehouseListForm">
+        <br/>
+
+        <div class="buttons">
+            <ui:insert name="addButton"/>
+        </div>
+        <rich:dataTable value="#{xproductionProductAssignedDataModel}"
+                        var="productionProductItem"
+                        id="productionProductItemList"
+                        rows="#{sessionUser.rowsPerPage}"
+                        width="100%"
+                        columnsWidth="5%, 50%, 15%, 15%, 15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column styleClass="center">
+                        <app:selectCheckboxHeader dataModel="#{xproductionProductAssignedDataModel}" reRender="productionProductItemList, dataScroller"/>
+                    </rich:column>
+                    <rich:column>#{messages['ProductItem.name']}</rich:column>
+                    <rich:column>#{messages['ProductItem.productItemCode']}</rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column styleClass="center">
+                <h:selectBooleanCheckbox id="selectCheckboxItem"
+                                         immediate="true"
+                                         value="#{xproductionProductAssignedDataModel.selectedList[xproductionProductAssignedDataModel.page][productionProductItem.id]}">
+                    <a4j:support event="onchange"
+                                 reRender="selectCheckboxItem"/>
+                </h:selectBooleanCheckbox>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{productionProductItem.productItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{productionProductItem.productItem.productItemCode}"/>
+            </rich:column>
+
+        </rich:dataTable>
+
+        <app:dataScroller id="dataScroller"
+                          for="productionProductItemList"
+                          dataModel="#{xproductionProductAssignedDataModel}"/>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, addButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

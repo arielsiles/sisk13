@@ -1,0 +1,778 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.1.xsd"
+       login-view-id="/login.xhtml">
+
+    <page view-id="/xproduction/*" login-required="true"/>
+
+    <page view-id="/xproduction/rawMaterialRejectionNoteList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{rawMaterialRejectionNoteAction.startNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialRejectionNote.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialRejectionNoteAction.select(rawMaterialRejectionNoteItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialRejectionNote.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialRejectionNote.xhtml"
+          no-conversation-view-id="/xproduction/rawMaterialRejectionNoteList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialRejectionNoteList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialPayRollList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{rawMaterialPayRollAction.select(rawMaterialPayRollItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPayRoll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialPayRollAction.startNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPayRoll.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialPayRollAction.startNewApprove}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPayRollApprove.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialPayRollApprove.xhtml" >
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialPayRollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialPayRoll.xhtml"
+          no-conversation-view-id="/xproduction/rawMaterialPayRollList.xhtml">
+        <navigation from-action="#{rawMaterialPayRecordDetailsAction.select(rawMaterialPayRecordItem)}">
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialPayRecordDetails.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{rawMaterialPayRollAction.generateAll}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPayRollList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{rawMaterialPayRollAction.deleteAll}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPayRollList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialPayRollList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialPayRecordDetails.xhtml"
+          no-conversation-view-id="/xproduction/rawMaterialPayRollList.xhtml">
+        <navigation from-action="#{rawMaterialPayRollAction.selectJoin(rawMaterialPayRecord.rawMaterialPayRoll)}">
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialPayRoll.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialProducerDiscountList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{rawMaterialProducerDiscountAction.select(rawMaterialProducerItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialProducerDiscount.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialProducerDiscount.xhtml"
+          no-conversation-view-id="/xproduction/rawMaterialProducerDiscountList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialProducerDiscountList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionTransferLogList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productionTransferLogAction.createNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionTransferLog.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{productionTransferLogAction.selectForDelivering(productionTransferLogItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionTransferLog.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionTransferLog.xhtml"
+          no-conversation-view-id="/xproduction/productionTransferLogList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productionTransferLogList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialCollectionSessionList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{rawMaterialCollectionSessionAction.startCreate}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialCollectionSession.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialCollectionSessionAction.select(rawMaterialCollectionSessionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialCollectionSession.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialCollectionSession.xhtml"
+          no-conversation-view-id="/xproduction/rawMaterialCollectionSessionList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialCollectionSessionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionOrderList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productionOrderAction.select(productionOrderItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionOrder.xhtml" no-conversation-view-id="/xproduction/productionOrderList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productionOrderList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionPlanningList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productionPlanningAction.select(productionPlanningItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionPlanning.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{productionPlanningAction.createNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionPlanning.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/reportOutputProductionVoucher.xhtml" action="#{productionOrderReporter.prepare}">
+        <param name="id" value="#{productionOrderReporter.id}"/>
+    </page>
+    <page view-id="/xproduction/reportInputProductionVoucher.xhtml" action="#{productionOrderReporter.prepare}">
+        <param name="id" value="#{productionOrderReporter.id}"/>
+    </page>
+    <page view-id="/xproduction/reportOutputProductionTransferLog.xhtml"
+          action="#{productionTransferLogReporter.prepare}">
+        <param name="id" value="#{productionTransferLogReporter.id}"/>
+    </page>
+    <page view-id="/warehouse/reportInputProductionTransferLog.xhtml" action="#{productionTransferLogReporter.prepare}">
+        <param name="id" value="#{productionTransferLogReporter.id}"/>
+    </page>
+
+    <page view-id="/xproduction/productionPlanning.xhtml"
+          no-conversation-view-id="/xproduction/productionPlanningList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productionPlanningList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{productionPlanningAction.removeFormulation()}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionPlanning.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+
+    <page view-id="/xproduction/productCompositionList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productCompositionAction.startCreateNew}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productComposition.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{productCompositionAction.select(productCompositionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productComposition.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productComposition.xhtml"
+          no-conversation-view-id="/xproduction/productCompositionList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productCompositionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionMaterialList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productionMaterialAction.select(productionMaterialItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionMaterial.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionMaterial.xhtml"
+          no-conversation-view-id="/xproduction/productionMaterialList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productionMaterialList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionInputList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productionInputAction.select(productionInputItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionInput.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionInput.xhtml" no-conversation-view-id="/xproduction/productionInputList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productionInputList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/measureUnitProductionList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{measureUnitxproductionAction.select(measureUnitProductionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/measureUnitProduction.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/measureUnitProduction.xhtml"
+          no-conversation-view-id="/xproduction/measureUnitProductionList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/measureUnitProducionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/processedProductList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{processedProductAction.select(processedProductItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/processedProduct.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/processedProduct.xhtml" no-conversation-view-id="/xproduction/processedProductList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/processedProductList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/collectionFormList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{collectionFormAction.select(collectionFormItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/collectionForm.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{collectionFormAction.startCreate}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/collectionForm.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/collectionForm.xhtml" no-conversation-view-id="/xproduction/collectionFormList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/collectionFormList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/collectedRawMaterial.xhtml"
+          no-conversation-view-id="/xproduction/productiveZoneList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productiveZoneList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productiveZoneModalPanel.xhtml">
+        <navigation from-action="#{collectedRawMaterialAction.beginCollectionRawMaterial}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/collectedRawMaterial.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productiveZoneList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productiveZoneAction.select(productiveZoneItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productiveZone.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productiveZone.xhtml" no-conversation-view-id="/xproduction/productiveZoneList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productiveZoneList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/gestionTaxList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{gestionTaxAction.select(gestionTaxItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/gestionTax.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/gestionTax.xhtml" no-conversation-view-id="/xproduction/gestionTaxList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/gestionTaxList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/discountProducerList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{discountProducerAction.select(discountProducerItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/discountProducer.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/discountProducer.xhtml" no-conversation-view-id="/xproduction/discountProducerList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/discountProducerList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialProducerList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{rawMaterialProducerAction.select(rawMaterialProducerItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialProducer.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialProducerAction.startCreate}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialProducer.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialProducer.xhtml"
+          no-conversation-view-id="/xproduction/rawMaterialProducerList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialProducerList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/salaryMovementProducerList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{salaryMovementProducerAction.select(salaryMovementProducerItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/salaryMovementProducer.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/salaryMovementProducer.xhtml"
+          no-conversation-view-id="/xproduction/salaryMovementProducerList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/salaryMovementProducerList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/salaryMovementGABList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{salaryMovementGABAction.select(salaryMovementGABItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/salaryMovementGAB.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/salaryMovementGAB.xhtml"
+          no-conversation-view-id="/xproduction/salaryMovementGABList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/salaryMovementGABList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/employeeTimeCardList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{employeeTimeCardAction.select(employeeTimeCardItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/employeeTimeCard.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/employeeTimeCard.xhtml" no-conversation-view-id="/xproduction/employeeTimeCardList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/employeeTimeCardList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/indirectCostConfigList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{indirectCostsConfigurationAction.select(item)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/indirectCostConfig.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/indirectCostConfig.xhtml" no-conversation-view-id="/xproduction/indirectCostConfigList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/indirectCostConfigList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/indirectCostsList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{indirectCostsAction.select(item)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/indirectCosts.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/indirectCosts.xhtml" no-conversation-view-id="/xproduction/indirectCostsList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/indirectCostsList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- -->
+
+    <page view-id="/xproduction/formulationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{xformulationAction.select(formulationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/formulation.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionPlanList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{xproductionPlanAction.select(productionPlanItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/formulation.xhtml" no-conversation-view-id="/xproduction/formulationList.xhtml">
+        <navigation from-action="#{xformulationAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/formulationList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xformulationAction.select(formulationItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/formulation.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xformulationAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/formulation.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/xproduction/formulationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/productionPlan.xhtml" no-conversation-view-id="/xproduction/productionPlanList.xhtml">
+        <navigation from-action="#{xproductionPlanAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xproductionPlanAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xproductionPlanAction.addProduction}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/production.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xproductionAction.select(productionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/production.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/productionPlanList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/production.xhtml" no-conversation-view-id="/xproduction/productionPlan.xhtml">
+        <navigation from-action="#{xproductionAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/production.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xproductionAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/xproduction/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/materialConfigurationList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{materialInputAction.select(materialInputItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/materialConfiguration.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/materialConfiguration.xhtml" no-conversation-view-id="/xproduction/materialConfigurationList.xhtml">
+        <navigation from-action="#{materialInputAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/materialConfigurationList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{materialInputAction.delete}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/materialConfigurationList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/xproduction/materialConfigurationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/distributionIndirectCost.xhtml" no-conversation-view-id="/xproduction/productionPlanList.xhtml">
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/xproduction/productionPlanList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/salaryMovementProducerGral.xhtml" no-conversation-view-id="/xproduction/salaryMovementProducerList.xhtml">
+        <navigation from-action="#{salaryMovementProducerAction.createGeneralDiscounts}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/salaryMovementProducerList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/xproduction/salaryMovementProducerList.xhtml"/>
+            </rule>
+        </navigation>
+
+    </page>
+
+    <page view-id="/xproduction/metaProductList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{metaProductAction.select(metaProductItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/metaProduct.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/xproduction/metaProduct.xhtml" no-conversation-view-id="/xproduction/metaProductList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/metaProductList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/collectMaterialList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{collectMaterialAction.select(collectMaterialItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/collectMaterial.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/xproduction/collectMaterial.xhtml" no-conversation-view-id="/xproduction/collectMaterialList.xhtml">
+        <navigation from-action="#{collectMaterialAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/collectMaterial.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{collectMaterialAction.approve}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/collectMaterial.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{collectMaterialAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/collectMaterial.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/collectMaterialList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/postRecordCollection.xhtml" no-conversation-view-id="/xproduction/collectMaterialList.xhtml">
+        <navigation from-action="#{collectMaterialAction.accounting}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/postRecordCollection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/collectMaterialList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/producerPriceList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{producerPriceAction.select(producerPriceItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/producerPrice.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/xproduction/producerPrice.xhtml" no-conversation-view-id="/xproduction/producerPriceList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/producerPriceList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialPaymentRequestList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{rawMaterialPaymentAction.select(rawMaterialPaymentItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPaymentRequestUpdate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/xproduction/rawMaterialPaymentRequest.xhtml" no-conversation-view-id="/xproduction/rawMaterialPaymentRequestList.xhtml">
+        <navigation from-action="#{rawMaterialPaymentAction.create}">
+            <rule if-outcome="Success">
+                <begin-conversation flush-mode="MANUAL"/>
+                <redirect view-id="/xproduction/rawMaterialPaymentRequestUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialPaymentRequestList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialPaymentRequestUpdate.xhtml" no-conversation-view-id="/xproduction/rawMaterialPaymentRequestList.xhtml">
+        <navigation from-action="#{rawMaterialPaymentAction.update}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPaymentRequestUpdate.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialPaymentAction.sendRequest}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPaymentRequestList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialPaymentAction.liquidatePayment}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/rawMaterialPaymentRequestList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{rawMaterialPaymentAction.cancel}">
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialPaymentRequestList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/rawMaterialPaymentRequestList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+</pages>

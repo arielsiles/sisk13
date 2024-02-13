@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich" xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{formulationAction.managed}">
+                #{messages['Formulation.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Formulation.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="production"/>
+    <ui:define name="body">
+
+    <h:form id="productionForm">
+
+        <div class="buttons">
+
+            <h:commandButton action="#{materialInputAction.create}" value="#{messages['Common.save']}"
+                             styleClass="button"
+                             rendered="#{!materialInputAction.managed and s:hasPermission('FORMULATION','CREATE')}"
+                             tabindex="1">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton action="#{materialInputAction.delete}" value="#{messages['Common.delete']}"
+                             styleClass="button"
+                             rendered="#{materialInputAction.managed and s:hasPermission('FORMULATION','DELETE')}"
+                             tabindex="1">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton action="#{materialInputAction.update}" value="#{messages['Common.update']}"
+                             styleClass="button"
+                             rendered="#{materialInputAction.managed and s:hasPermission('FORMULATION','UPDATE')}"
+                             tabindex="1">
+                <s:defaultAction/>
+            </h:commandButton>
+
+            <h:commandButton action="#{materialInputAction.cancel}" value="#{messages['Common.cancel']}"
+                             styleClass="button" immediate="true"
+                             tabindex="4">
+            </h:commandButton>
+        </div>
+
+        <rich:panel id="formPanel">
+
+        <f:facet name="header">
+            <c:choose>
+                <c:when test="#{materialInputAction.managed}">
+                    #{messages['Common.edit']}
+                </c:when>
+                <c:otherwise>
+                    #{messages['Common.new']}
+                </c:otherwise>
+            </c:choose>
+        </f:facet>
+
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+            <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.finishedProduct']}</ui:define>
+                <app:selectPopUp id="productItem"
+                                 required="true"
+                                 textValue="#{materialInput.productItem.name}"
+                                 value="#{materialInput.productItem}"
+                                 clearAction="#{materialInputAction.clearProductItem()}"
+                                 searchModalPanel="productItemListModalPanel"
+                                 dataModel="#{productItemSearchDataModel}"
+                                 reRender="productItemField"
+                                 hotKeySelect="alt+2"/>
+            </s:decorate>
+
+            <s:decorate id="productItemMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.assignMaterial']}</ui:define>
+                <app:selectPopUp id="productItemMaterial"
+                                 required="true"
+                                 textValue="#{materialInput.productItemMaterial.name}"
+                                 value="#{materialInput.productItemMaterial}"
+                                 clearAction="#{materialInputAction.clearProductItemMaterial()}"
+                                 searchModalPanel="productItemMaterialListModalPanel"
+                                 dataModel="#{productItemSearchDataModel}"
+                                 reRender="productItemMaterialField"
+                                 hotKeySelect="alt+2"/>
+            </s:decorate>
+
+            <s:decorate id="supplyTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.type']}</ui:define>
+                <h:selectOneMenu id="supplyType"
+                                 value="#{materialInput.type}"
+                                 styleClass="inputMedium"
+                                 tabindex="4">
+                    <s:selectItems value="#{SupplyTypeEnum}"
+                                   var="supplyType"
+                                   label="#{messages[supplyType.resourceKey]}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <rich:spacer height="10" />
+
+            <s:decorate id="quantityFlagField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.defaultQuantity']}</ui:define>
+                <h:selectBooleanCheckbox id="quantityFlag"
+                                         value="#{materialInput.quantityFlag}"
+                                         disabled="false"
+                                         tabindex="31">
+                </h:selectBooleanCheckbox>
+            </s:decorate>
+
+
+            <rich:spacer height="10" />
+
+            <s:decorate id="volumeOneField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.volumeOne']}</ui:define>
+                <h:inputText id="volumeOneId"
+                             value="#{materialInput.volumeOne}"
+                             styleClass="inputSmall right">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="volumeOneId"/>
+                    <a4j:support event="onblur" ajaxSingle="true" reRender="volumeOneId" />
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="weightOneField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['MaterialInput.weightOne']}</ui:define>
+                <h:inputText id="weightOneId"
+                             value="#{materialInput.weightOne}"
+                             styleClass="inputSmall right">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="weightOneId"/>
+                    <a4j:support event="onblur" ajaxSingle="true" reRender="weightOneId" />
+                </h:inputText>
+            </s:decorate>
+
+        </h:panelGrid>
+
+        </rich:panel>
+
+    </h:form>
+
+        <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="productItemListModalPanelContainer"/>
+            <ui:param name="dialogId" value="productItemListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                       action="#{materialInputAction.assignProduct(productItemItem)}"
+                                       image="/img/active.gif"
+                                       styleClass="select-image-middle"
+                                       reRender="productItemField"
+                                       oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="productItemMaterialListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="productItemMaterialListModalPanelContainer"/>
+            <ui:param name="dialogId" value="productItemMaterialListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{materialInputAction.assignMaterial(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="productItemMaterialField"
+                                   oncomplete="Richfaces.hideModalPanel('productItemMaterialListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+</ui:define>
+</ui:composition>

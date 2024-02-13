@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemadesigner version="6.5">
 <source>
-<database charset="utf8" collation="utf8_general_ci">caiscdev</database>
+<database charset="utf8" collation="utf8_general_ci">terdemol</database>
 </source>
 <canvas zoom="100">
 <tables>
 <table name="pr_formula" view="colnames">
-<left>714</left>
-<top>579</top>
+<left>783</left>
+<top>353</top>
 <width>143</width>
 <height>214</height>
 <sql_create_table>CREATE TABLE `pr_formula` (
@@ -16,7 +16,7 @@
   `estado` varchar(3) DEFAULT NULL,
   `totaleq` decimal(16,2) NOT NULL,
   `capacidad` decimal(16,2) DEFAULT NULL,
-  `activo` int(1) DEFAULT NULL,
+  `activo` int(11) DEFAULT NULL,
   `idcategoria` bigint(20) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
@@ -26,15 +26,15 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_insumoformula" view="colnames">
-<left>1059</left>
-<top>422</top>
-<width>192</width>
-<height>197</height>
+<left>1179</left>
+<top>267</top>
+<width>198</width>
+<height>212</height>
 <sql_create_table>CREATE TABLE `pr_insumoformula` (
   `idinsumoformula` bigint(20) NOT NULL,
   `cantidad` decimal(20,6) NOT NULL,
   `cod_art` varchar(6) NOT NULL,
-  `defecto` int(1) DEFAULT NULL,
+  `defecto` int(11) DEFAULT NULL,
   `idformula` bigint(20) NOT NULL,
   `idform` bigint(20) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,
@@ -47,10 +47,10 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_produccion" view="colnames">
-<left>320</left>
-<top>331</top>
-<width>185</width>
-<height>250</height>
+<left>314</left>
+<top>231</top>
+<width>250</width>
+<height>277</height>
 <sql_create_table>CREATE TABLE `pr_produccion` (
   `idproduccion` bigint(20) NOT NULL,
   `codigo` int(11) DEFAULT NULL,
@@ -61,7 +61,8 @@
   `idformula` bigint(20) DEFAULT NULL,
   `idtanque` bigint(20) DEFAULT NULL,
   `idplan` bigint(20) DEFAULT NULL,
-  `VERSION` bigint(20) NOT NULL,
+  `id_tmpenc` bigint(20) DEFAULT NULL,
+  `version` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
   PRIMARY KEY (`idproduccion`),
   KEY `idformula` (`idformula`),
@@ -73,8 +74,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_insumo" view="colnames">
-<left>833</left>
-<top>166</top>
+<left>914</left>
+<top>53</top>
 <width>151</width>
 <height>248</height>
 <sql_create_table>CREATE TABLE `pr_insumo` (
@@ -98,16 +99,19 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_material" view="colnames">
-<left>1095</left>
-<top>29</top>
+<left>1145</left>
+<top>20</top>
 <width>180</width>
-<height>216</height>
+<height>172</height>
 <sql_create_table>CREATE TABLE `pr_material` (
   `idmaterial` bigint(20) NOT NULL,
   `cod_art` varchar(6) NOT NULL,
   `cod_art_mat` varchar(6) NOT NULL,
   `descri` varchar(100) DEFAULT NULL,
-  `flag_cant` int(1) DEFAULT NULL,
+  `flag_cant` int(11) DEFAULT NULL,
+  `tipo` varchar(15) DEFAULT NULL,
+  `vol1` decimal(10,2) DEFAULT NULL,
+  `peso1` decimal(10,2) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
   PRIMARY KEY (`idmaterial`),
@@ -118,19 +122,19 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_producto" view="colnames">
-<left>571</left>
-<top>40</top>
+<left>626</left>
+<top>15</top>
 <width>152</width>
 <height>197</height>
 <sql_create_table>CREATE TABLE `pr_producto` (
   `idproducto` bigint(20) NOT NULL,
   `cod_art` varchar(6) DEFAULT NULL,
   `cantidad` decimal(16,2) DEFAULT NULL,
-  `costo` decimal(16,2) NOT NULL DEFAULT '0.00',
-  `costouni` decimal(16,2) NOT NULL DEFAULT '0.00',
-  `costo_a` decimal(16,2) NOT NULL DEFAULT '0.00',
-  `costo_b` decimal(16,2) NOT NULL DEFAULT '0.00',
-  `costo_c` decimal(16,2) NOT NULL DEFAULT '0.00',
+  `costo` decimal(16,2) DEFAULT '0.00',
+  `costouni` decimal(16,2) DEFAULT '0.00',
+  `costo_a` decimal(16,2) DEFAULT '0.00',
+  `costo_b` decimal(16,2) DEFAULT '0.00',
+  `costo_c` decimal(16,2) DEFAULT '0.00',
   `idproduccion` bigint(20) DEFAULT NULL,
   `idplan` bigint(20) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,
@@ -144,10 +148,10 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_tanque" view="colnames">
-<left>87</left>
-<top>579</top>
+<left>57</left>
+<top>350</top>
 <width>157</width>
-<height>197</height>
+<height>177</height>
 <sql_create_table>CREATE TABLE `pr_tanque` (
   `idtanque` bigint(20) NOT NULL,
   `nombre` varchar(255) NOT NULL,
@@ -159,10 +163,10 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_plan" view="colnames">
-<left>81</left>
-<top>87</top>
-<width>124</width>
-<height>163</height>
+<left>60</left>
+<top>31</top>
+<width>140</width>
+<height>185</height>
 <sql_create_table>CREATE TABLE `pr_plan` (
   `idplan` bigint(20) NOT NULL,
   `nombre` varchar(100) DEFAULT NULL,
