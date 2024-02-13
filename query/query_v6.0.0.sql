@@ -235,7 +235,7 @@ DROP TABLE IF EXISTS `xpr_maquina`;
 CREATE TABLE `xpr_maquina` (
                                `idmaquina` bigint(20) NOT NULL,
                                `nombre` varchar(255) DEFAULT NULL,
-                               `VERSION` bigint(20) DEFAULT NULL,
+                               `version` bigint(20) DEFAULT NULL,
                                `idcompania` bigint(20) DEFAULT NULL,
                                PRIMARY KEY (`idmaquina`)
 ) ;
@@ -251,7 +251,7 @@ DROP TABLE IF EXISTS `xpr_proceso`;
 CREATE TABLE `xpr_proceso` (
                                `idproceso` bigint(20) NOT NULL,
                                `nombre` varchar(255) NOT NULL,
-                               `VERSION` bigint(20) DEFAULT NULL,
+                               `version` bigint(20) DEFAULT NULL,
                                `idcompania` bigint(20) DEFAULT NULL,
                                PRIMARY KEY (`idproceso`)
 );
@@ -268,7 +268,7 @@ CREATE TABLE `xpr_procesomaquina` (
                                       `idprocesomaquina` bigint(20) NOT NULL,
                                       `idmaquina` bigint(20) DEFAULT NULL,
                                       `idproceso` bigint(20) DEFAULT NULL,
-                                      `VERSION` bigint(20) DEFAULT NULL,
+                                      `version` bigint(20) DEFAULT NULL,
                                       `idcompania` bigint(20) DEFAULT NULL,
                                       PRIMARY KEY (`idprocesomaquina`),
                                       KEY `xpr_procesomaqina_xpr_proceso_idproceso_fk` (`idproceso`),
@@ -286,3 +286,9 @@ CREATE TABLE `xpr_procesomaquina` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2024-02-12 19:48:46
+
+-- 12.02.2024
+alter table xpr_produccion add column idproceso bigint(20) after idplan;
+alter table xpr_produccion add foreign key (idproceso) references xpr_proceso (idproceso);
+
+insert into xpr_proceso values (1, 'Proceso de Produccion Rumifos', 0, 1);

@@ -92,6 +92,9 @@
     <factory name="xproductionTankList" value="#{xproductionTankQuery}"/>
     <framework:entity-query name="xproductionTankQuery" ejbql="select p from XProductionTank p"/>
 
+    <factory name="xprocessList" value="#{xprocessQuery}"/>
+    <framework:entity-query name="xprocessQuery" ejbql="select x from XProcess x"/>
+
     <factory name="xformulationList" value="#{xformulationQuery}"/>
     <framework:entity-query name="xformulationQuery" ejbql="select p from XFormulation p">
         <framework:restrictions>

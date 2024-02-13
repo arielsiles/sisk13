@@ -28,7 +28,7 @@ public class XProcess implements BaseModel {
     @Column(name = "idproceso", nullable = false)
     private Long id;
 
-    @Column(name = "nombre", nullable = false, length = 150)
+    @Column(name = "nombre", nullable = false, length = 255)
     private String name;
 
     @OneToMany(mappedBy = "xProcess", fetch = FetchType.LAZY)

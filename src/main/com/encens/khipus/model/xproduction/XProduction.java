@@ -65,6 +65,10 @@ public class XProduction implements BaseModel {
     @JoinColumn(name = "idplan", nullable = true, updatable = false, insertable = true)
     private XProductionPlan productionPlan;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idproceso", nullable = true, updatable = false, insertable = true)
+    private XProcess process;
+
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
     private List<XSupply> supplyList = new ArrayList<XSupply>(0);
 
@@ -193,5 +197,13 @@ public class XProduction implements BaseModel {
 
     public void setVoucher(Voucher voucher) {
         this.voucher = voucher;
+    }
+
+    public XProcess getProcess() {
+        return process;
+    }
+
+    public void setProcess(XProcess process) {
+        this.process = process;
     }
 }

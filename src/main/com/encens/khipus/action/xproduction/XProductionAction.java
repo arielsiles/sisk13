@@ -30,6 +30,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XProductionTank productionTank;
     private XFormulation formulation;
     private XProductionPlan productionPlan;
+    private XProcess process;
 
     private List<XSupply> ingredientSupplyList = new ArrayList<XSupply>();
     private List<XSupply> materialSupplyList = new ArrayList<XSupply>();
@@ -61,6 +62,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         String outCome = super.select(instance);
         setFormulation(getInstance().getFormulation());
         setProductionTank(getInstance().getProductionTank());
+        setProcess(getInstance().getProcess());
         setIngredientSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.INGREDIENT));
         setMaterialSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.MATERIAL));
 
@@ -75,6 +77,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setProductionTank(productionTank);
         production.setFormulation(formulation);
         production.setProductionPlan(productionPlan);
+        production.setProcess(process);
 
         Long seq = sequenceService.createOrUpdateNextSequenceValue(Constants.PRODUCTION_CODE);
         production.setCode(seq.intValue());
@@ -91,8 +94,6 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setProductionTank(productionTank);
         production.setFormulation(formulation);
 
-        //System.out.println("-------> Update Total cost: " + calculateTotalCost());
-        //System.out.println("-------> Update Total mil: " + calculateRawMaterial());
         production.setTotalCost(calculateTotalCost());
         production.setTotalRawMaterial(calculateRawMaterial());
         xproductionService.updateProduction(production, ingredientSupplyList, materialSupplyList);
@@ -612,6 +613,14 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void setSupplyAssign(XSupply supplyAssign) {
         this.supplyAssign = supplyAssign;
+    }
+
+    public XProcess getProcess() {
+        return process;
+    }
+
+    public void setProcess(XProcess process) {
+        this.process = process;
     }
 
     /*public BigDecimal getTotalCost() {

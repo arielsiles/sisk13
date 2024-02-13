@@ -47,10 +47,10 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_produccion" view="colnames">
-<left>344</left>
+<left>314</left>
 <top>231</top>
-<width>246</width>
-<height>276</height>
+<width>250</width>
+<height>277</height>
 <sql_create_table>CREATE TABLE `pr_produccion` (
   `idproduccion` bigint(20) NOT NULL,
   `codigo` int(11) DEFAULT NULL,
@@ -148,8 +148,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="pr_tanque" view="colnames">
-<left>47</left>
-<top>297</top>
+<left>57</left>
+<top>350</top>
 <width>157</width>
 <height>177</height>
 <sql_create_table>CREATE TABLE `pr_tanque` (

@@ -142,6 +142,23 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
+                <s:decorate id="processField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProduction.process']}</ui:define>
+                    <h:selectOneMenu id="process"
+                                     value="#{xproductionAction.process}"
+                                     styleClass="input"
+                                     required="true"
+                                     disabled="#{xproductionAction.approved or xproductionAction.managed}"
+                                     tabindex="7">
+                        <s:selectItems value="#{xprocessList}"
+                                       var="process"
+                                       label="#{process.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
                 <s:decorate id="formulationField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.formulation']}</ui:define>
                     <h:selectOneMenu id="formulationTank"
