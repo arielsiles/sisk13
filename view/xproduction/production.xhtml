@@ -38,18 +38,6 @@
                            reRender="ingredientPanel, totalCostField, totalRawMaterialField">
         </a4j:commandButton>
 
-        <!--<a4j:commandButton id="addProductCommandButton"
-                           action="#{productionProductAssignedDataModel.reset()}"
-                           value="Add product"
-                           styleClass="button"
-                           immediate="true"
-                           oncomplete="Richfaces.showModalPanel('productItemsByAssignmentListModalPanel');"
-                           actionListener="#{selectPopUpAction.select}"
-                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
-                           reRender="productItemsByAssignmentListModalPanel">
-            <f:attribute name="dataModelObject" value="#{productionProductAssignedDataModel}"/>
-        </a4j:commandButton>-->
-
         <a4j:commandButton id="addMaterialCommandButton"
                            action="#{productItemByWarehouseDataModel.reset()}"
                            value="#{messages['Production.addMaterial']}"
@@ -88,7 +76,6 @@
                          rendered="#{!xproductionAction.managed and s:hasPermission('PRODUCTION','CREATE')}">
         </h:commandButton>
 
-        <!--!xproductionAction.existProductionProducts() and-->
         <h:commandButton action="#{xproductionAction.approve}" value="#{messages['Common.approve']}"
                          styleClass="button"
                          rendered="#{xproductionAction.managed and
@@ -121,11 +108,8 @@
             <c:choose>
                 <c:when test="#{xproductionAction.managed}">
                     <h:outputFormat value="{0, date, dd/MMMM/yyyy}">
-                        <f:param value="#{productionPlan.date}"/>
+                        <f:param value="#{xproductionPlan.date}"/>
                     </h:outputFormat>
-                    <!--<h:outputFormat value="#{productionPlan.date}">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                    </h:outputFormat>-->
                 </c:when>
                 <c:otherwise>
                     #{messages['Production.new']}
@@ -136,21 +120,9 @@
         <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent,width50percent">
 
             <s:div>
-                <!--<s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.date']}</ui:define>
-                    <rich:calendar value="#{productionPlan.date}"
-                                   popup="true"
-                                   datePattern="#{messages['patterns.date']}"
-                                   styleClass="input"
-                                   disabled="true"
-                                   tabindex="9">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                    </rich:calendar>
-                </s:decorate>-->
-
                 <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Production.state']}</ui:define>
-                    <h:outputText value="#{messages[production.state.resourceKey]}"/>
+                    <h:outputText value="#{messages[xproduction.state.resourceKey]}"/>
                 </s:decorate>
 
                 <s:decorate id="productionTankField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -242,11 +214,8 @@
                 </c:if>
             </s:div>
         </h:panelGrid>
-    <!--</rich:panel>-->
 
-    <!--<rich:spacer height="5" />-->
     <rich:dataTable></rich:dataTable>
-    <!--<h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">-->
 
     <rich:tabPanel selectedTab="ingredientTab">
         <rich:tab name="ingredientTab" label="#{messages['Production.ingredient']}">
@@ -302,7 +271,7 @@
                                                  required="false"
                                                  disabled="#{xproductionAction.approved}"
                                                  tabindex="7">
-                                    <s:selectItems value="#{productionProductList}"
+                                    <s:selectItems value="#{xproductionProductList}"
                                                    var="product"
                                                    label="#{product.productItem.name}"
                                                    noSelectionLabel="#{messages['ProductionPlan.product.allProducts']}"
@@ -311,34 +280,7 @@
                                 </h:selectOneMenu>
 
                                 <c:if test="#{xproductionAction.managed}">
-                                    <!-- TEST -->
-                                    <!--<a4j:commandButton
-                                            action="#{xproductionAction.assignSupply(supplyDetail)}"
-                                            value="Add product"
-                                            styleClass="button"
-                                            immediate="true"
-                                            oncomplete="Richfaces.showModalPanel('productItemsByAssignmentListModalPanel');"
-                                            actionListener="#{selectPopUpAction.select}"
-                                            reRender="productItemsByAssignmentListModalPanel">
-                                        <f:attribute name="dataModelObject" value="#{productionProductAssignedDataModel}"/>
-                                    </a4j:commandButton>-->
                                 </c:if>
-
-                                <!--<s:decorate id="#{productItemsByAssignmentListModalPanelContainerFieldId}" template="/production/productItemsByAssignmentListModalPanel.xhtml">
-                                    <ui:param name="containerId" value="productItemsByAssignmentListModalPanelContainer"/>
-                                    <ui:param name="dialogId" value="productItemsByAssignmentListModalPanel"/>
-                                    <ui:define name="addButton">
-                                        <a4j:commandButton id="addButton"
-                                                           immediate="true"
-                                                           ajaxSingle="true"
-                                                           action="#{xproductionAction.assignProductAffect(supplyDetail)}"
-                                                           value="#{messages['Common.add']}"
-                                                           reRender="materialPanel"
-                                                           styleClass="button"
-                                                           oncomplete="Richfaces.hideModalPanel('productItemsByAssignmentListModalPanel');"/>
-                                    </ui:define>
-                                </s:decorate>-->
-
                             </td>
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
@@ -357,7 +299,7 @@
             </s:div>
         </rich:tab>
     </rich:tabPanel>
-    <!--<rich:spacer height="5" />-->
+
     <rich:tabPanel selectedTab="materialTab">
         <rich:tab name="materialTab" label="#{messages['Production.material']}">
             <s:div id="materialPanel">
@@ -411,7 +353,7 @@
                                                  required="false"
                                                  disabled="#{xproductionAction.approved}"
                                                  tabindex="7">
-                                <s:selectItems value="#{productionProductList}"
+                                <s:selectItems value="#{xproductionProductList}"
                                                var="product"
                                                label="#{product.productItem.name}"
                                                noSelectionLabel="#{messages['ProductionPlan.product.allProducts']}"
@@ -438,13 +380,11 @@
         </rich:tab>
     </rich:tabPanel>
 
-    <!--<rich:spacer height="5" />-->
-
     <rich:tabPanel selectedTab="productsTab">
     <rich:tab name="productsTab" label="#{messages['Production.products']}">
     <s:div id="finalProductList">
         <rich:dataTable id="productList"
-                        value="#{production.productionProductList}"
+                        value="#{xproduction.productionProductList}"
                         var="product"
                         width="100%" columnsWidth="50%, 15%, 15%, 15%, 5%">
             <f:facet name="header">
@@ -500,7 +440,7 @@
     <!-- Test -->
     <c:if test="#{xproductionAction.managed}">
     <s:decorate id="productItemsByAssignmentListModalPanelContainer"
-                template="/production/productItemsByAssignmentListModalPanel.xhtml">
+                template="/xproduction/productItemsByAssignmentListModalPanel.xhtml">
         <ui:param name="containerId" value="productItemsByAssignmentListModalPanelContainer"/>
         <ui:param name="dialogId" value="productItemsByAssignmentListModalPanel"/>
         <ui:define name="addButton">

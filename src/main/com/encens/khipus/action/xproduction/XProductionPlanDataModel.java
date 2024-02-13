@@ -22,8 +22,8 @@ public class XProductionPlanDataModel extends QueryDataModel<Long, XProductionPl
     private Date endDate;
 
     private static final String[] RESTRICTIONS = {"" +
-            "productionPlan.date >= #{productionPlanDataModel.startDate}",
-            "productionPlan.date <= #{productionPlanDataModel.endDate}"};
+            "productionPlan.date >= #{xproductionPlanDataModel.startDate}",
+            "productionPlan.date <= #{xproductionPlanDataModel.endDate}"};
 
     @Create
     public void init() {
