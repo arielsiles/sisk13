@@ -94,22 +94,13 @@
                     </rich:calendar>
                 </s:decorate>
 
-                <s:decorate id="totalWeighedField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.milkWeighing']}</ui:define>
-                    <h:outputText value="#{xproductionPlanAction.getTotalWeighed(xproductionPlan)}">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
-                    </h:outputText>
-                    <span class="spacer"></span>
-                    <h:outputText value="#{messages['MeasureUnit.LT']}" />
-                </s:decorate>
-
                 <s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.usedMilk']}</ui:define>
+                    <ui:define name="label">#{messages['XProductionPlan.usedRawMaterial']}</ui:define>
                     <h:outputText value="#{xproductionPlanAction.calculateTotalRawMaterial(xproductionPlan)}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
                     <span class="spacer"></span>
-                    <h:outputText value="#{messages['MeasureUnit.LT']}" />
+                    <h:outputText value="#{messages['MeasureUnit.KG']}" />
                 </s:decorate>
 
 
@@ -134,7 +125,7 @@
                     <rich:columnGroup>
                         <rich:column><h:outputText value="#{messages['Production.code']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.productionTank']}" /></rich:column>
-                        <rich:column><h:outputText value="#{messages['ProductionPlan.usedMilk']}" /></rich:column>
+                        <rich:column><h:outputText value="#{messages['XProductionPlan.usedRawMaterial']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.category']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.state']}" /></rich:column>
                         <rich:column styleClass="center"><h:outputText value="#{messages['Common.action']}" /></rich:column>
