@@ -214,3 +214,75 @@ CREATE TABLE `xpr_tanque` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+
+/* **************procesos**********************/
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `xpr_maquina`
+--
+
+DROP TABLE IF EXISTS `xpr_maquina`;
+
+CREATE TABLE `xpr_maquina` (
+                               `idmaquina` bigint(20) NOT NULL,
+                               `nombre` varchar(255) DEFAULT NULL,
+                               `VERSION` bigint(20) DEFAULT NULL,
+                               `idcompania` bigint(20) DEFAULT NULL,
+                               PRIMARY KEY (`idmaquina`)
+) ;
+
+
+--
+-- Table structure for table `xpr_proceso`
+--
+
+DROP TABLE IF EXISTS `xpr_proceso`;
+
+
+CREATE TABLE `xpr_proceso` (
+                               `idproceso` bigint(20) NOT NULL,
+                               `nombre` varchar(255) NOT NULL,
+                               `VERSION` bigint(20) DEFAULT NULL,
+                               `idcompania` bigint(20) DEFAULT NULL,
+                               PRIMARY KEY (`idproceso`)
+);
+
+
+--
+-- Table structure for table `xpr_procesomaquina`
+--
+
+DROP TABLE IF EXISTS `xpr_procesomaquina`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+
+CREATE TABLE `xpr_procesomaquina` (
+                                      `idprocesomaquina` bigint(20) NOT NULL,
+                                      `idmaquina` bigint(20) DEFAULT NULL,
+                                      `idproceso` bigint(20) DEFAULT NULL,
+                                      `VERSION` bigint(20) DEFAULT NULL,
+                                      `idcompania` bigint(20) DEFAULT NULL,
+                                      PRIMARY KEY (`idprocesomaquina`),
+                                      KEY `xpr_procesomaqina_xpr_proceso_idproceso_fk` (`idproceso`),
+                                      KEY `xpr_procesomaqina_xpr_maquina_idmaquina_fk` (`idmaquina`),
+                                      CONSTRAINT `xpr_procesomaqina_xpr_maquina_idmaquina_fk` FOREIGN KEY (`idmaquina`) REFERENCES `xpr_maquina` (`idmaquina`),
+                                      CONSTRAINT `xpr_procesomaqina_xpr_proceso_idproceso_fk` FOREIGN KEY (`idproceso`) REFERENCES `xpr_proceso` (`idproceso`)
+);
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2024-02-12 19:48:46
