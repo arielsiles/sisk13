@@ -13,7 +13,7 @@
     <ui:param name="selectedTab" value="customers"/>
     <ui:define name="body">
         <h:form id="processRegistrationSearch">
-            <rich:simpleTogglePanel label="#{messages['production.proccessRegister.search ']}" switchType="cliente">
+            <rich:simpleTogglePanel label="#{messages['production.proccessRegister.search']}" switchType="cliente">
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['PresetAccountingTemplate.name']}</ui:define>
                     <h:inputText id="name" value="#{processRegistrationDataModel.criteria.name}"
