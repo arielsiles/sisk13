@@ -8,18 +8,18 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-    <ui:define name="pageTitle">#{messages['PresetAccountingTemplate.list']}</ui:define>
+    <ui:define name="pageTitle">#{messages['production.proccessRegister.title']}</ui:define>
     <ui:param name="bodyWidth" value="60%"/>
     <ui:param name="selectedTab" value="customers"/>
     <ui:define name="body">
         <h:form id="processRegistrationSearch">
-            <rich:simpleTogglePanel label="#{messages['PresetAccountingTemplate.search']}" switchType="cliente">
+            <rich:simpleTogglePanel label="#{messages['production.proccessRegister.search ']}" switchType="cliente">
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['PresetAccountingTemplate.name']}</ui:define>
                     <h:inputText id="name" value="#{processRegistrationDataModel.criteria.name}"
                                  maxlength="150" tabindex="2" styleClass="input">
                     </h:inputText>
-                    <a4j:commandButton action="#{processRegistrationDataModel.search}"
+                    <a4j:commandButton action="#{production.proccessRegister.search}"
                                        reRender="processRegistrationList"
                                        styleClass="button" id="searchButtonId" tabindex="2"
                                        value="#{messages['Common.search']}">

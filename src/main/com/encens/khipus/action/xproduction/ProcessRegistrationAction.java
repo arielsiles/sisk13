@@ -84,6 +84,24 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
         return Outcome.SUCCESS;
     }
 
+    public void setMachine(XMachine xMachine) {
+        if (!selectedMachines.contains(xMachine.getId())) {
+
+            selectedMachines.add(xMachine);
+
+            XMachineProcess item = new XMachineProcess();
+            item.setXmachine(xMachine);
+            item.setxProcess(getInstance());
+            getxMachineProcesses().add(item);
+        }
+    }
+
+    public void removeXMachine(XMachineProcess instance) {
+        selectedMachines.remove(instance.getXmachine());
+        xMachineProcesses.remove(instance);
+        xProcessService.deleteXMachineProcess(instance);
+    }
+
     @Override
     @End
     public String create() {

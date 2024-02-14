@@ -727,7 +727,7 @@
 
     <page view-id="/xproduction/processRegistrationList.xhtml">
         <end-conversation/>
-        <navigation from-action="#{xprocessAction.select(presetAccountingTemplateItem)}">
+        <navigation from-action="#{xprocessAction.select(processRegistrationItem)}">
             <rule if-outcome="Success">
                 <redirect view-id="/xproduction/processRegistration.xhtml"/>
             </rule>

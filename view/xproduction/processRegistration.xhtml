@@ -18,9 +18,9 @@
         </c:choose>
     </ui:define>
     <ui:param name="bodyWidth" value="50%"/>
-    <ui:param name="selectedTab" value="presetAccountingTemplate"/>
+    <ui:param name="selectedTab" value="xProcess"/>
     <ui:define name="body">
-        <h:form id="presetAccountingTemplateForm">
+        <h:form id="processForm">
             <div class="buttons">
                 <h:commandButton id="createButtonId"
                                  action="#{xprocessAction.create}"
@@ -56,17 +56,17 @@
                 <f:facet name="header">
                     <c:choose>
                         <c:when test="#{xprocessAction.managed}">
-                            #{messages['PresetAccountingTemplate.edit']}
+                            #{messages['production.proccessRegister.edit']}
                         </c:when>
                         <c:otherwise>
-                            #{messages['PresetAccountingTemplate.new']}
+                            #{messages['production.proccessRegister.new']}
                         </c:otherwise>
                     </c:choose>
                 </f:facet>
 
                 <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['PresetAccountingTemplate.name']}</ui:define>
-                    <h:inputText id="name" value="#{presetAccountingTemplate.name}" styleClass="input" required="true"
+                    <h:inputText id="name" value="#{xProcess.name}" styleClass="input" required="true"
                                  maxlength="150" tabindex="1"/>
                 </s:decorate>
             </rich:panel>
@@ -74,7 +74,7 @@
                 <div class="buttons">
                     <a4j:commandButton id="addProcessMachineButton"
                                        action="#{cashAccountDataModel.reset()}"
-                                       value="Agregar Cuenta"
+                                       value="#{production.proccessRegister.addMachine}"
                                        styleClass="button"
                                        immediate="true"
                                        rendered="#{xprocessAction.managed}"
@@ -106,7 +106,7 @@
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
-                                                 action="#{customerCategoryAction.removeCashAccount(instance)}"
+                                                 action="#{xprocessAction.removeXMachine(instance)}"
                                                  ajaxSingle="true"
                                                  rendered="true"
                                                  reRender="machineListPanel">
