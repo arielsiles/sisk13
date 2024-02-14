@@ -2,6 +2,7 @@ package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.production.CollectMaterial;
 import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.model.xproduction.XProductionProduct;
@@ -29,10 +30,13 @@ public interface InventoryService extends GenericService {
     public Warehouse findWarehouseByItemArticle(ProductItem productItem);
     void updateInventoryForSales(CustomerOrder customerOrder);
     void updateInventoryForProduction(ProductionProduct product);
+    void updateInventoryForCollectMaterial(CollectMaterial collectMaterial);
 
     void updateInventoryForProduction(XProductionProduct product);
 
     void updateInventoryForSalesAnnuled(CustomerOrder customerOrder);
     void updateInventoryRemoveFromProduction(ProductionProduct product);
     void updateInventoryRemoveFromProduction(XProductionProduct product);
+
+    void increaseProductItemAmount(ProductItem productItem, BigDecimal newQuantityInventory, BigDecimal amountToAdd, BigDecimal amountCTAdd);
 }

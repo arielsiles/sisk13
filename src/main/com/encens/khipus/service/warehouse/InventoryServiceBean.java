@@ -3,11 +3,13 @@ package com.encens.khipus.service.warehouse;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.production.CollectMaterial;
 import com.encens.khipus.model.production.ProductionProduct;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.model.xproduction.XProductionProduct;
 import com.encens.khipus.service.customers.SaleService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -99,6 +101,60 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
         inventoryDetail.setQuantity(inventory.getUnitaryBalance());
         eventEm.merge(inventoryDetail);
         eventEm.flush();
+    }
+
+    @Override
+    public void updateInventoryForCollectMaterial(CollectMaterial collectMaterial){
+
+        /** Update Inventory **/
+        Inventory inventory = findInventoryByProductItemCode(collectMaterial.getMetaProduct().getProductItemCode());
+        BigDecimal quantity = collectMaterial.getBalanceWeight();
+
+        BigDecimal availableQuantity = inventory.getUnitaryBalance();
+        BigDecimal newAvailableQuantity = BigDecimalUtil.sum(availableQuantity, quantity);
+        inventory.setUnitaryBalance(newAvailableQuantity);
+        eventEm.merge(inventory);
+        eventEm.flush();
+
+        InventoryDetail inventoryDetail = findInventoryDetailByProductItemCode(collectMaterial.getMetaProduct().getProductItemCode());
+        inventoryDetail.setQuantity(inventory.getUnitaryBalance());
+        eventEm.merge(inventoryDetail);
+        eventEm.flush();
+
+        /** Update ProductItem **/
+        BigDecimal price = BigDecimalUtil.divide(collectMaterial.getPrice(), BigDecimalUtil.ONE_HUNDRED, 6);
+        BigDecimal amountToAdd = BigDecimal.ZERO;
+        BigDecimal amountCTAdd = BigDecimal.ZERO;
+
+        if ( collectMaterial.getHasIva() ) {
+            BigDecimal newPrice = BigDecimalUtil.divide(price, Constants.VAT_COMPLEMENT);
+            amountToAdd = BigDecimalUtil.multiply(quantity, newPrice, 6);
+            amountCTAdd = BigDecimalUtil.multiply(quantity, price, 6);
+        } else {
+            amountToAdd = BigDecimalUtil.multiply(quantity, price, 6);
+            amountCTAdd = amountToAdd;
+        }
+
+        increaseProductItemAmount(collectMaterial.getMetaProduct().getProductItem(), newAvailableQuantity, amountToAdd, amountCTAdd);
+
+    }
+
+    @Override
+    public void increaseProductItemAmount(ProductItem productItem, BigDecimal newQuantityInventory, BigDecimal amountToAdd, BigDecimal amountCTAdd) {
+
+        /** Actualiza CT **/
+        BigDecimal newTotalCost = BigDecimalUtil.sum(productItem.getCt(), amountCTAdd, 6);
+        productItem.setCt(newTotalCost);
+        productItem.setCu( BigDecimalUtil.divide(newTotalCost, newQuantityInventory, 6) );
+
+        /** Actualiza Saldo_Mon **/
+        BigDecimal newInvestmentAmount = BigDecimalUtil.sum(productItem.getInvestmentAmount(), amountToAdd, 6);
+        productItem.setInvestmentAmount(newInvestmentAmount);
+        productItem.setUnitCost( BigDecimalUtil.divide(newInvestmentAmount, newQuantityInventory, 6) );
+
+        eventEm.merge(productItem);
+        eventEm.flush();
+
     }
 
     @Override

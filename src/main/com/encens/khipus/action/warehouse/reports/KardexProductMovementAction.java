@@ -5,15 +5,13 @@ import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundExceptio
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.customers.SaleTypeEnum;
 import com.encens.khipus.model.finances.CompanyConfiguration;
-import com.encens.khipus.model.production.BaseProduct;
-import com.encens.khipus.model.production.ProductionOrder;
-import com.encens.khipus.model.production.ProductionProduct;
-import com.encens.khipus.model.production.SingleProduct;
+import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.customers.ArticleOrderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.production.CollectMaterialService;
 import com.encens.khipus.service.production.ProductionOrderService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.ProductItemService;
@@ -65,6 +63,8 @@ public class KardexProductMovementAction extends GenericReportAction {
     private ProductItemService productItemService;
     @In
     private ProductionOrderService productionOrderService;
+    @In
+    private CollectMaterialService collectMaterialService;
     @In
     private CompanyConfigurationService companyConfigurationService;
     @In
@@ -135,6 +135,7 @@ public class KardexProductMovementAction extends GenericReportAction {
         //List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
 
         List<ProductionProduct> productionProductList = productionOrderService.findProductionByProductItem(productItem.getProductItemCode(), startDate, endDate);
+        List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterialByCode(productItem.getProductItemCode(), startDate, endDate);
 
         /*for (ProductionOrder po:productionOrderList){
             CollectionData collectionData = new CollectionData(
@@ -146,6 +147,18 @@ public class KardexProductMovementAction extends GenericReportAction {
                     "ORDEN DE PRODUCCION NRO. " + po.getCode());
             datas.add(collectionData);
         }*/
+
+        for (CollectMaterial collectMaterial : collectMaterialList) {
+            CollectionData collectionData = new CollectionData(
+                    formatearFecha(collectMaterial.getDate(), "E"),
+                    collectMaterial.getCode(),
+                    collectMaterial.getBalanceWeight(),
+                    BigDecimal.ZERO,
+                    "E",
+                    "ACOPIO DE MATERIA PRIMA EN FECHA " + DateUtils.format(collectMaterial.getDate(), "dd/MM/yyyy") );
+            datas.add(collectionData);
+        }
+
 
         for (ProductionProduct product : productionProductList){
             CollectionData collectionData = new CollectionData(

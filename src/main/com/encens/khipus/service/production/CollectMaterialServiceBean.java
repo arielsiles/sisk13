@@ -4,6 +4,7 @@ import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundExceptio
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.production.CollectMaterial;
+import com.encens.khipus.model.production.CollectMaterialState;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.FinanceProviderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
@@ -46,6 +47,32 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
                         .setParameter("startDate", startDate)
                         .setParameter("endDate", endDate)
                         .setParameter("state", Boolean.FALSE)
+                .getResultList();
+
+        return resultList;
+    }
+
+    @Override
+    public List<CollectMaterial> findApprovedCollectMaterial(Date startDate, Date endDate) {
+        List<CollectMaterial> resultList = em.createQuery("select c from CollectMaterial c " +
+                        "where c.date between :startDate and :endDate and c.state = :state")
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .setParameter("state", CollectMaterialState.APR)
+                .getResultList();
+
+        return resultList;
+    }
+
+    @Override
+    public List<CollectMaterial> findApprovedCollectMaterialByCode(String productItemCode, Date startDate, Date endDate) {
+
+        List<CollectMaterial> resultList = em.createQuery("select c from CollectMaterial c " +
+                "where c.date between :startDate and :endDate and c.metaProduct.productItemCode = :productItemCode and c.state = :state")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("productItemCode", productItemCode)
+                .setParameter("state", CollectMaterialState.APR)
                 .getResultList();
 
         return resultList;

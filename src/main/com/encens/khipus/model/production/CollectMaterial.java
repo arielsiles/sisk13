@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.Employee;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
@@ -58,8 +59,12 @@ public class CollectMaterial implements Serializable, BaseModel {
     private CollectMaterialState state = CollectMaterialState.PEN;
 
     @Column(name = "conta", nullable = false)
-    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    @Type(type = IntegerBooleanUserType.NAME)
     private Boolean accountigFlag = Boolean.FALSE;
+
+    @Column(name = "tieneiva", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean hasIva = Boolean.FALSE;
 
     @Column(name = "chofer", nullable = false)
     private String driver;
@@ -252,5 +257,13 @@ public class CollectMaterial implements Serializable, BaseModel {
 
     public void setAccountigFlag(Boolean accountigFlag) {
         this.accountigFlag = accountigFlag;
+    }
+
+    public Boolean getHasIva() {
+        return hasIva;
+    }
+
+    public void setHasIva(Boolean hasIva) {
+        this.hasIva = hasIva;
     }
 }

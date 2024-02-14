@@ -10,9 +10,9 @@ import com.encens.khipus.model.production.CollectMaterial;
 import com.encens.khipus.model.production.CollectMaterialState;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialProducer;
-import com.encens.khipus.model.warehouse.WarehouseVoucher;
 import com.encens.khipus.service.production.CollectMaterialService;
 import com.encens.khipus.service.production.ProducerPriceService;
+import com.encens.khipus.service.warehouse.InventoryService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
@@ -37,6 +37,9 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
 
     @In
     private CollectMaterialService collectMaterialService;
+
+    @In
+    private InventoryService inventoryService;
 
     @Factory(value = "collectMaterial", scope = ScopeType.STATELESS)
     public CollectMaterial initCollectMaterial() {
@@ -109,6 +112,9 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
             CollectMaterial collectMaterial = getInstance();
             collectMaterial.setState(CollectMaterialState.APR);
             getService().update(collectMaterial);
+
+            inventoryService.updateInventoryForCollectMaterial(collectMaterial);
+
             addApprovedMessage();
 
             return Outcome.SUCCESS;

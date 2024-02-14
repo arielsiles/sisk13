@@ -292,3 +292,11 @@ alter table xpr_produccion add column idproceso bigint(20) after idplan;
 alter table xpr_produccion add foreign key (idproceso) references xpr_proceso (idproceso);
 
 insert into xpr_proceso values (1, 'Proceso de Produccion Rumifos', 0, 1);
+
+update inv_inventario i set i.cod_alm = 4 where i.cod_art in (1,2,3,4,5,6,7);
+update inv_inventario_detalle i set i.cod_alm = 4 where i.cod_art in (1,2,3,4,5,6,7);
+update inv_inicio i set i.alm = 4 where i.cod_art in (1,2,3,4,5,6,7);
+
+--
+alter table acopiomp add column tieneiva int(1) after conta;
+update acopiomp set tieneiva = 0 where tieneiva is null;

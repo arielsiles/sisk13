@@ -4,13 +4,11 @@ import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.finances.CompanyConfiguration;
-import com.encens.khipus.model.production.BaseProduct;
-import com.encens.khipus.model.production.ProductionOrder;
-import com.encens.khipus.model.production.ProductionProduct;
-import com.encens.khipus.model.production.SingleProduct;
+import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.customers.ArticleOrderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.production.CollectMaterialService;
 import com.encens.khipus.service.production.ProductionOrderService;
 import com.encens.khipus.service.warehouse.InitialInventoryService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
@@ -67,6 +65,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
     private ProductInventoryService productInventoryService;
     @In
     private ProductionOrderService productionOrderService;
+    @In
+    private CollectMaterialService collectMaterialService;
     @In
     private CompanyConfigurationService companyConfigurationService;
     @In
@@ -165,6 +165,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
         List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(startDate, endDate);
 
+        List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(startDate, endDate);
+
         // Ventas al contado y pedidos
         List cashSaleDetailList = articleOrderService.findCashSaleDetailListGroupBy(startDate, endDate);
         List orderDetailList    = articleOrderService.findCustomerOrderDetailListGroupBy(startDate, endDate);
@@ -198,6 +200,14 @@ public class ProductInventoryReportAction extends GenericReportAction {
                     //initialInventory.getUnitCost()
                     BigDecimal.ZERO
             );
+
+            /** Acopio MP **/
+            for (CollectMaterial collectMaterial : collectMaterialList) {
+                if (inventoryPeriod.getProductItemCode().equals(collectMaterial.getMetaProduct().getProductItemCode())){
+                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), collectMaterial.getBalanceWeight(), 6));
+                }
+            }
+
 
             /** PR_PRODUCCION **/
             for (ProductionProduct product : productionProductList){
