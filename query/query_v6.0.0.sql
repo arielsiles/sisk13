@@ -1,6 +1,6 @@
 -- nuevo modulo de produccion de terdemol
 INSERT INTO modulo (idmodulo, descripcion, nombrerecurso, idcompania)
-VALUES (11, 'Produccion TERDEMOL', 'productionx', 1);
+VALUES (11, 'Produccion TERDEMOL', 'xproduction', 1);
 -- clonando
 
 -- ----------------
@@ -302,3 +302,15 @@ insert into `arcgms` (`cuenta`, `descri`, `cta_raiz`, `cta_niv3`, `est`, `cn_ana
 values('33000000','AJUSTES AL PATRIMONIO','33000000',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'01',NULL,'C','S','N',NULL,'N',NULL,NULL,'P',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL,NULL,'S',NULL,NULL);
 insert into `arcgms` (`cuenta`, `descri`, `cta_raiz`, `cta_niv3`, `est`, `cn_ana`, `cn_nivel`, `cn_dv`, `cn_tip`, `cn_act`, `no_cia`, `clase`, `tipo`, `activa`, `util`, `nomutil`, `permite_iva`, `ind_presup`, `creditos`, `moneda`, `debitos`, `saldo_mes_ant_dol`, `saldo_per_ant_dol`, `creditos_dol`, `debitos_dol`, `gru_cta`, `permiso_con`, `exije_cc`, `permiso_afijo`, `permiso_cxp`, `permiso_cxc`, `permiso_che`, `permiso_inv`, `f_inactiva`, `ind_mov`, `saldo_mes_ant`, `saldo_per_ant`)
 values('33000100','AJUSTES AL PATRIMONIO','33000000',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'01',NULL,'C','S','N',NULL,'N',NULL,NULL,'P',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL,NULL,'S',NULL,NULL);
+
+--
+insert into modulocompania values (1, 11, 1);
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(290, 'XPRODUCTION', 11, 1, 'Functionality.xproduction', 1);
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(291, 'XPRODUCTION_PLAN', 11, 15, 'Functionality.xproduction.productionPlan', 1);
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(292, 'XFORMULATION', 11, 15, 'Functionality.xproduction.formulation', 1);

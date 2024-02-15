@@ -1496,20 +1496,22 @@
     <rich:tab id="xproduction"
               label="#{messages['menu.xproduction']}"
               disabled="#{disableMenu}"
-              rendered="#{s:hasPermission('PRODUCT','VIEW')}">
+              rendered="#{s:hasPermission('XPRODUCTION','VIEW')}">
         <h:panelGrid columns="7" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator">
 
             <s:link view="/xproduction/productionPlanList.xhtml"
                     value="#{messages['menu.xproduction.productionPlan']}"
                     styleClass="tab-cell"
+                    rendered="#{s:hasPermission('XPRODUCTION_PLAN','VIEW')}"
                     propagation="none"/>
 
             <s:link view="/xproduction/formulationList.xhtml"
                     value="#{messages['menu.xproduction.formulations']}"
                     styleClass="tab-cell"
+                    rendered="#{s:hasPermission('XFORMULATION','VIEW')}"
                     propagation="none"/>
 
-            <rich:dropDownMenu value="#{messages['menu.xproduction.process']}" >
+            <!--<rich:dropDownMenu value="#{messages['menu.xproduction.process']}" >
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item">
 
@@ -1549,10 +1551,9 @@
                             value="#{messages['menu.finances.accounting.closingProductionCostAccounts']}"
                             propagation="none" />
                 </rich:menuItem>
+            </rich:dropDownMenu>-->
 
-            </rich:dropDownMenu>
-
-            <rich:dropDownMenu value="#{messages['menu.xproduction.configuration']}"
+            <!--<rich:dropDownMenu value="#{messages['menu.xproduction.configuration']}"
                                rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item">
@@ -1561,12 +1562,14 @@
                             value="#{messages['menu.xproduction.inputMaterialConfiguration']}"
                             propagation="begin"/>
                 </rich:menuItem>
+
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item">
                     <s:link view="/xproduction/indirectCostConfigList.xhtml"
                             value="#{messages['menu.xproduction.configuration.indirectCostParameters']}"
                             propagation="none"/>
                 </rich:menuItem>
+
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item">
                     <s:link view="/xproduction/processRegistrationList.xhtml"
@@ -1580,7 +1583,7 @@
                             value="#{messages['menu.xproduction.configuration.indirectCostRegistration']}"
                             propagation="none"/>
                 </rich:menuItem>
-            </rich:dropDownMenu>
+            </rich:dropDownMenu>-->
 
         </h:panelGrid>
     </rich:tab>
