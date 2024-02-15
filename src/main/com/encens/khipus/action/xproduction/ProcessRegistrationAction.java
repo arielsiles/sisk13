@@ -40,10 +40,10 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
 
     @Factory(value ="xProcess", scope = ScopeType.STATELESS)
     //@Restrict("#{s:hasPermission('CUSTOMERCATEGORY','VIEW')}")
-    public XProcess initPresetAccountingTemplate() {
+    public XProcess initXProcess() {
         //typePresetAccountingTemplates = typePresetAccountingTemplateService.getTypePresetAccountingTemplates(getInstance());
         return getInstance();
-}
+    }
 
     @Override
     @Begin(flushMode = FlushModeType.MANUAL)
@@ -82,6 +82,24 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
         }
         addUpdatedMessage();
         return Outcome.SUCCESS;
+    }
+
+    public void setMachine(XMachine xMachine) {
+        if (!selectedMachines.contains(xMachine.getId())) {
+
+            selectedMachines.add(xMachine);
+
+            XMachineProcess item = new XMachineProcess();
+            item.setXmachine(xMachine);
+            item.setxProcess(getInstance());
+            getxMachineProcesses().add(item);
+        }
+    }
+
+    public void removeXMachine(XMachineProcess instance) {
+        selectedMachines.remove(instance.getXmachine());
+        xMachineProcesses.remove(instance);
+        xProcessService.deleteXMachineProcess(instance);
     }
 
     @Override
@@ -131,11 +149,4 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
         this.selectedMachines = selectedMachines;
     }
 
-    public XProcessService getxProcessService() {
-        return xProcessService;
-    }
-
-    public void setxProcessService(XProcessService xProcessService) {
-        this.xProcessService = xProcessService;
-    }
 }

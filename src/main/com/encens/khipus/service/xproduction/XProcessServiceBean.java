@@ -1,5 +1,8 @@
 package com.encens.khipus.service.xproduction;
 
+import com.encens.khipus.exception.ConcurrencyException;
+import com.encens.khipus.exception.ReferentialIntegrityException;
+import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.finances.PresetAccountingTemplate;
 import com.encens.khipus.model.finances.TypePresetAccountingTemplate;
@@ -17,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Stateless
-@Name("xProcessServiceService")
+@Name("xProcessService")
 @AutoCreate
 public class XProcessServiceBean extends GenericServiceBean implements XProcessService {
 
@@ -66,7 +69,13 @@ public class XProcessServiceBean extends GenericServiceBean implements XProcessS
 
     @Override
     public void deleteXMachineProcess(XMachineProcess xMachineProcess) {
-
+        try {
+            this.delete(xMachineProcess);
+        } catch (ConcurrencyException e) {
+            throw new RuntimeException(e);
+        } catch (ReferentialIntegrityException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
