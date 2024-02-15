@@ -328,6 +328,8 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
         try {
             service.nullifyPurchaseOrder(getInstance());
+            service.nullifyInvoicesPurchaseOrder(getInstance());
+
             addPurchaseOrderNullifiedMessage();
             return Outcome.SUCCESS;
         } catch (PurchaseOrderFinalizedException e) {

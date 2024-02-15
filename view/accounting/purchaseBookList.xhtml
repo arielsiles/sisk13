@@ -105,7 +105,7 @@
                 var="purchaseDocumentItem"
                 rows="#{sessionUser.rowsPerPage}"
                 width="100%"
-                columnsWidth="8%, 10%, 10%, 10%, 35%, 10%, 10%, 7%">
+                columnsWidth="5%, 10%, 25%, 10%, 25%, 10%, 10%, 5%">
     <f:facet name="header">
         <rich:columnGroup>
             <rich:column>
@@ -125,6 +125,8 @@
             <rich:column>#{messages['Voucher.purchaseBook.number']}</rich:column>
 
             <rich:column>#{messages['Voucher.purchaseBook.name']}</rich:column>
+
+            <rich:column>#{messages['Voucher.purchaseBook.state']}</rich:column>
 
             <rich:column>#{messages['Voucher.documentNumber']}</rich:column>
 
@@ -150,6 +152,9 @@
     </rich:column>
     <rich:column>
         <h:outputText value="#{purchaseDocumentItem.name}"/>
+    </rich:column>
+    <rich:column styleClass="center">
+        <h:outputText value="#{messages[purchaseDocumentItem.state.resourceKey]}"/>
     </rich:column>
     <rich:column styleClass="center">
         <h:outputText value="#{purchaseDocumentItem.voucherDetailFiscalCredit.voucher.fullDocument}"

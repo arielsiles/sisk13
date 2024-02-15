@@ -38,10 +38,10 @@ public final class Constants {
     public static final String ACADEMIC_SCHEMA  = "terdemol";
 
     //Schema for KHIPUS - F. CISC / ILVA
-    /*public static final String KHIPUS_SCHEMA    = "ilva";
-    public static final String FINANCES_SCHEMA  = "ilva";
-    public static final String CASHBOX_SCHEMA   = "ilva";
-    public static final String ACADEMIC_SCHEMA  = "ilva";*/
+    /*public static final String KHIPUS_SCHEMA    = "khipus";
+    public static final String FINANCES_SCHEMA  = "khipus";
+    public static final String CASHBOX_SCHEMA   = "khipus";
+    public static final String ACADEMIC_SCHEMA  = "khipus";*/
 
     //Schema for CAISC - Fondo Lech
     /*public static final String KHIPUS_SCHEMA    = "caisc";

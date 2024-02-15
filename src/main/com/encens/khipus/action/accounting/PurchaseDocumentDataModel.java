@@ -2,7 +2,6 @@ package com.encens.khipus.action.accounting;
 
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.purchases.PurchaseDocument;
-import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -26,10 +25,10 @@ public class PurchaseDocumentDataModel extends QueryDataModel<Long, PurchaseDocu
     private Date endDate;
     private String number;
     private String name;
-    private PurchaseDocumentState stateNullified = PurchaseDocumentState.NULLIFIED;
+    //private PurchaseDocumentState stateNullified = PurchaseDocumentState.NULLIFIED;
 
     private static final String[] RESTRICTIONS = {
-            "purchaseDocument.state <> #{purchaseDocumentDataModel.stateNullified}",
+
             "purchaseDocument.number = #{purchaseDocumentDataModel.number}",
             "lower(purchaseDocument.name) like concat('%', concat(lower(#{purchaseDocumentDataModel.name}), '%'))",
             "purchaseDocument.date >= #{purchaseDocumentDataModel.startDate}",
@@ -84,11 +83,4 @@ public class PurchaseDocumentDataModel extends QueryDataModel<Long, PurchaseDocu
         this.name = name;
     }
 
-    public PurchaseDocumentState getStateNullified() {
-        return stateNullified;
-    }
-
-    public void setStateNullified(PurchaseDocumentState stateNullified) {
-        this.stateNullified = stateNullified;
-    }
 }

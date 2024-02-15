@@ -8,6 +8,7 @@ import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
+import com.encens.khipus.model.purchases.PurchaseDocumentState;
 import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.Warehouse;
@@ -304,6 +305,28 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     public void annulVoucher(Voucher voucher){
         em.merge(voucher);
         em.flush();
+    }
+
+    @Override
+    public void annulInvoicesInVoucher(Voucher voucher){
+
+        for (PurchaseDocument purchaseDocument : voucher.getPurchaseDocumentList()) {
+            purchaseDocument.setState(PurchaseDocumentState.NULLIFIED);
+            em.merge(purchaseDocument);
+            em.flush();
+        }
+
+    }
+
+    @Override
+    public void approveInvoicesVoucher(Voucher voucher){
+
+        for (PurchaseDocument purchaseDocument : voucher.getPurchaseDocumentList()) {
+            purchaseDocument.setState(PurchaseDocumentState.APPROVED);
+            em.merge(purchaseDocument);
+            em.flush();
+        }
+
     }
 
     @Override

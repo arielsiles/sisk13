@@ -178,7 +178,7 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
         getEntityManager().merge(document);
 
         if (document.isInvoiceDocument()) {
-            financeAccountingDocumentService.createFinanceAccountingDocument(document);
+            //financeAccountingDocumentService.createFinanceAccountingDocument(document); // cxp_lcompras
             financeAccountingDocumentService.createAccountingVoucher(document);
         } else if (document.isAdjustmentDocument()) {
             financeAccountingDocumentService.createAccountingVoucher(document);

@@ -489,6 +489,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public String annulVoucher(){
         voucher.setState(VoucherState.ANL.toString());
         voucherAccoutingService.annulVoucher(voucher);
+        voucherAccoutingService.annulInvoicesInVoucher(voucher);
+
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.annulAccountingEntry");
         return ANNUL_OUTCOME;
     }
@@ -507,6 +509,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucher.setDocumentNumber(voucher.getNumber());
 
         voucherAccoutingService.approveVoucher(voucher);
+        voucherAccoutingService.approveInvoicesVoucher(voucher);
+
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.approveAccountingEntry");
         return APPROVED_OUTCOME;
     }

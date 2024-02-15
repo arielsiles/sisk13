@@ -162,6 +162,17 @@ public class PurchaseOrderServiceBean extends GenericServiceBean implements Purc
         }
     }
 
+    @Override
+    public void nullifyInvoicesPurchaseOrder(PurchaseOrder purchaseOrder){
+
+        for (PurchaseDocument purchaseDocument : purchaseOrder.getPurchaseDocumentList()) {
+            purchaseDocument.setState(PurchaseDocumentState.NULLIFIED);
+            listEm.merge(purchaseDocument);
+            listEm.flush();
+        }
+
+    }
+
     public boolean canChangePurchaseOrder(PurchaseOrder entity)
             throws PurchaseOrderApprovedException,
             PurchaseOrderFinalizedException, PurchaseOrderNullifiedException,

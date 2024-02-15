@@ -59,6 +59,8 @@ public interface PurchaseOrderService extends GenericService {
             PurchaseOrderNullifiedException,
             PurchaseOrderLiquidatedException;
 
+    void nullifyInvoicesPurchaseOrder(PurchaseOrder purchaseOrder);
+
     BigDecimal currentBalanceAmount(PurchaseOrder purchaseOrder);
 
     void updateCurrentPaymentStatus(PurchaseOrder entity);
