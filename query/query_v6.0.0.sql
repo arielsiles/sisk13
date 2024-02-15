@@ -1,33 +1,11 @@
 -- nuevo modulo de produccion de terdemol
 INSERT INTO modulo (idmodulo, descripcion, nombrerecurso, idcompania)
-VALUES (11, 'modulo de produccion de TERDEMOL', 'productionx', 1);
+VALUES (11, 'Produccion TERDEMOL', 'productionx', 1);
 -- clonando
 
 -- ----------------
 
--- drop table `xpr_categoria`;
--- drop table `xpr_formula`;
--- drop table `xpr_insumo`;
--- drop table `xpr_insumoformula`;
--- drop table `xpr_maquina`;
--- drop table `xpr_material`;
--- drop table `xpr_plan`;
--- drop table `xpr_proceso`;
--- drop table `xpr_prodafectado`;
--- drop table `xpr_produccion`;
--- drop table `xpr_produccionmaquina`;
--- drop table `xpr_producto`;
--- drop table `xpr_tanque`;
-
-/*
-SQLyog Ultimate v12.09 (64 bit)
-MySQL - 5.6.10 : Database - khipus
-*********************************************************************
-*/
-
-
 /*!40101 SET NAMES utf8 */;
-
 /*!40101 SET SQL_MODE=''*/;
 
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -217,14 +195,6 @@ CREATE TABLE `xpr_tanque` (
 
 
 /* **************procesos**********************/
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
 -- Table structure for table `xpr_maquina`
@@ -262,7 +232,6 @@ CREATE TABLE `xpr_proceso` (
 --
 
 DROP TABLE IF EXISTS `xpr_procesomaquina`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
 
 CREATE TABLE `xpr_procesomaquina` (
                                       `idprocesomaquina` bigint(20) NOT NULL,
@@ -277,26 +246,59 @@ CREATE TABLE `xpr_procesomaquina` (
                                       CONSTRAINT `xpr_procesomaqina_xpr_proceso_idproceso_fk` FOREIGN KEY (`idproceso`) REFERENCES `xpr_proceso` (`idproceso`)
 );
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2024-02-12 19:48:46
-
 -- 12.02.2024
 alter table xpr_produccion add column idproceso bigint(20) after idplan;
 alter table xpr_produccion add foreign key (idproceso) references xpr_proceso (idproceso);
 
 insert into xpr_proceso values (1, 'Proceso de Produccion Rumifos', 0, 1);
-
-update inv_inventario i set i.cod_alm = 4 where i.cod_art in (1,2,3,4,5,6,7);
-update inv_inventario_detalle i set i.cod_alm = 4 where i.cod_art in (1,2,3,4,5,6,7);
-update inv_inicio i set i.alm = 4 where i.cod_art in (1,2,3,4,5,6,7);
-
 --
 alter table acopiomp add column tieneiva int(1) after conta;
 update acopiomp set tieneiva = 0 where tieneiva is null;
+
+-- 14.02.2024
+alter table configuracion add column cta_pat01 varchar(20);
+alter table configuracion add column cta_pat02 varchar(20);
+alter table configuracion add column cta_pat03 varchar(20);
+alter table configuracion add column cta_pat04 varchar(20);
+alter table configuracion add column cta_pat05 varchar(20);
+
+-- For ILVA
+update configuracion set cta_pat01 = '3100000000' where no_cia = '01';
+update configuracion set cta_pat02 = '3200000000' where no_cia = '01';
+update configuracion set cta_pat03 = '3300000000' where no_cia = '01';
+update configuracion set cta_pat04 = '3400000000' where no_cia = '01';
+update configuracion set cta_pat05 = '3500000000' where no_cia = '01';
+
+-- For Terdemol
+
+delete from arcgms where cuenta = '32000300';
+delete from arcgms where cuenta = '32000301';
+
+update configuracion set cta_pat01 = '31000000' where no_cia = '01';
+update configuracion set cta_pat02 = '32000000' where no_cia = '01';
+update configuracion set cta_pat03 = '33000000' where no_cia = '01';
+update configuracion set cta_pat04 = '34000000' where no_cia = '01';
+update configuracion set cta_pat05 = '35000000' where no_cia = '01';
+
+--
+update arcgms set cuenta = '35000000', cta_raiz = '35000000' where cuenta = '33000000';
+update arcgms set cuenta = '35000100', cta_raiz = '35000000' where cuenta = '33000100';
+update arcgms set cuenta = '35000101', cta_raiz = '35000000' where cuenta = '33000101';
+update arcgms set cuenta = '35000200', cta_raiz = '35000000' where cuenta = '33000200';
+update arcgms set cuenta = '35000201', cta_raiz = '35000000' where cuenta = '33000201';
+
+update arcgms set cuenta = '34000000', cta_raiz = '34000000' where cuenta = '32000000';
+update arcgms set cuenta = '34000100', cta_raiz = '34000000' where cuenta = '32000100';
+update arcgms set cuenta = '34000101', cta_raiz = '34000000' where cuenta = '32000101';
+update arcgms set cuenta = '34000200', cta_raiz = '34000000' where cuenta = '32000200';
+update arcgms set cuenta = '34000201', cta_raiz = '34000000' where cuenta = '32000201';
+
+insert into `arcgms` (`cuenta`, `descri`, `cta_raiz`, `cta_niv3`, `est`, `cn_ana`, `cn_nivel`, `cn_dv`, `cn_tip`, `cn_act`, `no_cia`, `clase`, `tipo`, `activa`, `util`, `nomutil`, `permite_iva`, `ind_presup`, `creditos`, `moneda`, `debitos`, `saldo_mes_ant_dol`, `saldo_per_ant_dol`, `creditos_dol`, `debitos_dol`, `gru_cta`, `permiso_con`, `exije_cc`, `permiso_afijo`, `permiso_cxp`, `permiso_cxc`, `permiso_che`, `permiso_inv`, `f_inactiva`, `ind_mov`, `saldo_mes_ant`, `saldo_per_ant`)
+values('32000000','APORTES NO CAPITALIZABLES','32000000',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'01',NULL,'C','S','N',NULL,'N',NULL,NULL,'P',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL,NULL,'S',NULL,NULL);
+insert into `arcgms` (`cuenta`, `descri`, `cta_raiz`, `cta_niv3`, `est`, `cn_ana`, `cn_nivel`, `cn_dv`, `cn_tip`, `cn_act`, `no_cia`, `clase`, `tipo`, `activa`, `util`, `nomutil`, `permite_iva`, `ind_presup`, `creditos`, `moneda`, `debitos`, `saldo_mes_ant_dol`, `saldo_per_ant_dol`, `creditos_dol`, `debitos_dol`, `gru_cta`, `permiso_con`, `exije_cc`, `permiso_afijo`, `permiso_cxp`, `permiso_cxc`, `permiso_che`, `permiso_inv`, `f_inactiva`, `ind_mov`, `saldo_mes_ant`, `saldo_per_ant`)
+values('32000100','APORTES NO CAPITALIZABLES','32000000',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'01',NULL,'C','S','N',NULL,'N',NULL,NULL,'P',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL,NULL,'S',NULL,NULL);
+
+insert into `arcgms` (`cuenta`, `descri`, `cta_raiz`, `cta_niv3`, `est`, `cn_ana`, `cn_nivel`, `cn_dv`, `cn_tip`, `cn_act`, `no_cia`, `clase`, `tipo`, `activa`, `util`, `nomutil`, `permite_iva`, `ind_presup`, `creditos`, `moneda`, `debitos`, `saldo_mes_ant_dol`, `saldo_per_ant_dol`, `creditos_dol`, `debitos_dol`, `gru_cta`, `permiso_con`, `exije_cc`, `permiso_afijo`, `permiso_cxp`, `permiso_cxc`, `permiso_che`, `permiso_inv`, `f_inactiva`, `ind_mov`, `saldo_mes_ant`, `saldo_per_ant`)
+values('33000000','AJUSTES AL PATRIMONIO','33000000',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'01',NULL,'C','S','N',NULL,'N',NULL,NULL,'P',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL,NULL,'S',NULL,NULL);
+insert into `arcgms` (`cuenta`, `descri`, `cta_raiz`, `cta_niv3`, `est`, `cn_ana`, `cn_nivel`, `cn_dv`, `cn_tip`, `cn_act`, `no_cia`, `clase`, `tipo`, `activa`, `util`, `nomutil`, `permite_iva`, `ind_presup`, `creditos`, `moneda`, `debitos`, `saldo_mes_ant_dol`, `saldo_per_ant_dol`, `creditos_dol`, `debitos_dol`, `gru_cta`, `permiso_con`, `exije_cc`, `permiso_afijo`, `permiso_cxp`, `permiso_cxc`, `permiso_che`, `permiso_inv`, `f_inactiva`, `ind_mov`, `saldo_mes_ant`, `saldo_per_ant`)
+values('33000100','AJUSTES AL PATRIMONIO','33000000',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'01',NULL,'C','S','N',NULL,'N',NULL,NULL,'P',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL,NULL,'S',NULL,NULL);

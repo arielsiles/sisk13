@@ -110,11 +110,17 @@ public class BalanceSheetReportAction extends GenericReportAction {
 
         /** PATRIMONIO **/
 
-        Double capital_social       = voucherAccoutingService.totalCapital(start, end, "3100000000").doubleValue();
-        Double capital_aportes      = voucherAccoutingService.totalCapital(start, end, "3200000000").doubleValue();
-        Double capital_ajustes      = voucherAccoutingService.totalCapital(start, end, "3300000000").doubleValue();
-        Double capital_reservas     = voucherAccoutingService.totalCapital(start, end, "3400000000").doubleValue();
-        Double capital_acumulados   = voucherAccoutingService.totalCapital(start, end, "3500000000").doubleValue();
+        //Double capital_social       = voucherAccoutingService.totalCapital(start, end, "3100000000").doubleValue();
+        //Double capital_aportes      = voucherAccoutingService.totalCapital(start, end, "3200000000").doubleValue();
+        //Double capital_ajustes      = voucherAccoutingService.totalCapital(start, end, "3300000000").doubleValue();
+        //Double capital_reservas     = voucherAccoutingService.totalCapital(start, end, "3400000000").doubleValue();
+        //Double capital_acumulados   = voucherAccoutingService.totalCapital(start, end, "3500000000").doubleValue();
+
+        Double capital_social       = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet1().getAccountCode()).doubleValue();
+        Double capital_aportes      = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet2().getAccountCode()).doubleValue();
+        Double capital_ajustes      = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet3().getAccountCode()).doubleValue();
+        Double capital_reservas     = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet4().getAccountCode()).doubleValue();
+        Double capital_acumulados   = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet5().getAccountCode()).doubleValue();
 
         Double perdidasExcedentes       = voucherAccoutingService.perdidasExcedentesPeriodo(start, end).doubleValue(); // Perdidas/Excedentes Anterior
         Double totalPerdidasExcedentes  = perdidasExcedentes + totalResults;
@@ -179,7 +185,7 @@ public class BalanceSheetReportAction extends GenericReportAction {
                         " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
 
         String[] restrictions = new String[]{};
-        String orderBy = "cashAccount.accountCode";
+        String orderBy = "rootCashAccount.accountCode";
 
         //generate the sub report
         TypedReportData subReportData = super.generateSubReport(
@@ -224,7 +230,7 @@ public class BalanceSheetReportAction extends GenericReportAction {
                 " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
 
         String[] restrictions = new String[]{};
-        String orderBy = "cashAccount.accountCode";
+        String orderBy = "rootCashAccount.accountCode";
 
         //generate the sub report
         TypedReportData subReportData = super.generateSubReport(
@@ -270,7 +276,7 @@ public class BalanceSheetReportAction extends GenericReportAction {
                 " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
 
         String[] restrictions = new String[]{};
-        String orderBy = "cashAccount.accountCode";
+        String orderBy = "rootCashAccount.accountCode";
 
         //generate the sub report
         TypedReportData subReportData = super.generateSubReport(

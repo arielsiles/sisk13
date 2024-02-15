@@ -645,6 +645,41 @@ public class CompanyConfiguration {
     })
     private CashAccount accountPayableSupplier;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cta_pat01", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountBalanceSheet1;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cta_pat02", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountBalanceSheet2;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cta_pat03", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountBalanceSheet3;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cta_pat04", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountBalanceSheet4;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cta_pat05", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountBalanceSheet5;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1679,5 +1714,45 @@ public class CompanyConfiguration {
 
     public void setAccountPayableSupplier(CashAccount accountPayableSupplier) {
         this.accountPayableSupplier = accountPayableSupplier;
+    }
+
+    public CashAccount getAccountBalanceSheet1() {
+        return accountBalanceSheet1;
+    }
+
+    public void setAccountBalanceSheet1(CashAccount accountBalanceSheet1) {
+        this.accountBalanceSheet1 = accountBalanceSheet1;
+    }
+
+    public CashAccount getAccountBalanceSheet2() {
+        return accountBalanceSheet2;
+    }
+
+    public void setAccountBalanceSheet2(CashAccount accountBalanceSheet2) {
+        this.accountBalanceSheet2 = accountBalanceSheet2;
+    }
+
+    public CashAccount getAccountBalanceSheet3() {
+        return accountBalanceSheet3;
+    }
+
+    public void setAccountBalanceSheet3(CashAccount accountBalanceSheet3) {
+        this.accountBalanceSheet3 = accountBalanceSheet3;
+    }
+
+    public CashAccount getAccountBalanceSheet4() {
+        return accountBalanceSheet4;
+    }
+
+    public void setAccountBalanceSheet4(CashAccount accountBalanceSheet4) {
+        this.accountBalanceSheet4 = accountBalanceSheet4;
+    }
+
+    public CashAccount getAccountBalanceSheet5() {
+        return accountBalanceSheet5;
+    }
+
+    public void setAccountBalanceSheet5(CashAccount accountBalanceSheet5) {
+        this.accountBalanceSheet5 = accountBalanceSheet5;
     }
 }
