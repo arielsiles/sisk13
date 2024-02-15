@@ -94,4 +94,6 @@ public class XMachineProcess implements BaseModel {
     public void setXmachine(XMachine xmachine) {
         this.xmachine = xmachine;
     }
+
+
 }
