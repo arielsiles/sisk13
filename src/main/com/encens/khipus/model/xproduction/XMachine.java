@@ -28,7 +28,10 @@ public class XMachine implements BaseModel {
     @Column(name = "idmaquina", nullable = false)
     private Long id;
 
-    @Column(name = "nombre", nullable = false, length = 150)
+    @Column(name = "codigo", nullable = false, length = 50)
+    private String code;
+
+    @Column(name = "nombre", nullable = false, length = 255)
     private String name;
 
     @OneToMany(mappedBy = "xmachine", fetch = FetchType.LAZY)
@@ -82,5 +85,13 @@ public class XMachine implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

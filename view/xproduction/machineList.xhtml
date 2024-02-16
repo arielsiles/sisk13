@@ -8,19 +8,19 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-    <ui:define name="pageTitle">#{messages['production.proccessRegister.title']}</ui:define>
+    <ui:define name="pageTitle">#{messages['XProduction.productionMachine.title']}</ui:define>
     <ui:param name="bodyWidth" value="60%"/>
     <ui:param name="selectedTab" value="xproduction"/>
     <ui:define name="body">
-        <h:form id="processRegistrationSearch">
-            <rich:simpleTogglePanel label="#{messages['production.proccessRegister.search']}" switchType="cliente">
+        <h:form id="productionMachineSearch">
+            <rich:simpleTogglePanel label="#{messages['XProduction.productionMachine.search']}" switchType="ajax">
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['PresetAccountingTemplate.name']}</ui:define>
-                    <h:inputText id="name" value="#{processRegistrationDataModel.criteria.name}"
+                    <ui:define name="label">#{messages['XProduction.productionMachine.name']}</ui:define>
+                    <h:inputText id="name" value="#{machineDataModel.criteria.name}"
                                  maxlength="150" tabindex="2" styleClass="input">
                     </h:inputText>
-                    <a4j:commandButton action="#{processRegistrationDataModel.search}"
-                                       reRender="processRegistrationList"
+                    <a4j:commandButton action="#{machineDataModel.search}"
+                                       reRender="productionMachineList"
                                        styleClass="button" id="searchButtonId" tabindex="2"
                                        value="#{messages['Common.search']}">
                         <s:defaultAction/>
@@ -31,46 +31,42 @@
 
             <div class="buttons">
                 <s:button value="#{messages['Common.new']}"
-                          view="/xproduction/processRegistration.xhtml"
+                          view="/xproduction/machine.xhtml"
                           styleClass="button"
                           propagation="begin"
                           rendered="true"/>
             </div>
 
-            <rich:dataTable value="#{processRegistrationDataModel}" var="processRegistrationItem"
-                            id="processRegistrationList" rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="80%, 20%">
+            <rich:dataTable value="#{machineDataModel}" var="xmachineItem"
+                            id="productionMachineList" rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="30%, 60%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
-                        <rich:column>
-                            <app:commandSortHeader sortProperty="processRegistration.name"
-                                                   dataModel="#{processRegistrationDataModel}"
-                                                   reRender="processRegistrationList, dataScroller">
-                                #{messages['PresetAccountingTemplate.name']}
-                            </app:commandSortHeader>
-                        </rich:column>
-                        <rich:column styleClass="center">
-                            #{messages['Common.action']}
-                        </rich:column>
+                        <rich:column>#{messages['XProduction.productionMachine.code']}</rich:column>
+                        <rich:column>#{messages['XProduction.productionMachine.name']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
                     </rich:columnGroup>
                 </f:facet>
                 <rich:column>
-                    <h:outputText value="#{processRegistrationItem.name}"/>
+                    <h:outputText value="#{xmachineItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{xmachineItem.name}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"
                                    immediate="true"
-                                   action="#{xprocessAction.select(processRegistrationItem)}"
+                                   action="#{xmachineAction.select(xmachineItem)}"
                                    rendered="true">
                         <s:conversationPropagation value="none"/>
                     </h:commandLink>
                 </rich:column>
             </rich:dataTable>
-            <app:dataScroller id="dataScroller" for="processRegistrationList" dataModel="#{processRegistrationDataModel}"/>
+            <app:dataScroller id="dataScroller" for="productionMachineList" dataModel="#{machineDataModel}"/>
 
             <div class="buttons">
                 <s:button value="#{messages['Common.new']}"
-                          view="/xproduction/processRegistration.xhtml"
+                          view="/xproduction/machine.xhtml"
                           styleClass="button"
                           propagation="none"
                           rendered="true"/>

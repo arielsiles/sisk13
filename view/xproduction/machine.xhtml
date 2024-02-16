@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{xmachineAction.managed}">
+                #{messages['Common.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Common.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="selectedTab" value="xproduction"/>
+    <ui:define name="body">
+
+    <h:form id="machineForm">
+
+    <div class="buttons">
+        <h:commandButton action="#{xmachineAction.update}" value="#{messages['Common.update']}"
+                         styleClass="button"
+                         rendered="#{xmachineAction.managed}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{xmachineAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!xmachineAction.managed}"
+                         tabindex="1">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{xmachineAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true"
+                         tabindex="4">
+        </h:commandButton>
+    </div>
+
+    <rich:panel id="formPanel">
+
+    <f:facet name="header">
+        <c:choose>
+            <c:when test="#{xmachineAction.managed}">
+                #{messages['Formulation.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Formulation.new']}
+            </c:otherwise>
+        </c:choose>
+    </f:facet>
+
+    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['XProduction.productionMachine.code']}</ui:define>
+            <h:inputText id="name" value="#{xmachine.code}" styleClass="inputLarge" required="true" tabindex="1">
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['XProduction.productionMachine.name']}</ui:define>
+            <h:inputText id="name" value="#{xmachine.name}" styleClass="inputLarge" required="true" tabindex="2">
+            </h:inputText>
+        </s:decorate>
+
+    </h:panelGrid>
+    </rich:panel>
+
+</h:form>
+
+</ui:define>
+</ui:composition>

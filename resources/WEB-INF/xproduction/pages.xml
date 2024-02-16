@@ -804,4 +804,21 @@
         </navigation>
     </page>
 
+    <page view-id="/xproduction/machineList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{xmachineAction.select(xmachineItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/machine.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/xproduction/rawMaterialProducerDiscount.xhtml" no-conversation-view-id="/xproduction/machineList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/xproduction/machineList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>

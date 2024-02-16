@@ -27,7 +27,8 @@ public class MachineDataModel extends QueryDataModel<Long,XMachine> {
 
     @Create
     public void init() {
-        sortProperty = "machine.name";
+        sortProperty = "machine.id";
+        sortAsc = false;
     }
 
     @Override

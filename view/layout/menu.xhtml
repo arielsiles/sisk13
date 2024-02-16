@@ -1553,11 +1553,11 @@
                 </rich:menuItem>
             </rich:dropDownMenu>-->
 
-            <!--<rich:dropDownMenu value="#{messages['menu.xproduction.configuration']}"
+            <rich:dropDownMenu value="#{messages['menu.xproduction.configuration']}"
                                rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item">
 
+                <!--<rich:menuItem submitMode="none"
+                               styleClass="main-menu-item">
                     <s:link view="/xproduction/materialConfigurationList.xhtml"
                             value="#{messages['menu.xproduction.inputMaterialConfiguration']}"
                             propagation="begin"/>
@@ -1572,18 +1572,26 @@
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item">
-                    <s:link view="/xproduction/processRegistrationList.xhtml"
-                            value="#{messages['menu.xproduction.configuration.processRegistration']}"
+                    <s:link view="/xproduction/indirectCostsList.xhtml"
+                            value="#{messages['menu.xproduction.configuration.indirectCostRegistration']}"
+                            propagation="none"/>
+                </rich:menuItem>-->
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item">
+                    <s:link view="/xproduction/machineList.xhtml"
+                            value="#{messages['menu.xproduction.configuration.machineProduction']}"
                             propagation="none"/>
                 </rich:menuItem>
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item">
-                    <s:link view="/xproduction/indirectCostsList.xhtml"
-                            value="#{messages['menu.xproduction.configuration.indirectCostRegistration']}"
+                    <s:link view="/xproduction/processRegistrationList.xhtml"
+                            value="#{messages['menu.xproduction.configuration.processRegistration']}"
                             propagation="none"/>
                 </rich:menuItem>
-            </rich:dropDownMenu>-->
+
+            </rich:dropDownMenu>
 
         </h:panelGrid>
     </rich:tab>
