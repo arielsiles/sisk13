@@ -142,7 +142,7 @@ public class ProfitAndLossReportAction extends GenericReportAction {
                         " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
 
         String[] restrictions = new String[]{};
-        String orderBy = "cashAccount.accountCode";
+        String orderBy = "rootCashAccount.accountCode";
 
         //generate the sub report
         TypedReportData subReportData = super.generateSubReport(
@@ -187,7 +187,7 @@ public class ProfitAndLossReportAction extends GenericReportAction {
                 " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
 
         String[] restrictions = new String[]{};
-        String orderBy = "cashAccount.accountCode";
+        String orderBy = "rootCashAccount.accountCode";
 
         //generate the sub report
         TypedReportData subReportData = super.generateSubReport(
