@@ -1,5 +1,6 @@
 package com.encens.khipus.service.warehouse;
 
+import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.WarehouseDocumentType;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
 
@@ -14,4 +15,5 @@ public interface WarehouseVoucherService {
 
     String createWarehouseVoucherListAccounting(List<WarehouseVoucher> warehouseVoucherList);
 
+    WarehouseVoucher findWarehouseVoucherByPurchaseOrder(PurchaseOrder purchaseOrder);
 }

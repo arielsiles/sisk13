@@ -25,11 +25,13 @@ import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.*;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.Warehouse;
+import com.encens.khipus.model.warehouse.WarehouseVoucher;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.service.purchases.PurchaseOrderService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.service.warehouse.WarehousePurchaseOrderService;
+import com.encens.khipus.service.warehouse.WarehouseVoucherService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.FormatUtils;
@@ -60,6 +62,9 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
     @In(create = true, value = "warehousePurchaseOrderDetailListCreateAction")
     private WarehousePurchaseOrderDetailListCreateAction detailListCreateAction;
+
+    @In(value = "warehouseVoucherUpdateAction")
+    private WarehouseVoucherUpdateAction warehouseVoucherUpdateAction;
 
     @In(create = true, value = "liquidationPaymentAction")
     private LiquidationPaymentAction liquidationPaymentAction;
@@ -116,6 +121,9 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
     @In(value = "warehousePurchaseOrderService")
     private WarehousePurchaseOrderService service;
+
+    @In
+    private WarehouseVoucherService warehouseVoucherService;
 
     @Factory(value = "warehousePurchaseOrder", scope = ScopeType.STATELESS)
     @Restrict("#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}")
@@ -415,6 +423,12 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
             service.finalizePurchaseOrder(getInstance());
             select(getInstance());
             addPurchaseOrderFinalizedMessage();
+
+            /** Aprueba el vale despues de finalizar la O.C. **/
+            WarehouseVoucher warehouseVoucher = warehouseVoucherService.findWarehouseVoucherByPurchaseOrder(getInstance());
+            warehouseVoucherUpdateAction.putWarehouseVoucher(warehouseVoucher.getId());
+            warehouseVoucherUpdateAction.approve();
+
             return Outcome.SUCCESS;
         } catch (WarehouseDocumentTypeNotFoundException e) {
             addWarehouseDocumentTypeErrorMessage();

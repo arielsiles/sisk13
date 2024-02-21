@@ -5,6 +5,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.util.Constants;
@@ -99,5 +100,16 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
 
         result = Outcome.SUCCESS;
         return  result;
+    }
+
+    @Override
+    public WarehouseVoucher findWarehouseVoucherByPurchaseOrder(PurchaseOrder purchaseOrder) {
+
+        WarehouseVoucher result = (WarehouseVoucher) em.createQuery("select w from WarehouseVoucher w " +
+                        " where w.purchaseOrderId =:purchaseOrderId ")
+                        .setParameter("purchaseOrderId", purchaseOrder.getId())
+                        .getSingleResult();
+
+        return result;
     }
 }
