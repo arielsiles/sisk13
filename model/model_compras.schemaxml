@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemadesigner version="6.5">
 <source>
-<database charset="utf8" collation="utf8_general_ci">erp_ilvadev</database>
+<database charset="utf8" collation="utf8_general_ci">terdemol</database>
 </source>
 <canvas zoom="100">
 <tables>
 <table name="com_encoc" view="colnames">
-<left>106</left>
-<top>196</top>
+<left>759</left>
+<top>150</top>
 <width>245</width>
 <height>137</height>
 <sql_create_table>CREATE TABLE `com_encoc` (
@@ -36,6 +36,9 @@
   `confactura` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `idunidadnegocio` bigint(20) DEFAULT NULL,
   `idcondicionpago` bigint(20) DEFAULT NULL,
+  `cta_def` int(1) DEFAULT NULL,
+  `cod_prov_aux` varchar(6) DEFAULT NULL,
+  `cuentapago` varchar(20) DEFAULT NULL,
   `idcontratopuestosol` bigint(20) DEFAULT NULL,
   `idmotivoordenc` bigint(20) DEFAULT NULL,
   `idlugarrecepcion` bigint(20) DEFAULT NULL,
@@ -43,32 +46,9 @@
   PRIMARY KEY (`id_com_encoc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
-<table name="com_detoc" view="colnames">
-<left>449</left>
-<top>15</top>
-<width>186</width>
-<height>128</height>
-<sql_create_table>CREATE TABLE `com_detoc` (
-  `id_com_detoc` bigint(20) DEFAULT NULL,
-  `no_cia` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `nro` bigint(20) DEFAULT NULL,
-  `no_orden` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `cod_art` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `cod_med` varchar(6) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `cant_sol` decimal(16,2) DEFAULT NULL,
-  `total` decimal(16,6) DEFAULT NULL,
-  `costo_uni` decimal(16,6) DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `advertencia` varchar(250) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `idhistorialarticuloprov` bigint(20) DEFAULT NULL,
-  `id_com_encoc` bigint(20) DEFAULT NULL,
-  KEY `id_com_encoc` (`id_com_encoc`),
-  CONSTRAINT `com_detoc_ibfk_1` FOREIGN KEY (`id_com_encoc`) REFERENCES `com_encoc` (`id_com_encoc`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
-</table>
 <table name="documentocompra" view="colnames">
-<left>899</left>
-<top>139</top>
+<left>254</left>
+<top>131</top>
 <width>261</width>
 <height>181</height>
 <sql_create_table>CREATE TABLE `documentocompra` (
@@ -85,120 +65,47 @@
   `idtmpenc` bigint(20) DEFAULT NULL,
   `id_tmpdet` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`iddocumentocompra`),
-  KEY `idordencompra` (`idordencompra`),
   KEY `idtmpenc` (`idtmpenc`),
+  KEY `idordencompra` (`idordencompra`),
   KEY `id_tmpdet` (`id_tmpdet`),
-  CONSTRAINT `documentocompra_ibfk_1` FOREIGN KEY (`idordencompra`) REFERENCES `com_encoc` (`id_com_encoc`),
-  CONSTRAINT `documentocompra_ibfk_2` FOREIGN KEY (`idtmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `documentocompra_ibfk_1` FOREIGN KEY (`idtmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `documentocompra_ibfk_2` FOREIGN KEY (`idordencompra`) REFERENCES `com_encoc` (`id_com_encoc`),
   CONSTRAINT `documentocompra_ibfk_3` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocontable` (`iddocumentocontable`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
-<table name="documentocontable" view="colnames">
-<left>1317</left>
-<top>79</top>
-<width>172</width>
-<height>160</height>
-<sql_create_table>CREATE TABLE `documentocontable` (
-  `iddocumentocontable` bigint(20) NOT NULL DEFAULT '0',
-  `direccion` varchar(50) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `importe` decimal(12,2) DEFAULT NULL,
-  `numeroautorizacion` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `codigocontrol` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `fecha` date DEFAULT NULL,
-  `exento` decimal(12,2) DEFAULT NULL,
-  `regcompro` int(11) DEFAULT NULL,
-  `ice` decimal(12,2) DEFAULT NULL,
-  `iva` decimal(12,2) DEFAULT NULL,
-  `nombre` varchar(100) DEFAULT NULL,
-  `importeneto` decimal(12,2) DEFAULT NULL,
-  `nit` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `numero` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `numerotransaccion` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`iddocumentocontable`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
-</table>
-<table name="sf_tmpdet" view="colnames">
-<left>1368</left>
-<top>378</top>
-<width>162</width>
-<height>306</height>
-<sql_create_table>CREATE TABLE `sf_tmpdet` (
-  `id_tmpdet` bigint(20) NOT NULL,
-  `timemillis` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `cuenta` varchar(31) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `cod_uni` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `no_cia` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `cod_cc` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `debe` decimal(16,2) DEFAULT NULL,
-  `haber` decimal(16,2) DEFAULT NULL,
-  `debeme` decimal(16,2) DEFAULT NULL,
-  `haberme` decimal(16,2) DEFAULT NULL,
-  `moneda` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `tc` decimal(10,6) DEFAULT NULL,
-  `no_trans` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `id_tmpenc` bigint(20) NOT NULL,
-  `idmovimiento` bigint(24) DEFAULT NULL,
-  `glosa` varchar(1000) DEFAULT NULL,
-  `idpersonacliente` bigint(20) DEFAULT NULL,
-  `cod_prov` varchar(6) DEFAULT NULL,
-  `cod_art` varchar(6) DEFAULT NULL,
-  `cant_art` decimal(16,2) DEFAULT NULL,
-  `idsocio` bigint(20) DEFAULT NULL,
-  `idcuenta` bigint(20) DEFAULT NULL,
-  `idcredito` bigint(20) DEFAULT NULL,
-  `iddocumentocompra` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id_tmpdet`),
-  KEY `FK_TMPENC` (`id_tmpenc`),
-  KEY `idpersonacliente` (`idpersonacliente`),
-  KEY `idsocio` (`idsocio`),
-  KEY `idcuenta` (`idcuenta`),
-  KEY `idcredito` (`idcredito`),
-  KEY `idmovimiento` (`idmovimiento`),
-  KEY `iddocumentocompra` (`iddocumentocompra`),
-  CONSTRAINT `FK_TMPENC` FOREIGN KEY (`id_tmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
-  CONSTRAINT `sf_tmpdet_ibfk_1` FOREIGN KEY (`idpersonacliente`) REFERENCES `personacliente` (`IDPERSONACLIENTE`),
-  CONSTRAINT `sf_tmpdet_ibfk_2` FOREIGN KEY (`idsocio`) REFERENCES `socio` (`idsocio`),
-  CONSTRAINT `sf_tmpdet_ibfk_3` FOREIGN KEY (`idcuenta`) REFERENCES `cuenta` (`idcuenta`),
-  CONSTRAINT `sf_tmpdet_ibfk_4` FOREIGN KEY (`idcredito`) REFERENCES `credito` (`idcredito`),
-  CONSTRAINT `sf_tmpdet_ibfk_5` FOREIGN KEY (`idmovimiento`) REFERENCES `movimiento` (`IDMOVIMIENTO`),
-  CONSTRAINT `sf_tmpdet_ibfk_6` FOREIGN KEY (`iddocumentocompra`) REFERENCES `documentocompra` (`iddocumentocompra`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
-</table>
 <table name="sf_tmpenc" view="colnames">
-<left>622</left>
-<top>486</top>
-<width>164</width>
-<height>306</height>
+<left>662</left>
+<top>445</top>
+<width>232</width>
+<height>213</height>
 <sql_create_table>CREATE TABLE `sf_tmpenc` (
   `id_tmpenc` bigint(20) NOT NULL,
   `no_trans` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `agregar_cta_prov` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `monto` decimal(16,2) DEFAULT NULL,
   `cta_bco` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `cuenta` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `sede_pago_chq` varchar(8) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `no_cia` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `moneda` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `fecha` date DEFAULT NULL,
-  `idmovimiento` bigint(24) DEFAULT NULL,
+  `idmovimiento` bigint(20) DEFAULT NULL,
   `fac` int(11) DEFAULT NULL,
-  `descri` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `no_doc` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `tipo_doc` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `estado` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `glosa` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `descri` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `beneficiario` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `tc` decimal(10,6) DEFAULT NULL,
   `fecha_ven` date DEFAULT NULL,
-  `formulario` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `glosa` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `observacion` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `sede_pago_chq` varchar(8) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `formulario` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `pendiente_registro` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `agregar_cta_prov` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `cod_prov` varchar(6) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `entregado_a` varchar(660) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `no_trans_rel` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `procedencia` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
-  `estado` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `no_usr` varchar(4) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
   `cod_enti` bigint(20) DEFAULT NULL,
   `NOMBRECLIENTE` varchar(100) DEFAULT NULL,
@@ -209,6 +116,88 @@
   `ndoc` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id_tmpenc`),
   UNIQUE KEY `id_tmpenc_UNIQUE` (`id_tmpenc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="pagoordencompra" view="colnames">
+<left>1264</left>
+<top>27</top>
+<width>241</width>
+<height>311</height>
+<sql_create_table>CREATE TABLE `pagoordencompra` (
+  `idpagoordencompra` bigint(20) DEFAULT NULL,
+  `fechaaprobacion` date DEFAULT NULL,
+  `cuentabanco` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `nombrebeneficiario` varchar(200) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `tipobeneficiario` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cuentacaja` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_cia` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `fechacreacion` date DEFAULT NULL,
+  `descripcion` varchar(1000) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `tipocambio` decimal(12,2) DEFAULT NULL,
+  `montopago` decimal(12,2) DEFAULT NULL,
+  `monedapago` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `tipopago` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `idordencompra` bigint(20) DEFAULT NULL,
+  `clasepago` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `montoorigen` decimal(12,2) DEFAULT NULL,
+  `monedaorigen` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `estado` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `notrans` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `aprobadopor` bigint(20) DEFAULT NULL,
+  `idsededestinocheque` bigint(20) DEFAULT NULL,
+  `creadopor` bigint(20) DEFAULT NULL,
+  `idfondorotatorio` bigint(20) DEFAULT NULL,
+  `id_tmpenc` bigint(20) DEFAULT NULL,
+  KEY `idordencompra` (`idordencompra`),
+  CONSTRAINT `pagoordencompra_ibfk_1` FOREIGN KEY (`idordencompra`) REFERENCES `com_encoc` (`id_com_encoc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="inv_vales" view="colnames">
+<left>1115</left>
+<top>382</top>
+<width>225</width>
+<height>275</height>
+<sql_create_table>CREATE TABLE `inv_vales` (
+  `no_cia` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_trans` varchar(10) NOT NULL,
+  `contracuenta` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cod_cc` varchar(8) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `cod_doc` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_vale` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `id_com_encoc` bigint(20) DEFAULT NULL,
+  `no_trans_rec` varchar(10) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `estado` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `oper` varchar(6) DEFAULT NULL,
+  `dest` varchar(10) DEFAULT NULL,
+  `orig` varchar(10) DEFAULT NULL,
+  `dest_cod_cc` varchar(8) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cod_alm_dest` varchar(6) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `cod_alm` varchar(6) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `tiporecepcion` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `idunidadnegocio` bigint(20) DEFAULT NULL,
+  `no_cia_raiz` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `no_trans_raiz` varchar(10) DEFAULT NULL,
+  `idcontratopuestosol` bigint(20) DEFAULT NULL,
+  `id_responsable` bigint(20) DEFAULT NULL,
+  `idunidadnegocio_dest` bigint(20) DEFAULT NULL,
+  `id_responsable_dest` bigint(20) DEFAULT NULL,
+  `idordenproduccion` bigint(20) DEFAULT NULL,
+  `idproductobase` bigint(20) DEFAULT NULL,
+  `idtmpenc` bigint(20) DEFAULT NULL,
+  `idpedidostr` bigint(20) DEFAULT NULL,
+  `iddestino` bigint(20) DEFAULT NULL,
+  UNIQUE KEY `no_trans_UNIQUE` (`no_trans`),
+  KEY `id_com_encoc` (`id_com_encoc`),
+  KEY `idtmpenc` (`idtmpenc`),
+  KEY `idpedidostr` (`idpedidostr`),
+  KEY `iddestino` (`iddestino`),
+  CONSTRAINT `inv_vales_ibfk_1` FOREIGN KEY (`id_com_encoc`) REFERENCES `com_encoc` (`id_com_encoc`),
+  CONSTRAINT `inv_vales_ibfk_2` FOREIGN KEY (`idtmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `inv_vales_ibfk_3` FOREIGN KEY (`idpedidostr`) REFERENCES `pedidos` (`IDPEDIDOS`),
+  CONSTRAINT `inv_vales_ibfk_4` FOREIGN KEY (`iddestino`) REFERENCES `inv_destino` (`iddestino`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 </tables>

@@ -111,6 +111,7 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
     private Boolean showBillConditions =false;
 
     private Boolean billConditions = true;
+    private Boolean defaultAccountCash = true;
 
     // this map stores the PurchaseOrderDetails that are under the minimal stock and the unitaryBalance of the Inventory
     private Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailUnderMinimalStockMap = new HashMap<PurchaseOrderDetail, BigDecimal>();
@@ -191,6 +192,14 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
                     ordersNumbers);
             liquidationPaymentAction.setPurchaseOrder(getInstance());
         }
+
+        if (instance.isPurchaseOrderApproved()) {
+            liquidationPaymentAction.setDefaultDescription(instance,
+                    MessageUtils.getMessage("WarehousePurchaseOrder.warehouses"),
+                    ordersNumbers);
+            liquidationPaymentAction.setPurchaseOrder(getInstance());
+        }
+
         return outcome;
     }
 
@@ -553,9 +562,19 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
         getInstance().setProvider(provider);
     }
 
+    public void assignProviderAux(Provider provider) {
+        getInstance().setProviderAux(provider);
+    }
+
+
+
     public void clearProvider() {
         detailListCreateAction.initializeAction();
         getInstance().setProvider(null);
+    }
+
+    public void clearProviderAux() {
+        getInstance().setProviderAux(null);
     }
 
     public String getResponsibleFullName() {
@@ -563,6 +582,11 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
             getInstance().setResponsible(currentUser.getEmployee());
         }
         return getInstance().getResponsible().getFullName();
+    }
+
+    public void changeDefaultAccountCheck(){
+        clearCashAccountPay();
+        clearProviderAux();
     }
 
     public boolean isPurchaseOrderApproved() {
@@ -958,6 +982,22 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
     }
 
+    public void assignCashAccountPay(CashAccount cashAccount){
+        getInstance().setCashAccountPay(cashAccount);
+    }
+
+    public void clearCashAccountPay(){
+        getInstance().setCashAccountPay(null);
+    }
+
+    public boolean isPurchaseOrderCash(){
+        return getInstance().getPayConditions().getType().equals(PayConditionsType.CASH);
+    }
+
+    public boolean isPurchaseOrderCredit(){
+        return getInstance().getPayConditions().getType().equals(PayConditionsType.CREDIT);
+    }
+
     public Boolean getShowBillConditions() {
         return showBillConditions;
     }
@@ -999,4 +1039,11 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
     }
 
+    public Boolean getDefaultAccountCash() {
+        return defaultAccountCash;
+    }
+
+    public void setDefaultAccountCash(Boolean defaultAccountCash) {
+        this.defaultAccountCash = defaultAccountCash;
+    }
 }

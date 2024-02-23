@@ -6,16 +6,15 @@ import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.employees.Month;
-import com.encens.khipus.model.finances.CollectionDocumentType;
-import com.encens.khipus.model.finances.CostCenter;
-import com.encens.khipus.model.finances.JobContract;
-import com.encens.khipus.model.finances.Provider;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.fixedassets.PurchaseOrderCause;
 import com.encens.khipus.model.fixedassets.PurchaseOrderFixedAssetPart;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.ValidatorUtil;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
@@ -117,6 +116,31 @@ public class PurchaseOrder implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "idcondicionpago", nullable = false)
     private PayConditions payConditions;
+
+    @Column(name = "cta_def", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean defaultAccount = Boolean.TRUE;
+
+    @Column(name = "cod_prov_aux", length = 6, nullable = true)
+    @Length(max = 6)
+    private String providerCodeAux;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cod_prov_aux", nullable = false, updatable = false, insertable = false)
+    })
+    private Provider providerAux;
+
+    @Column(name = "cuentapago", updatable = false)
+    private String cashAccountPayCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumns({
+            //@JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cuentapago", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount cashAccountPay;
 
     @Column(name = "sub_total", precision = 16, scale = 2)
     private BigDecimal subTotalAmount = BigDecimal.ZERO;
@@ -545,5 +569,48 @@ public class PurchaseOrder implements BaseModel {
 
     public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
         this.purchaseDocumentList = purchaseDocumentList;
+    }
+
+    public Boolean getDefaultAccount() {
+        System.out.println("----------> getDefaultAccount: " + defaultAccount);
+        return defaultAccount;
+    }
+
+    public void setDefaultAccount(Boolean defaultAccount) {
+        this.defaultAccount = defaultAccount;
+        System.out.println("----------> setDefaultAccount: " + defaultAccount);
+    }
+
+    public String getProviderCodeAux() {
+        return providerCodeAux;
+    }
+
+    public void setProviderCodeAux(String providerCodeAux) {
+        this.providerCodeAux = providerCodeAux;
+    }
+
+    public Provider getProviderAux() {
+        return providerAux;
+    }
+
+    public void setProviderAux(Provider providerAux) {
+        this.providerAux = providerAux;
+        setProviderCodeAux(this.providerAux != null ? this.providerAux.getProviderCode() : null);
+    }
+
+    public String getCashAccountPayCode() {
+        return cashAccountPayCode;
+    }
+
+    public void setCashAccountPayCode(String cashAccountPayCode) {
+        this.cashAccountPayCode = cashAccountPayCode;
+    }
+
+    public CashAccount getCashAccountPay() {
+        return cashAccountPay;
+    }
+
+    public void setCashAccountPay(CashAccount cashAccountPay) {
+        this.cashAccountPay = cashAccountPay;
     }
 }

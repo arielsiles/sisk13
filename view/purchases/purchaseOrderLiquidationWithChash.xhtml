@@ -1,0 +1,73 @@
+<app:fieldset xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:s="http://jboss.com/products/seam/taglib"
+              xmlns:ui="http://java.sun.com/jsf/facelets"
+              xmlns:f="http://java.sun.com/jsf/core"
+              xmlns:h="http://java.sun.com/jsf/html"
+              xmlns:a4j="http://richfaces.org/a4j"
+              xmlns:app="http://encens.com/products/khipus/facelets"
+              template="/layout/template.xhtml"
+              id="fixedAssetPaymentFieldset"
+              title="#{messages['PurchaseOrderPayment.paymentDetail']}">
+<a4j:region>
+<s:div id="globalDiv">
+<h:panelGrid columns="2"
+             width="100%"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             columnClasses="width50percent, width50percent">
+<s:div>
+
+
+    <s:div id="cashBoxCashAccountDiv">
+        <s:decorate id="cashBoxCashAccountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{liquidationPaymentAction.cashBoxPayment}">
+            <ui:define name="label">#{messages['RotatoryFundPayment.cashBoxCashAccount']}</ui:define>
+            <app:selectPopUp id="cashBoxCashAccount"
+                             required="true"
+                             textValue="#{liquidationPaymentAction.liquidationPayment.cashBoxCashAccount.fullName}"
+                             value="#{liquidationPaymentAction.liquidationPayment.cashBoxCashAccount}"
+                             dataModel="#{cashAccountDataModel}"
+                             clearAction="liquidationPaymentAction.clearCashBoxCashAccount()"
+                             searchModalPanel="cashBoxCashAccountListModalPanel"
+                             reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
+                             hotKeySelect="alt+3"
+                             tabindex="1003">
+            </app:selectPopUp>
+        </s:decorate>
+    </s:div>
+
+</s:div>
+
+<s:div>
+    <s:decorate id="paymentDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['PurchaseOrderPayment.description']}</ui:define>
+        <h:inputTextarea id="description"
+                         value="#{liquidationPaymentAction.liquidationPayment.description}"
+                         styleClass="input textarea"
+                         required="true"
+                         tabindex="1005">
+            <f:validateLength maximum="1000"/>
+        </h:inputTextarea>
+    </s:decorate>
+    <s:decorate id="computePaymentButton"
+                template="/include/viewField.xhtml"
+                styleClass="formRow">
+        <ui:param name="required" value="falmse"/>
+        <a4j:commandButton id="calculatePayentValues"
+                           action="#{liquidationPaymentAction.computePayment(warehousePurchaseOrderAction.currentBalanceAmount)}"
+                           value="#{messages['PurchaseOrderPayment.computePayment']}"
+                           styleClass="button"
+                           ajaxSingle="false"
+                           immediate="false"
+                           reRender="globalDiv"
+                           tabindex="1006"/>
+    </s:decorate>
+</s:div>
+
+</h:panelGrid>
+</s:div>
+</a4j:region>
+</app:fieldset>

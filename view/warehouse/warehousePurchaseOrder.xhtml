@@ -635,7 +635,7 @@
                            action="#{liquidationPaymentAction.assignCashBoxCashAccount(cashAccountItem)}"
                            image="/img/active.gif"
                            styleClass="select-image-middle"
-                           reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel, payAmountField, payCurrencyField"
+                           reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel, payAmountField, payCurrencyField, purchaseOrderWithCheckPanel"
                            oncomplete="Richfaces.hideModalPanel('cashBoxCashAccountListModalPanel');"/>
     </ui:define>
 </s:decorate>
@@ -656,6 +656,33 @@
         </ui:define>
     </s:decorate>
 </s:div>
+
+<s:decorate id="cashAccountPayListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="containerId" value="cashAccountPayListModalPanelContainer"/>
+    <ui:param name="dialogId" value="cashAccountPayListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{warehousePurchaseOrderAction.assignCashAccountPay(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="cashAccountPayField"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountPayListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="providerAuxListModalPanelContainer" template="/finances/providerAuxListModalPanel.xhtml">
+    <ui:param name="containerId" value="providerAuxListModalPanelContainer"/>
+    <ui:param name="dialogId" value="providerAuxListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseOrderAction.assignProviderAux(providerItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           reRender="providerAuxField"
+                           oncomplete="Richfaces.hideModalPanel('providerAuxListModalPanel');"/>
+    </ui:define>
+</s:decorate>
 
 <c:if test="#{not functionAction.hasSeverityErrorMessages and not warehousePurchaseOrderAction.managed}">
     <script type="text/javascript">

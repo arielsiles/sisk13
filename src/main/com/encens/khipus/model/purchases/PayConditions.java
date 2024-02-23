@@ -45,6 +45,10 @@ public class PayConditions implements BaseModel {
     @NotNull
     private String name;
 
+    @Column(name = "tipo")
+    @Enumerated(EnumType.STRING)
+    private PayConditionsType type;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -95,5 +99,13 @@ public class PayConditions implements BaseModel {
 
     public String getFullName() {
         return getCode() + " - " + getName();
+    }
+
+    public PayConditionsType getType() {
+        return type;
+    }
+
+    public void setType(PayConditionsType type) {
+        this.type = type;
     }
 }

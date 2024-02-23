@@ -577,14 +577,29 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
             voucherDetail.setProviderCode(purchaseOrder.getProviderCode()); /** Asocia con el proveedor **/
         }
+
         if (purchaseOrder.getPayConditions().getName().equals(Constants.CONDITION_CASH)) {
-            voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
-                    executorUnitCode,
-                    costCenterCode,
-                    companyConfiguration.getGeneralCashAccountNational(),
-                    totalCreditAmount,
-                    purchaseOrder.getProvider().getPayableAccount().getCurrency(),
-                    financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
+
+            if ( purchaseOrder.getDefaultAccount() ){
+                voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
+                        executorUnitCode,
+                        costCenterCode,
+                        companyConfiguration.getGeneralCashAccountNational(),
+                        totalCreditAmount,
+                        purchaseOrder.getProvider().getPayableAccount().getCurrency(),
+                        financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
+            } else {
+                voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
+                        executorUnitCode,
+                        costCenterCode,
+                        purchaseOrder.getCashAccountPay(),
+                        totalCreditAmount,
+                        purchaseOrder.getProvider().getPayableAccount().getCurrency(),
+                        financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
+
+                String providerAuxCode = purchaseOrder.getProviderAux() != null ? purchaseOrder.getProviderAux().getProviderCode() : null;
+                voucherDetail.setProviderCode(providerAuxCode);
+            }
         }
 
         voucher.addVoucherDetail(voucherDetail);

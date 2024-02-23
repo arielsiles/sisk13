@@ -536,15 +536,51 @@
     </c:choose>
 </s:decorate>
 
-<s:decorate id="billConditionsField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehousePurchaseOrderAction.showBillConditions}">
-    <ui:define name="label">
-        <h:outputText value="#{messages['WarehousePurchaseOrder.billConditions']}"/>
-    </ui:define>
-    <h:selectBooleanCheckbox value="#{warehousePurchaseOrderAction.billConditions}" disabled="#{!isPurchaseOrderPending}">
-        <a4j:support event="onchange" action="#{warehousePurchaseOrderAction.setWithWill}" ajaxSingle="true"/>
-    </h:selectBooleanCheckbox>
-</s:decorate>
+<c:if test="#{warehousePurchaseOrderAction.purchaseOrderApproved and warehousePurchaseOrderAction.purchaseOrderCash}">
+    <s:decorate id="defaultAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">
+            <h:outputText value="#{messages['WarehousePurchaseOrder.defaultAccount']}"/>
+        </ui:define>
+        <h:selectBooleanCheckbox value="#{warehousePurchaseOrder.defaultAccount}">
+            <a4j:support event="onchange" action="#{warehousePurchaseOrderAction.changeDefaultAccountCheck()}"
+                         reRender="cashAccountPayDiv"
+                         ajaxSingle="true"/>
+            <!--<a4j:support event="onclick" ajaxSingle="true" reRender="cashAccountPayDiv"/>-->
+        </h:selectBooleanCheckbox>
+    </s:decorate>
+</c:if>
+
+    <s:div id="cashAccountPayDiv">
+        <s:decorate id="cashAccountPayField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{!warehousePurchaseOrder.defaultAccount}">
+            <ui:define name="label">#{messages['WarehousePurchaseOrder.cashAccount']}</ui:define>
+            <app:selectPopUp id="cashAccountPay"
+                             required="true"
+                             textValue="#{warehousePurchaseOrder.cashAccountPay.fullName}"
+                             value="#{warehousePurchaseOrder.cashAccountPay}"
+                             dataModel="#{cashAccountDataModel}"
+                             clearAction="#{warehousePurchaseOrderAction.clearCashAccountPay()}"
+                             searchModalPanel="cashAccountPayListModalPanel"
+                             hotKeySelect="alt+3"
+                             tabindex="1003">
+            </app:selectPopUp>
+        </s:decorate>
+
+        <s:decorate id="providerAuxField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{!warehousePurchaseOrder.defaultAccount}">
+            <ui:define name="label">#{messages['WarehousePurchaseOrder.auxiliary']}</ui:define>
+            <app:selectPopUp id="provider"
+                             textValue="#{warehousePurchaseOrder.providerAux.fullName}"
+                             value="#{warehousePurchaseOrder.providerAux}"
+                             dataModel="#{providerDataModel}"
+                             clearAction="#{warehousePurchaseOrderAction.clearProviderAux()}"
+                             searchModalPanel="providerAuxListModalPanel"
+                             hotKeySelect="alt+5">
+            </app:selectPopUp>
+        </s:decorate>
+    </s:div>
 
 </s:div>
+
 </h:panelGrid>
 </ui:composition>

@@ -46,7 +46,7 @@
   `version` bigint(20) DEFAULT NULL,
   `idcompania` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`idproceso`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
 </table>
 <table name="xpr_plan" view="colnames">
 <left>105</left>
@@ -75,7 +75,7 @@
   `estado` varchar(3) DEFAULT NULL,
   `totaleq` decimal(16,2) NOT NULL,
   `capacidad` decimal(16,2) DEFAULT NULL,
-  `activo` int(1) DEFAULT NULL,
+  `activo` int(11) DEFAULT NULL,
   `idcategoria` bigint(20) DEFAULT NULL,
   `VERSION` bigint(20) NOT NULL,
   `idcompania` bigint(20) NOT NULL,
@@ -100,8 +100,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="xpr_procesomaquina" view="colnames">
-<left>562</left>
-<top>518</top>
+<left>439</left>
+<top>548</top>
 <width>177</width>
 <height>163</height>
 <sql_create_table>CREATE TABLE `xpr_procesomaquina` (
@@ -115,11 +115,11 @@
   KEY `xpr_procesomaqina_xpr_maquina_idmaquina_fk` (`idmaquina`),
   CONSTRAINT `xpr_procesomaqina_xpr_maquina_idmaquina_fk` FOREIGN KEY (`idmaquina`) REFERENCES `xpr_maquina` (`idmaquina`),
   CONSTRAINT `xpr_procesomaqina_xpr_proceso_idproceso_fk` FOREIGN KEY (`idproceso`) REFERENCES `xpr_proceso` (`idproceso`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
 </table>
 <table name="xpr_maquina" view="colnames">
-<left>942</left>
-<top>535</top>
+<left>781</left>
+<top>548</top>
 <width>161</width>
 <height>163</height>
 <sql_create_table>CREATE TABLE `xpr_maquina` (
@@ -128,7 +128,71 @@
   `nombre` varchar(255) DEFAULT NULL,
   `version` bigint(20) DEFAULT NULL,
   `idcompania` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`idmaquina`)
+  PRIMARY KEY (`idmaquina`),
+  KEY `idcompania` (`idcompania`),
+  CONSTRAINT `xpr_maquina_ibfk_1` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+</table>
+<table name="inv_destino" view="colnames">
+<left>1387</left>
+<top>588</top>
+<width>162</width>
+<height>170</height>
+<sql_create_table>CREATE TABLE `inv_destino` (
+  `iddestino` bigint(20) NOT NULL,
+  `codigo` varchar(50) DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `idcompania` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`iddestino`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="af_activos" view="colnames">
+<left>1115</left>
+<top>279</top>
+<width>220</width>
+<height>215</height>
+<sql_create_table>CREATE TABLE `af_activos` (
+  `idactivo` bigint(20) DEFAULT NULL,
+  `dep_acu_vo` decimal(12,2) DEFAULT NULL,
+  `fch_ajuste` date DEFAULT NULL,
+  `codbarras` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `codigo` varchar(255) DEFAULT NULL,
+  `vobs` decimal(12,2) DEFAULT NULL,
+  `tasabssus` decimal(16,6) DEFAULT NULL,
+  `tasabsufv` decimal(16,6) DEFAULT NULL,
+  `no_cia` varchar(2) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `cod_cc` varchar(6) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `moneda` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `dep_vo` decimal(12,2) DEFAULT NULL,
+  `tasa_dep` decimal(7,2) DEFAULT NULL,
+  `revaluo` int(11) DEFAULT NULL,
+  `descri` varchar(250) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `detalle` varchar(250) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `duracion` int(11) DEFAULT NULL,
+  `fch_baja` date DEFAULT NULL,
+  `cod_acti` bigint(20) DEFAULT NULL,
+  `grupo` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `subgrupo` varchar(3) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `mej` decimal(12,2) DEFAULT NULL,
+  `ulttasabssus` decimal(16,6) DEFAULT NULL,
+  `ulttasabsufv` decimal(16,6) DEFAULT NULL,
+  `medida` varchar(250) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `modelo` varchar(255) DEFAULT NULL,
+  `mesesgarantia` int(11) DEFAULT NULL,
+  `id_com_encoc` bigint(20) DEFAULT NULL,
+  `fch_alta` date DEFAULT NULL,
+  `desecho` decimal(12,2) DEFAULT NULL,
+  `serie` varchar(255) DEFAULT NULL,
+  `estado` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL,
+  `vosus` decimal(12,2) DEFAULT NULL,
+  `marca` varchar(255) DEFAULT NULL,
+  `voufv` decimal(12,2) DEFAULT NULL,
+  `version` bigint(20) DEFAULT NULL,
+  `idunidadnegocio` bigint(20) DEFAULT NULL,
+  `idcontratopuesto` bigint(20) DEFAULT NULL,
+  `idaflocalizacion` bigint(20) DEFAULT NULL,
+  `idfoto` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 </tables>

@@ -332,8 +332,8 @@
                 styleClass="formRow">
         <ui:param name="required" value="true"/>
         <ui:define name="label">#{messages['RotatoryFund.cashAccount']}</ui:define>
-        <c:choose>
-            <c:when test="#{rotatoryFundAction.showCashAccountSelect}">
+        <!--<c:choose>-->
+            <!--<c:when test="#{rotatoryFundAction.showCashAccountSelect}">-->
                 <app:selectPopUp id="cashAccount"
                                  required="true"
                                  textValue="#{rotatoryFund.cashAccount.fullName}"
@@ -344,11 +344,11 @@
                                  reRender="activeCashAccountField"
                                  hotKeySelect="alt+2"
                                  tabindex="17"/>
-            </c:when>
+            <!--</c:when>
             <c:otherwise>
                 <h:outputText value="#{rotatoryFund.cashAccount.fullName}"/>
-            </c:otherwise>
-        </c:choose>
+            </c:otherwise>-->
+        <!--</c:choose>-->
     </s:decorate>
 </s:div>
 <s:decorate id="registerEmployeeField" template="/include/inputField.xhtml"
