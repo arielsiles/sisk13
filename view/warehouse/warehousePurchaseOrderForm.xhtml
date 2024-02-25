@@ -31,7 +31,7 @@
     <s:decorate id="documentTypeField"
                 template="/include/inputField.xhtml"
                 styleClass="formRow">
-        <ui:define name="label">#{messages['PurchaseOrder.purchaseDocumentType']}</ui:define>
+        <ui:define name="label">#{messages['PurchaseOrder.purchaseDocument']}</ui:define>
         <c:choose>
             <c:when test="#{isPurchaseOrderPending or empty warehousePurchaseOrder.documentType}">
                 <h:selectOneMenu id="purchaseDocumentType"
@@ -48,12 +48,10 @@
                     <a4j:support event="onchange"
                                  action="#{warehousePurchaseOrderAction.verifyCondicionWill}"
                                  reRender="rightSidePanel"
-                                 imnediate = "true"
                                  ajaxSingle="true"/>
                 </h:selectOneMenu>
             </c:when>
             <c:otherwise>
-                <ui:param name="required" value="true"/>
                 <h:outputText value="#{messages[warehousePurchaseOrder.documentType.resourceKey]}"/>
             </c:otherwise>
         </c:choose>
@@ -63,7 +61,7 @@
                 styleClass="formRow"
                 rendered="#{warehousePurchaseOrderAction.managed}">
         <ui:define name="label">
-            <h:outputText value="#{messages['WarehousePurchaseOrder.invoiceNumber']}"/>
+            <h:outputText value="#{messages['WarehousePurchaseOrder.docNumber']}"/>
         </ui:define>
         <h:inputText id="invoiceNumber"
                      value="#{warehousePurchaseOrder.invoiceNumber}"
@@ -150,7 +148,6 @@
                     </h:selectOneMenu>
                 </c:when>
                 <c:otherwise>
-                    <ui:param name="required" value="true"/>
                     <h:outputText value="#{warehousePurchaseOrder.executorUnit.fullName}"/>
                 </c:otherwise>
             </c:choose>
@@ -184,7 +181,6 @@
         <ui:define name="label">
             <h:outputText value="#{messages['WarehousePurchaseOrder.responsible']}"/>
         </ui:define>
-        <ui:param name="required" value="true"/>
         <h:outputText value="#{warehousePurchaseOrderAction.responsibleFullName}"/>
     </s:decorate>
 
@@ -194,7 +190,7 @@
         </ui:define>
         <h:inputTextarea id="observation"
                          value="#{warehousePurchaseOrder.gloss}"
-                         styleClass="input textarea"
+                         styleClass="input textarea-small2"
                          required="true"
                          readonly="#{not isPurchaseOrderPending}"
                          tabindex="4">
@@ -456,7 +452,6 @@
             </h:selectOneMenu>
         </c:when>
         <c:otherwise>
-            <ui:param name="required" value="true"/>
             <h:outputText value="#{messages[warehousePurchaseOrder.consumeMonth.resourceKey]}"/>
         </c:otherwise>
     </c:choose>
@@ -497,7 +492,6 @@
                 </h:selectOneMenu>
             </c:when>
             <c:otherwise>
-                <ui:param name="required" value="true"/>
                 <h:outputText value="#{warehousePurchaseOrder.receptionPlace.fullName}"/>
             </c:otherwise>
         </c:choose>
@@ -530,7 +524,7 @@
             </h:selectOneMenu>
         </c:when>
         <c:otherwise>
-            <ui:param name="required" value="true"/>
+            <!--<ui:param name="required" value="true"/>-->
             <h:outputText value="#{warehousePurchaseOrder.payConditions.fullName}"/>
         </c:otherwise>
     </c:choose>
@@ -570,6 +564,7 @@
                     rendered="#{!warehousePurchaseOrder.defaultAccount}">
             <ui:define name="label">#{messages['WarehousePurchaseOrder.auxiliary']}</ui:define>
             <app:selectPopUp id="provider"
+                             required="false"
                              textValue="#{warehousePurchaseOrder.providerAux.fullName}"
                              value="#{warehousePurchaseOrder.providerAux}"
                              dataModel="#{providerDataModel}"

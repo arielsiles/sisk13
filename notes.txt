@@ -2,19 +2,10 @@
 - Change on Jboss start script: JAVA_OPTS=%JAVA_OPTS% -Xms256m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=512m (or depending of your environment).
 - timecard
 
-productionPlanList
-productionPlan
-production
+- Orden de Compra a Credito con factura     OK
+- Orden de Compra a Credito con recibo      OK
 
-formulationList
-formulation
+- Orden de Compra al Contado con factura + Cta contable                 OK
+- Orden de Compra al Contado con factura + Cta contable + Auxiliar      OK
 
-distributionIndirectCost
-processVouchersWithoutAccounting *
-generateCostOfSales
-generateCostOfSalesByWarehouse
-generateClosingProductionCostAccounts
-
-materialConfigurationList
-indirectCostConfigList
-indirectCostsList
+- Liquidar varias OC a Credito      OK

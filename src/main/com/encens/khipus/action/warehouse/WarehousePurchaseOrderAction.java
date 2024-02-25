@@ -28,6 +28,7 @@ import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.employees.JobContractService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.purchases.PurchaseOrderService;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.service.warehouse.WarehousePurchaseOrderService;
@@ -68,6 +69,9 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
     @In(create = true, value = "liquidationPaymentAction")
     private LiquidationPaymentAction liquidationPaymentAction;
+
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     @In
     private PurchaseOrderService purchaseOrderService;
@@ -129,7 +133,10 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
     @Factory(value = "warehousePurchaseOrder", scope = ScopeType.STATELESS)
     @Restrict("#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}")
     public PurchaseOrder initPurchaseOrder() {
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
         getInstance().setOrderType(PurchaseOrderType.WAREHOUSE);
+        getInstance().setCostCenter(companyConfiguration.getExchangeRateBalanceCostCenter());
+
         return getInstance();
     }
 
@@ -1045,5 +1052,16 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
     public void setDefaultAccountCash(Boolean defaultAccountCash) {
         this.defaultAccountCash = defaultAccountCash;
+    }
+
+    public CompanyConfiguration getCompanyConfiguration(){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+            return companyConfiguration;
+        } catch (CompanyConfigurationNotFoundException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");
+            return null;
+        }
     }
 }
