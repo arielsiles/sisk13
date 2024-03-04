@@ -1,13 +1,11 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.finances.PresetAccountingTemplate;
 import com.encens.khipus.model.xproduction.XProcess;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,16 +22,17 @@ import java.util.List;
 public class ProcessRegistrationDataModel extends QueryDataModel<Long, XProcess> {
 
     private static final String[] RESTRICTIONS =
-            {"lower(xProcess.name) like concat('%', concat(lower(#{processRegistrationDataModel.criteria.name}), '%'))"};
+            {"lower(xprocess.name) like concat('%', concat(lower(#{processRegistrationDataModel.criteria.name}), '%'))"};
 
     @Create
     public void init() {
-        sortProperty = "xProcess.name";
+        sortProperty = "xprocess.id";
+        sortAsc = false;
     }
 
     @Override
     public String getEjbql() {
-        return "select xProcess from XProcess xProcess";
+        return "select xprocess from XProcess xprocess";
     }
 
     @Override

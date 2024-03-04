@@ -20,7 +20,7 @@
                                  maxlength="150" tabindex="2" styleClass="input">
                     </h:inputText>
                     <a4j:commandButton action="#{machineDataModel.search}"
-                                       reRender="productionMachineList"
+                                       reRender="productionMachineSearch, productionMachineList, dataScroller"
                                        styleClass="button" id="searchButtonId" tabindex="2"
                                        value="#{messages['Common.search']}">
                         <s:defaultAction/>

@@ -28,11 +28,18 @@ public class XProcess implements BaseModel {
     @Column(name = "idproceso", nullable = false)
     private Long id;
 
+    @Column(name = "codigo", nullable = false, length = 20)
+    private String code;
+
     @Column(name = "nombre", nullable = false, length = 255)
     private String name;
 
     @OneToMany(mappedBy = "xProcess", fetch = FetchType.LAZY)
-    private List<XMachineProcess> typePresetAccountingTemplateList = new ArrayList<XMachineProcess>(0);
+    private List<XMachineProcess> xmachineProcessList = new ArrayList<XMachineProcess>(0);
+
+    @Column(name = "estado")
+    @Enumerated(EnumType.STRING)
+    private XProcessState state = XProcessState.PEN;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -60,12 +67,12 @@ public class XProcess implements BaseModel {
         this.name = name;
     }
 
-    public List<XMachineProcess> getTypePresetAccountingTemplateList() {
-        return typePresetAccountingTemplateList;
+    public List<XMachineProcess> getXmachineProcessList() {
+        return xmachineProcessList;
     }
 
-    public void setTypePresetAccountingTemplateList(List<XMachineProcess> typePresetAccountingTemplateList) {
-        this.typePresetAccountingTemplateList = typePresetAccountingTemplateList;
+    public void setXmachineProcessList(List<XMachineProcess> xmachineProcessList) {
+        this.xmachineProcessList = xmachineProcessList;
     }
 
     public Company getCompany() {
@@ -82,5 +89,21 @@ public class XProcess implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public XProcessState getState() {
+        return state;
+    }
+
+    public void setState(XProcessState state) {
+        this.state = state;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

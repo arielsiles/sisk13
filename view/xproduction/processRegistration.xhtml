@@ -10,22 +10,22 @@
     <ui:define name="pageTitle">
         <c:choose>
             <c:when test="#{xprocessAction.managed}">
-                #{messages['PresetAccountingTemplate.edit']}
+                #{messages['XProcess.edit']}
             </c:when>
             <c:otherwise>
-                #{messages['PresetAccountingTemplate.new']}
+                #{messages['XProcess.new']}
             </c:otherwise>
         </c:choose>
     </ui:define>
-    <ui:param name="bodyWidth" value="50%"/>
-    <ui:param name="selectedTab" value="xProcess"/>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="selectedTab" value="xproduction"/>
     <ui:define name="body">
         <h:form id="processForm">
             <div class="buttons">
                 <h:commandButton id="createButtonId"
                                  action="#{xprocessAction.create}"
                                  value="#{messages['Common.save']}"
-                                 rendered="#{!xprocessAction.managed }"
+                                 rendered="#{!xprocessAction.managed and s:hasPermission('XPROCESS_PRODUCTION','CREATE')}"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
@@ -33,14 +33,28 @@
                 <h:commandButton id="updateButtonId"
                                  action="#{xprocessAction.update}"
                                  value="#{messages['Common.saveChange']}"
-                                 rendered="#{xprocessAction.managed }"
+                                 rendered="#{xprocessAction.managed and xprocessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
+                <h:commandButton id="approveButtonId"
+                                 action="#{xprocessAction.approve}"
+                                 value="#{messages['Common.approve']}"
+                                 rendered="#{xprocessAction.managed and xprocessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
+                                 styleClass="button">
+                </h:commandButton>
+
+                <h:commandButton id="annulButtonId"
+                                 action="#{xprocessAction.annul}"
+                                 value="#{messages['Common.annul']}"
+                                 rendered="#{xprocessAction.managed and xprocessAction.approved and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
+                                 styleClass="button">
+                </h:commandButton>
+
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{xprocessAction.managed }">
+                                 rendered="#{xprocessAction.managed and xprocessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','DELETE')}">
                     <rich:componentControl for="deleteConfirmation"
                                            event="onclick"
                                            disableDefault="true"
@@ -56,18 +70,29 @@
                 <f:facet name="header">
                     <c:choose>
                         <c:when test="#{xprocessAction.managed}">
-                            #{messages['production.proccessRegister.edit']}
+                            #{messages['XProcess.edit']}
                         </c:when>
                         <c:otherwise>
-                            #{messages['production.proccessRegister.new']}
+                            #{messages['XProcess.new']}
                         </c:otherwise>
                     </c:choose>
                 </f:facet>
 
-                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['PresetAccountingTemplate.name']}</ui:define>
-                    <h:inputText id="name" value="#{xProcess.name}" styleClass="input" required="true"
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProcessState.state']}</ui:define>
+                    <h:outputText value="#{messages[xProcess.state.resourceKey]}"/>
+                </s:decorate>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProcessState.code']}</ui:define>
+                    <h:inputText id="code" value="#{xProcess.code}" styleClass="input" required="true"
                                  maxlength="150" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProcessState.name']}</ui:define>
+                    <h:inputText id="name" value="#{xProcess.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="2"/>
                 </s:decorate>
             </rich:panel>
             <s:div id="machineListPanel">
@@ -77,7 +102,7 @@
                                        value="#{messages['production.proccessRegister.addMachine']}"
                                        styleClass="button"
                                        immediate="true"
-                                       rendered="#{xprocessAction.managed}"
+                                       rendered="#{xprocessAction.managed and xprocessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
                                        oncomplete="Richfaces.showModalPanel('machineListModalPanel');"
                                        actionListener="#{selectPopUpAction.select}"
                                        reRender="machineListModalPanel">
@@ -89,6 +114,7 @@
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
+                        <th class="rich-table-headercell">Codigo</th>
                         <th class="rich-table-headercell">Nombre</th>
                         <th class="rich-table-headercell">#{messages['Common.action']}</th>
                     </tr>
@@ -99,6 +125,9 @@
                         <c:set var="amountInputTextId" value="amountInputText_#{row.index}"/>
 
                         <tr class="rich-table-row">
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{instance.xmachine.code}"/>
+                            </td>
                             <td class="rich-table-cell">
                                 <h:outputText value="#{instance.xmachine.name}"/>
                             </td>

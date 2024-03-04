@@ -9,3 +9,7 @@
 - Orden de Compra al Contado con factura + Cta contable + Auxiliar      OK
 
 - Liquidar varias OC a Credito      OK
+
+
+
+

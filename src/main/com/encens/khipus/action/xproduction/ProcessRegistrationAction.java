@@ -3,19 +3,13 @@ package com.encens.khipus.action.xproduction;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.EntryNotFoundException;
-import com.encens.khipus.exception.ReferentialIntegrityException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.CashAccountPk;
-import com.encens.khipus.model.finances.PresetAccountingTemplate;
-import com.encens.khipus.model.finances.TypePresetAccountingTemplate;
 import com.encens.khipus.model.xproduction.XMachine;
 import com.encens.khipus.model.xproduction.XMachineProcess;
 import com.encens.khipus.model.xproduction.XProcess;
-import com.encens.khipus.service.finances.TypePresetAccountingTemplateService;
+import com.encens.khipus.model.xproduction.XProcessState;
 import com.encens.khipus.service.xproduction.XProcessService;
-import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
@@ -34,6 +28,7 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
 
     private List<XMachineProcess> xMachineProcesses = new ArrayList<XMachineProcess>();
     private List<XMachine> selectedMachines = new ArrayList<XMachine>();
+    private List<Long> selectedMachineIds = new ArrayList<Long>();
 
     @In
     private XProcessService xProcessService;
@@ -50,12 +45,24 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
     public String select(XProcess instance) {
         String outCome = super.select(instance);
         setxMachineProcesses(xProcessService.getXMachineProcess(getInstance()));
+
+        loadMachine(getxMachineProcesses());
+
         return outCome;
     }
 
     @Override
     protected String getDisplayNameProperty() {
         return "name";
+    }
+
+    public void loadMachine(List<XMachineProcess> xMachineProcessList){
+
+        for (XMachineProcess xMachineProcess : xMachineProcessList) {
+            this.selectedMachines.add(xMachineProcess.getXmachine());
+            this.selectedMachineIds.add(xMachineProcess.getXmachine().getId());
+        }
+
     }
 
     /*@End(beforeRedirect = true)*/
@@ -84,10 +91,26 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
         return Outcome.SUCCESS;
     }
 
+    @End
+    public String approve() {
+        getInstance().setState(XProcessState.APR);
+        update();
+        return Outcome.SUCCESS;
+    }
+
+    @End
+    public String annul() {
+        getInstance().setState(XProcessState.ANL);
+        update();
+        return Outcome.SUCCESS;
+    }
+
     public void setMachine(XMachine xMachine) {
-        if (!selectedMachines.contains(xMachine.getId())) {
+        //if (!selectedMachines.contains(xMachine)) {
+        if (!selectedMachineIds.contains(xMachine.getId())) {
 
             selectedMachines.add(xMachine);
+            selectedMachineIds.add(xMachine.getId());
 
             XMachineProcess item = new XMachineProcess();
             item.setXmachine(xMachine);
@@ -98,6 +121,7 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
 
     public void removeXMachine(XMachineProcess instance) {
         selectedMachines.remove(instance.getXmachine());
+        selectedMachineIds.remove(instance.getXmachine().getId());
         xMachineProcesses.remove(instance);
         xProcessService.deleteXMachineProcess(instance);
     }
@@ -113,24 +137,20 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
-            return Outcome.REDISPLAY;
+            return Outcome.FAIL;
         }
     }
-    @Override
-    @End
-    public String delete() {
-        try {
-            getService().delete(getInstance());
-            addDeletedMessage();
-        } catch (ConcurrencyException e) {
-            entryNotFoundLog();
-            addDeleteConcurrencyMessage();
-        } catch (ReferentialIntegrityException e) {
-            referentialIntegrityLog();
-            addDeleteReferentialIntegrityMessage();
-        }
 
-        return Outcome.NEXT;
+    public boolean isPending(){
+        return getInstance().getState().equals(XProcessState.PEN);
+    }
+
+    public boolean isApproved(){
+        return getInstance().getState().equals(XProcessState.APR);
+    }
+
+    public boolean isAnnulled(){
+        return getInstance().getState().equals(XProcessState.ANL);
     }
 
     public List<XMachineProcess> getxMachineProcesses() {

@@ -1578,14 +1578,16 @@
                 </rich:menuItem>-->
 
                 <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item">
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('XMACHINE_PRODUCTION','VIEW')}">
                     <s:link view="/xproduction/machineList.xhtml"
                             value="#{messages['menu.xproduction.configuration.machineProduction']}"
                             propagation="none"/>
                 </rich:menuItem>
 
                 <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item">
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('XPROCESS_PRODUCTION','VIEW')}">
                     <s:link view="/xproduction/processRegistrationList.xhtml"
                             value="#{messages['menu.xproduction.configuration.processRegistration']}"
                             propagation="none"/>

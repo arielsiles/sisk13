@@ -42,11 +42,14 @@
 <height>146</height>
 <sql_create_table>CREATE TABLE `xpr_proceso` (
   `idproceso` bigint(20) NOT NULL,
+  `codigo` varchar(20) DEFAULT NULL,
   `nombre` varchar(255) NOT NULL,
+  `estado` varchar(20) DEFAULT NULL,
   `version` bigint(20) DEFAULT NULL,
   `idcompania` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`idproceso`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+  PRIMARY KEY (`idproceso`),
+  UNIQUE KEY `codigo` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="xpr_plan" view="colnames">
 <left>105</left>
@@ -115,7 +118,7 @@
   KEY `xpr_procesomaqina_xpr_maquina_idmaquina_fk` (`idmaquina`),
   CONSTRAINT `xpr_procesomaqina_xpr_maquina_idmaquina_fk` FOREIGN KEY (`idmaquina`) REFERENCES `xpr_maquina` (`idmaquina`),
   CONSTRAINT `xpr_procesomaqina_xpr_proceso_idproceso_fk` FOREIGN KEY (`idproceso`) REFERENCES `xpr_proceso` (`idproceso`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="xpr_maquina" view="colnames">
 <left>781</left>
@@ -129,15 +132,16 @@
   `version` bigint(20) DEFAULT NULL,
   `idcompania` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`idmaquina`),
+  UNIQUE KEY `codigo` (`codigo`),
   KEY `idcompania` (`idcompania`),
   CONSTRAINT `xpr_maquina_ibfk_1` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4</sql_create_table>
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="inv_destino" view="colnames">
-<left>1387</left>
-<top>588</top>
-<width>162</width>
-<height>170</height>
+<left>1269</left>
+<top>535</top>
+<width>198</width>
+<height>155</height>
 <sql_create_table>CREATE TABLE `inv_destino` (
   `iddestino` bigint(20) NOT NULL,
   `codigo` varchar(50) DEFAULT NULL,
@@ -148,10 +152,10 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
 </table>
 <table name="af_activos" view="colnames">
-<left>1115</left>
-<top>279</top>
-<width>220</width>
-<height>215</height>
+<left>1270</left>
+<top>343</top>
+<width>196</width>
+<height>164</height>
 <sql_create_table>CREATE TABLE `af_activos` (
   `idactivo` bigint(20) DEFAULT NULL,
   `dep_acu_vo` decimal(12,2) DEFAULT NULL,

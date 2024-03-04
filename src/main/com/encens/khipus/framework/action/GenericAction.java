@@ -85,7 +85,7 @@ public class GenericAction<T> implements Serializable {
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
-            return Outcome.REDISPLAY;
+            return Outcome.FAIL;
         }
     }
 

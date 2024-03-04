@@ -740,10 +740,29 @@
                 <begin-conversation flush-mode="MANUAL"/>
                 <redirect view-id="/xproduction/processRegistration.xhtml"/>
             </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/xproduction/processRegistration.xhtml"/>
+            </rule>
         </navigation>
         <navigation from-action="#{xprocessAction.update}">
             <rule if-outcome="Success">
                 <redirect view-id="/xproduction/processRegistration.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xprocessAction.delete}">
+            <rule if-outcome="Success">
+                <end-conversation/>
+                <redirect view-id="/xproduction/processRegistrationList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xprocessAction.approve}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/processRegistrationList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{xprocessAction.annul}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/processRegistrationList.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{xprocessAction.cancel}">
@@ -814,6 +833,14 @@
     </page>
 
     <page view-id="/xproduction/machine.xhtml" no-conversation-view-id="/xproduction/machineList.xhtml">
+        <navigation from-action="#{xmachineAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/machineList.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/xproduction/machine.xhtml"/>
+            </rule>
+        </navigation>
         <navigation>
             <rule>
                 <redirect view-id="/xproduction/machineList.xhtml"/>

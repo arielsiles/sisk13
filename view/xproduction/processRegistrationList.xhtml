@@ -9,7 +9,7 @@
                 template="/layout/template.xhtml">
 
     <ui:define name="pageTitle">#{messages['production.proccessRegister.title']}</ui:define>
-    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="bodyWidth" value="70%"/>
     <ui:param name="selectedTab" value="xproduction"/>
     <ui:define name="body">
         <h:form id="processRegistrationSearch">
@@ -20,7 +20,7 @@
                                  maxlength="150" tabindex="2" styleClass="input">
                     </h:inputText>
                     <a4j:commandButton action="#{processRegistrationDataModel.search}"
-                                       reRender="processRegistrationList"
+                                       reRender="processRegistrationSearch, processRegistrationList, dataScroller"
                                        styleClass="button" id="searchButtonId" tabindex="2"
                                        value="#{messages['Common.search']}">
                         <s:defaultAction/>
@@ -34,28 +34,30 @@
                           view="/xproduction/processRegistration.xhtml"
                           styleClass="button"
                           propagation="begin"
-                          rendered="true"/>
+                          rendered="#{s:hasPermission('XPROCESS_PRODUCTION','CREATE')}"/>
             </div>
 
             <rich:dataTable value="#{processRegistrationDataModel}" var="processRegistrationItem"
                             id="processRegistrationList" rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="80%, 20%">
+                            width="100%" columnsWidth="10%, 50%, 30%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
-                        <rich:column>
-                            <app:commandSortHeader sortProperty="processRegistration.name"
-                                                   dataModel="#{processRegistrationDataModel}"
-                                                   reRender="processRegistrationList, dataScroller">
-                                #{messages['PresetAccountingTemplate.name']}
-                            </app:commandSortHeader>
-                        </rich:column>
+                        <rich:column>#{messages['XProcessState.code']}</rich:column>
+                        <rich:column>#{messages['XProcessState.name']}</rich:column>
+                        <rich:column>#{messages['XProcessState.state']}</rich:column>
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{processRegistrationItem.code}"/>
+                </rich:column>
                 <rich:column>
                     <h:outputText value="#{processRegistrationItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[processRegistrationItem.state.resourceKey]}" />
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"
@@ -73,7 +75,7 @@
                           view="/xproduction/processRegistration.xhtml"
                           styleClass="button"
                           propagation="none"
-                          rendered="true"/>
+                          rendered="#{s:hasPermission('XPROCESS_PRODUCTION','CREATE')}"/>
             </div>
         </h:form>
     </ui:define>
