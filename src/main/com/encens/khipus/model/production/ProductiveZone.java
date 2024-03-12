@@ -2,6 +2,7 @@ package com.encens.khipus.model.production;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.contacts.City;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
@@ -53,7 +54,7 @@ public class ProductiveZone implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductiveZone.tableGenerator")
     private Long id;
 
-    @Column(name = "numero", nullable = false, length = 20)
+    @Column(name = "numero", nullable = true, length = 20)
     private String number;
 
     @Column(name = "grupo", nullable = true, length = 20)
@@ -61,6 +62,10 @@ public class ProductiveZone implements BaseModel {
 
     @Column(name = "nombre", nullable = false, length = 200)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idciudad", nullable = false)
+    private City city;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -136,5 +141,13 @@ public class ProductiveZone implements BaseModel {
 
     public void setCollectionRecordList(List<CollectionRecord> collectionRecordList) {
         this.collectionRecordList = collectionRecordList;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 }

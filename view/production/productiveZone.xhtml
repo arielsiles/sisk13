@@ -55,6 +55,38 @@
                     </c:choose>
                 </f:facet>
 
+                <!-- -->
+                <s:decorate id="departmentField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Zone.department']}</ui:define>
+                    <h:selectOneMenu id="department"
+                                     value="#{productiveZoneAction.department}"
+                                     styleClass="input"
+                                     tabindex="2">
+                        <s:selectItems value="#{departmentList.resultList}"
+                                       var="department"
+                                       label="#{department.name}"
+                                       hideNoSelectionLabel="false"
+                                       noSelectionLabel=""/>
+                        <a4j:support event="onchange" reRender="city" ajaxSingle="true"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="cityField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Zone.city']}</ui:define>
+                    <h:selectOneMenu id="city"
+                                     value="#{productiveZone.city}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="3">
+                        <s:selectItems value="#{cityList.resultList}" var="city" label="#{city.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <!-- -->
+
                 <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductiveZone.name']}</ui:define>
                     <h:inputText id="name" value="#{productiveZone.name}" styleClass="input" required="true"
@@ -65,7 +97,7 @@
 
                 <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductiveZone.number']}</ui:define>
-                    <h:inputText id="number" value="#{productiveZone.number}" styleClass="input" required="true"
+                    <h:inputText id="number" value="#{productiveZone.number}" styleClass="input" required="false"
                                  maxlength="100" tabindex="3">
                         <a4j:support event="onblur" reRender="numberField"/>
                     </h:inputText>
@@ -73,7 +105,7 @@
 
                 <s:decorate id="groupField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductiveZone.group']}</ui:define>
-                    <h:inputText id="group" value="#{productiveZone.group}" styleClass="input" required="true"
+                    <h:inputText id="group" value="#{productiveZone.group}" styleClass="input" required="false"
                                  maxlength="100" tabindex="4">
                         <a4j:support event="onblur" reRender="groupField"/>
                     </h:inputText>
