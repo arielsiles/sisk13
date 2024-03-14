@@ -18,7 +18,9 @@ import org.jboss.seam.international.StatusMessage;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Stateless
 @Name("collectMaterialService")
@@ -43,10 +45,10 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
     @Override
     public List<CollectMaterial> findCollectMaterialNoAccounting(Date startDate, Date endDate) {
         List<CollectMaterial> resultList = em.createQuery("select c from CollectMaterial c " +
-                        "where c.date between :startDate and :endDate and c.state != 'PEN' and c.accountigFlag = :state")
+                        "where c.date between :startDate and :endDate and c.state =:state")
                         .setParameter("startDate", startDate)
                         .setParameter("endDate", endDate)
-                        .setParameter("state", Boolean.FALSE)
+                        .setParameter("state", CollectMaterialState.APR)
                 .getResultList();
 
         return resultList;
@@ -98,8 +100,18 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             financesEntity = financeProviderService.findByIdNumber(colMat.getProducer().getIdNumber());
 
             CashAccount warehouseCashAccount = colMat.getMetaProduct().getProductItem().getWarehouse().getWarehouseCashAccount();
-            BigDecimal aux = BigDecimalUtil.divide(colMat.getBalanceWeight(),BigDecimalUtil.toBigDecimal(1000));
-            BigDecimal amount = BigDecimalUtil.multiply(aux, colMat.getPrice());
+
+            BigDecimal weightTon    = BigDecimalUtil.divide(colMat.getBalanceWeight(),BigDecimalUtil.toBigDecimal(1000));
+            BigDecimal amount       = BigDecimalUtil.multiply(weightTon, colMat.getPrice());
+            BigDecimal totalAmount  = amount;
+
+            /** --Haber-- **/
+            BigDecimal taxCreditFiscal = BigDecimal.ZERO;
+            /** CF **/
+            if (colMat.getHasInvoice()){
+                taxCreditFiscal = BigDecimalUtil.multiply(amount, Constants.VAT);
+                amount = BigDecimalUtil.subtract(amount, taxCreditFiscal);
+            }
 
             VoucherDetail voucherDetailDev = VoucherDetailBuilder.newDebitVoucherDetail(
                     null, null, warehouseCashAccount, amount, FinancesCurrencyType.P, BigDecimal.ONE);
@@ -108,23 +120,48 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             voucherDetailDev.setProductItemCode(colMat.getMetaProduct().getProductItem().getProductItemCode());
             voucher.getDetails().add(voucherDetailDev);
 
-            VoucherDetail supplierAccountOutput = VoucherDetailBuilder.newCreditVoucherDetail(
-                    null, null, companyConfiguration.getAccountPayableSupplier(), amount, FinancesCurrencyType.P, BigDecimal.ONE);
+            /** CF **/
+            if (colMat.getHasInvoice()){
+                VoucherDetail voucherDetailCF = VoucherDetailBuilder.newDebitVoucherDetail(
+                        null, null, companyConfiguration.getAccountPayableIVA(), taxCreditFiscal, FinancesCurrencyType.P, BigDecimal.ONE);
+                voucher.getDetails().add(voucherDetailCF);
+            }
 
-            //voucher.getDetails().add(supplierAccountOutput);
+            /** --Haber-- **/
+            VoucherDetail supplierAccountOutput = VoucherDetailBuilder.newCreditVoucherDetail(
+                    null, null, companyConfiguration.getAccountPayableSupplier(), BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE);
+
 
             supplierAccountOutput.setProviderCode(financesEntity.getId().toString());
             supplierDetailCashAcounts.add(supplierAccountOutput);
-            //voucher.getDetails().add(voucherDetailDev);
+
+            /** Regalia **/
+            BigDecimal regaliaValue = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(colMat.getMetaProduct().getRegalia(), BigDecimalUtil.ONE_HUNDRED));
+            VoucherDetail regaliaAccount = VoucherDetailBuilder.newCreditVoucherDetail(
+                    null, null, companyConfiguration.getAccountRegalia(), regaliaValue, FinancesCurrencyType.P, BigDecimal.ONE);
+            supplierDetailCashAcounts.add(regaliaAccount);
+
+
+            /** CNS **/
+            BigDecimal retentionCNSValue = BigDecimal.ZERO;
+            if (!colMat.getProductiveZone().getHasCNS()){
+                retentionCNSValue = BigDecimalUtil.multiply(totalAmount, companyConfiguration.getRetentionCNSValue());
+                VoucherDetail retentionCNSAccount = VoucherDetailBuilder.newCreditVoucherDetail(
+                        null, null, companyConfiguration.getAccountRetentionCNS(), retentionCNSValue, FinancesCurrencyType.P, BigDecimal.ONE);
+                supplierDetailCashAcounts.add(retentionCNSAccount);
+            }
+
+            BigDecimal supplierAccountValue = BigDecimalUtil.subtract(totalAmount, regaliaValue, retentionCNSValue);
+            supplierAccountOutput.setCredit(supplierAccountValue);
 
         }
 
-        Collections.sort(supplierDetailCashAcounts, new Comparator<VoucherDetail>() {
+        /*Collections.sort(supplierDetailCashAcounts, new Comparator<VoucherDetail>() {
             @Override
             public int compare(VoucherDetail o1, VoucherDetail o2) {
                 return o1.getAccount().compareTo(o2.getAccount());
             }
-        });
+        });*/
 
         for (VoucherDetail voucherDetail:supplierDetailCashAcounts){
             voucher.getDetails().add(voucherDetail);

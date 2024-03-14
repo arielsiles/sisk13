@@ -51,6 +51,10 @@ public class CollectMaterial implements Serializable, BaseModel {
     @Column(name = "boleta", nullable = false)
     private String ticket;
 
+    @Column(name = "tienefac", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean hasInvoice = Boolean.FALSE;
+
     @Column(name = "formulario", nullable = false)
     private String form;
 
@@ -61,10 +65,6 @@ public class CollectMaterial implements Serializable, BaseModel {
     @Column(name = "conta", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean accountigFlag = Boolean.FALSE;
-
-    @Column(name = "tieneiva", nullable = false)
-    @Type(type = IntegerBooleanUserType.NAME)
-    private Boolean hasIva = Boolean.FALSE;
 
     @Column(name = "chofer", nullable = false)
     private String driver;
@@ -259,11 +259,11 @@ public class CollectMaterial implements Serializable, BaseModel {
         this.accountigFlag = accountigFlag;
     }
 
-    public Boolean getHasIva() {
-        return hasIva;
+    public Boolean getHasInvoice() {
+        return hasInvoice;
     }
 
-    public void setHasIva(Boolean hasIva) {
-        this.hasIva = hasIva;
+    public void setHasInvoice(Boolean hasInvoice) {
+        this.hasInvoice = hasInvoice;
     }
 }

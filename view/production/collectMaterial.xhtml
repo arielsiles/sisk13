@@ -141,12 +141,37 @@
                     </h:inputText>
                 </s:decorate>
 
+                <!--<s:decorate id="hasInvoiceField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.hasInvoice']}</ui:define>
+                    <h:selectBooleanCheckbox id="hasInvoice"
+                                             value="#{collectMaterial.hasInvoice}"
+                                             tabindex="5">
+                    </h:selectBooleanCheckbox>
+                </s:decorate>-->
+
+                <s:decorate id="hasInvoiceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.hasInvoice']}</ui:define>
+                    <h:selectOneMenu id="hasInvoice"
+                                     value="#{collectMaterial.hasInvoice}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="4">
+                        <s:selectItems value="#{booleanEnum}" var="active"
+                                       label="#{messages[active.resourceKey]}"
+                                       itemValue="#{active.value}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
                 <s:decorate id="formField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CollectMaterial.formNumber']}</ui:define>
                     <h:inputText id="form" value="#{collectMaterial.form}"
                                  styleClass="input"
                                  required="true"
-                                 tabindex="5">
+                                 tabindex="6">
                     </h:inputText>
                 </s:decorate>
 
@@ -155,7 +180,7 @@
                     <h:inputText id="driver" value="#{collectMaterial.driver}"
                                  styleClass="input"
                                  required="true"
-                                 tabindex="6">
+                                 tabindex="7">
                     </h:inputText>
                 </s:decorate>
 
@@ -164,7 +189,7 @@
                     <h:inputText id="netWeight" value="#{collectMaterial.netWeight}"
                                  styleClass="input"
                                  required="true"
-                                 tabindex="7">
+                                 tabindex="8">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="netWeight"/>
                         <a4j:support event="onblur" reRender="netWeightField"/>
                     </h:inputText>
@@ -176,7 +201,7 @@
                     <h:inputText id="balanceWeight" value="#{collectMaterial.balanceWeight}"
                                  styleClass="input"
                                  required="true"
-                                 tabindex="8">
+                                 tabindex="9">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="balanceWeight"/>
                         <a4j:support event="onblur" reRender="balanceWeightField"/>
                     </h:inputText>
@@ -189,7 +214,7 @@
                                  styleClass="input"
                                  required="true"
                                  maxlength="20"
-                                 tabindex="9">
+                                 tabindex="10">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="price"/>
                         <a4j:support event="onblur" reRender="priceField"/>
                     </h:inputText>
@@ -206,7 +231,7 @@
                                      searchModalPanel="generalEmployeeListModalPanel"
                                      dataModel="#{generalEmployeeDataModel}"
                                      reRender="employeeField"
-                                     tabindex="10"/>
+                                     tabindex="11"/>
                 </s:decorate>
 
                 <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -215,7 +240,7 @@
                                      value="#{collectMaterial.observation}"
                                      required="false"
                                      styleClass="input textarea-medium"
-                                     tabindex="11">
+                                     tabindex="12">
                         <f:validateLength maximum="1000"/>
                     </h:inputTextarea>
                 </s:decorate>

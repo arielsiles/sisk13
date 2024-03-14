@@ -95,6 +95,21 @@
                     </h:inputText>
                 </s:decorate>
 
+                <s:decorate id="hasCNSField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductiveZone.hasCNS']}</ui:define>
+                    <h:selectOneMenu id="hasCNS"
+                                     value="#{productiveZone.hasCNS}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="4">
+                        <s:selectItems value="#{booleanEnum}" var="active"
+                                       label="#{messages[active.resourceKey]}"
+                                       itemValue="#{active.value}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
                 <s:decorate id="numberField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductiveZone.number']}</ui:define>
                     <h:inputText id="number" value="#{productiveZone.number}" styleClass="input" required="false"

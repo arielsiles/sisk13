@@ -3,8 +3,10 @@ package com.encens.khipus.model.production;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.contacts.City;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
@@ -62,6 +64,10 @@ public class ProductiveZone implements BaseModel {
 
     @Column(name = "nombre", nullable = false, length = 200)
     private String name;
+
+    @Column(name = "tienecns", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean hasCNS = Boolean.FALSE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idciudad", nullable = false)
@@ -149,5 +155,13 @@ public class ProductiveZone implements BaseModel {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public Boolean getHasCNS() {
+        return hasCNS;
+    }
+
+    public void setHasCNS(Boolean hasCNS) {
+        this.hasCNS = hasCNS;
     }
 }

@@ -9,6 +9,7 @@ public enum CollectMaterialState {
     PEN("CollectMaterial.state.pending"),
     ANL("CollectMaterial.state.nullfied"),
     PAY("CollectMaterial.state.toPay"),
+    CONTA("CollectMaterial.state.accountig"),
     LIQ("CollectMaterial.state.liquidated");
 
     private String resourceKey;

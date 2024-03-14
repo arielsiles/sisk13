@@ -132,12 +132,14 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
     }
 
     public String accounting(){
+
         List<CollectMaterial> collectMaterialList = collectMaterialService.findCollectMaterialNoAccounting( this.startDate, this.endDate);
         String outcome = Outcome.FAIL;
         if (collectMaterialList.size() > 0) {
             outcome = collectMaterialService.createCollectMaterialListAccounting(collectMaterialList,startDate,endDate);
             for( CollectMaterial collectMaterial:collectMaterialList){
-                collectMaterial.setAccountigFlag(Boolean.TRUE); //set flag for accounting
+                //collectMaterial.setAccountigFlag(Boolean.TRUE); //set flag for accounting
+                collectMaterial.setState(CollectMaterialState.CONTA);
                 // collectMaterial
                 update(collectMaterial);
             }

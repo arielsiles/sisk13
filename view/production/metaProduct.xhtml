@@ -101,6 +101,18 @@
                     </h:inputText>
                 </s:decorate>
 
+                <s:decorate id="regaliaField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MetaProduct.regalia']}</ui:define>
+                    <h:inputText id="regalia" value="#{metaProduct.regalia}"
+                                 styleClass="inputSmall"
+                                 required="false"
+                                 maxlength="20"
+                                 tabindex="4">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="regalia"/>
+                        <a4j:support event="onblur" reRender="regaliaField"/>
+                    </h:inputText>
+                </s:decorate>
+
 
             </rich:panel>
 

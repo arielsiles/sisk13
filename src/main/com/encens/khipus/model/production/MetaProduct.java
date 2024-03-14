@@ -60,6 +60,9 @@ public class MetaProduct implements Serializable, BaseModel {
     @Column(name = "precio", precision = 12, scale = 2, nullable = false)
     private BigDecimal price;
 
+    @Column(name = "regalia", precision = 12, scale = 2, nullable = false)
+    private BigDecimal regalia;
+
     @Column(name = "no_cia", insertable = false, updatable = false, nullable = false)
     @Length(max = 2)
     private String companyNumber;
@@ -218,6 +221,14 @@ public class MetaProduct implements Serializable, BaseModel {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getRegalia() {
+        return regalia;
+    }
+
+    public void setRegalia(BigDecimal regalia) {
+        this.regalia = regalia;
     }
 
     /*public BaseProduct getBaseProduct() {

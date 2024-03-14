@@ -680,6 +680,30 @@ public class CompanyConfiguration {
     })
     private CashAccount accountBalanceSheet5;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cxp_iva", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountPayableIVA;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cxp_regalia", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountRegalia;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cxp_cns", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount accountRetentionCNS;
+
+    @Column(name = "ret_cns", nullable = true)
+    private BigDecimal retentionCNSValue;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1754,5 +1778,37 @@ public class CompanyConfiguration {
 
     public void setAccountBalanceSheet5(CashAccount accountBalanceSheet5) {
         this.accountBalanceSheet5 = accountBalanceSheet5;
+    }
+
+    public CashAccount getAccountPayableIVA() {
+        return accountPayableIVA;
+    }
+
+    public void setAccountPayableIVA(CashAccount accountPayableIVA) {
+        this.accountPayableIVA = accountPayableIVA;
+    }
+
+    public CashAccount getAccountRegalia() {
+        return accountRegalia;
+    }
+
+    public void setAccountRegalia(CashAccount accountRegalia) {
+        this.accountRegalia = accountRegalia;
+    }
+
+    public CashAccount getAccountRetentionCNS() {
+        return accountRetentionCNS;
+    }
+
+    public void setAccountRetentionCNS(CashAccount accountRetentionCNS) {
+        this.accountRetentionCNS = accountRetentionCNS;
+    }
+
+    public BigDecimal getRetentionCNSValue() {
+        return retentionCNSValue;
+    }
+
+    public void setRetentionCNSValue(BigDecimal retentionCNSValue) {
+        this.retentionCNSValue = retentionCNSValue;
     }
 }
