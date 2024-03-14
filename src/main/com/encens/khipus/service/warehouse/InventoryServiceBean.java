@@ -126,7 +126,7 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
         BigDecimal amountToAdd = BigDecimal.ZERO;
         BigDecimal amountCTAdd = BigDecimal.ZERO;
 
-        if ( collectMaterial.getHasIva() ) {
+        if ( collectMaterial.getHasInvoice() ) {
             BigDecimal newPrice = BigDecimalUtil.divide(price, Constants.VAT_COMPLEMENT);
             amountToAdd = BigDecimalUtil.multiply(quantity, newPrice, 6);
             amountCTAdd = BigDecimalUtil.multiply(quantity, price, 6);
