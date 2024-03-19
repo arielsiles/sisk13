@@ -50,6 +50,9 @@ public class VoucherAction extends GenericAction<Voucher> {
     @In(required = false)
     VoucherDataModel voucherDataModel;
 
+    @In(required = false)
+    DiaryBookDataModel diaryBookDataModel;
+
     @In
     private VoucherService voucherService;
 
@@ -101,6 +104,15 @@ public class VoucherAction extends GenericAction<Voucher> {
         voucherDataModel.getCriteria().setDocumentNumber(documentNumber);
 
         voucherDataModel.search();
+    }
+
+    public void searchBook() {
+
+        diaryBookDataModel.filterByDocumentType(null == docType ? "" : docType.getName());
+        diaryBookDataModel.getCriteria().setGloss(gloss);
+        diaryBookDataModel.getCriteria().setDocumentNumber(documentNumber);
+
+        diaryBookDataModel.search();
     }
 
     public void generateCostOfSales()throws CompanyConfigurationNotFoundException {

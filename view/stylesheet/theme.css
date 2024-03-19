@@ -1139,3 +1139,9 @@ input[type="text"].disabledInput {
 .tiny-menu-cell-border div {
     font-weight: normal;
 }
+
+.no-bullets {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}

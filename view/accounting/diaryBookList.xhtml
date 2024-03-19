@@ -1,0 +1,160 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Voucher.diaryBook']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="VoucherSearch">
+    <rich:simpleTogglePanel id="voucherSearchPanelId"
+                            label="#{messages['Voucher.diaryBook']}"
+                            switchType="client">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent,width50percent">
+            <s:div id="leftSidePanel">
+                <s:decorate id="documTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+                    <h:selectOneMenu id="documType"
+                                     value="#{voucherAction.docType}"
+                                     styleClass="input"
+                                     tabindex="1">
+                        <s:selectItems value="#{voucherDocumentTypeList}"
+                                       var="element"
+                                       label="#{element.fullName}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+
+                    <rich:spacer width="5" />
+
+                    <h:inputText id="documentNumber"
+                                 value="#{diaryBookDataModel.documentNumber}"
+                                 styleClass="inputTiny"
+                                 maxlength="150"
+                                 tabindex="2"/>
+
+                </s:decorate>
+
+            </s:div>
+
+            <s:div id="rightSidePanel">
+                <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                    <h:panelGrid columns="4" width="100%" columnClasses="top,top,top,top">
+                        <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                            <rich:calendar id="startDate"
+                                           value="#{diaryBookDataModel.startDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="3">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                        <h:outputText value="-"/>
+                        <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                            <rich:calendar id="endDate"
+                                           value="#{diaryBookDataModel.endDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="4">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <a4j:commandButton action="#{voucherAction.searchBook}"
+                                           reRender="voucherSearchPanelId, voucherList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="5">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+
+                    </h:panelGrid>
+                </s:decorate>
+            </s:div>
+
+        </h:panelGrid>
+        <rich:jQuery selector="#documentType" query="focus()" timing="onload"/>
+    </rich:simpleTogglePanel>
+
+
+    <rich:spacer height="4" />
+
+    <rich:dataTable id="voucherList"
+                    value="#{diaryBookDataModel}"
+                    var="comprobante"
+                    width="100%" columnsWidth="6%, 5%, 25, 50%, 7%, 7%"
+                    rows="#{sessionUser.rowsPerPage20}">
+
+        <rich:column styleClass="center">
+            <f:facet name="header">Fecha</f:facet>
+            <h:outputText value="#{comprobante.date}" >
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </rich:column>
+
+        <rich:column styleClass="center">
+            <f:facet name="header">Doc</f:facet>
+            <h:outputText value="#{comprobante.fullDocument}" />
+        </rich:column>
+
+        <rich:column>
+            <f:facet name="header">Glosa</f:facet>
+            <h:outputText value="#{comprobante.gloss}" />
+        </rich:column>
+
+        <rich:column>
+            <f:facet name="header">Descripción</f:facet>
+            <rich:dataList value="#{comprobante.voucherDetailList}" var="cuenta" styleClass="no-bullets">
+                <h:outputText value="#{cuenta.fullCashAccount}" />
+            </rich:dataList>
+        </rich:column>
+
+        <rich:column styleClass="right">
+            <f:facet name="header">Debe</f:facet>
+            <rich:dataList value="#{comprobante.voucherDetailList}" var="cuenta" styleClass="no-bullets">
+                <h:outputText value="#{cuenta.debit}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:dataList>
+        </rich:column>
+
+        <rich:column styleClass="right">
+            <f:facet name="header">Haber</f:facet>
+            <rich:dataList value="#{comprobante.voucherDetailList}" var="cuenta" styleClass="no-bullets">
+                <h:outputText value="#{cuenta.credit}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:dataList>
+        </rich:column>
+
+    </rich:dataTable>
+    <app:dataScroller id="dataScroller" for="voucherList" dataModel="#{diaryBookDataModel}"/>
+
+
+</h:form>
+</ui:define>
+
+</ui:composition>

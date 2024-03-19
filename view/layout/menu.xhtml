@@ -433,6 +433,14 @@
     </rich:menuItem>
 
     <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('DIARY_BOOK','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/diaryBookList.xhtml"
+                value="#{messages['menu.finances.accounting.diaryBook']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
         <s:link view="/accounting/dailyCollectionReport.xhtml"
