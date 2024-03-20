@@ -105,7 +105,7 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             BigDecimal amount       = BigDecimalUtil.multiply(weightTon, colMat.getPrice());
             BigDecimal totalAmount  = amount;
 
-            /** --Haber-- **/
+            /** --Debe-- **/
             BigDecimal taxCreditFiscal = BigDecimal.ZERO;
             /** CF **/
             if (colMat.getHasInvoice()){
@@ -136,11 +136,13 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             supplierDetailCashAcounts.add(supplierAccountOutput);
 
             /** Regalia **/
-            BigDecimal regaliaValue = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(colMat.getMetaProduct().getRegalia(), BigDecimalUtil.ONE_HUNDRED));
-            VoucherDetail regaliaAccount = VoucherDetailBuilder.newCreditVoucherDetail(
-                    null, null, companyConfiguration.getAccountRegalia(), regaliaValue, FinancesCurrencyType.P, BigDecimal.ONE);
-            supplierDetailCashAcounts.add(regaliaAccount);
-
+            BigDecimal regaliaValue = BigDecimal.ZERO;
+            if (colMat.getHasInvoice()) {
+                regaliaValue = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(colMat.getMetaProduct().getRegalia(), BigDecimalUtil.ONE_HUNDRED));
+                VoucherDetail regaliaAccount = VoucherDetailBuilder.newCreditVoucherDetail(
+                        null, null, companyConfiguration.getAccountRegalia(), regaliaValue, FinancesCurrencyType.P, BigDecimal.ONE);
+                supplierDetailCashAcounts.add(regaliaAccount);
+            }
 
             /** CNS **/
             BigDecimal retentionCNSValue = BigDecimal.ZERO;

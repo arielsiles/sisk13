@@ -83,7 +83,7 @@ and a.idproductormateriaprima = 41; -- Pedro Cuba
 update acopiomp a set a.estado = 'APR'
 where a.fecha between '2023-09-01' and '2023-10-10';
 
-update acopiomp a set a.tienefac = 1
+update acopiomp a set a.tienefac = 0
 where a.fecha between '2023-09-01' and '2023-10-10'
 and a.idproductormateriaprima = 39; -- Feliciano
 

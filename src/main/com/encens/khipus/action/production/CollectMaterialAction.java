@@ -138,9 +138,7 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
         if (collectMaterialList.size() > 0) {
             outcome = collectMaterialService.createCollectMaterialListAccounting(collectMaterialList,startDate,endDate);
             for( CollectMaterial collectMaterial:collectMaterialList){
-                //collectMaterial.setAccountigFlag(Boolean.TRUE); //set flag for accounting
                 collectMaterial.setState(CollectMaterialState.CONTA);
-                // collectMaterial
                 update(collectMaterial);
             }
         }else{
