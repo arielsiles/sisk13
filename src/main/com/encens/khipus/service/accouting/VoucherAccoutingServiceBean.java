@@ -354,6 +354,29 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     }
 
     @Override
+    public List<VoucherDetail> getDetailsByDates(String account, Date startDate, Date endDate) {
+        List<VoucherDetail> voucherDetails = new ArrayList<VoucherDetail>();
+
+        try {
+            voucherDetails = (List<VoucherDetail>) em.createQuery("" +
+                            " select voucherDetail from VoucherDetail voucherDetail " +
+                            " left join voucherDetail.voucher voucher" +
+                            " where voucherDetail.account =:account " +
+                            " and voucher.date between :startDate and :endDate " +
+                            " and voucher.state <> 'ANL' " +
+                            " order by voucher.date ")
+                    .setParameter("account", account)
+                    .setParameter("startDate", startDate)
+                    .setParameter("endDate", endDate)
+                    .getResultList();
+
+        }catch (NoResultException e){
+            return null;
+        }
+        return voucherDetails;
+    }
+
+    @Override
     public List<VoucherDetail> getVoucherDetailList(Voucher voucher){
 
         List<VoucherDetail> voucherDetails = new ArrayList<VoucherDetail>();

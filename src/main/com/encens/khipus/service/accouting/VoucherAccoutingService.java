@@ -29,6 +29,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     List<VoucherDetail> getVoucherDetailList(String transactionNumber);
 
+    List<VoucherDetail> getDetailsByDates(String account, Date startDate, Date endDate);
+
     public Voucher getVoucher(String transactionNumber);
 
     public Voucher getVoucher(Long id);

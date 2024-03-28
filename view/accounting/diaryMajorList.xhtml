@@ -1,0 +1,202 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+<ui:define name="pageTitle">#{messages['Voucher.diaryMajor']}</ui:define>
+<ui:param name="bodyAlign" value="center"/>
+<ui:param name="bodyWidth" value="100%"/>
+
+<ui:param name="selectedTab" value="finances"/>
+<ui:define name="body">
+<h:form id="VoucherSearch">
+    <rich:simpleTogglePanel id="voucherSearchPanelId"
+                            label="#{messages['Voucher.diaryMajor']}"
+                            switchType="client">
+        <h:panelGrid columns="2"
+                     width="100%"
+                     cellpadding="0"
+                     cellspacing="0"
+                     border="0"
+                     columnClasses="width50percent,width50percent">
+
+            <s:div id="leftSidePanel">
+                <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
+                    <app:selectPopUp id="itemAccount"
+                                     required="false"
+                                     textValue="#{diaryMajorAction.account.fullName}"
+                                     value="#{diaryMajorAction.account}"
+                                     clearAction="#{diaryMajorAction.clearAccount()}"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="itemAccountField"
+                                     tabindex="11" hotKeySelect="alt+1">
+                    </app:selectPopUp>
+                </s:decorate>
+            </s:div>
+
+            <s:div id="rightSidePanel">
+                <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                    <h:panelGrid columns="4" width="100%" columnClasses="top,top,top,top">
+                        <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                            <rich:calendar id="startDate"
+                                           value="#{diaryMajorAction.startDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="3">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                        <h:outputText value="-"/>
+                        <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
+                            <rich:calendar id="endDate"
+                                           value="#{diaryMajorAction.endDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="4">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+
+                        <a4j:commandButton action="#{diaryMajorAction.searchMajor}"
+                                           reRender="majorDetailListPanel"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}"
+                                           id="searchButtonId"
+                                           tabindex="5">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+
+                    </h:panelGrid>
+                </s:decorate>
+            </s:div>
+
+        </h:panelGrid>
+        <rich:jQuery selector="#itemAccount" query="focus()" timing="onload"/>
+    </rich:simpleTogglePanel>
+
+
+    <rich:spacer height="4" />
+
+    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <s:div id="majorDetailListPanel">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                <thead class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-headercell" width="7%">#{messages['Voucher.date']}</th>
+                        <th class="rich-table-headercell" width="7%">#{messages['Voucher.documentNumber']}</th>
+                        <th class="rich-table-headercell" width="62%">#{messages['Voucher.gloss']}</th>
+                        <th class="rich-table-headercell" width="8%">#{messages['Voucher.debit']}</th>
+                        <th class="rich-table-headercell" width="8%">#{messages['Voucher.credit']}</th>
+                        <th class="rich-table-cell" width="8%" align="right">
+                            <h:outputText value="#{diaryMajorAction.previosBalance}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumberAccounting']}"/>
+                            </h:outputText>
+                        </th>
+                    </tr>
+                </thead>
+
+                <c:forEach var="voucherDetail" items="#{diaryMajorAction.voucherDetails}" varStatus="row">
+                    <tr class="rich-table-row">
+
+                        <td class="rich-table-cell" align="center">
+                            <h:outputText value="#{voucherDetail.voucher.date}">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </h:outputText>
+                        </td>
+
+                        <td class="rich-table-cell" align="center">
+                            <h:outputText value="#{voucherDetail.voucher.fullDocument}"/>
+                        </td>
+
+                        <td class="rich-table-cell">
+                            <h:outputText value="#{voucherDetail.voucher.gloss}"/>
+                        </td>
+
+                        <td class="rich-table-cell" align="right">
+                            <h:outputText value="#{voucherDetail.debit}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumberAccounting']}"/>
+                            </h:outputText>
+                        </td>
+
+                        <td class="rich-table-cell" align="right">
+                            <h:outputText value="#{voucherDetail.credit}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumberAccounting']}"/>
+                            </h:outputText>
+                        </td>
+
+                        <td class="rich-table-cell" align="right">
+                            <h:outputText value="#{ diaryMajorAction.getUpdateBalance(voucherDetail) }">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumberAccounting']}"/>
+                            </h:outputText>
+                        </td>
+
+                    </tr>
+                </c:forEach>
+
+                <tfoot class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-cell"></th>
+                        <th class="rich-table-cell"></th>
+                        <th class="rich-table-cell"></th>
+                        <th class="rich-table-cell" align="right">
+                            <h:outputText value="#{diaryMajorAction.totalDebit}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumberAccounting']}"/>
+                            </h:outputText>
+                        </th>
+                        <th class="rich-table-cell" align="right">
+                            <h:outputText value="#{diaryMajorAction.totalCredit}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumberAccounting']}"/>
+                            </h:outputText>
+                        </th>
+                        <th class="rich-table-cell" align="right">
+                            <h:outputText value="#{diaryMajorAction.previosBalance}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumberAccounting']}"/>
+                            </h:outputText>
+                        </th>
+                    </tr>
+                </tfoot>
+
+            </table>
+        </s:div>
+    </h:panelGrid>
+
+
+</h:form>
+
+    <s:div id="cashAccountListModalPanelDiv">
+
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="hasWarehousePermission" value="true"/>
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{diaryMajorAction.setAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="itemAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </s:div>
+
+</ui:define>
+
+</ui:composition>
