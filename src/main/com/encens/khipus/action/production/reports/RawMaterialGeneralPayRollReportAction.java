@@ -1,16 +1,19 @@
 package com.encens.khipus.action.production.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.employees.GeneratedPayrollType;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.GestionPayroll;
 import com.encens.khipus.model.employees.Month;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.MetaProduct;
 import com.encens.khipus.model.production.Periodo;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialPayRoll;
 import com.encens.khipus.reports.GenerationReportData;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.ProductiveZoneService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
 import com.encens.khipus.service.production.RawMaterialPayRollServiceBean;
@@ -23,6 +26,8 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -46,6 +51,10 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
 
     @In
     ProductiveZoneService productiveZoneService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
+    @In
+    private FacesMessages facesMessages;
 
     private String summaryReportTitle;
     private String gestionTitle;
@@ -101,6 +110,12 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
     }
 
     private void generarTodosGAB(Map params, DateFormat df) throws ParseException {
+
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
         JasperPrint jasperPrint1 = new JasperPrint();
         TypedReportData typedReportData;
         TypedReportData mostrar = new TypedReportData();
@@ -109,6 +124,9 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
 
         System.out.println("=====> PERIODO: " + periodo.getResourceKey().toString());
         params.put("reportTitle", title);
+        params.put("companyName", companyConfiguration.getCompanyName());
+        params.put("systemName", companyConfiguration.getSystemName());
+        params.put("locationName", companyConfiguration.getLocationName());
         params.put("periodo", (periodo.getResourceKey().toString() == "Periodo.first") ? "1RA QUINCENA" : "2DA QUINCENA" + " " + getMes(month));
         params.put("startDate", df.format(dateIni.getTime()));
         params.put("endDate", df.format(dateEnd.getTime()));

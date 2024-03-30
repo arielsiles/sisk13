@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rawMaterialGeneralPayRoll" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="570" leftMargin="21" rightMargin="21" topMargin="21" bottomMargin="21">
 	<property name="ireport.zoom" value="2.3579476910000046"/>
-	<property name="ireport.x" value="24"/>
+	<property name="ireport.x" value="167"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="periodo" class="java.lang.String"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="locationName" class="java.lang.String"/>
 	<field name="gab" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -34,16 +36,6 @@
 	<title>
 		<band height="49" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement key="date_text" positionType="Float" x="0" y="0" width="370" height="12"/>
-				<box padding="1">
-					<pen lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["COOPERATIVA INTEGRAL DE SERVICIOS CBBA. LTDA."]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement key="date_text" positionType="Float" x="100" y="24" width="390" height="12"/>
 				<box padding="1">
 					<pen lineStyle="Solid" lineColor="#000000"/>
@@ -63,15 +55,19 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodo}+" - "+$P{startDate}+" al "+$P{endDate}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement key="date_text" positionType="Float" x="0" y="12" width="370" height="12"/>
-				<box padding="1">
-					<pen lineStyle="Solid" lineColor="#000000"/>
-				</box>
+			<textField>
+				<reportElement x="0" y="0" width="370" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["INDUSTRIAS LACTEAS DEL VALLE ALTO"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="12" width="370" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -170,7 +166,12 @@
 		<band height="15" splitType="Stretch">
 			<textField>
 				<reportElement x="0" y="0" width="100" height="15"/>
-				<box leftPadding="2"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -178,6 +179,12 @@
 			</textField>
 			<textField>
 				<reportElement x="100" y="0" width="70" height="15"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -185,7 +192,12 @@
 			</textField>
 			<textField>
 				<reportElement x="170" y="0" width="200" height="15"/>
-				<box leftPadding="2"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -193,7 +205,12 @@
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="370" y="0" width="60" height="15"/>
-				<box rightPadding="2"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -201,7 +218,12 @@
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="430" y="0" width="60" height="15"/>
-				<box rightPadding="2"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -209,7 +231,12 @@
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="490" y="0" width="80" height="15"/>
-				<box rightPadding="2"/>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
