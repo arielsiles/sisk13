@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{localRawMaterialAction.managed}">
+                #{messages['Common.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Common.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <!--<ui:param name="selectedTab" value="finances"/>-->
+    <ui:define name="body">
+
+        <h:form id="laboratoryResultFormId">
+            
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{localRawMaterialAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 rendered="#{!localRawMaterialAction.managed and s:hasPermission('LOCALRAWMATERIAL','CREATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{localRawMaterialAction.update}"
+                                 value="#{messages['Common.saveChange']}"
+                                 styleClass="button"
+                                 rendered="#{localRawMaterialAction.managed and s:hasPermission('LOCALRAWMATERIAL','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                
+                <h:commandButton action="#{localRawMaterialAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+            
+            <s:div id="mainDivId">
+                <rich:panel id="formPanel">
+                    <f:facet name="header">
+                        <c:choose>
+                            <c:when test="#{localRawMaterialAction.managed}">
+                                #{messages['Common.edit']}
+                            </c:when>
+                            <c:otherwise>
+                                #{messages['Common.new']}
+                            </c:otherwise>
+                        </c:choose>
+                    </f:facet>
+                    <h:panelGrid columns="1"
+                                 width="100%"
+                                 cellpadding="0"
+                                 cellspacing="0"
+                                 border="0"
+                                 columnClasses="width100percent">
+
+                        <s:div id="leftDocDiv">
+
+                            <s:decorate id="metaProductField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['LocalRawMaterial.mineral']}</ui:define>
+                                <h:selectOneMenu id="metaProduct" value="#{localRawMaterial.metaProduct}"
+                                                 disabled="false"
+                                                 styleClass="input" required="true" tabindex="2">
+                                    <s:selectItems value="#{collectableProductList}"
+                                                   var="product"
+                                                   label="#{product.fullNameRawMaterial}"
+                                                   hideNoSelectionLabel="false" noSelectionLabel=""/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+
+                            <s:decorate id="originPriceField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['LocalRawMaterial.originPrice']}</ui:define>
+                                <h:inputText id="originPrice" value="#{localRawMaterial.originPrice}"
+                                             styleClass="input"
+                                             required="true"
+                                             maxlength="20"
+                                             tabindex="10">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="originPrice"/>
+                                    <a4j:support event="onblur" reRender="originPriceField"/>
+                                </h:inputText>
+                                <h:outputText value=" x Tonelada"/>
+                            </s:decorate>
+
+                            <s:decorate id="destinationPriceField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['LocalRawMaterial.destinationPrice']}</ui:define>
+                                <h:inputText id="destinationPrice" value="#{localRawMaterial.destinationPrice}"
+                                             styleClass="input"
+                                             required="true"
+                                             maxlength="20"
+                                             tabindex="11">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="destinationPrice"/>
+                                    <a4j:support event="onblur" reRender="destinationPriceField"/>
+                                </h:inputText>
+                                <h:outputText value=" x Tonelada"/>
+                            </s:decorate>
+
+                            <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['LocalRawMaterial.observation']}</ui:define>
+                                <h:inputTextarea id="observation"
+                                                 value="#{localRawMaterial.observation}"
+                                                 styleClass="input textarea"
+                                                 tabindex="12">
+                                </h:inputTextarea>
+                            </s:decorate>
+                            
+                        </s:div>
+                    </h:panelGrid>
+                </rich:panel>
+
+            </s:div>
+            
+        </h:form>
+        
+    </ui:define>
+</ui:composition>

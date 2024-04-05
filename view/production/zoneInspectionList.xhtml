@@ -1,0 +1,148 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ZoneInspection.list']}</ui:define>
+    <style type="text/css">
+        .special tr[id] {
+            display: none;
+        }
+    </style>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="productiveZoneSearch">
+            <rich:simpleTogglePanel label="#{messages['ZoneInspection.search']}" switchType="client">
+
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div id="leftSidePanel">
+                        <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Common.dates']}</ui:define>
+                            <rich:calendar id="startDate"
+                                           value="#{zoneInspectionDataModel.startDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="5">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+
+                            <rich:calendar id="endDate"
+                                           value="#{zoneInspectionDataModel.endDate}"
+                                           inputClass="inputSmall"
+                                           datePattern="#{messages['patterns.date']}"
+                                           enableManualInput="true"
+                                           tabindex="5">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"
+                                                   type="date"/>
+                            </rich:calendar>
+                        </s:decorate>
+                    </s:div>
+
+                    <s:div id="rightSidePanel">
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <a4j:commandButton action="#{zoneInspectionDataModel.search}"
+                                               reRender="zoneInspectionList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+
+                </h:panelGrid>
+
+            </rich:simpleTogglePanel>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/zoneInspection.xhtml" styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('ZONEINSPECTION','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{zoneInspectionDataModel}" var="zoneInspectionItem" id="zoneInspectionList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="10%, 10%, 10%, 25%, 15%, 20%, 10%">
+
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>#{messages['ZoneInspection.date']}</rich:column>
+                        <rich:column>#{messages['ZoneInspection.initHour']}</rich:column>
+                        <rich:column>#{messages['ZoneInspection.endHour']}</rich:column>
+                        <rich:column>#{messages['ZoneInspection.responsible']}</rich:column>
+                        <rich:column>#{messages['ZoneInspection.city']}</rich:column>
+                        <rich:column>#{messages['ZoneInspection.productiveZone']}</rich:column>
+
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{zoneInspectionItem.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{zoneInspectionItem.initHour}">
+                        <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{zoneInspectionItem.endHour}">
+                        <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{zoneInspectionItem.producer.fullName}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{zoneInspectionItem.productiveZone.city.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{zoneInspectionItem.productiveZone.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{zoneInspectionAction.select(zoneInspectionItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="zoneInspectionList" dataModel="#{zoneInspectionDataModel}"/>
+
+
+            <rich:jQuery selector="#zoneInspectionList tr"
+                         query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+            <rich:jQuery selector="#zoneInspectionList tr"
+                         query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
+
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/zoneInspection.xhtml" styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('ZONEINSPECTION','CREATE')}"/>
+            </div>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

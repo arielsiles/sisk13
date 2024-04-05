@@ -775,4 +775,93 @@
         </navigation>
     </page>
 
+    <page view-id="/production/zoneInspectionList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{zoneInspectionAction.select(zoneInspectionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/production/zoneInspection.xhtml" no-conversation-view-id="/production/zoneInspectionList.xhtml">
+
+        <navigation from-action="#{zoneInspectionAction.create}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{zoneInspectionAction.update}">
+            <begin-conversation flush-mode="MANUAL"/>
+            <rule if-outcome="Success">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{zoneInspectionAction.cancel}">
+            <rule>
+                <redirect view-id="/production/zoneInspectionList.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{zoneInspectionAction.addLaboratoryResult}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/addLaboratoryResult.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{zoneInspectionAction.addLocalRawMaterial}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/addLocalRawMaterial.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{laboratoryResultAction.select(laboratoryItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/addLaboratoryResult.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{localRawMaterialAction.select(localRawMaterialItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/addLaboratoryResult.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/production/addLaboratoryResult.xhtml" no-conversation-view-id="/production/zoneInspectionList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/production/addLocalRawMaterial.xhtml" no-conversation-view-id="/production/zoneInspectionList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+            <rule if-outcome="Fail">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/production/zoneInspection.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+
 </pages>

@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemadesigner version="6.5">
 <source>
-<database charset="utf8" collation="utf8_general_ci">terdemol</database>
+<database charset="utf8mb4" collation="utf8mb4_0900_ai_ci">terdemol</database>
 </source>
 <canvas zoom="100">
 <tables>
 <table name="acopiomp" view="colnames">
-<left>121</left>
-<top>299</top>
-<width>266</width>
-<height>231</height>
+<left>765</left>
+<top>24</top>
+<width>239</width>
+<height>201</height>
 <sql_create_table>CREATE TABLE `acopiomp` (
-  `idacopiomp` bigint(20) NOT NULL,
+  `idacopiomp` bigint NOT NULL,
   `fecha` date DEFAULT NULL,
-  `codigo` varchar(50) DEFAULT NULL,
+  `codigo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `pesoneto` decimal(12,2) DEFAULT NULL,
   `pesobal` decimal(12,2) DEFAULT NULL,
   `precio` decimal(12,2) DEFAULT NULL,
-  `boleta` varchar(50) DEFAULT NULL,
-  `formulario` varchar(50) DEFAULT NULL,
-  `estado` varchar(25) DEFAULT NULL,
-  `conta` int(11) DEFAULT NULL,
-  `tieneiva` int(11) DEFAULT NULL,
-  `chofer` varchar(100) DEFAULT NULL,
-  `observacion` varchar(1000) DEFAULT NULL,
-  `idzonaproductiva` bigint(20) NOT NULL,
-  `idproductormateriaprima` bigint(20) NOT NULL,
-  `idmetaproductoproduccion` bigint(20) NOT NULL,
-  `idempleado` bigint(20) DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
+  `boleta` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `tienefac` int DEFAULT NULL,
+  `formulario` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `estado` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `conta` int DEFAULT NULL,
+  `chofer` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `observacion` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `idzonaproductiva` bigint NOT NULL,
+  `idproductormateriaprima` bigint NOT NULL,
+  `idmetaproductoproduccion` bigint NOT NULL,
+  `idempleado` bigint DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
   PRIMARY KEY (`idacopiomp`),
   KEY `idproductormateriaprima` (`idproductormateriaprima`),
   KEY `idmetaproductoproduccion` (`idmetaproductoproduccion`),
@@ -44,83 +44,96 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="zonaproductiva" view="colnames">
-<left>524</left>
-<top>169</top>
-<width>182</width>
-<height>192</height>
+<left>503</left>
+<top>275</top>
+<width>188</width>
+<height>200</height>
 <sql_create_table>CREATE TABLE `zonaproductiva` (
-  `idzonaproductiva` bigint(20) NOT NULL,
+  `idzonaproductiva` bigint NOT NULL,
   `grupo` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
   `nombre` varchar(200) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
   `numero` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `idciudad` bigint(20) DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
+  `tienecns` int DEFAULT NULL,
+  `idciudad` bigint DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
   PRIMARY KEY (`idzonaproductiva`),
   KEY `idciudad` (`idciudad`),
   CONSTRAINT `zonaproductiva_ibfk_1` FOREIGN KEY (`idciudad`) REFERENCES `ciudad` (`idciudad`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="inspeccionzona" view="colnames">
-<left>858</left>
-<top>281</top>
-<width>178</width>
-<height>196</height>
+<left>829</left>
+<top>269</top>
+<width>200</width>
+<height>218</height>
 <sql_create_table>CREATE TABLE `inspeccionzona` (
-  `idinspeccion` bigint(20) NOT NULL,
+  `idinspeccionzona` bigint NOT NULL,
   `fecha` date DEFAULT NULL,
   `horasalida` time DEFAULT NULL,
   `horallegada` time DEFAULT NULL,
-  `idproductor` bigint(20) DEFAULT NULL,
-  `idciudad` bigint(20) DEFAULT NULL,
-  `idzonaproductiva` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`idinspeccion`),
+  `idproductor` bigint DEFAULT NULL,
+  `idzonaproductiva` bigint DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`idinspeccionzona`),
   KEY `inspeccionzona_ibfk_1` (`idproductor`),
-  KEY `inspeccionzona_ibfk_2` (`idciudad`),
-  KEY `inspeccionzona_ibfk_3` (`idzonaproductiva`),
+  KEY `inspeccionzona_ibfk_2` (`idzonaproductiva`),
+  KEY `inspeccionzona_ibfk_3` (`idcompania`),
   CONSTRAINT `inspeccionzona_ibfk_1` FOREIGN KEY (`idproductor`) REFERENCES `productormateriaprima` (`idproductormateriaprima`),
-  CONSTRAINT `inspeccionzona_ibfk_2` FOREIGN KEY (`idciudad`) REFERENCES `ciudad` (`idciudad`),
-  CONSTRAINT `inspeccionzona_ibfk_3` FOREIGN KEY (`idzonaproductiva`) REFERENCES `zonaproductiva` (`idzonaproductiva`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+  CONSTRAINT `inspeccionzona_ibfk_2` FOREIGN KEY (`idzonaproductiva`) REFERENCES `zonaproductiva` (`idzonaproductiva`),
+  CONSTRAINT `inspeccionzona_ibfk_3` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 <table name="materiasprimaszona" view="colnames">
-<left>1233</left>
-<top>78</top>
-<width>211</width>
-<height>178</height>
+<left>1197</left>
+<top>393</top>
+<width>219</width>
+<height>200</height>
 <sql_create_table>CREATE TABLE `materiasprimaszona` (
-  `idmateriasprimaszona` bigint(20) NOT NULL,
-  `idmetaproductoproduccion` bigint(20) DEFAULT NULL,
+  `idmateriasprimaszona` bigint NOT NULL,
+  `idmetaproductoproduccion` bigint DEFAULT NULL,
   `precioorigen` decimal(12,2) DEFAULT NULL,
   `preciodestino` decimal(12,2) DEFAULT NULL,
   `observacion` varchar(255) DEFAULT NULL,
-  `idinspeccion` bigint(20) DEFAULT NULL,
+  `idinspeccionzona` bigint DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
   PRIMARY KEY (`idmateriasprimaszona`),
   KEY `materiasprimaszona_ibfk_1` (`idmetaproductoproduccion`),
-  KEY `materiasprimaszona_ibfk_2` (`idinspeccion`),
+  KEY `materiasprimaszona_ibfk_2` (`idinspeccionzona`),
+  KEY `materiasprimaszona_ibfk_3` (`idcompania`),
   CONSTRAINT `materiasprimaszona_ibfk_1` FOREIGN KEY (`idmetaproductoproduccion`) REFERENCES `metaproductoproduccion` (`idmetaproductoproduccion`),
-  CONSTRAINT `materiasprimaszona_ibfk_2` FOREIGN KEY (`idinspeccion`) REFERENCES `inspeccionzona` (`idinspeccion`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+  CONSTRAINT `materiasprimaszona_ibfk_2` FOREIGN KEY (`idinspeccionzona`) REFERENCES `inspeccionzona` (`idinspeccionzona`),
+  CONSTRAINT `materiasprimaszona_ibfk_3` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
-<table name="informelab" view="colnames">
-<left>1240</left>
-<top>352</top>
-<width>209</width>
-<height>219</height>
-<sql_create_table>CREATE TABLE `informelab` (
-  `idinformelab` bigint(20) NOT NULL,
+<table name="resultadolab" view="colnames">
+<left>1195</left>
+<top>67</top>
+<width>215</width>
+<height>264</height>
+<sql_create_table>CREATE TABLE `resultadolab` (
+  `idresultadolab` bigint NOT NULL,
   `fecha` date DEFAULT NULL,
-  `codigoinforme` varchar(100) DEFAULT NULL,
+  `codigo` varchar(100) DEFAULT NULL,
   `caracteristica` varchar(255) DEFAULT NULL,
   `fechamuestra` date DEFAULT NULL,
   `fecharecepcion` date DEFAULT NULL,
   `fechainicio` date DEFAULT NULL,
   `fechafin` date DEFAULT NULL,
-  `idinspeccion` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`idinformelab`),
-  KEY `informelab_ibfk_1` (`idinspeccion`),
-  CONSTRAINT `informelab_ibfk_1` FOREIGN KEY (`idinspeccion`) REFERENCES `inspeccionzona` (`idinspeccion`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+  `idinspeccionzona` bigint DEFAULT NULL,
+  `idarchivo` bigint DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`idresultadolab`),
+  KEY `informelab_ibfk_1` (`idinspeccionzona`),
+  KEY `resultadolab_ibfk_2` (`idcompania`),
+  KEY `resultadolab_ibfk_3` (`idarchivo`),
+  CONSTRAINT `resultadolab_ibfk_1` FOREIGN KEY (`idinspeccionzona`) REFERENCES `inspeccionzona` (`idinspeccionzona`),
+  CONSTRAINT `resultadolab_ibfk_2` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
+  CONSTRAINT `resultadolab_ibfk_3` FOREIGN KEY (`idarchivo`) REFERENCES `archivo` (`idarchivo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 </tables>
 </canvas>

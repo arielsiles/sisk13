@@ -1,0 +1,265 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{zoneInspectionAction.managed}">
+                #{messages['Common.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Common.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="zoneInspectionForm">
+            <div class="buttons">
+                <h:commandButton action="#{zoneInspectionAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!zoneInspectionAction.managed and s:hasPermission('ZONEINSPECTION','CREATE')}"
+                                 id="createButtonId">
+
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{zoneInspectionAction.update}" value="#{messages['Common.saveChange']}"
+                                 styleClass="button"
+                                 rendered="#{zoneInspectionAction.managed and s:hasPermission('ZONEINSPECTION','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{zoneInspectionAction.managed and s:hasPermission('ZONEINSPECTION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{zoneInspectionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{zoneInspectionAction.managed}">
+                            #{messages['Common.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Common.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ZoneInspection.date']}</ui:define>
+                    <rich:calendar id="date"
+                                   enableManualInput="true"
+                                   value="#{zoneInspection.date}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   required="true"
+                                   tabindex="1">
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="initHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ZoneInspection.initHour']}</ui:define>
+                    <h:inputText id="initHour" value="#{zoneInspection.initHour}" styleClass="inputTiny"
+                                 required="true"
+                                 maxlength="150" tabindex="11">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}" type="time"/>
+                    </h:inputText>
+                    <h:outputText value=" #{messages['patterns.hourMinuteTime']}"/>
+                </s:decorate>
+
+                <s:decorate id="endHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ZoneInspection.endHour']}</ui:define>
+                    <h:inputText id="endHour" value="#{zoneInspection.endHour}" styleClass="inputTiny"
+                                 required="true"
+                                 maxlength="150" tabindex="12">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}" type="time"/>
+                    </h:inputText>
+                    <h:outputText value=" #{messages['patterns.hourMinuteTime']}"/>
+                </s:decorate>
+
+                <s:decorate id="productiveZoneField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ZoneInspection.productiveZone']}</ui:define>
+                    <app:selectPopUp id="productiveZone"
+                                     required="true"
+                                     textValue="#{zoneInspection.productiveZone.fullName}"
+                                     value="#{zoneInspection.productiveZone}"
+                                     dataModel="#{productiveZoneDataModel}"
+                                     clearAction="#{zoneInspectionAction.clearProductiveZone()}"
+                                     searchModalPanel="productiveZoneModalPanel"
+                                     reRender="productiveZoneField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+
+                <s:decorate id="producerField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ZoneInspection.president']}</ui:define>
+                    <app:selectPopUp id="producer"
+                                     required="true"
+                                     textValue="#{zoneInspection.producer.fullName}"
+                                     value="#{zoneInspection.producer}"
+                                     dataModel="#{rawMaterialProducerDataModel}"
+                                     clearAction="#{zoneInspectionAction.clearProducer()}"
+                                     searchModalPanel="rawMaterialProducerListModalPanel"
+                                     reRender="producerField"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{zoneInspectionAction.addLaboratoryResult}"
+                                 value="#{messages['ZoneInspection.addLaboratoryResult']}"
+                                 styleClass="button"
+                                 rendered="#{zoneInspectionAction.managed}"
+                                 tabindex="34"
+                                 immediate="true"/>
+
+                <h:commandButton action="#{zoneInspectionAction.addLocalRawMaterial}"
+                                 value="#{messages['ZoneInspection.addLocalRawMaterial']}"
+                                 styleClass="button"
+                                 rendered="#{zoneInspectionAction.managed}"
+                                 tabindex="35"
+                                 immediate="true"/>
+            </div>
+
+            <c:if test="#{zoneInspectionAction.managed}">
+                <rich:tabPanel switchType="ajax" selectedTab="#{zoneInspectionAction.activeTabName}">
+                <rich:tab name="laboratoryTab" label="Laboratorio" ajaxSingle="true" immediate="true"
+                          action="#{zoneInspectionAction.enableLaboratoryTab}">
+
+                    <rich:dataTable id="laboratoryTable" value="#{laboratoryResultDataModel}" var="laboratoryItem"
+                                    rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="15%, 15%, 40%, 15%, 15%">
+                        <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['LaboratoryResult.reportDate']}</rich:column>
+                                    <rich:column>#{messages['LaboratoryResult.code']}</rich:column>
+                                    <rich:column>#{messages['LaboratoryResult.characteristic']}</rich:column>
+                                    <rich:column>#{messages['LaboratoryResult.sampleDate']}</rich:column>
+                                    <rich:column styleClass="center">
+                                        <h:outputText value="#{messages['Common.action']}"/>
+                                    </rich:column>
+                                </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{laboratoryItem.date}">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{laboratoryItem.code}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{laboratoryItem.description}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{laboratoryItem.sampleDate}">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <h:commandLink value="#{messages['Common.select']}"
+                                           immediate="true"
+                                           rendered="#{s:hasPermission('LABORATORYRESULT','VIEW')}"
+                                           action="#{laboratoryResultAction.select(laboratoryItem)}"/>
+                        </rich:column>
+                    </rich:dataTable>
+
+                </rich:tab>
+                <rich:tab name="localRawMaterialTab" label="Materias Primas" ajaxSingle="true" immediate="true"
+                          action="#{zoneInspectionAction.enableLocalRawMaterialTab}">
+                    <rich:dataTable id="localRawMaterialTable" value="#{localRawMaterialDataModel}" var="localRawMaterialItem"
+                                    rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="40%, 20%, 20%, 20%">
+                        <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['LocalRawMaterial.mineral']}</rich:column>
+                                    <rich:column>#{messages['LocalRawMaterial.originPrice']}</rich:column>
+                                    <rich:column>#{messages['LocalRawMaterial.destinationPrice']}</rich:column>
+                                    <rich:column styleClass="center">
+                                        <h:outputText value="#{messages['Common.action']}"/>
+                                    </rich:column>
+                                </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{localRawMaterialItem.metaProduct.name}" />
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{localRawMaterialItem.originPrice}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{localRawMaterialItem.destinationPrice}"/>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <h:commandLink value="#{messages['Common.select']}"
+                                           immediate="true"
+                                           rendered="#{s:hasPermission('LOCALRAWMATERIAL','VIEW')}"
+                                           action="#{localRawMaterialAction.select(localRawMaterialItem)}"/>
+                        </rich:column>
+                    </rich:dataTable>
+                </rich:tab>
+            </rich:tabPanel>
+            </c:if>
+        </h:form>
+
+        <s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
+            <ui:param name="listTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+            <ui:param name="searchPanelTitle" value="#{messages['RawMaterialProducer.searchProductiveZone']}" />
+            <ui:param name="dialogId" value="productiveZoneModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{zoneInspectionAction.assignProductiveZone(productiveZoneItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="productiveZoneField"
+                                   oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
+                                   style="width:0.8em"/>
+
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="rawMaterialProdecerModalPanelContainer"
+                    template="/production/searchRawMaterialProducerModalPanel.xhtml"
+                    rendered="#{not collectMaterialAction.managed}">
+            <ui:param name="dialogId" value="rawMaterialProducerListModalPanel"/>
+            <ui:param name="dataModel" value="#{rawMaterialProducerDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{zoneInspectionAction.assignProducer(rawMaterialProducerItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="producerField"
+                                   oncomplete="Richfaces.hideModalPanel('rawMaterialProducerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{zoneInspectionAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductiveZone.delete.confirmation']}" />
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{zoneInspectionAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

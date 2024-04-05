@@ -4,50 +4,68 @@ alter table acopiomp add foreign key (idzonaproductiva) references zonaproductiv
 alter table zonaproductiva add column idciudad bigint(20) after numero;
 alter table zonaproductiva add foreign key (idciudad) references ciudad (idciudad);
 --
-/*
+
+/** **/
+DROP TABLE IF EXISTS inspeccionzona;
 CREATE TABLE `inspeccionzona`(
-    `idinspeccion` BIGINT(20) NOT NULL,
+    `idinspeccionzona` BIGINT(20) NOT NULL,
     `fecha` DATE,
     `horasalida` TIME,
     `horallegada` TIME,
     `idproductor` BIGINT(20),
-    `idciudad` BIGINT(20),
     `idzonaproductiva` BIGINT(20),
-    PRIMARY KEY (`idinspeccion`),
-    CONSTRAINT `inspeccionzona_ibfk_1` FOREIGN KEY (`idproductor`) REFERENCES `terdemol`.`productormateriaprima`(`idproductormateriaprima`),
-    CONSTRAINT `inspeccionzona_ibfk_2` FOREIGN KEY (`idciudad`) REFERENCES `terdemol`.`ciudad`(`idciudad`),
-    CONSTRAINT `inspeccionzona_ibfk_3` FOREIGN KEY (`idzonaproductiva`) REFERENCES `terdemol`.`zonaproductiva`(`idzonaproductiva`)
+    `version` BIGINT(20),
+    `idcompania` BIGINT(20),
+    PRIMARY KEY (`idinspeccionzona`),
+    CONSTRAINT `inspeccionzona_ibfk_1` FOREIGN KEY (`idproductor`) REFERENCES `productormateriaprima`(`idproductormateriaprima`),
+    CONSTRAINT `inspeccionzona_ibfk_2` FOREIGN KEY (`idzonaproductiva`) REFERENCES `zonaproductiva`(`idzonaproductiva`),
+    CONSTRAINT `inspeccionzona_ibfk_3` FOREIGN KEY (`idcompania`) REFERENCES `compania`(`idcompania`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS materiasprimaszona;
 CREATE TABLE `materiasprimaszona` (
     `idmateriasprimaszona` bigint(20) NOT NULL,
     `idmetaproductoproduccion` bigint(20) DEFAULT NULL,
     `precioorigen` decimal(12,2) DEFAULT NULL,
     `preciodestino` decimal(12,2) DEFAULT NULL,
     `observacion` varchar(255) DEFAULT NULL,
-    `idinspeccion` bigint(20) DEFAULT NULL,
+    `idinspeccionzona` bigint(20) DEFAULT NULL,
+    `version` BIGINT(20),
+    `idcompania` BIGINT(20),
     PRIMARY KEY (`idmateriasprimaszona`),
     KEY `materiasprimaszona_ibfk_1` (`idmetaproductoproduccion`),
-    KEY `materiasprimaszona_ibfk_2` (`idinspeccion`),
+    KEY `materiasprimaszona_ibfk_2` (`idinspeccionzona`),
     CONSTRAINT `materiasprimaszona_ibfk_1` FOREIGN KEY (`idmetaproductoproduccion`) REFERENCES `metaproductoproduccion` (`idmetaproductoproduccion`),
-    CONSTRAINT `materiasprimaszona_ibfk_2` FOREIGN KEY (`idinspeccion`) REFERENCES `inspeccionzona` (`idinspeccion`)
+    CONSTRAINT `materiasprimaszona_ibfk_2` FOREIGN KEY (`idinspeccionzona`) REFERENCES `inspeccionzona` (`idinspeccionzona`),
+    CONSTRAINT `materiasprimaszona_ibfk_3` FOREIGN KEY (`idcompania`) REFERENCES `compania`(`idcompania`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `informelab` (
-    `idinformelab` bigint(20) NOT NULL,
+
+alter table archivo add primary key (idarchivo);
+
+DROP TABLE IF EXISTS resultadolab;
+CREATE TABLE `resultadolab` (
+    `idresultadolab` bigint(20) NOT NULL,
     `fecha` date DEFAULT NULL,
-    `codigoinforme` varchar(100) DEFAULT NULL,
+    `codigo` varchar(100) DEFAULT NULL,
     `caracteristica` varchar(255) DEFAULT NULL,
     `fechamuestra` date DEFAULT NULL,
     `fecharecepcion` date DEFAULT NULL,
     `fechainicio` date DEFAULT NULL,
     `fechafin` date DEFAULT NULL,
-    `idinspeccion` bigint(20) DEFAULT NULL,
-    PRIMARY KEY (`idinformelab`),
-    KEY `informelab_ibfk_1` (`idinspeccion`),
-    CONSTRAINT `informelab_ibfk_1` FOREIGN KEY (`idinspeccion`) REFERENCES `inspeccionzona` (`idinspeccion`)
+    `idinspeccionzona` bigint(20) DEFAULT NULL,
+    `idarchivo` bigint(20) DEFAULT NULL,
+    `version` BIGINT(20),
+    `idcompania` BIGINT(20),
+    PRIMARY KEY (`idresultadolab`),
+    KEY `informelab_ibfk_1` (`idinspeccionzona`),
+    CONSTRAINT `resultadolab_ibfk_1` FOREIGN KEY (`idinspeccionzona`) REFERENCES `inspeccionzona` (`idinspeccionzona`),
+    CONSTRAINT `resultadolab_ibfk_2` FOREIGN KEY (`idcompania`) REFERENCES `compania`(`idcompania`),
+    CONSTRAINT `resultadolab_ibfk_3` FOREIGN KEY (`idarchivo`) REFERENCES `archivo` (`idarchivo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-*/
+
+/** **/
+
 -- 12.03.2024
 alter table metaproductoproduccion add column regalia decimal(12,2) after precio;
 

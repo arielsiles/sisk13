@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <components xmlns="http://jboss.com/products/seam/components"
-            xmlns:core="http://jboss.com/products/seam/core"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:framework="http://jboss.com/products/seam/framework"
-            xsi:schemaLocation="http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.2.xsd
-                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
+            xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd
                  http://jboss.com/products/seam/framework http://jboss.com/products/seam/framework-2.2.xsd"
             xmlns:web="http://jboss.com/products/seam/web">
 
@@ -28,6 +26,7 @@
             <value>c.department = #{zoneAction.department}</value>
             <value>c.department = #{districtAction.department}</value>
             <value>c.department = #{streetAction.department}</value>
+            <value>c.department = #{productiveZoneAction.department}</value>
             <!--<value>c.department = #{businessAction.department}</value>
             <value>c.department = #{businessUnitAction.department}</value> -->
         </framework:restrictions>
