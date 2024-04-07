@@ -150,6 +150,34 @@
             </a4j:commandLink>
         </s:decorate>
 
+        <s:decorate id="expenseAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Group.expenseAccount']}</ui:define>
+            <h:inputText id="expenseAccount"
+                         required="true"
+                         styleClass="input"
+                         readonly="true"
+                         value="#{warehouseGroup.expenseAccount}"
+                         maxlength="100"
+                         tabindex="3"/>
+            <a4j:commandLink id="selectExpenseAccount"
+                             ajaxSingle="true"
+                             immediate="true"
+                             tabindex="4"
+                             title="#{messages['Group.expenseAccount.select']}"
+                             onclick="Richfaces.showModalPanel('expenseCashAccountListModalPanel');">
+                <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+            <a4j:commandLink id="selectButton"
+                             ajaxSingle="true"
+                             immediate="true"
+                             tabindex="5"
+                             title="#{messages['Common.clear']}"
+                             action="#{groupAction.clearExpenseAccount}"
+                             reRender="expenseAccount">
+                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+            </a4j:commandLink>
+        </s:decorate>
+
     </rich:panel>
 
     <div class="buttons">
@@ -282,6 +310,20 @@
                            styleClass="select-image-middle"
                            reRender="costAccount"
                            oncomplete="Richfaces.hideModalPanel('costCashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="expenseCashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+    <ui:param name="hasWarehousePermission" value="true"/>
+    <ui:param name="containerId" value="expenseCashAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="expenseCashAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{groupAction.assignExpenseAccount(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="expenseAccount"
+                           oncomplete="Richfaces.hideModalPanel('expenseCashAccountListModalPanel');"/>
     </ui:define>
 </s:decorate>
 <!--Set selector Id to enable focus-->

@@ -6,10 +6,7 @@ import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.model.employees.Employee;
-import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.CostCenter;
-import com.encens.khipus.model.finances.JobContract;
-import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -75,6 +72,11 @@ public class WarehouseVoucher implements BaseModel {
     @Column(name = "estado", nullable = true, length = 3)
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherState state;
+
+    @Column(name = "tipo_gasto", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private ExpenseType expenseType;
+
 
     @Column(name = "oper", nullable = true)
     @Enumerated(EnumType.STRING)
@@ -672,5 +674,13 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setDestination(Destination destination) {
         this.destination = destination;
+    }
+
+    public ExpenseType getExpenseType() {
+        return expenseType;
+    }
+
+    public void setExpenseType(ExpenseType expenseType) {
+        this.expenseType = expenseType;
     }
 }

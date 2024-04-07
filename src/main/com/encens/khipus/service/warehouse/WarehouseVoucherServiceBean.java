@@ -1,10 +1,7 @@
 package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.FinancesCurrencyType;
-import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -63,7 +60,13 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
         for (WarehouseVoucher warehouseVoucher:warehouseVoucherList){
             for (InventoryMovement inventoryMovement:warehouseVoucher.getInventoryMovementList()){
                 for (MovementDetail movementDetail:inventoryMovement.getMovementDetailList()){
-                    CashAccount expenseCashAccount = movementDetail.getProductItem().getCashAccount();
+
+                    CashAccount expenseCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getCostCashAccount();
+
+                    if (warehouseVoucher.getExpenseType().equals(ExpenseType.ADMINISTRATIVE)){
+                        expenseCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getExpenseCashAccount();
+                    }
+
                     VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
                             null, null, expenseCashAccount, movementDetail.getAmount(), FinancesCurrencyType.P, BigDecimal.ONE);
                     voucher.getDetails().add(voucherDetail);

@@ -9,7 +9,7 @@
                 template="/layout/template.xhtml">
 
     <ui:define name="pageTitle">#{messages['Group.list']}</ui:define>
-    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyWidth" value="80%"/>
     <ui:param name="bodyAlign" value="center"/>
 
     <ui:param name="selectedTab" value="finances"/>
@@ -46,9 +46,9 @@
             <rich:dataTable value="#{groupDataModel}"
                             var="groupItem"
                             id="groupList"
-                            rows="#{sessionUser.rowsPerPage}"
+                            rows="#{sessionUser.rowsPerPage15}"
                             width="100%"
-                            columnsWidth="40%, 10%, 20%, 20%, 10%">
+                            columnsWidth="40%, 7%, 15%, 15%, 15%, 8%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -59,14 +59,10 @@
                                 #{messages['Group.name']}
                             </app:commandSortHeader>
                         </rich:column>
-                        <rich:column>
-                            <app:commandSortHeader sortProperty="warehouseGroup.groupCode" dataModel="#{groupDataModel}"
-                                                   reRender="groupList, dataScroller">
-                                #{messages['Group.groupCode']}
-                            </app:commandSortHeader>
-                        </rich:column>
+                        <rich:column>#{messages['Group.groupCode']}</rich:column>
                         <rich:column>#{messages['Group.inventoryAccount']}</rich:column>
                         <rich:column>#{messages['Group.costAccount']}</rich:column>
+                        <rich:column>#{messages['Group.expenseAccount']}</rich:column>
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
                         </rich:column>
@@ -83,6 +79,9 @@
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{groupItem.costAccount}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{groupItem.expenseAccount}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"

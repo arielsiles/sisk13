@@ -6,6 +6,7 @@ import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherPendantException;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.finances.ExpenseType;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.finances.MeasureUnitPk;
 import com.encens.khipus.model.warehouse.*;
@@ -15,10 +16,7 @@ import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
 import com.encens.khipus.service.warehouse.WarehouseCatalogService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.End;
-import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Name;
-import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
 
@@ -60,6 +58,13 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
     private BigDecimal quantity;
     private String description;
 
+    @Factory(value = "expenseTypeList", scope = ScopeType.STATELESS)
+    public ExpenseType[] getExpenseType() {
+        return new ExpenseType[]{
+                ExpenseType.ADMINISTRATIVE,
+                ExpenseType.PRODUCTION
+        };
+    }
 
     @Override
     @End

@@ -692,6 +692,21 @@
             </h:selectOneMenu>
         </s:decorate>
 
+        <s:decorate id="expenseTypeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+            <ui:define name="label">#{messages['WarehouseVoucher.expenseType']}</ui:define>
+            <h:selectOneMenu id="expenseType"
+                             value="#{warehouseVoucherUpdateAction.warehouseVoucher.expenseType}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="24">
+                <s:selectItems value="#{expenseTypeList}" var="type"
+                               label="#{messages[type.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+
     </s:div>
 </c:otherwise>
 </c:choose>

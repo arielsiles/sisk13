@@ -26,7 +26,7 @@
 </c:if>
 
 <c:set var="mainComponentIdsToRerender"
-       value="documentTypeField, transferorder, destination, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
+       value="documentTypeField, transferorder, destination, expenseTypeDiv, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
 
 <c:set var="elementsToReRenderForPetitionerJobContractChange"
        value="petitionerJobContractPanel, executorUnitLeftSidePanel"/>
@@ -491,6 +491,23 @@
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="expenseTypeDiv">
+        <s:decorate id="expenseTypeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+            <ui:define name="label">#{messages['WarehouseVoucher.expenseType']}</ui:define>
+            <h:selectOneMenu id="expenseType"
+                             value="#{warehouseVoucherCreateAction.warehouseVoucher.expenseType}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="14">
+                <s:selectItems value="#{expenseTypeList}" var="type"
+                               label="#{messages[type.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEnum/>
             </h:selectOneMenu>
         </s:decorate>
     </s:div>
