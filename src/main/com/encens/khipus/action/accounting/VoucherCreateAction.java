@@ -135,6 +135,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         return outCome;
     }
 
+    public void initView(Voucher instance) {
+        System.out.println("===> " + instance.getFullDocument());
+        setVoucher(instance);
+        System.out.println("gloss: " + voucher.getGloss());
+        setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
+        setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
+    }
+
     @Override
     @End
     public String create() {

@@ -1,0 +1,107 @@
+<rich:modalPanel height="600" width="1000" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="jQuery('##{containerId}\\\\:productItemListForm\\\\:productItemCodeField\\\\:productItemCode').focus();">
+    <f:facet name="header">
+        <h:outputText>Documento Contable</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+    <h:form id="productItemListForm">
+
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width100percent">
+
+            <s:decorate id="accountCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">Fecha: </ui:define>
+                <h:outputText value="#{voucherCreateAction.voucher.date}" >
+                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                </h:outputText>
+
+                <h:outputText value=" - " />
+
+                <h:outputText value="#{voucherCreateAction.voucher.fullDocument}" styleClass="bold" />
+            </s:decorate>
+
+            <s:decorate id="desciptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
+                <h:inputTextarea id="description" value="#{voucherCreateAction.voucher.gloss}" style="width:600px;height:40px;" />
+            </s:decorate>
+
+        </h:panelGrid>
+
+
+        <rich:spacer height="7" />
+
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <s:div id="movementDetailListPanel">
+
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                    <thead class="rich-table-thead">
+                    <tr class="rich-table-header">
+                        <th class="rich-table-headercell">#{messages['Voucher.accountDescription']}</th>
+                        <th class="rich-table-headercell">#{messages['Voucher.debit']}</th>
+                        <th class="rich-table-headercell">#{messages['Voucher.credit']}</th>
+                    </tr>
+                    </thead>
+
+                    <c:forEach var="voucherDetail" items="#{voucherCreateAction.voucherDetails}" varStatus="row">
+
+                        <tr class="rich-table-row">
+                            <td class="rich-table-cell">
+                                <h:outputText value="#{voucherDetail.fullCashAccount}"/>
+                            </td>
+
+                            <td class="rich-table-cell right">
+                                <h:outputText value="#{voucherDetail.debit}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </td>
+
+                            <td class="rich-table-cell right">
+                                <h:outputText value="#{voucherDetail.credit}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </td>
+
+                        </tr>
+                    </c:forEach>
+
+                    <thead class="rich-table-thead">
+                        <tr class="rich-table-header">
+                            <td class="rich-table-headercell center">-</td>
+                            <td class="rich-table-headercell right">
+                                <s:div id="totalDebit">
+                                    <h:outputText value="#{voucherCreateAction.totalsDebit}"><f:convertNumber pattern="#,##0.00"  /></h:outputText>
+                                </s:div>
+                            </td>
+                            <td class="rich-table-headercell right">
+                                <s:div id="totalCredit">
+                                    <h:outputText value="#{voucherCreateAction.totalsCredit}"><f:convertNumber pattern="#,##0.00"  /></h:outputText>
+                                </s:div>
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
+            </s:div>
+        </h:panelGrid>
+
+        <div class="buttonsRight">
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </h:commandButton>
+        </div>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink, confirmRegisterButton, confirmRegisterInvoiceButton"
+                               operation="hide"
+                               event="onclick"/>
+    </h:form>
+</rich:modalPanel>

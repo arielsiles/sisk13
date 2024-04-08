@@ -18,8 +18,8 @@ import java.util.List;
  * @version 2.26
  */
 @Name("voucherDataModel")
-@Scope(ScopeType.PAGE)
-/*@Restrict("#{s:hasPermission('ORGANIZATION','VIEW')}")*/
+/*@Scope(ScopeType.PAGE)*/
+@Scope(ScopeType.SESSION)
 public class VoucherDataModel extends QueryDataModel<Long, Voucher> {
 
     private Date startDate;

@@ -124,7 +124,7 @@
                 var="voucherItem"
                 rows="#{sessionUser.rowsPerPage}"
                 width="100%"
-                columnsWidth="7%, 7%, 7%, 7%, 53%, 7%">
+                columnsWidth="7%, 7%, 7%, 7%, 53%, 10%">
     <f:facet name="header">
         <rich:columnGroup>
             <rich:column>
@@ -199,11 +199,27 @@
             <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
                             title="#{messages['Voucher.report.generateReport']}"/>
         </h:commandLink>
+        &#160;
+        <a4j:commandLink id="creditSaleCommandButton"
+                         action="#{voucherCreateAction.initView(voucherItem)}"
+                         styleClass="button"
+                         immediate="true"
+                         oncomplete="Richfaces.showModalPanel('voucerViewModalPanel');"
+                         reRender="voucerViewModalPanel">
+            <h:graphicImage value="/img/ver16.png" styleClass="select-image" title="Ver documento"/>
+        </a4j:commandLink>
+
     </rich:column>
 </rich:dataTable>
 <app:dataScroller id="dataScroller" for="voucherList" dataModel="#{voucherDataModel}"/>
 
 </h:form>
+
+    <s:decorate id="voucerViewModalPanelContainer" template="/accounting/voucherViewModalPanel.xhtml">
+        <ui:param name="containerId" value="voucerViewModalPanelContainer"/>
+        <ui:param name="dialogId" value="voucerViewModalPanel"/>
+    </s:decorate>
+
 </ui:define>
 
 </ui:composition>
