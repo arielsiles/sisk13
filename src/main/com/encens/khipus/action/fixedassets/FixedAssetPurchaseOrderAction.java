@@ -15,10 +15,7 @@ import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.interceptor.BusinessUnitRestrict;
 import com.encens.khipus.interceptor.BusinessUnitRestriction;
 import com.encens.khipus.model.admin.User;
-import com.encens.khipus.model.finances.CostCenter;
-import com.encens.khipus.model.finances.FinancesCurrencyType;
-import com.encens.khipus.model.finances.JobContract;
-import com.encens.khipus.model.finances.Provider;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.fixedassets.FixedAsset;
 import com.encens.khipus.model.fixedassets.FixedAssetState;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -26,6 +23,7 @@ import com.encens.khipus.model.purchases.PurchaseOrderPayment;
 import com.encens.khipus.model.purchases.PurchaseOrderType;
 import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.fixedassets.FixedAssetPurchaseOrderService;
 import com.encens.khipus.service.fixedassets.FixedAssetService;
 import com.encens.khipus.service.fixedassets.PurchaseOrderCauseFixedAssetStateService;
@@ -81,6 +79,9 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
     private JobContractService jobContractService;
 
     @In
+    private CompanyConfigurationService companyConfigurationService;
+
+    @In
     private FinancesExchangeRateService financesExchangeRateService;
 
     @In(value = "#{listEntityManager}")
@@ -116,7 +117,9 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
 
     @Factory(value = "fixedAssetPurchaseOrder", scope = ScopeType.STATELESS)
     public PurchaseOrder initPurchaseOrder() {
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
         getInstance().setOrderType(PurchaseOrderType.FIXEDASSET);
+        getInstance().setCostCenter(companyConfiguration.getExchangeRateBalanceCostCenter());
         return getInstance();
     }
 
@@ -359,10 +362,6 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
         try {
             service.finalizePurchaseOrder(getInstance());
             PurchaseOrderPayment purchaseOrderPayment = getLiquidationPayment();
-
-            /*System.out.println("------------> purchaseOrderPayment: " + purchaseOrderPayment);
-            System.out.println("------------> purchaseOrderPayment.getPayAmount(): " + purchaseOrderPayment.getPayAmount());
-            System.out.println("------------> purchaseOrderPayment.getSourceAmount(): " + purchaseOrderPayment.getSourceAmount());*/
 
             BigDecimal defaultExchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.name());
             service.createFixedAssetPurchaseOrderFinalizedAccountEntry(getInstance(), defaultExchangeRate);
@@ -853,4 +852,14 @@ public class FixedAssetPurchaseOrderAction extends GenericAction<PurchaseOrder> 
         liquidationPaymentAction.computePayment(currentBalanceAmount);
     }
 
+    public CompanyConfiguration getCompanyConfiguration(){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+            return companyConfiguration;
+        } catch (CompanyConfigurationNotFoundException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");
+            return null;
+        }
+    }
 }

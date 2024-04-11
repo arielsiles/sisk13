@@ -631,10 +631,10 @@
           no-conversation-view-id="/fixedassets/fixedAssetPurchaseOrderList.xhtml">
         <navigation>
             <rule if-outcome="Success">
-                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseDocument.xhtml"/>
             </rule>
             <rule if-outcome="Fail">
-                <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>
+                <redirect view-id="/fixedassets/fixedAssetPurchaseDocument.xhtml"/>
             </rule>
             <rule>
                 <redirect view-id="/fixedassets/fixedAssetPurchaseOrder.xhtml"/>

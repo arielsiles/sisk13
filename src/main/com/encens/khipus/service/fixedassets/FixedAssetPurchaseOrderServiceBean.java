@@ -537,38 +537,56 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
 
         Voucher voucher = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
         voucher.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());
-        voucher.setDocumentType(Constants.CD_VOUCHER_DOCTYPE);
+        voucher.setDocumentType(companyConfiguration.getDocumentFixedAssetOC());
+
+        BigDecimal totalDebitAmount = BigDecimal.ZERO;
 
         if (CollectionDocumentType.INVOICE.equals(purchaseOrder.getDocumentType())) {
 
             for (FixedAssetPurchaseOrderDetail fixedAssetPurchaseOrderDetail : purchaseOrder.getFixedAssetPurchaseOrderDetailList()){
+                BigDecimal fixedAssetValue = BigDecimalUtil.multiply(fixedAssetPurchaseOrderDetail.getBsTotalAmount(), Constants.VAT_COMPLEMENT);
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                         executorUnitCode,
                         costCenterCode,
                         fixedAssetPurchaseOrderDetail.getFixedAssetSubGroup().getWarehouseCashAccount(),
-                        BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT_COMPLEMENT),
+                        fixedAssetValue,
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
+                totalDebitAmount = BigDecimalUtil.sum(totalDebitAmount, fixedAssetValue);
             }
 
-            voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
+            BigDecimal amountVAT = BigDecimal.ZERO;
+
+            for (PurchaseDocument purchaseDocument : purchaseOrder.getPurchaseDocumentList()) {
+                amountVAT = BigDecimalUtil.sum(amountVAT, purchaseDocument.getIva());
+                VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
                     companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
-                    BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT),
+                    purchaseDocument.getIva(),
                     FinancesCurrencyType.P,
-                    BigDecimal.ONE));
+                    BigDecimal.ONE);
+
+                voucherDetail.setPurchaseDocument(purchaseDocument);
+                voucher.addVoucherDetail(voucherDetail);
+            }
+
+            totalDebitAmount = BigDecimalUtil.sum(totalDebitAmount, amountVAT);
+
         } else {
+
             for (FixedAssetPurchaseOrderDetail fixedAssetPurchaseOrderDetail : purchaseOrder.getFixedAssetPurchaseOrderDetailList()){
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                         executorUnitCode,
                         costCenterCode,
                         fixedAssetPurchaseOrderDetail.getFixedAssetSubGroup().getWarehouseCashAccount(),
-                        //purchaseOrder.getTotalAmount(),
                         fixedAssetPurchaseOrderDetail.getBsTotalAmount(),
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
+
+                totalDebitAmount = BigDecimalUtil.sum(totalDebitAmount, fixedAssetPurchaseOrderDetail.getBsTotalAmount());
             }
+
         }
 
         /*if (BigDecimalUtil.isPositive(sumAdvancePaymentAmount)) {
@@ -591,29 +609,43 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                     financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), defaultExchangeRate)));
         }*/
 
-        BigDecimal balanceAmount = BigDecimalUtil.subtract(purchaseOrder.getTotalAmount(), sumAdvancePaymentAmount, sumLiquidationPaymentAmount);
-        if (balanceAmount.doubleValue() > 0) {
+        BigDecimal totalCreditAmount = BigDecimalUtil.subtract(purchaseOrder.getTotalAmount(), sumAdvancePaymentAmount, sumLiquidationPaymentAmount);
+        BigDecimal balanceAmount = BigDecimalUtil.subtract(totalDebitAmount, totalCreditAmount);
+
+        if (totalCreditAmount.doubleValue() > 0) {
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
                     //purchaseOrder.getProvider().getPayableAccount(),
                     companyConfiguration.getFixedAssetProvidersAccount(),
-                    balanceAmount,
+                    totalCreditAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE,
                     purchaseOrder.getProviderCode()));
-        } /*else if (balanceAmount.doubleValue() < 0) {
-            voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
-                    executorUnitCode,
-                    companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
-                    balanceAmount.abs(),
-                    FinancesCurrencyType.P,
-                    BigDecimal.ONE));
-        }*/
-        //voucherService.create(voucher);
+        }
+
+        /** En caso de haber diferencias, se ajusta en el articulo **/
+        if (balanceAmount.doubleValue() > 0) { // Debit major
+            System.out.println("----->>>----->>> DIFF: " + balanceAmount);
+            for (VoucherDetail detail : voucher.getDetails()){
+                if (detail.getDebit().doubleValue() > 0){
+                    detail.setDebit(BigDecimalUtil.subtract(detail.getDebit(), balanceAmount, 2));
+                    break;
+                }
+            }
+        } else if (balanceAmount.doubleValue() < 0) {
+            System.out.println("----->>>----->>> DIFF: " + balanceAmount);
+            for (VoucherDetail detail : voucher.getDetails()){
+                if (detail.getDebit().doubleValue() > 0){
+                    detail.setDebit(BigDecimalUtil.sum(detail.getDebit(), BigDecimalUtil.abs(balanceAmount), 2));
+                    break;
+                }
+            }
+        }
+
         voucherAccoutingService.saveVoucher(voucher);
 
+        voucherAccoutingService.updatePurchaseDocumentIfExist(voucher);
     }
 
 
@@ -745,7 +777,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
 
         Voucher voucher = VoucherBuilder.newGeneralVoucher(Constants.FIXEDASSET_VOUCHER_FORM, gloss);
         voucher.setUserNumber(companyConfiguration.getDefaultAccountancyUser().getId());
-        voucher.setDocumentType(Constants.CP_VOUCHER_DOCTYPE);
+        voucher.setDocumentType(companyConfiguration.getPaymentDocumentOC());
 
 
         System.out.println("------> PURCHASE ORDER PAYMENT: " + purchaseOrderPayment);

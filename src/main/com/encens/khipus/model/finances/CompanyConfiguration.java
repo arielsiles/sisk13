@@ -638,6 +638,9 @@ public class CompanyConfiguration {
     @Column(name = "doc_oc_pago")
     private String paymentDocumentOC;
 
+    @Column(name = "af_fin_oc")
+    private String documentFixedAssetOC;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
@@ -1810,5 +1813,13 @@ public class CompanyConfiguration {
 
     public void setRetentionCNSValue(BigDecimal retentionCNSValue) {
         this.retentionCNSValue = retentionCNSValue;
+    }
+
+    public String getDocumentFixedAssetOC() {
+        return documentFixedAssetOC;
+    }
+
+    public void setDocumentFixedAssetOC(String documentFixedAssetOC) {
+        this.documentFixedAssetOC = documentFixedAssetOC;
     }
 }

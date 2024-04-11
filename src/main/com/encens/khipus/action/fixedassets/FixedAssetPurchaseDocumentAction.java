@@ -26,7 +26,7 @@ public class FixedAssetPurchaseDocumentAction extends GenericAction<PurchaseDocu
     @In(create = true)
     private PurchaseDocumentAction purchaseDocumentAction;
 
-    @In
+    @In(value = "fixedAssetPurchaseOrderAction")
     private FixedAssetPurchaseOrderAction fixedAssetPurchaseOrderAction;
 
     @Create
@@ -55,7 +55,8 @@ public class FixedAssetPurchaseDocumentAction extends GenericAction<PurchaseDocu
     }
 
     @Override
-    @End(beforeRedirect = true)
+    /*@End(beforeRedirect = true)*/
+    @Begin(join = true, flushMode = FlushModeType.MANUAL)
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENT','CREATE')}")
     @BusinessUnitRestriction(value = "#{fixedAssetPurchaseOrderAction.instance}")
     public String create() {
@@ -63,7 +64,8 @@ public class FixedAssetPurchaseDocumentAction extends GenericAction<PurchaseDocu
     }
 
     @Override
-    @End(beforeRedirect = true)
+    /*@End(beforeRedirect = true)*/
+    @Begin(join = true, flushMode = FlushModeType.MANUAL)
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENT','UPDATE')}")
     @BusinessUnitRestriction(value = "#{fixedAssetPurchaseOrderAction.instance}")
     public String update() {
@@ -82,14 +84,16 @@ public class FixedAssetPurchaseDocumentAction extends GenericAction<PurchaseDocu
         return purchaseDocumentAction.delete();
     }
 
-    @End(beforeRedirect = true)
+    /*@End(beforeRedirect = true)*/
+    @Begin(join = true, flushMode = FlushModeType.MANUAL)
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENT','UPDATE')}")
     @BusinessUnitRestriction(value = "#{fixedAssetPurchaseOrderAction.instance}")
     public String approve() {
         return purchaseDocumentAction.approve();
     }
 
-    @End(beforeRedirect = true)
+    /*@End(beforeRedirect = true)*/
+    @Begin(join = true, flushMode = FlushModeType.MANUAL)
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENT','UPDATE')}")
     @BusinessUnitRestriction(value = "#{fixedAssetPurchaseOrderAction.instance}")
     public String nullify() {

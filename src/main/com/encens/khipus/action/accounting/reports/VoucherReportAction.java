@@ -99,6 +99,8 @@ public class VoucherReportAction extends GenericReportAction {
         BigDecimal totalD = voucherCreateAction.getTotalsDebit();
         BigDecimal totalC = voucherCreateAction.getTotalsCredit();
 
+        System.out.println("-----> Documento: " +voucher.getDocumentType());
+
         String documentTitle = (voucherService.getDocType(voucher.getDocumentType())).getDescription();
 
         MoneyUtil money = new MoneyUtil();
