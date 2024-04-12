@@ -315,11 +315,8 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                 fixedAsset.setLastBsSusRate(fixedAsset.getBsSusRate());
                 fixedAsset.setLastBsUfvRate(fixedAsset.getBsUfvRate());
                 //fixedAsset.setCostCenter(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getCostCenter());
-                System.out.println("===========> purchaseOrder.getCostCenterCode(): " + purchaseOrder.getCostCenterCode());
-                //fixedAsset.setCostCenter(purchaseOrder.getCostCenter());
-                fixedAsset.setCostCenterCode(Constants.DEFAULT_COST_CENTER_PRODUCTION);
-                System.out.println("===========> fixedAsset.getCostCenterCode(): " + fixedAsset.getCostCenterCode());
                 //fixedAsset.setCostCenterCode(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getCostCenter().getCode());
+
                 fixedAsset.setBusinessUnit(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getExecutorUnit());
                 fixedAsset.setDepreciationRate(fixedAssetPurchaseOrderDetail.getFixedAssetSubGroup().getDepreciationRate());
                 fixedAsset.setDescription(fixedAssetPurchaseOrderDetail.getPurchaseOrder().getGloss());
@@ -342,6 +339,13 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                     // to the entity manager (duplicated exceptions), the next time it will persist the entity
                     getEntityManager().persist(fixedAsset);
                     getEntityManager().flush();
+
+                    /** todo Asignando el CC y merge, poruque al momento de crear y persistir asigna null a CC **/
+                    fixedAsset.setCostCenter(purchaseOrder.getCostCenter());
+                    fixedAsset.setCostCenterCode(purchaseOrder.getCostCenter().getCode());
+                    getEntityManager().merge(fixedAsset);
+                    getEntityManager().flush();
+
                     fixedAssetPartService.createFixedAssetParts(fixedAsset, fixedAssetPurchaseOrderDetail);
                 } catch (PersistenceException e) { //TODO when hibernate will fix this http://opensource.atlassian.com/projects/hibernate/browse/EJB-382, we have to restore EntityExistsException here.
                     log.debug("Persistence error..", e);

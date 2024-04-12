@@ -20,7 +20,7 @@
         <h:commandButton action="#{fixedAssetAction.update}"
                          value="#{messages['Common.save']}"
                          styleClass="button"
-                         rendered="#{s:hasPermission('FIXEDASSET','UPDATE')}"
+                         rendered="#{fixedAssetAction.managed and s:hasPermission('FIXEDASSET','UPDATE')}"
                          tabindex="3"/>
 
         <h:commandButton action="#{fixedAssetAction.cancel}"
