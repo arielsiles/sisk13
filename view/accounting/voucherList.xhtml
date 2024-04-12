@@ -204,8 +204,8 @@
                          action="#{voucherCreateAction.initView(voucherItem)}"
                          styleClass="button"
                          immediate="true"
-                         oncomplete="Richfaces.showModalPanel('voucerViewModalPanel');"
-                         reRender="voucerViewModalPanel">
+                         oncomplete="Richfaces.showModalPanel('voucherViewModalPanel');"
+                         reRender="voucherViewModalPanel">
             <h:graphicImage value="/img/ver16.png" styleClass="select-image" title="Ver documento"/>
         </a4j:commandLink>
 
@@ -215,9 +215,9 @@
 
 </h:form>
 
-    <s:decorate id="voucerViewModalPanelContainer" template="/accounting/voucherViewModalPanel.xhtml">
-        <ui:param name="containerId" value="voucerViewModalPanelContainer"/>
-        <ui:param name="dialogId" value="voucerViewModalPanel"/>
+    <s:decorate id="voucherViewModalPanelContainer" template="/accounting/voucherViewModalPanel.xhtml">
+        <ui:param name="containerId" value="voucherViewModalPanelContainer"/>
+        <ui:param name="dialogId" value="voucherViewModalPanel"/>
     </s:decorate>
 
 </ui:define>

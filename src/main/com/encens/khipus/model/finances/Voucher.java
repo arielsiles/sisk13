@@ -528,7 +528,7 @@ public class Voucher implements BaseModel{
     }
 
     public String getFullDocument(){
-        return getDocumentType() + " " + getDocumentNumber();
+        return getDocumentType() + "-" + getDocumentNumber();
     }
 
     public String getNumber() {
