@@ -555,6 +555,7 @@
                              dataModel="#{cashAccountDataModel}"
                              clearAction="#{warehousePurchaseOrderAction.clearCashAccountPay()}"
                              searchModalPanel="cashAccountPayListModalPanel"
+                             reRender="cashAccountPayField"
                              hotKeySelect="alt+3"
                              tabindex="1003">
             </app:selectPopUp>
@@ -570,6 +571,7 @@
                              dataModel="#{providerDataModel}"
                              clearAction="#{warehousePurchaseOrderAction.clearProviderAux()}"
                              searchModalPanel="providerAuxListModalPanel"
+                             reRender="providerAuxField"
                              hotKeySelect="alt+5">
             </app:selectPopUp>
         </s:decorate>

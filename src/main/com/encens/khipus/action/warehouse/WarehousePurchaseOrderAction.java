@@ -582,6 +582,7 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
     public void clearProviderAux() {
         getInstance().setProviderAux(null);
+        getInstance().setProviderCodeAux(null);
     }
 
     public String getResponsibleFullName() {

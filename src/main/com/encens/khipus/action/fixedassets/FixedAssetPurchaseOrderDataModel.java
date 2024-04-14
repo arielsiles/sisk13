@@ -55,7 +55,7 @@ public class FixedAssetPurchaseOrderDataModel extends QueryDataModel<Long, Purch
     @Create
     public void init() {
         setEntityManagerName(ListEntityManagerName.BUSINESS_UNIT_LIST.getName());
-        sortProperty = "fixedAssetPurchaseOrder.date, fixedAssetPurchaseOrder.orderNumber";
+        sortProperty = "fixedAssetPurchaseOrder.receptionDate, fixedAssetPurchaseOrder.orderNumber";
         sortAsc = false;
     }
 

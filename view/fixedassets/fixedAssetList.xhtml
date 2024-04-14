@@ -147,7 +147,7 @@
         </h:inputText>
     </s:decorate>
     <s:decorate id="barCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['FixedAsset.barCode']}</ui:define>
+        <ui:define name="label">#{messages['FixedAsset.code']}</ui:define>
         <app:inputBarcode id="barCode"
                           value="#{fixedAssetDataModel.criteria.barCode}"
                           maxlength="250"
@@ -286,24 +286,9 @@
 
 <rich:dataTable value="#{fixedAssetDataModel}" var="fixedAssetItem" id="fixedAssetList"
                 rows="#{sessionUser.rowsPerPage}"
-                width="100%" columnsWidth="8%,8%,12%,12%,8%,12%,12%,5%,5%,8%,5%,5%">
+                width="100%" columnsWidth="20%,10%,10%,22%,7%,7%,10%,7%,7%">
     <f:facet name="header">
         <rich:columnGroup>
-            <rich:column>
-                <app:commandSortHeader sortProperty="fixedAsset.businessUnit.executorUnitCode"
-                                       dataModel="#{fixedAssetDataModel}"
-                                       reRender="fixedAssetList, dataScroller">
-                    #{messages['FixedAsset.executorUnitCode']}
-                </app:commandSortHeader>
-            </rich:column>
-            <rich:column>
-                <app:commandSortHeader sortProperty="fixedAsset.costCenterCode"
-                                       dataModel="#{fixedAssetDataModel}"
-                                       reRender="fixedAssetList, dataScroller">
-                    #{messages['FixedAsset.costCenterCode']}
-                </app:commandSortHeader>
-            </rich:column>
-
             <rich:column>
                 <app:commandSortHeader sortProperty="employee.lastName,employee.maidenName,employee.firstName"
                                        dataModel="#{fixedAssetDataModel}"
@@ -311,13 +296,7 @@
                     #{messages['FixedAsset.custodian']}
                 </app:commandSortHeader>
             </rich:column>
-            <rich:column>
-                <app:commandSortHeader sortProperty="fixedAsset.barCode"
-                                       dataModel="#{fixedAssetDataModel}"
-                                       reRender="fixedAssetList, dataScroller">
-                    #{messages['FixedAsset.barCode']}
-                </app:commandSortHeader>
-            </rich:column>
+            <rich:column>#{messages['FixedAsset.code']}</rich:column>
             <rich:column>
                 <app:commandSortHeader sortProperty="fixedAsset.purchaseOrder.orderNumber"
                                        dataModel="#{fixedAssetDataModel}"
@@ -330,13 +309,6 @@
                                        dataModel="#{fixedAssetDataModel}"
                                        reRender="fixedAssetList, dataScroller">
                     #{messages['FixedAsset.detail']}
-                </app:commandSortHeader>
-            </rich:column>
-            <rich:column>
-                <app:commandSortHeader sortProperty="fixedAsset.measurement"
-                                       dataModel="#{fixedAssetDataModel}"
-                                       reRender="fixedAssetList, dataScroller">
-                    #{messages['FixedAsset.measurement']}
                 </app:commandSortHeader>
             </rich:column>
             <rich:column>
@@ -374,12 +346,6 @@
         </rich:columnGroup>
     </f:facet>
     <rich:column>
-        <h:outputText value="#{fixedAssetItem.businessUnit.fullName}"/>
-    </rich:column>
-    <rich:column>
-        <h:outputText value="#{fixedAssetItem.costCenter.fullName}"/>
-    </rich:column>
-    <rich:column>
         <h:outputText value="#{fixedAssetItem.custodianJobContract.contract.employee.fullName}"/>
     </rich:column>
     <rich:column>
@@ -390,9 +356,6 @@
     </rich:column>
     <rich:column>
         <h:outputText value="#{fixedAssetItem.detail}"/>
-    </rich:column>
-    <rich:column>
-        <h:outputText value="#{fixedAssetItem.measurement}"/>
     </rich:column>
     <rich:column>
         <h:outputText value="#{fixedAssetItem.registrationDate}">

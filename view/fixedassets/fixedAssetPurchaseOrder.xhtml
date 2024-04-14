@@ -47,17 +47,20 @@
                      styleClass="button"
                      rendered="#{fixedAssetPurchaseOrderAction.managed and fixedAssetPurchaseOrderAction.purchaseOrderFinalized and s:hasPermission('ADVANCEPAYMENT','CREATE')}"
                      immediate="true"/>
-    <a4j:commandButton value="#{messages['FixedAsset.addFixedAssets']}"
+
+    <!-- Boton "Añadir Activos" -->
+    <!--<a4j:commandButton value="#{messages['FixedAsset.addFixedAssets']}"
                        styleClass="button"
                        rendered="#{fixedAssetPurchaseOrderAction.purchaseOrderPending  and not empty fixedAssetPurchaseOrder.purchaseOrderCause and fixedAssetPurchaseOrder.purchaseOrderCause.requiresFixedAssets and fixedAssetPurchaseOrder.purchaseOrderCause.fixedassetPurchase}"
                        reRender="associatedFixedAssetToPurchaseOrderTabDiv, fixedAssetSelectListModalPanelContainerDiv"
                        oncomplete="Richfaces.showModalPanel('fixedAssetSelectListModalPanel');">
+
         <a4j:support event="onclick"
                      action="#{fixedAssetDataModel.reset()}"
                      reRender="fixedAssetSelectListModalPanelContainerDiv "
                      ajaxSingle="true"
                      immediate="true"/>
-    </a4j:commandButton>
+    </a4j:commandButton>-->
 
     <a4j:commandButton id="newFixedAssetPurchaseOrderDetailId"
                        action="#{fixedAssetPurchaseOrderDetailAction.addFixedAssetPurchaseOrderDetail}"
@@ -699,7 +702,8 @@
                      rendered="#{fixedAssetPurchaseOrderAction.managed and fixedAssetPurchaseOrderAction.purchaseOrderFinalized and s:hasPermission('ADVANCEPAYMENT','CREATE')}"
                      immediate="true"/>
 
-    <a4j:commandButton value="#{messages['FixedAsset.addFixedAssets']}"
+    <!-- Boton "Añadir Activos" -->
+    <!--<a4j:commandButton value="#{messages['FixedAsset.addFixedAssets']}"
                        styleClass="button"
                        rendered="#{fixedAssetPurchaseOrderAction.purchaseOrderPending  and not empty fixedAssetPurchaseOrder.purchaseOrderCause and fixedAssetPurchaseOrder.purchaseOrderCause.requiresFixedAssets and fixedAssetPurchaseOrder.purchaseOrderCause.fixedassetPurchase}"
                        reRender="associatedFixedAssetToPurchaseOrderTabDiv, fixedAssetSelectListModalPanelContainerDiv"
@@ -709,7 +713,7 @@
                      reRender="fixedAssetSelectListModalPanelContainerDiv "
                      ajaxSingle="true"
                      immediate="true"/>
-    </a4j:commandButton>
+    </a4j:commandButton>-->
 
     <a4j:commandButton action="#{fixedAssetPurchaseOrderDetailAction.addFixedAssetPurchaseOrderDetail}"
                        value="#{messages['FixedAssetPurchaseOrder.addFixedAssetPurchaseOrderDetail']}"

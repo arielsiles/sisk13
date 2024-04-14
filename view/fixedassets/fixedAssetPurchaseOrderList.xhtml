@@ -260,7 +260,7 @@
                 var="fixedAssetPurchaseOrderItem"
                 rows="#{sessionUser.rowsPerPage}"
                 width="100%"
-                columnsWidth="5%, 8%, 8%, 15%, 15%, 15%, 8%, 14%, 5%,5%">
+                columnsWidth="8%, 8%, 8%, 20%, 20%, 20%, 8%, 8%">
 
     <f:facet name="header">
         <rich:columnGroup>
@@ -282,7 +282,7 @@
                 <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.date"
                                        dataModel="#{fixedAssetPurchaseOrderDataModel}"
                                        reRender="fixedAssetPurchaseOrderList, dataScroller">
-                    #{messages['FixedAssetPurchaseOrder.date']}
+                    #{messages['FixedAssetPurchaseOrder.receptionDate']}
                 </app:commandSortHeader>
             </rich:column>
             <rich:column>
@@ -307,25 +307,10 @@
                 </app:commandSortHeader>
             </rich:column>
             <rich:column>
-                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.executorUnit.executorUnitCode"
-                                       dataModel="#{fixedAssetPurchaseOrderDataModel}"
-                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
-                    #{messages['FixedAssetPurchaseOrder.executorUnitCode']}
-                </app:commandSortHeader>
-            </rich:column>
-            <rich:column>
-                <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.costCenter"
-                                       dataModel="#{fixedAssetPurchaseOrderDataModel}"
-                                       reRender="fixedAssetPurchaseOrderList, dataScroller">
-                    #{messages['FixedAssetPurchaseOrder.costCenter']}
-                </app:commandSortHeader>
-            </rich:column>
-            <rich:column>
                 <app:commandSortHeader sortProperty="fixedAssetPurchaseOrder.state"
                                        dataModel="#{fixedAssetPurchaseOrderDataModel}"
                                        reRender="fixedAssetPurchaseOrderList, dataScroller">
-                    #{messages['FixedAssetPurchaseOrder.state'
-                            ]}
+                    #{messages['FixedAssetPurchaseOrder.state']}
                 </app:commandSortHeader>
             </rich:column>
             <rich:column styleClass="center">
@@ -340,9 +325,9 @@
     <rich:column styleClass="#{fixedAssetPurchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
         <h:outputText value="#{fixedAssetPurchaseOrderItem.invoiceNumber}"/>
     </rich:column>
-    <rich:column styleClass="#{fixedAssetPurchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
-        <h:outputText value="#{fixedAssetPurchaseOrderItem.date}">
-            <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+    <rich:column styleClass="#{fixedAssetPurchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}" style="text-align: center">
+        <h:outputText value="#{fixedAssetPurchaseOrderItem.receptionDate}">
+            <f:convertDateTime pattern="#{messages['patterns.date']}"
                                timeZone="#{sessionUser.timeZone}"
                                type="date"/>
         </h:outputText>
@@ -357,13 +342,7 @@
     <rich:column styleClass="#{fixedAssetPurchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
         <h:outputText value="#{fixedAssetPurchaseOrderItem.provider.fullName}"/>
     </rich:column>
-    <rich:column styleClass="#{fixedAssetPurchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
-        <h:outputText
-                value="#{fixedAssetPurchaseOrderItem.executorUnit.executorUnitCode} - #{fixedAssetPurchaseOrderItem.executorUnit.descriptionBU}"/>
-    </rich:column>
-    <rich:column styleClass="#{fixedAssetPurchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
-        <h:outputText value="#{fixedAssetPurchaseOrderItem.costCenter.fullName}"/>
-    </rich:column>
+
     <rich:column styleClass="#{fixedAssetPurchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
         <h:outputText value="#{messages[fixedAssetPurchaseOrderItem.state.resourceKey]}"/>
     </rich:column>
