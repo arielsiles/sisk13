@@ -16,15 +16,15 @@ where a.cuenta in ();
 -- UPDATE SUBGRUPOS FOR TERDEMOL
 update af_subgrupos a set a.descri = 'EQUIPOS E INSTALACION DE LABORATORIO' where subgrupo = '4';
 
-update af_subgrupos a set a.ctadavo = '12300301', a.cta_vo = '12300201', a.cta_alm = '12300201', a.ctagavo = '51000905' where a.subgrupo = 1;
-update af_subgrupos a set a.ctadavo = '12300500', a.cta_vo = '12300400', a.cta_alm = '12300400', a.ctagavo = '51000901' where a.subgrupo = 3;
-update af_subgrupos a set a.ctadavo = '12300901', a.cta_vo = '12300801', a.cta_alm = '12300801', a.ctagavo = '51000909' where a.subgrupo = 2;
-update af_subgrupos a set a.ctadavo = '12301501', a.cta_vo = '12301401', a.cta_alm = '12301401', a.ctagavo = '51000911' where a.subgrupo = 4;
-update af_subgrupos a set a.ctadavo = '12302501', a.cta_vo = '12302401', a.cta_alm = '12302401', a.ctagavo = '51000903' where a.subgrupo = 5;
-update af_subgrupos a set a.ctadavo = '12302301', a.cta_vo = '12302201', a.cta_alm = '12302201', a.ctagavo = '51000912' where a.subgrupo = 7;
-update af_subgrupos a set a.ctadavo = '12300701', a.cta_vo = '12300601', a.cta_alm = '12300601', a.ctagavo = '51000902' where a.subgrupo = 6;
-update af_subgrupos a set a.ctadavo = '12301301', a.cta_vo = '12301201', a.cta_alm = '12301201', a.ctagavo = '51000904' where a.subgrupo = 8;
-update af_subgrupos a set a.ctadavo = '12301101', a.cta_vo = '12301001', a.cta_alm = '12301001', a.ctagavo = '51000910' where a.subgrupo = 9;
+update af_subgrupos a set a.ctadavo = '12300301', a.cta_vo = '12300201', a.ctamej = '12300201', a.cta_alm = '12300201', a.ctagavo = '51000905' where a.subgrupo = 1;
+update af_subgrupos a set a.ctadavo = '12300500', a.cta_vo = '12300400', a.ctamej = '12300400', a.cta_alm = '12300400', a.ctagavo = '51000901' where a.subgrupo = 3;
+update af_subgrupos a set a.ctadavo = '12300901', a.cta_vo = '12300801', a.ctamej = '12300801', a.cta_alm = '12300801', a.ctagavo = '51000909' where a.subgrupo = 2;
+update af_subgrupos a set a.ctadavo = '12301501', a.cta_vo = '12301401', a.ctamej = '12301401', a.cta_alm = '12301401', a.ctagavo = '51000911' where a.subgrupo = 4;
+update af_subgrupos a set a.ctadavo = '12302501', a.cta_vo = '12302401', a.ctamej = '12302401', a.cta_alm = '12302401', a.ctagavo = '51000903' where a.subgrupo = 5;
+update af_subgrupos a set a.ctadavo = '12302301', a.cta_vo = '12302201', a.ctamej = '12302201', a.cta_alm = '12302201', a.ctagavo = '51000912' where a.subgrupo = 7;
+update af_subgrupos a set a.ctadavo = '12300701', a.cta_vo = '12300601', a.ctamej = '12300601', a.cta_alm = '12300601', a.ctagavo = '51000902' where a.subgrupo = 6;
+update af_subgrupos a set a.ctadavo = '12301301', a.cta_vo = '12301201', a.ctamej = '12301201', a.cta_alm = '12301201', a.ctagavo = '51000904' where a.subgrupo = 8;
+update af_subgrupos a set a.ctadavo = '12301101', a.cta_vo = '12301001', a.ctamej = '12301001', a.cta_alm = '12301001', a.ctagavo = '51000910' where a.subgrupo = 9;
 
 -- 10.04.2024
 alter table configuracion add column af_fin_oc varchar(5) after doc_oc_pago;
