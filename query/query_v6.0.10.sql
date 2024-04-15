@@ -4,9 +4,6 @@ delete from af_grupos where grupo >= 1;
 
 insert into af_grupos(no_cia, grupo, descri, version) values ('01', 1, 'ACTIVOS TERDEMOL', 0);
 
-insert into `arcgms` (`cuenta`, `descri`, `cta_raiz`, `cta_niv3`, `est`, `cn_ana`, `cn_nivel`, `cn_dv`, `cn_tip`, `cn_act`, `no_cia`, `clase`, `tipo`, `activa`, `util`, `nomutil`, `permite_iva`, `ind_presup`, `creditos`, `moneda`, `debitos`, `saldo_mes_ant_dol`, `saldo_per_ant_dol`, `creditos_dol`, `debitos_dol`, `gru_cta`, `permiso_con`, `exije_cc`, `permiso_afijo`, `permiso_cxp`, `permiso_cxc`, `permiso_che`, `permiso_inv`, `f_inactiva`, `ind_mov`, `saldo_mes_ant`, `saldo_per_ant`)
-values('12302501','DEPRECIACION ACUMULADO DE INSTALACIONES','12000000',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'01',NULL,'E','S','N',NULL,'N',NULL,NULL,'P',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'N',NULL,NULL,NULL,NULL,NULL,NULL,'S',NULL,NULL);
-
 /*
 -- Revisar cuenta raiz
 update arcgms a set a.cta_raiz = '12000000'
