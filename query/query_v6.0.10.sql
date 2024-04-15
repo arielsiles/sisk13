@@ -42,6 +42,14 @@ update gensecuencia g set g.valor = 0 where g.nombre = 'FIXEDASSET_ITEM_SEQUENCE
 update gensecuencia g set g.valor = 0 where g.nombre = 'FIXEDASSET_ITEM_SEQUENCE_1_9';
 
 UPDATE secuencia SET valor=(SELECT MAX(e.idgensecuencia)+1 FROM gensecuencia e) WHERE tabla='gensecuencia';
-
 update configuracion set ctaprovaf = '21200101' where no_cia = '01';
+update unidadnegocio set sigla = 'OC' where sigla = 'CISC';
 
+-- 14.04.2024
+alter table xpr_maquina add column idactivo bigint(20) after nombre;
+
+alter table af_activos add primary key (idactivo);
+
+alter table xpr_maquina add foreign key (idactivo) references af_activos(idactivo);
+
+UPDATE secuencia SET valor=(SELECT MAX(e.idmaquina)+1 FROM xpr_maquina e) WHERE tabla='xpr_maquina';

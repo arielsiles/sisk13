@@ -355,8 +355,8 @@
             rendered="#{not readOnly}">
     <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
     <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton"
+    <ui:define name="addButton">
+        <a4j:commandButton id="addButton"
                            action="#{specialDateAction.assignEmployee(employeeItem)}"
                            image="/img/active.gif"
                            styleClass="select-image-middle"

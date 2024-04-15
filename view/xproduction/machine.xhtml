@@ -1,6 +1,8 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:s="http://jboss.com/products/seam/taglib"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:app="http://encens.com/products/khipus/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:c="http://java.sun.com/jstl/core"
@@ -17,7 +19,7 @@
             </c:otherwise>
         </c:choose>
     </ui:define>
-    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyWidth" value="60%"/>
     <ui:param name="selectedTab" value="xproduction"/>
     <ui:define name="body">
 
@@ -71,10 +73,41 @@
             </h:inputText>
         </s:decorate>
 
+        <s:decorate id="fixedAssetField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['XProduction.productionMachine.fixedAsset']}</ui:define>
+            <app:selectPopUp id="fixedAsset"
+                             required="true"
+                             textValue="#{xmachine.fixedAsset.detail}"
+                             value="#{xmachine.fixedAsset}"
+                             clearAction="#{xmachineAction.clearFixedAsset()}"
+                             searchModalPanel="fixedAssetModalPanel"
+                             dataModel="#{fixedAssetDataModel}"
+                             reRender="fixedAssetField"
+                             tabindex="12">
+            </app:selectPopUp>
+        </s:decorate>
+
     </h:panelGrid>
     </rich:panel>
 
 </h:form>
+
+        <s:div id="fixedAssetModalPanelContainerDiv">
+            <s:decorate id="fixedAssetModalPanelContainer" template="/fixedassets/fixedAssetModalPanel.xhtml">
+                <ui:param name="dialogId" value="fixedAssetModalPanel"/>
+                <ui:param name="dataModel" value="#{fixedAssetDataModel}"/>
+                <ui:define name="addButton">
+                    <a4j:commandButton id="addButton"
+                                       action="#{xmachineAction.assignFixedAsset(fixedAssetItem)}"
+                                       image="/img/active.gif"
+                                       immediate="true"
+                                       ajaxSingle="true"
+                                       styleClass="select-image-middle"
+                                       reRender="fixedAssetField"
+                                       oncomplete="Richfaces.hideModalPanel('fixedAssetModalPanel');"/>
+                </ui:define>
+            </s:decorate>
+        </s:div>
 
 </ui:define>
 </ui:composition>

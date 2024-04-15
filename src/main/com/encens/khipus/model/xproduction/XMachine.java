@@ -3,6 +3,7 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.fixedassets.FixedAsset;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
@@ -33,6 +34,10 @@ public class XMachine implements BaseModel {
 
     @Column(name = "nombre", nullable = false, length = 255)
     private String name;
+
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idactivo", referencedColumnName = "idactivo", nullable = true)
+    private FixedAsset fixedAsset;
 
     @OneToMany(mappedBy = "xmachine", fetch = FetchType.LAZY)
     private List<XMachineProcess> typePresetAccountingTemplateList = new ArrayList<XMachineProcess>(0);
@@ -93,5 +98,13 @@ public class XMachine implements BaseModel {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public FixedAsset getFixedAsset() {
+        return fixedAsset;
+    }
+
+    public void setFixedAsset(FixedAsset fixedAsset) {
+        this.fixedAsset = fixedAsset;
     }
 }

@@ -1,0 +1,157 @@
+<rich:modalPanel height="520" width="950" zindex="2000" resizeable="false" autosized="false"
+                 style="overflow:auto;"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}"
+                 onshow="goToTop(); jQuery('##{containerId}\\:fixedAssetListForm#{dialogId}\\:detailField\\:detail').focus();">
+
+<c:set var="dataModel" value="#{fixedAssetDataModel}"/>
+
+<f:facet name="header">
+    <h:outputText>#{messages['FixedAsset.list']}</h:outputText>
+</f:facet>
+<f:facet name="controls">
+    <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+</f:facet>
+<h:form id="fixedAssetListForm#{dialogId}">
+
+<rich:simpleTogglePanel id="fixedAssetSearchPanel" label="#{messages['FixedAsset.search']}" switchType="client">
+
+    <h:panelGrid columns="2"
+                 width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 columnClasses="width30percent,width30percent,width40percent">
+        <s:div>
+            <s:decorate id="detailField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.detail']}</ui:define>
+                <h:inputText id="sequence"
+                             value="#{dataModel.criteria.detail}"
+                             styleClass="input"
+                             tabindex="11">
+                </h:inputText>
+            </s:decorate>
+        </s:div>
+        <s:div>
+            <s:decorate id="fixedAssetCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['FixedAsset.code']}</ui:define>
+                <h:inputText id="fixedAssetCode"
+                             value="#{dataModel.criteria.fixedAssetCode}"
+                             styleClass="input"
+                             tabindex="10">
+                    <f:convertNumber/>
+                </h:inputText>
+            </s:decorate>
+
+            <s:decorate id="searchButtonsField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:div styleClass="right input">
+                    <a4j:commandButton action="#{dataModel.search}"
+                                       reRender="fixedAssetSearchPanel, fixedAssetList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId"
+                                       tabindex="16">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <a4j:commandButton action="#{dataModel.clear}"
+                                       reRender="fixedAssetSearchPanel, fixedAssetList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}"
+                                       id="clearButtonId"
+                                       tabindex="17">
+                    </a4j:commandButton>
+                </s:div>
+            </s:decorate>
+        </s:div>
+    </h:panelGrid>
+
+    <rich:jQuery selector="#executorUnit" query="focus()" timing="onload"/>
+</rich:simpleTogglePanel>
+
+<rich:dataTable value="#{dataModel}" var="fixedAssetItem" id="fixedAssetList"
+                rows="#{sessionUser.rowsPerPage}"
+                width="100%" columnsWidth="33%,10%,35%,10%,7%,5%">
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.fixedAssetSubGroup.id.fixedAssetSubGroupCode"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.fixedAssetSubGroupCode']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>#{messages['FixedAsset.code']}</rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.detail"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.detail']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.ufvOriginalValue"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.originalValue']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column>
+                <app:commandSortHeader sortProperty="fixedAsset.state"
+                                       dataModel="#{dataModel}"
+                                       reRender="fixedAssetList, dataScroller">
+                    #{messages['FixedAsset.state']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">#{messages['Common.select']}</rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column>
+        <h:outputText value="#{fixedAssetItem.fixedAssetSubGroup.fullName}">
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetItem.barCode}">
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{fixedAssetItem.detail}">
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="right">
+        <h:outputText value="#{fixedAssetItem.ufvOriginalValue}">
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{messages[fixedAssetItem.state.resourceKey]}">
+        </h:outputText>
+    </rich:column>
+    <rich:column styleClass="center">
+        <ui:insert name="addButton"/>
+    </rich:column>
+</rich:dataTable>
+<app:dataScroller id="dataScroller" for="fixedAssetList" dataModel="#{dataModel}"/>
+<rich:componentControl for="fixedAssetSelectListModalPanel" attachTo="closeLink" operation="hide" event="onclick"/>
+
+<script type="text/javascript">
+    function focusFirstElement() {
+        document.getElementById("#{rich:clientId('executorUnit')}").focus();
+    }
+    function goToTop() {
+        window.scrollTo(0, 0);
+        focusFirstElement();
+        document.getElementById('executorUnitField').focus();
+    }
+</script>
+
+
+</h:form>
+</rich:modalPanel>

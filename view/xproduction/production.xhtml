@@ -190,7 +190,7 @@
                 </s:decorate>
 
                 <s:decorate id="totalRawMaterialField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.usedMilk']}</ui:define>
+                    <ui:define name="label">#{messages['ProductionPlan.usedRawMaterial']}</ui:define>
                     <h:outputText value="#{xproductionAction.calculateRawMaterial()}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                     </h:outputText>
