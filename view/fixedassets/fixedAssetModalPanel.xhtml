@@ -139,19 +139,7 @@
     </rich:column>
 </rich:dataTable>
 <app:dataScroller id="dataScroller" for="fixedAssetList" dataModel="#{dataModel}"/>
-<rich:componentControl for="fixedAssetSelectListModalPanel" attachTo="closeLink" operation="hide" event="onclick"/>
-
-<script type="text/javascript">
-    function focusFirstElement() {
-        document.getElementById("#{rich:clientId('executorUnit')}").focus();
-    }
-    function goToTop() {
-        window.scrollTo(0, 0);
-        focusFirstElement();
-        document.getElementById('executorUnitField').focus();
-    }
-</script>
-
+<rich:componentControl for="fixedAssetModalPanel" attachTo="closeLink" operation="hide" event="onclick"/>
 
 </h:form>
 </rich:modalPanel>

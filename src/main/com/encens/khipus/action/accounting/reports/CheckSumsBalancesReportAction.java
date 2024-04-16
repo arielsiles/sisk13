@@ -71,7 +71,8 @@ public class CheckSumsBalancesReportAction extends GenericReportAction {
                 "  LEFT  JOIN voucherDetail.cashAccount cashAccount " +
                 "  WHERE voucher.date between '"+start+"' and '"+end+"' " +
                 "  AND   voucher.state <> 'ANL' " +
-                "  GROUP BY voucherDetail.account, cashAccount.description ";
+                "  GROUP BY voucherDetail.account, cashAccount.description " +
+                "  ORDER BY voucherDetail.account ";
 
     }
 

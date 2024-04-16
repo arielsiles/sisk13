@@ -116,7 +116,7 @@
 
             <rich:dataTable value="#{collectMaterialDataModel}" var="collectMaterialItem" id="collectMaterialList"
                             rows="#{sessionUser.rowsPerPage15}"
-                            width="100%" columnsWidth="7%, 10%, 10%, 15%, 10%, 8%, 10%, 8%, 7%, 10%, 5%">
+                            width="100%" columnsWidth="7%, 10%, 11%, 16%, 7%, 7%, 10%, 8%, 7%, 4%, 8%, 5%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -129,6 +129,7 @@
                         <rich:column>#{messages['CollectMaterial.rawMaterial']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.balanceWeight']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.tonPrice']}</rich:column>
+                        <rich:column>#{messages['CollectMaterial.invoice']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.state']}</rich:column>
 
                         <rich:column styleClass="center">
@@ -169,6 +170,9 @@
                     <h:outputText value="#{collectMaterialItem.price}">
                         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{collectMaterialItem.hasInvoice ? 'Si' : 'No'}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{messages[collectMaterialItem.state.resourceKey]}"/>

@@ -1639,11 +1639,12 @@
         styleClass="tab-cell"
         propagation="none"/>
 
-<s:link view="/warehouse/productInventoryList.xhtml"
+<!-- Eliminar, vistas, clases y tablas de este menu -->
+<!--<s:link view="/warehouse/productInventoryList.xhtml"
         value="#{messages['menu.products.stock']}"
         rendered="#{s:hasPermission('PRODUCTSTOCK','VIEW')}"
         styleClass="tab-cell"
-        propagation="none"/>
+        propagation="none"/>-->
 
 <rich:dropDownMenu value="#{messages['menu.products.configuration']}"
                    rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
