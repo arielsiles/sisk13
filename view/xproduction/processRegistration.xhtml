@@ -85,13 +85,13 @@
 
                 <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['XProcessState.code']}</ui:define>
-                    <h:inputText id="code" value="#{xProcess.code}" styleClass="input" required="true"
+                    <h:inputText id="code" value="#{xProcess.code}" styleClass="inputTiny" required="true"
                                  maxlength="150" tabindex="1"/>
                 </s:decorate>
 
                 <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['XProcessState.name']}</ui:define>
-                    <h:inputText id="name" value="#{xProcess.name}" styleClass="input" required="true"
+                    <h:inputText id="name" value="#{xProcess.name}" styleClass="input250" required="true"
                                  maxlength="150" tabindex="2"/>
                 </s:decorate>
             </rich:panel>
@@ -133,11 +133,11 @@
                             </td>
 
                             <td class="rich-table-cell center">
-                                <a4j:commandLink immediate="true"
-                                                 title="#{messages['Common.remove']}"
+                                <a4j:commandLink title="#{messages['Common.remove']}"
                                                  action="#{xprocessAction.removeXMachine(instance)}"
+                                                 rendered="#{xprocessAction.managed and xprocessAction.pending}"
                                                  ajaxSingle="true"
-                                                 rendered="true"
+                                                 immediate="true"
                                                  reRender="machineListPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>

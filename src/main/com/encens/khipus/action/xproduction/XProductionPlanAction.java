@@ -11,17 +11,16 @@ import com.encens.khipus.model.production.IndirectCosts;
 import com.encens.khipus.model.production.PeriodIndirectCost;
 import com.encens.khipus.model.production.ProductionPlanState;
 import com.encens.khipus.model.production.ProductionState;
-import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
-
 import com.encens.khipus.service.production.IndirectCostsService;
 import com.encens.khipus.service.production.PeriodIndirectCostService;
+import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.service.xproduction.XProductionPlanService;
 import com.encens.khipus.service.xproduction.XProductionService;
-import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
@@ -366,7 +365,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
                 voucherAccoutingService.saveVoucher(voucher);
                 production.setVoucher(voucher);
-                xproductionService.updateProduction(production, new ArrayList<XSupply>(), new ArrayList<XSupply>());
+                xproductionService.updateProduction(production, new ArrayList<XSupply>(), new ArrayList<XSupply>(), new ArrayList<XProductionLabor>());
             }
             productionPlan.setState(ProductionPlanState.SUS);
             xproductionPlanService.updateProductionPlan(productionPlan);
@@ -497,7 +496,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
                 }
                 production.setState(ProductionState.FIN);
                 production.setTotalCost(productionTotalCost);
-                xproductionService.updateProduction(production, emptyList, emptyList);
+                xproductionService.updateProduction(production, emptyList, emptyList, new ArrayList<XProductionLabor>());
             }
             productionPlan.setState(ProductionPlanState.FIN);
             xproductionPlanService.updateProductionPlan(productionPlan, new ArrayList<XProductionProduct>());

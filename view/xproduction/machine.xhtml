@@ -76,7 +76,7 @@
         <s:decorate id="fixedAssetField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['XProduction.productionMachine.fixedAsset']}</ui:define>
             <app:selectPopUp id="fixedAsset"
-                             required="true"
+                             required="false"
                              textValue="#{xmachine.fixedAsset.detail}"
                              value="#{xmachine.fixedAsset}"
                              clearAction="#{xmachineAction.clearFixedAsset()}"

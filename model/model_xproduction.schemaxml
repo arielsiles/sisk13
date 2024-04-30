@@ -6,10 +6,10 @@
 <canvas zoom="100">
 <tables>
 <table name="xpr_produccion" view="colnames">
-<left>377</left>
-<top>141</top>
+<left>597</left>
+<top>208</top>
 <width>201</width>
-<height>299</height>
+<height>219</height>
 <sql_create_table>CREATE TABLE `xpr_produccion` (
   `idproduccion` bigint NOT NULL,
   `codigo` int DEFAULT NULL,
@@ -36,7 +36,7 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 <table name="xpr_proceso" view="colnames">
-<left>97</left>
+<left>81</left>
 <top>534</top>
 <width>176</width>
 <height>146</height>
@@ -48,15 +48,14 @@
   `version` bigint DEFAULT NULL,
   `idcompania` bigint DEFAULT NULL,
   PRIMARY KEY (`idproceso`),
-  UNIQUE KEY `codigo` (`codigo`),
-  UNIQUE KEY `codigo_2` (`codigo`)
+  UNIQUE KEY `codigo` (`codigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci</sql_create_table>
 </table>
 <table name="xpr_plan" view="colnames">
-<left>105</left>
-<top>232</top>
-<width>147</width>
-<height>180</height>
+<left>84</left>
+<top>369</top>
+<width>172</width>
+<height>132</height>
 <sql_create_table>CREATE TABLE `xpr_plan` (
   `idplan` bigint NOT NULL,
   `nombre` varchar(100) DEFAULT NULL,
@@ -69,10 +68,10 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 <table name="xpr_formula" view="colnames">
-<left>810</left>
-<top>90</top>
-<width>169</width>
-<height>231</height>
+<left>948</left>
+<top>191</top>
+<width>205</width>
+<height>183</height>
 <sql_create_table>CREATE TABLE `xpr_formula` (
   `idformula` bigint NOT NULL,
   `nombre` varchar(100) NOT NULL,
@@ -89,10 +88,10 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 <table name="xpr_tanque" view="colnames">
-<left>105</left>
-<top>12</top>
-<width>151</width>
-<height>180</height>
+<left>947</left>
+<top>406</top>
+<width>206</width>
+<height>166</height>
 <sql_create_table>CREATE TABLE `xpr_tanque` (
   `idtanque` bigint NOT NULL,
   `nombre` varchar(255) NOT NULL,
@@ -104,8 +103,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 <table name="xpr_procesomaquina" view="colnames">
-<left>439</left>
-<top>548</top>
+<left>455</left>
+<top>660</top>
 <width>177</width>
 <height>163</height>
 <sql_create_table>CREATE TABLE `xpr_procesomaquina` (
@@ -122,8 +121,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci</sql_create_table>
 </table>
 <table name="xpr_maquina" view="colnames">
-<left>781</left>
-<top>548</top>
+<left>983</left>
+<top>643</top>
 <width>161</width>
 <height>163</height>
 <sql_create_table>CREATE TABLE `xpr_maquina` (
@@ -135,7 +134,6 @@
   `idcompania` bigint DEFAULT NULL,
   PRIMARY KEY (`idmaquina`),
   UNIQUE KEY `codigo` (`codigo`),
-  UNIQUE KEY `codigo_2` (`codigo`),
   KEY `idcompania` (`idcompania`),
   KEY `idactivo` (`idactivo`),
   CONSTRAINT `xpr_maquina_ibfk_1` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
@@ -157,8 +155,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 <table name="af_activos" view="colnames">
-<left>1240</left>
-<top>473</top>
+<left>1307</left>
+<top>636</top>
 <width>196</width>
 <height>164</height>
 <sql_create_table>CREATE TABLE `af_activos` (
@@ -203,6 +201,53 @@
   `idaflocalizacion` bigint DEFAULT NULL,
   `idfoto` bigint DEFAULT NULL,
   PRIMARY KEY (`idactivo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="xpr_manoobra" view="colnames">
+<left>947</left>
+<top>3</top>
+<width>208</width>
+<height>166</height>
+<sql_create_table>CREATE TABLE `xpr_manoobra` (
+  `idmanoobra` bigint NOT NULL,
+  `horas` decimal(10,2) DEFAULT NULL,
+  `idempleado` bigint DEFAULT NULL,
+  `idproduccion` bigint DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`idmanoobra`),
+  KEY `idempleado` (`idempleado`),
+  KEY `idproduccion` (`idproduccion`),
+  KEY `idcompania` (`idcompania`),
+  CONSTRAINT `xpr_manoobra_ibfk_1` FOREIGN KEY (`idempleado`) REFERENCES `empleado` (`idempleado`),
+  CONSTRAINT `xpr_manoobra_ibfk_2` FOREIGN KEY (`idproduccion`) REFERENCES `xpr_produccion` (`idproduccion`),
+  CONSTRAINT `xpr_manoobra_ibfk_3` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="xpr_producto" view="colnames">
+<left>317</left>
+<top>65</top>
+<width>175</width>
+<height>151</height>
+<sql_create_table>CREATE TABLE `xpr_producto` (
+  `idproducto` bigint NOT NULL,
+  `cod_art` varchar(6) DEFAULT NULL,
+  `cantidad` decimal(16,2) DEFAULT NULL,
+  `costo` decimal(16,2) DEFAULT '0.00',
+  `costouni` decimal(16,2) DEFAULT '0.00',
+  `costo_a` decimal(16,2) DEFAULT '0.00',
+  `costo_b` decimal(16,2) DEFAULT '0.00',
+  `costo_c` decimal(16,2) DEFAULT '0.00',
+  `idproduccion` bigint DEFAULT NULL,
+  `idplan` bigint DEFAULT NULL,
+  `VERSION` bigint NOT NULL,
+  `idcompania` bigint NOT NULL,
+  PRIMARY KEY (`idproducto`),
+  KEY `idproduccion` (`idproduccion`),
+  KEY `idplan` (`idplan`),
+  CONSTRAINT `xpr_producto_ibfk_1` FOREIGN KEY (`idproduccion`) REFERENCES `xpr_produccion` (`idproduccion`),
+  CONSTRAINT `xpr_producto_ibfk_2` FOREIGN KEY (`idproduccion`) REFERENCES `xpr_produccion` (`idproduccion`),
+  CONSTRAINT `xpr_producto_ibfk_3` FOREIGN KEY (`idplan`) REFERENCES `xpr_plan` (`idplan`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 </tables>

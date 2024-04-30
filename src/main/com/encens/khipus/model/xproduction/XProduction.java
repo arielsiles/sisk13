@@ -10,6 +10,7 @@ import org.hibernate.annotations.Filter;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,6 +53,9 @@ public class XProduction implements BaseModel {
 
     @Column(name = "descripcion")
     private String description;
+
+    @Column(name = "fechafin")
+    private Date endDate;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idformula", nullable = true, updatable = false, insertable = true)
@@ -206,4 +210,27 @@ public class XProduction implements BaseModel {
     public void setProcess(XProcess process) {
         this.process = process;
     }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public boolean isApproved(){
+        boolean result = false;
+        if (getState().equals(ProductionState.APR))
+            result = true;
+        return result;
+    }
+
+    public boolean isPending(){
+        boolean result = false;
+        if (getState().equals(ProductionState.PEN))
+            result = true;
+        return result;
+    }
+
 }

@@ -3,6 +3,7 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.production.MeasurementUnit;
 import com.encens.khipus.model.production.ProductionState;
 import com.encens.khipus.model.production.SupplyType;
@@ -34,11 +35,13 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     private List<XSupply> ingredientSupplyList = new ArrayList<XSupply>();
     private List<XSupply> materialSupplyList = new ArrayList<XSupply>();
+    private List<XProductionLabor> laborList = new ArrayList<XProductionLabor>();
 
     //private BigDecimal totalCost;
     //private BigDecimal totalRawMaterial;
 
     private XSupply supplyAssign;
+    private String activeTabName = "productsTab";
 
     @In
     private XProductionPlanAction xproductionPlanAction;
@@ -65,6 +68,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         setProcess(getInstance().getProcess());
         setIngredientSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.INGREDIENT));
         setMaterialSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.MATERIAL));
+        setLaborList(xproductionService.getLaborList(getInstance()));
 
         return outCome;
     }
@@ -96,7 +100,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
         production.setTotalCost(calculateTotalCost());
         production.setTotalRawMaterial(calculateRawMaterial());
-        xproductionService.updateProduction(production, ingredientSupplyList, materialSupplyList);
+        xproductionService.updateProduction(production, ingredientSupplyList, materialSupplyList, laborList);
 
         return Outcome.SUCCESS;
     }
@@ -118,7 +122,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     public void disapprove(){
         getInstance().setState(ProductionState.PEN);
         xproductionPlanAction.changePlanStatus(getInstance().getProductionPlan());
-        xproductionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
+        xproductionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList, laborList);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.disapproveProduction");
     }
     /**
@@ -209,7 +213,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         getInstance().setState(ProductionState.APR);
         xproductionPlanAction.changePlanStatus(getInstance().getProductionPlan());
 
-        xproductionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList);
+        xproductionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList, laborList);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
     }
 
@@ -307,6 +311,15 @@ public class XProductionAction extends GenericAction<XProduction> {
         }
     }
 
+    public void addProductionLabor(Employee employee){
+        enableLaborTab();
+        XProductionLabor labor = new XProductionLabor();
+        labor.setEmployee(employee);
+        labor.setHours(BigDecimal.ONE);
+        labor.setProduction(getInstance());
+
+        getLaborList().add(labor);
+    }
 
     public BigDecimal getSupplyUnitCost(XSupply supplyDetail){
 
@@ -341,6 +354,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     }
 
     public void assignProduct(XProductionProduct product){
+        enableProductsTab();
         xproductionService.assignProduct(getInstance(), product);
         addMaterialDefault(product, product.getQuantity());
     }
@@ -417,6 +431,12 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void removeProductionProduct(XProductionProduct product){
         xproductionService.removeProductionProduct(product, getInstance());
+    }
+
+    public void removeLabor(XProductionLabor labor){
+
+        /** todo **/
+        laborList.remove(labor);
     }
 
     public boolean hasFormula(XSupply supply){
@@ -554,8 +574,15 @@ public class XProductionAction extends GenericAction<XProduction> {
         BigDecimal result = BigDecimal.ZERO;
 
         for (XSupply supply : ingredientSupplyList){
-            if (supply.getProductItemCode().equals(Constants.ID_ART_RAW_MILK))
-                result = BigDecimalUtil.sum(result, supply.getQuantity(), 6);
+
+            /*if (supply.getProductItemCode().equals(Constants.ID_ART_RAW_MILK))
+                result = BigDecimalUtil.sum(result, supply.getQuantity(), 6);*/
+
+            if (supply.hasFormula()){
+                if (supply.getFormulationInput().getInputDefault()){
+                    result = BigDecimalUtil.sum(result, supply.getQuantity(), 6);
+                }
+            }
 
             if (supply.hasFormula()){
                 if (supply.getFormulationInput().hasSecondFormula()){
@@ -621,6 +648,30 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void setProcess(XProcess process) {
         this.process = process;
+    }
+
+    public List<XProductionLabor> getLaborList() {
+        return laborList;
+    }
+
+    public void setLaborList(List<XProductionLabor> laborList) {
+        this.laborList = laborList;
+    }
+
+    public String getActiveTabName() {
+        return activeTabName;
+    }
+
+    public void setActiveTabName(String activeTabName) {
+        this.activeTabName = activeTabName;
+    }
+
+    public void enableLaborTab() {
+        setActiveTabName("laborTab");
+    }
+
+    public void enableProductsTab() {
+        setActiveTabName("productsTab");
     }
 
     /*public BigDecimal getTotalCost() {

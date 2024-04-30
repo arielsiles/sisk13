@@ -1,7 +1,6 @@
 package com.encens.khipus.service.xproduction;
 
 
-import com.encens.khipus.model.xproduction.XMaterialInput;
 import com.encens.khipus.model.production.SupplyType;
 import com.encens.khipus.model.xproduction.*;
 import org.jboss.seam.annotations.AutoCreate;
@@ -47,9 +46,8 @@ public class XProductionServiceBean implements XProductionService {
         }
     }
 
-    public void updateProduction(XProduction production, List<XSupply> ingredientSupplyList, List<XSupply> materialSupplyList){
+    public void updateProduction(XProduction production, List<XSupply> ingredientSupplyList, List<XSupply> materialSupplyList, List<XProductionLabor> laborList){
 
-        //System.out.println("----> Estado Produccion: " + production.getState());
         for (XSupply supply : ingredientSupplyList){
             if (supply.getId() == null){
                 supply.setProduction(production);
@@ -79,11 +77,15 @@ public class XProductionServiceBean implements XProductionService {
             em.flush();
         }
 
+
+        for (XProductionLabor labor : laborList){
+            em.merge(labor);
+            em.flush();
+        }
+
         em.merge(production);
         em.flush();
 
-        /*em.merge(production.getProductionPlan());
-        em.flush();*/
     }
 
     @Override
@@ -135,6 +137,15 @@ public class XProductionServiceBean implements XProductionService {
                 .getResultList();
 
         return supplyList;
+    }
+
+    public List<XProductionLabor> getLaborList(XProduction production){
+        List<XProductionLabor> laborList = em.createQuery("select labor from XProductionLabor labor " +
+                " where labor.production = :production ")
+                .setParameter("production", production)
+                .getResultList();
+
+        return laborList;
     }
 
     public void removeProductionProduct(XProductionProduct product, XProduction production){

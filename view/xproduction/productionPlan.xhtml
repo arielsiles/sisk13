@@ -120,24 +120,25 @@
                             var="productionItem"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="10%, 35%, 15%, 20%, 10%, 10%">
+                            columnsWidth="5%, 35%, 10%, 20%, 10%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column><h:outputText value="#{messages['Production.code']}" /></rich:column>
-                        <rich:column><h:outputText value="#{messages['Production.productionTank']}" /></rich:column>
+                        <rich:column><h:outputText value="#{messages['Production.formulation']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['XProductionPlan.usedRawMaterial']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.category']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.state']}" /></rich:column>
+                        <rich:column><h:outputText value="#{messages['XProduction.ends']}" /></rich:column>
                         <rich:column styleClass="center"><h:outputText value="#{messages['Common.action']}" /></rich:column>
                     </rich:columnGroup>
                 </f:facet>
 
-                <rich:column>
+                <rich:column styleClass="center">
                     <h:outputText value="#{productionItem.code}" />
                 </rich:column>
 
                 <rich:column>
-                    <h:outputText value="#{productionItem.productionTank.name}" />
+                    <h:outputText value="#{productionItem.formulation.name}" />
                 </rich:column>
 
                 <rich:column styleClass="right">
@@ -150,8 +151,14 @@
                     <h:outputText value="#{productionItem.formulation.category.name}" />
                 </rich:column>
 
-                <rich:column>
+                <rich:column styleClass="center">
                     <h:outputText value="#{messages[productionItem.state.resourceKey]}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{productionItem.endDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
                 </rich:column>
 
                 <rich:column styleClass="center">
@@ -189,16 +196,17 @@
                             </td>
                             <td class="rich-table-cell" align="center">
 
-                                <a4j:commandLink title="#{messages['Common.remove']}"
-                                                 immediate="true"
+                                <!-- Aun no es funcional -->
+                                <!--<a4j:commandLink title="#{messages['Common.remove']}"
                                                  action="#{xproductionPlanAction.assignProductToSubtract(productItem)}"
+                                                 rendered="#{productItem.production.isPending()}"
+                                                 immediate="true"
                                                  ajaxSingle="true"
                                                  oncomplete="Richfaces.showModalPanel('removeProductQuantityModalPanel');"
                                                  reRender="productsPanel, removeProductQuantityModalPanel">
                                     <h:graphicImage value="/img/minus.png" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
-
-                                <rich:spacer width="5"/>
+                                <rich:spacer width="5"/>-->
 
                                 <c:if test="#{!xproductionPlanAction.hasProduction2(productItem)}">
                                 <h:inputText id="#{quantityInputFieldId}"
@@ -216,16 +224,17 @@
                                     </h:outputText>
                                 </c:if>
 
-                                <rich:spacer width="5"/>
-
-                                <a4j:commandLink title="#{messages['Common.add']}"
-                                                 immediate="true"
+                                <!--<rich:spacer width="5"/>-->
+                                <!-- Aun no es funcional -->
+                                <!--<a4j:commandLink title="#{messages['Common.add']}"
                                                  action="#{xproductionPlanAction.assignProductToSum(productItem)}"
+                                                 rendered="#{productItem.production.isPending()}"
+                                                 immediate="true"
                                                  ajaxSingle="true"
                                                  oncomplete="Richfaces.showModalPanel('addProductQuantityModalPanel');"
                                                  reRender="productsPanel, addProductQuantityModalPanel">
                                     <h:graphicImage value="/img/more.png" styleClass="select-image-middle"/>
-                                </a4j:commandLink>
+                                </a4j:commandLink>-->
 
                             </td>
                             <td class="rich-table-cell" align="center">
@@ -297,12 +306,12 @@
         </ui:define>
     </s:decorate>
 
-    <s:decorate id="addProductQuantityPanelContainer" template="/customers/addProductQuantityModalPanel.xhtml">
+    <s:decorate id="addProductQuantityPanelContainer" template="/xproduction/addProductQuantityModalPanel.xhtml">
         <ui:param name="containerId" value="addProductQuantityModalPanelContainer"/>
         <ui:param name="dialogId" value="addProductQuantityModalPanel"/>
     </s:decorate>
 
-    <s:decorate id="removeProductQuantityPanelContainer" template="/customers/removeProductQuantityModalPanel.xhtml">
+    <s:decorate id="removeProductQuantityPanelContainer" template="/xproduction/removeProductQuantityModalPanel.xhtml">
         <ui:param name="containerId" value="removeProductQuantityModalPanelContainer"/>
         <ui:param name="dialogId" value="removeProductQuantityModalPanel"/>
     </s:decorate>

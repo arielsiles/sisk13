@@ -208,7 +208,7 @@ CREATE TABLE `xpr_maquina` (
                                `version` bigint(20) DEFAULT NULL,
                                `idcompania` bigint(20) DEFAULT NULL,
                                PRIMARY KEY (`idmaquina`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 --
@@ -224,7 +224,7 @@ CREATE TABLE `xpr_proceso` (
                                `version` bigint(20) DEFAULT NULL,
                                `idcompania` bigint(20) DEFAULT NULL,
                                PRIMARY KEY (`idproceso`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 --
@@ -244,7 +244,7 @@ CREATE TABLE `xpr_procesomaquina` (
                                       KEY `xpr_procesomaqina_xpr_maquina_idmaquina_fk` (`idmaquina`),
                                       CONSTRAINT `xpr_procesomaqina_xpr_maquina_idmaquina_fk` FOREIGN KEY (`idmaquina`) REFERENCES `xpr_maquina` (`idmaquina`),
                                       CONSTRAINT `xpr_procesomaqina_xpr_proceso_idproceso_fk` FOREIGN KEY (`idproceso`) REFERENCES `xpr_proceso` (`idproceso`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 12.02.2024
 alter table xpr_produccion add column idproceso bigint(20) after idplan;

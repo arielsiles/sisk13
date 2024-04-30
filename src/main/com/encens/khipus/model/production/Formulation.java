@@ -50,7 +50,7 @@ public class Formulation implements BaseModel {
     private BigDecimal capacity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idcategoria", nullable = true, updatable = false, insertable = true)
+    @JoinColumn(name = "idcategoria", nullable = true, updatable = true, insertable = true)
     private ProductionCategory category;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "formulation")

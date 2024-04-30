@@ -130,6 +130,11 @@ public class RawMaterialProducer extends Person {
         return (productiveZone == null ? "" : productiveZone.getFullName());
     }
 
+    public String getFullNameProducerAndId() {
+        return getId() + " - " + getFullName();
+    }
+
+
     public void setFullNameOfProductiveZone(String fullName) {
 
     }
