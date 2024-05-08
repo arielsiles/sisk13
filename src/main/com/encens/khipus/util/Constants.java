@@ -32,10 +32,10 @@ public final class Constants {
     public static final Long currencyIdSus = (long) 2;
 
     //Schema for KHIPUS - TERDEMOL
-    public static final String KHIPUS_SCHEMA    = "terdemol";
+    /*public static final String KHIPUS_SCHEMA    = "terdemol";
     public static final String FINANCES_SCHEMA  = "terdemol";
     public static final String CASHBOX_SCHEMA   = "terdemol";
-    public static final String ACADEMIC_SCHEMA  = "terdemol";
+    public static final String ACADEMIC_SCHEMA  = "terdemol";*/
 
     /*public static final String KHIPUS_SCHEMA    = "ilva3";
     public static final String FINANCES_SCHEMA  = "ilva3";
@@ -43,10 +43,10 @@ public final class Constants {
     public static final String ACADEMIC_SCHEMA  = "ilva3";*/
 
     //Schema for KHIPUS - F. CISC / ILVA
-    /*public static final String KHIPUS_SCHEMA    = "khipus";
+    public static final String KHIPUS_SCHEMA    = "khipus";
     public static final String FINANCES_SCHEMA  = "khipus";
     public static final String CASHBOX_SCHEMA   = "khipus";
-    public static final String ACADEMIC_SCHEMA  = "khipus";*/
+    public static final String ACADEMIC_SCHEMA  = "khipus";
 
     //Schema for CAISC - Fondo Lech
     /*public static final String KHIPUS_SCHEMA    = "caisc";
