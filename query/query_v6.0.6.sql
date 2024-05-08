@@ -27,6 +27,8 @@ update acopiomp set tienefac = 0 where tienefac is null;
 alter table acopiomp drop column tieneiva;
 
 update acopiomp a set a.estado = 'CONTA' where a.estado = 'APR';
+
+-- Para Terdemol
 update zonaproductiva set idciudad = 4 where idciudad is null;
 
 update zonaproductiva set tienecns = 1 where nombre = 'CHAUPISUYU';

@@ -84,10 +84,11 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("815059")){
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
         }
-        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2862262")){
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2862262")){ // Juana Pozo
             instance.setLaborIndividualAFP(BigDecimal.ZERO);
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
         }
-        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2868139")){
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2868139")){ // Eliseo Camacho
             instance.setLaborIndividualAFP(BigDecimal.ZERO);
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
         }

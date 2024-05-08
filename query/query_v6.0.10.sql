@@ -1,15 +1,16 @@
 -- 08.04.2024
+-- Solo Para Terdemol Inicio de AF
 delete from af_activos where idactivo >= 1;
 delete from af_grupos where grupo >= 1;
-
 insert into af_grupos(no_cia, grupo, descri, version) values ('01', 1, 'ACTIVOS TERDEMOL', 0);
-
+-- End
 /*
 -- Revisar cuenta raiz
 update arcgms a set a.cta_raiz = '12000000'
 where a.cuenta in ();
 */
 
+-- Solo para TERDEMOL
 -- UPDATE SUBGRUPOS FOR TERDEMOL
 update af_subgrupos a set a.descri = 'EQUIPOS E INSTALACION DE LABORATORIO' where subgrupo = '4';
 
@@ -22,6 +23,7 @@ update af_subgrupos a set a.ctadavo = '12302301', a.cta_vo = '12302201', a.ctame
 update af_subgrupos a set a.ctadavo = '12300701', a.cta_vo = '12300601', a.ctamej = '12300601', a.cta_alm = '12300601', a.ctagavo = '51000902' where a.subgrupo = 6;
 update af_subgrupos a set a.ctadavo = '12301301', a.cta_vo = '12301201', a.ctamej = '12301201', a.cta_alm = '12301201', a.ctagavo = '51000904' where a.subgrupo = 8;
 update af_subgrupos a set a.ctadavo = '12301101', a.cta_vo = '12301001', a.ctamej = '12301001', a.cta_alm = '12301001', a.ctagavo = '51000910' where a.subgrupo = 9;
+-- End
 
 -- 10.04.2024
 alter table configuracion add column af_fin_oc varchar(5) after doc_oc_pago;
