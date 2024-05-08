@@ -39,11 +39,12 @@
 
             <rich:dataTable value="#{machineDataModel}" var="xmachineItem"
                             id="productionMachineList" rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="30%, 60%, 10%">
+                            width="100%" columnsWidth="10%, 60%, 20%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>#{messages['XProduction.productionMachine.code']}</rich:column>
                         <rich:column>#{messages['XProduction.productionMachine.name']}</rich:column>
+                        <rich:column>#{messages['XProduction.productionMachine.fixedAssetCode']}</rich:column>
                         <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
                     </rich:columnGroup>
                 </f:facet>
@@ -52,6 +53,9 @@
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{xmachineItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{xmachineItem.fixedAsset eq null ? '' : xmachineItem.fixedAsset.barCode}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"

@@ -410,7 +410,10 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
     /** Start Proceso Distribucion de costos indirectos (1) **/
     public void processIndirectCostDistribution(){
 
-        PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirect(this.month, this.gestion);
+        System.out.println("-------> month: " + this.month);
+        System.out.println("-------> gestion: " + this.gestion);
+
+        PeriodIndirectCost periodIndirectCost = periodIndirectCostService.findPeriodIndirectX(this.month.getValue()+1, this.gestion);
 
         if (periodIndirectCost.getProcessed()){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Production.message.distributedIndirectCosts");

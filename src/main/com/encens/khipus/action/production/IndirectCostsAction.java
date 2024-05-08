@@ -217,6 +217,10 @@ public class IndirectCostsAction extends GenericAction<IndirectCosts> {
 
     public void findLastPeriod() {
 
+        //indirectCostses = new ArrayList<IndirectCosts>();
+
+        indirectCostses.clear();
+
         List<IndirectCostsConfig> costGeneral = periodIndirectCostService.findPredefinedIndirectCost();
 
         Date startDate = DateUtils.getFirstDayOfMonth(month.getValue()+1, gestion.getYear());

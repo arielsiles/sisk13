@@ -483,9 +483,10 @@
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell" width="40%">#{messages['XProductionLabor.employeeName']}</th>
-                        <th class="rich-table-headercell" width="5%">#{messages['XProductionLabor.hoursWorked']}</th>
-                        <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
+                        <th class="rich-table-headercell" width="60%">#{messages['XProductionLabor.employeeName']}</th>
+                        <th class="rich-table-headercell" width="15%">#{messages['XProductionLabor.hoursWorked']}</th>
+                        <th class="rich-table-headercell" width="15%">#{messages['XProductionLabor.costPerHour']}</th>
+                        <th class="rich-table-headercell" width="10%">#{messages['Common.action']}</th>
                     </tr>
                     </thead>
                     <c:forEach var="laborDetail" items="#{xproductionAction.laborList}" varStatus="row">
@@ -507,6 +508,12 @@
 
                                     <a4j:support event="onblur" ajaxSingle="true" reRender="laborPanel" />
                                 </h:inputText>
+                            </td>
+
+                            <td class="rich-table-cell center">
+                                <h:outputText value="#{laborDetail.costPerHour}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                                </h:outputText>
                             </td>
 
                             <td class="rich-table-cell center">

@@ -15,6 +15,8 @@ import java.util.List;
 public interface PeriodIndirectCostService {
     public PeriodIndirectCost findLastPeriodIndirectCost();
     PeriodIndirectCost findPeriodIndirect(Month month, Gestion gestion);
+
+    public PeriodIndirectCost findPeriodIndirectX(Integer month, Gestion gestion);
     boolean findPeriodIndirect(PeriodIndirectCost periodIndirectCost);
     PeriodIndirectCost findLastPeriodIndirectCostUsed();
     public List<IndirectCostsConfig> findPredefinedIndirectCost();

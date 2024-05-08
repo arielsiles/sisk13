@@ -4,12 +4,14 @@ package com.encens.khipus.action.xproduction;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.employees.Employee;
+import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.production.MeasurementUnit;
 import com.encens.khipus.model.production.ProductionState;
 import com.encens.khipus.model.production.SupplyType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.service.common.SequenceService;
+import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.service.xproduction.XProductionPlanService;
 import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -52,6 +54,8 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XProductionPlanService xproductionPlanService;
     @In
     private SequenceService sequenceService;
+    @In
+    private JobContractService jobContractService;
 
     @Factory(value = "xproduction", scope = ScopeType.STATELESS)
     public XProduction initProduction() {
@@ -313,10 +317,18 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void addProductionLabor(Employee employee){
         enableLaborTab();
+
+        BigDecimal costPerHour = BigDecimal.ZERO;
+        JobContract jobContract = jobContractService.getJobContract(employee);
+
+        if (jobContract != null)
+            costPerHour = BigDecimalUtil.divide(jobContract.getJob().getSalary().getBasicAmount(), BigDecimalUtil.toBigDecimal(30));
+
         XProductionLabor labor = new XProductionLabor();
         labor.setEmployee(employee);
         labor.setHours(BigDecimal.ONE);
         labor.setProduction(getInstance());
+        labor.setCostPerHour(costPerHour);
 
         getLaborList().add(labor);
     }

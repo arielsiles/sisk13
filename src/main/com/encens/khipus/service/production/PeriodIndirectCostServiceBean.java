@@ -43,7 +43,7 @@ public class PeriodIndirectCostServiceBean implements PeriodIndirectCostService 
             periodIndirectCostList = (List<PeriodIndirectCost>) em.createQuery(" select periodIndirectCost from PeriodIndirectCost periodIndirectCost " +
                     " where periodIndirectCost.month = :month " +
                     " and   periodIndirectCost.gestion = :gestion " +
-                    " order by periodIndirectCost desc")
+                    "")
                     .setParameter("month", month.getValue() + 1)
                     .setParameter("gestion", gestion)
                     .getResultList();
@@ -55,6 +55,27 @@ public class PeriodIndirectCostServiceBean implements PeriodIndirectCostService 
             return null;
 
         return periodIndirectCostList.get(0);
+    }
+
+    @Override
+    public PeriodIndirectCost findPeriodIndirectX(Integer month, Gestion gestion) {
+
+        PeriodIndirectCost result = null;
+
+        try {
+            result = (PeriodIndirectCost) em.createQuery(" select periodIndirectCost from PeriodIndirectCost periodIndirectCost " +
+                            " where periodIndirectCost.month = :month " +
+                            " and   periodIndirectCost.gestion = :gestion ")
+                    .setParameter("month", month)
+                    .setParameter("gestion", gestion)
+                    .getSingleResult();
+
+            System.out.println("======> result: " + result);
+
+        }catch(NoResultException e){
+            result = null;
+        }
+        return result;
     }
 
     @Override

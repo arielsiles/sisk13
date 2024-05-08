@@ -29,6 +29,9 @@ public class XProductionLabor {
     @Column(name = "horas", nullable = false)
     private BigDecimal hours;
 
+    @Column(name = "costoxhora", nullable = true)
+    private BigDecimal costPerHour;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idempleado", nullable = false, updatable = false)
     private Employee employee;
@@ -91,5 +94,13 @@ public class XProductionLabor {
 
     public void setProduction(XProduction production) {
         this.production = production;
+    }
+
+    public BigDecimal getCostPerHour() {
+        return costPerHour;
+    }
+
+    public void setCostPerHour(BigDecimal costPerHour) {
+        this.costPerHour = costPerHour;
     }
 }

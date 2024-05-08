@@ -1535,7 +1535,7 @@
                     rendered="#{s:hasPermission('XFORMULATION','VIEW')}"
                     propagation="none"/>
 
-            <!--<rich:dropDownMenu value="#{messages['menu.xproduction.process']}" >
+            <rich:dropDownMenu value="#{messages['menu.xproduction.process']}" >
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item">
 
@@ -1543,6 +1543,10 @@
                             value="#{messages['menu.xproduction.process.distributionIndirectCost']}"
                             propagation="begin"/>
                 </rich:menuItem>
+            </rich:dropDownMenu>
+
+            <!--
+            <rich:dropDownMenu value="#{messages['menu.xproduction.process']}" >
 
                 <rich:menuItem submitMode="none"
                                rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"

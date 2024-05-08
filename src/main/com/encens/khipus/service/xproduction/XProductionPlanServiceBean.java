@@ -1,9 +1,9 @@
 package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.model.production.CollectionForm;
+import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.XProductionPlan;
 import com.encens.khipus.model.xproduction.XProductionProduct;
-import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.annotations.AutoCreate;
@@ -99,7 +99,7 @@ public class XProductionPlanServiceBean implements XProductionPlanService {
 
     public List<XProductionPlan> getProductionPlanList(Date startDate, Date endDate){
 
-        List<XProductionPlan> productionPlanList = (List<XProductionPlan>) em.createQuery("select p from ProductionPlan p " +
+        List<XProductionPlan> productionPlanList = (List<XProductionPlan>) em.createQuery("select p from XProductionPlan p " +
                 "where p.date between :startDate and :endDate")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)

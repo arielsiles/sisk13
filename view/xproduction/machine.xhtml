@@ -63,7 +63,7 @@
 
         <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['XProduction.productionMachine.code']}</ui:define>
-            <h:inputText id="code" value="#{xmachine.code}" styleClass="inputLarge" required="true" tabindex="1">
+            <h:inputText id="code" value="#{xmachine.code}" styleClass="input80" required="true" tabindex="1">
             </h:inputText>
         </s:decorate>
 
@@ -75,7 +75,7 @@
 
         <s:decorate id="fixedAssetField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['XProduction.productionMachine.fixedAsset']}</ui:define>
-            <app:selectPopUp id="fixedAsset"
+            <app:selectPopUp id="fixedAsset" styleClass="inputLarge"
                              required="false"
                              textValue="#{xmachine.fixedAsset.detail}"
                              value="#{xmachine.fixedAsset}"

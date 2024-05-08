@@ -16,3 +16,5 @@ alter table xpr_manoobra add foreign key (idproduccion) references xpr_produccio
 alter table xpr_manoobra add foreign key (idcompania) references compania(idcompania);
 
 alter table xpr_produccion add column fechafin date after descripcion;
+
+alter table xpr_manoobra add column costoxhora decimal(10,2) after horas;
