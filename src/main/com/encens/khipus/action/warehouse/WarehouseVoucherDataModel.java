@@ -63,7 +63,8 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
     @Create
     public void init() {
         setEntityManagerName(ListEntityManagerName.BUSINESS_UNIT_LIST.getName());
-        sortProperty = "warehouseVoucher.date";
+        //sortProperty = "warehouseVoucher.date";
+        sortProperty = "warehouseVoucher.creationDate";
         setSortAsc(false);
     }
 

@@ -176,13 +176,13 @@
             </rule>
             <rule if-outcome="Success">
                 <begin-conversation flush-mode="MANUAL"/>
-                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
             </rule>
             <rule if-outcome="Fail">
                 <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
             </rule>
             <rule>
-                <redirect view-id="/warehouse/warehouseVoucherUpdate.xhtml"/>
+                <redirect view-id="/warehouse/warehouseVoucherList.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{partialWarehouseVoucherAction.addPartialWarehouseVoucher}">

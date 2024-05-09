@@ -1,0 +1,2 @@
+-- 08.05.2024
+ALTER TABLE inv_vales ADD COLUMN fechacreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP after estado ;

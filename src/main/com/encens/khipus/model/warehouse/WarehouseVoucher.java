@@ -73,6 +73,10 @@ public class WarehouseVoucher implements BaseModel {
     @Enumerated(EnumType.STRING)
     private WarehouseVoucherState state;
 
+    @Column(name = "fechacreacion", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date creationDate = new Date();
+
     @Column(name = "tipo_gasto", nullable = true)
     @Enumerated(EnumType.STRING)
     private ExpenseType expenseType;
@@ -682,5 +686,13 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setExpenseType(ExpenseType expenseType) {
         this.expenseType = expenseType;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 }
