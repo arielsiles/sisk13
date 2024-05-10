@@ -439,7 +439,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return voucher;
     }
 
-    public Double getBalance(Date startDate, String cashAccountCode){
+    /*public Double getBalance(Date startDate, String cashAccountCode){
 
         List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>();
 
@@ -469,6 +469,32 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         balance = (balanceD - balanceC);
 
         return balance;
+    }*/
+    public Double getBalance(Date startDate, String cashAccountCode){
+
+        try {
+            Double balanceD = ((BigDecimal) em.createQuery("select sum(voucherDetail.debit) from VoucherDetail voucherDetail " +
+                            " join voucherDetail.voucher voucher " +
+                            " where voucher.date < :startdate " +
+                            " and voucherDetail.account = :cashAccountCode " +
+                            " and voucher.state <> 'ANL' ")
+                    .setParameter("startdate", startDate)
+                    .setParameter("cashAccountCode", cashAccountCode)
+                    .getSingleResult()).doubleValue();
+
+            Double balanceC = ((BigDecimal) em.createQuery("select sum(voucherDetail.credit) from VoucherDetail voucherDetail " +
+                            " join voucherDetail.voucher voucher " +
+                            " where voucher.date < :startdate " +
+                            " and voucherDetail.account = :cashAccountCode " +
+                            " and voucher.state <> 'ANL' ")
+                    .setParameter("startdate", startDate)
+                    .setParameter("cashAccountCode", cashAccountCode)
+                    .getSingleResult()).doubleValue();
+
+            return (balanceD != null ? balanceD : 0.0) - (balanceC != null ? balanceC : 0.0);
+        } catch (NoResultException e) {
+            return 0.0;
+        }
     }
 
 

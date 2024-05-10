@@ -61,11 +61,13 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
             for (InventoryMovement inventoryMovement:warehouseVoucher.getInventoryMovementList()){
                 for (MovementDetail movementDetail:inventoryMovement.getMovementDetailList()){
 
+                    /*
                     CashAccount expenseCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getCostCashAccount();
-
                     if (warehouseVoucher.getExpenseType().equals(ExpenseType.ADMINISTRATIVE)){
                         expenseCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getExpenseCashAccount();
                     }
+                    */
+                    CashAccount expenseCashAccount = getCashAccountExpense(warehouseVoucher, movementDetail);
 
                     VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
                             null, null, expenseCashAccount, movementDetail.getAmount(), FinancesCurrencyType.P, BigDecimal.ONE);
@@ -115,4 +117,31 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
 
         return result;
     }
+
+    /**
+     *
+     * @param warehouseVoucher
+     * @param movementDetail
+     * @return Retorna la cuenta de costo o gasto asignada en grupos, si es null, retorna la cuenta asignada en el articulo
+     */
+    private CashAccount getCashAccountExpense(WarehouseVoucher warehouseVoucher, MovementDetail movementDetail) {
+
+        if (movementDetail.getProductItem().getSubGroup().getGroup().getCostCashAccount() == null){
+            return movementDetail.getProductItem().getCashAccount();
+        }
+
+        CashAccount expenseCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getCostCashAccount();
+
+        if (warehouseVoucher.getExpenseType().equals(ExpenseType.ADMINISTRATIVE)){
+
+            if (movementDetail.getProductItem().getSubGroup().getGroup().getExpenseCashAccount() != null) {
+                expenseCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getExpenseCashAccount();
+            }else{
+                expenseCashAccount = movementDetail.getProductItem().getCashAccount();
+            }
+        }
+
+        return expenseCashAccount;
+    }
+
 }

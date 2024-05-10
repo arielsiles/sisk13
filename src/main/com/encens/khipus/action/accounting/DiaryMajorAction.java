@@ -70,6 +70,7 @@ public class DiaryMajorAction extends GenericAction {
 
     public void clearAccount() {
         setAccount(null);
+        setVoucherDetails(new ArrayList<VoucherDetail>());
     }
 
     public Date getStartDate() {
