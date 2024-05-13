@@ -490,8 +490,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
             for (XProduction production : productionPlan.getProductionList()){
                 BigDecimal productionTotalCost = BigDecimal.ZERO;
                 for (XProductionProduct product : production.getProductionProductList()){
-                    BigDecimal  productCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), 2);
-                                productCost = BigDecimalUtil.sum(productCost, product.getCostC(), 2);
+                    BigDecimal  productCost = BigDecimalUtil.sum(product.getCostA(), product.getCostB(), product.getCostC(), product.getCostMo());
 
                     product.setCost(productCost);
                     product.setUnitCost(BigDecimalUtil.divide(productCost, product.getQuantity(), 2));
@@ -522,6 +521,11 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
             totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionProduction, 2);
             System.out.println("-------==============> Dist: " + volumeProduction + " - " + percentage + " = " + distributionProduction);
             distributionCostbyProduction(production, distributionProduction);
+
+            /** Para Mano de Obra **/
+            BigDecimal laborCostProduction = calculateLaborProduction(production);
+            distributionLaborCostByProduction(production, laborCostProduction);
+
         }
         System.out.println("-------==============> Total Dist: " + totalDistribution);
     }
@@ -544,6 +548,36 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
     }
     /** End Proceso Distribucion de costos indirectos **/
 
+    /** Proceso Distribucion de Mano de Obra **/
+    public void distributionLaborCostByProduction(XProduction production, BigDecimal distributionLabor){
+
+        BigDecimal volumeProduction = xproductionAction.calculateTotalVolume(production);
+        BigDecimal totalDistribution = BigDecimal.ZERO;
+
+        for (XProductionProduct product : production.getProductionProductList()){
+            BigDecimal volumeProduct = BigDecimalUtil.multiply(product.getQuantity(), product.getProductItem().getBasicQuantity(), 2);
+            BigDecimal percentage    = BigDecimalUtil.multiply(volumeProduct, BigDecimalUtil.toBigDecimal(100), 2);
+            percentage = BigDecimalUtil.divide(percentage, volumeProduction, 2);
+
+            BigDecimal distributionProduct = BigDecimalUtil.multiply(distributionLabor, BigDecimalUtil.divide(percentage, BigDecimalUtil.toBigDecimal(100), 4), 2);
+            totalDistribution = BigDecimalUtil.sum(totalDistribution, distributionProduct, 2);
+
+            product.setCostMo(distributionProduct);
+        }
+        System.out.println("-------==============--------------------> Total Dist MO: " + totalDistribution);
+    }
+
+
+    public BigDecimal calculateLaborProduction(XProduction production){
+
+        BigDecimal result = BigDecimal.ZERO;
+
+        for (XProductionLabor labor : production.getProductionLaborList()){
+            BigDecimal laborCost = BigDecimalUtil.multiply(labor.getHours(), labor.getCostPerHour());
+            result = BigDecimalUtil.sum(result, laborCost);
+        }
+        return result;
+    }
 
     public BigDecimal calculateTotalVolumePlan(XProductionPlan productionPlan){
 
@@ -588,6 +622,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
             product.setCostA(BigDecimal.ZERO);
             product.setCostB(BigDecimal.ZERO);
             product.setCostC(BigDecimal.ZERO);
+            product.setCostMo(BigDecimal.ZERO);
             product.setCost(BigDecimal.ZERO);
             product.setProductItemCode(productItem.getProductItemCode());
             product.setProductItem(productItem);

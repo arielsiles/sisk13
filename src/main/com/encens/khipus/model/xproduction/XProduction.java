@@ -79,6 +79,9 @@ public class XProduction implements BaseModel {
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
     private List<XProductionProduct> productionProductList = new ArrayList<XProductionProduct>(0);
 
+    @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
+    private List<XProductionLabor> productionLaborList = new ArrayList<XProductionLabor>(0);
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tmpenc")
     private Voucher voucher;
@@ -233,4 +236,11 @@ public class XProduction implements BaseModel {
         return result;
     }
 
+    public List<XProductionLabor> getProductionLaborList() {
+        return productionLaborList;
+    }
+
+    public void setProductionLaborList(List<XProductionLabor> productionLaborList) {
+        this.productionLaborList = productionLaborList;
+    }
 }

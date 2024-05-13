@@ -74,6 +74,9 @@ public class XProductionProduct implements BaseModel {
     @Column(name = "costo_c", nullable = false, updatable = true, insertable = true)
     private BigDecimal costC;
 
+    @Column(name = "costo_mo", nullable = false, updatable = true, insertable = true)
+    private BigDecimal costMo;
+
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproduccion", nullable = true, updatable = true, insertable = true)
     private XProduction production;
@@ -192,6 +195,14 @@ public class XProductionProduct implements BaseModel {
 
     public void setUnitCost(BigDecimal unitCost) {
         this.unitCost = unitCost;
+    }
+
+    public BigDecimal getCostMo() {
+        return costMo;
+    }
+
+    public void setCostMo(BigDecimal costMo) {
+        this.costMo = costMo;
     }
 
     /*public Boolean zeroOrNullQuantity(){
