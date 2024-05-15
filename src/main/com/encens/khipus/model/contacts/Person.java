@@ -130,6 +130,12 @@ public class Person extends Entity {
         return getIdNumber() + " - " + (firstName != null ? firstName + " " : "") + (lastName != null ? lastName + " " : "") + (maidenName != null ? maidenName : "");
     }
 
+    public String getSingleName() {
+        String name = firstName.trim();
+        String[] nameParts = name.split(" ");
+        return nameParts[0] + " " + lastName;
+    }
+
     public String getName() {
         return getFullName();
     }

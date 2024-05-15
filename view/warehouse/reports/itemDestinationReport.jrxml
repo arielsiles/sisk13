@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="556" leftMargin="28" rightMargin="28" topMargin="14" bottomMargin="14">
 	<property name="ireport.zoom" value="2.5937424601000147"/>
-	<property name="ireport.x" value="161"/>
+	<property name="ireport.x" value="48"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
@@ -10,6 +10,7 @@
 	<parameter name="endDate" class="java.util.Date"/>
 	<parameter name="warehouse" class="java.lang.String"/>
 	<parameter name="period" class="java.lang.String"/>
+	<parameter name="petitioner" class="java.lang.String"/>
 	<field name="date" class="java.util.Date">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -40,6 +41,9 @@
 	<field name="destName" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
 	</field>
+	<variable name="sumAmount" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
 	<group name="fixedAssetSubGroup">
 		<groupHeader>
 			<band height="11">
@@ -186,7 +190,29 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="12"/>
+			<band height="22">
+				<textField>
+					<reportElement x="0" y="11" width="260" height="11"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="7"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{petitioner}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00;(#,##0.00)">
+					<reportElement x="355" y="0" width="45" height="11"/>
+					<box rightPadding="2">
+						<pen lineWidth="0.25" lineStyle="Dotted"/>
+						<topPen lineWidth="0.25" lineStyle="Dotted"/>
+						<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+						<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+						<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="Arial" size="6" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sumAmount}]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupFooter>
 	</group>
 	<title>
@@ -345,7 +371,7 @@
 				</textElement>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{date}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.0000">
+			<textField pattern="#,##0.00">
 				<reportElement x="355" y="0" width="45" height="11"/>
 				<box rightPadding="2">
 					<pen lineWidth="0.25" lineStyle="Dotted"/>

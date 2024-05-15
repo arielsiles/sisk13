@@ -5,6 +5,7 @@ import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.finances.CompanyConfiguration;
+import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.Warehouse;
@@ -47,6 +48,7 @@ public class ItemDestinationReportAction extends GenericReportAction {
 
     private ProductItem productItem;
     private Warehouse warehouse;
+    private JobContract petitionerJobContract;
     private Boolean articlesWithMovement = true;
 
     @In
@@ -79,7 +81,8 @@ public class ItemDestinationReportAction extends GenericReportAction {
                 "warehouseVoucher.date >= #{itemDestinationReportAction.startDate}",
                 "warehouseVoucher.date <= #{itemDestinationReportAction.endDate}",
                 "warehouseVoucher.warehouseCode = #{itemDestinationReportAction.warehouse.warehouseCode}",
-                "warehouseVoucher.documentCode = #{itemDestinationReportAction.documentCode}"
+                "warehouseVoucher.documentCode = #{itemDestinationReportAction.documentCode}",
+                "warehouseVoucher.petitionerJobContract = #{itemDestinationReportAction.petitionerJobContract}"
         };
     }
 
@@ -112,6 +115,10 @@ public class ItemDestinationReportAction extends GenericReportAction {
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
         String period = DateUtils.format(startDate, "dd/MM/yyyy") + " - " + DateUtils.format(endDate, "dd/MM/yyyy");
+        String petitioner = "";
+        if (petitionerJobContract != null) {
+            petitioner = "Solicitante: " + petitionerJobContract.getContract().getEmployee().getFullName();
+        }
 
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -124,6 +131,7 @@ public class ItemDestinationReportAction extends GenericReportAction {
         paramMap.put("endDate", endDate);
         paramMap.put("warehouse", warehouse.getFullName());
         paramMap.put("period", period);
+        paramMap.put("petitioner", petitioner);
 
         super.generateReport(
                 "itemDestinationReport",
@@ -194,6 +202,18 @@ public class ItemDestinationReportAction extends GenericReportAction {
 
     public void setDocumentCode(String documentCode) {
         this.documentCode = documentCode;
+    }
+
+    public JobContract getPetitionerJobContract() {
+        return petitionerJobContract;
+    }
+
+    public void setPetitionerJobContract(JobContract petitionerJobContract) {
+        this.petitionerJobContract = petitionerJobContract;
+    }
+
+    public void clearPetitionerJobContract() {
+        setPetitionerJobContract(null);
     }
 
     /**
@@ -327,6 +347,7 @@ public class ItemDestinationReportAction extends GenericReportAction {
             this.valuedBalance = valuedBalance;
         }
     }
+
 
 
     public class ArticleMovement{

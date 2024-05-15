@@ -95,6 +95,24 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
+
+                <s:decorate id="petitionerJobContractField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehouseVoucher.petitioner']}</ui:define>
+                    <app:selectPopUp id="petitionerJobContract"
+                                     required="false"
+                                     textValue="#{itemDestinationReportAction.petitionerJobContract.contract.employee.singleName}"
+                                     value="#{itemDestinationReportAction.petitionerJobContract}"
+                                     dataModel="#{jobContractDataModel}"
+                                     clearAction="#{itemDestinationReportAction.clearPetitionerJobContract()}"
+                                     searchModalPanel="jobContractListModalPanel"
+                                     reRender="petitionerJobContractField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+
+
                 <!--<s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Reports.kardex.productItem']}</ui:define>
                     <app:quickSearch id="productItemQuickSearch"
@@ -146,6 +164,20 @@
                                    styleClass="select-image"
                                    reRender="warehouseField"
                                    oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="jobContractListModalPanelContainer"
+                    template="/employees/jobContractListModalPanel.xhtml">
+            <ui:param name="dialogId" value="jobContractListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{itemDestinationReportAction.setPetitionerJobContract(jobContractItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="petitionerJobContractField"
+                                   oncomplete="Richfaces.hideModalPanel('jobContractListModalPanel');"/>
             </ui:define>
         </s:decorate>
 
