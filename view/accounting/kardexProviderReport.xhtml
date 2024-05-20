@@ -6,7 +6,6 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:app="http://encens.com/products/khipus/facelets"
-                xmlns:c="http://java.sun.com/jstl/core"
                 template="/layout/template.xhtml">
 
 <ui:define name="pageTitle">#{messages['AuxiliaryAnalytical.report']}</ui:define>
@@ -100,9 +99,10 @@
                                      editModalPanel="financeProviderModalPanel"
                                      hotKeySelect="alt+3">
                         <ui:define name="dataModelStaticProperties">
-                            <f:setPropertyActionListener
+                            <!--<f:setPropertyActionListener
                                     value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.ModuleProviderType','WAREHOUSE')}"
-                                    target="#{providerDataModel.moduleProviderType}"/>
+                                    target="#{providerDataModel.moduleProviderType}"/>-->
+
                             <f:setPropertyActionListener
                                     value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesEntityState','VIG')}"
                                     target="#{providerDataModel.financesEntityState}"/>

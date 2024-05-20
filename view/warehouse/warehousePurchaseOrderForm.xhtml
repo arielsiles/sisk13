@@ -354,9 +354,9 @@
                      editAction="#{financeProviderAction.selectInstanceInModalPanel(warehousePurchaseOrder.provider)}"
                      hotKeySelect="alt+3">
         <ui:define name="dataModelStaticProperties">
-            <f:setPropertyActionListener
+            <!--<f:setPropertyActionListener
                     value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.ModuleProviderType','WAREHOUSE')}"
-                    target="#{providerDataModel.moduleProviderType}"/>
+                    target="#{providerDataModel.moduleProviderType}"/>-->
             <f:setPropertyActionListener
                     value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesEntityState','VIG')}"
                     target="#{providerDataModel.financesEntityState}"/>
