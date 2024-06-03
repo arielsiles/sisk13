@@ -1,11 +1,13 @@
 package com.encens.khipus.action.warehouse;
 
+import com.encens.khipus.action.finances.CashAccountInventoryDataModel;
 import com.encens.khipus.exception.warehouse.InventoryException;
 import com.encens.khipus.exception.warehouse.MonthProcessValidException;
 import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherPendantException;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.CustomerOrder;
+import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.ExpenseType;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.finances.MeasureUnitPk;
@@ -53,6 +55,9 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
     @In
     private WarehouseAccountEntryService warehouseAccountEntryService;
 
+    @In(value = "cashAccountInventoryDataModel", required = false, create = true)
+    private CashAccountInventoryDataModel cashAccountInventoryDataModel;
+
     private ProductItem productItemFrom;
     private ProductItem productItemTo;
     private BigDecimal quantity;
@@ -61,8 +66,10 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
     @Factory(value = "expenseTypeList", scope = ScopeType.STATELESS)
     public ExpenseType[] getExpenseType() {
         return new ExpenseType[]{
-                ExpenseType.ADMINISTRATIVE,
-                ExpenseType.PRODUCTION
+                ExpenseType.PROD,
+                ExpenseType.ADM,
+                ExpenseType.COM,
+                ExpenseType.LAB
         };
     }
 
@@ -307,6 +314,11 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         super.assignWarehouse(warehouse);
     }
 
+    public void assignExpenseCashAccount(CashAccount cashAccount) {
+        warehouseVoucher.setExpenseCashAccountCode(cashAccount.getAccountCode());
+        warehouseVoucher.setExpenseCashAccount(cashAccount);
+    }
+
     public void assignTransferCustomerOrder(CustomerOrder customerOrder){
         getWarehouseVoucher().setTransferCustomerOrder(customerOrder);
     }
@@ -521,6 +533,10 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         }
 
         return validationOutcome;
+    }
+
+    public void updateSearchCashAccount() {
+        cashAccountInventoryDataModel.setExpenseType(warehouseVoucher.getExpenseType());
     }
 
     private MeasureUnit getMeasureUnit(ProductItem productItem) {

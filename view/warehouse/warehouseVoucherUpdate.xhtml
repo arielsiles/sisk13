@@ -676,7 +676,7 @@
                              tabindex="17"/>
         </s:decorate>
 
-        <s:decorate id="destinationField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+        <s:decorate id="destinationField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherUpdateAction.warehouseVoucher.consumption}">
             <ui:define name="label">#{messages['WarehouseVoucher.destination']}</ui:define>
             <h:selectOneMenu id="destination"
                              value="#{warehouseVoucherUpdateAction.warehouseVoucher.destination}"
@@ -692,7 +692,7 @@
             </h:selectOneMenu>
         </s:decorate>
 
-        <s:decorate id="expenseTypeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+        <s:decorate id="expenseTypeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherUpdateAction.warehouseVoucher.consumption}">
             <ui:define name="label">#{messages['WarehouseVoucher.expenseType']}</ui:define>
             <h:selectOneMenu id="expenseType"
                              value="#{warehouseVoucherUpdateAction.warehouseVoucher.expenseType}"
@@ -704,8 +704,28 @@
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <s:convertEnum/>
+                <a4j:support event="onchange"
+                             action="#{warehouseVoucherUpdateAction.updateSearchCashAccount()}"
+                             reRender="expenseCashAccountDiv"
+                             ajaxSingle="true"/>
             </h:selectOneMenu>
         </s:decorate>
+
+        <s:div id="expenseCashAccountDiv">
+            <s:decorate id="expenseCashAccountField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherUpdateAction.warehouseVoucher.consumption}">
+                <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
+                <app:selectPopUp id="productItemAccount"
+                                 required="true"
+                                 textValue="#{warehouseVoucherUpdateAction.warehouseVoucher.expenseCashAccount.fullName}"
+                                 value="#{warehouseVoucherUpdateAction.warehouseVoucher.expenseCashAccount}"
+                                 clearAction="#{warehouseVoucherUpdateAction.warehouseVoucher.setExpenseCashAccount(null)}"
+                                 searchModalPanel="cashAccountInventoryListModalPanel"
+                                 dataModel="#{cashAccountInventoryDataModel}"
+                                 reRender="expenseCashAccountField"
+                                 tabindex="11" hotKeySelect="alt+1">
+                </app:selectPopUp>
+            </s:decorate>
+        </s:div>
 
     </s:div>
 </c:otherwise>
@@ -1032,6 +1052,19 @@
     </ui:define>
 </s:decorate>
 
+    <s:decorate id="cashAccountInventoryListModalPanelContainer" template="/finances/cashAccountInventoryListModalPanel.xhtml">
+        <ui:param name="hasWarehousePermission" value="true"/>
+        <ui:param name="containerId" value="cashAccountInventoryListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashAccountInventoryListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{warehouseVoucherUpdateAction.assignExpenseCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="expenseCashAccountField"
+                               oncomplete="Richfaces.hideModalPanel('cashAccountInventoryListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
 
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#quickSearchExecutorUnit" query="focus()" timing="onload"/>

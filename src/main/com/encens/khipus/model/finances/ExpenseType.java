@@ -1,6 +1,12 @@
 package com.encens.khipus.model.finances;
 
 public enum ExpenseType {
+
+    PROD("WarehouseVoucher.expenseType.pro"),
+    ADM("WarehouseVoucher.expenseType.adm"),
+    COM("WarehouseVoucher.expenseType.com"),
+    LAB("WarehouseVoucher.expenseType.lab"),
+
     ADMINISTRATIVE("WarehouseVoucher.expenseType.administrative"),
     PRODUCTION("WarehouseVoucher.expenseType.production");
 

@@ -1,5 +1,6 @@
 package com.encens.khipus.action.warehouse;
 
+import com.encens.khipus.action.finances.CashAccountInventoryDataModel;
 import com.encens.khipus.action.fixedassets.LiquidationPaymentAction;
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.ReferentialIntegrityException;
@@ -9,6 +10,7 @@ import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundExceptio
 import com.encens.khipus.exception.warehouse.*;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.interceptor.BusinessUnitRestriction;
+import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
@@ -66,6 +68,9 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
 
     @In
     private WarehouseAccountEntryService warehouseAccountEntryService;
+
+    @In(value = "cashAccountInventoryDataModel", required = false, create = true)
+    private CashAccountInventoryDataModel cashAccountInventoryDataModel;
 
     @Override
     @BusinessUnitRestriction(value = "#{warehouseVoucherUpdateAction.warehouseVoucher}", postValidation = true)
@@ -401,6 +406,15 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
     protected void addUpdatedMessage() {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
                 "WarehouseVoucher.message.updated");
+    }
+
+    public void updateSearchCashAccount() {
+        cashAccountInventoryDataModel.setExpenseType(warehouseVoucher.getExpenseType());
+    }
+
+    public void assignExpenseCashAccount(CashAccount cashAccount) {
+        getWarehouseVoucher().setExpenseCashAccountCode(cashAccount.getAccountCode());
+        getWarehouseVoucher().setExpenseCashAccount(cashAccount);
     }
 
     public boolean isApproved() {

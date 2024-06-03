@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="utf8mb4" collation="utf8mb4_0900_ai_ci">terdemol</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="inv_almacenes" view="colnames">
+<left>170</left>
+<top>87</top>
+<width>210</width>
+<height>276</height>
+<sql_create_table>CREATE TABLE `inv_almacenes` (
+  `no_cia` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL,
+  `cod_alm` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL,
+  `cuenta` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `ctacosto` varchar(20) DEFAULT NULL,
+  `descri` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `tipo` varchar(20) DEFAULT NULL,
+  `id_responsable` bigint DEFAULT NULL,
+  `estado` varchar(3) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `cod_est` varchar(15) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `idunidadnegocio` bigint DEFAULT NULL,
+  `inv_egr` int DEFAULT NULL,
+  PRIMARY KEY (`no_cia`,`cod_alm`),
+  KEY `id_responsable` (`id_responsable`),
+  CONSTRAINT `inv_almacenes_ibfk_1` FOREIGN KEY (`id_responsable`) REFERENCES `empleado` (`idempleado`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="inv_vales" view="colnames">
+<left>554</left>
+<top>89</top>
+<width>218</width>
+<height>271</height>
+<sql_create_table>CREATE TABLE `inv_vales` (
+  `no_cia` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `no_trans` varchar(10) NOT NULL,
+  `contracuenta` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `cod_cc` varchar(8) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `cod_doc` varchar(3) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `no_vale` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `id_com_encoc` bigint DEFAULT NULL,
+  `no_trans_rec` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `estado` varchar(3) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `cta_gasto` varchar(20) DEFAULT NULL,
+  `fechacreacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `tipo_gasto` varchar(100) DEFAULT NULL,
+  `oper` varchar(6) DEFAULT NULL,
+  `dest` varchar(10) DEFAULT NULL,
+  `orig` varchar(10) DEFAULT NULL,
+  `dest_cod_cc` varchar(8) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `cod_alm_dest` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `cod_alm` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `tiporecepcion` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `idunidadnegocio` bigint DEFAULT NULL,
+  `no_cia_raiz` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `no_trans_raiz` varchar(10) DEFAULT NULL,
+  `idcontratopuestosol` bigint DEFAULT NULL,
+  `id_responsable` bigint DEFAULT NULL,
+  `idunidadnegocio_dest` bigint DEFAULT NULL,
+  `id_responsable_dest` bigint DEFAULT NULL,
+  `idordenproduccion` bigint DEFAULT NULL,
+  `idproductobase` bigint DEFAULT NULL,
+  `idtmpenc` bigint DEFAULT NULL,
+  `idpedidostr` bigint DEFAULT NULL,
+  `iddestino` bigint DEFAULT NULL,
+  UNIQUE KEY `no_trans_UNIQUE` (`no_trans`),
+  KEY `id_com_encoc` (`id_com_encoc`),
+  KEY `idtmpenc` (`idtmpenc`),
+  KEY `idpedidostr` (`idpedidostr`),
+  KEY `iddestino` (`iddestino`),
+  CONSTRAINT `inv_vales_ibfk_1` FOREIGN KEY (`id_com_encoc`) REFERENCES `com_encoc` (`id_com_encoc`),
+  CONSTRAINT `inv_vales_ibfk_2` FOREIGN KEY (`idtmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `inv_vales_ibfk_3` FOREIGN KEY (`idpedidostr`) REFERENCES `pedidos` (`IDPEDIDOS`),
+  CONSTRAINT `inv_vales_ibfk_4` FOREIGN KEY (`iddestino`) REFERENCES `inv_destino` (`iddestino`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="inv_destino" view="colnames">
+<left>920</left>
+<top>128</top>
+<width>139</width>
+<height>180</height>
+<sql_create_table>CREATE TABLE `inv_destino` (
+  `iddestino` bigint NOT NULL,
+  `codigo` varchar(50) DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`iddestino`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="arcgms" view="colnames">
+<left>178</left>
+<top>434</top>
+<width>219</width>
+<height>264</height>
+<sql_create_table>CREATE TABLE `arcgms` (
+  `cuenta` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin NOT NULL DEFAULT '',
+  `descri` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `cta_raiz` varchar(20) DEFAULT NULL,
+  `cta_niv3` varchar(20) DEFAULT NULL,
+  `est` varchar(3) DEFAULT NULL,
+  `cn_ana` varchar(1) DEFAULT NULL,
+  `cn_nivel` int DEFAULT NULL,
+  `cn_dv` int DEFAULT NULL,
+  `cn_tip` varchar(1) DEFAULT NULL,
+  `cn_act` int DEFAULT NULL,
+  `no_cia` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `clase` varchar(1) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `tipo` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `tipo_gasto` varchar(50) DEFAULT NULL,
+  `activa` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `util` varchar(2) DEFAULT NULL,
+  `nomutil` varchar(50) DEFAULT NULL,
+  `permite_iva` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `ind_presup` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `creditos` decimal(14,2) DEFAULT NULL,
+  `moneda` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `debitos` decimal(14,2) DEFAULT NULL,
+  `saldo_mes_ant_dol` decimal(20,6) DEFAULT NULL,
+  `saldo_per_ant_dol` decimal(20,6) DEFAULT NULL,
+  `creditos_dol` decimal(20,6) DEFAULT NULL,
+  `debitos_dol` decimal(20,6) DEFAULT NULL,
+  `gru_cta` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `permiso_con` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `exije_cc` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `permiso_afijo` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `permiso_cxp` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `permiso_cxc` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `permiso_che` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `permiso_inv` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `f_inactiva` date DEFAULT NULL,
+  `ind_mov` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `saldo_mes_ant` decimal(15,2) DEFAULT NULL,
+  `saldo_per_ant` decimal(15,2) DEFAULT NULL,
+  PRIMARY KEY (`cuenta`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>

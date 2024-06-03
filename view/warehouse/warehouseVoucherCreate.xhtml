@@ -26,7 +26,7 @@
 </c:if>
 
 <c:set var="mainComponentIdsToRerender"
-       value="documentTypeField, transferorder, destination, expenseTypeDiv, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
+       value="documentTypeField, transferorder, destination, expenseTypeDiv,  petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
 
 <c:set var="elementsToReRenderForPetitionerJobContractChange"
        value="petitionerJobContractPanel, executorUnitLeftSidePanel"/>
@@ -508,7 +508,27 @@
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <s:convertEnum/>
+                <a4j:support event="onchange"
+                             action="#{warehouseVoucherCreateAction.updateSearchCashAccount()}"
+                             reRender="expenseCashAccountDiv"
+                             ajaxSingle="true"/>
             </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="expenseCashAccountDiv">
+        <s:decorate id="expenseCashAccountField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+            <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
+            <app:selectPopUp id="productItemAccount"
+                             required="true"
+                             textValue="#{warehouseVoucherCreateAction.warehouseVoucher.expenseCashAccount.fullName}"
+                             value="#{warehouseVoucherCreateAction.warehouseVoucher.expenseCashAccount}"
+                             clearAction="#{warehouseVoucherCreateAction.warehouseVoucher.setExpenseCashAccount(null)}"
+                             searchModalPanel="cashAccountInventoryListModalPanel"
+                             dataModel="#{cashAccountInventoryDataModel}"
+                             reRender="expenseCashAccountField"
+                             tabindex="11" hotKeySelect="alt+1">
+            </app:selectPopUp>
         </s:decorate>
     </s:div>
 
@@ -878,6 +898,20 @@
         </s:decorate>
 
     </s:div>
+
+    <s:decorate id="cashAccountInventoryListModalPanelContainer" template="/finances/cashAccountInventoryListModalPanel.xhtml">
+        <ui:param name="hasWarehousePermission" value="true"/>
+        <ui:param name="containerId" value="cashAccountInventoryListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashAccountInventoryListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               action="#{warehouseVoucherCreateAction.assignExpenseCashAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="expenseCashAccountField"
+                               oncomplete="Richfaces.hideModalPanel('cashAccountInventoryListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
 
 <!--Set selector Id to enable focus-->
 <!--<rich:jQuery selector="#documentTypeSearch" query="focus()" timing="onload"/>-->

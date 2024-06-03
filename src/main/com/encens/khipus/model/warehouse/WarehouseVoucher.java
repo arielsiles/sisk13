@@ -86,6 +86,16 @@ public class WarehouseVoucher implements BaseModel {
     @Enumerated(EnumType.STRING)
     private VoucherOperation operation;
 
+    @Column(name = "cta_gasto")
+    private String expenseCashAccountCode;
+
+    @ManyToOne(optional = true)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cta_gasto", referencedColumnName = "cuenta", updatable = false, insertable = false)
+    })
+    private CashAccount expenseCashAccount;
+
     @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
@@ -694,5 +704,21 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public CashAccount getExpenseCashAccount() {
+        return expenseCashAccount;
+    }
+
+    public void setExpenseCashAccount(CashAccount expenseCashAccount) {
+        this.expenseCashAccount = expenseCashAccount;
+    }
+
+    public String getExpenseCashAccountCode() {
+        return expenseCashAccountCode;
+    }
+
+    public void setExpenseCashAccountCode(String expenseCashAccountCode) {
+        this.expenseCashAccountCode = expenseCashAccountCode;
     }
 }

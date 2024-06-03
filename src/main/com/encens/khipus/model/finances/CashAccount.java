@@ -64,6 +64,9 @@ public class CashAccount implements BaseModel {
     @Enumerated(EnumType.STRING)
     private CashAccountType accountType;
 
+    @Column(name = "tipo_gasto")
+    @Enumerated(EnumType.STRING)
+    private ExpenseType expenseType;
 
     @Column(name = "clase", length = 1)
     @Length(max = 1)
@@ -521,6 +524,14 @@ public class CashAccount implements BaseModel {
 
     public void setUtilName(String utilName) {
         this.utilName = utilName;
+    }
+
+    public ExpenseType getExpenseType() {
+        return expenseType;
+    }
+
+    public void setExpenseType(ExpenseType expenseType) {
+        this.expenseType = expenseType;
     }
 
     /*public String getAccountType() {

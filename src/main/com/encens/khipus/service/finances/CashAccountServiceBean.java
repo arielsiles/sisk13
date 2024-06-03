@@ -80,17 +80,19 @@ public class CashAccountServiceBean implements CashAccountService {
         cashAccount.setCompanyNumber(Constants.defaultCompanyNumber);
 
         try {
-            em.createNativeQuery("insert into arcgms (cuenta, descri, cta_raiz, no_cia, tipo, activa, moneda, exije_cc, ind_mov) " +
-                    "values(:cuenta, :descri, :cta_raiz, :no_cia, :tipo, :activa, :moneda, :exije_cc, :ind_mov)")
+            em.createNativeQuery("insert into arcgms (cuenta, descri, cta_raiz, no_cia, tipo, tipo_gasto, activa, moneda, exije_cc, ind_mov, permiso_inv) " +
+                    "values(:cuenta, :descri, :cta_raiz, :no_cia, :tipo, :tipo_gasto, :activa, :moneda, :exije_cc, :ind_mov, :permiso_inv)")
                     .setParameter("cuenta", cashAccount.getAccountCode())
                     .setParameter("descri", cashAccount.getDescription())
                     .setParameter("cta_raiz", cashAccount.getRootCashAccount().getAccountCode())
                     .setParameter("no_cia", Constants.defaultCompanyNumber)
                     .setParameter("tipo", cashAccount.getAccountType().toString())
+                    .setParameter("tipo_gasto", cashAccount.getExpenseType().toString())
                     .setParameter("activa", 'S')
                     .setParameter("moneda", cashAccount.getCurrency().toString())
                     .setParameter("exije_cc", 'N')
                     .setParameter("ind_mov", cashAccount.getMovementAccount() ? 'S' : 'N')
+                    .setParameter("permiso_inv", cashAccount.getHasWarehousePermission() ? 'S' : 'N')
                     .executeUpdate();
             return Boolean.TRUE;
         } catch (Exception e){
