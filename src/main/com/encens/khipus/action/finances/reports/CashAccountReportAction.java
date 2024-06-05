@@ -29,7 +29,7 @@ public class CashAccountReportAction extends GenericReportAction {
                "        cashAccount.accountType as type, " +
                "        cashAccount.currency as currency, " +
                "        cashAccount.active as active, " +
-               "        cashAccount.hasWarehousePermission as inv, " +
+               "        cashAccount.hasWarehousePermission as permission, " +
                "        cashAccount.expenseType as expenseType " +
                "  FROM  CashAccount cashAccount ";
     }
