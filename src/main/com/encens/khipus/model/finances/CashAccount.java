@@ -64,7 +64,7 @@ public class CashAccount implements BaseModel {
     @Enumerated(EnumType.STRING)
     private CashAccountType accountType;
 
-    @Column(name = "tipo_gasto")
+    @Column(name = "tipo_gasto", nullable = true)
     @Enumerated(EnumType.STRING)
     private ExpenseType expenseType;
 

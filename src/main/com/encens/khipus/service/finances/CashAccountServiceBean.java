@@ -78,6 +78,10 @@ public class CashAccountServiceBean implements CashAccountService {
     public Boolean createCashAccount(CashAccount cashAccount) {
 
         cashAccount.setCompanyNumber(Constants.defaultCompanyNumber);
+        String expenseType = null;
+        if (cashAccount.getExpenseType() != null) {
+            expenseType = cashAccount.getExpenseType().toString();
+        }
 
         try {
             em.createNativeQuery("insert into arcgms (cuenta, descri, cta_raiz, no_cia, tipo, tipo_gasto, activa, moneda, exije_cc, ind_mov, permiso_inv) " +
@@ -87,7 +91,7 @@ public class CashAccountServiceBean implements CashAccountService {
                     .setParameter("cta_raiz", cashAccount.getRootCashAccount().getAccountCode())
                     .setParameter("no_cia", Constants.defaultCompanyNumber)
                     .setParameter("tipo", cashAccount.getAccountType().toString())
-                    .setParameter("tipo_gasto", cashAccount.getExpenseType().toString())
+                    .setParameter("tipo_gasto", expenseType)
                     .setParameter("activa", 'S')
                     .setParameter("moneda", cashAccount.getCurrency().toString())
                     .setParameter("exije_cc", 'N')
