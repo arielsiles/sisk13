@@ -60,7 +60,7 @@
                         id="productItemList"
                         rows="#{sessionUser.rowsPerPage}"
                         width="100%"
-                        columnsWidth="5%, 30%, 65%">
+                        columnsWidth="5%, 10%, 50%, 35%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column styleClass="center">
@@ -81,6 +81,7 @@
                             #{messages['ProductItem.name']}
                         </app:commandSortHeader>
                     </rich:column>
+                    <rich:column>#{messages['Inventory.warehouse']}</rich:column>
                 </rich:columnGroup>
             </f:facet>
             <rich:column styleClass="center">
@@ -96,6 +97,9 @@
             </rich:column>
             <rich:column>
                 <h:outputText value="#{productItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{productItem.warehouse.fullName}"/>
             </rich:column>
         </rich:dataTable>
 
