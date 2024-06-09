@@ -92,4 +92,8 @@ public class Destination implements BaseModel {
         this.version = version;
     }
 
+    public String getFullName() {
+        return code + " " + name;
+    }
+
 }
