@@ -1557,10 +1557,17 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         }
 
         for (MovementDetail detail : movementDetailList){
+
+            CashAccount expenseCashAccount = detail.getProductItem().getSubGroup().getGroup().getCostCashAccount();
+            if (warehouseVoucher.getExpenseCashAccount() != null)
+                expenseCashAccount = warehouseVoucher.getExpenseCashAccount();
+
+
             voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnit.getExecutorUnitCode(),
                     costCenterCode,
-                    detail.getProductItem().getCashAccount() ,
+                    /*detail.getProductItem().getCashAccount() ,*/
+                    expenseCashAccount,
                     detail.getAmount(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));

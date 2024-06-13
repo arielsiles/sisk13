@@ -1,7 +1,10 @@
 package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.finances.*;
+import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -132,13 +135,17 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
 
         CashAccount expenseCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getCostCashAccount();
 
-        if (warehouseVoucher.getExpenseType().equals(ExpenseType.ADMINISTRATIVE)){
-
+        /** Anterior, seleccionaba cuenta de gasto o costo de la configuracion de inv_grupos **/
+        /*if (warehouseVoucher.getExpenseType().equals(ExpenseType.ADMINISTRATIVE)){
             if (movementDetail.getProductItem().getSubGroup().getGroup().getExpenseCashAccount() != null) {
                 expenseCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getExpenseCashAccount();
             }else{
                 expenseCashAccount = movementDetail.getProductItem().getCashAccount();
             }
+        }*/
+
+        if (warehouseVoucher.getExpenseCashAccount() != null){
+                expenseCashAccount = warehouseVoucher.getExpenseCashAccount();
         }
 
         return expenseCashAccount;

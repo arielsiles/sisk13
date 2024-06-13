@@ -496,7 +496,8 @@
     </s:div>
 
     <s:div id="expenseTypeDiv">
-        <s:decorate id="expenseTypeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+        <s:decorate id="expenseTypeField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption or warehouseVoucherCreateAction.warehouseVoucher.reception}">
             <ui:define name="label">#{messages['WarehouseVoucher.expenseType']}</ui:define>
             <h:selectOneMenu id="expenseType"
                              value="#{warehouseVoucherCreateAction.warehouseVoucher.expenseType}"
@@ -517,7 +518,8 @@
     </s:div>
 
     <s:div id="expenseCashAccountDiv">
-        <s:decorate id="expenseCashAccountField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+        <s:decorate id="expenseCashAccountField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption or warehouseVoucherCreateAction.warehouseVoucher.reception}">
             <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
             <app:selectPopUp id="productItemAccount"
                              required="true"
