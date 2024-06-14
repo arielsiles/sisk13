@@ -52,6 +52,10 @@ public class Group implements BaseModel {
     @Length(max = 31)
     private String expenseAccount;
 
+    @Column(name = "cta_baja", nullable = true, length = 31)
+    @Length(max = 31)
+    private String lowAccount;
+
     @ManyToOne(optional = false)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
@@ -72,6 +76,13 @@ public class Group implements BaseModel {
             @JoinColumn(name = "cta_gasto", referencedColumnName = "cuenta", updatable = false, insertable = false)
     })
     private CashAccount expenseCashAccount;
+
+    @ManyToOne(optional = true)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cta_baja", referencedColumnName = "cuenta", updatable = false, insertable = false)
+    })
+    private CashAccount lowCashAccount;
 
     @Version
     @Column(name = "version")
@@ -172,5 +183,21 @@ public class Group implements BaseModel {
 
     public void setExpenseCashAccount(CashAccount expenseCashAccount) {
         this.expenseCashAccount = expenseCashAccount;
+    }
+
+    public String getLowAccount() {
+        return lowAccount;
+    }
+
+    public void setLowAccount(String lowAccount) {
+        this.lowAccount = lowAccount;
+    }
+
+    public CashAccount getLowCashAccount() {
+        return lowCashAccount;
+    }
+
+    public void setLowCashAccount(CashAccount lowCashAccount) {
+        this.lowCashAccount = lowCashAccount;
     }
 }

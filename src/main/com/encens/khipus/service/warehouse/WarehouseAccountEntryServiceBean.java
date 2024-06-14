@@ -1309,7 +1309,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
                     if (MovementDetailType.S.equals(movementDetailType)) {
                         System.out.println("4--------------------->: createAccountEntryForOutputs(warehouseVoucher...");
-                        if (warehouseVoucher.getWarehouse().getDefaultOutputWarehouse())
+                        if ( warehouseVoucher.getWarehouse().getDefaultOutputWarehouse() || warehouseVoucher.getLowFlag() )
                             createAccountEntryForOutputs(warehouseVoucher,
                                     warehouseVoucher.getExecutorUnit(),
                                     warehouseVoucher.getCostCenterCode(),
@@ -1847,6 +1847,10 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             /** Cuenta para reprocesos **/
             if (warehouseVoucher.getDocumentType().getWarehouseVoucherType().equals(WarehouseVoucherType.W))
                 debitCashAccount = companyConfiguration.getReworkAccount();
+
+            if (warehouseVoucher.getLowFlag()){
+                debitCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getLowCashAccount();
+            }
 
             System.out.println("======> aaaaa : " + movementDetail.getProductItem().getFullName() + " - " + detailAmount);
 

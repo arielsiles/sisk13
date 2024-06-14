@@ -10,8 +10,10 @@ import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.purchases.PurchaseOrder;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
 
 import javax.persistence.*;
@@ -88,6 +90,10 @@ public class WarehouseVoucher implements BaseModel {
 
     @Column(name = "cta_gasto")
     private String expenseCashAccountCode;
+
+    @Column(name = "baja", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean lowFlag = Boolean.FALSE;
 
     @ManyToOne(optional = true)
     @JoinColumns({
@@ -720,5 +726,13 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setExpenseCashAccountCode(String expenseCashAccountCode) {
         this.expenseCashAccountCode = expenseCashAccountCode;
+    }
+
+    public Boolean getLowFlag() {
+        return lowFlag;
+    }
+
+    public void setLowFlag(Boolean lowFlag) {
+        this.lowFlag = lowFlag;
     }
 }

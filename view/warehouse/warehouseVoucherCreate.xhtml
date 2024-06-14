@@ -26,7 +26,7 @@
 </c:if>
 
 <c:set var="mainComponentIdsToRerender"
-       value="documentTypeField, transferorder, destination, expenseTypeDiv,  petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
+       value="documentTypeField, transferorder, lowCheckField, destination, expenseTypeDiv,  petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
 
 <c:set var="elementsToReRenderForPetitionerJobContractChange"
        value="petitionerJobContractPanel, executorUnitLeftSidePanel"/>
@@ -133,14 +133,14 @@
                     value="#{warehouseVoucherCreateAction.warehouseVoucher.petitionerJobContract.job.charge.name}"
                     styleClass="input"/>
         </s:decorate>
-        <s:decorate id="contractPetitionerOrganizationalUnitField" template="/include/inputField.xhtml"
+        <!--<s:decorate id="contractPetitionerOrganizationalUnitField" template="/include/inputField.xhtml"
                     rendered="#{warehouseVoucherCreateAction.enableContractInfo}"
                     styleClass="formRow">
             <ui:define name="label">#{messages['WarehouseVoucher.petitionerArea']}</ui:define>
             <h:outputText
                     value="#{warehouseVoucherCreateAction.warehouseVoucher.petitionerJobContract.job.organizationalUnit.fullName}"
                     styleClass="input"/>
-        </s:decorate>
+        </s:decorate>-->
     </c:if>
 </s:div>
 
@@ -477,8 +477,22 @@
         </s:decorate>
     </s:div>
 
+    <!--<c:if test="#{warehousePurchaseOrderAction.purchaseOrderApproved and warehousePurchaseOrderAction.purchaseOrderCash}">-->
+    <s:div id="lowCheckField">
+        <s:decorate id="lowCheck" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+            <ui:define name="label">
+                <h:outputText value="#{messages['WarehouseVoucher.isLow']}"/>
+            </ui:define>
+            <h:selectBooleanCheckbox value="#{warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
+                <a4j:support event="onchange" reRender="destination, expenseTypeDiv" ajaxSingle="true"/>
+            </h:selectBooleanCheckbox>
+        </s:decorate>
+    </s:div>
+    <!--</c:if>-->
+
     <s:div id="destination">
-        <s:decorate template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
             <ui:define name="label">#{messages['WarehouseVoucher.destination']}</ui:define>
             <h:selectOneMenu id="destination"
                              value="#{warehouseVoucherCreateAction.warehouseVoucher.destination}"
@@ -497,7 +511,8 @@
 
     <s:div id="expenseTypeDiv">
         <s:decorate id="expenseTypeField" template="/include/inputField.xhtml" styleClass="formRow"
-                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption or warehouseVoucherCreateAction.warehouseVoucher.reception}">
+                    rendered="#{(warehouseVoucherCreateAction.warehouseVoucher.consumption or warehouseVoucherCreateAction.warehouseVoucher.reception)
+                                and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
             <ui:define name="label">#{messages['WarehouseVoucher.expenseType']}</ui:define>
             <h:selectOneMenu id="expenseType"
                              value="#{warehouseVoucherCreateAction.warehouseVoucher.expenseType}"
