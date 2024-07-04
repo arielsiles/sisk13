@@ -129,42 +129,42 @@
 					<staticText>
 						<reportElement x="0" y="1" width="41" height="15"/>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
-							<font fontName="Trebuchet MS" size="7"/>
+							<font fontName="Arial" size="7"/>
 						</textElement>
 						<text><![CDATA[CUENTA]]></text>
 					</staticText>
 					<staticText>
 						<reportElement x="41" y="1" width="190" height="15"/>
 						<textElement verticalAlignment="Middle">
-							<font fontName="Trebuchet MS" size="7"/>
+							<font fontName="Arial" size="7"/>
 						</textElement>
 						<text><![CDATA[DESCRIPCION]]></text>
 					</staticText>
 					<staticText>
 						<reportElement x="236" y="0" width="70" height="15"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="Trebuchet MS" size="7" isBold="false"/>
+							<font fontName="Arial" size="7" isBold="false"/>
 						</textElement>
 						<text><![CDATA[ACTIVO]]></text>
 					</staticText>
 					<staticText>
 						<reportElement x="307" y="0" width="70" height="15"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="Trebuchet MS" size="7" isBold="false"/>
+							<font fontName="Arial" size="7" isBold="false"/>
 						</textElement>
 						<text><![CDATA[PASIVO]]></text>
 					</staticText>
 					<staticText>
 						<reportElement x="378" y="0" width="70" height="15"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="Trebuchet MS" size="7" isBold="false"/>
+							<font fontName="Arial" size="7" isBold="false"/>
 						</textElement>
 						<text><![CDATA[EGRESOS]]></text>
 					</staticText>
 					<staticText>
 						<reportElement x="449" y="0" width="70" height="15"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="Trebuchet MS" size="7" isBold="false"/>
+							<font fontName="Arial" size="7" isBold="false"/>
 						</textElement>
 						<text><![CDATA[INGRESOS]]></text>
 					</staticText>

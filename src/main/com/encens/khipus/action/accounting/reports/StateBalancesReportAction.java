@@ -51,6 +51,7 @@ public class StateBalancesReportAction extends GenericReportAction {
     @Create
     public void init() {
         restrictions = new String[]{};
+        sortProperty = "voucherDetail.account";
     }
 
     @Override

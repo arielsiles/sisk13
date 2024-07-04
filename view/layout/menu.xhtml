@@ -448,13 +448,14 @@
                 propagation="none" />
     </rich:menuItem>
 
+    <!-- For CISC
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
         <s:link view="/accounting/dailyCollectionReport.xhtml"
                 value="#{messages['menu.finances.accounting.dailyCollection']}"
                 propagation="none" />
-    </rich:menuItem>
+    </rich:menuItem>-->
 
     <!--<rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
@@ -512,29 +513,30 @@
                 propagation="none" />
     </rich:menuItem>
 
+    <!-- For ILVA
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
         <s:link view="/accounting/productionCostReport.xhtml"
                 value="#{messages['menu.finances.accounting.productionCost']}"
                 propagation="none" />
-    </rich:menuItem>
+    </rich:menuItem>-->
 
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
-        <s:link view="/accounting/balanceSheetReport.xhtml"
-                value="#{messages['menu.finances.accounting.balanceSheet']}"
-                propagation="none" />
+        <!--<s:link view="/accounting/balanceSheetReport.xhtml" value="#{messages['menu.finances.accounting.balanceSheet']}" propagation="none" />-->
+        <s:link view="/accounting/balanceSheetReport.xhtml" value="Balance General" propagation="none" />
     </rich:menuItem>
 
+    <!-- For CISC
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
         <s:link view="/accounting/balanceSheetFinancialReport.xhtml"
                 value="#{messages['menu.finances.accounting.balanceSheetFinancial']}"
                 propagation="none" />
-    </rich:menuItem>
+    </rich:menuItem>-->
 
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
