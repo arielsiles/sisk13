@@ -174,6 +174,17 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
         return productItemList;
     }
 
+    public List<ProductItem> findByGroupCode(String groupCode) {
+        List<ProductItem> productItemList = new ArrayList<ProductItem>();
+        List<ProductItem> resultList = getEntityManager().createNamedQuery("ProductItem.findByGroupCode")
+                .setParameter("groupCode", groupCode)
+                .getResultList();
+        if (resultList != null) {
+            productItemList = resultList;
+        }
+        return productItemList;
+    }
+
     /**
      * Finds a list of ProductItems involved in a ProductItem List
      *

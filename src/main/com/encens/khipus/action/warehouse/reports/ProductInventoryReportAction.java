@@ -55,6 +55,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
     private Warehouse warehouse;
     private Boolean articlesWithMovement = true;
 
+    private Group group;
+
     @In
     private MovementDetailService movementDetailService;
     @In
@@ -109,6 +111,12 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         Collection<CollectionData> beanCollection = calculateCollectionData2();
 
+        String groupName = "";
+        if (group != null) {
+            beanCollection = filterByGroup(beanCollection, group);
+            groupName = " - " + group.getName();
+        }
+
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("reportTitle", "REPORTE GENERAL DE INVENTARIO");
@@ -117,7 +125,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         paramMap.put("locationName", companyConfiguration.getLocationName());
         paramMap.put("startDate", startDate);
         paramMap.put("endDate", endDate);
-        paramMap.put("warehouse", warehouse.getFullName());
+        paramMap.put("warehouse", warehouse.getFullName() + groupName);
 
         parameters.putAll(paramMap);
 
@@ -133,6 +141,21 @@ public class ProductInventoryReportAction extends GenericReportAction {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public Collection<CollectionData> filterByGroup(Collection<CollectionData> beanCollection, Group group){
+        Collection<CollectionData> result = new ArrayList();
+        List<ProductItem> productItemGroupList = productItemService.findByGroupCode(group.getGroupCode());
+
+        for (CollectionData collectionData : beanCollection) {
+            for (ProductItem item : productItemGroupList) {
+                if (item.getProductItemCode().equals(collectionData.getCode())) {
+                    result.add(collectionData);
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -782,6 +805,14 @@ public class ProductInventoryReportAction extends GenericReportAction {
         this.articlesWithMovement = articlesWithMovement;
     }
 
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
     /**
      *
      */
@@ -980,6 +1011,10 @@ public class ProductInventoryReportAction extends GenericReportAction {
         public void setMovementType(MovementDetailType movementType) {
             this.movementType = movementType;
         }
+    }
+
+    public void cleanGroupField() {
+        setGroup(null);
     }
 
 }
