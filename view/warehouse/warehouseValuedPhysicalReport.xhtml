@@ -1,0 +1,152 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.kardex.valuedPhysicalInventory.titleReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="productInventoryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.kardex.valuedPhysicalInventory.titleReport']}
+                </f:facet>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{warehouseValuedPhysicalReportAction.startDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{warehouseValuedPhysicalReportAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="startDate"
+                                                forLabel="#{messages['Reports.kardex.movement.startDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryManagement.warehouse']}</ui:define>
+                    <app:quickSearch id="quickSearchWarehouse"
+                                     textValue="#{warehouseValuedPhysicalReportAction.warehouse.warehouseCode}"
+                                     value="#{warehouseValuedPhysicalReportAction.warehouse}"
+                                     searchField="warehouseCode"
+                                     alias="warehouse"
+                                     reRender="warehouseField"
+                                     tabindex="3">
+                    </app:quickSearch>
+                    <app:selectPopUp id="warehouse"
+                                     textValue="#{warehouseValuedPhysicalReportAction.warehouse.name}"
+                                     required="true"
+                                     value="#{warehouseValuedPhysicalReportAction.warehouse}"
+                                     clearAction="#{warehouseValuedPhysicalReportAction.cleanWarehouseField()}"
+                                     searchModalPanel="warehouseModalPanel"
+                                     dataModel="#{warehouseSearchDataModel}"
+                                     reRender="warehouseField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="groupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.report.group']}</ui:define>
+                    <app:quickSearch id="quickSearchGroup"
+                                     textValue="#{warehouseValuedPhysicalReportAction.group.groupCode}"
+                                     value="#{warehouseValuedPhysicalReportAction.group}"
+                                     searchField="groupCode"
+                                     reRender="groupField"
+                                     tabindex="9"/>
+                    <app:selectPopUp id="group"
+                                     textValue="#{warehouseValuedPhysicalReportAction.group.fullName}"
+                                     value="#{warehouseValuedPhysicalReportAction.group}"
+                                     dataModel="#{groupSearchDataModel}"
+                                     clearAction="#{warehouseValuedPhysicalReportAction.cleanGroupField()}"
+                                     searchModalPanel="groupListModalPanel"
+                                     reRender="groupField"
+                                     hotKeySelect="alt+3">
+                    </app:selectPopUp>
+                </s:decorate>
+
+                <div class="buttons">
+
+                    <h:commandButton action="#{warehouseValuedPhysicalReportAction.generateReport}"
+                                     styleClass="button"
+                                     value="#{messages['Common.generate']}" id="generateButtonId" tabindex="1">
+                    </h:commandButton>
+
+
+                </div>
+
+            </rich:panel>
+
+        </h:form>
+
+        <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+            <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+            <ui:param name="dialogId" value="warehouseModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{warehouseValuedPhysicalReportAction.setWarehouse(warehouseItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   reRender="warehouseField"
+                                   oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="hasWarehousePermission" value="true"/>
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{warehouseValuedPhysicalReportAction.setCashAccount(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="itemAccountField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="groupListModalPanelContainer" template="/warehouse/groupListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{warehouseValuedPhysicalReportAction.setGroup(groupItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="groupField"
+                                   oncomplete="Richfaces.hideModalPanel('groupListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

@@ -728,6 +728,14 @@
                     propagation="none"/>
         </rich:menuItem>
 
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('VALUED_PHYSICAL_INVENTORY_REPORT','VIEW')}">
+            <s:link view="/warehouse/warehouseValuedPhysicalReport.xhtml"
+                    value="#{messages['menu.warehouse.report.warehouseReportInputsOutputs']}"
+                    propagation="none"/>
+        </rich:menuItem>
+
         <!-- Estado del Inventario -->
         <!--<rich:menuItem submitMode="none"
                        styleClass="main-menu-item"

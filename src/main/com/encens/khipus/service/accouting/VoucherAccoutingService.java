@@ -128,6 +128,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     public List<Object[]> getValuedInventory(Date startDate, Date endDate, CashAccount cashAccount);
 
+    public List<Object[]> getWarehouseValuedPhysical(Date startDate, Date endDate, CashAccount cashAccount, String groupCode);
+
     public List<Object[]> getProductionCostAccountResults(Date startDate, Date endDate, CashAccount cashAccountProductionCost);
 
 }

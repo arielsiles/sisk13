@@ -2195,6 +2195,34 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
     }
 
+    public List<Object[]> getWarehouseValuedPhysical(Date startDate, Date endDate, CashAccount cashAccount, String groupCode){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        datas = em.createNativeQuery("" +
+                        "SELECT d.cod_art, a.descri, a.cod_med, " +
+                        "SUM(d.debe)     AS debe, " +
+                        "SUM(d.haber)    AS haber, " +
+                        "SUM(IF(d.debe>0, d.cant_art, 0))  AS cant_e, " +
+                        "SUM(IF(d.haber>0, d.cant_art, 0)) AS cant_s " +
+                        "FROM sf_tmpdet d " +
+                        "LEFT JOIN sf_tmpenc e ON d.id_tmpenc = e.id_tmpenc " +
+                        "LEFT JOIN inv_articulos a ON d.cod_art = a.cod_art " +
+                        "WHERE d.cuenta = :cashAccount " +
+                        "AND e.fecha BETWEEN :startDate AND :endDate " +
+                        "AND e.estado <> 'ANL' " +
+                        "AND a.cod_gru = :groupCode " +
+                        "GROUP BY d.cod_art, a.descri, a.cod_med order by a.descri asc")
+                .setParameter("cashAccount", cashAccount.getAccountCode())
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("groupCode", groupCode)
+                .getResultList();
+
+        return datas;
+
+    }
+
     public List<Object[]> getProductionCostAccountResults(Date startDate, Date endDate, CashAccount cashAccountProductionCost){
 
         List<Object[]> datas = new ArrayList<Object[]>();
