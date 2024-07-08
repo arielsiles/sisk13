@@ -71,7 +71,7 @@
                              value="#{cashAccount.accountCode}"
                              styleClass="input"
                              required="true"
-                             maxlength="100"
+                             maxlength="10"
                              tabindex="1"/>
             </s:decorate>
 
@@ -135,7 +135,7 @@
                                  required="true"
                                  textValue="#{cashAccount.rootCashAccount.fullName}"
                                  value="#{cashAccount.rootCashAccount}"
-                                 clearAction="voucherCreateAction.clearAccount()"
+                                 clearAction="#{cashAccountAction.clearRootAccount()}"
                                  searchModalPanel="cashAccountListModalPanel"
                                  dataModel="#{cashAccountDataModel}"
                                  reRender="itemAccountField"

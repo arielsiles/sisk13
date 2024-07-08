@@ -69,7 +69,12 @@ public class CashAccountAction extends GenericAction<CashAccount> {
 
     }
 
+    public void clearRootAccount() {
+        getInstance().setRootCashAccount(null);
+    }
+
     public void assignRootCashAccount(CashAccount cashAccount) {
         getInstance().setRootCashAccount(cashAccount);
+        getInstance().setRootAccountCode(cashAccount.getAccountCode());
     }
 }
