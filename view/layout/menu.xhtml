@@ -542,7 +542,15 @@
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
         <s:link view="/accounting/profitAndLossReport.xhtml"
-                value="#{messages['menu.finances.accounting.profitAndLoss']}"
+                value="#{messages['menu.finances.accounting.profitAndLoss1']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/profitAndLossTwoReport.xhtml"
+                value="#{messages['menu.finances.accounting.profitAndLoss2']}"
                 propagation="none" />
     </rich:menuItem>
 
@@ -550,7 +558,7 @@
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                    styleClass="main-menu-item">
         <s:link view="/accounting/profitAndLossN3Report.xhtml"
-                value="#{messages['menu.finances.accounting.profitAndLossN3']}"
+                value="#{messages['menu.finances.accounting.profitAndLoss3']}"
                 propagation="none" />
     </rich:menuItem>
 
