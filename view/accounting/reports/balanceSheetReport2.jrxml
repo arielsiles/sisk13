@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="balanceSheetReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="531" leftMargin="56" rightMargin="25" topMargin="42" bottomMargin="42">
 	<property name="ireport.zoom" value="1.7715610000000115"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="343"/>
+	<property name="ireport.x" value="68"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
@@ -56,187 +56,20 @@
 					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
 					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BALANCELIABILITIESSUBREPORT}]]></subreportExpression>
 				</subreport>
-				<staticText>
-					<reportElement x="285" y="191" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[APORTES POR CAPITALIZAR]]></text>
-				</staticText>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="434" y="172" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_social}]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="434" y="249" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_reservas}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="285" y="172" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[CAPITAL SOCIAL]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="285" y="210" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[AJUSTES AL PATRIMONIO]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="285" y="249" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[RESERVAS]]></text>
-				</staticText>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="434" y="368" width="84" height="15"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="8" isBold="true"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalPatrimonio}]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="434" y="326" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_acumulados}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="285" y="326" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[RESULTADOS ACUMULADOS]]></text>
-				</staticText>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="434" y="210" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_ajustes}]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="425" y="345" width="93" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalPerdidasExcedentes}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="285" y="153" width="81" height="11"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="9" isUnderline="true"/>
-					</textElement>
-					<text><![CDATA[P A T R I M O N I O]]></text>
-				</staticText>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="434" y="191" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_aportes}]]></textFieldExpression>
-				</textField>
-				<line>
-					<reportElement x="434" y="365" width="85" height="1"/>
-					<graphicElement>
-						<pen lineWidth="0.25"/>
-					</graphicElement>
-				</line>
-				<staticText>
-					<reportElement x="285" y="345" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[PERDIDAS / EXCEDENTES DEL PERIODO]]></text>
-				</staticText>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="434" y="396" width="84" height="15"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="8" isBold="true"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{totalLiabilitiesCapitalRes}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="284" y="396" width="135" height="15"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8" isBold="true"/>
-					</textElement>
-					<text><![CDATA[TOTAL PASIVO + PATRIMONIO:]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="283" y="368" width="134" height="15"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="8" isBold="true"/>
-					</textElement>
-					<text><![CDATA[TOTAL PATRIMONIO:]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="285" y="229" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[RESERVAS POR REVALUOS TECNICOS]]></text>
-				</staticText>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="435" y="229" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_reservastec}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="284" y="268" width="131" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[AJUSTES AL PATRIMONIO]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="284" y="287" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[AJUSTE DE CAPITAL]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="284" y="306" width="140" height="12"/>
-					<textElement verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<text><![CDATA[APORTES NO CAPITALIZABLES]]></text>
-				</staticText>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="434" y="268" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_ajuste_pat}]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="435" y="287" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_ajustes_cap}]]></textFieldExpression>
-				</textField>
-				<textField pattern="#,##0.00;(#,##0.00)">
-					<reportElement x="435" y="306" width="84" height="12"/>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="Arial" size="7"/>
-					</textElement>
-					<textFieldExpression class="java.lang.Double"><![CDATA[$P{capital_aportes_nocap}]]></textFieldExpression>
-				</textField>
+				<subreport isUsingCache="true">
+					<reportElement x="282" y="151" width="71" height="44"/>
+					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+					<subreportParameter name="totalLiabilitiesCapitalRes">
+						<subreportParameterExpression><![CDATA[$P{totalLiabilitiesCapitalRes}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="profitOrLoss">
+						<subreportParameterExpression><![CDATA[$P{totalPerdidasExcedentes}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="totalPatrimonio">
+						<subreportParameterExpression><![CDATA[$P{totalPatrimonio}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BALANCECAPITALSUBREPORT}]]></subreportExpression>
+				</subreport>
 			</band>
 		</groupHeader>
 	</group>

@@ -152,11 +152,12 @@ public class BalanceSheet2ReportAction extends GenericReportAction {
 
         addCriteriaAssetSubReport("BALANCESHEETSUBREPORT", params);
         addCriteriaLiabilitiesSubReport("BALANCELIABILITIESSUBREPORT", params);
-        //addCriteriaCapitalSubReport("BALANCECAPITALSUBREPORT", params);
+
+        addCriteriaCapitalSubReport("BALANCECAPITALSUBREPORT", params);
 
         /*setReportFormat(ReportFormat.PDF);*/
         super.generateReport("balanceSheetReport",
-                "/accounting/reports/balanceSheet2Report.jrxml",
+                "/accounting/reports/balanceSheetReport2.jrxml",
                 PageFormat.LETTER, PageOrientation.PORTRAIT, messages.get("BalanceSheet.report"), params);
 
     }
@@ -286,7 +287,7 @@ public class BalanceSheet2ReportAction extends GenericReportAction {
         //generate the sub report
         TypedReportData subReportData = super.generateSubReport(
                 subReportKey,
-                "/accounting/reports/balanceSheetCapitalReport.jrxml",
+                "/accounting/reports/balanceSheetCapitalReport2.jrxml",
                 PageFormat.LETTER,
                 PageOrientation.PORTRAIT,
                 createQueryForSubreport(subReportKey, ejbql, Arrays.asList(restrictions), orderBy),
