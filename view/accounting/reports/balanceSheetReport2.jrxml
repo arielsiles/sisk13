@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="balanceSheetReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="531" leftMargin="56" rightMargin="25" topMargin="42" bottomMargin="42">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="balanceSheetReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="514" leftMargin="56" rightMargin="42" topMargin="28" bottomMargin="28">
 	<property name="ireport.zoom" value="1.7715610000000115"/>
-	<property name="ireport.x" value="68"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="336"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
@@ -57,7 +57,7 @@
 					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BALANCELIABILITIESSUBREPORT}]]></subreportExpression>
 				</subreport>
 				<subreport isUsingCache="true">
-					<reportElement x="282" y="151" width="71" height="44"/>
+					<reportElement x="282" y="287" width="71" height="44"/>
 					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
 					<subreportParameter name="totalLiabilitiesCapitalRes">
 						<subreportParameterExpression><![CDATA[$P{totalLiabilitiesCapitalRes}]]></subreportParameterExpression>
@@ -202,7 +202,4 @@
 			</line>
 		</band>
 	</pageFooter>
-	<summary>
-		<band height="19" splitType="Stretch"/>
-	</summary>
 </jasperReport>

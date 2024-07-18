@@ -25,7 +25,7 @@
                 <s:decorate id="dateFromField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Voucher.majorReport.dateFrom']}</ui:define>
                     <rich:calendar id="dateFrom"
-                                   value="#{balanceSheet2ReportAction.startDate}"
+                                   value="#{balanceSheet3ReportAction.startDate}"
                                    styleClass="input"
                                    datePattern="#{messages['patterns.date']}"
                                    timeZone="#{sessionUser.timeZone}"
@@ -39,7 +39,7 @@
                 <s:decorate id="dateToField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Voucher.majorReport.dateTo']}</ui:define>
                     <rich:calendar id="dateTo"
-                                   value="#{balanceSheet2ReportAction.endDate}"
+                                   value="#{balanceSheet3ReportAction.endDate}"
                                    styleClass="input"
                                    datePattern="#{messages['patterns.date']}"
                                    timeZone="#{sessionUser.timeZone}"
@@ -54,12 +54,12 @@
             </h:panelGrid>
         </rich:panel>
 
-        <app:reportDefaultOptions reportAction="#{balanceSheet2ReportAction}" showPageFormat="false"
+        <app:reportDefaultOptions reportAction="#{balanceSheet3ReportAction}" showPageFormat="false"
                                   tabIndex="11"
                                   showReportTitle="false"/>
 
         <div class="buttons">
-            <h:commandButton action="#{balanceSheet2ReportAction.generateReport}"
+            <h:commandButton action="#{balanceSheet3ReportAction.generateReport}"
                              styleClass="button"
                              value="#{messages['Common.generate']}" id="searchButtonId" tabindex="12">
                 <s:defaultAction/>
