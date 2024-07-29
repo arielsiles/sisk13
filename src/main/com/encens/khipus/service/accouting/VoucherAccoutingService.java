@@ -64,6 +64,10 @@ public interface VoucherAccoutingService extends GenericService {
 
     public Double getBalanceProvider(Date startDate, String cashAccountCode, String providerCode);
 
+    public Double getTotalCashInflows(String startDate, String endDate);
+
+    public Double getTotalCashOutflows(String startDate, String endDate);
+
     public Double getCustomerBalance(Date startDate, String cashAccountCode, Long clientId);
 
     public Double getTotalProfits(String startDate, String endDate);

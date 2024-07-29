@@ -574,6 +574,88 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return balance;
     }
 
+    public Double getTotalCashInflows(String startDate, String endDate){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+        String ejbql =  " SELECT " +
+                " rootCashAccount.accountCode as accountCode, " +
+                " rootCashAccount.description as description, " +
+                " cashAccount.accountType as accountType," +
+                " SUM(voucherDetail.debit) AS debit, " +
+                " SUM(voucherDetail.credit) AS credit" +
+                " FROM VoucherDetail voucherDetail " +
+                " LEFT  JOIN voucherDetail.voucher voucher " +
+                " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
+                " WHERE cashAccount.cashFlowAccount = 'I' " +
+                " AND voucher.state <> 'ANL' " +
+                " AND voucher.date between '"+startDate+"' and '"+endDate+"' " +
+                " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
+
+        datas = em.createQuery(ejbql).getResultList();
+
+        Double balance  = new Double(0);
+
+        for(Object[] obj: datas){
+
+            Double debit  = ((BigDecimal)obj[3]).doubleValue();
+            Double credit = ((BigDecimal)obj[4]).doubleValue();
+            String type   = ((CashAccountType)obj[2]).toString();
+
+            if ( type.equals("A") || type.equals("E") ){
+                balance  = balance + (debit - credit);
+            }
+
+            if ( type.equals("P") || type.equals("C") || type.equals("I") ){
+                balance  = balance + (credit - debit);
+            }
+
+        }
+
+        return balance;
+    }
+
+    public Double getTotalCashOutflows(String startDate, String endDate){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+        String ejbql =  " SELECT " +
+                " rootCashAccount.accountCode as accountCode, " +
+                " rootCashAccount.description as description, " +
+                " cashAccount.accountType as accountType," +
+                " SUM(voucherDetail.debit) AS debit, " +
+                " SUM(voucherDetail.credit) AS credit" +
+                " FROM VoucherDetail voucherDetail " +
+                " LEFT  JOIN voucherDetail.voucher voucher " +
+                " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
+                " WHERE cashAccount.cashFlowAccount = 'E' " +
+                " AND voucher.state <> 'ANL' " +
+                " AND voucher.date between '"+startDate+"' and '"+endDate+"' " +
+                " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
+
+        datas = em.createQuery(ejbql).getResultList();
+
+        Double balance  = new Double(0);
+
+        for(Object[] obj: datas){
+
+            Double debit  = ((BigDecimal)obj[3]).doubleValue();
+            Double credit = ((BigDecimal)obj[4]).doubleValue();
+            String type   = ((CashAccountType)obj[2]).toString();
+
+            if ( type.equals("A") || type.equals("E") ){
+                balance  = balance + (debit - credit);
+            }
+
+            if ( type.equals("P") || type.equals("C") || type.equals("I") ){
+                balance  = balance + (credit - debit);
+            }
+
+        }
+
+        return balance;
+    }
+
     public Double getTotalProfits(String startDate, String endDate){
 
         List<Object[]> datas = new ArrayList<Object[]>();

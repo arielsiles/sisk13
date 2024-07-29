@@ -16,7 +16,6 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -30,7 +29,7 @@ import java.util.HashMap;
  */
 @Name("creditDebitComparativeReportAction")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('REPORTCREDDEBCOMP','VIEW')}")
+/*@Restrict("#{s:hasPermission('REPORTCREDDEBCOMP','VIEW')}")*/
 public class CreditDebitComparativeReportAction extends GenericReportAction {
     private String executorUnitCode;
     private CostCenter costCenter;

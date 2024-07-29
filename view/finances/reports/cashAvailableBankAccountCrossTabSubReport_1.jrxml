@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="1080" pageHeight="612" whenNoDataType="AllSectionsNoDetail" columnWidth="1080" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<template><![CDATA[com.encens.khipus.util.FileCacheLoader.i.getPath("/include/reports/reportStyles.jrtx")]]></template>
+	<parameter name="crosstabInfoMapParam" class="java.util.Map"/>
+	<parameter name="groupIdentifierParam" class="java.lang.String"/>
+	<parameter name="executorUnitIdParam" class="java.lang.String"/>
+	<field name="financesBank.id" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+	</field>
+	<field name="financesBank.name" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+	</field>
+	<field name="financesBankAccount.companyNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+	</field>
+	<field name="financesBankAccount.accountNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+	</field>
+	<field name="financesBankAccount.currency" class="com.encens.khipus.model.finances.FinancesCurrencyType">
+		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+	</field>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band/>
+	</pageFooter>
+	<summary>
+		<band height="12">
+			<frame>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="1080" height="12"/>
+				<crosstab>
+					<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="1080" height="12"/>
+					<rowGroup name="emptyRowGroup" width="0">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[""]]></bucketExpression>
+						</bucket>
+						<crosstabRowHeader>
+							<cellContents/>
+						</crosstabRowHeader>
+						<crosstabTotalRowHeader>
+							<cellContents/>
+						</crosstabTotalRowHeader>
+					</rowGroup>
+					<columnGroup name="financesBank.name" height="0" headerPosition="Stretch">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[$F{financesBank.name}]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents mode="Opaque"/>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<columnGroup name="financesBankAccount.accountNumber" height="0">
+						<bucket>
+							<bucketExpression class="java.lang.String"><![CDATA[$F{financesBankAccount.accountNumber}+ " " + str($F{financesBankAccount.currency}.getSymbolResourceKey())]]></bucketExpression>
+						</bucket>
+						<crosstabColumnHeader>
+							<cellContents mode="Opaque"/>
+						</crosstabColumnHeader>
+						<crosstabTotalColumnHeader>
+							<cellContents/>
+						</crosstabTotalColumnHeader>
+					</columnGroup>
+					<measure name="customMeasure" class="java.math.BigDecimal">
+						<measureExpression><![CDATA[com.encens.khipus.action.finances.reports.CashAvailableReportUtil.getCrosstabRowColumnValue($P{groupIdentifierParam}, $P{crosstabInfoMapParam}, $P{executorUnitIdParam}, $F{financesBank.id}, $F{financesBankAccount.companyNumber}, $F{financesBankAccount.accountNumber})]]></measureExpression>
+					</measure>
+					<crosstabCell width="90" height="12">
+						<cellContents mode="Opaque">
+							<box>
+								<topPen lineWidth="1.0" lineStyle="Solid"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid"/>
+							</box>
+							<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+								<reportElement style="detailStyle" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="90" height="12"/>
+								<box padding="1"/>
+								<textElement textAlignment="Right"/>
+								<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{customMeasure}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabCell>
+				</crosstab>
+			</frame>
+		</band>
+	</summary>
+</jasperReport>

@@ -56,6 +56,12 @@ public class CashAccount implements BaseModel {
     @Enumerated(EnumType.STRING)
     private CreditState state;
 
+    @Column(name = "cn_nivel")
+    private Integer accountLevel;
+
+    @Column(name = "cta_fe")
+    private String cashFlowAccount;
+
     /*@Column(name = "TIPO", length = 2, updatable = false)
     @Length(max = 2)
     private String accountType;*/
@@ -532,6 +538,22 @@ public class CashAccount implements BaseModel {
 
     public void setExpenseType(ExpenseType expenseType) {
         this.expenseType = expenseType;
+    }
+
+    public Integer getAccountLevel() {
+        return accountLevel;
+    }
+
+    public void setAccountLevel(Integer accountLevel) {
+        this.accountLevel = accountLevel;
+    }
+
+    public String getCashFlowAccount() {
+        return cashFlowAccount;
+    }
+
+    public void setCashFlowAccount(String cashFlowAccount) {
+        this.cashFlowAccount = cashFlowAccount;
     }
 
     /*public String getAccountType() {

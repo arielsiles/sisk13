@@ -33,9 +33,9 @@ import java.util.Map;
  * @version 2.3
  */
 
-@Name("profitAndLoss2ReportAction")
+@Name("cashFlowStatementReportAction")
 @Scope(ScopeType.PAGE)
-public class ProfitAndLoss2ReportAction extends GenericReportAction {
+public class CashFlowStatementReportAction extends GenericReportAction {
 
     private Date startDate;
     private Date endDate;
@@ -89,6 +89,11 @@ public class ProfitAndLoss2ReportAction extends GenericReportAction {
         Double totalLosses  = voucherAccoutingService.getTotalLosses(start, end);
         Double totalResults = totalProfits - totalLosses;
 
+        Double totalCashInflows = voucherAccoutingService.getTotalCashInflows(start, end);
+        Double totalCashOutflows = voucherAccoutingService.getTotalCashOutflows(start, end);
+
+        Double totalCashBalance = totalCashInflows - totalCashOutflows;
+
         log.debug("Generating balance sheet report...................");
 
         HashMap<String, Object> params = new HashMap<String, Object>();
@@ -102,13 +107,17 @@ public class ProfitAndLoss2ReportAction extends GenericReportAction {
         params.put("totalLosses", totalLosses);
         params.put("totalResults", totalResults);
 
+        params.put("totalCashInflows", totalCashInflows);
+        params.put("totalCashOutflows", totalCashOutflows);
+        params.put("totalCashBalance", totalCashBalance);
+
         addCriteriaProfitSubReport("PROFITSUBREPORT", params);
         addCriteriaLossSubReport("LOSSSUBREPORT", params);
 
 
         /*setReportFormat(ReportFormat.PDF);*/
         super.generateReport("profitAndLossReport",
-                "/accounting/reports/profitAndLossReport.jrxml",
+                "/accounting/reports/cashFlowStatementReport.jrxml",
                 PageFormat.LETTER, PageOrientation.PORTRAIT, messages.get("ProfitAndLoss.report"), params);
 
     }
@@ -128,18 +137,19 @@ public class ProfitAndLoss2ReportAction extends GenericReportAction {
         Map<String, Object> params = new HashMap<String, Object>();
 
         String ejbql =  " SELECT " +
-                        " rootCashAccount.accountCode as accountCode, " +
-                        " rootCashAccount.description as description, " +
-                        " SUM(voucherDetail.debit) AS debit, " +
-                        " SUM(voucherDetail.credit) AS credit" +
-                        " FROM VoucherDetail voucherDetail " +
-                        " LEFT JOIN voucherDetail.voucher voucher " +
-                        " LEFT JOIN voucherDetail.cashAccount cashAccount" +
-                        " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
-                        " WHERE cashAccount.accountType = 'E' " +
-                        " AND voucher.state <> 'ANL' " +
-                        " AND voucher.date between '"+start+"' and '"+end+"' " +
-                        " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
+                " rootCashAccount.accountCode as accountCode, " +
+                " rootCashAccount.description as description, " +
+                " cashAccount.accountType as accountType," +
+                " SUM(voucherDetail.debit) AS debit, " +
+                " SUM(voucherDetail.credit) AS credit" +
+                " FROM VoucherDetail voucherDetail " +
+                " LEFT JOIN voucherDetail.voucher voucher " +
+                " LEFT JOIN voucherDetail.cashAccount cashAccount" +
+                " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
+                " WHERE cashAccount.cashFlowAccount = 'E' " +
+                " AND voucher.state <> 'ANL' " +
+                " AND voucher.date between '"+start+"' and '"+end+"' " +
+                " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
 
         String[] restrictions = new String[]{};
         String orderBy = "rootCashAccount.accountCode";
@@ -147,7 +157,7 @@ public class ProfitAndLoss2ReportAction extends GenericReportAction {
         //generate the sub report
         TypedReportData subReportData = super.generateSubReport(
                 subReportKey,
-                "/accounting/reports/lossReport.jrxml",
+                "/accounting/reports/cashOutflowsReport.jrxml",
                 PageFormat.LETTER,
                 PageOrientation.PORTRAIT,
                 createQueryForSubreport(subReportKey, ejbql, Arrays.asList(restrictions), orderBy),
@@ -173,16 +183,16 @@ public class ProfitAndLoss2ReportAction extends GenericReportAction {
         Map<String, Object> params = new HashMap<String, Object>();
 
         String ejbql =  " SELECT " +
-                " cashAccount." +
                 " rootCashAccount.accountCode as accountCode, " +
                 " rootCashAccount.description as description, " +
+                " cashAccount.accountType as accountType," +
                 " SUM(voucherDetail.debit) AS debit, " +
                 " SUM(voucherDetail.credit) AS credit" +
                 " FROM VoucherDetail voucherDetail " +
                 " LEFT  JOIN voucherDetail.voucher voucher " +
                 " LEFT JOIN voucherDetail.cashAccount cashAccount" +
                 " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
-                " WHERE cashAccount.accountType = 'I' " +
+                " WHERE cashAccount.cashFlowAccount = 'I' " +
                 " AND voucher.state <> 'ANL' " +
                 " AND voucher.date between '"+start+"' and '"+end+"' " +
                 " GROUP BY rootCashAccount.accountCode, rootCashAccount.description ";
@@ -193,7 +203,7 @@ public class ProfitAndLoss2ReportAction extends GenericReportAction {
         //generate the sub report
         TypedReportData subReportData = super.generateSubReport(
                 subReportKey,
-                "/accounting/reports/profitReport.jrxml",
+                "/accounting/reports/cashInflowsReport.jrxml",
                 PageFormat.LETTER,
                 PageOrientation.PORTRAIT,
                 createQueryForSubreport(subReportKey, ejbql, Arrays.asList(restrictions), orderBy),

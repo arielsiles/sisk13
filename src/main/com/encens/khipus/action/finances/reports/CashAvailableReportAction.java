@@ -12,7 +12,6 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -28,7 +27,7 @@ import java.util.Map;
  */
 @Name("cashAvailableReportAction")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('REPORTCASHAVAILABLE','VIEW')}")
+/*@Restrict("#{s:hasPermission('REPORTCASHAVAILABLE','VIEW')}")*/
 public class CashAvailableReportAction extends GenericReportAction {
 
     @In
