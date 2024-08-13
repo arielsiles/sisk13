@@ -541,6 +541,12 @@
         <s:link view="/accounting/balanceSheetThreeReport.xhtml" value="#{messages['menu.finances.accounting.balanceSheet2']}" propagation="none" />
     </rich:menuItem>
 
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/balanceSheetExtendedReport.xhtml" value="#{messages['menu.finances.accounting.balanceSheetExtended']}" propagation="none" />
+    </rich:menuItem>
+
     <!-- For CISC
     <rich:menuItem submitMode="none"
                    rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
