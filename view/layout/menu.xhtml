@@ -573,6 +573,14 @@
     </rich:menuItem>
 
     <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/accounting/profitAndLossExtendedReport.xhtml"
+                value="#{messages['menu.finances.accounting.profitAndLossExtended']}"
+                propagation="none" />
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
                    styleClass="main-menu-item">
         <s:link view="/accounting/cashFlowStatementReport.xhtml"
                 value="Estado de Flujo de Efectivo"
