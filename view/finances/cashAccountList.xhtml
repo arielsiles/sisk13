@@ -93,17 +93,21 @@
             </div>
 
             <rich:dataTable value="#{cashAccountDataModel}" var="cashAccountItem" id="cashAccountList"
-                            rows="#{sessionUser.rowsPerPage15}" width="100%" columnsWidth="10%, 50%, 10%, 10%, 10%, 10%">
+                            rows="#{sessionUser.rowsPerPage15}" width="100%" columnsWidth="10%, 10%, 50%, 5%, 10%, 10%, 5%">
                 <f:facet name="header">
                     <rich:columnGroup>
+                        <rich:column>#{messages['CashAccount.type']}</rich:column>
                         <rich:column>#{messages['CashAccount.accountCode']}</rich:column>
                         <rich:column>#{messages['CashAccount.description']}</rich:column>
-                        <rich:column>#{messages['CashAccount.type']}</rich:column>
+                        <rich:column>#{messages['CashAccount.level']}</rich:column>
                         <rich:column>#{messages['CashAccount.activeAccount']}</rich:column>
                         <rich:column>#{messages['CashAccount.movement']}</rich:column>
                         <rich:column styleClass="center">#{messages['Common.select']}</rich:column>
                     </rich:columnGroup>
                 </f:facet>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[cashAccountItem.accountType.resourceKey]}"/>
+                </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{cashAccountItem.accountCode}"/>
                 </rich:column>
@@ -111,7 +115,7 @@
                     <h:outputText value="#{cashAccountItem.description}"/>
                 </rich:column>
                 <rich:column styleClass="center">
-                    <h:outputText value="#{messages[cashAccountItem.accountType.resourceKey]}"/>
+                    <h:outputText value="#{cashAccountItem.accountLevel}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{cashAccountItem.active ? 'SI' : 'NO'}"/>

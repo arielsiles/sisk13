@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="770" leftMargin="11" rightMargin="11" topMargin="11" bottomMargin="11" scriptletClass="com.encens.khipus.action.finances.reports.CashAccountReportScriptlet">
-	<property name="ireport.zoom" value="1.7715610000000115"/>
-	<property name="ireport.x" value="0"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="1008" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="986" leftMargin="11" rightMargin="11" topMargin="11" bottomMargin="11" scriptletClass="com.encens.khipus.action.finances.reports.CashAccountReportScriptlet">
+	<property name="ireport.zoom" value="1.9487171000000143"/>
+	<property name="ireport.x" value="784"/>
 	<property name="ireport.y" value="0"/>
 	<field name="code" class="java.lang.String">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
@@ -27,11 +27,34 @@
 	<field name="expenseType" class="com.encens.khipus.model.finances.ExpenseType">
 		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
 	</field>
+	<field name="level" class="java.lang.Integer">
+		<fieldDescription><![CDATA[COLUMN_9]]></fieldDescription>
+	</field>
+	<field name="fe" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_10]]></fieldDescription>
+	</field>
+	<field name="movementAccount" class="java.lang.Boolean">
+		<fieldDescription><![CDATA[COLUMN_11]]></fieldDescription>
+	</field>
+	<field name="rootAccount" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_12]]></fieldDescription>
+	</field>
+	<field name="accountLevel3" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_13]]></fieldDescription>
+	</field>
+	<field name="util" class="java.lang.Boolean">
+		<fieldDescription><![CDATA[COLUMN_14]]></fieldDescription>
+	</field>
+	<field name="utilName" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_15]]></fieldDescription>
+	</field>
 	<variable name="typeVar" class="java.lang.String" calculation="System"/>
 	<variable name="currencyVar" class="java.lang.String" calculation="System"/>
 	<variable name="activeVar" class="java.lang.String" calculation="System"/>
 	<variable name="permissionVar" class="java.lang.String" calculation="System"/>
 	<variable name="expenseTypeVar" class="java.lang.String" calculation="System"/>
+	<variable name="movementAccountVar" class="java.lang.String" calculation="System"/>
+	<variable name="utilVar" class="java.lang.String" calculation="System"/>
 	<group name="fixedAssetSubGroup">
 		<groupHeader>
 			<band height="14">
@@ -50,7 +73,7 @@
 					<text><![CDATA[Cuenta]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="60" y="0" width="448" height="14" backcolor="#CCCCCC"/>
+					<reportElement mode="Opaque" x="60" y="0" width="435" height="14" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineStyle="Dotted"/>
 						<topPen lineStyle="Dotted"/>
@@ -64,7 +87,7 @@
 					<text><![CDATA[Nombre]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="508" y="0" width="60" height="14" backcolor="#CCCCCC"/>
+					<reportElement mode="Opaque" x="495" y="0" width="60" height="14" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineStyle="Dotted"/>
 						<topPen lineStyle="Dotted"/>
@@ -78,7 +101,7 @@
 					<text><![CDATA[Cta. Raiz]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="608" y="0" width="30" height="14" backcolor="#CCCCCC"/>
+					<reportElement mode="Opaque" x="681" y="0" width="30" height="14" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineStyle="Dotted"/>
 						<topPen lineStyle="Dotted"/>
@@ -92,7 +115,7 @@
 					<text><![CDATA[Mon.]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="638" y="0" width="44" height="14" backcolor="#CCCCCC"/>
+					<reportElement mode="Opaque" x="711" y="0" width="44" height="14" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineStyle="Dotted"/>
 						<topPen lineStyle="Dotted"/>
@@ -106,7 +129,7 @@
 					<text><![CDATA[Activa]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="682" y="0" width="50" height="14" backcolor="#CCCCCC"/>
+					<reportElement mode="Opaque" x="811" y="0" width="50" height="14" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineStyle="Dotted"/>
 						<topPen lineStyle="Dotted"/>
@@ -120,7 +143,7 @@
 					<text><![CDATA[Tipo_G]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="732" y="0" width="38" height="14" backcolor="#CCCCCC"/>
+					<reportElement mode="Opaque" x="861" y="0" width="38" height="14" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineStyle="Dotted"/>
 						<topPen lineStyle="Dotted"/>
@@ -134,7 +157,7 @@
 					<text><![CDATA[Inv.]]></text>
 				</staticText>
 				<staticText>
-					<reportElement mode="Opaque" x="568" y="0" width="40" height="14" backcolor="#CCCCCC"/>
+					<reportElement mode="Opaque" x="641" y="0" width="40" height="14" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineStyle="Dotted"/>
 						<topPen lineStyle="Dotted"/>
@@ -146,6 +169,90 @@
 						<font fontName="Arial" size="8"/>
 					</textElement>
 					<text><![CDATA[Tipo]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="555" y="0" width="60" height="14" backcolor="#CCCCCC"/>
+					<box>
+						<pen lineStyle="Dotted"/>
+						<topPen lineStyle="Dotted"/>
+						<leftPen lineStyle="Dotted"/>
+						<bottomPen lineStyle="Dotted"/>
+						<rightPen lineStyle="Dotted"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[Cta. Niv3]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="615" y="0" width="26" height="14" backcolor="#CCCCCC"/>
+					<box>
+						<pen lineStyle="Dotted"/>
+						<topPen lineStyle="Dotted"/>
+						<leftPen lineStyle="Dotted"/>
+						<bottomPen lineStyle="Dotted"/>
+						<rightPen lineStyle="Dotted"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[Nivel]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="755" y="0" width="56" height="14" backcolor="#CCCCCC"/>
+					<box>
+						<pen lineStyle="Dotted"/>
+						<topPen lineStyle="Dotted"/>
+						<leftPen lineStyle="Dotted"/>
+						<bottomPen lineStyle="Dotted"/>
+						<rightPen lineStyle="Dotted"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[Movimiento]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="899" y="0" width="25" height="14" backcolor="#CCCCCC"/>
+					<box>
+						<pen lineStyle="Dotted"/>
+						<topPen lineStyle="Dotted"/>
+						<leftPen lineStyle="Dotted"/>
+						<bottomPen lineStyle="Dotted"/>
+						<rightPen lineStyle="Dotted"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[F.E.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="924" y="0" width="25" height="14" backcolor="#CCCCCC"/>
+					<box>
+						<pen lineStyle="Dotted"/>
+						<topPen lineStyle="Dotted"/>
+						<leftPen lineStyle="Dotted"/>
+						<bottomPen lineStyle="Dotted"/>
+						<rightPen lineStyle="Dotted"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[Util]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="949" y="0" width="37" height="14" backcolor="#CCCCCC"/>
+					<box>
+						<pen lineStyle="Dotted"/>
+						<topPen lineStyle="Dotted"/>
+						<leftPen lineStyle="Dotted"/>
+						<bottomPen lineStyle="Dotted"/>
+						<rightPen lineStyle="Dotted"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="8"/>
+					</textElement>
+					<text><![CDATA[Util]]></text>
 				</staticText>
 			</band>
 		</groupHeader>
@@ -176,7 +283,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="60" y="0" width="448" height="14"/>
+				<reportElement x="60" y="0" width="435" height="14"/>
 				<box>
 					<pen lineStyle="Dotted"/>
 					<topPen lineStyle="Dotted"/>
@@ -190,7 +297,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="508" y="0" width="60" height="14"/>
+				<reportElement x="495" y="0" width="60" height="14"/>
 				<box>
 					<pen lineStyle="Dotted"/>
 					<topPen lineStyle="Dotted"/>
@@ -204,39 +311,95 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{root}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="608" y="0" width="30" height="14"/>
+				<reportElement x="681" y="0" width="30" height="14"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{currencyVar}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="638" y="0" width="44" height="14"/>
+				<reportElement x="711" y="0" width="44" height="14"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{activeVar}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="682" y="0" width="50" height="14"/>
+				<reportElement x="811" y="0" width="50" height="14"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{expenseTypeVar}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="732" y="0" width="38" height="14"/>
+				<reportElement x="861" y="0" width="38" height="14"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{permissionVar}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="568" y="0" width="40" height="14"/>
+				<reportElement x="641" y="0" width="40" height="14"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{typeVar}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="555" y="0" width="60" height="14"/>
+				<box>
+					<pen lineStyle="Dotted"/>
+					<topPen lineStyle="Dotted"/>
+					<leftPen lineStyle="Dotted"/>
+					<bottomPen lineStyle="Dotted"/>
+					<rightPen lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{accountLevel3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="615" y="0" width="26" height="14"/>
+				<box>
+					<pen lineStyle="Dotted"/>
+					<topPen lineStyle="Dotted"/>
+					<leftPen lineStyle="Dotted"/>
+					<bottomPen lineStyle="Dotted"/>
+					<rightPen lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{level}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="755" y="0" width="56" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{movementAccountVar}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="899" y="0" width="25" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fe}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="924" y="0" width="25" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{utilVar}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="949" y="0" width="37" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{utilName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

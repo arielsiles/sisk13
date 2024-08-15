@@ -142,7 +142,8 @@ public class ProfitAndLossExtendedReportAction extends GenericReportAction {
                 " FROM VoucherDetail voucherDetail " +
                 " LEFT JOIN voucherDetail.voucher voucher " +
                 " LEFT JOIN voucherDetail.cashAccount cashAccount" +
-                " LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +
+                /*" LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +*/
+                " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
                 " WHERE cashAccount.accountType = 'I' " +
                 " AND voucher.state <> 'ANL' " +
                 " AND voucher.date between '"+start+"' and '"+end+"' " +
@@ -190,7 +191,8 @@ public class ProfitAndLossExtendedReportAction extends GenericReportAction {
                 " FROM VoucherDetail voucherDetail " +
                 " LEFT JOIN voucherDetail.voucher voucher " +
                 " LEFT JOIN voucherDetail.cashAccount cashAccount" +
-                " LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +
+                /*" LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +*/
+                " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
                 " WHERE cashAccount.accountType = 'E' " +
                 " AND voucher.state <> 'ANL' " +
                 " AND voucher.date between '"+start+"' and '"+end+"' " +

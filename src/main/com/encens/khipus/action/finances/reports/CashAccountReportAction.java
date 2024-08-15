@@ -30,7 +30,14 @@ public class CashAccountReportAction extends GenericReportAction {
                "        cashAccount.currency as currency, " +
                "        cashAccount.active as active, " +
                "        cashAccount.hasWarehousePermission as permission, " +
-               "        cashAccount.expenseType as expenseType " +
+               "        cashAccount.expenseType as expenseType, " +
+               "        cashAccount.accountLevel as level, " +
+               "        cashAccount.cashFlowAccount as fe, " +
+               "        cashAccount.movementAccount as movementAccount, " +
+               "        cashAccount.rootAccountCode as rootAccount, " +
+               "        cashAccount.accountLevel3Code as accountLevel3, " +
+               "        cashAccount.util as util, " +
+               "        cashAccount.utilName as utilName " +
                "  FROM  CashAccount cashAccount ";
     }
 

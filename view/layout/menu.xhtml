@@ -612,8 +612,15 @@
                 propagation="begin" />
     </rich:menuItem>
 
+    <rich:menuItem submitMode="none"
+                   rendered="#{s:hasPermission('ACCOUNTINGPLAN','VIEW')}"
+                   styleClass="main-menu-item">
+        <s:link view="/finances/cashAccountList.xhtml"
+                value="#{messages['menu.finances.cashAccount.accountingPlan']}"
+                propagation="none" />
+    </rich:menuItem>
 
-    <rich:menuGroup value="#{messages['menu.warehouse.configuration']}">
+    <!--<rich:menuGroup value="#{messages['menu.warehouse.configuration']}">
 
         <rich:menuItem submitMode="none"
                        rendered="#{s:hasPermission('ACCOUNTINGPLAN','VIEW')}"
@@ -631,7 +638,7 @@
                     propagation="none" />
         </rich:menuItem>
 
-    </rich:menuGroup>
+    </rich:menuGroup>-->
 
 </rich:dropDownMenu>
 

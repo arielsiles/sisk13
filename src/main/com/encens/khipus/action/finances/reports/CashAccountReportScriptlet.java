@@ -15,6 +15,8 @@ public class CashAccountReportScriptlet extends JRDefaultScriptlet {
         CashAccountType cashAccountType = (CashAccountType) getFieldValue("type");
         FinancesCurrencyType currency   = (FinancesCurrencyType) getFieldValue("currency");
         Boolean active                  = (Boolean) getFieldValue("active");
+        Boolean movementAccount         = (Boolean) getFieldValue("movementAccount");
+        Boolean util                    = (Boolean) getFieldValue("util");
         Boolean hasPermission           = (Boolean) getFieldValue("permission");
         ExpenseType expenseType         = (ExpenseType) getFieldValue("expenseType");
 
@@ -28,9 +30,15 @@ public class CashAccountReportScriptlet extends JRDefaultScriptlet {
         if (hasPermission != null && hasPermission)
             permissionVar = "S";
 
+        String utilVar = "N";
+        if (util != null && util)
+            utilVar = "S";
+
         this.setVariableValue("typeVar", cashAccountType.toString());
         this.setVariableValue("currencyVar", currencyVar);
         this.setVariableValue("activeVar", active ? "S" : "N");
+        this.setVariableValue("movementAccountVar", movementAccount ? "S" : "N");
+        this.setVariableValue("utilVar", utilVar);
         this.setVariableValue("permissionVar", permissionVar);
         this.setVariableValue("expenseTypeVar", expenseType != null ? expenseType.toString() : "");
 
