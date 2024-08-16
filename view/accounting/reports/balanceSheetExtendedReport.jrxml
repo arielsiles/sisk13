@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="balanceSheetReport" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="534" leftMargin="39" rightMargin="39" topMargin="22" bottomMargin="22">
 	<property name="ireport.zoom" value="1.7715610000000115"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="26"/>
+	<property name="ireport.y" value="90"/>
 	<parameter name="documentTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
@@ -31,7 +31,7 @@
 	<group name="ZoneA">
 		<groupExpression><![CDATA[$F{account}]]></groupExpression>
 		<groupHeader>
-			<band height="391">
+			<band height="424">
 				<subreport isUsingCache="true">
 					<reportElement x="0" y="0" width="71" height="44"/>
 					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
@@ -43,7 +43,7 @@
 					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BALANCELIABILITIESSUBREPORT}]]></subreportExpression>
 				</subreport>
 				<subreport isUsingCache="true">
-					<reportElement x="276" y="347" width="71" height="44"/>
+					<reportElement x="276" y="378" width="71" height="44"/>
 					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
 					<subreportParameter name="totalLiabilities">
 						<subreportParameterExpression><![CDATA[$P{totalLiabilities}]]></subreportParameterExpression>

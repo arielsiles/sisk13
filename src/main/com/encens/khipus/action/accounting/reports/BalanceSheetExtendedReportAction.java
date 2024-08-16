@@ -160,7 +160,8 @@ public class BalanceSheetExtendedReportAction extends GenericReportAction {
                 " FROM VoucherDetail voucherDetail " +
                 " LEFT JOIN voucherDetail.voucher voucher " +
                 " LEFT JOIN voucherDetail.cashAccount cashAccount" +
-                " LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +
+                /*" LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +*/
+                " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
                 " WHERE cashAccount.accountType = 'A' " +
                 " AND voucher.state <> 'ANL' " +
                 " AND voucher.date between '"+start+"' and '"+end+"' " +
@@ -208,7 +209,8 @@ public class BalanceSheetExtendedReportAction extends GenericReportAction {
                 " FROM VoucherDetail voucherDetail " +
                 " LEFT JOIN voucherDetail.voucher voucher " +
                 " LEFT JOIN voucherDetail.cashAccount cashAccount" +
-                " LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +
+                /*" LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +*/
+                " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
                 " WHERE cashAccount.accountType = 'P' " +
                 " AND voucher.state <> 'ANL' " +
                 " AND voucher.date between '"+start+"' and '"+end+"' " +
@@ -256,7 +258,8 @@ public class BalanceSheetExtendedReportAction extends GenericReportAction {
                 " FROM VoucherDetail voucherDetail " +
                 " LEFT JOIN voucherDetail.voucher voucher " +
                 " LEFT JOIN voucherDetail.cashAccount cashAccount" +
-                " LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +
+                /*" LEFT JOIN voucherDetail.cashAccount.rootCashAccount rootCashAccount " +*/
+                " LEFT JOIN voucherDetail.cashAccount.cashAccountLeve3 rootCashAccount " +
                 " WHERE cashAccount.accountType = 'C' " +
                 " AND voucher.state <> 'ANL' " +
                 " AND voucher.date between '"+start+"' and '"+end+"' " +
