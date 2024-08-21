@@ -201,6 +201,12 @@
             </rich:menuItem>
 
             <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
+                <s:link view="/customers/contributionByDatesReport.xhtml"
+                        value="Reporte de aportes por fechas"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item" rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/savingStatusReport.xhtml"
                         value="#{messages['menu.customers.report.savingStatus']}"
                         propagation="none"/>
