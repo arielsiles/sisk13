@@ -1469,8 +1469,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
 
     @Override
     public Double getReservProducer(Date startDate, Date endDate) {
-        BigDecimal result = (BigDecimal)getEntityManager().createNativeQuery("select IFNULL(sum(monto),0.0) from DESCUENTORESERVA\n" +
-                "where FECHAINI = :startDate\n " +
+        BigDecimal result = (BigDecimal)getEntityManager().createNativeQuery("select IFNULL(sum(monto),0.0) from descuentoreserva " +
+                "where FECHAINI = :startDate " +
                 "and FECHAFIN  = :endDate")
                 .setParameter("startDate",startDate,TemporalType.DATE)
                 .setParameter("endDate",endDate,TemporalType.DATE )
