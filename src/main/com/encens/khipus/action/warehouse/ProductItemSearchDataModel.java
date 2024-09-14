@@ -19,9 +19,12 @@ import java.util.List;
 @Name("productItemSearchDataModel")
 @Scope(ScopeType.PAGE)
 public class ProductItemSearchDataModel extends QueryDataModel<ProductItemPK, ProductItem> {
+
+    private String productItemCode;
+
     private static final String[] RESTRICTIONS =
             {
-                    "lower(productItem.id.productItemCode) like concat(lower(#{productItemSearchDataModel.criteria.id.productItemCode}), '%')",
+                    "productItem.id.productItemCode = #{productItemSearchDataModel.productItemCode}",
                     "lower(productItem.name) like concat('%',concat(lower(#{productItemSearchDataModel.criteria.name}), '%'))",
                     "productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"
             };
@@ -50,5 +53,13 @@ public class ProductItemSearchDataModel extends QueryDataModel<ProductItemPK, Pr
         }
 
         return result;
+    }
+
+    public String getProductItemCode() {
+        return productItemCode;
+    }
+
+    public void setProductItemCode(String productItemCode) {
+        this.productItemCode = productItemCode;
     }
 }

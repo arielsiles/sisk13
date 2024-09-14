@@ -26,7 +26,7 @@ public class ProvideSearchDataModel extends QueryDataModel<Long, Provide> {
 
     private static final String[] RESTRICTIONS =
             {
-                    "lower(productItem.id.productItemCode) like concat(lower(#{provideSearchDataModel.productItemCode}), '%')",
+                    "productItem.id.productItemCode = #{provideSearchDataModel.productItemCode}",
                     "lower(productItem.name) like concat('%',concat(lower(#{provideSearchDataModel.productItemName}), '%'))",
                     "element.providerCode = #{provideSearchDataModel.criteria.providerCode}",
                     "productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"

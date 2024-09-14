@@ -74,7 +74,7 @@ public class RealNumberConverter extends NumberConverter implements javax.faces.
         Number numberObject = (Number) super.getAsObject(facesContext, uiComponent, value);
 
         if (null != numberObject) {
-            BigDecimal number = null;
+            BigDecimal number = null; //suggestion, BigDecimal number = new BigDecimal(numberObject.toString());
 
             if (numberObject instanceof Double) {
                 number = new BigDecimal(String.valueOf(numberObject.doubleValue()));
@@ -223,9 +223,14 @@ public class RealNumberConverter extends NumberConverter implements javax.faces.
     }
 
     private Integer getDecimalPartFromNumber(BigDecimal number) {
-        String numberAsString = String.valueOf(number.doubleValue());
+        //String numberAsString = String.valueOf(number.doubleValue());
+        String numberAsString = number.toPlainString();
 
         int pointIndex = numberAsString.indexOf('.');
+
+        if (pointIndex < 0) {
+            return 0; // No hay parte decimal
+        }
 
         String decimalPart = numberAsString.substring(pointIndex + 1);
         return decimalPart.length();

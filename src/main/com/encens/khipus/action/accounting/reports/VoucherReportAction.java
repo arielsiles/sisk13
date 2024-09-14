@@ -11,6 +11,7 @@ import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.util.MoneyNumberUtil;
 import com.encens.khipus.util.MoneyUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -105,7 +106,10 @@ public class VoucherReportAction extends GenericReportAction {
 
         MoneyUtil money = new MoneyUtil();
         String literalAmount = "";
-        literalAmount = ( totalD.compareTo(totalC) == 0 ? money.Convertir(totalD.toString(), true, messages.get("Reports.cashAvailable.bs")) : "");
+
+        literalAmount = MoneyNumberUtil.convertirNumeroALetras(totalD).toUpperCase();
+        //literalAmount = ( totalD.compareTo(totalC) == 0 ? money.Convertir(totalD.toString(), true, messages.get("Reports.cashAvailable.bs")) : "");
+        literalAmount = ( totalD.compareTo(totalC) == 0 ? literalAmount  : "");
 
         log.debug("Generating products produced report...................");
         HashMap<String, Object> reportParameters = new HashMap<String, Object>();
