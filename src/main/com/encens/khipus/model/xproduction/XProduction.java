@@ -54,7 +54,12 @@ public class XProduction implements BaseModel {
     @Column(name = "descripcion")
     private String description;
 
+    @Column(name = "fechainicio")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date initDate;
+
     @Column(name = "fechafin")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
@@ -242,5 +247,13 @@ public class XProduction implements BaseModel {
 
     public void setProductionLaborList(List<XProductionLabor> productionLaborList) {
         this.productionLaborList = productionLaborList;
+    }
+
+    public Date getInitDate() {
+        return initDate;
+    }
+
+    public void setInitDate(Date initDate) {
+        this.initDate = initDate;
     }
 }

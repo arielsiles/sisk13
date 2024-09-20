@@ -91,6 +91,8 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setCode(seq.intValue());
         xproductionService.createProduction(production, ingredientSupplyList, materialSupplyList);
 
+        production.setInitDate(production.getProductionPlan().getDate());
+
         /*setOp(OP_UPDATE);*/
         super.select(production);
         return Outcome.SUCCESS;
