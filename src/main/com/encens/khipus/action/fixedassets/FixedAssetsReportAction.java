@@ -76,7 +76,7 @@ public class FixedAssetsReportAction extends GenericReportAction {
                 "fixedAsset.ufvOriginalValue<=#{fixedAssetsReportAction.endOriginalValue}",
                 "fixedAsset.state <> #{fixedAssetsReportAction.stateDefault}"};
 
-        sortProperty = "fixedAssetGroup.id, fixedAssetSubGroup.id, fixedAsset.id";
+        sortProperty = "fixedAssetGroup.id, fixedAssetSubGroup.id, fixedAsset.detail";
     }
 
     protected String getEjbql() {
