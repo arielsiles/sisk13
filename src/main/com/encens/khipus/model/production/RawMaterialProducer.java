@@ -50,11 +50,11 @@ public class RawMaterialProducer extends Person {
 
     @Column(name = "esresponsable", nullable = true)
     @Type(type = "IntegerBoolean")
-    private Boolean responsible;
+    private Boolean responsible = false;
 
     @Column(name = "activo", nullable = true)
     @Type(type = "IntegerBoolean")
-    private Boolean active;
+    private Boolean active = true;
 
     @Column(name = "numerocuenta", length = 50, nullable = true)
     @Length(max = 50)
