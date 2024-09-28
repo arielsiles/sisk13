@@ -291,8 +291,7 @@
         </s:decorate>
 
         <s:decorate id="rawMaterialProdecerModalPanelContainer"
-                    template="/production/searchRawMaterialProducerModalPanel.xhtml"
-                    rendered="#{not collectMaterialAction.managed}">
+                    template="/production/searchRawMaterialProducerModalPanel.xhtml">
             <ui:param name="dialogId" value="rawMaterialProducerListModalPanel"/>
             <ui:param name="dataModel" value="#{rawMaterialProducerDataModel}"/>
             <ui:define name="assignButton">
