@@ -47,7 +47,7 @@
 
     <h:commandButton action="#{voucherCreateAction.update}" value="#{messages['Common.update']}"
                      styleClass="button"
-                     rendered="#{voucherCreateAction.managed and voucherCreateAction.pending}"
+                     rendered="#{voucherCreateAction.managed and voucherCreateAction.pending and s:hasPermission('VOUCHER','UPDATE')}"
                      tabindex="6">
         <s:defaultAction/>
     </h:commandButton>
@@ -55,7 +55,7 @@
     <h:commandButton action="#{voucherCreateAction.approveVoucher}"
                      value="#{messages['Voucher.approve']}"
                      styleClass="button"
-                     rendered="#{voucherCreateAction.pending and voucherCreateAction.managed and s:hasPermission('VOUCHER','VIEW')}"
+                     rendered="#{voucherCreateAction.pending and voucherCreateAction.managed and s:hasPermission('VOUCHER','UPDATE')}"
                      tabindex="3"/>
 
     <h:commandButton action="#{voucherCreateAction.generateReport(voucherCreateAction.voucher)}"
@@ -183,7 +183,7 @@
 
         </s:decorate>
 
-        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow" rendered="#{s:hasPermission('VOUCHER','UPDATE')}">
             <c:forEach items="#{voucherCreateAction.accountsUtil()}" var="cashAccount">
                 <a4j:commandButton action="#{voucherCreateAction.assignCashAccountDefault(cashAccount.accountCode)}"
                                    value="#{cashAccount.utilName}"
@@ -261,7 +261,7 @@
             </a4j:commandButton>
         </s:decorate>
 
-        <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow">
+        <s:decorate id="accountField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{s:hasPermission('PARTNER','VIEW')}">
             <ui:define name="label"><h:outputText value="#{messages['Partner.partnerAccount']}"/></ui:define>
             <app:selectPopUp id="accountFieldId"
                              required="false"
@@ -301,7 +301,7 @@
             </a4j:commandButton>
         </s:decorate>
 
-        <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
+        <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{s:hasPermission('PARTNER','VIEW')}">
             <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
             <app:selectPopUp id="partnerFieldId"
                              textValue="#{voucherCreateAction.partner.fullName}"

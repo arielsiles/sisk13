@@ -28,7 +28,7 @@
     <h:commandButton action="#{purchaseDocumentAction.updatePurchaseDocument}"
                      value="#{messages['Common.save']}"
                      styleClass="button"
-                     rendered="#{s:hasPermission('PURCHASEBOOKREPORT','VIEW')}"/>
+                     rendered="#{s:hasPermission('PURCHASEBOOKREPORT','UPDATE')}"/>
 
     <h:commandButton action="#{purchaseDocumentAction.cancel}" value="#{messages['Common.cancel']}"
                      styleClass="button" immediate="true">

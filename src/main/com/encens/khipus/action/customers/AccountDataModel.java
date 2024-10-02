@@ -5,7 +5,6 @@ import com.encens.khipus.model.customers.Account;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
 
 @Name("accountDataModel")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('CREDIT','VIEW')}")
+/*@Restrict("#{s:hasPermission('CREDIT','VIEW')}")*/
 public class AccountDataModel extends QueryDataModel<Long, Account> {
 
     private String firstName;

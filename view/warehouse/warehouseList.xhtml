@@ -5,7 +5,6 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
@@ -13,7 +12,7 @@
     <ui:param name="bodyAlign" value="center"/>
     <ui:param name="bodyWidth" value="90%"/>
 
-    <ui:param name="selectedTab" value="finances"/>
+    <ui:param name="selectedTab" value="warehouses"/>
     <ui:define name="body">
         <h:form id="warehouseSearch">
             <rich:simpleTogglePanel label="#{messages['Warehouse.search']}" switchType="client">

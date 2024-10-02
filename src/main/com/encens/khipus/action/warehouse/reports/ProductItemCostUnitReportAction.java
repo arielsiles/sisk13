@@ -12,7 +12,6 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.security.Restrict;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +25,7 @@ import java.util.Map;
  */
 @Name("productItemCostUnitReportAction")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW')}")
+/*@Restrict("#{s:hasPermission('PRODUCTITEMCOSTUNITREPORT','VIEW')}")*/
 public class ProductItemCostUnitReportAction extends GenericReportAction {
 
     @In(required = false)
