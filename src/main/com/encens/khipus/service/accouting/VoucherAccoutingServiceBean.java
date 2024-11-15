@@ -1192,7 +1192,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "FROM ventas v " +
                 "WHERE v.fecha BETWEEN :startDate AND :endDate " +
                 "AND v.`cod_alm` =:cod_alm " +
-                "AND v.idtipopedido IN (1) " +
+                "AND v.idtipopedido IN (1, 9) " +
                 "GROUP BY v.cod_art " +
                 ") z " +
                 "GROUP BY z.cod_art ")

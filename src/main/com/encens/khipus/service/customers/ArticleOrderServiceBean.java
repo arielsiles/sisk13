@@ -2,6 +2,7 @@ package com.encens.khipus.service.customers;
 
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.customers.ArticleOrder;
+import com.encens.khipus.model.customers.CustomerOrderTypeEnum;
 import com.encens.khipus.model.customers.SaleStatus;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -43,6 +44,7 @@ public class ArticleOrderServiceBean extends GenericServiceBean implements Artic
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("annulledState", SaleStatus.ANULADO)
+                .setParameter("customerOrderTypeEnum", CustomerOrderTypeEnum.SPECIAL)
                 .getResultList();
     }
 
@@ -60,6 +62,7 @@ public class ArticleOrderServiceBean extends GenericServiceBean implements Artic
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("annulledState", SaleStatus.ANULADO)
+                .setParameter("customerOrderTypeEnum", CustomerOrderTypeEnum.SPECIAL)
                 .getResultList();
     }
 
