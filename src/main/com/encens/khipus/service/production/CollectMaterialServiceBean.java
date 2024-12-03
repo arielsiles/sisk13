@@ -83,28 +83,35 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
 
     @Override
     public String createCollectMaterialListAccounting(List<CollectMaterial> collectMaterialList , Date startDate, Date endDate) {
-        String result = Outcome.FAIL;
-        String gloss = "";
-        if ( startDate.compareTo(endDate) == 0 )
-            gloss = "INGRESO ALMACEN DE MATERIAS PRIMAS DEL " + DateUtils.format(startDate, "dd/MM/yyyy");
-        else
-            gloss = "INGRESO ALMACEN DE MATERIAS PRIMAS DEL " + DateUtils.format(startDate, "dd/MM/yyyy") + " AL " + DateUtils.format(endDate, "dd/MM/yyyy");
 
-        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, gloss);
-        voucher.setDocumentType(Constants.IA_VOUCHER_DOCTYPE);
-
-        List<VoucherDetail> supplierDetailCashAcounts = new ArrayList<VoucherDetail>();
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();
-        FinancesEntity financesEntity;
+        String result = Outcome.FAIL;
 
         for (CollectMaterial colMat:collectMaterialList) {
-            financesEntity = financeProviderService.findByIdNumber(colMat.getProducer().getIdNumber());
 
+            String gloss = "INGRESO ALMACEN DE MATERIAS PRIMAS DEL " + DateUtils.format(colMat.getDate(), "dd/MM/yyyy") + " " +
+                    colMat.getMetaProduct().getName() + ", " + "Proveedor: " + colMat.getProducer().getFullName() + ", " +
+                    colMat.getCode() + ", Boleta: " + colMat.getTicket() + ", Form: " + colMat.getForm() + ", Chofer: " + colMat.getDriver();
+
+            Voucher voucher = VoucherBuilder.newGeneralVoucher(null, gloss);
+            voucher.setDate(colMat.getDate());
+            voucher.setDocumentType(Constants.IMP_VOUCHER_DOCTYPE);
+            List<VoucherDetail> supplierDetailCashAcounts = new ArrayList<VoucherDetail>();
+
+            FinancesEntity financesEntity = financeProviderService.findByIdNumber(colMat.getProducer().getIdNumber());
             CashAccount warehouseCashAccount = colMat.getMetaProduct().getProductItem().getWarehouse().getWarehouseCashAccount();
 
-            BigDecimal weightTon    = BigDecimalUtil.divide(colMat.getBalanceWeight(),BigDecimalUtil.toBigDecimal(1000));
+            BigDecimal averageWeight = BigDecimalUtil.avg(colMat.getProviderWeight(), colMat.getBalanceWeight());
+            BigDecimal weightTon    = BigDecimalUtil.divide(averageWeight, BigDecimalUtil.toBigDecimal(1000));
             BigDecimal amount       = BigDecimalUtil.multiply(weightTon, colMat.getPrice());
             BigDecimal totalAmount  = amount;
+
+            System.out.println("------------------------------------------------");
+            System.out.println("===> Peso Promedio: " + averageWeight);
+            System.out.println("===> Peso Promedio Ton: " + weightTon);
+            System.out.println("===> Price: " + colMat.getPrice());
+            System.out.println("===> Monto 100%: " + amount);
+
 
             /** --Debe-- **/
             BigDecimal taxCreditFiscal = BigDecimal.ZERO;
@@ -112,12 +119,15 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             if (colMat.getHasInvoice()){
                 taxCreditFiscal = BigDecimalUtil.multiply(amount, Constants.VAT);
                 amount = BigDecimalUtil.subtract(amount, taxCreditFiscal);
+                System.out.println("===> Tax CreditFiscal 13%: " + taxCreditFiscal);
+                System.out.println("===> Monto 87%: " + amount);
             }
 
             VoucherDetail voucherDetailDev = VoucherDetailBuilder.newDebitVoucherDetail(
                     null, null, warehouseCashAccount, amount, FinancesCurrencyType.P, BigDecimal.ONE);
 
-            voucherDetailDev.setQuantityArt(colMat.getBalanceWeight());
+            //voucherDetailDev.setQuantityArt(colMat.getBalanceWeight());
+            voucherDetailDev.setQuantityArt(averageWeight);
             voucherDetailDev.setProductItemCode(colMat.getMetaProduct().getProductItem().getProductItemCode());
             voucher.getDetails().add(voucherDetailDev);
 
@@ -157,14 +167,106 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             BigDecimal supplierAccountValue = BigDecimalUtil.subtract(totalAmount, regaliaValue, retentionCNSValue);
             supplierAccountOutput.setCredit(supplierAccountValue);
 
+
+
+            for (VoucherDetail voucherDetail:supplierDetailCashAcounts){
+                voucher.getDetails().add(voucherDetail);
+            }
+
+            voucherAccoutingService.saveVoucher(voucher);
+
         }
 
-        /*Collections.sort(supplierDetailCashAcounts, new Comparator<VoucherDetail>() {
-            @Override
-            public int compare(VoucherDetail o1, VoucherDetail o2) {
-                return o1.getAccount().compareTo(o2.getAccount());
+        result = Outcome.SUCCESS;
+        return  result;
+    }
+
+    /* Se contabiliza todo el acopio por fecha, un solo asiento. */
+    /*
+    @Override
+    public String createCollectMaterialListAccounting(List<CollectMaterial> collectMaterialList , Date startDate, Date endDate) {
+        String result = Outcome.FAIL;
+        String gloss = "";
+        if ( startDate.compareTo(endDate) == 0 )
+            gloss = "INGRESO ALMACEN DE MATERIAS PRIMAS DEL " + DateUtils.format(startDate, "dd/MM/yyyy");
+        else
+            gloss = "INGRESO ALMACEN DE MATERIAS PRIMAS DEL " + DateUtils.format(startDate, "dd/MM/yyyy") + " AL " + DateUtils.format(endDate, "dd/MM/yyyy");
+
+        Voucher voucher = VoucherBuilder.newGeneralVoucher(null, gloss);
+        voucher.setDocumentType(Constants.IA_VOUCHER_DOCTYPE);
+
+        List<VoucherDetail> supplierDetailCashAcounts = new ArrayList<VoucherDetail>();
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        FinancesEntity financesEntity;
+
+        for (CollectMaterial colMat:collectMaterialList) {
+            financesEntity = financeProviderService.findByIdNumber(colMat.getProducer().getIdNumber());
+
+            CashAccount warehouseCashAccount = colMat.getMetaProduct().getProductItem().getWarehouse().getWarehouseCashAccount();
+
+            BigDecimal weightTon    = BigDecimalUtil.divide(colMat.getBalanceWeight(),BigDecimalUtil.toBigDecimal(1000));
+            BigDecimal amount       = BigDecimalUtil.multiply(weightTon, colMat.getPrice());
+            BigDecimal totalAmount  = amount;
+
+            // --Debe--
+            BigDecimal taxCreditFiscal = BigDecimal.ZERO;
+            // CF
+            if (colMat.getHasInvoice()){
+                taxCreditFiscal = BigDecimalUtil.multiply(amount, Constants.VAT);
+                amount = BigDecimalUtil.subtract(amount, taxCreditFiscal);
             }
-        });*/
+
+            VoucherDetail voucherDetailDev = VoucherDetailBuilder.newDebitVoucherDetail(
+                    null, null, warehouseCashAccount, amount, FinancesCurrencyType.P, BigDecimal.ONE);
+
+            voucherDetailDev.setQuantityArt(colMat.getBalanceWeight());
+            voucherDetailDev.setProductItemCode(colMat.getMetaProduct().getProductItem().getProductItemCode());
+            voucher.getDetails().add(voucherDetailDev);
+
+            // CF
+            if (colMat.getHasInvoice()){
+                VoucherDetail voucherDetailCF = VoucherDetailBuilder.newDebitVoucherDetail(
+                        null, null, companyConfiguration.getAccountPayableIVA(), taxCreditFiscal, FinancesCurrencyType.P, BigDecimal.ONE);
+                voucher.getDetails().add(voucherDetailCF);
+            }
+
+            // --Haber--
+            VoucherDetail supplierAccountOutput = VoucherDetailBuilder.newCreditVoucherDetail(
+                    null, null, companyConfiguration.getAccountPayableSupplier(), BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE);
+
+
+            supplierAccountOutput.setProviderCode(financesEntity.getId().toString());
+            supplierDetailCashAcounts.add(supplierAccountOutput);
+
+            // Regalia
+            BigDecimal regaliaValue = BigDecimal.ZERO;
+            if (colMat.getHasInvoice()) {
+                regaliaValue = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(colMat.getMetaProduct().getRegalia(), BigDecimalUtil.ONE_HUNDRED));
+                VoucherDetail regaliaAccount = VoucherDetailBuilder.newCreditVoucherDetail(
+                        null, null, companyConfiguration.getAccountRegalia(), regaliaValue, FinancesCurrencyType.P, BigDecimal.ONE);
+                supplierDetailCashAcounts.add(regaliaAccount);
+            }
+
+            // CNS
+            BigDecimal retentionCNSValue = BigDecimal.ZERO;
+            if (!colMat.getProductiveZone().getHasCNS()){
+                retentionCNSValue = BigDecimalUtil.multiply(totalAmount, companyConfiguration.getRetentionCNSValue());
+                VoucherDetail retentionCNSAccount = VoucherDetailBuilder.newCreditVoucherDetail(
+                        null, null, companyConfiguration.getAccountRetentionCNS(), retentionCNSValue, FinancesCurrencyType.P, BigDecimal.ONE);
+                supplierDetailCashAcounts.add(retentionCNSAccount);
+            }
+
+            BigDecimal supplierAccountValue = BigDecimalUtil.subtract(totalAmount, regaliaValue, retentionCNSValue);
+            supplierAccountOutput.setCredit(supplierAccountValue);
+
+        }
+
+        //Collections.sort(supplierDetailCashAcounts, new Comparator<VoucherDetail>() {
+        //    @Override
+        //    public int compare(VoucherDetail o1, VoucherDetail o2) {
+        //        return o1.getAccount().compareTo(o2.getAccount());
+        //    }
+        //});
 
         for (VoucherDetail voucherDetail:supplierDetailCashAcounts){
             voucher.getDetails().add(voucherDetail);
@@ -174,7 +276,7 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
         voucherAccoutingService.saveVoucher(voucher);
         result = Outcome.SUCCESS;
         return  result;
-    }
+    }*/
 
     public CompanyConfiguration getCompanyConfiguration(){
         CompanyConfiguration companyConfiguration = null;

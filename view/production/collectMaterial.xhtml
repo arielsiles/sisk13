@@ -184,6 +184,18 @@
                     </h:inputText>
                 </s:decorate>
 
+                <s:decorate id="providerWeightField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CollectMaterial.providerWeight']}</ui:define>
+                    <h:inputText id="providerWeight" value="#{collectMaterial.providerWeight}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="8">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="providerWeight"/>
+                        <a4j:support event="onblur" reRender="providerWeightField"/>
+                    </h:inputText>
+                    <h:outputText value=" #{messages['Common.unit.kg']}"/>
+                </s:decorate>
+
                 <s:decorate id="netWeightField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CollectMaterial.netWeight']}</ui:define>
                     <h:inputText id="netWeight" value="#{collectMaterial.netWeight}"
@@ -197,7 +209,7 @@
                 </s:decorate>
 
                 <s:decorate id="balanceWeightField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['CollectMaterial.balanceWeight']}</ui:define>
+                    <ui:define name="label">#{messages['CollectMaterial.companyWeight']}</ui:define>
                     <h:inputText id="balanceWeight" value="#{collectMaterial.balanceWeight}"
                                  styleClass="input"
                                  required="true"

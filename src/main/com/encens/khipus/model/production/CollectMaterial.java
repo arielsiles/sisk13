@@ -39,6 +39,9 @@ public class CollectMaterial implements Serializable, BaseModel {
     @Column(name = "codigo", nullable = false, length = 50)
     private String code;
 
+    @Column(name = "pesoprov", precision = 12, scale = 2, nullable = false)
+    private BigDecimal providerWeight;
+
     @Column(name = "pesoneto", precision = 12, scale = 2, nullable = false)
     private BigDecimal netWeight;
 
@@ -265,5 +268,13 @@ public class CollectMaterial implements Serializable, BaseModel {
 
     public void setHasInvoice(Boolean hasInvoice) {
         this.hasInvoice = hasInvoice;
+    }
+
+    public BigDecimal getProviderWeight() {
+        return providerWeight;
+    }
+
+    public void setProviderWeight(BigDecimal providerWeight) {
+        this.providerWeight = providerWeight;
     }
 }
