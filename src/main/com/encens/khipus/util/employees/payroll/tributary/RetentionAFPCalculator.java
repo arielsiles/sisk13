@@ -87,10 +87,21 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2862262")){ // Juana Pozo
             instance.setLaborIndividualAFP(BigDecimal.ZERO);
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+
+            /** Aporte Nal. Solidario, temporal **/
+            BigDecimal difference = BigDecimalUtil.subtract(instance.getTotalGrained(), BigDecimalUtil.toBigDecimal("13000"));
+            BigDecimal solidaryAFPValue = BigDecimalUtil.getPercentage(difference, BigDecimalUtil.toBigDecimal("1.15"), TWO_DECIMAL_SCALE);
+            instance.setSolidaryAFP(solidaryAFPValue);
+
         }
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2868139")){ // Eliseo Camacho
             instance.setLaborIndividualAFP(BigDecimal.ZERO);
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+
+            /** Aporte Nal. Solidario, temporal **/
+            BigDecimal difference = BigDecimalUtil.subtract(instance.getTotalGrained(), BigDecimalUtil.toBigDecimal("13000"));
+            BigDecimal solidaryAFPValue = BigDecimalUtil.getPercentage(difference, BigDecimalUtil.toBigDecimal("1.15"), TWO_DECIMAL_SCALE);
+            instance.setSolidaryAFP(solidaryAFPValue);
         }
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("921886")){
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
