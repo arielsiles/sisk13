@@ -35,7 +35,8 @@ import java.util.List;
                         "where productItem in (:productItemList) "),
         @NamedQuery(name = "ProductItem.findByCode", query = "select p from ProductItem p where p.productItemCode=:productItemCode"),
         @NamedQuery(name = "ProductItem.findByWarehouseCode", query = "select p from ProductItem p where p.warehouseCode=:warehouseCode"),
-        @NamedQuery(name = "ProductItem.findByGroupCode", query = "select p from ProductItem p where p.groupCode=:groupCode")
+        @NamedQuery(name = "ProductItem.findByGroupCode", query = "select p from ProductItem p where p.groupCode=:groupCode"),
+        @NamedQuery(name = "ProductItem.findBySubGroupCode", query = "select p from ProductItem p where p.groupCode=:groupCode and p.subGroupCode=:subGroupCode")
 
 })
 

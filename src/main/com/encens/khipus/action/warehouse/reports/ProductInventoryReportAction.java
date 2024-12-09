@@ -56,6 +56,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
     private Boolean articlesWithMovement = true;
 
     private Group group;
+    private SubGroup subGroup;
 
     @In
     private MovementDetailService movementDetailService;
@@ -143,12 +144,69 @@ public class ProductInventoryReportAction extends GenericReportAction {
         }
     }
 
+    public void generateSubGroupReport() {
+
+        log.debug("generating Product Inventory Report................................................");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        Collection<CollectionData> beanCollection = calculateCollectionData2();
+
+        String subGroupName = "";
+        if (getSubGroup() != null) {
+            beanCollection = filterBySubGroup(beanCollection, getSubGroup());
+            subGroupName = " - " + subGroup.getName();
+        }
+
+        HashMap parameters = new HashMap();
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("reportTitle", "REPORTE DE INVENTARIO POR SUBGRUPO");
+        paramMap.put("companyName", companyConfiguration.getCompanyName());
+        paramMap.put("systemName", companyConfiguration.getSystemName());
+        paramMap.put("locationName", companyConfiguration.getLocationName());
+        paramMap.put("startDate", startDate);
+        paramMap.put("endDate", endDate);
+        paramMap.put("warehouse", warehouse.getFullName() + subGroupName);
+
+        parameters.putAll(paramMap);
+
+        System.out.println("|Codigo|Articulo|Unidad|Inv Inicial|Entradas|Salidas|Saldo");
+        for (CollectionData data : beanCollection){
+            System.out.println("|"+ data.getCode() +"|"+ data.getProductName() +"|"+ data.getUnit() +"|"+ data.getInitialAmount() +"|"+ data.getEntryAmount() +"|"+ data.getOutputAmount() +"|"+ data.getBalance());
+        }
+
+        try{
+            File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+            exportarPDF(jasperPrint);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public Collection<CollectionData> filterByGroup(Collection<CollectionData> beanCollection, Group group){
         Collection<CollectionData> result = new ArrayList();
         List<ProductItem> productItemGroupList = productItemService.findByGroupCode(group.getGroupCode());
 
         for (CollectionData collectionData : beanCollection) {
             for (ProductItem item : productItemGroupList) {
+                if (item.getProductItemCode().equals(collectionData.getCode())) {
+                    result.add(collectionData);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Collection<CollectionData> filterBySubGroup(Collection<CollectionData> beanCollection, SubGroup subGroup){
+        Collection<CollectionData> result = new ArrayList();
+        List<ProductItem> productItemSubGroupList = productItemService.findBySubGroupCode(subGroup.getGroupCode(), subGroup.getSubGroupCode());
+
+        for (CollectionData collectionData : beanCollection) {
+            for (ProductItem item : productItemSubGroupList) {
                 if (item.getProductItemCode().equals(collectionData.getCode())) {
                     result.add(collectionData);
                 }
@@ -813,6 +871,14 @@ public class ProductInventoryReportAction extends GenericReportAction {
         this.group = group;
     }
 
+    public SubGroup getSubGroup() {
+        return subGroup;
+    }
+
+    public void setSubGroup(SubGroup subGroup) {
+        this.subGroup = subGroup;
+    }
+
     /**
      *
      */
@@ -1017,4 +1083,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         setGroup(null);
     }
 
+    public void cleanSubGroupField() {
+        setGroup(null);
+    }
 }

@@ -46,6 +46,8 @@ public interface ProductItemService extends GenericService {
 
     public List<ProductItem> findByGroupCode(String groupCode);
 
+    public List<ProductItem> findBySubGroupCode(String groupCode, String subGroupCode);
+
     /**
      * Finds a list of ProductItems involved in a ProductItem List
      *

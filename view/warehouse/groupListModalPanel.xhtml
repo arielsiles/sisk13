@@ -8,7 +8,7 @@
                  xmlns:a4j="http://richfaces.org/a4j"
                  xmlns:app="http://encens.com/products/khipus/facelets"
                  id="groupListModalPanel"
-                 onshow="jQuery('#groupListModalPanelContainer\\:groupListForm\\:groupCodeField\\:groupCode').focus();">
+                 onshow="jQuery('#groupListModalPanelContainer\\:groupListForm\\:nameField\\:name').focus();">
     <f:facet name="header">
         <h:outputText>#{messages['ProductItem.groupList']}</h:outputText>
     </f:facet>
@@ -59,14 +59,14 @@
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>
-                        <app:commandSortHeader sortProperty="groupItem.groupCode"
+                        <app:commandSortHeader sortProperty="o.groupCode"
                                                dataModel="#{groupSearchDataModel}"
-                                               reRender="productItemList, dataScroller">
+                                               reRender="groupList, dataScroller">
                             #{messages['Group.groupCode']}
                         </app:commandSortHeader>
                     </rich:column>
                     <rich:column>
-                        <app:commandSortHeader sortProperty="groupItem.name"
+                        <app:commandSortHeader sortProperty="o.name"
                                                dataModel="#{groupSearchDataModel}"
                                                reRender="groupList, dataScroller">
                             #{messages['Group.name']}
