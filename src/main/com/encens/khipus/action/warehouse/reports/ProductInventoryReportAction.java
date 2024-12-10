@@ -136,7 +136,52 @@ public class ProductInventoryReportAction extends GenericReportAction {
         }
 
         try{
+            /* iReport 3 */
             File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+            exportarPDF(jasperPrint);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void generateGroupedReport() {
+
+        log.debug("generating Product Inventory Report................................................");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+
+        Collection<CollectionData> beanCollection = calculateCollectionData2();
+
+        String groupName = "";
+        if (group != null) {
+            beanCollection = filterByGroup(beanCollection, group);
+            groupName = " - " + group.getName();
+        }
+
+        String period = "Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy");
+        HashMap parameters = new HashMap();
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("reportTitle", "REPORTE GENERAL DE INVENTARIO - " + warehouse.getName());
+        paramMap.put("companyName", companyConfiguration.getCompanyName());
+        paramMap.put("systemName", companyConfiguration.getSystemName());
+        paramMap.put("locationName", companyConfiguration.getLocationName());
+        paramMap.put("startDate", startDate);
+        paramMap.put("endDate", endDate);
+        paramMap.put("period", period);
+        //paramMap.put("warehouse", warehouse.getFullName() + groupName);
+
+        parameters.putAll(paramMap);
+
+        System.out.println("|Codigo|Articulo|Unidad|Inv Inicial|Entradas|Salidas|Saldo");
+        for (CollectionData data : beanCollection){
+            System.out.println("|"+ data.getCode() +"|"+ data.getProductName() +"|"+ data.getUnit() +"|"+ data.getInitialAmount() +"|"+ data.getEntryAmount() +"|"+ data.getOutputAmount() +"|"+ data.getBalance());
+        }
+
+        try{
+            File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryGroupedReport.jasper"));
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
             exportarPDF(jasperPrint);
         }catch (Exception e){
@@ -271,7 +316,9 @@ public class ProductInventoryReportAction extends GenericReportAction {
                 }
             }
 
-            CollectionData data = new CollectionData(inventoryPeriod.getProductItemCode(),
+            CollectionData data = new CollectionData(
+                    inventoryPeriod.getProductItem().getSubGroup().getName(),
+                    inventoryPeriod.getProductItemCode(),
                     inventoryPeriod.getProductItem().getName(),
                     inventoryPeriod.getProductItem().getUsageMeasureCode(),
                     initQuantity,
@@ -367,12 +414,32 @@ public class ProductInventoryReportAction extends GenericReportAction {
             data.setBalance(BigDecimalUtil.subtract(data.getBalance(), data.getOutputAmount(), 6));
         }
 
-        Collections.sort(beanCollection2, new Comparator<CollectionData>() {
+        // Ordenamiento por producto
+        /*Collections.sort(beanCollection2, new Comparator<CollectionData>() {
             @Override
             public int compare(CollectionData o1, CollectionData o2) {
                 return o1.getProductName().compareTo(o2.getProductName());
             }
+        });*/
+
+        // Ordenamiento por Subgroup y producto
+        Collections.sort(beanCollection2, new Comparator<CollectionData>() {
+            @Override
+            public int compare(CollectionData o1, CollectionData o2) {
+                // Primero, compara por Subgroup
+                int subgroupComparison = o1.getSubgroupName().compareTo(o2.getSubgroupName());
+
+                // Si los Subgroup son iguales, compara por ProductName
+                if (subgroupComparison == 0) {
+                    return o1.getProductName().compareTo(o2.getProductName());
+                }
+
+                // Si los Subgroup no son iguales, retorna el resultado de la comparación por Subgroup
+                return subgroupComparison;
+            }
         });
+
+
 
         //return beanCollection;
         return beanCollection2;
@@ -428,7 +495,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
                 }
             }
 
-            CollectionData data = new CollectionData(   initialInventory.getProductItemCode(),
+            CollectionData data = new CollectionData(   initialInventory.getProductItem().getSubGroup().getName(),
+                                                        initialInventory.getProductItemCode(),
                                                         initialInventory.getProductItem().getName(),
                                                         initialInventory.getProductItem().getUsageMeasureCode(),
                                                         initQuantity,
@@ -711,6 +779,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         /** Inventario inicial inv_inicio **/
         for (InitialInventory initialInventory:initialInventoryList){
             CollectionData data = new CollectionData(
+                    initialInventory.getProductItem().getSubGroup().getName(),
                     initialInventory.getProductItemCode(),
                     initialInventory.getProductItem().getName(),
                     initialInventory.getProductItem().getUsageMeasureCode(),
@@ -914,6 +983,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
      */
     public class CollectionData{
 
+        private String subgroupName;
         private String code;
         private String productName;
         private String unit;
@@ -926,6 +996,20 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         public CollectionData(String code, String productName, String unit, BigDecimal initialAmount,  BigDecimal entryAmount, BigDecimal outputAmount, BigDecimal balance, BigDecimal unitCost){
 
+            this.setCode(code);
+            this.setProductName(productName);
+            this.unit = unit;
+            this.setInitialAmount(initialAmount);
+            this.setEntryAmount(entryAmount);
+            this.setOutputAmount(outputAmount);
+            this.setBalance(balance);
+            this.unitCost = unitCost;
+            this.valuedBalance = BigDecimal.ZERO;
+        }
+
+        public CollectionData(String subgroupName, String code, String productName, String unit, BigDecimal initialAmount,  BigDecimal entryAmount, BigDecimal outputAmount, BigDecimal balance, BigDecimal unitCost){
+
+            this.setSubgroupName(subgroupName);
             this.setCode(code);
             this.setProductName(productName);
             this.unit = unit;
@@ -1008,6 +1092,14 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         public void setValuedBalance(BigDecimal valuedBalance) {
             this.valuedBalance = valuedBalance;
+        }
+
+        public String getSubgroupName() {
+            return subgroupName;
+        }
+
+        public void setSubgroupName(String subgroupName) {
+            this.subgroupName = subgroupName;
         }
     }
 

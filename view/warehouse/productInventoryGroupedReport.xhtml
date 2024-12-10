@@ -8,7 +8,7 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-    <ui:define name="pageTitle">#{messages['Reports.kardex.inventoryReport.titleReport']}</ui:define>
+    <ui:define name="pageTitle">#{messages['Reports.kardex.inventoryGroupedReport.titleReport']}</ui:define>
     <ui:param name="bodyAlign" value="center"/>
     <ui:param name="bodyWidth" value="70%"/>
 
@@ -18,7 +18,7 @@
 
             <rich:panel>
                 <f:facet name="header">
-                    #{messages['Reports.kardex.inventoryReport.titleReport']}
+                    #{messages['Reports.kardex.inventoryGroupedReport.titleReport']}
                 </f:facet>
 
                 <s:decorate id="warehouseField"
@@ -115,17 +115,9 @@
                                       showReportTitle="false"/>-->
 
             <div class="buttons">
-                <h:commandButton action="#{productInventoryReportAction.generateReport}"
+                <h:commandButton action="#{productInventoryReportAction.generateGroupedReport}"
                                  styleClass="button"
                                  value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
-                    <s:defaultAction/>
-                </h:commandButton>
-
-                <h:commandButton action="#{productInventoryReportAction.startInventoryAnnual}"
-                                 styleClass="button"
-                                 value="#{messages['ProductInventory.startAnnualInventory']}" id="inventoryInitButtonId" tabindex="5"
-                                 onclick="Richfaces.showModalPanel('progressModalPanel');"
-                                 rendered="#{s:hasPermission('PRODUCTINVENTORYSTART','CREATE')}">
                     <s:defaultAction/>
                 </h:commandButton>
 

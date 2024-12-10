@@ -283,6 +283,14 @@
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('GROUPED_GENERAL_INVENTORY_REPORT','VIEW')}">
+                    <s:link view="/warehouse/productInventoryGroupedReport.xhtml"
+                            value="#{messages['menu.warehouse.report.inventoryGroupedReport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
                                rendered="#{s:hasPermission('SUBGROUP_INVENTORY_REPORT','VIEW')}">
                     <s:link view="/warehouse/productInventorySubGroupReport.xhtml"
                             value="#{messages['menu.warehouse.report.inventorySubGroupReport']}"

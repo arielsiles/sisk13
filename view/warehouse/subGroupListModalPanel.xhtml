@@ -75,23 +75,23 @@
                         id="subGroupList"
                         rows="#{sessionUser.rowsPerPage}"
                         width="100%"
-                        columnsWidth="40%, 15%, 30%, 15%">
+                        columnsWidth="55%, 35%, 10%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>
                         <app:commandSortHeader sortProperty="subGroup.name"
                                                dataModel="#{subGroupSearchDataModel}"
                                                reRender="subGroupList, dataScroller">
-                            #{messages['SubGroup.name']}
+                            #{messages['SubGroup.subGroups']}
                         </app:commandSortHeader>
                     </rich:column>
-                    <rich:column>
+                    <!--<rich:column>
                         <app:commandSortHeader sortProperty="subGroup.subGroupCode"
                                                dataModel="#{subGroupSearchDataModel}"
                                                reRender="subGroupList, dataScroller">
                             #{messages['SubGroup.subGroupCode']}
                         </app:commandSortHeader>
-                    </rich:column>
+                    </rich:column>-->
                     <rich:column>
                         <app:commandSortHeader sortProperty="subGroup.group.name"
                                                dataModel="#{subGroupSearchDataModel}"
@@ -105,11 +105,11 @@
                 </rich:columnGroup>
             </f:facet>
             <rich:column>
-                <h:outputText value="#{subGroupItem.name}"/>
+                <h:outputText value="#{subGroupItem.fullName}"/>
             </rich:column>
-            <rich:column>
+            <!--<rich:column>
                 <h:outputText value="#{subGroupItem.subGroupCode}"/>
-            </rich:column>
+            </rich:column>-->
             <rich:column>
                 <h:outputText value="#{subGroupItem.group.fullName}"/>
             </rich:column>

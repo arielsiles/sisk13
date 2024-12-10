@@ -8,7 +8,7 @@
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
-    <ui:define name="pageTitle">#{messages['Reports.kardex.inventoryReport.titleReport']}</ui:define>
+    <ui:define name="pageTitle">#{messages['Reports.kardex.inventorySubGroupReport.titleReport']}</ui:define>
     <ui:param name="bodyAlign" value="center"/>
     <ui:param name="bodyWidth" value="70%"/>
 
@@ -18,7 +18,7 @@
 
             <rich:panel>
                 <f:facet name="header">
-                    #{messages['Reports.kardex.inventoryReport.titleReport']}
+                    #{messages['Reports.kardex.inventorySubGroupReport.titleReport']}
                 </f:facet>
 
                 <s:decorate id="warehouseField"
@@ -96,15 +96,16 @@
                 <s:decorate id="compareFlagField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Reports.inventoryReport.articlesOnlyMovement']}</ui:define>
                     <h:selectBooleanCheckbox id="compareFlag"
+                                             disabled="true"
                                              value="#{productInventoryReportAction.articlesWithMovement}"
                                              tabindex="3"/>
                 </s:decorate>
 
             </rich:panel>
 
-            <app:reportDefaultOptions reportAction="#{productInventoryReportAction}" showPageFormat="false"
+            <!--<app:reportDefaultOptions reportAction="#{productInventoryReportAction}" showPageFormat="false"
                                       tabIndex="3"
-                                      showReportTitle="false"/>
+                                      showReportTitle="false"/>-->
 
             <div class="buttons">
                 <h:commandButton action="#{productInventoryReportAction.generateSubGroupReport}"
