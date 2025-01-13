@@ -493,4 +493,13 @@
         <delete dir="${jboss.home}/server/default/work/jboss.web/localhost/${project.name}"/>
     </target>
 
+
+    <path id="classpath">
+        <fileset dir="lib">
+            <include name="javax.mail-1.6.2.jar"/>
+            <!-- otras dependencias de bibliotecas -->
+        </fileset>
+    </path>
+
+
 </project>

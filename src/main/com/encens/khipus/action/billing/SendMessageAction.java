@@ -58,7 +58,11 @@ public class SendMessageAction {
                 t.sendMessage(mensaje, mensaje.getAllRecipients());
                 t.close();
                 System.out.println("................Mensaje Enviado...............");
-            } catch (MessagingException e) {
+            } catch (AuthenticationFailedException e) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error de autenticación: " + e.getMessage());
+                e.printStackTrace();
+            } catch (Exception e) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No se puede enviar, debe generar los archivos PDF/XML.");
                 e.printStackTrace();
             }
         }
@@ -84,6 +88,12 @@ public class SendMessageAction {
                 p.setProperty("mail.smtp.port", "587");
                 p.setProperty("mail.smtp.user", correo);
                 p.setProperty("mail.smtp.auth", "true");
+                p.put("mail.smtp.starttls.enable", "true");  // Habilitar TLS
+                p.put("mail.smtp.ssl.protocols", "TLSv1.2");  // Asegurarte de que se use TLSv1.2
+
+                // Asegúrate de no usar SSL, ya que STARTTLS es lo que se debe usar con el puerto 587
+                p.remove("mail.smtp.ssl.trust");
+
                 Session s = Session.getDefaultInstance(p);
 
                 BodyPart texto = new MimeBodyPart();
@@ -120,4 +130,65 @@ public class SendMessageAction {
             e.printStackTrace();
         }
     }
+
+    public void sendEmailAttachment_0(CustomerOrder customerOrder) {
+        try {
+            // Habilitar manualmente TLSv1.2
+            System.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
+
+            // Configuración de propiedades del correo
+            Properties emailProperties = new Properties();
+            emailProperties.put("mail.smtp.host", "smtp.gmail.com");
+            emailProperties.put("mail.smtp.port", "587");
+            emailProperties.put("mail.smtp.auth", "true");
+            emailProperties.put("mail.smtp.starttls.enable", "true");
+
+
+            // Habilitar depuración
+            emailProperties.put("mail.debug", "true");
+
+            // Crear sesión de correo
+            Session emailSession = Session.getInstance(emailProperties, new javax.mail.Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication("ariel.siles@gmail.com", "wwlatgldmmoboiep");
+                }
+            });
+
+            // Crear el mensaje de correo
+            MimeMessage emailMessage = new MimeMessage(emailSession);
+            emailMessage.setFrom(new InternetAddress("ariel.siles@gmail.com"));
+            emailMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse("ariel.siles+ebilling@gmail.com"));
+            emailMessage.setSubject("Asunto del correo con adjunto");
+
+            // Crear el cuerpo del mensaje
+            BodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setText("Este es un mensaje de prueba con un adjunto.");
+
+            // Crear el archivo adjunto
+            BodyPart attachmentBodyPart = new MimeBodyPart();
+            String filename = "C:/TEMP/FACTURA-1.pdf";
+            FileDataSource source = new FileDataSource(filename);
+            attachmentBodyPart.setDataHandler(new DataHandler(source));
+            attachmentBodyPart.setFileName(source.getName());
+
+            // Combinar partes en un multipart
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+            multipart.addBodyPart(attachmentBodyPart);
+
+            // Establecer el contenido del mensaje
+            emailMessage.setContent(multipart);
+
+            // Enviar el mensaje
+            Transport.send(emailMessage);
+
+            System.out.println("Correo con adjunto enviado exitosamente.");
+
+        } catch (MessagingException e) {
+            System.err.println("Error al enviar el correo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
 }
