@@ -116,7 +116,7 @@
 
             <rich:dataTable value="#{collectMaterialDataModel}" var="collectMaterialItem" id="collectMaterialList"
                             rows="#{sessionUser.rowsPerPage15}"
-                            width="100%" columnsWidth="7%, 10%, 11%, 16%, 7%, 7%, 10%, 8%, 7%, 4%, 8%, 5%">
+                            width="100%" columnsWidth="5%, 10%, 11%, 15%, 7%, 7%, 10%, 7%, 7%, 6%, 2%, 8%, 5%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -128,6 +128,7 @@
                         <rich:column>#{messages['CollectMaterial.formNumber']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.rawMaterial']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.companyWeight']}</rich:column>
+                        <rich:column>#{messages['CollectMaterial.averageWeight']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.tonPrice']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.invoice']}</rich:column>
                         <rich:column>#{messages['CollectMaterial.state']}</rich:column>
@@ -163,6 +164,11 @@
                 </rich:column>
                 <rich:column styleClass="right">
                     <h:outputText value="#{collectMaterialItem.balanceWeight}">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{collectMaterialItem.getAverageWeight()}">
                         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </rich:column>

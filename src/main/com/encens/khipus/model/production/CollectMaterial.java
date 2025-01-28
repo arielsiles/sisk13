@@ -5,6 +5,7 @@ import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
+import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
@@ -276,5 +277,19 @@ public class CollectMaterial implements Serializable, BaseModel {
 
     public void setProviderWeight(BigDecimal providerWeight) {
         this.providerWeight = providerWeight;
+    }
+
+    public BigDecimal getAverageWeight() {
+
+        // Verificar y convertir valores nulos a cero si es necesario
+        BigDecimal providerWeight = (getProviderWeight() != null) ? getProviderWeight() : BigDecimal.ZERO;
+        BigDecimal balanceWeight = (getBalanceWeight() != null) ? getBalanceWeight() : BigDecimal.ZERO;
+
+        // Calcular el promedio entre providerWeight y balanceWeight (considerando valores nulos como cero)
+        BigDecimal sum = BigDecimalUtil.sum(providerWeight, balanceWeight);
+        //BigDecimal average = sum.divide(new BigDecimal("2"), 2, BigDecimal.ROUND_HALF_UP); // Redondeo a 2 decimales
+        BigDecimal average = BigDecimalUtil.divide(sum, BigDecimalUtil.toBigDecimal(2));
+
+        return average;
     }
 }
