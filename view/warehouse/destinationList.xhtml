@@ -36,7 +36,7 @@
 
             <rich:dataTable value="#{destinationDataModel}" var="destinationItem" id="destinationList"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="20%, 60%, 20%">
+                            width="100%" columnsWidth="15%, 60%, 10%, 15%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>#{messages['Destination.code']}</rich:column>
@@ -46,6 +46,9 @@
                                 #{messages['Destination.name']}
                             </app:commandSortHeader>
                         </rich:column>
+
+                        <rich:column>#{messages['Common.active']}</rich:column>
+
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
                         </rich:column>
@@ -56,6 +59,9 @@
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{destinationItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox value="#{destinationItem.active}" disabled="true"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"

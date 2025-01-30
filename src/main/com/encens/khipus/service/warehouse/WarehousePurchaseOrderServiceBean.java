@@ -319,6 +319,14 @@ public class WarehousePurchaseOrderServiceBean extends PurchaseOrderServiceBean 
         }
     }
 
+    public void updatePurchaseOrder(Voucher voucher, PurchaseOrder purchaseOrder){
+
+        purchaseOrder.setVoucher(voucher);
+        getEntityManager().merge(purchaseOrder);
+        getEntityManager().flush();
+
+    }
+
     public void approveWarehousePurchaseOrder(PurchaseOrder entity,
                                               Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailUnderMinimalStockMap,
                                               Map<PurchaseOrderDetail, BigDecimal> purchaseOrderDetailOverMaximumStockMap,

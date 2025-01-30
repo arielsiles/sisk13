@@ -132,12 +132,12 @@ public class PurchaseOrder implements BaseModel {
     })
     private Provider providerAux;
 
-    @Column(name = "cuentapago", updatable = false)
+    @Column(name = "cuentapago", nullable = true)
     private String cashAccountPayCode;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
-            //@JoinColumn(name = "NO_CIA", referencedColumnName = "NO_CIA", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "cuentapago", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount cashAccountPay;
@@ -228,6 +228,10 @@ public class PurchaseOrder implements BaseModel {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
     private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>(0);
+
+    @ManyToOne
+    @JoinColumn(name = "idtmpenc", nullable = true)
+    private Voucher voucher;
 
     public Long getId() {
         return id;
@@ -612,5 +616,14 @@ public class PurchaseOrder implements BaseModel {
 
     public void setCashAccountPay(CashAccount cashAccountPay) {
         this.cashAccountPay = cashAccountPay;
+        setCashAccountPayCode(this.cashAccountPay != null ? this.cashAccountPay.getAccountCode() : null);
+    }
+
+    public Voucher getVoucher() {
+        return voucher;
+    }
+
+    public void setVoucher(Voucher voucher) {
+        this.voucher = voucher;
     }
 }

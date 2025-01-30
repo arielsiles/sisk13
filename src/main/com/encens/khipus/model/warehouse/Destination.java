@@ -3,8 +3,10 @@ package com.encens.khipus.model.warehouse;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -43,6 +45,10 @@ public class Destination implements BaseModel {
 
     @Column(name = "nombre", nullable = false)
     private String name;
+
+    @Column(name = "activo", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean active = Boolean.TRUE;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -96,4 +102,11 @@ public class Destination implements BaseModel {
         return code + " " + name;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 }

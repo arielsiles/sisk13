@@ -61,6 +61,8 @@ public class WarehouseVoucherDestinationReportAction extends GenericReportAction
                 "warehouseVoucher.warehouseCode = #{warehouseVoucherDestinationReportAction.warehouse.warehouseCode}",
                 "warehouseVoucher.documentCode = #{warehouseVoucherDestinationReportAction.documentType.documentCode}"
         };
+
+        sortProperty = "warehouseVoucher.date";
     }
 
 

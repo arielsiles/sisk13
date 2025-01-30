@@ -194,7 +194,11 @@
 
     <factory name="warehouseDestinationList" value="#{warehouseDestinationQuery}"/>
     <framework:entity-query name="warehouseDestinationQuery"
-                            ejbql="select destination from Destination destination order by destination.name">
+                            ejbql="select destination from Destination destination">
+        <framework:restrictions>
+            <value>destination.active = #{true}</value>
+        </framework:restrictions>
+        <framework:order>destination.name ASC</framework:order>
     </framework:entity-query>
 
     <!--Enumerations-->

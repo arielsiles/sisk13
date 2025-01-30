@@ -77,6 +77,7 @@ public interface WarehousePurchaseOrderService extends PurchaseOrderService {
             PurchaseOrderNullifiedException,
             DiscountAmountException, PurchaseOrderLiquidatedException;
 
+    void updatePurchaseOrder(Voucher voucher, PurchaseOrder purchaseOrder);
     void liquidatePurchaseOrder(PurchaseOrder entity, PurchaseOrderPayment purchaseOrderPayment)
             throws WarehouseDocumentTypeNotFoundException,
             PurchaseOrderDetailEmptyException,

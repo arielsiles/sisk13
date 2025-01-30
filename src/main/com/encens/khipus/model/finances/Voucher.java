@@ -555,6 +555,10 @@ public class Voucher implements BaseModel{
         this.movement = movement;
     }
 
+    public String getDocument() {
+        return getDocumentType() + "-" + getDocumentNumber();
+    }
+
     /*@Override
     public Object getId() {
         return this.transactionNumber.toString() ;

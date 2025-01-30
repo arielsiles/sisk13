@@ -314,9 +314,14 @@
     </rich:column>
 
     <rich:column styleClass="center #{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
-        <h:commandLink value="#{messages['Common.select']}"
+        <!--<h:commandLink value="#{messages['Common.select']}"
                        immediate="true"
                        action="#{warehousePurchaseOrderAction.select(purchaseOrderItem)}">
+            <s:conversationPropagation value="none"/>
+        </h:commandLink>-->
+        <h:commandLink action="#{warehousePurchaseOrderAction.select(purchaseOrderItem)}"
+                       immediate="true">
+            <h:graphicImage value="/img/edit.gif" styleClass="select-image" title="#{messages['Common.edit']}"/>
             <s:conversationPropagation value="none"/>
         </h:commandLink>
         &#160;
@@ -324,7 +329,13 @@
                        immediate="true"
                        rendered="#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}">
             <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
-                            title="#{messages['Warehouse.purchaseOrder.report.generateReport']}"/>
+                            title="Generar Orden de Compra"/>
+        </h:commandLink>
+        &#160;
+        <h:commandLink action="#{voucherCreateAction.generateReport(purchaseOrderItem.voucher)}"
+                       rendered="#{purchaseOrderItem.voucher != null}"
+                       immediate="true">
+            <h:graphicImage value="/img/payroll.jpg" styleClass="select-image" title="#{purchaseOrderItem.voucher.getDocument()}"/>
         </h:commandLink>
     </rich:column>
 </rich:dataTable>

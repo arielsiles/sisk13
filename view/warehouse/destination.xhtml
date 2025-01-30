@@ -73,6 +73,16 @@
                                  maxlength="255" tabindex="2"/>
                 </s:decorate>
 
+                <s:decorate id="activeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['Common.active']}</ui:define>
+                    <h:selectBooleanCheckbox
+                            id="active"
+                            value="#{destination.active}"
+                            tabindex="3"/>
+                </s:decorate>
+
             </rich:panel>
 
             <div class="buttons">
