@@ -2237,7 +2237,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         return datas;
     }
 
-    public Integer getNextMaxNumberByDocType(String docType, Date startDate, Date endDate){
+    /** Antigua, error cuando no hay asientos **/
+    /*public Integer getNextMaxNumberByDocType(String docType, Date startDate, Date endDate){
 
         BigDecimal number = (BigDecimal) em.createNativeQuery("SELECT MAX(CAST(no_doc AS DECIMAL)) FROM sf_tmpenc " +
                 "WHERE tipo_doc =:docType " +
@@ -2250,7 +2251,21 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         Integer result = new Integer(number.toString());
         result++;
         return result;
+    }*/
+
+    /** Nueva, sin error de no existir asientos **/
+    public Integer getNextMaxNumberByDocType(String docType, Date startDate, Date endDate) {
+        BigDecimal number = (BigDecimal) em.createNativeQuery("SELECT COALESCE(MAX(CAST(no_doc AS DECIMAL)), 0) FROM sf_tmpenc " +
+                        "WHERE tipo_doc = :docType " +
+                        "AND fecha BETWEEN :startDate AND :endDate ")
+                .setParameter("docType", docType)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getSingleResult();
+
+        return number.intValue() + 1;
     }
+
 
     public List<Object[]> getValuedInventory(Date startDate, Date endDate, CashAccount cashAccount){
 

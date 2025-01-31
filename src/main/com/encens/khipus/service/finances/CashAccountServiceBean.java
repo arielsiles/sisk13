@@ -86,8 +86,8 @@ public class CashAccountServiceBean implements CashAccountService {
         String rootAccountCode = cashAccount.getRootCashAccount() != null ? cashAccount.getRootCashAccount().getAccountCode() : null;
 
         try {
-            em.createNativeQuery("insert into arcgms (cuenta, descri, cta_raiz, no_cia, tipo, tipo_gasto, activa, moneda, exije_cc, ind_mov, permiso_inv) " +
-                    "values(:cuenta, :descri, :cta_raiz, :no_cia, :tipo, :tipo_gasto, :activa, :moneda, :exije_cc, :ind_mov, :permiso_inv)")
+            em.createNativeQuery("insert into arcgms (cuenta, descri, cta_raiz, no_cia, tipo, tipo_gasto, activa, moneda, exije_cc, ind_mov, permiso_inv, permite_iva) " +
+                    "values(:cuenta, :descri, :cta_raiz, :no_cia, :tipo, :tipo_gasto, :activa, :moneda, :exije_cc, :ind_mov, :permiso_inv, :permite_iva)")
                     .setParameter("cuenta", cashAccount.getAccountCode())
                     .setParameter("descri", cashAccount.getDescription())
                     .setParameter("cta_raiz", rootAccountCode)
@@ -99,6 +99,7 @@ public class CashAccountServiceBean implements CashAccountService {
                     .setParameter("exije_cc", 'N')
                     .setParameter("ind_mov", cashAccount.getMovementAccount() ? 'S' : 'N')
                     .setParameter("permiso_inv", cashAccount.getHasWarehousePermission() ? 'S' : 'N')
+                    .setParameter("permite_iva", 'N')
                     .executeUpdate();
             return Boolean.TRUE;
         } catch (Exception e){

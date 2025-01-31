@@ -13,3 +13,14 @@
 
 
 
+cuenta      descri                              cta_raiz    cta_niv3    cn_nivel    tipo    activa  no_cia  permiso_inv     exije_cc
+3800000000	RESULTADOS ACUMULADOS	            3800000000	NULL	    2           C       N       01      N               N
+3810000000	Utilidades Acumuladas	            3800000000	3810000000	3           C       N       01      N               N
+3810100000	Utilidades Acumuladas	            3800000000	3810000000	4           C       N       01      N               N
+3820000000	UTILIDADES DEL PERIODO O GESTION	3800000000	3820000000	3           C       N       01      N               N
+3820100000	Utilidades del periodo o gestion	3800000000	3820000000	4           C       N       01      N               N
+3830000000	(PERDIDAS ACUMULADAS)	            3800000000	3830000000	3           C       N       01      N               N
+3830100000	(PERDIDAS ACUMULADAS)	            3800000000	3830000000	4           C       N       01      N               N
+3840000000	(PERDIDAS DEL PERIODO O GESTION)	3800000000	3840000000	3           C       N       01      N               N
+3840100000	(Perdidas del periodo o gestion)	3800000000	3840000000	4           C       N       01      N               N
+

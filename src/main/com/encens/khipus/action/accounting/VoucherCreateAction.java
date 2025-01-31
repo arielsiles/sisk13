@@ -3,6 +3,7 @@ package com.encens.khipus.action.accounting;
 import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.purchases.PurchaseDocumentAction;
 import com.encens.khipus.action.warehouse.reports.ValuedPhysicalInventoryReportAction;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
@@ -20,6 +21,7 @@ import com.encens.khipus.service.customers.ClientService;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.service.finances.VoucherService;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.service.warehouse.WarehouseService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -113,6 +115,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     @In
     private FinancesExchangeRateService financesExchangeRateService;
+
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     @In(create = true)
     private PurchaseDocumentAction purchaseDocumentAction;
@@ -248,6 +253,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void generateClosingResults(){
 
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+
         BigDecimal exchangeRate = BigDecimal.ZERO;
         try {
             exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
@@ -317,14 +324,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             VoucherDetail voucherDetail = new VoucherDetail();
             voucherDetail.setDebit(BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
             voucherDetail.setCredit(BigDecimal.ZERO);
-            voucherDetail.setAccount("3530100000"); /** MODIFYID **/
+            voucherDetail.setAccount(companyConfiguration.getLossCashAccount().getAccountCode());
             voucher.getDetails().add(voucherDetail);
         }
         if (totalCredit.compareTo(totalDebit) > 0){ /** Utilidades **/
             VoucherDetail voucherDetail = new VoucherDetail();
             voucherDetail.setDebit(BigDecimal.ZERO);
             voucherDetail.setCredit(BigDecimalUtil.subtract(totalCredit, totalDebit, 2));
-            voucherDetail.setAccount("3510100000"); /** MODIFYID **/
+            voucherDetail.setAccount(companyConfiguration.getProfitCashAccount().getAccountCode());
+
             voucher.getDetails().add(voucherDetail);
         }
 
@@ -541,7 +549,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     }
 
     public Boolean isFiscalCredit(VoucherDetail voucherDetail){
-        return voucherDetail.getAccount().equals("1420710000");
+        CompanyConfiguration configuration =  getCompanyConfiguration();
+        //return voucherDetail.getAccount().equals("1420710000");
+        return voucherDetail.getAccount().equals(configuration.getNationalCurrencyVATFiscalCreditAccountCode());
     }
 
     public void assignVoucherDetail(CashAccount cashAccount){
@@ -1487,5 +1497,16 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    private CompanyConfiguration getCompanyConfiguration(){
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+            return companyConfiguration;
+        } catch (CompanyConfigurationNotFoundException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");
+            return null;
+        }
     }
 }

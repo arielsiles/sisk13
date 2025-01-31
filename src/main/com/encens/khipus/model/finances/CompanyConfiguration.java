@@ -707,6 +707,20 @@ public class CompanyConfiguration {
     @Column(name = "ret_cns", nullable = true)
     private BigDecimal retentionCNSValue;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "res_perdida", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount lossCashAccount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "res_utilidad", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount profitCashAccount;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1821,5 +1835,21 @@ public class CompanyConfiguration {
 
     public void setDocumentFixedAssetOC(String documentFixedAssetOC) {
         this.documentFixedAssetOC = documentFixedAssetOC;
+    }
+
+    public CashAccount getLossCashAccount() {
+        return lossCashAccount;
+    }
+
+    public void setLossCashAccount(CashAccount lossCashAccount) {
+        this.lossCashAccount = lossCashAccount;
+    }
+
+    public CashAccount getProfitCashAccount() {
+        return profitCashAccount;
+    }
+
+    public void setProfitCashAccount(CashAccount profitCashAccount) {
+        this.profitCashAccount = profitCashAccount;
     }
 }

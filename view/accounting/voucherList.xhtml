@@ -188,9 +188,8 @@
     </rich:column>
     <rich:column styleClass="center">
         <!--<h:commandLink value="#{messages['Common.select']}" immediate="true" action="#{voucherUpdateAction.select(voucherItem)}">-->
-        <h:commandLink value="#{messages['Common.select']}"
-                       immediate="true"
-                       action="#{voucherCreateAction.select(voucherItem)}">
+        <h:commandLink action="#{voucherCreateAction.select(voucherItem)}" immediate="true">
+            <h:graphicImage value="/img/edit.gif" styleClass="select-image" title="#{messages['Common.edit']}"/>
             <s:conversationPropagation value="none"/>
         </h:commandLink>
         &#160;
