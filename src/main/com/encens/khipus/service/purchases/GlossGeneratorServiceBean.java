@@ -38,7 +38,7 @@ public class GlossGeneratorServiceBean extends GenericServiceBean implements Glo
 
         String gloss = (obs + ", "
                 + executorUnitName + ", "
-                + costCenterName + ", "
+                /*+ costCenterName + ", "*/
                 + petitionerName + ", "
                 + providerName + ", "
                 + monthName + ", "

@@ -548,6 +548,21 @@ public class WarehousePurchaseOrderServiceBean extends PurchaseOrderServiceBean 
 
     }
 
+    /** Solo TEST **/
+    public void liquidateCashPurchaseOrder(PurchaseOrder purchaseOrder, PurchaseOrderPayment liquidationPayment){
+        System.out.println("=======> Liquidando Orden de Compra Al contado... <========================");
+        System.out.println("======================> " + purchaseOrder.getOrderNumber());
+        System.out.println("======================> " + liquidationPayment.getBeneficiaryName());
+        System.out.println("======================> " + liquidationPayment.getProviderAux().getFullName());
+
+        getEntityManager().merge(purchaseOrder);
+        getEntityManager().flush();
+
+        liquidationPayment.setPurchaseOrder(purchaseOrder);
+        getEntityManager().persist(liquidationPayment);
+        getEntityManager().flush();
+    }
+
     public void onlyLiquidatePurchaseOrder(List<PurchaseOrder> purchaseOrders, PurchaseOrder entity)
             throws WarehouseDocumentTypeNotFoundException,
             PurchaseOrderDetailEmptyException,

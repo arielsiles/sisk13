@@ -11,7 +11,8 @@ public enum PurchaseOrderPaymentType {
     PAYMENT_BANK_ACCOUNT(1, "RotatoryFundPaymentType.paymentToBankAccount"),
     PAYMENT_WITH_CHECK(2, "RotatoryFundPaymentType.paymentWithCheck"),
     PAYMENT_CASHBOX(3, "RotatoryFundPaymentType.paymentWithCashBox"),
-    PAYMENT_ROTATORY_FUND(4, "RotatoryFundPaymentType.paymentWithRotatoryFund");
+    PAYMENT_ROTATORY_FUND(4, "RotatoryFundPaymentType.paymentWithRotatoryFund"),
+    PAYMENT_FUND_PAID(5, "RotatoryFundPaymentType.paymentWithFundToRender");
 
     private int code;
 

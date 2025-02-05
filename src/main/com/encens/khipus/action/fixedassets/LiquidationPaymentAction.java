@@ -6,6 +6,7 @@ import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundExceptio
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.finances.RotatoryFund;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.purchases.PurchaseOrderPayment;
@@ -59,6 +60,8 @@ public class LiquidationPaymentAction {
     private List<PurchaseOrder> purchaseOrdersWithCheck = new ArrayList<PurchaseOrder>();
     private boolean hasAccountCorrency = true;
 
+    private boolean hasCalculatedCash = false;
+
     public PurchaseOrder getPurchaseOrder() {
         return purchaseOrder;
     }
@@ -108,6 +111,23 @@ public class LiquidationPaymentAction {
         getLiquidationPayment().setCashBoxCashAccount(null);
     }
 
+    public void clearCashAccountToRender() {
+        getLiquidationPayment().setCashAccountToRender(null);
+    }
+
+    public void clearProviderAux() {
+        getLiquidationPayment().setProviderAux(null);
+        getLiquidationPayment().setProviderAuxCode(null);
+    }
+
+    public void assignCashAccountToRender(CashAccount cashAccount){
+        getLiquidationPayment().setCashAccountToRender(cashAccount);
+    }
+
+    public void assignProviderAux(Provider provider) {
+        getLiquidationPayment().setProviderAux(provider);
+    }
+
     public void assignRotatoryFund(RotatoryFund rotatoryFund) {
         try {
             rotatoryFund = genericService.findById(RotatoryFund.class, rotatoryFund.getId());
@@ -154,6 +174,11 @@ public class LiquidationPaymentAction {
     public boolean isRotatoryFundPayment() {
         return null != getLiquidationPayment().getPaymentType()
                 && getLiquidationPayment().getPaymentType().equals(PurchaseOrderPaymentType.PAYMENT_ROTATORY_FUND);
+    }
+
+    public boolean isFundToPaidPayment() {
+        return null != getLiquidationPayment().getPaymentType()
+                && getLiquidationPayment().getPaymentType().equals(PurchaseOrderPaymentType.PAYMENT_FUND_PAID);
     }
 
     /* In case of a change of bank account or cash account */
@@ -213,6 +238,11 @@ public class LiquidationPaymentAction {
         }
     }
 
+    public void computePaymentCash(BigDecimal payAmount) {
+        computePayment(payAmount);
+        setHasCalculatedCash(true);
+    }
+
     public boolean checkPayment(BigDecimal payAmount) {
         if (BigDecimalUtil.isZeroOrNull(payAmount)) {
             return true;
@@ -237,7 +267,7 @@ public class LiquidationPaymentAction {
                 bankAmount.compareTo(getLiquidationPayment().getSourceAmount()) == 0;
     }
 
-    public void paymentTypeChanged() {
+    /*public void paymentTypeChanged() {
         if (isBankPayment() || isCheckPayment()) {
             getLiquidationPayment().setCashBoxCashAccount(null);
             getLiquidationPayment().setBeneficiaryName(getPurchaseOrder().getProvider().getEntity().getAcronym());
@@ -252,6 +282,27 @@ public class LiquidationPaymentAction {
         }
         getLiquidationPayment().setPayAmount(null);
         getLiquidationPayment().setSourceAmount(null);
+    }*/
+
+    public void paymentTypeChanged() {
+
+        // Beneficiario
+        getLiquidationPayment().setBeneficiaryType(BeneficiaryType.PERSON);
+        getLiquidationPayment().setBeneficiaryName(getPurchaseOrder().getProvider().getEntity().getAcronym());
+        // Caja
+        getLiquidationPayment().setCashBoxCashAccount(null);
+        // Bank
+        getLiquidationPayment().setBankAccount(null);
+        // Rotatory fund
+        getLiquidationPayment().setRotatoryFund(null);
+        // Fund to render
+        getLiquidationPayment().setCashAccountToRender(null);
+        getLiquidationPayment().setProviderAux(null);
+        // Amount
+        getLiquidationPayment().setPayAmount(null);
+        getLiquidationPayment().setSourceAmount(null);
+
+        setHasCalculatedCash(false);
     }
 
     public void removePurchaseOrder(BigDecimal payAmount) {
@@ -316,5 +367,13 @@ public class LiquidationPaymentAction {
 
     public void setHasAccountCorrency(boolean hasAccountCorrency) {
         this.hasAccountCorrency = hasAccountCorrency;
+    }
+
+    public boolean isHasCalculatedCash() {
+        return hasCalculatedCash;
+    }
+
+    public void setHasCalculatedCash(boolean hasCalculatedCash) {
+        this.hasCalculatedCash = hasCalculatedCash;
     }
 }

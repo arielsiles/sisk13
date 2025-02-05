@@ -1,5 +1,6 @@
 package com.encens.khipus.service.warehouse;
 
+import com.encens.khipus.action.fixedassets.LiquidationPaymentAction;
 import com.encens.khipus.action.production.ProductionPlanningAction;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
@@ -82,6 +83,10 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
     @In
     private FinancesPkGeneratorService financesPkGeneratorService;
+
+    /*@In(create = true, value = "liquidationPaymentAction")*/
+    @In
+    private LiquidationPaymentAction liquidationPaymentAction;
 
     /* For advance payments of warehouse and fixedAssets */
 
@@ -537,10 +542,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         if (CollectionDocumentType.INVOICE.equals(purchaseOrder.getDocumentType())) {
             if(purchaseOrder.getWithBill().compareTo(Constants.WITH_BILL) == 0){
-
-                //BigDecimal amountVAT = BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT);
                 BigDecimal amountVAT = BigDecimal.ZERO;
-
                 for (PurchaseDocument purchaseDocument : purchaseOrder.getPurchaseDocumentList()){
                     /** Toma solo facturas Aprobadas **/
                     if (purchaseDocument.getState().equals(PurchaseDocumentState.APPROVED)) {
@@ -556,13 +558,10 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                         voucherDetail.setPurchaseDocument(purchaseDocument);
                         voucher.addVoucherDetail(voucherDetail);
                     }
-                    //purchaseDocument.setVoucherDetailFiscalCredit(voucherDetail);
-                    //purchaseDocument.setVoucher(voucher);
                 }
                 totalDebitAmount = BigDecimalUtil.sum(totalDebitAmount, amountVAT);
             }
         }
-
 
         BigDecimal totalCreditAmount = purchaseOrder.getTotalAmount();
         VoucherDetail voucherDetail = new VoucherDetail();
@@ -578,6 +577,9 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucherDetail.setProviderCode(purchaseOrder.getProviderCode()); /** Asocia con el proveedor **/
         }
 
+        PurchaseOrderPayment purchaseOrderPayment = liquidationPaymentAction.getLiquidationPayment();
+        System.out.println("~~~~~~~~~~~~~~~~~> Desciption purchaseOrderPayment: " + purchaseOrderPayment.getDescription());
+
         if (purchaseOrder.getPayConditions().getName().equals(Constants.CONDITION_CASH)) {
 
             if ( purchaseOrder.getDefaultAccount() ){
@@ -588,18 +590,20 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                         totalCreditAmount,
                         purchaseOrder.getProvider().getPayableAccount().getCurrency(),
                         financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
-            } else {
-                voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
-                        executorUnitCode,
-                        costCenterCode,
-                        purchaseOrder.getCashAccountPay(),
-                        totalCreditAmount,
-                        purchaseOrder.getProvider().getPayableAccount().getCurrency(),
-                        financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
 
-                String providerAuxCode = purchaseOrder.getProviderAux() != null ? purchaseOrder.getProviderAux().getProviderCode() : null;
-                voucherDetail.setProviderCode(providerAuxCode);
+                purchaseOrderPayment.setCashBoxCashAccount(companyConfiguration.getGeneralCashAccountNational());
+                purchaseOrderPayment.setSourceAmount(totalCreditAmount);
+                purchaseOrderPayment.setPayAmount(totalCreditAmount);
+                purchaseOrderPayment.setBeneficiaryName(purchaseOrder.getProvider().getEntity().getAcronym());
+                persistPurchaseOrderPayment(purchaseOrderPayment, purchaseOrder);
+
+            } else {
+
+                voucherDetail = createCreditVoucherDetail_CashPurchaseOrder(purchaseOrder, purchaseOrderPayment);
+                persistPurchaseOrderPayment(purchaseOrderPayment, purchaseOrder);
+
             }
+
         }
 
         voucher.addVoucherDetail(voucherDetail);
@@ -636,6 +640,9 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         voucher.setState(Constants.VOUCHER_APR);
         voucherAccoutingService.saveVoucher(voucher);
 
+        purchaseOrderPayment.setVoucher(voucher);
+        getEntityManager().flush();
+
         /** Actualiza DocumentoCompra y la relacion con sf_tmpdet **/
         /*for (PurchaseDocument purchaseDocument : purchaseOrder.getPurchaseDocumentList()){
             try {
@@ -648,6 +655,86 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
     }
     /* when a fixedAsset or warehouse purchases order has been liquidated whith only check
     *  (bank or cashbox) vs provider */
+
+    private VoucherDetail createCreditVoucherDetail_CashPurchaseOrder(PurchaseOrder purchaseOrder, PurchaseOrderPayment purchaseOrderPayment) throws FinancesExchangeRateNotFoundException, FinancesCurrencyNotFoundException {
+
+        VoucherDetail voucherDetail = new VoucherDetail();
+        String executorUnitCode = purchaseOrder.getExecutorUnit().getExecutorUnitCode();
+        String costCenterCode   = purchaseOrder.getCostCenter().getCode();
+        BigDecimal totalCreditAmount = purchaseOrder.getTotalAmount();
+
+        if ( !purchaseOrder.getDefaultAccount() && purchaseOrderPayment.getPaymentType().equals(PurchaseOrderPaymentType.PAYMENT_BANK_ACCOUNT) ){
+            voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    purchaseOrderPayment.getBankAccount().getCashAccount(),
+                    totalCreditAmount,
+                    purchaseOrder.getProvider().getPayableAccount().getCurrency(),
+                    financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
+
+            String providerCode = purchaseOrder.getProvider() != null ? purchaseOrder.getProvider().getProviderCode() : null;
+            System.out.println("...........................>>>> Provider Code: " + providerCode);
+            voucherDetail.setProviderCode(providerCode);
+        }
+
+        if ( !purchaseOrder.getDefaultAccount() && purchaseOrderPayment.getPaymentType().equals(PurchaseOrderPaymentType.PAYMENT_WITH_CHECK) ){
+            voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    purchaseOrderPayment.getBankAccount().getCashAccount(),
+                    totalCreditAmount,
+                    purchaseOrder.getProvider().getPayableAccount().getCurrency(),
+                    financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
+
+            String providerCode = purchaseOrder.getProvider() != null ? purchaseOrder.getProvider().getProviderCode() : null;
+            System.out.println("...........................>>>> Provider Code: " + providerCode);
+            voucherDetail.setProviderCode(providerCode);
+        }
+
+        if ( !purchaseOrder.getDefaultAccount() && purchaseOrderPayment.getPaymentType().equals(PurchaseOrderPaymentType.PAYMENT_CASHBOX) ){
+            voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    purchaseOrderPayment.getCashBoxCashAccount(),
+                    totalCreditAmount,
+                    purchaseOrder.getProvider().getPayableAccount().getCurrency(),
+                    financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
+
+            String providerCode = purchaseOrder.getProvider() != null ? purchaseOrder.getProvider().getProviderCode() : null;
+            System.out.println("...........................>>>> Provider Code: " + providerCode);
+            voucherDetail.setProviderCode(providerCode);
+        }
+
+        if ( !purchaseOrder.getDefaultAccount() && purchaseOrderPayment.getPaymentType().equals(PurchaseOrderPaymentType.PAYMENT_FUND_PAID) ){
+            voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
+                    executorUnitCode,
+                    costCenterCode,
+                    purchaseOrderPayment.getCashAccountToRender(),
+                    totalCreditAmount,
+                    purchaseOrder.getProvider().getPayableAccount().getCurrency(),
+                    financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
+
+            String providerAuxCode = purchaseOrderPayment.getProviderAux() != null ? purchaseOrderPayment.getProviderAux().getProviderCode() : null;
+            System.out.println("...........................>>>> Provider Code: " + providerAuxCode);
+            voucherDetail.setProviderCode(providerAuxCode);
+        }
+
+        return voucherDetail;
+    }
+
+    private void persistPurchaseOrderPayment(PurchaseOrderPayment purchaseOrderPayment, PurchaseOrder purchaseOrder) {
+
+        purchaseOrderPayment.setPayCurrency(FinancesCurrencyType.P);
+        purchaseOrderPayment.setState(PurchaseOrderPaymentState.APPROVED);
+        purchaseOrderPayment.setCreationDate(new Date());
+        purchaseOrderPayment.setRegisterEmployee(currentUser);
+        purchaseOrderPayment.setApprovalDate(new Date());
+        purchaseOrderPayment.setApprovedByEmployee(currentUser);
+        purchaseOrderPayment.setPurchaseOrder(purchaseOrder);
+
+        getEntityManager().persist(purchaseOrderPayment);
+        getEntityManager().flush();
+    }
 
     public void setPurchaseOrderForPaymentCheck(PurchaseOrder purchaseOrder, PurchaseOrderPayment purchaseOrderPayment,String transactionNumber)
             throws CompanyConfigurationNotFoundException,

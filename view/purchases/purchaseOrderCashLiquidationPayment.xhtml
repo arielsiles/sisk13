@@ -1,7 +1,6 @@
 <app:fieldset xmlns="http://www.w3.org/1999/xhtml"
               xmlns:s="http://jboss.com/products/seam/taglib"
               xmlns:ui="http://java.sun.com/jsf/facelets"
-              xmlns:f="http://java.sun.com/jsf/core"
               xmlns:h="http://java.sun.com/jsf/html"
               xmlns:a4j="http://richfaces.org/a4j"
               xmlns:c="http://java.sun.com/jstl/core"
@@ -19,7 +18,8 @@
              border="0"
              columnClasses="width50percent, width50percent">
 <s:div>
-    <s:decorate id="paymentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+
+    <s:decorate id="paymentTypeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{!warehousePurchaseOrder.defaultAccount}">
         <ui:define name="label">#{messages['PurchaseOrderPayment.paymentType']}</ui:define>
         <h:selectOneMenu id="paymentType"
                          value="#{liquidationPaymentAction.liquidationPayment.paymentType}"
@@ -33,14 +33,15 @@
                            hideNoSelectionLabel="false"/>
             <a4j:support event="onchange"
                          action="#{liquidationPaymentAction.paymentTypeChanged()}"
-                         reRender="beneficiaryPanel, cashBoxCashAccountDiv, checkDestinationDiv, bankDiv, calculatedAmountDiv, exchangeRatePanel, rotatoryFundDiv, rotatoryFundListModalPanelDiv,purchaseOrdersWithCheckList"
+                         reRender="globalDiv, beneficiaryPanel, cashBoxCashAccountDiv, checkDestinationDiv, bankDiv, calculatedAmountDiv, exchangeRatePanel,
+                                   cashAccountPayDiv, purchaseOrdersWithCheckList"
                          ajaxSingle="true"/>
             <s:convertEnum/>
         </h:selectOneMenu>
     </s:decorate>
 
     <s:div id="beneficiaryPanel">
-        <s:fragment rendered="#{liquidationPaymentAction.enableBeneficiaryFields}">
+        <s:fragment rendered="#{liquidationPaymentAction.enableBeneficiaryFields and !warehousePurchaseOrder.defaultAccount}">
             <s:decorate id="beneficiaryNameField"
                         template="/include/inputField.xhtml"
                         styleClass="formRow">
@@ -67,9 +68,10 @@
             </s:decorate>
         </s:fragment>
     </s:div>
+
     <s:div id="checkDestinationDiv">
         <s:decorate id="checkDestinationField" template="/include/inputField.xhtml"
-                    rendered="#{liquidationPaymentAction.checkPayment}"
+                    rendered="#{liquidationPaymentAction.checkPayment and !warehousePurchaseOrder.defaultAccount}"
                     styleClass="formRow">
             <ui:define name="label">#{messages['RotatoryFund.checkDestination']}</ui:define>
             <ui:param name="validateId" value="executorUnit"/>
@@ -95,12 +97,13 @@
             </h:selectOneMenu>
         </s:decorate>
     </s:div>
+
     <s:div id="bankDiv">
         <s:decorate id="bankAccountField"
                     template="/include/inputField.xhtml"
                     styleClass="formRow"
-                    rendered="#{liquidationPaymentAction.enableBankAccount}">
-            <ui:define name="label">#{messages['PurchaseOrderPayment.bankAccount']}</ui:define>
+                    rendered="#{liquidationPaymentAction.enableBankAccount and !warehousePurchaseOrder.defaultAccount}">
+            <ui:define name="label">Cuenta Banco</ui:define>
             <h:selectOneMenu id="bankAccount"
                              value="#{liquidationPaymentAction.liquidationPayment.bankAccount}"
                              styleClass="input"
@@ -120,18 +123,19 @@
             </h:selectOneMenu>
         </s:decorate>
     </s:div>
+
     <s:div id="cashBoxCashAccountDiv">
         <s:decorate id="cashBoxCashAccountField"
                     template="/include/inputField.xhtml"
                     styleClass="formRow"
-                    rendered="#{liquidationPaymentAction.cashBoxPayment}">
+                    rendered="#{liquidationPaymentAction.cashBoxPayment and !warehousePurchaseOrder.defaultAccount}">
             <ui:define name="label">#{messages['RotatoryFundPayment.cashBoxCashAccount']}</ui:define>
             <app:selectPopUp id="cashBoxCashAccount"
                              required="true"
                              textValue="#{liquidationPaymentAction.liquidationPayment.cashBoxCashAccount.fullName}"
                              value="#{liquidationPaymentAction.liquidationPayment.cashBoxCashAccount}"
                              dataModel="#{cashAccountDataModel}"
-                             clearAction="liquidationPaymentAction.clearCashBoxCashAccount()"
+                             clearAction="#{liquidationPaymentAction.clearCashBoxCashAccount()}"
                              searchModalPanel="cashBoxCashAccountListModalPanel"
                              reRender="cashBoxCashAccountField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
                              hotKeySelect="alt+3"
@@ -140,41 +144,36 @@
         </s:decorate>
     </s:div>
 
-    <s:div id="rotatoryFundDiv">
-        <s:decorate id="rotatoryFundField"
-                    template="/include/inputField.xhtml"
-                    styleClass="formRow"
-                    rendered="#{liquidationPaymentAction.rotatoryFundPayment}">
-            <ui:define name="label">#{messages['PurchaseOrderPayment.rotatoryFund']}</ui:define>
-            <app:selectPopUp id="rotatoryFund"
+    <s:div id="cashAccountPayDiv">
+        <s:decorate id="cashAccountPayField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{liquidationPaymentAction.fundToPaidPayment and !warehousePurchaseOrder.defaultAccount}">
+            <ui:define name="label">#{messages['WarehousePurchaseOrder.cashAccount']}</ui:define>
+            <app:selectPopUp id="cashAccountPay"
                              required="true"
-                             textValue="#{liquidationPaymentAction.liquidationPayment.rotatoryFund.fullName}"
-                             value="#{liquidationPaymentAction.liquidationPayment.rotatoryFund}"
-                             dataModel="#{rotatoryFundDataModel}"
-                             clearAction="liquidationPaymentAction.clearRotatoryFund()"
-                             searchModalPanel="rotatoryFundListModalPanel"
-                             reRender="rotatoryFundField, valuesDiv, sourceCurrencyDiv,exchangeRatePanel,payCurrencyField, payAmountField"
+                             textValue="#{liquidationPaymentAction.liquidationPayment.cashAccountToRender.fullName}"
+                             value="#{liquidationPaymentAction.liquidationPayment.cashAccountToRender}"
+                             dataModel="#{cashAccountDataModel}"
+                             clearAction="#{liquidationPaymentAction.clearCashAccountToRender()}"
+                             searchModalPanel="cashAccountPayListModalPanel"
+                             reRender="cashAccountPayField"
                              hotKeySelect="alt+3"
                              tabindex="1003">
             </app:selectPopUp>
         </s:decorate>
-    </s:div>
 
-    <s:div id="exchangeRatePanel">
-        <s:decorate id="exchangeRateField"
-                    template="/include/inputField.xhtml"
-                    rendered="#{liquidationPaymentAction.enableExchangeRateField}"
-                    styleClass="formRow">
-            <ui:define name="label">#{messages['PurchaseOrderPayment.exchangeRate']}</ui:define>
-            <h:inputText id="exchangeRate"
-                         value="#{liquidationPaymentAction.liquidationPayment.exchangeRate}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="1004">
-                <app:realNumberConverter minimum="0.000001"
-                                         pattern="#{messages['patterns.decimal6FNumber']}"
-                                         forId="exchangeRate"/>
-            </h:inputText>
+        <s:decorate id="providerAuxField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{liquidationPaymentAction.fundToPaidPayment}">
+            <ui:define name="label">#{messages['WarehousePurchaseOrder.auxiliary']}</ui:define>
+            <app:selectPopUp id="provider"
+                             required="false"
+                             textValue="#{liquidationPaymentAction.liquidationPayment.providerAux.fullName}"
+                             value="#{liquidationPaymentAction.liquidationPayment.providerAux}"
+                             dataModel="#{providerDataModel}"
+                             clearAction="#{liquidationPaymentAction.clearProviderAux()}"
+                             searchModalPanel="providerAuxListModalPanel"
+                             reRender="providerAuxField"
+                             hotKeySelect="alt+5">
+            </app:selectPopUp>
         </s:decorate>
     </s:div>
 
@@ -216,22 +215,24 @@
 </s:div>
 
 <s:div>
-    <s:decorate id="paymentDescriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+    <!--<s:decorate id="paymentDescriptionField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{!warehousePurchaseOrder.defaultAccount}">
         <ui:define name="label">#{messages['PurchaseOrderPayment.description']}</ui:define>
         <h:inputTextarea id="description"
                          value="#{liquidationPaymentAction.liquidationPayment.description}"
-                         styleClass="input textarea"
+                         styleClass="input textarea-medium1"
                          required="true"
                          tabindex="1005">
             <f:validateLength maximum="1000"/>
         </h:inputTextarea>
-    </s:decorate>
+    </s:decorate>-->
+
     <s:decorate id="computePaymentButton"
                 template="/include/viewField.xhtml"
-                styleClass="formRow">
+                styleClass="formRow"
+                rendered="#{!warehousePurchaseOrder.defaultAccount}">
         <ui:param name="required" value="false"/>
         <a4j:commandButton id="calculatePayentValues"
-                           action="#{liquidationPaymentAction.computePayment(warehousePurchaseOrderAction.currentBalanceAmount)}"
+                           action="#{liquidationPaymentAction.computePaymentCash(warehousePurchaseOrderAction.currentBalanceAmount)}"
                            value="#{messages['PurchaseOrderPayment.computePayment']}"
                            styleClass="button"
                            ajaxSingle="false"
@@ -240,49 +241,7 @@
                            tabindex="1006"/>
     </s:decorate>
 </s:div>
-<s:div id="purchaseOrdersWithCheckList">
 
-    <ui:include src="/warehouse/warehousePurchaseOrderWithCheckListCreate.xhtml"/>
-    <!--<rich:dataTable value="#{warehousePurchaseOrderDataModel}"
-                    var="purchaseOrderItem"
-                    id="purchaseOrderWithCheckList"
-                    rows="#{sessionUser.rowsPerPage}"
-                    rendered="#{liquidationPaymentAction.checkPayment}"
-                    width="100%"
-                    >
-
-        <f:facet name="header">
-            <rich:columnGroup>
-                <rich:column>
-                        #{messages['WarehousePurchaseOrder.orderNumber']}
-                </rich:column>
-                <rich:column>
-                        #{messages['WarehousePurchaseOrder.invoiceNumber']}
-                </rich:column>
-                <rich:column>
-                        #{messages['WarehousePurchaseOrder.date']}
-                </rich:column>
-                <rich:column>
-                        #{messages['WarehousePurchaseOrder.responsible']}
-                </rich:column>
-                <rich:column>
-                        #{messages['WarehousePurchaseOrder.provider']}
-                </rich:column>
-                <rich:column>
-                        #{messages['WarehousePurchaseOrder.warehouse']}
-                </rich:column>
-                <rich:column>
-                        #{messages['WarehousePurchaseOrder.state']}
-                </rich:column>
-                <rich:column styleClass="center">
-                    #{messages['Common.action']}
-                </rich:column>
-            </rich:columnGroup>
-        </f:facet>
-
-
-    </rich:dataTable>-->
-</s:div>
 </h:panelGrid>
 </s:div>
 </a4j:region>

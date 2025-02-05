@@ -149,6 +149,14 @@
         </ui:include>
     </c:if>
 
+    <c:if test="#{  warehousePurchaseOrderAction.purchaseOrderApproved and warehousePurchaseOrderAction.hasBalanceAmount() and
+                    warehousePurchaseOrderAction.cashPayment}">
+        <ui:include src="/purchases/purchaseOrderCashLiquidationPayment.xhtml">
+            <ui:param name="mainAction" value="#{warehousePurchaseOrderAction}"/>
+            <ui:param name="purchaseOrder" value="#{warehousePurchaseOrderAction.purchaseOrder}"/>
+        </ui:include>
+    </c:if>
+
 </rich:panel>
 
 <div class="buttons">
@@ -662,7 +670,7 @@
     <ui:param name="dialogId" value="cashAccountPayListModalPanel"/>
     <ui:define name="assignButton">
         <a4j:commandButton id="assignButton"
-                           action="#{warehousePurchaseOrderAction.assignCashAccountPay(cashAccountItem)}"
+                           action="#{liquidationPaymentAction.assignCashAccountToRender(cashAccountItem)}"
                            image="/img/active.gif"
                            styleClass="select-image-middle"
                            reRender="cashAccountPayField"
@@ -676,7 +684,7 @@
     <ui:define name="assignButton">
         <a4j:commandButton id="assignButton"
                            title="#{messages['Common.choose']}"
-                           action="#{warehousePurchaseOrderAction.assignProviderAux(providerItem)}"
+                           action="#{liquidationPaymentAction.assignProviderAux(providerItem)}"
                            image="/img/active.gif"
                            styleClass="select-image"
                            reRender="providerAuxField"

@@ -164,5 +164,8 @@ public interface WarehousePurchaseOrderService extends PurchaseOrderService {
     public void updateliquidatePurchaseOrder(PurchaseOrder purchaseOrder) throws CompanyConfigurationNotFoundException;
 
     WarehouseDocumentType getFirstReceptionType();
+
+    /** Solo TEST **/
+    void liquidateCashPurchaseOrder(PurchaseOrder purchaseOrder, PurchaseOrderPayment liquidationPayment);
 }
 

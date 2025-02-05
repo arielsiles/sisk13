@@ -453,6 +453,11 @@ input, select, textarea {
     width: 380px;
 }
 
+.textarea-medium1 {
+    height: 60px;
+    width: 350px;
+}
+
 .textarea-largest {
     height: 60px;
     width: 550px;

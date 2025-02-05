@@ -152,12 +152,12 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
             //primeramente ejecuta las operacion y verifica que no haya errores
 
             /** O.C. & Pago con Factura **/
+            /** Aprobar vale si tiene una O.C al contado o credito **/
             if(     warehouseVoucher.hasPurchaseOrder() &&
-                   /*(warehouseVoucher.getPurchaseOrder().getWithBill().equals(Constants.WITH_BILL) || warehouseVoucher.getPurchaseOrder().getWithBill().equals(Constants.WITHOUT_BILL)) &&*/
                     (warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CREDIT) ||
                      warehouseVoucher.getPurchaseOrder().getPayConditions().getName().equals(Constants.CONDITION_CASH) ) ) {
-                //System.out.println("=======> O.C. con Factura ");
-                voucher = warehouseAccountEntryService.createEntryAccountForPurchaseOrder(warehouseVoucher); /** Testing **/
+
+                voucher = warehouseAccountEntryService.createEntryAccountForPurchaseOrder(warehouseVoucher); /** Asiento de Ingreso de la O.C. **/
 
                 voucherAccoutingService.updatePurchaseDocumentIfExist(voucher);
 

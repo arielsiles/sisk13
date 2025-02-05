@@ -141,6 +141,26 @@ public class PurchaseOrderPayment implements BaseModel {
     @Column(name = "id_tmpenc", nullable = true, updatable = false, insertable = false)
     private Long idtmpenc;
 
+    @Column(name = "prov_aux", nullable = true)
+    private String providerAuxCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "prov_aux", nullable = false, updatable = false, insertable = false)
+    })
+    private Provider providerAux;
+
+    @Column(name = "cuentarendir")
+    private String cashAccountToRenderCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
+            @JoinColumn(name = "cuentarendir", referencedColumnName = "cuenta", updatable = false, insertable = false)
+    })
+    private CashAccount cashAccountToRender;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", updatable = false, insertable = false),
@@ -517,4 +537,40 @@ public class PurchaseOrderPayment implements BaseModel {
     public void setIdtmpenc(Long idtmpenc) {
         this.idtmpenc = idtmpenc;
     }
+
+    public String getProviderAuxCode() {
+        return providerAuxCode;
+    }
+
+    public void setProviderAuxCode(String providerAuxCode) {
+        this.providerAuxCode = providerAuxCode;
+    }
+
+    public Provider getProviderAux() {
+        return providerAux;
+    }
+
+    public void setProviderAux(Provider providerAux) {
+        this.providerAux = providerAux;
+        setProviderAuxCode(this.providerAux != null ? this.providerAux.getProviderCode() : null);
+    }
+
+    public String getCashAccountToRenderCode() {
+        return cashAccountToRenderCode;
+    }
+
+    public void setCashAccountToRenderCode(String cashAccountToRenderCode) {
+        this.cashAccountToRenderCode = cashAccountToRenderCode;
+    }
+
+    public CashAccount getCashAccountToRender() {
+        return cashAccountToRender;
+    }
+
+    public void setCashAccountToRender(CashAccount cashAccountToRender) {
+        this.cashAccountToRender = cashAccountToRender;
+        setCashAccountToRenderCode(this.cashAccountToRender != null ? this.cashAccountToRender.getAccountCode() : null);
+        setSourceCurrency(this.cashAccountToRender != null ? this.cashAccountToRender.getCurrency() : null);
+    }
+
 }

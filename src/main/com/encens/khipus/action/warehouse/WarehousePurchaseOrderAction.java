@@ -397,6 +397,9 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
 
             addPurchaseOrderApprovedMessage();
             showPurchaseOrderDetailWarningMessages();
+
+            select(getInstance());
+
             return Outcome.SUCCESS;
         } catch (CompanyConfigurationNotFoundException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -435,6 +438,13 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
             return Outcome.REDISPLAY;
         }
 
+        if ( getInstance().getPayConditions().getName().equals(Constants.CONDITION_CASH) ) {
+            if ( !liquidationPaymentAction.isHasCalculatedCash() && !getInstance().getDefaultAccount() ){
+                addPurchaseOrderCalculatedCashPaymenthMessage();
+                return Outcome.REDISPLAY;
+            }
+        }
+
         try {
             service.finalizePurchaseOrder(getInstance());
             select(getInstance());
@@ -444,6 +454,9 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
             WarehouseVoucher warehouseVoucher = warehouseVoucherService.findWarehouseVoucherByPurchaseOrder(getInstance());
             warehouseVoucherUpdateAction.putWarehouseVoucher(warehouseVoucher.getId());
             warehouseVoucherUpdateAction.approve();
+
+            // Error persist
+            //service.liquidateCashPurchaseOrder(getInstance(), getLiquidationPayment());
 
             return Outcome.SUCCESS;
         } catch (WarehouseDocumentTypeNotFoundException e) {
@@ -595,6 +608,9 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
     public void changeDefaultAccountCheck(){
         clearCashAccountPay();
         clearProviderAux();
+
+        liquidationPaymentAction.paymentTypeChanged();
+
     }
 
     public boolean isPurchaseOrderApproved() {
@@ -738,6 +754,10 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
     private void addPurchaseOrderLiquidatedMessage() {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
                 "PurchaseOrder.liquidateMessage", getInstance().getOrderNumber());
+    }
+
+    private void addPurchaseOrderCalculatedCashPaymenthMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "PurchaseOrder.calculatedCashPaymentMessage");
     }
 
     private void addPurchaseOrderWithCheckLiquidatedMessage(List<PurchaseOrder> purchaseOrdersWithCheck) {
