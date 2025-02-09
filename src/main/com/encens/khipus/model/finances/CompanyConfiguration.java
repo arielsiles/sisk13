@@ -721,6 +721,13 @@ public class CompanyConfiguration {
     })
     private CashAccount profitCashAccount;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "oc_pagodefault", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount defaultAccountPurchaseOrder;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", unique = true, nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -1851,5 +1858,13 @@ public class CompanyConfiguration {
 
     public void setProfitCashAccount(CashAccount profitCashAccount) {
         this.profitCashAccount = profitCashAccount;
+    }
+
+    public CashAccount getDefaultAccountPurchaseOrder() {
+        return defaultAccountPurchaseOrder;
+    }
+
+    public void setDefaultAccountPurchaseOrder(CashAccount defaultAccountPurchaseOrder) {
+        this.defaultAccountPurchaseOrder = defaultAccountPurchaseOrder;
     }
 }

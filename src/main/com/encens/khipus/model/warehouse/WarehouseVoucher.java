@@ -15,6 +15,7 @@ import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.Length;
+import org.jboss.seam.security.Identity;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -262,6 +263,36 @@ public class WarehouseVoucher implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iddestino", nullable = true)
     private Destination destination;
+
+    @Column(name = "created_at", updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column(name = "created_by", updatable = false)
+    private String createdBy;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = new Date();
+        this.createdBy = getCurrentUser();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Date();
+        this.updatedBy = getCurrentUser();
+    }
+
+    private String getCurrentUser() {
+        return Identity.instance().isLoggedIn() ? Identity.instance().getPrincipal().getName() : "unknown";
+    }
 
     public WarehouseVoucherPK getId() {
         return id;
@@ -734,5 +765,37 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setLowFlag(Boolean lowFlag) {
         this.lowFlag = lowFlag;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

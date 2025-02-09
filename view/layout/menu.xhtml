@@ -786,9 +786,17 @@
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('PRODUCTION_LINE','VIEW')}">
+                    <s:link view="/xproduction/productionLineList.xhtml"
+                            value="#{messages['menu.xproduction.configuration.productionLines']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
                                rendered="#{s:hasPermission('XPROCESS_PRODUCTION','VIEW')}">
-                    <s:link view="/xproduction/processRegistrationList.xhtml"
-                            value="#{messages['menu.xproduction.configuration.processRegistration']}"
+                    <s:link view="/xproduction/productionProcessList.xhtml"
+                            value="#{messages['menu.xproduction.configuration.productionProcess']}"
                             propagation="none"/>
                 </rich:menuItem>
 

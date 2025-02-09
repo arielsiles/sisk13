@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{productionLineAction.managed}">
+                #{messages['ProductionLine.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductionLine.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="selectedTab" value="xproduction"/>
+    <ui:define name="body">
+        <h:form id="ProductionLineForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{productionLineAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 rendered="#{!productionLineAction.managed and s:hasPermission('PRODUCTION_LINE','CREATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{productionLineAction.update}"
+                                 value="#{messages['Common.saveChange']}"
+                                 rendered="#{productionLineAction.managed and s:hasPermission('PRODUCTION_LINE','UPDATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="deleteButtonId"
+                                 action="#{productionLineAction.delete}"
+                                 value="#{messages['Common.delete']}"
+                                 rendered="#{productionLineAction.managed and s:hasPermission('PRODUCTION_LINE','DELETE')}"
+                                 styleClass="button">
+                </h:commandButton>
+
+                <h:commandButton action="#{productionLineAction.cancel}"
+                                 styleClass="button"
+                                 value="#{messages['Common.cancel']}"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{productionLineAction.managed}">
+                            #{messages['ProductionLine.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ProductionLine.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionLine.code']}</ui:define>
+                    <h:inputText id="code" value="#{productionLine.code}" styleClass="inputTiny" required="true"
+                                 maxlength="100" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionLine.code']}</ui:define>
+                    <h:inputText id="name" value="#{productionLine.name}" styleClass="input250" required="true"
+                                 maxlength="255" tabindex="1"/>
+                </s:decorate>
+
+
+            </rich:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

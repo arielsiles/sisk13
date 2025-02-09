@@ -725,7 +725,7 @@
         </navigation>
     </page>
 
-    <page view-id="/xproduction/processRegistrationList.xhtml">
+    <page view-id="/xproduction/productionProcessList.xhtml">
         <end-conversation/>
         <navigation from-action="#{xprocessAction.select(processRegistrationItem)}">
             <rule if-outcome="Success">
@@ -734,7 +734,7 @@
         </navigation>
     </page>
 
-    <page view-id="/xproduction/processRegistration.xhtml" no-conversation-view-id="/xproduction/processRegistrationList.xhtml">
+    <page view-id="/xproduction/processRegistration.xhtml" no-conversation-view-id="/xproduction/productionProcessList.xhtml">
         <navigation from-action="#{xprocessAction.create}">
             <rule if-outcome="Success">
                 <begin-conversation flush-mode="MANUAL"/>
@@ -752,22 +752,22 @@
         <navigation from-action="#{xprocessAction.delete}">
             <rule if-outcome="Success">
                 <end-conversation/>
-                <redirect view-id="/xproduction/processRegistrationList.xhtml"/>
+                <redirect view-id="/xproduction/productionProcessList.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{xprocessAction.approve}">
             <rule if-outcome="Success">
-                <redirect view-id="/xproduction/processRegistrationList.xhtml"/>
+                <redirect view-id="/xproduction/productionProcessList.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{xprocessAction.annul}">
             <rule if-outcome="Success">
-                <redirect view-id="/xproduction/processRegistrationList.xhtml"/>
+                <redirect view-id="/xproduction/productionProcessList.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{xprocessAction.cancel}">
             <rule>
-                <redirect view-id="/xproduction/processRegistrationList.xhtml"/>
+                <redirect view-id="/xproduction/productionProcessList.xhtml"/>
             </rule>
         </navigation>
 
@@ -848,4 +848,28 @@
         </navigation>
     </page>
 
+    <page view-id="/xproduction/productionLineList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{productionLineAction.select(productionLineItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionLine.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+<page view-id="/xproduction/productionLine.xhtml" no-conversation-view-id="/xproduction/productionLineList.xhtml">
+    <navigation from-action="#{productionLineAction.create}">
+        <rule if-outcome="Success">
+            <redirect view-id="/xproduction/productionLineList.xhtml"/>
+        </rule>
+        <rule if-outcome="Fail">
+            <redirect view-id="/xproduction/productionLine.xhtml"/>
+        </rule>
+    </navigation>
+    <navigation>
+        <rule>
+            <redirect view-id="/xproduction/productionLineList.xhtml"/>
+        </rule>
+    </navigation>
+</page>
 </pages>

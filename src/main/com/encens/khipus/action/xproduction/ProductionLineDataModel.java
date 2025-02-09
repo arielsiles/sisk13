@@ -1,7 +1,7 @@
 package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.xproduction.XProcess;
+import com.encens.khipus.model.xproduction.ProductionLine;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -10,34 +10,26 @@ import org.jboss.seam.annotations.Scope;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Data model for Customer category
- *
- * @author:
- */
-
-@Name("processRegistrationDataModel")
+@Name("productionLineDataModel")
 @Scope(ScopeType.PAGE)
-//@Restrict("#{s:hasPermission('CUSTOMERCATEGORY','VIEW')}")
-public class ProcessRegistrationDataModel extends QueryDataModel<Long, XProcess> {
+public class ProductionLineDataModel extends QueryDataModel<Long, ProductionLine> {
 
     private static final String[] RESTRICTIONS =
-            {"lower(xprocess.name) like concat('%', concat(lower(#{processRegistrationDataModel.criteria.name}), '%'))"};
+            {"lower(productionLine.name) like concat('%', concat(lower(#{productionLineDataModel.criteria.name}), '%'))"};
 
     @Create
     public void init() {
-        sortProperty = "xprocess.id";
+        sortProperty = "productionLine.id";
         sortAsc = false;
     }
 
     @Override
     public String getEjbql() {
-        return "select xprocess from XProcess xprocess";
+        return "select productionLine from ProductionLine productionLine";
     }
 
     @Override
     public List<String> getRestrictions() {
         return Arrays.asList(RESTRICTIONS);
     }
-
 }

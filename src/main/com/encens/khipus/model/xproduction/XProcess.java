@@ -31,6 +31,9 @@ public class XProcess implements BaseModel {
     @Column(name = "codigo", nullable = false, length = 20)
     private String code;
 
+    @Column(name = "posicion")
+    private Integer position;
+
     @Column(name = "nombre", nullable = false, length = 255)
     private String name;
 
@@ -40,6 +43,10 @@ public class XProcess implements BaseModel {
     @Column(name = "estado")
     @Enumerated(EnumType.STRING)
     private XProcessState state = XProcessState.PEN;
+
+    @ManyToOne( fetch = FetchType.LAZY)
+    @JoinColumn(name = "idlinea", nullable = false, updatable = true, insertable = true)
+    private ProductionLine productionLine;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -105,5 +112,21 @@ public class XProcess implements BaseModel {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public ProductionLine getProductionLine() {
+        return productionLine;
+    }
+
+    public void setProductionLine(ProductionLine productionLine) {
+        this.productionLine = productionLine;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }

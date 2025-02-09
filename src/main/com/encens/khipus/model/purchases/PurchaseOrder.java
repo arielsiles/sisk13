@@ -607,13 +607,11 @@ public class PurchaseOrder implements BaseModel {
     }
 
     public Boolean getDefaultAccount() {
-        System.out.println("----------> getDefaultAccount: " + defaultAccount);
         return defaultAccount;
     }
 
     public void setDefaultAccount(Boolean defaultAccount) {
         this.defaultAccount = defaultAccount;
-        System.out.println("----------> setDefaultAccount: " + defaultAccount);
     }
 
     public String getProviderCodeAux() {

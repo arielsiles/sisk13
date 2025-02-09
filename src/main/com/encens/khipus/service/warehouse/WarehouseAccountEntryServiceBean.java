@@ -586,7 +586,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
                         executorUnitCode,
                         costCenterCode,
-                        companyConfiguration.getGeneralCashAccountNational(),
+                        companyConfiguration.getDefaultAccountPurchaseOrder(),
                         totalCreditAmount,
                         purchaseOrder.getProvider().getPayableAccount().getCurrency(),
                         financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
