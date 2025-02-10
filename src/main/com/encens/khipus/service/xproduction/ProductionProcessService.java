@@ -2,8 +2,8 @@ package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.finances.PresetAccountingTemplate;
+import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.model.xproduction.XMachineProcess;
-import com.encens.khipus.model.xproduction.XProcess;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -18,9 +18,9 @@ import java.util.Map;
  */
 
 @Local
-public interface XProcessService extends GenericService {
+public interface ProductionProcessService extends GenericService {
 
-    List<XMachineProcess> getXMachineProcess(XProcess xProcess);
+    List<XMachineProcess> getXMachineProcess(ProductionProcess productionProcess);
     Map<String, BigDecimal> getTypePresetAccountingTemplateMap(PresetAccountingTemplate presetAccountingTemplate);
     Map<String, BigDecimal> getTypePresetAccountingTemplates();
     void updateXMachineProcesses(List<XMachineProcess> xMachineProcess);

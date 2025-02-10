@@ -168,10 +168,9 @@
                              tabindex="9"/>
             </s:decorate>
             <s:decorate template="/include/viewField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['WarehouseVoucher.date']}</ui:define>
+                <ui:define name="label">#{messages['WarehouseVoucher.period']}</ui:define>
                 <h:panelGrid columns="4" width="100%"
                              columnClasses="top,top,top,top">
-                    <h:outputText value="#{messages['Common.dateFrom']}"/>
                     <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
                         <rich:calendar id="startDate"
                                        value="#{warehouseVoucherDataModel.startDate}"
@@ -184,7 +183,6 @@
                                                type="date"/>
                         </rich:calendar>
                     </s:decorate>
-                    <h:outputText value="#{messages['Common.dateTo']}"/>
                     <s:decorate template="/include/validateField.xhtml" styleClass="formRow">
                         <rich:calendar id="endDate"
                                        value="#{warehouseVoucherDataModel.endDate}"

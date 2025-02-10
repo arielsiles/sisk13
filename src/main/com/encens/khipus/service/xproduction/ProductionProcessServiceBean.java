@@ -2,12 +2,10 @@ package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.ReferentialIntegrityException;
-import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.finances.PresetAccountingTemplate;
-import com.encens.khipus.model.finances.TypePresetAccountingTemplate;
+import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.model.xproduction.XMachineProcess;
-import com.encens.khipus.model.xproduction.XProcess;
 import com.encens.khipus.service.customers.CustomerCategoryService;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -20,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 @Stateless
-@Name("xProcessService")
+@Name("productionProcessService")
 @AutoCreate
-public class XProcessServiceBean extends GenericServiceBean implements XProcessService {
+public class ProductionProcessServiceBean extends GenericServiceBean implements ProductionProcessService {
 
     @In(value = "#{entityManager}")
     private EntityManager em;
@@ -31,11 +29,11 @@ public class XProcessServiceBean extends GenericServiceBean implements XProcessS
     private CustomerCategoryService customerCategoryService;
 
     @Override
-    public List<XMachineProcess> getXMachineProcess(XProcess xProcess) {
+    public List<XMachineProcess> getXMachineProcess(ProductionProcess productionProcess) {
 
         List<XMachineProcess> resultList = em.createQuery("select p from XMachineProcess p " +
-                " where p.xProcess =:xProcess")
-                .setParameter("xProcess", xProcess)
+                " where p.productionProcess =:productionProcess")
+                .setParameter("productionProcess", productionProcess)
                 .getResultList();
 
         return resultList;

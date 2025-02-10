@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@TableGenerator(schema = Constants.KHIPUS_SCHEMA,name = "XProcess.tableGenerator",
+@TableGenerator(schema = Constants.KHIPUS_SCHEMA,name = "ProductionProcess.tableGenerator",
         table = Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
@@ -21,10 +21,10 @@ import java.util.List;
 @Filter(name = Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
 @Table(schema = Constants.KHIPUS_SCHEMA, name = "xpr_proceso",uniqueConstraints = @UniqueConstraint(columnNames = {"idproceso"}))
-public class XProcess implements BaseModel {
+public class ProductionProcess implements BaseModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "XProcess.tableGenerator")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionProcess.tableGenerator")
     @Column(name = "idproceso", nullable = false)
     private Long id;
 
@@ -37,7 +37,7 @@ public class XProcess implements BaseModel {
     @Column(name = "nombre", nullable = false, length = 255)
     private String name;
 
-    @OneToMany(mappedBy = "xProcess", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "productionProcess", fetch = FetchType.LAZY)
     private List<XMachineProcess> xmachineProcessList = new ArrayList<XMachineProcess>(0);
 
     @Column(name = "estado")
@@ -129,4 +129,9 @@ public class XProcess implements BaseModel {
     public void setPosition(Integer position) {
         this.position = position;
     }
+
+    public String getFullName() {
+        return code + " - " + name;
+    }
+
 }

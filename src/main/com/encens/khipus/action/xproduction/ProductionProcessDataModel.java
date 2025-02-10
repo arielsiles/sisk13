@@ -2,7 +2,7 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.xproduction.ProductionLine;
-import com.encens.khipus.model.xproduction.XProcess;
+import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.service.xproduction.ProductionLineService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Name("productionProcessDataModel")
 @Scope(ScopeType.PAGE)
-public class ProductionProcessDataModel extends QueryDataModel<Long, XProcess> {
+public class ProductionProcessDataModel extends QueryDataModel<Long, ProductionProcess> {
 
     @In
     private ProductionLineService productionLineService;
@@ -40,7 +40,7 @@ public class ProductionProcessDataModel extends QueryDataModel<Long, XProcess> {
 
     @Override
     public String getEjbql() {
-        return "select process from XProcess process";
+        return "select process from ProductionProcess process";
     }
 
     @Override

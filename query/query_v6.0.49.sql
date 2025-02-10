@@ -1,6 +1,6 @@
 -- 06.02.2025
 alter table `configuracion` add column oc_pagodefault varchar(20);
-update configuracion set `oc_pagodefault` = '1120050100';
+update configuracion set `oc_pagodefault` = '1120050100'; -- Terdemol
 
 alter table inv_vales add column created_at datetime;
 alter table inv_vales add column created_by varchar(100);
@@ -22,6 +22,6 @@ alter table `xpr_proceso` add column posicion int(10) after codigo;
 
 -- 
 INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
-VALUES(306, 'PRODUCTION_LINE', 11, 15, 'Functionality.xproduction.productionLines', 1);
+VALUES(308, 'PRODUCTION_LINE', 11, 15, 'Functionality.xproduction.productionLines', 1);
 
 alter table xpr_linea add column codigo varchar(100) after idlinea;

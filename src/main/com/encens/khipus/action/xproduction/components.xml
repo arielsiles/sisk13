@@ -124,6 +124,13 @@
     <framework:entity-query name="productionLineQuery"
                             ejbql="select o from ProductionLine o order by o.name ASC"/>
 
+    <factory name="productionProcessList" value="#{productionProcessQuery}"/>
+    <framework:entity-query name="productionProcessQuery" ejbql="select p from ProductionProcess p">
+        <framework:restrictions>
+            <value>p.productionLine = #{warehouseVoucherCreateAction.productionLine}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
     <!--Enumerations-->
 
     <factory name="xrawMaterialPaymentTypeEnum"

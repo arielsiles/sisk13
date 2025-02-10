@@ -33,7 +33,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XProductionTank productionTank;
     private XFormulation formulation;
     private XProductionPlan productionPlan;
-    private XProcess process;
+    private ProductionProcess process;
 
     private List<XSupply> ingredientSupplyList = new ArrayList<XSupply>();
     private List<XSupply> materialSupplyList = new ArrayList<XSupply>();
@@ -656,11 +656,11 @@ public class XProductionAction extends GenericAction<XProduction> {
         this.supplyAssign = supplyAssign;
     }
 
-    public XProcess getProcess() {
+    public ProductionProcess getProcess() {
         return process;
     }
 
-    public void setProcess(XProcess process) {
+    public void setProcess(ProductionProcess process) {
         this.process = process;
     }
 

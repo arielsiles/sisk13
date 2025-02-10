@@ -76,7 +76,7 @@ public class XProduction implements BaseModel {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproceso", nullable = true, updatable = false, insertable = true)
-    private XProcess process;
+    private ProductionProcess process;
 
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
     private List<XSupply> supplyList = new ArrayList<XSupply>(0);
@@ -211,11 +211,11 @@ public class XProduction implements BaseModel {
         this.voucher = voucher;
     }
 
-    public XProcess getProcess() {
+    public ProductionProcess getProcess() {
         return process;
     }
 
-    public void setProcess(XProcess process) {
+    public void setProcess(ProductionProcess process) {
         this.process = process;
     }
 

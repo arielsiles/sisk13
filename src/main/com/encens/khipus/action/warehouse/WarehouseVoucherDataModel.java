@@ -8,9 +8,12 @@ import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
 import com.encens.khipus.model.warehouse.WarehouseVoucherPK;
+import com.encens.khipus.service.warehouse.MonthProcessService;
+import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.ListEntityManagerName;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.security.Restrict;
@@ -37,6 +40,9 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
     private Warehouse warehouse;
     private Date startDate = new Date();
     private Date endDate = new Date();;
+
+    @In
+    private MonthProcessService monthProcessService;
 
     private static final String[] RESTRICTIONS = {
             "lower(warehouseVoucher.number) like concat(lower(#{warehouseVoucherDataModel.criteria.number}), '%')",
@@ -66,6 +72,12 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
         //sortProperty = "warehouseVoucher.date";
         sortProperty = "warehouseVoucher.creationDate";
         setSortAsc(false);
+
+        Date mothProcessDate = monthProcessService.getMothProcessDate(new Date());
+
+        setStartDate(DateUtils.getFirstDayOfMonth(mothProcessDate));
+        setEndDate(DateUtils.getLastDayOfMonth(mothProcessDate));
+
     }
 
     @Override

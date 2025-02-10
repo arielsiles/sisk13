@@ -9,7 +9,7 @@
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">
         <c:choose>
-            <c:when test="#{xprocessAction.managed}">
+            <c:when test="#{productionProcessAction.managed}">
                 #{messages['XProcess.edit']}
             </c:when>
             <c:otherwise>
@@ -23,44 +23,44 @@
         <h:form id="processForm">
             <div class="buttons">
                 <h:commandButton id="createButtonId"
-                                 action="#{xprocessAction.create}"
+                                 action="#{productionProcessAction.create}"
                                  value="#{messages['Common.save']}"
-                                 rendered="#{!xprocessAction.managed and s:hasPermission('XPROCESS_PRODUCTION','CREATE')}"
+                                 rendered="#{!productionProcessAction.managed and s:hasPermission('XPROCESS_PRODUCTION','CREATE')}"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton id="updateButtonId"
-                                 action="#{xprocessAction.update}"
+                                 action="#{productionProcessAction.update}"
                                  value="#{messages['Common.saveChange']}"
-                                 rendered="#{xprocessAction.managed and xprocessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
+                                 rendered="#{productionProcessAction.managed and productionProcessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
                                  styleClass="button">
                     <s:defaultAction/>
                 </h:commandButton>
 
                 <h:commandButton id="approveButtonId"
-                                 action="#{xprocessAction.approve}"
+                                 action="#{productionProcessAction.approve}"
                                  value="#{messages['Common.approve']}"
-                                 rendered="#{xprocessAction.managed and xprocessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
+                                 rendered="#{productionProcessAction.managed and productionProcessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
                                  styleClass="button">
                 </h:commandButton>
 
                 <h:commandButton id="annulButtonId"
-                                 action="#{xprocessAction.annul}"
+                                 action="#{productionProcessAction.annul}"
                                  value="#{messages['Common.annul']}"
-                                 rendered="#{xprocessAction.managed and xprocessAction.approved and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
+                                 rendered="#{productionProcessAction.managed and productionProcessAction.approved and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
                                  styleClass="button">
                 </h:commandButton>
 
                 <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{xprocessAction.managed and xprocessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','DELETE')}">
+                                 rendered="#{productionProcessAction.managed and productionProcessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','DELETE')}">
                     <rich:componentControl for="deleteConfirmation"
                                            event="onclick"
                                            disableDefault="true"
                                            operation="show"/>
                 </h:commandButton>
-                <h:commandButton action="#{xprocessAction.cancel}"
+                <h:commandButton action="#{productionProcessAction.cancel}"
                                  styleClass="button"
                                  value="#{messages['Common.cancel']}"
                                  immediate="true"/>
@@ -69,7 +69,7 @@
             <rich:panel id="formPanel">
                 <f:facet name="header">
                     <c:choose>
-                        <c:when test="#{xprocessAction.managed}">
+                        <c:when test="#{productionProcessAction.managed}">
                             #{messages['XProcess.edit']}
                         </c:when>
                         <c:otherwise>
@@ -79,26 +79,26 @@
                 </f:facet>
 
                 <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['XProcessState.state']}</ui:define>
-                    <h:outputText value="#{messages[xProcess.state.resourceKey]}"/>
+                    <ui:define name="label">#{messages['ProductionProcess.state']}</ui:define>
+                    <h:outputText value="#{messages[productionProcess.state.resourceKey]}"/>
                 </s:decorate>
 
                 <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['XProcessState.code']}</ui:define>
-                    <h:inputText id="code" value="#{xProcess.code}" styleClass="inputTiny" required="true"
+                    <ui:define name="label">#{messages['ProductionProcess.code']}</ui:define>
+                    <h:inputText id="code" value="#{productionProcess.code}" styleClass="inputTiny" required="true"
                                  maxlength="150" tabindex="1"/>
                 </s:decorate>
 
                 <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['XProcessState.name']}</ui:define>
-                    <h:inputText id="name" value="#{xProcess.name}" styleClass="input250" required="true"
+                    <ui:define name="label">#{messages['ProductionProcess.name']}</ui:define>
+                    <h:inputText id="name" value="#{productionProcess.name}" styleClass="input250" required="true"
                                  maxlength="150" tabindex="2"/>
                 </s:decorate>
 
                 <s:decorate id="productionLineField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionProcess.productionLine']}</ui:define>
                     <h:selectOneMenu id="productionLine"
-                                     value="#{xProcess.productionLine}"
+                                     value="#{productionProcess.productionLine}"
                                      styleClass="input"
                                      required="true"
                                      tabindex="4">
@@ -111,8 +111,8 @@
                 </s:decorate>
 
                 <s:decorate id="positionField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['XProcess.position']}</ui:define>
-                    <h:inputText id="position" value="#{xProcess.position}"
+                    <ui:define name="label">#{messages['ProductionProcess.position']}</ui:define>
+                    <h:inputText id="position" value="#{productionProcess.position}"
                                  styleClass="inputTiny"
                                  required="true"
                                  tabindex="5">
@@ -130,7 +130,7 @@
                                        value="#{messages['production.proccessRegister.addMachine']}"
                                        styleClass="button"
                                        immediate="true"
-                                       rendered="#{xprocessAction.managed and xprocessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
+                                       rendered="#{productionProcessAction.managed and productionProcessAction.pending and s:hasPermission('XPROCESS_PRODUCTION','UPDATE')}"
                                        oncomplete="Richfaces.showModalPanel('machineListModalPanel');"
                                        actionListener="#{selectPopUpAction.select}"
                                        reRender="machineListModalPanel">
@@ -147,7 +147,7 @@
                     </tr>
                     </thead>
 
-                    <c:forEach var="instance" items="#{xprocessAction.xMachineProcesses}" varStatus="row">
+                    <c:forEach var="instance" items="#{productionProcessAction.xMachineProcesses}" varStatus="row">
                         <c:set var="amountFieldId" value="amountField_#{row.index}"/>
                         <c:set var="amountInputTextId" value="amountInputText_#{row.index}"/>
 
@@ -161,8 +161,8 @@
 
                             <td class="rich-table-cell center">
                                 <a4j:commandLink title="#{messages['Common.remove']}"
-                                                 action="#{xprocessAction.removeXMachine(instance)}"
-                                                 rendered="#{xprocessAction.managed and xprocessAction.pending}"
+                                                 action="#{productionProcessAction.removeXMachine(instance)}"
+                                                 rendered="#{productionProcessAction.managed and productionProcessAction.pending}"
                                                  ajaxSingle="true"
                                                  immediate="true"
                                                  reRender="machineListPanel">
@@ -177,21 +177,21 @@
         </h:form>
 
         <s:decorate template="/include/modalDialog.xhtml"
-                    rendered="#{xprocessAction.managed }">
+                    rendered="#{productionProcessAction.managed }">
             <ui:param name="dialogId" value="deleteConfirmation"/>
             <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
             <ui:define name="dialogContent">
                 <p>
                     <h:outputFormat value="¿Esta seguro de eliminar el proceso?">
-                        <f:param value="#{xProcess.name}"/>
+                        <f:param value="#{productionProcess.name}"/>
                     </h:outputFormat>
                 </p>
             </ui:define>
             <ui:define name="dialogOption">
-                <a4j:commandButton action="#{xprocessAction.delete}"
+                <a4j:commandButton action="#{productionProcessAction.delete}"
                                    value="#{messages['Common.delete']}"
                                    immediate="true"
-                                   rendered="#{xprocessAction.managed}"
+                                   rendered="#{productionProcessAction.managed}"
                                    styleClass="button"/>
             </ui:define>
         </s:decorate>
@@ -204,7 +204,7 @@
             <ui:param name="dialogId" value="machineListModalPanel"/>
             <ui:define name="assignButton">
                 <a4j:commandButton id="assignButton"
-                                   action="#{xprocessAction.setMachine(machineItem)}"
+                                   action="#{productionProcessAction.setMachine(machineItem)}"
                                    image="/img/active.gif"
                                    styleClass="select-image-middle"
                                    reRender="machineListPanel"

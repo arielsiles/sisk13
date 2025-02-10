@@ -68,7 +68,7 @@
                           rendered="#{s:hasPermission('XPROCESS_PRODUCTION','CREATE')}"/>
             </div>
 
-            <rich:dataTable value="#{productionProcessDataModel}" var="processRegistrationItem"
+            <rich:dataTable value="#{productionProcessDataModel}" var="productionProcessItem"
                             id="processRegistrationList" rows="#{sessionUser.rowsPerPage}"
                             width="100%" columnsWidth="5%, 10%, 50%, 15%, 10%, 10%">
                 <f:facet name="header">
@@ -84,24 +84,24 @@
                     </rich:columnGroup>
                 </f:facet>
                 <rich:column styleClass="center">
-                    <h:outputText value="#{processRegistrationItem.position}"/>
+                    <h:outputText value="#{productionProcessItem.position}"/>
                 </rich:column>
                 <rich:column styleClass="center">
-                    <h:outputText value="#{processRegistrationItem.code}"/>
+                    <h:outputText value="#{productionProcessItem.code}"/>
                 </rich:column>
                 <rich:column>
-                    <h:outputText value="#{processRegistrationItem.name}"/>
+                    <h:outputText value="#{productionProcessItem.name}"/>
                 </rich:column>
                 <rich:column  styleClass="center">
-                    <h:outputText value="#{processRegistrationItem.productionLine.code}"/>
+                    <h:outputText value="#{productionProcessItem.productionLine.code}"/>
                 </rich:column>
                 <rich:column styleClass="center">
-                    <h:outputText value="#{messages[processRegistrationItem.state.resourceKey]}" />
+                    <h:outputText value="#{messages[productionProcessItem.state.resourceKey]}" />
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"
                                    immediate="true"
-                                   action="#{xprocessAction.select(processRegistrationItem)}"
+                                   action="#{productionProcessAction.select(productionProcessItem)}"
                                    rendered="true">
                         <s:conversationPropagation value="none"/>
                     </h:commandLink>

@@ -727,45 +727,45 @@
 
     <page view-id="/xproduction/productionProcessList.xhtml">
         <end-conversation/>
-        <navigation from-action="#{xprocessAction.select(processRegistrationItem)}">
+        <navigation from-action="#{productionProcessAction.select(productionProcessItem)}">
             <rule if-outcome="Success">
-                <redirect view-id="/xproduction/processRegistration.xhtml"/>
+                <redirect view-id="/xproduction/productionProcess.xhtml"/>
             </rule>
         </navigation>
     </page>
 
-    <page view-id="/xproduction/processRegistration.xhtml" no-conversation-view-id="/xproduction/productionProcessList.xhtml">
-        <navigation from-action="#{xprocessAction.create}">
+    <page view-id="/xproduction/productionProcess.xhtml" no-conversation-view-id="/xproduction/productionProcessList.xhtml">
+        <navigation from-action="#{productionProcessAction.create}">
             <rule if-outcome="Success">
                 <begin-conversation flush-mode="MANUAL"/>
-                <redirect view-id="/xproduction/processRegistration.xhtml"/>
+                <redirect view-id="/xproduction/productionProcess.xhtml"/>
             </rule>
             <rule if-outcome="Fail">
-                <redirect view-id="/xproduction/processRegistration.xhtml"/>
+                <redirect view-id="/xproduction/productionProcess.xhtml"/>
             </rule>
         </navigation>
-        <navigation from-action="#{xprocessAction.update}">
+        <navigation from-action="#{productionProcessAction.update}">
             <rule if-outcome="Success">
-                <redirect view-id="/xproduction/processRegistration.xhtml"/>
+                <redirect view-id="/xproduction/productionProcess.xhtml"/>
             </rule>
         </navigation>
-        <navigation from-action="#{xprocessAction.delete}">
+        <navigation from-action="#{productionProcessAction.delete}">
             <rule if-outcome="Success">
                 <end-conversation/>
                 <redirect view-id="/xproduction/productionProcessList.xhtml"/>
             </rule>
         </navigation>
-        <navigation from-action="#{xprocessAction.approve}">
+        <navigation from-action="#{productionProcessAction.approve}">
             <rule if-outcome="Success">
                 <redirect view-id="/xproduction/productionProcessList.xhtml"/>
             </rule>
         </navigation>
-        <navigation from-action="#{xprocessAction.annul}">
+        <navigation from-action="#{productionProcessAction.annul}">
             <rule if-outcome="Success">
                 <redirect view-id="/xproduction/productionProcessList.xhtml"/>
             </rule>
         </navigation>
-        <navigation from-action="#{xprocessAction.cancel}">
+        <navigation from-action="#{productionProcessAction.cancel}">
             <rule>
                 <redirect view-id="/xproduction/productionProcessList.xhtml"/>
             </rule>

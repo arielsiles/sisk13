@@ -12,6 +12,8 @@ import com.encens.khipus.model.finances.ExpenseType;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.finances.MeasureUnitPk;
 import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.model.xproduction.ProductionLine;
+import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
 import com.encens.khipus.service.warehouse.MonthProcessService;
 import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
@@ -62,6 +64,9 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
     private ProductItem productItemTo;
     private BigDecimal quantity;
     private String description;
+
+    private ProductionLine productionLine;
+    private ProductionProcess productionProcess;
 
     @Factory(value = "expenseTypeList", scope = ScopeType.STATELESS)
     public ExpenseType[] getExpenseType() {
@@ -578,5 +583,21 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
 
     public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
+    }
+
+    public ProductionLine getProductionLine() {
+        return productionLine;
+    }
+
+    public void setProductionLine(ProductionLine productionLine) {
+        this.productionLine = productionLine;
+    }
+
+    public ProductionProcess getProductionProcess() {
+        return productionProcess;
+    }
+
+    public void setProductionProcess(ProductionProcess productionProcess) {
+        this.productionProcess = productionProcess;
     }
 }

@@ -5,11 +5,11 @@ import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.model.xproduction.XMachine;
 import com.encens.khipus.model.xproduction.XMachineProcess;
-import com.encens.khipus.model.xproduction.XProcess;
 import com.encens.khipus.model.xproduction.XProcessState;
-import com.encens.khipus.service.xproduction.XProcessService;
+import com.encens.khipus.service.xproduction.ProductionProcessService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
@@ -22,29 +22,27 @@ import java.util.List;
  * @author:
  */
 
-@Name("xprocessAction")
+@Name("productionProcessAction")
 @Scope(ScopeType.CONVERSATION)
-public class ProcessRegistrationAction extends GenericAction<XProcess> {
+public class ProductionProcessAction extends GenericAction<ProductionProcess> {
 
     private List<XMachineProcess> xMachineProcesses = new ArrayList<XMachineProcess>();
     private List<XMachine> selectedMachines = new ArrayList<XMachine>();
     private List<Long> selectedMachineIds = new ArrayList<Long>();
 
     @In
-    private XProcessService xProcessService;
+    private ProductionProcessService productionProcessService;
 
-    @Factory(value ="xProcess", scope = ScopeType.STATELESS)
-    //@Restrict("#{s:hasPermission('CUSTOMERCATEGORY','VIEW')}")
-    public XProcess initXProcess() {
-        //typePresetAccountingTemplates = typePresetAccountingTemplateService.getTypePresetAccountingTemplates(getInstance());
+    @Factory(value = "productionProcess", scope = ScopeType.STATELESS)
+    public ProductionProcess initProductionProcess() {
         return getInstance();
     }
 
     @Override
     @Begin(flushMode = FlushModeType.MANUAL)
-    public String select(XProcess instance) {
+    public String select(ProductionProcess instance) {
         String outCome = super.select(instance);
-        setxMachineProcesses(xProcessService.getXMachineProcess(getInstance()));
+        setxMachineProcesses(productionProcessService.getXMachineProcess(getInstance()));
 
         loadMachine(getxMachineProcesses());
 
@@ -71,7 +69,7 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
 
         Long currentVersion = (Long) getVersion(getInstance());
         try {
-            xProcessService.updateXMachineProcesses(xMachineProcesses);
+            productionProcessService.updateXMachineProcesses(xMachineProcesses);
             getService().update(getInstance());
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
@@ -114,7 +112,7 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
 
             XMachineProcess item = new XMachineProcess();
             item.setXmachine(xMachine);
-            item.setxProcess(getInstance());
+            item.setProductionProcess(getInstance());
             getxMachineProcesses().add(item);
         }
     }
@@ -123,7 +121,7 @@ public class ProcessRegistrationAction extends GenericAction<XProcess> {
         selectedMachines.remove(instance.getXmachine());
         selectedMachineIds.remove(instance.getXmachine().getId());
         xMachineProcesses.remove(instance);
-        xProcessService.deleteXMachineProcess(instance);
+        productionProcessService.deleteXMachineProcess(instance);
     }
 
     @Override

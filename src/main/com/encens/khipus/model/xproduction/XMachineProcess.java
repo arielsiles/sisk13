@@ -3,8 +3,6 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
-import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.PresetAccountingTemplate;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
@@ -39,7 +37,7 @@ public class XMachineProcess implements BaseModel {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idproceso", nullable = false, updatable = false, insertable = true)
-    private XProcess xProcess;
+    private ProductionProcess productionProcess;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idmaquina", nullable = false, updatable = false, insertable = true)
@@ -63,12 +61,12 @@ public class XMachineProcess implements BaseModel {
         this.id = id;
     }
 
-    public XProcess getxProcess() {
-        return xProcess;
+    public ProductionProcess getProductionProcess() {
+        return productionProcess;
     }
 
-    public void setxProcess(XProcess xProcess) {
-        this.xProcess = xProcess;
+    public void setProductionProcess(ProductionProcess productionProcess) {
+        this.productionProcess = productionProcess;
     }
 
     public long getVersion() {

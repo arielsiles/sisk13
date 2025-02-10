@@ -454,7 +454,7 @@
         <h:inputTextarea id="description"
                          value="#{warehouseVoucherCreateAction.inventoryMovement.description}"
                          required="true"
-                         styleClass="input textarea"
+                         styleClass="input textarea-medium1"
                          tabindex="10">
             <f:validateLength maximum="250"/>
         </h:inputTextarea>
@@ -489,6 +489,32 @@
         </s:decorate>
     </s:div>
     <!--</c:if>-->
+
+    <!--<s:div id="productionLineDiv">
+        <s:decorate id="productionLineField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductionProcess.productionLine']}</ui:define>
+            <h:selectOneMenu id="productionLine" value="#{warehouseVoucherCreateAction.productionLine}"
+                             styleClass="input"
+                             tabindex="4">
+                <s:selectItems value="#{productionLineList.resultList}" var="productionLine"
+                               label="#{productionLine.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange" reRender="process" ajaxSingle="true"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="processField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ProductionProcess.process']}</ui:define>
+            <h:selectOneMenu id="process" value="#{warehouseVoucherCreateAction.productionProcess}" styleClass="input" required="true"
+                             tabindex="2">
+                <s:selectItems value="#{productionProcessList.resultList}" var="productionProcess" label="#{productionProcess.fullName}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>-->
 
     <s:div id="destination">
         <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
