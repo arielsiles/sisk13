@@ -759,13 +759,13 @@
 
             <s:decorate id="finishedProductField" template="/include/inputField.xhtml" styleClass="formRow"
                         rendered="#{warehouseVoucherUpdateAction.warehouseVoucher.consumption and !warehouseVoucherUpdateAction.warehouseVoucher.lowFlag and
-                            warehouseVoucherUpdateAction.isDestinationProductionOrMaintenance()}">
+                            warehouseVoucherUpdateAction.isDestinationProduction()}">
                 <ui:define name="label">
                     <h:outputText value="#{messages['ProductionProcess.finishedProduct']}" styleClass="label-blue"/>
                 </ui:define>
                 <h:selectOneMenu id="finishedProduct" value="#{warehouseVoucherUpdateAction.warehouseVoucher.productionProduct}"
                                  styleClass="input"
-                                 required="#{warehouseVoucherUpdateAction.isDestinationProduction()}"
+                                 required="true"
                                  disabled="#{warehouseVoucherApproved}"
                                  tabindex="2">
                     <s:selectItems value="#{finishedGoodsList}" var="product" label="#{product.fullName}"
