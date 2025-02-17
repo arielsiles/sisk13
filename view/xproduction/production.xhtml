@@ -155,7 +155,24 @@
                     </h:selectOneMenu>
                 </s:decorate>-->
 
-                <s:decorate id="processField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:decorate id="productionLineField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProduction.productionLine']}</ui:define>
+                    <h:selectOneMenu id="productionLine"
+                                     value="#{xproductionAction.productionLine}"
+                                     styleClass="input250"
+                                     required="true"
+                                     disabled="#{xproductionAction.approved or xproductionAction.managed}"
+                                     tabindex="7">
+                        <s:selectItems value="#{productionLineList}"
+                                       var="productionLine"
+                                       label="#{productionLine.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <!--<s:decorate id="processField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['XProduction.process']}</ui:define>
                     <h:selectOneMenu id="process"
                                      value="#{xproductionAction.process}"
@@ -170,7 +187,7 @@
                                        hideNoSelectionLabel="false"/>
                         <s:convertEntity/>
                     </h:selectOneMenu>
-                </s:decorate>
+                </s:decorate>-->
 
                 <s:decorate id="formulationField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductionPlan.formulation']}</ui:define>

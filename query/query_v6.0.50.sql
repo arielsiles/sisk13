@@ -14,4 +14,10 @@ alter table inv_vales add foreign key (idproceso) references xpr_proceso(idproce
 -- add column cod_prod varchar 6 in inv_vales table after idproceso
 alter table inv_vales add column cod_prod varchar(6) after idproceso;
 
+-- SOLO TERDEMOL
 update inv_almacenes set tipo = 'FINISHED_GOODS' where cod_alm = 3;
+--
+--
+-- Añadir columna idlinea bigint(20) en xpr_produccion despues de idproceso, asi como tambien añadir llave foranea con la tabla xpr_linea
+alter table xpr_produccion add column idlinea bigint(20) after idproceso;
+alter table xpr_produccion add foreign key (idlinea) references xpr_linea(idlinea);

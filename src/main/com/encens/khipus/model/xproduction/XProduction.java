@@ -78,6 +78,10 @@ public class XProduction implements BaseModel {
     @JoinColumn(name = "idproceso", nullable = true, updatable = false, insertable = true)
     private ProductionProcess process;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idlinea", nullable = true, updatable = false, insertable = true)
+    private ProductionLine productionLine;
+
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
     private List<XSupply> supplyList = new ArrayList<XSupply>(0);
 
@@ -255,5 +259,13 @@ public class XProduction implements BaseModel {
 
     public void setInitDate(Date initDate) {
         this.initDate = initDate;
+    }
+
+    public ProductionLine getProductionLine() {
+        return productionLine;
+    }
+
+    public void setProductionLine(ProductionLine productionLine) {
+        this.productionLine = productionLine;
     }
 }

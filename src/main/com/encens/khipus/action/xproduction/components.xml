@@ -93,7 +93,7 @@
     <framework:entity-query name="xproductionTankQuery" ejbql="select p from XProductionTank p"/>
 
     <factory name="xprocessList" value="#{xprocessQuery}"/>
-    <framework:entity-query name="xprocessQuery" ejbql="select x from XProcess x">
+    <framework:entity-query name="xprocessQuery" ejbql="select x from ProductionProcess x">
         <framework:restrictions>
             <value>x.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.production.FormulationState', 'APR')}</value>
         </framework:restrictions>

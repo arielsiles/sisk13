@@ -34,6 +34,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XFormulation formulation;
     private XProductionPlan productionPlan;
     private ProductionProcess process;
+    private ProductionLine productionLine;
 
     private List<XSupply> ingredientSupplyList = new ArrayList<XSupply>();
     private List<XSupply> materialSupplyList = new ArrayList<XSupply>();
@@ -70,6 +71,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         setFormulation(getInstance().getFormulation());
         setProductionTank(getInstance().getProductionTank());
         setProcess(getInstance().getProcess());
+        setProductionPlan(getInstance().getProductionPlan());
         setIngredientSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.INGREDIENT));
         setMaterialSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.MATERIAL));
         setLaborList(xproductionService.getLaborList(getInstance()));
@@ -86,6 +88,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setFormulation(formulation);
         production.setProductionPlan(productionPlan);
         production.setProcess(process);
+        production.setProductionLine(productionLine);
 
         Long seq = sequenceService.createOrUpdateNextSequenceValue(Constants.PRODUCTION_CODE);
         production.setCode(seq.intValue());
@@ -686,6 +689,14 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void enableProductsTab() {
         setActiveTabName("productsTab");
+    }
+
+    public ProductionLine getProductionLine() {
+        return productionLine;
+    }
+
+    public void setProductionLine(ProductionLine productionLine) {
+        this.productionLine = productionLine;
     }
 
     /*public BigDecimal getTotalCost() {
