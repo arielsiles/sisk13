@@ -14,10 +14,7 @@ import com.encens.khipus.model.finances.MeasureUnitPk;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.model.xproduction.ProductionLine;
 import com.encens.khipus.model.xproduction.ProductionProcess;
-import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
-import com.encens.khipus.service.warehouse.MonthProcessService;
-import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
-import com.encens.khipus.service.warehouse.WarehouseCatalogService;
+import com.encens.khipus.service.warehouse.*;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
@@ -60,13 +57,15 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
     @In(value = "cashAccountInventoryDataModel", required = false, create = true)
     private CashAccountInventoryDataModel cashAccountInventoryDataModel;
 
+    @In
+    private WarehouseVoucherService warehouseVoucherService;
+
     private ProductItem productItemFrom;
     private ProductItem productItemTo;
     private BigDecimal quantity;
     private String description;
 
     private ProductionLine productionLine;
-    private ProductionProcess productionProcess;
 
     @Factory(value = "expenseTypeList", scope = ScopeType.STATELESS)
     public ExpenseType[] getExpenseType() {
@@ -76,6 +75,17 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
                 ExpenseType.COM,
                 ExpenseType.LAB
         };
+    }
+
+    @Factory(value = "productionProcessList", scope = ScopeType.STATELESS)
+    public List<ProductionProcess> getProductionProcessList() {
+        return warehouseVoucherService.getProductionProcesses(getProductionLine());
+    }
+
+    // Lista de productos terminados ProductItem de un almacen especifico
+    @Factory(value = "finishedGoodsList", scope = ScopeType.STATELESS)
+    public List<ProductItem> getFinishedGoodsList() {
+        return warehouseVoucherService.getFinishedGoodsList();
     }
 
     @Override
@@ -593,11 +603,25 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         this.productionLine = productionLine;
     }
 
-    public ProductionProcess getProductionProcess() {
-        return productionProcess;
+    public Boolean isDestinationProductionOrMaintenance(){
+        return warehouseVoucher.isDestinarionAreaProduction() || warehouseVoucher.isDestinarionAreaMaintenance();
     }
 
-    public void setProductionProcess(ProductionProcess productionProcess) {
-        this.productionProcess = productionProcess;
+    public boolean isDestinationProduction(){
+        return warehouseVoucher.isDestinarionAreaProduction();
     }
+
+    public void cleanDestinationProductionOrMaintenance(){
+        warehouseVoucher.setDestination(null);
+        setProductionLine(null);
+        warehouseVoucher.setProductionProduct(null);
+
+        warehouseVoucher.setExpenseType(null);
+        warehouseVoucher.setExpenseCashAccount(null);
+    }
+
+    // clearProductionProduct()
+    /*public void clearProductionProduct(){
+        warehouseVoucher.setProductionProduct(null);
+    }*/
 }

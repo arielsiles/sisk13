@@ -26,7 +26,7 @@
 </c:if>
 
 <c:set var="mainComponentIdsToRerender"
-       value="documentTypeField, transferorder, lowCheckField, destination, expenseTypeDiv,  petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
+       value="documentTypeField, transferorder, lowCheckField, productionLineDiv, destinationDiv, expenseTypeDiv, expenseCashAccountDiv, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
 
 <c:set var="elementsToReRenderForPetitionerJobContractChange"
        value="petitionerJobContractPanel, executorUnitLeftSidePanel"/>
@@ -55,7 +55,7 @@
 <f:facet name="header">
     #{messages['WarehouseVoucher.new']}
 </f:facet>
-<app:fieldset id="warehouseVoucherFields" title="#{messages['WarehouseVoucher.title']}">
+<!--<app:fieldset id="warehouseVoucherFields" title="#{messages['WarehouseVoucher.title']}">-->
 <h:panelGrid columns="2"
              width="100%"
              cellpadding="0"
@@ -63,6 +63,20 @@
              border="0"
              columnClasses="width50percent, width50percent">
 <s:div id="leftSidePanel">
+
+    <s:div id="lowCheckField">
+        <s:decorate id="lowCheck" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+            <ui:define name="label">
+                <h:outputText value="#{messages['WarehouseVoucher.isLow']}"/>
+            </ui:define>
+            <h:selectBooleanCheckbox value="#{warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
+                <a4j:support event="onchange" action="#{warehouseVoucherCreateAction.cleanDestinationProductionOrMaintenance()}"
+                             reRender="productionLineDiv, destinationDiv, expenseTypeDiv, expenseCashAccountDiv"
+                             ajaxSingle="true"/>
+            </h:selectBooleanCheckbox>
+        </s:decorate>
+    </s:div>
+
 <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:param name="validateId" value="documentType"/>
     <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
@@ -125,14 +139,14 @@
                              reRender="#{elementsToReRenderForPetitionerJobContractChange}"
                              hotKeySelect="alt+1"/>
         </s:decorate>
-        <s:decorate id="contractPetitionerChargeField" template="/include/inputField.xhtml"
+        <!--<s:decorate id="contractPetitionerChargeField" template="/include/inputField.xhtml"
                     rendered="#{warehouseVoucherCreateAction.enableContractInfo}"
                     styleClass="formRow">
             <ui:define name="label">#{messages['WarehouseVoucher.petitionerCharge']}</ui:define>
             <h:outputText
                     value="#{warehouseVoucherCreateAction.warehouseVoucher.petitionerJobContract.job.charge.name}"
                     styleClass="input"/>
-        </s:decorate>
+        </s:decorate>-->
         <!--<s:decorate id="contractPetitionerOrganizationalUnitField" template="/include/inputField.xhtml"
                     rendered="#{warehouseVoucherCreateAction.enableContractInfo}"
                     styleClass="formRow">
@@ -238,7 +252,7 @@
     <s:decorate id="responsibleField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">
             <h:outputText
-                    value="#{warehouseVoucherCreateAction.transference or warehouseVoucherCreateAction.executorUnitTransference ? messages['WarehouseVoucher.sourceResponsible'] : messages['WarehouseVoucher.responsible']}"/>
+                    value="#{warehouseVoucherCreateAction.transference or warehouseVoucherCreateAction.executorUnitTransference ? messages['WarehouseVoucher.sourceResponsible'] : messages['Warehouse.responsible']}"/>
         </ui:define>
         <c:choose>
             <c:when test="#{warehouseVoucherCreateAction.enabledResponsibleField}">
@@ -293,20 +307,24 @@
     </s:decorate>
 </s:div>
 
-<s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
-    <ui:define name="label">#{messages['WarehouseVoucher.date']}</ui:define>
-    <h:outputText value="#{warehouseVoucherCreateAction.warehouseVoucher.date}">
-        <s:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
-    </h:outputText>
-</s:decorate>
-
 </s:div>
 
 <s:div id="rightSidePanel">
+
     <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['WarehouseVoucher.state']}</ui:define>
-        <h:outputText value="#{messages[warehouseVoucherCreateAction.warehouseVoucher.state.resourceKey]}"/>
+        <h:outputText value="#{messages[warehouseVoucherCreateAction.warehouseVoucher.state.resourceKey]}" styleClass="bold" />
+
+        <rich:spacer width="10"/>
+        <s:span styleClass="tab-separator" />
+        <rich:spacer width="10"/>
+
+        <h:outputText value="#{messages['WarehouseVoucher.date']}: " style="color: #000000;" styleClass="bold"/>
+        <h:outputText value="#{warehouseVoucherCreateAction.warehouseVoucher.date}">
+            <s:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}"/>
+        </h:outputText>
     </s:decorate>
+
     <s:div id="executorUnitRightSidePanel">
         <c:choose>
             <c:when test="#{warehouseVoucherCreateAction.executorUnitTransference}">
@@ -449,18 +467,18 @@
             </c:otherwise>
         </c:choose>
     </s:div>
+
     <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['InventoryMovement.description']}</ui:define>
         <h:inputTextarea id="description"
                          value="#{warehouseVoucherCreateAction.inventoryMovement.description}"
                          required="true"
-                         styleClass="input textarea-medium1"
+                         styleClass="input textarea-medium"
                          tabindex="10">
             <f:validateLength maximum="250"/>
         </h:inputTextarea>
     </s:decorate>
 
-    <!--rendered="#{s:hasPermission('ORDER_RELATIONSHIP','VIEW')}"-->
     <s:div id="transferorder">
         <s:decorate id="transferOrderField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.receptionByTransfer}">
             <ui:define name="label"><h:outputText value="#{messages['CustomerOrder.order']}"/></ui:define>
@@ -477,24 +495,37 @@
         </s:decorate>
     </s:div>
 
-    <!--<c:if test="#{warehousePurchaseOrderAction.purchaseOrderApproved and warehousePurchaseOrderAction.purchaseOrderCash}">-->
-    <s:div id="lowCheckField">
-        <s:decorate id="lowCheck" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption}">
+    <s:div id="destinationDiv">
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
             <ui:define name="label">
-                <h:outputText value="#{messages['WarehouseVoucher.isLow']}"/>
+                <h:outputText value="#{messages['WarehouseVoucher.destinationArea']}" styleClass="label-blue"/>
             </ui:define>
-            <h:selectBooleanCheckbox value="#{warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
-                <a4j:support event="onchange" reRender="destination, expenseTypeDiv" ajaxSingle="true"/>
-            </h:selectBooleanCheckbox>
+            <h:selectOneMenu id="destination"
+                             value="#{warehouseVoucherCreateAction.warehouseVoucher.destination}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="13">
+                <s:selectItems value="#{warehouseDestinationList}" var="element"
+                               label="#{element.code} - #{element.name}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+                <a4j:support event="onchange" reRender="productionLineDiv" ajaxSingle="true"/>
+            </h:selectOneMenu>
         </s:decorate>
     </s:div>
-    <!--</c:if>-->
 
-    <!--<s:div id="productionLineDiv">
-        <s:decorate id="productionLineField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['ProductionProcess.productionLine']}</ui:define>
+    <s:div id="productionLineDiv">
+        <s:decorate id="productionLineField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag and
+                            warehouseVoucherCreateAction.isDestinationProductionOrMaintenance()}">
+            <ui:define name="label">
+                <h:outputText value="#{messages['ProductionProcess.productionLine']}" styleClass="label-blue"/>
+            </ui:define>
             <h:selectOneMenu id="productionLine" value="#{warehouseVoucherCreateAction.productionLine}"
                              styleClass="input"
+                             required="true"
                              tabindex="4">
                 <s:selectItems value="#{productionLineList.resultList}" var="productionLine"
                                label="#{productionLine.name}"
@@ -505,40 +536,49 @@
             </h:selectOneMenu>
         </s:decorate>
 
-        <s:decorate id="processField" template="/include/inputField.xhtml" styleClass="formRow">
-            <ui:define name="label">#{messages['ProductionProcess.process']}</ui:define>
-            <h:selectOneMenu id="process" value="#{warehouseVoucherCreateAction.productionProcess}" styleClass="input" required="true"
+        <s:decorate id="processField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag and
+                            warehouseVoucherCreateAction.isDestinationProductionOrMaintenance()}">
+            <ui:define name="label">
+                <h:outputText value="#{messages['ProductionProcess.process']}" styleClass="label-blue"/>
+            </ui:define>
+            <h:selectOneMenu id="process" value="#{warehouseVoucherCreateAction.warehouseVoucher.productionProcess}"
+                             styleClass="input"
+                             required="true"
                              tabindex="2">
-                <s:selectItems value="#{productionProcessList.resultList}" var="productionProcess" label="#{productionProcess.fullName}"
+                <s:selectItems value="#{productionProcessList}" var="productionProcess" label="#{productionProcess.fullName}"
                                noSelectionLabel="" hideNoSelectionLabel="false"/>
                 <s:convertEntity/>
             </h:selectOneMenu>
         </s:decorate>
-    </s:div>-->
 
-    <s:div id="destination">
-        <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
-                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
-            <ui:define name="label">#{messages['WarehouseVoucher.destination']}</ui:define>
-            <h:selectOneMenu id="destination"
-                             value="#{warehouseVoucherCreateAction.warehouseVoucher.destination}"
+        <s:decorate id="finishedProductField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag and
+                            warehouseVoucherCreateAction.isDestinationProductionOrMaintenance()}">
+            <ui:define name="label">
+                <h:outputText value="#{messages['ProductionProcess.finishedProduct']}" styleClass="label-blue"/>
+            </ui:define>
+            <h:selectOneMenu id="finishedProduct" value="#{warehouseVoucherCreateAction.warehouseVoucher.productionProduct}"
                              styleClass="input"
-                             required="true"
-                             tabindex="13">
-                <s:selectItems value="#{warehouseDestinationList}"
-                               var="element"
-                               label="#{element.code} - #{element.name}"
-                               noSelectionLabel=""
-                               hideNoSelectionLabel="false"/>
+                             required="#{warehouseVoucherCreateAction.isDestinationProduction()}"
+                             tabindex="2">
+                <s:selectItems value="#{finishedGoodsList}" var="product" label="#{product.fullName}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
                 <s:convertEntity/>
             </h:selectOneMenu>
         </s:decorate>
     </s:div>
 
+    <!--<rich:spacer height="5" />
+    <rich:separator style="height: 1px;"/>
+    <rich:spacer height="5" />-->
+
+    <rich:spacer height="15" />
+
     <s:div id="expenseTypeDiv">
         <s:decorate id="expenseTypeField" template="/include/inputField.xhtml" styleClass="formRow"
-                    rendered="#{(warehouseVoucherCreateAction.warehouseVoucher.consumption or warehouseVoucherCreateAction.warehouseVoucher.reception)
-                                and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
+                    rendered="#{(warehouseVoucherCreateAction.warehouseVoucher.consumption or warehouseVoucherCreateAction.warehouseVoucher.reception) and
+                                !warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
             <ui:define name="label">#{messages['WarehouseVoucher.expenseType']}</ui:define>
             <h:selectOneMenu id="expenseType"
                              value="#{warehouseVoucherCreateAction.warehouseVoucher.expenseType}"
@@ -560,7 +600,8 @@
 
     <s:div id="expenseCashAccountDiv">
         <s:decorate id="expenseCashAccountField" template="/include/inputField.xhtml" styleClass="formRow"
-                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption or warehouseVoucherCreateAction.warehouseVoucher.reception}">
+                    rendered="#{(warehouseVoucherCreateAction.warehouseVoucher.consumption or warehouseVoucherCreateAction.warehouseVoucher.reception) and
+                                !warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
             <ui:define name="label">#{messages['CashAccount.account']}:</ui:define>
             <app:selectPopUp id="productItemAccount"
                              required="true"
@@ -577,7 +618,7 @@
 
 </s:div>
 </h:panelGrid>
-</app:fieldset>
+<!--</app:fieldset>-->
 
 <app:fieldset id="movementDetailFields" title="#{messages['MovementDetail.title']}">
     <h:panelGrid columns="1"

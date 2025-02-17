@@ -7,6 +7,8 @@ import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.model.xproduction.ProductionLine;
+import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.VoucherBuilder;
@@ -119,6 +121,29 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
                         .getSingleResult();
 
         return result;
+    }
+
+    @Override
+    public List<ProductionProcess> getProductionProcesses(ProductionLine productionLine) {
+
+            List<ProductionProcess> resultList = em.createQuery("select p from ProductionProcess p" +
+                    " where p.productionLine =:productionLine" +
+                    " order by p.position")
+                    .setParameter("productionLine", productionLine)
+                    .getResultList();
+
+            return resultList;
+    }
+
+    @Override
+    public List<ProductItem> getFinishedGoodsList() {
+
+        List<ProductItem> resultList = em.createQuery("select p from ProductItem p" +
+                " where p.warehouse.warehouseType =:warehouseType")
+                .setParameter("warehouseType", WarehouseType.FINISHED_GOODS)
+                .getResultList();
+
+        return resultList;
     }
 
     /**

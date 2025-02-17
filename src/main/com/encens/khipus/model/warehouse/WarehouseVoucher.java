@@ -11,6 +11,7 @@ import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
+import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
@@ -263,6 +264,20 @@ public class WarehouseVoucher implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iddestino", nullable = true)
     private Destination destination;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idproceso", nullable = true)
+    private ProductionProcess productionProcess;
+
+    @Column(name = "cod_prod")
+    private String productionProductCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", insertable = false, updatable = false),
+            @JoinColumn(name = "cod_prod", referencedColumnName = "cod_art", insertable = false, updatable = false)
+    })
+    private ProductItem productionProduct;
 
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -797,5 +812,47 @@ public class WarehouseVoucher implements BaseModel {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public boolean isDestinarionAreaProduction(){
+        return getDestination() != null ? getDestination().getDestinationTypeArea().equals(DestinationTypeArea.PRODUCTION) : false;
+    }
+
+    public boolean isDestinarionAreaMaintenance(){
+        return getDestination() != null ? getDestination().getDestinationTypeArea().equals(DestinationTypeArea.MAINTENANCE) : false;
+    }
+
+    public boolean isDestinarionAreaOther(){
+        return getDestination() != null ? getDestination().getDestinationTypeArea().equals(DestinationTypeArea.OTHER) : false;
+    }
+
+    public ProductionProcess getProductionProcess() {
+        return productionProcess;
+    }
+
+    public void setProductionProcess(ProductionProcess productionProcess) {
+        this.productionProcess = productionProcess;
+    }
+
+    public String getProductionProductCode() {
+        return productionProductCode;
+    }
+
+    public void setProductionProductCode(String productionProductCode) {
+        this.productionProductCode = productionProductCode;
+    }
+
+    public ProductItem getProductionProduct() {
+        return productionProduct;
+    }
+
+    public void setProductionProduct(ProductItem productionProduct) {
+        this.productionProduct = productionProduct;
+
+        if (null != productionProduct) {
+            setProductionProductCode(productionProduct.getId().getProductItemCode());
+        } else {
+            setProductionProductCode(null);
+        }
     }
 }

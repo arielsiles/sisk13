@@ -2,6 +2,7 @@ package com.encens.khipus.model.warehouse;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
+import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
@@ -32,7 +33,7 @@ import javax.persistence.*;
 
 @Entity
 @Filter(name = Constants.COMPANY_FILTER_NAME)
-@EntityListeners(CompanyListener.class)
+@EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
 @Table(schema = Constants.KHIPUS_SCHEMA, name = "inv_destino", uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "nombre"}))
 public class Destination implements BaseModel {
     @Id
@@ -49,6 +50,10 @@ public class Destination implements BaseModel {
     @Column(name = "activo", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean active = Boolean.TRUE;
+
+    @Column(name = "tipo_area", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private DestinationTypeArea destinationTypeArea;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -108,5 +113,13 @@ public class Destination implements BaseModel {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public DestinationTypeArea getDestinationTypeArea() {
+        return destinationTypeArea;
+    }
+
+    public void setDestinationTypeArea(DestinationTypeArea destinationTypeArea) {
+        this.destinationTypeArea = destinationTypeArea;
     }
 }

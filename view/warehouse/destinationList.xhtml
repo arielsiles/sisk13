@@ -26,6 +26,15 @@
                         <s:defaultAction/>
                     </a4j:commandButton>
                 </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Common.active']}</ui:define>
+                    <h:selectBooleanCheckbox
+                            id="active"
+                            value="#{destinationDataModel.active}"
+                            tabindex="3"/>
+                </s:decorate>
+
                 <rich:jQuery selector="#name" query="focus()" timing="onload"/>
             </rich:simpleTogglePanel>
 

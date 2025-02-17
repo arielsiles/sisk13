@@ -3,6 +3,7 @@ package com.encens.khipus.action.warehouse;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.model.contacts.EntityType;
 import com.encens.khipus.model.warehouse.Destination;
+import com.encens.khipus.model.warehouse.DestinationTypeArea;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.Name;
@@ -26,6 +27,11 @@ public class DestinationAction extends GenericAction<Destination> {
     @Factory("destinationEntityTypeList")
     public EntityType[] getEntityType() {
         return EntityType.values();
+    }
+
+    @Factory("destinationTypeAreaList")
+    public DestinationTypeArea[] getDestinationTypeArea() {
+        return DestinationTypeArea.values();
     }
 
     @Override

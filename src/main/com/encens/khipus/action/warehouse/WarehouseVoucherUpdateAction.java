@@ -14,12 +14,11 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.model.xproduction.ProductionLine;
+import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
-import com.encens.khipus.service.warehouse.ApprovalWarehouseVoucherService;
-import com.encens.khipus.service.warehouse.MovementDetailService;
-import com.encens.khipus.service.warehouse.WarehouseAccountEntryService;
-import com.encens.khipus.service.warehouse.WarehousePurchaseOrderService;
+import com.encens.khipus.service.warehouse.*;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.MessageUtils;
@@ -31,6 +30,7 @@ import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author
@@ -72,6 +72,11 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
     @In(value = "cashAccountInventoryDataModel", required = false, create = true)
     private CashAccountInventoryDataModel cashAccountInventoryDataModel;
 
+    @In
+    private WarehouseVoucherService warehouseVoucherService;
+
+    private ProductionLine productionLine;
+
     @Override
     @BusinessUnitRestriction(value = "#{warehouseVoucherUpdateAction.warehouseVoucher}", postValidation = true)
     @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
@@ -80,6 +85,11 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         setOp(OP_UPDATE);
         try {
             readWarehouseVoucher(instance.getId());
+            loadProductionLine();
+            /*if (getWarehouseVoucher().getProductionProcess() != null) {
+                setProductionLine(getWarehouseVoucher().getProductionProcess().getProductionLine());
+            }*/
+
         } catch (WarehouseVoucherNotFoundException e) {
             addNotFoundMessage();
             return Outcome.FAIL;
@@ -92,8 +102,15 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         setOp(OP_UPDATE);
         try {
             readWarehouseVoucher(pk);
+            loadProductionLine();
         } catch (WarehouseVoucherNotFoundException e) {
             //this exception never happens because this method is executed immediately after of create operation.
+        }
+    }
+
+    private void loadProductionLine() {
+        if (getWarehouseVoucher().getProductionProcess() != null) {
+            setProductionLine(getWarehouseVoucher().getProductionProcess().getProductionLine());
         }
     }
 
@@ -365,6 +382,10 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         return Outcome.CANCEL;
     }
 
+    @Factory(value = "productionProcessList2", scope = ScopeType.STATELESS)
+    public List<ProductionProcess> getProductionProcessList() {
+        return warehouseVoucherService.getProductionProcesses(getProductionLine());
+    }
 
     public void readWarehouseVoucher(WarehouseVoucherPK id) throws WarehouseVoucherNotFoundException {
         setWarehouseVoucher(warehouseService.findWarehouseVoucher(id));
@@ -559,5 +580,30 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
     private void addAdvancePaymentPendingErrorMessage(PurchaseOrder purchaseOrder) {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                 "PurchaseOrder.error.purchaseOrderPaymentPending", purchaseOrder.getOrderNumber());
+    }
+
+    public Boolean isDestinationProductionOrMaintenance(){
+        return warehouseVoucher.isDestinarionAreaProduction() || warehouseVoucher.isDestinarionAreaMaintenance();
+    }
+
+    public boolean isDestinationProduction(){
+        return warehouseVoucher.isDestinarionAreaProduction();
+    }
+
+    public ProductionLine getProductionLine() {
+        return productionLine;
+    }
+
+    public void setProductionLine(ProductionLine productionLine) {
+        this.productionLine = productionLine;
+    }
+
+    public void cleanDestinationProductionOrMaintenance(){
+        warehouseVoucher.setDestination(null);
+        setProductionLine(null);
+        warehouseVoucher.setProductionProduct(null);
+
+        warehouseVoucher.setExpenseType(null);
+        warehouseVoucher.setExpenseCashAccount(null);
     }
 }

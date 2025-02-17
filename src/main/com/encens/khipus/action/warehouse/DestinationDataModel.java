@@ -19,12 +19,17 @@ import java.util.List;
 @Scope(ScopeType.PAGE)
 public class DestinationDataModel extends QueryDataModel<Long, Destination> {
 
-    private static final String[] RESTRICTIONS =
-            {"lower(destination.name) like concat('%', concat(lower(#{destinationDataModel.criteria.name}), '%'))"};
+    private Boolean active;
+
+    private static final String[] RESTRICTIONS = {
+            "lower(destination.name) like concat('%', concat(lower(#{destinationDataModel.criteria.name}), '%'))",
+            "destination.active = #{destinationDataModel.active}"
+    };
 
     @Create
     public void init() {
         sortProperty = "destination.name";
+        active = Boolean.TRUE;
     }
 
     @Override
@@ -35,5 +40,13 @@ public class DestinationDataModel extends QueryDataModel<Long, Destination> {
     @Override
     public List<String> getRestrictions() {
         return Arrays.asList(RESTRICTIONS);
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }
