@@ -1612,7 +1612,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 "  " + /** Inventario inicio de periodo **/
                 " SELECT p.cod_art, (p.saldofis * p.costouni) AS debe, 0 AS haber, p.saldofis AS cant_d, 0 AS cant_h " +
                 " FROM inv_periodo p " +
-                " WHERE p.cod_alm = 2 " +
+                " WHERE p.cod_alm in (2, 8) " +
                 " AND p.mes = :month " +
                 " AND p.gestion = :gestion " +
                 " AND p.saldofis > 0 " +
@@ -1622,7 +1622,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 " FROM inv_movdet d " +
                 " LEFT JOIN inv_vales v ON d.no_trans = v.no_trans " +
                 " WHERE v.fecha BETWEEN  :startDate AND  :endDate " +
-                " AND v.cod_alm = 2 AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL " +
+                " AND v.cod_alm in (2, 8) AND d.tipo_mov = 'E' AND v.id_com_encoc IS NOT NULL " +
                 " GROUP BY d.cod_art " +
                 " UNION " +
                 " " + /** Entradas de produccion **/
@@ -1630,7 +1630,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 " FROM inv_vales i " +
                 " JOIN inv_movdet d ON i.no_trans = d.no_trans " +
                 " WHERE i.fecha BETWEEN  :startDate AND  :endDate " +
-                " AND i.cod_alm = 2 " +
+                " AND i.cod_alm in (2, 8) " +
                 " AND (i.idordenproduccion IS NOT NULL OR i.idproductobase IS NOT NULL) " +
                 " GROUP BY d.cod_art " +
                 " UNION " +
@@ -1687,20 +1687,20 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             BigDecimal value = entry.getValue();
             System.out.println("======>>: " + cod_art + " - " + value);
         }
-        /*for (Object[] product : productList){
-            String codArt = (String) product[0];
-            BigDecimal unitCost = (BigDecimal) product[1];
-            System.out.println("====> MAP PRODUCT: |" + codArt + "|" + unitCost);
-        }*/
         System.out.println("===============END===============");
 
-        /** Adicionando lista de productos equivalentes (Productos agencia) **/
-        List<ProductItem> productItemEqList = getProductItemEqList();
+        /** Adicionando lista de productos equivalentes (Productos agencia) **
+         *  Obtiene los costos unitarios de los Productos Terminados de Planta (Alm 2)
+         *  Pero no funciona cuando los costos unitarios del Alm 2 es cero y
+         *  requieres costo unitario para los productos de la Agencia Alm 8, entonces se comenta el codigo.
+         *  En la consulta grande de arriba se añadio productos de Alm 8
+         */
+        /*List<ProductItem> productItemEqList = getProductItemEqList();
         System.out.println("=====> Añadiendo Produtos de Agencia : " + productItemEqList.size());
         for (ProductItem productItem : productItemEqList){
             System.out.println("=====> Add Eq: " + productItem.getProductItemCodeEq() + " - " + result.get(productItem.getProductItemCode()));
             result.put(productItem.getProductItemCodeEq(), result.get(productItem.getProductItemCode()));
-        }
+        }*/
 
         System.out.println("=============== LISTA C.U. FINAL =============== ");
         for (Map.Entry<String, BigDecimal> entry : result.entrySet()) {
