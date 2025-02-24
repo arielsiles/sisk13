@@ -10,6 +10,7 @@ import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundExceptio
 import com.encens.khipus.exception.warehouse.*;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.interceptor.BusinessUnitRestriction;
+import com.encens.khipus.model.finances.AnalyticDetail;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -387,6 +388,11 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         return warehouseVoucherService.getProductionProcesses(getProductionLine());
     }
 
+    @Factory(value = "analyticDetailList2", scope = ScopeType.STATELESS)
+    public List<AnalyticDetail> getAnalyticDetailList() {
+        return warehouseVoucherService.getAnalyticDetails(getWarehouseVoucher().getDestination());
+    }
+
     public void readWarehouseVoucher(WarehouseVoucherPK id) throws WarehouseVoucherNotFoundException {
         setWarehouseVoucher(warehouseService.findWarehouseVoucher(id));
 
@@ -586,6 +592,10 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         return warehouseVoucher.isDestinarionAreaProduction() || warehouseVoucher.isDestinarionAreaMaintenance();
     }
 
+    public boolean isAnalyticDetail(){
+        return warehouseVoucher.isDestinationAnalyticDetail();
+    }
+
     public boolean isDestinationProduction(){
         return warehouseVoucher.isDestinarionAreaProduction();
     }
@@ -605,5 +615,7 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
 
         warehouseVoucher.setExpenseType(null);
         warehouseVoucher.setExpenseCashAccount(null);
+
+        warehouseVoucher.setAnalyticDetail(null);
     }
 }

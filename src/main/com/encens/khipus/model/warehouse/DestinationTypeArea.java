@@ -7,6 +7,7 @@ package com.encens.khipus.model.warehouse;
 public enum DestinationTypeArea {
     PRODUCTION("WarehouseVoucher.destinationArea.production"),
     MAINTENANCE("WarehouseVoucher.destinationArea.maintenance"),
+    ANALITYCDETAIL("WarehouseVoucher.destinationArea.analyticDetail"),
     OTHER("WarehouseVoucher.destinationArea.other");
     private String resourceKey;
 

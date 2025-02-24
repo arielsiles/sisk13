@@ -26,7 +26,7 @@
 </c:if>
 
 <c:set var="mainComponentIdsToRerender"
-       value="documentTypeField, transferorder, lowCheckField, productionLineDiv, destinationDiv, expenseTypeDiv, expenseCashAccountDiv, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
+       value="documentTypeField, transferorder, lowCheckField, productionLineDiv, destinationDiv, analyticDetailDiv, expenseTypeDiv, expenseCashAccountDiv, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
 
 <c:set var="elementsToReRenderForPetitionerJobContractChange"
        value="petitionerJobContractPanel, executorUnitLeftSidePanel"/>
@@ -71,7 +71,7 @@
             </ui:define>
             <h:selectBooleanCheckbox value="#{warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
                 <a4j:support event="onchange" action="#{warehouseVoucherCreateAction.cleanDestinationProductionOrMaintenance()}"
-                             reRender="productionLineDiv, destinationDiv, expenseTypeDiv, expenseCashAccountDiv"
+                             reRender="analyticDetailDiv, productionLineDiv, destinationDiv, expenseTypeDiv, expenseCashAccountDiv"
                              ajaxSingle="true"/>
             </h:selectBooleanCheckbox>
         </s:decorate>
@@ -499,7 +499,7 @@
         <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
                     rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag}">
             <ui:define name="label">
-                <h:outputText value="#{messages['WarehouseVoucher.destinationArea']}" styleClass="label-blue"/>
+                <h:outputText value="#{messages['WarehouseVoucher.costArea']}" styleClass="label-blue"/>
             </ui:define>
             <h:selectOneMenu id="destination"
                              value="#{warehouseVoucherCreateAction.warehouseVoucher.destination}"
@@ -511,7 +511,25 @@
                                noSelectionLabel=""
                                hideNoSelectionLabel="false"/>
                 <s:convertEntity/>
-                <a4j:support event="onchange" reRender="productionLineDiv" ajaxSingle="true"/>
+                <a4j:support event="onchange" reRender="productionLineDiv, analyticDetailDiv" ajaxSingle="true"/>
+            </h:selectOneMenu>
+        </s:decorate>
+    </s:div>
+
+    <s:div id="analyticDetailDiv">
+        <s:decorate id="analyticDetail" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{warehouseVoucherCreateAction.warehouseVoucher.consumption and !warehouseVoucherCreateAction.warehouseVoucher.lowFlag and
+                                warehouseVoucherCreateAction.isAnalyticDetail()}">
+            <ui:define name="label">
+                <h:outputText value="#{messages['WarehouseVoucher.detail']}" styleClass="label-blue"/>
+            </ui:define>
+            <h:selectOneMenu id="analyticDetail" value="#{warehouseVoucherCreateAction.warehouseVoucher.analyticDetail}"
+                             styleClass="input"
+                             required="true"
+                             tabindex="14">
+                <s:selectItems value="#{analyticDetailList}" var="analyticDetailItem" label="#{analyticDetailItem.name}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
             </h:selectOneMenu>
         </s:decorate>
     </s:div>

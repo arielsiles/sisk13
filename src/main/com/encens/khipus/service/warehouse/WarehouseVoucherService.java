@@ -1,6 +1,8 @@
 package com.encens.khipus.service.warehouse;
 
+import com.encens.khipus.model.finances.AnalyticDetail;
 import com.encens.khipus.model.purchases.PurchaseOrder;
+import com.encens.khipus.model.warehouse.Destination;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.WarehouseDocumentType;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
@@ -23,4 +25,6 @@ public interface WarehouseVoucherService {
     List<ProductionProcess> getProductionProcesses(ProductionLine productionLine);
 
     List<ProductItem> getFinishedGoodsList();
+
+    List<AnalyticDetail> getAnalyticDetails(Destination destination);
 }

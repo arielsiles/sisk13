@@ -279,6 +279,10 @@ public class WarehouseVoucher implements BaseModel {
     })
     private ProductItem productionProduct;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "iddetalleanalitica", nullable = true)
+    private AnalyticDetail analyticDetail;
+
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -822,6 +826,10 @@ public class WarehouseVoucher implements BaseModel {
         return getDestination() != null ? getDestination().getDestinationTypeArea().equals(DestinationTypeArea.MAINTENANCE) : false;
     }
 
+    public boolean isDestinationAnalyticDetail(){
+        return getDestination() != null ? getDestination().getDestinationTypeArea().equals(DestinationTypeArea.ANALITYCDETAIL) : false;
+    }
+
     public boolean isDestinarionAreaOther(){
         return getDestination() != null ? getDestination().getDestinationTypeArea().equals(DestinationTypeArea.OTHER) : false;
     }
@@ -854,5 +862,13 @@ public class WarehouseVoucher implements BaseModel {
         } else {
             setProductionProductCode(null);
         }
+    }
+
+    public AnalyticDetail getAnalyticDetail() {
+        return analyticDetail;
+    }
+
+    public void setAnalyticDetail(AnalyticDetail analyticDetail) {
+        this.analyticDetail = analyticDetail;
     }
 }

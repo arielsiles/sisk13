@@ -7,10 +7,7 @@ import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherPendantException;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.CustomerOrder;
-import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.ExpenseType;
-import com.encens.khipus.model.finances.MeasureUnit;
-import com.encens.khipus.model.finances.MeasureUnitPk;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.model.xproduction.ProductionLine;
 import com.encens.khipus.model.xproduction.ProductionProcess;
@@ -81,6 +78,12 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
     public List<ProductionProcess> getProductionProcessList() {
         return warehouseVoucherService.getProductionProcesses(getProductionLine());
     }
+
+    @Factory(value = "analyticDetailList", scope = ScopeType.STATELESS)
+    public List<AnalyticDetail> getAnalyticDetailList() {
+        return warehouseVoucherService.getAnalyticDetails(getWarehouseVoucher().getDestination());
+    }
+
 
     // Lista de productos terminados ProductItem de un almacen especifico
     @Factory(value = "finishedGoodsList", scope = ScopeType.STATELESS)
@@ -611,6 +614,10 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         return warehouseVoucher.isDestinarionAreaProduction();
     }
 
+    public boolean isAnalyticDetail(){
+        return warehouseVoucher.isDestinationAnalyticDetail();
+    }
+
     public void cleanDestinationProductionOrMaintenance(){
         warehouseVoucher.setDestination(null);
         setProductionLine(null);
@@ -618,6 +625,8 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
 
         warehouseVoucher.setExpenseType(null);
         warehouseVoucher.setExpenseCashAccount(null);
+
+        warehouseVoucher.setAnalyticDetail(null);
     }
 
     // clearProductionProduct()

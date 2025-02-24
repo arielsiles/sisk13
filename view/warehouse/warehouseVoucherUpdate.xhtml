@@ -701,7 +701,7 @@
             <s:decorate id="destinationField" template="/include/inputField.xhtml" styleClass="formRow"
                         rendered="#{warehouseVoucherUpdateAction.warehouseVoucher.consumption and !warehouseVoucherUpdateAction.warehouseVoucher.lowFlag}">
                 <ui:define name="label">
-                    <h:outputText value="#{messages['WarehouseVoucher.destinationArea']}" styleClass="label-blue"/>
+                    <h:outputText value="#{messages['WarehouseVoucher.costArea']}" styleClass="label-blue"/>
                 </ui:define>
                 <h:selectOneMenu id="destination"
                                  value="#{warehouseVoucherUpdateAction.warehouseVoucher.destination}"
@@ -714,7 +714,26 @@
                                    noSelectionLabel=""
                                    hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
-                    <a4j:support event="onchange" reRender="productionLineDiv" ajaxSingle="true"/>
+                    <a4j:support event="onchange" reRender="productionLineDiv, analyticDetailDiv" ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </s:div>
+
+        <s:div id="analyticDetailDiv">
+            <s:decorate id="analyticDetail" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{warehouseVoucherUpdateAction.warehouseVoucher.consumption and !warehouseVoucherUpdateAction.warehouseVoucher.lowFlag and
+                                warehouseVoucherUpdateAction.isAnalyticDetail()}">
+                <ui:define name="label">
+                    <h:outputText value="#{messages['WarehouseVoucher.detail']}" styleClass="label-blue"/>
+                </ui:define>
+                <h:selectOneMenu id="analyticDetail" value="#{warehouseVoucherUpdateAction.warehouseVoucher.analyticDetail}"
+                                 styleClass="input"
+                                 required="true"
+                                 disabled="#{warehouseVoucherApproved}"
+                                 tabindex="14">
+                    <s:selectItems value="#{analyticDetailList2}" var="analyticDetailItem" label="#{analyticDetailItem.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
                 </h:selectOneMenu>
             </s:decorate>
         </s:div>

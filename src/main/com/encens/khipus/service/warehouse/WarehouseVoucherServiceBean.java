@@ -1,10 +1,7 @@
 package com.encens.khipus.service.warehouse;
 
 import com.encens.khipus.framework.action.Outcome;
-import com.encens.khipus.model.finances.CashAccount;
-import com.encens.khipus.model.finances.FinancesCurrencyType;
-import com.encens.khipus.model.finances.Voucher;
-import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.*;
 import com.encens.khipus.model.xproduction.ProductionLine;
@@ -144,6 +141,17 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
                 .getResultList();
 
         return resultList;
+    }
+
+    @Override
+    public List<AnalyticDetail> getAnalyticDetails(Destination destination) {
+
+            List<AnalyticDetail> resultList = em.createQuery("select a from AnalyticDetail a" +
+                    " where a.destination =:destination")
+                    .setParameter("destination", destination)
+                    .getResultList();
+
+            return resultList;
     }
 
     /**
