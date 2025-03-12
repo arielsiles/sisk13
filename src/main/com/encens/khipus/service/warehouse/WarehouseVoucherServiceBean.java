@@ -8,6 +8,7 @@ import com.encens.khipus.model.xproduction.ProductionLine;
 import com.encens.khipus.model.xproduction.ProductionProcess;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.VoucherBuilder;
 import com.encens.khipus.util.VoucherDetailBuilder;
 import org.jboss.seam.annotations.AutoCreate;
@@ -83,6 +84,9 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
                     warehouseVoucherDetailCashAcounts.add(warehouseCashAccountOutput);
                 }
             }
+            String voucherDate = DateUtils.format(warehouseVoucher.getDate(), "dd/MM/yyyy");
+            gloss = gloss + " " + voucherDate + ", novale: " + warehouseVoucher.getNumber();
+            voucher.setGloss(gloss);
         }
 
         Collections.sort(warehouseVoucherDetailCashAcounts, new Comparator<VoucherDetail>() {
@@ -97,6 +101,7 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
         }
 
         voucher.setDate(warehouseVoucherList.get(0).getDate()); /** Temporal **/
+        voucher.setState(VoucherState.APR.toString());
         voucherAccoutingService.saveVoucher(voucher);
 
         for (WarehouseVoucher warehouseVoucher:warehouseVoucherList){

@@ -429,7 +429,11 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
 
         String outcome = Outcome.FAIL;
         if (warehouseVoucherList.size() > 0)
-            outcome = warehouseVoucherService.createWarehouseVoucherListAccounting(warehouseVoucherList);
+            for (WarehouseVoucher warehouseVoucher : warehouseVoucherList){
+                List<WarehouseVoucher> warehouseVoucherL = new ArrayList<WarehouseVoucher>();
+                warehouseVoucherL.add(warehouseVoucher);
+                outcome = warehouseVoucherService.createWarehouseVoucherListAccounting(warehouseVoucherL);
+            }
 
         if (outcome.equals(Outcome.SUCCESS))
             addCreatedMessage();

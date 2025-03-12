@@ -358,10 +358,10 @@
         <h:outputText value="#{warehouseVoucherItem.gloss}"/>
     </rich:column>
     <rich:column styleClass="center">
-        <h:commandLink value="#{messages['Common.select']}"
-                       immediate="true"
+        <h:commandLink immediate="true"
                        action="#{warehouseVoucherUpdateAction.select(warehouseVoucherItem)}"
                        rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}">
+            <h:graphicImage value="/img/edit.gif" styleClass="select-image" title="#{messages['Common.select']}"/>
             <s:conversationPropagation value="none"/>
         </h:commandLink>
         &#160;
@@ -371,6 +371,8 @@
             <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
                             title="#{messages['WarehouseVoucher.button.generateDocument']}"/>
         </h:commandLink>
+        &#160;
+        <h:graphicImage value="#{warehouseVoucherItem.isAccounted() ? '/img/ok.png' : '/img/nook.png'}" styleClass="select-image" />
     </rich:column>
 </rich:dataTable>
 

@@ -871,4 +871,9 @@ public class WarehouseVoucher implements BaseModel {
     public void setAnalyticDetail(AnalyticDetail analyticDetail) {
         this.analyticDetail = analyticDetail;
     }
+
+    public boolean isAccounted(){
+        return null != getVoucher();
+    }
+
 }
