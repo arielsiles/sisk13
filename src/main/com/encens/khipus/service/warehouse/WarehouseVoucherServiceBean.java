@@ -40,7 +40,8 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
                 " and w.voucher is null " +
                 " and w.operation is null" +
                 " and w.date between :startDate and :endDate " +
-                " and w.state =:state")
+                " and w.state =:state" +
+                " order by w.date")
                 .setParameter("documentType", documentType)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
