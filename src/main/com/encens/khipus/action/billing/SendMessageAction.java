@@ -2,6 +2,7 @@ package com.encens.khipus.action.billing;
 
 import com.encens.khipus.model.customers.CustomerOrder;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -16,6 +17,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.text.MessageFormat;
 import java.util.Properties;
 
 /**
@@ -26,8 +28,12 @@ import java.util.Properties;
 @Scope(ScopeType.PAGE)
 public class SendMessageAction {
 
-    private static final String correo = Constants.EMAIL_FROM;
-    private static final String contra = Constants.EMAIL_PASSW;
+    //private static final String correo = Constants.EMAIL_FROM;
+    //private static final String contra = Constants.EMAIL_PASSW;
+    private static final String SMTP_HOST = "mail.ilvabolivia.com";
+    private static final String SMTP_PORT = "587";
+    private static final String EMAIL_FROM = "ariel.siles@ilvabolivia.com";
+    private static final String EMAIL_PASSWORD = "Miracula.13";
 
     @In
     private FacesMessages facesMessages;
@@ -39,22 +45,23 @@ public class SendMessageAction {
         if (correoDestino != null) {
             try {
                 Properties p = new Properties();
-                p.put("mail.smtp.host", "smtp.gmail.com");
-                p.setProperty("mail.smtp.starttls.enable", "true");
-                p.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-                p.setProperty("mail.smtp.port", "587");
-                p.setProperty("mail.smtp.user", correo);
-                p.setProperty("mail.smtp.auth", "true");
+                p.put("mail.smtp.host", SMTP_HOST);
+                p.put("mail.smtp.port", SMTP_PORT);
+                p.put("mail.smtp.auth", "true");
+                p.put("mail.smtp.starttls.enable", "true");
+                p.put("mail.smtp.ssl.trust", "*");
+                p.put("mail.smtp.ssl.protocols", "TLSv1.2");
+
                 Session s = Session.getDefaultInstance(p);
 
                 MimeMessage mensaje = new MimeMessage(s);
-                mensaje.setFrom(new InternetAddress(correo));
+                mensaje.setFrom(new InternetAddress(EMAIL_FROM));
                 mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(correoDestino));
                 mensaje.setSubject(subject);
                 mensaje.setText(text);
 
                 Transport t = s.getTransport("smtp");
-                t.connect(correo, contra);
+                t.connect(EMAIL_FROM, EMAIL_PASSWORD);
                 t.sendMessage(mensaje, mensaje.getAllRecipients());
                 t.close();
                 System.out.println("................Mensaje Enviado...............");
@@ -81,23 +88,31 @@ public class SendMessageAction {
                 String pathFileNameXml = Constants.PATH_FILE_INVOICE + fileNameXml;
                 String pathFileNamePdf = Constants.PATH_FILE_INVOICE + fileNamePdf;
 
-                Properties p = new Properties();
-                p.put("mail.smtp.host", "smtp.gmail.com");
-                p.setProperty("mail.smtp.starttls.enable", "true");
-                p.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-                p.setProperty("mail.smtp.port", "587");
-                p.setProperty("mail.smtp.user", correo);
-                p.setProperty("mail.smtp.auth", "true");
-                p.put("mail.smtp.starttls.enable", "true");  // Habilitar TLS
-                p.put("mail.smtp.ssl.protocols", "TLSv1.2");  // Asegurarte de que se use TLSv1.2
+                Properties emailProperties = new Properties();
+                emailProperties.put("mail.smtp.host", SMTP_HOST);
+                emailProperties.put("mail.smtp.port", SMTP_PORT);
+                emailProperties.put("mail.smtp.auth", "true");
+                emailProperties.put("mail.smtp.starttls.enable", "true");
+                emailProperties.put("mail.smtp.ssl.trust", "*");
+                emailProperties.put("mail.smtp.ssl.protocols", "TLSv1.2");
 
-                // Asegúrate de no usar SSL, ya que STARTTLS es lo que se debe usar con el puerto 587
-                p.remove("mail.smtp.ssl.trust");
+                //p.setProperty("mail.smtp.user", correo);
 
-                Session s = Session.getDefaultInstance(p);
+                // Crear sesión de correo con autenticación
+                Session emailSession = Session.getInstance(emailProperties, new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(EMAIL_FROM, EMAIL_PASSWORD);
+                    }
+                });
 
                 BodyPart texto = new MimeBodyPart();
-                texto.setText(Constants.EMAIL_TEXT_1);
+
+                String name  = customerOrder.getMovement().getName();
+                String fecha = DateUtils.format(customerOrder.getCurrentDate(), "dd/MM/yyyy");
+                String invoiceNumber = customerOrder.getMovement().getNumber().toString();
+
+                String textMsg = MessageFormat.format( Constants.EMAIL_TEXT_1 , name, fecha, invoiceNumber);
+                texto.setText(textMsg);
 
                 BodyPart adjuntoXml = new MimeBodyPart();
                 adjuntoXml.setDataHandler(new DataHandler(new FileDataSource(pathFileNameXml)));
@@ -112,15 +127,14 @@ public class SendMessageAction {
                 m.addBodyPart(adjuntoXml);
                 m.addBodyPart(adjuntoPdf);
 
-                MimeMessage mensaje = new MimeMessage(s);
-                mensaje.setFrom(new InternetAddress(correo));
+                MimeMessage mensaje = new MimeMessage(emailSession);
+                mensaje.setFrom(new InternetAddress(EMAIL_FROM));
                 mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(correoDestino));
-                String subject = Constants.EMAIL_SUBJECT.replace("{0}", customerOrder.getMovement().getNumber().toString());
-                mensaje.setSubject(subject);
+                mensaje.setSubject(Constants.EMAIL_SUBJECT);
                 mensaje.setContent(m);
 
-                Transport t = s.getTransport("smtp");
-                t.connect(correo, contra);
+                Transport t = emailSession.getTransport("smtp");
+                t.connect(SMTP_HOST, EMAIL_FROM, EMAIL_PASSWORD);
                 t.sendMessage(mensaje, mensaje.getAllRecipients());
                 t.close();
                 System.out.println("................Mensaje Enviado...............");

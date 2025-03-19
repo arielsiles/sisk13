@@ -290,9 +290,15 @@
                 </f:facet>
 
                 <rich:column styleClass="center">
-                    <h:selectBooleanCheckbox id="selectCheckboxItem"
+                    <!--<h:selectBooleanCheckbox id="selectCheckboxItem"
                                              immediate="true"
                                              disabled="#{salesAction.isAnnulled(customerOrder) or salesAction.isRejected(customerOrder)}"
+                                             value="#{customerOrderDataModel.selectedList[customerOrderDataModel.page][customerOrder.id]}">
+                        <a4j:support event="onchange" reRender="selectCheckboxItem"/>
+                    </h:selectBooleanCheckbox>-->
+                    <h:selectBooleanCheckbox id="selectCheckboxItem"
+                                             immediate="true"
+                                             disabled="#{salesAction.isAnnulled(customerOrder)}"
                                              value="#{customerOrderDataModel.selectedList[customerOrderDataModel.page][customerOrder.id]}">
                         <a4j:support event="onchange" reRender="selectCheckboxItem"/>
                     </h:selectBooleanCheckbox>
@@ -348,7 +354,7 @@
 
                 <rich:column styleClass="center">
                     <!--&#160;-->
-                    <a4j:commandButton id="cashSaleCommandButton"
+                    <!--<a4j:commandButton id="cashSaleCommandButton"
                                        action="#{customerOrderAction.select(customerOrder)}"
                                        value="Anular"
                                        styleClass="button"
@@ -356,15 +362,35 @@
                                        rendered="#{salesAction.showActionsBilling(customerOrder) and s:hasPermission('CANCEL_ORDER_INVOICE_SFE','VIEW')}"
                                        oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
                                        reRender="customerOrderList,confirmCancelOrderModalPanel">
-                    </a4j:commandButton>
+                    </a4j:commandButton>-->
 
+                    <a4j:commandLink  id="cashSaleCommandButton"
+                                      action="#{customerOrderAction.select(customerOrder)}"
+                                      styleClass="button"
+                                      immediate="true"
+                                      rendered="#{salesAction.showActionsBilling(customerOrder) and s:hasPermission('CANCEL_ORDER_INVOICE_SFE','VIEW')}"
+                                      oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
+                                      reRender="customerOrderList,confirmCancelOrderModalPanel">
+                        <h:graphicImage value="/img/annul-doc.png" styleClass="select-image" title="ANULAR FACTURA" />
+                    </a4j:commandLink>
+
+                    &#160;
                     <h:commandLink action="#{salesAction.generateFileXML(customerOrder)}"
                                    rendered="#{salesAction.showActionsBilling(customerOrder)}"
                                    immediate="true">
-                        <h:graphicImage value="/img/payroll.jpg" styleClass="select-image"
-                                        title="Generar XML"/>
+                        <h:graphicImage value="/img/xmlfile.png" styleClass="select-image" title="Generar XML"/>
                     </h:commandLink>
-
+                    &#160;
+                    <a4j:commandLink  id="reversionCancelBillCommandButton"
+                                      action="#{customerOrderAction.select(customerOrder)}"
+                                      styleClass="button"
+                                      immediate="true"
+                                      rendered="#{salesAction.invoiceAnnulled(customerOrder) and s:hasPermission('REVERSION_CANCEL_BILL_SFE','VIEW')}"
+                                      oncomplete="Richfaces.showModalPanel('confirmReversionCancelBillModalPanel');"
+                                      reRender="customerOrderList, confirmReversionCancelBillModalPanel">
+                        <h:graphicImage value="/img/revertir1.png" styleClass="select-image" title="Revertir Anulación" />
+                    </a4j:commandLink>
+                    &#160;
                     <!--<h:commandLink action="#{billingReportAction.generateReport(customerOrder)}"
                                    immediate="true">
                         <h:graphicImage value="/img/payroll.jpg" styleClass="select-image"
@@ -392,6 +418,11 @@
         <s:decorate id="confirmCancelOrderModalPanelContainer" template="/customers/confirmCancelOrderModalPanel.xhtml">
             <ui:param name="containerId" value="confirmCancelOrderModalPanelContainer"/>
             <ui:param name="dialogId" value="confirmCancelOrderModalPanel"/>
+        </s:decorate>
+
+        <s:decorate id="confirmReversionCancelBillModalPanelContainer" template="/customers/confirmReversionCancelBillModalPanel.xhtml">
+            <ui:param name="containerId" value="confirmReversionCancelBillModalPanelContainer"/>
+            <ui:param name="dialogId" value="confirmReversionCancelBillModalPanel"/>
         </s:decorate>
 
     </ui:define>

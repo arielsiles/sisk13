@@ -1047,8 +1047,8 @@ public class SalesAction extends GenericAction {
         if (customerOrder.getState().equals(SaleStatus.ANULADO))
             result = false;
         if (customerOrder.getMovement() != null){
-            if (customerOrder.getMovement().getDescri() != null)
-                if (customerOrder.getMovement().getDescri().equals("RECHAZADA"))
+            if (customerOrder.getMovement().getStateDescription() != null)
+                if (customerOrder.getMovement().getStateDescription().equals("RECHAZADA"))
                     result = false;
         }
         return result;
@@ -1058,11 +1058,22 @@ public class SalesAction extends GenericAction {
         return customerOrder.getState().equals(SaleStatus.ANULADO);
     }
 
+    public boolean invoiceAnnulled(CustomerOrder customerOrder){
+        boolean result = false;
+        if (customerOrder.getMovement() != null){
+            if (customerOrder.getMovement().getStateDescription() != null)
+                result = customerOrder.getMovement().getStateDescription().equals("ANULACION CONFIRMADA");
+        }
+
+        return result;
+
+    }
+
     public boolean isRejected(CustomerOrder customerOrder){
         boolean result = false;
         if (customerOrder.getMovement() != null){
-            if (customerOrder.getMovement().getDescri() != null)
-                result = customerOrder.getMovement().getDescri().equals("RECHAZADA");
+            if (customerOrder.getMovement().getStateDescription() != null)
+                result = customerOrder.getMovement().getStateDescription().equals("RECHAZADA");
         }
 
         return result;

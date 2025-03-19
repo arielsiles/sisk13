@@ -329,13 +329,16 @@ public final class Constants {
 
     public static final String EMAIL_FROM = "ariel.siles@gmail.com";
     public static final String EMAIL_PASSW = "wwlatgldmmoboiep";
-    public static final String EMAIL_SUBJECT = "Factura Electrónica en Línea {0}, CISC Ltda. - ILVA";
+    public static final String EMAIL_SUBJECT = "EMISION DE FACTURA COMPRA-VENTA, CAISC R.L.";
     public static final String PATH_FILE_INVOICE = "C:/TEMP/";
     public static final String PREFIX_NAME_INVOICE = "FACTURA-";
 
-    public static final String EMAIL_TEXT_1 = "Usted tiene una Factura Electrónica en Línea, por favor revise sus archivos adjuntos.";
-    public static final String EMAIL_SUBJECT_ANNULLED = "Factura Electrónica en Línea ANULADA, CISC Ltda. - ILVA";
-    public static final String EMAIL_BUSINESS_NAME = "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS \"COCHABAMBA\" R.L.";
+    public static final String EMAIL_TEXT_1 =
+            "Estimado/a: {0},\n\nEn fecha {1}, se realizó la EMISION DE FACTURA DE COMPRA-VENTA Nro. {2}, en el cual usted, figura como beneficiario.\n" +
+            "Al pie del presente correo, se adjunta la representación gráfica y el archivo XML.\n\n" +
+            "Atentamente,\nCOOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\nINDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
+    public static final String EMAIL_SUBJECT_ANNULLED = "FACTURA DE COMPRA-VENTA ANULADA, CAISC R.L.";
+    public static final String EMAIL_BUSINESS_NAME = "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.";
 
     public static final String ACCOUNT_LECHECRUDA = "1580110400";
     public static final String ACCOUNT_FONDOSCUSTODIA = "2429910400";

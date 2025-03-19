@@ -111,6 +111,9 @@ public class CompanyConfiguration {
     @Column(name = "url_ping")
     private String connectionTestURL;
 
+    @Column(name = "url_reversion_cancel_bill")
+    private String reversionCancelBillURL;
+
     @Column(name = "ctadiftipcam", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
@@ -1821,5 +1824,13 @@ public class CompanyConfiguration {
 
     public void setDocumentFixedAssetOC(String documentFixedAssetOC) {
         this.documentFixedAssetOC = documentFixedAssetOC;
+    }
+
+    public String getReversionCancelBillURL() {
+        return reversionCancelBillURL;
+    }
+
+    public void setReversionCancelBillURL(String reversionCancelBillURL) {
+        this.reversionCancelBillURL = reversionCancelBillURL;
     }
 }

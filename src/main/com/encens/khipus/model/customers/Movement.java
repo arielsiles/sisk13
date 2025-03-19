@@ -107,7 +107,7 @@ public class Movement implements BaseModel {
     private String leyenda;
 
     @Column(name = "descri")
-    private String descri;
+    private String stateDescription;
 
     @Column(name = "codestado")
     private String codigoEstado;
@@ -330,12 +330,12 @@ public class Movement implements BaseModel {
         this.leyenda = leyenda;
     }
 
-    public String getDescri() {
-        return descri;
+    public String getStateDescription() {
+        return stateDescription;
     }
 
-    public void setDescri(String descri) {
-        this.descri = descri;
+    public void setStateDescription(String descri) {
+        this.stateDescription = descri;
     }
 
     public String getCodigoEstado() {
