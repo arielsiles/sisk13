@@ -78,6 +78,8 @@ public class SalesAction extends GenericAction {
     private String nitValidationMessage;
     private Boolean validateSale = Boolean.FALSE;
 
+    private Boolean isOnline = Boolean.TRUE;
+
     private UserCashBox userCashBox;
 
     private List<SignificantEventCodePOJO> significantEventsCodes; // no usado
@@ -236,10 +238,10 @@ public class SalesAction extends GenericAction {
 
         if (client == null) return;
 
-        if (!isThereInventory(productItem)){
+        /*if (!isThereInventory(productItem)){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No existe inventario suficiente...");
             return;
-        }
+        }*/
 
         System.out.println("--------------->>>----> VALIDAR VENTA PARAM: " + this.validateSale);
 
@@ -1202,6 +1204,22 @@ public class SalesAction extends GenericAction {
         return Outcome.SUCCESS;
     }
 
+    public String startInvoiceValidationOffline(){
+
+        try {
+            prepareOfflineBillPackages();
+            processOfflineBillPackages();
+            validateOfflineBillPackages();
+
+            movementService.updateAsValidated();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Outcome.SUCCESS;
+    }
+
     public ProductItem getProductItem() {
         return productItem;
     }
@@ -1396,11 +1414,13 @@ public class SalesAction extends GenericAction {
 
     public void chekBillingMode() throws IOException {
 
-        if (billControllerAction.checkBillingMode())
+        if (billControllerAction.checkBillingMode()) {
             this.setBillingMode("En Linea");
-        else
+            setOnline(Boolean.TRUE);
+        } else {
             this.setBillingMode("Fuera de Linea");
-
+            setOnline(Boolean.FALSE);
+        }
     }
 
     public Date getOrderDate() {
@@ -1625,5 +1645,13 @@ public class SalesAction extends GenericAction {
 
     public void setValidateSale(Boolean validateSale) {
         this.validateSale = validateSale;
+    }
+
+    public Boolean getOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(Boolean online) {
+        isOnline = online;
     }
 }

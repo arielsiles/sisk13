@@ -15,26 +15,16 @@
 
     <div class="buttons">
 
-        <!--<h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
-                         styleClass="button"
-                         tabindex="101">
-            <s:defaultAction/>
-        </h:commandButton>
-
-        <h:commandButton action="#{salesAction.processOfflineBillPackages()}" value="#{messages['Invoice.billingMode.process']}"
-                         styleClass="button"
-                         tabindex="101">
-            <s:defaultAction/>
-        </h:commandButton>
-
-        <h:commandButton action="#{salesAction.prepareOfflineBillPackages()}" value="#{messages['Invoice.billingMode.prepare']}"
-                         styleClass="button"
-                         tabindex="101">
-            <s:defaultAction/>
-        </h:commandButton>-->
-
         <h:commandButton action="#{salesAction.changeToOnlineBillingMode()}" value="#{messages['Invoice.billingMode.changeOnlineMode']}"
                          styleClass="button"
+                         rendered="#{!salesAction.online}"
+                         tabindex="101">
+            <s:defaultAction/>
+        </h:commandButton>
+
+        <h:commandButton action="#{salesAction.changeToOfflineBillingMode()}" value="#{messages['Invoice.billingMode.changeOfflineMode']}"
+                         styleClass="button"
+                         rendered="#{salesAction.online}"
                          tabindex="101">
             <s:defaultAction/>
         </h:commandButton>
@@ -114,7 +104,7 @@
 
     <div class="buttons">
 
-        <h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
+        <!--<h:commandButton action="#{salesAction.validateOfflineBillPackages()}" value="#{messages['Invoice.billingMode.validate']}"
                          styleClass="button"
                          tabindex="101">
             <s:defaultAction/>
@@ -130,11 +120,13 @@
                          styleClass="button"
                          tabindex="101">
             <s:defaultAction/>
-        </h:commandButton>
+        </h:commandButton>-->
 
-        <h:commandButton action="#{salesAction.changeToOfflineBillingMode()}" value="#{messages['Invoice.billingMode.changeOfflineMode']}"
+        <h:commandButton id="validateButtonId" action="#{salesAction.startInvoiceValidationOffline()}"
                          styleClass="button"
-                         tabindex="101">
+                         value="#{messages['Invoice.billingMode.validateBills']}" tabindex="5"
+                         onclick="Richfaces.showModalPanel('progressModalPanel');"
+                         rendered="#{salesAction.online}">
             <s:defaultAction/>
         </h:commandButton>
 
@@ -143,12 +135,17 @@
 </h:form>
 
 
-<s:fragment rendered="#{!clientAction.managed}">
-    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
-</s:fragment>
-<s:fragment rendered="#{clientAction.managed}">
-    <rich:jQuery selector="#firstName" query="focus()" timing="onload"/>
-</s:fragment>
+    <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+        <ui:param name="dialogId" value="progressModalPanel"/>
+        <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+        <ui:define name="progressTitle">"#{messages['Invoice.billingMode.invoiceValidationOffline']}"</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['Invoice.billingMode.invoiceValidationOffline.processMessage']}"/>
+            </p>
+        </ui:define>
+    </s:decorate>
+
 </ui:define>
 </ui:composition>
 

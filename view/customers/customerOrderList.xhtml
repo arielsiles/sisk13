@@ -397,6 +397,15 @@
                                         title="Generar XML Jasper"/>
                     </h:commandLink>-->
 
+                    <a4j:commandLink id="enviarButton"
+                                       action="#{printBillReportAction.sendMailAttachments(customerOrder)}"
+                                       styleClass="button"
+                                       immediate="true"
+                                       rendered="#{salesAction.showActionsBilling(customerOrder)}"
+                                       ajaxSingle="true">
+                        <h:graphicImage value="/img/enviar.png" styleClass="select-image" title="Enviar email" />
+                    </a4j:commandLink>
+
 
                 </rich:column>
 

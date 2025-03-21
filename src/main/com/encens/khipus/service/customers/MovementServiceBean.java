@@ -75,4 +75,10 @@ public class MovementServiceBean extends ExtendedGenericServiceBean implements M
         em.flush();
     }
 
+    @Override
+    public void updateAsValidated(){
+        //Actualizar tabla movimiento si columna descri = VALIDADA si es null
+        em.createNativeQuery("update movimiento set descri = 'VALIDADA' where descri is null").executeUpdate();
+    }
+
 }

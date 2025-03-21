@@ -138,6 +138,16 @@ public class PrintBillReportAction extends GenericReportAction {
 
     }
 
+    public void sendMailAttachments(CustomerOrder customerOrder){
+
+        //User user = getUser(currentUser.getId());
+        //this.customerOrderId = saleService.findLastSaleId(user);
+        //this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
+
+        sendMessageAction.sendEmailAttachment(customerOrder);
+
+    }
+
     private boolean hasValidInvoice(CustomerOrder customerOrder){
         boolean result = false;
         if (customerOrder.getMovement() != null) {
