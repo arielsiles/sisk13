@@ -89,77 +89,104 @@
                      styleClass="inputTiny"/>
     </s:decorate>
 
-    <s:decorate id="posNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.posName']}</ui:define>
-        <h:inputText id="posName" value="#{branchOffice.posName}"
-                     required="true"
-                     tabindex="4"
-                     styleClass="input"/>
+    <s:decorate id="pointOfSaleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['BranchOffice.pointOfSaleType']}</ui:define>
+        <h:selectOneMenu id="pointOfSaleType"
+                         value="#{branchOfficeAction.pointOfSaleTypeCode}" converter="pointOfSaleTypeCodeConverter"
+                         styleClass="input"
+                         required="false"
+                         tabindex="4">
+            <s:selectItems value="#{branchOfficeAction.pointOfSaleTypeCodeList}"
+                           var="element"
+                           label="#{element.codigoClasificador} - #{element.descripcion}"
+                           noSelectionLabel=""
+                           hideNoSelectionLabel="false"/>
+            <f:attribute name="pointOfSaleTypeCodeList" value="#{branchOfficeAction.pointOfSaleTypeCodeList}" />
+        </h:selectOneMenu>
+
+        <!--<h:selectOneMenu value="#{branchOfficeAction.pointOfSaleTypeCode}" converter="pointOfSaleCodeConverter">
+            <f:selectItems value="#{branchOfficeAction.pointOfSaleTypeCodeList}" var="pos"
+                           itemValue="#{pos}" itemLabel="#{pos.descripcion}" />
+            <f:attribute name="pointOfSaleTypeCodeList" value="#{branchOfficeAction.pointOfSaleTypeCodeList}" />
+        </h:selectOneMenu>-->
+
     </s:decorate>
 
-    <s:decorate id="sectorDocumentCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.sectorDocumentCode']}</ui:define>
-        <h:inputText id="sectorDocumentCode" value="#{branchOffice.sectorDocumentCode}"
-                     required="true"
-                     tabindex="5"
-                     styleClass="inputTiny"/>
-    </s:decorate>
+    <c:if test="#{branchOfficeAction.managed}">
 
-    <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.description']}</ui:define>
-        <h:inputText id="description" value="#{branchOffice.description}"
-                     required="true"
-                     tabindex="6"
-                     styleClass="input"/>
-    </s:decorate>
+        <s:decorate id="posNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.posName']}</ui:define>
+            <h:inputText id="posName" value="#{branchOffice.posName}"
+                         required="true"
+                         tabindex="4"
+                         styleClass="input"/>
+        </s:decorate>
 
-    <s:decorate id="activityField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.economicActivity']}</ui:define>
-        <h:inputText id="activity" value="#{branchOffice.activity}"
-                     required="true"
-                     tabindex="7"
-                     styleClass="inputLarge400"/>
-    </s:decorate>
+        <s:decorate id="sectorDocumentCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.sectorDocumentCode']}</ui:define>
+            <h:inputText id="sectorDocumentCode" value="#{branchOffice.sectorDocumentCode}"
+                         required="true"
+                         tabindex="5"
+                         styleClass="inputTiny"/>
+        </s:decorate>
 
-    <s:decorate id="companyNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.companyName']}</ui:define>
-        <h:inputText id="companyName" value="#{branchOffice.companyName}"
-                     required="true"
-                     tabindex="8"
-                     styleClass="inputLarge400"/>
-    </s:decorate>
+        <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.description']}</ui:define>
+            <h:inputText id="description" value="#{branchOffice.description}"
+                         required="true"
+                         tabindex="6"
+                         styleClass="input"/>
+        </s:decorate>
 
-    <s:decorate id="branchNameField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.branchName']}</ui:define>
-        <h:inputText id="branchName" value="#{branchOffice.branchName}"
-                     required="true"
-                     tabindex="9"
-                     styleClass="input"/>
-    </s:decorate>
+        <s:decorate id="activityField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.economicActivity']}</ui:define>
+            <h:inputText id="activity" value="#{branchOffice.activity}"
+                         required="true"
+                         tabindex="7"
+                         styleClass="inputLarge400"/>
+        </s:decorate>
 
-    <s:decorate id="placeField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.place']}</ui:define>
-        <h:inputText id="place" value="#{branchOffice.place}"
-                     required="true"
-                     tabindex="10"
-                     styleClass="input"/>
-    </s:decorate>
+        <s:decorate id="companyNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.companyName']}</ui:define>
+            <h:inputText id="companyName" value="#{branchOffice.companyName}"
+                         required="true"
+                         tabindex="8"
+                         styleClass="inputLarge400"/>
+        </s:decorate>
 
-    <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.phone']}</ui:define>
-        <h:inputText id="phone" value="#{branchOffice.phone}"
-                     required="true"
-                     tabindex="11"
-                     styleClass="input"/>
-    </s:decorate>
+        <s:decorate id="branchNameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.branchName']}</ui:define>
+            <h:inputText id="branchName" value="#{branchOffice.branchName}"
+                         required="true"
+                         tabindex="9"
+                         styleClass="input"/>
+        </s:decorate>
 
-    <s:decorate id="addressField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['BranchOffice.address']}</ui:define>
-        <h:inputText id="address" value="#{branchOffice.address}"
-                     required="true"
-                     tabindex="12"
-                     styleClass="inputLarge400"/>
-    </s:decorate>
+        <s:decorate id="placeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.place']}</ui:define>
+            <h:inputText id="place" value="#{branchOffice.place}"
+                         required="true"
+                         tabindex="10"
+                         styleClass="input"/>
+        </s:decorate>
+
+        <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.phone']}</ui:define>
+            <h:inputText id="phone" value="#{branchOffice.phone}"
+                         required="true"
+                         tabindex="11"
+                         styleClass="input"/>
+        </s:decorate>
+
+        <s:decorate id="addressField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['BranchOffice.address']}</ui:define>
+            <h:inputText id="address" value="#{branchOffice.address}"
+                         required="true"
+                         tabindex="12"
+                         styleClass="inputLarge400"/>
+        </s:decorate>
+
+    </c:if>
 
 </s:div>
 

@@ -13,6 +13,7 @@ import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.rest.SignificantEventCodePOJO;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.ReportService;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.*;
@@ -155,6 +156,9 @@ public class SalesAction extends GenericAction {
 
     @In(create = true)
     private SendMessageAction sendMessageAction;
+
+    @In
+    private ReportService reportService;
 
     @Factory(value = "subsidyEnumList")
     public SubsidyEnun[] getExperienceType() {
@@ -497,6 +501,8 @@ public class SalesAction extends GenericAction {
             clearAll();
             assignCustomerOrderTypeDefault();
         }
+
+        reportService.generateReportAsync(customerOrder);
     }
 
     public void generateInvoiceOnline(CustomerOrder customerOrder){
@@ -1357,7 +1363,7 @@ public class SalesAction extends GenericAction {
                 DocumentType docType = getClient().getInvoiceDocumentType();
                 boolean isOnlineMode =  billControllerAction.checkBillingMode();
 
-                if (docType.getSinCode() == 5 && isOnlineMode) {
+                if (docType.getSinCode() == 5 && isOnlineMode) { // codsin 5: NIT - NUMERO DE IDENTIFICACION TRIBUTARIA
                     result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
                     System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
                     setNitValidationMessage(result);
@@ -1367,11 +1373,15 @@ public class SalesAction extends GenericAction {
                         if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")) {
                             validNitCi = Boolean.TRUE;
                         } else
-                            validNitCi = Boolean.TRUE; /** FALSE Para controlar que no continue la venta en caso de un NIT inexistente **/
+                            validNitCi = Boolean.FALSE; /** FALSE Para controlar que no continue la venta en caso de un NIT inexistente **/
                     }
-                    if (result.equals("NIT ACTIVO") || result.equals("NIT INACTIVO")) {
+                    if (result.equals("NIT ACTIVO")) {
                         validNitCi = Boolean.TRUE;
                     }
+                    if (result.equals("NIT INACTIVO")) {
+                        validNitCi = Boolean.FALSE;
+                    }
+
                 }else {
                     result = "CI/CEX/PAS/OD";
                     if (!isOnlineMode)
@@ -1381,6 +1391,11 @@ public class SalesAction extends GenericAction {
                     validNitCi = Boolean.TRUE;
                     nitCiHasBeenValidated = Boolean.TRUE;
                 }
+            } catch (NumberFormatException e) {
+                setNitValidationMessage("Número de NIT/CI inválido.");
+                validNitCi = Boolean.FALSE;
+                nitCiHasBeenValidated = Boolean.FALSE;
+                return;
             } catch (Exception e) {
                 e.printStackTrace();
                 setNitValidationMessage("¡No se pudo validar!");

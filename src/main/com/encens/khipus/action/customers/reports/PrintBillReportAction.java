@@ -128,6 +128,33 @@ public class PrintBillReportAction extends GenericReportAction {
         }
     }
 
+
+    /*public void generatePdfFileReport(CustomerOrder customerOrder, GenerationReportData generationReportData) {
+        // Directorio donde deseas guardar el archivo PDF
+        //String outputDirectory = "/path/to/your/directory/"; // Reemplaza con el directorio real
+        String outputDirectory = Constants.PATH_FILE_INVOICE;
+        // Asegúrate de que el directorio exista, si no, créalo
+        File directory = new File(outputDirectory);
+        if (!directory.exists()) {
+            directory.mkdirs(); // Crea el directorio si no existe
+        }
+
+        // Definir el nombre del archivo PDF, agregando un prefijo y número de la factura
+        String destFileName = outputDirectory + Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".pdf";
+
+        JasperPrint jasperPrint = generationReportData.getExportReport().getJasperPrint();
+
+        try {
+            // Generar el archivo PDF
+            JasperExportManager.exportReportToPdfFile(jasperPrint, destFileName);
+            System.out.println("PDF generado en: " + destFileName); // Confirmación
+        } catch (JRException e) {
+            e.printStackTrace(); // Imprimir detalles del error en caso de fallo
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al generar el reporte PDF");
+        }
+    }*/
+
+
     public void sendMailAttachments(){
 
         User user = getUser(currentUser.getId());

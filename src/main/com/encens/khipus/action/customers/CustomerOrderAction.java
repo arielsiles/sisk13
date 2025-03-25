@@ -113,6 +113,7 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
                         movementService.updateMovement(movement);
                         // Anular Pedido
                         customerOrder.setState(SaleStatus.ANULADO);
+                        customerOrder.setCancellationReason(cancellationReason);
                         inventoryService.updateInventoryForSalesAnnuled(customerOrder);
                         saleService.updateCustomerOrder(customerOrder);
                         // Anular Asiento
@@ -200,6 +201,8 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
                 }
 
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "REVERSION DE ANULACION CONFIRMADA ...");
+                sendMessageReversionCancelInvoice(customerOrder);
+
             } else {
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, reversionResponse.getCodigoDescripcion());
             }
@@ -285,18 +288,34 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     public void sendMessageAnnulledInvoice(CustomerOrder customerOrder){
         Movement movement = customerOrder.getMovement();
         String text = "La Factura Nro. "  + movement.getNumber() + " de fecha "
-                                        + DateUtils.format(movement.getDate(), "dd/MM/yyyy")
-                                        + " emitida por " + Constants.EMAIL_BUSINESS_NAME
-                                        + " \ncon razón social " + movement.getName() + ", NIT/CI " + movement.getNit()
-                                        + " y Código de Autorización " + movement.getCuf()
-                                        + " ha sido ANULADA."
-                                        + "\nPor favor tomar las previsiones necesarias."
-                                        + "\n\nAtte."
-                                        + "\nCOOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L."
-                                        + "\nINDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
+                + DateUtils.format(movement.getDate(), "dd/MM/yyyy")
+                + " emitida por " + Constants.EMAIL_BUSINESS_NAME + "\n"
+                + "con razón social " + movement.getName() + ", NIT/CI " + movement.getNit()
+                + " y Código de Autorización " + movement.getCuf() + " ha sido ANULADA.\n"
+                + "Motivo de Anulación: " + (customerOrder.getCancellationReason() != null ? customerOrder.getCancellationReason().getDescription() : "No especificado") + "\n"
+                + "Por favor tomar las consideraciones necesarias.\n\n"
+                + "Atte.\n"
+                + "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\n"
+                + "INDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
 
         sendMessageAction.sendEmail(customerOrder, Constants.EMAIL_SUBJECT_ANNULLED, text);
         System.out.println("................" + Constants.EMAIL_SUBJECT_ANNULLED + "................");
+    }
+
+    public void sendMessageReversionCancelInvoice(CustomerOrder customerOrder){
+        Movement movement = customerOrder.getMovement();
+        String text = "La Factura Nro. "  + movement.getNumber() + " de fecha "
+                + DateUtils.format(movement.getDate(), "dd/MM/yyyy")
+                + " emitida por " + Constants.EMAIL_BUSINESS_NAME + "\n"
+                + "con razón social " + movement.getName() + ", NIT/CI " + movement.getNit()
+                + " y Código de Autorización " + movement.getCuf() + " ha sido REVERTIDA DE SU ANULACIÓN\n"
+                + "Por favor tomar las consideraciones necesarias.\n\n"
+                + "Atte.\n"
+                + "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\n"
+                + "INDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
+
+        sendMessageAction.sendEmail(customerOrder, Constants.EMAIL_SUBJECT_REVERSION_CANCEL_BILL, text);
+        System.out.println("................" + Constants.EMAIL_SUBJECT_REVERSION_CANCEL_BILL + "................");
     }
 
     public void executeBilling(List<CustomerOrder> customerOrderList) {

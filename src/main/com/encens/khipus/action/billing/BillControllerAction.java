@@ -643,6 +643,39 @@ public class BillControllerAction {
         System.out.println(result);
     }
 
+    public RegistroPosResponsePOJO registerPos(Integer codigoSucursal, Integer codigoPuntoVenta, Integer codigoTipoPuntoVenta, String descripcion, String nombrePos) {
+        //User user = getUser(currentUser.getId());
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        RegistroPosPOJO registroPosPOJO = new RegistroPosPOJO(codigoSucursal, codigoPuntoVenta, codigoTipoPuntoVenta, nombrePos, descripcion);
+
+        RegistroPosResponsePOJO registroPosResponsePOJO = null;
+
+        try {
+            String jsonString = Json.prettyPrint(Json.toJson(registroPosPOJO));
+            ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getRegisterPosURL(), jsonString);
+
+            if (serverResponse.getResponseJson() != null) {
+                JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+                registroPosResponsePOJO = Json.fromJson(jsonNodeResponse, RegistroPosResponsePOJO.class);
+
+                System.out.println("-----------------------REGISTER POS-------------------");
+                String result = Json.prettyPrint(jsonNodeResponse);
+                System.out.println(result);
+
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Nuevo Punto de Venta Registrado: " + registroPosResponsePOJO.getCodigoPuntoVenta());
+            } else {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (2).");
+            }
+        } catch (JsonProcessingException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (3).");
+            return null;
+        } catch (IOException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (4).");
+            return null;
+        }
+        return registroPosResponsePOJO;
+    }
+
     // No usado
     public List<SignificantEventCodePOJO> querySignificantEvents() throws IOException {
         User user = getUser(currentUser.getId());

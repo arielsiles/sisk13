@@ -338,6 +338,7 @@ public final class Constants {
             "Al pie del presente correo, se adjunta la representación gráfica y el archivo XML.\n\n" +
             "Atentamente,\nCOOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\nINDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
     public static final String EMAIL_SUBJECT_ANNULLED = "FACTURA DE COMPRA-VENTA ANULADA, CAISC R.L.";
+    public static final String EMAIL_SUBJECT_REVERSION_CANCEL_BILL = "REVERSION DE ANULACION FACTURA DE COMPRA-VENTA, CAISC R.L.";
     public static final String EMAIL_BUSINESS_NAME = "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.";
 
     public static final String ACCOUNT_LECHECRUDA = "1580110400";
@@ -350,6 +351,17 @@ public final class Constants {
     public static final String PROVIDER_CODE_PRODUCTORES = "433";
 
     public static final String NIT_COMPANY = "1008741021";
+
+    // Datos para crear Sucursal
+    public static final String NOMBRE_PUNTOVENTA = "No. Punto de Venta {0}";
+    public static final String DESCRIPCION = "ILVA - SUC({0}) POS({1})";
+    public static final Integer DOC_SECTOR = 1;
+    public static final String ACTIVIDAD_ECONOMICA_SUC2 = "ELABORACIÓN DE PRODUCTOS LÁCTEOS";
+    public static final String NOMBRE_EMPRESA_CAISC = "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.";
+    public static final String SUCURSAL = "SUCURSAL {0}";
+    public static final String LUGAR = "PUNATA - COCHABAMBA";
+    public static final String TELEFONO = "Teléfono: 4577003";
+    public static final String DIRECCION_SUC2 = "AVENIDA LIBERTADORES NRO.454 ZONA LOCALIDAD MIRABEL";
 
     private Constants() {
     }

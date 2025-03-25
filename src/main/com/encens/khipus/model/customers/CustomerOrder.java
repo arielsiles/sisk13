@@ -167,6 +167,10 @@ public class CustomerOrder implements BaseModel  {
     @ManyToOne(optional = true)
     private Movement movement;
 
+    @JoinColumn(name = "idmotivoanulacion", referencedColumnName = "idmotivoanulacion")
+    @ManyToOne(optional = true)
+    private CancellationReason cancellationReason;
+
     @JoinColumn(name = "iddistribuidor", referencedColumnName = "iddistribuidor")
     @ManyToOne(optional = true)
     private Distributor distributor;
@@ -447,5 +451,13 @@ public class CustomerOrder implements BaseModel  {
 
     public void setInvoiceNumberCafc(String invoiceNumberCafc) {
         this.invoiceNumberCafc = invoiceNumberCafc;
+    }
+
+    public CancellationReason getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(CancellationReason cancellationReason) {
+        this.cancellationReason = cancellationReason;
     }
 }

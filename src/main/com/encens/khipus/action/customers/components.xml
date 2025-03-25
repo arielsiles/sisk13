@@ -99,4 +99,7 @@
     <factory name="significantEventSINList" value="#{significantEventSINQuery}"/>
     <framework:entity-query name="significantEventSINQuery" ejbql="select d from SignificantEventSIN d "/>
 
+    <factory name="dosageList" value="#{dosageQuery}"/>
+    <framework:entity-query name="dosageQuery" ejbql="select d from Dosage d "/>
+
 </components>

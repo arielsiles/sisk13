@@ -114,6 +114,12 @@ public class CompanyConfiguration {
     @Column(name = "url_reversion_cancel_bill")
     private String reversionCancelBillURL;
 
+    @Column(name = "url_point_of_sale_types")
+    private String pointOfSaleTypesURL;
+
+    @Column(name = "url_register_pos")
+    private String registerPosURL;
+
     @Column(name = "ctadiftipcam", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
@@ -1832,5 +1838,21 @@ public class CompanyConfiguration {
 
     public void setReversionCancelBillURL(String reversionCancelBillURL) {
         this.reversionCancelBillURL = reversionCancelBillURL;
+    }
+
+    public String getPointOfSaleTypesURL() {
+        return pointOfSaleTypesURL;
+    }
+
+    public void setPointOfSaleTypesURL(String pointOfSaleTypesURL) {
+        this.pointOfSaleTypesURL = pointOfSaleTypesURL;
+    }
+
+    public String getRegisterPosURL() {
+        return registerPosURL;
+    }
+
+    public void setRegisterPosURL(String registerPosURL) {
+        this.registerPosURL = registerPosURL;
     }
 }
