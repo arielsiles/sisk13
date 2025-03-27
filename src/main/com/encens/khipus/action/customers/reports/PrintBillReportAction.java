@@ -111,6 +111,58 @@ public class PrintBillReportAction extends GenericReportAction {
             generationReportData.exportReport();
             generatePdfFileReport(lastCustomerOrder, generationReportData);
 
+            boolean messageSent = false;
+            if ( !customerOrder.getSent() )
+                messageSent = sendMessageAction.sendEmailAttachment(lastCustomerOrder);
+
+            System.out.println("------------->----------> envio: " + messageSent);
+            if ( messageSent ) {
+                customerOrder.setSent(true);
+                saleService.updateCustomerOrder(customerOrder);
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generatePDFReport(CustomerOrder customerOrder) {
+        log.debug("Generate BillInvoiceReportAction......");
+
+        User user = getUser(currentUser.getId());
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
+        //this.customerOrderId = saleService.findLastSaleId(user);
+        this.lastCustomerOrder = customerOrder;
+        setReportFormat(ReportFormat.PDF);
+
+
+        if (!hasValidInvoice(lastCustomerOrder)){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
+            return;
+        }
+
+
+        if (lastCustomerOrder.getMovement() != null){
+            if (lastCustomerOrder.getMovement().getStateDescription() != null) {
+                if (lastCustomerOrder.getMovement().getStateDescription().equals("RECHAZADA")) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURA RECHAZADA, No se puede imprimir.");
+                    return;
+                }
+            }
+        }
+
+        Map params = new HashMap();
+        params.putAll(getReportParams(dosage, lastCustomerOrder));
+        TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
+
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            generationReportData.exportReport();
+            generatePdfFileReport(lastCustomerOrder, generationReportData);
+
+            sendMessageAction.sendEmailAttachment(lastCustomerOrder);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

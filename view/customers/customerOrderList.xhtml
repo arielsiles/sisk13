@@ -371,14 +371,14 @@
                                       rendered="#{salesAction.showActionsBilling(customerOrder) and s:hasPermission('CANCEL_ORDER_INVOICE_SFE','VIEW')}"
                                       oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
                                       reRender="customerOrderList,confirmCancelOrderModalPanel">
-                        <h:graphicImage value="/img/annul-doc.png" styleClass="select-image" title="ANULAR FACTURA" />
+                        <h:graphicImage value="/img/annul2.png" styleClass="select-image" title="ANULAR FACTURA" />
                     </a4j:commandLink>
 
                     &#160;
-                    <h:commandLink action="#{salesAction.generateFileXML(customerOrder)}"
+                    <h:commandLink id="generateButtonId" action="#{salesAction.generateFilesPdfXml(customerOrder)}"
                                    rendered="#{salesAction.showActionsBilling(customerOrder)}"
                                    immediate="true">
-                        <h:graphicImage value="/img/xmlfile.png" styleClass="select-image" title="Generar XML"/>
+                        <h:graphicImage value="/img/doc_sent.png" styleClass="select-image" title="Generar XML"/>
                     </h:commandLink>
                     &#160;
                     <a4j:commandLink  id="reversionCancelBillCommandButton"
@@ -390,21 +390,21 @@
                                       reRender="customerOrderList, confirmReversionCancelBillModalPanel">
                         <h:graphicImage value="/img/revertir1.png" styleClass="select-image" title="Revertir Anulación" />
                     </a4j:commandLink>
-                    &#160;
+
                     <!--<h:commandLink action="#{billingReportAction.generateReport(customerOrder)}"
                                    immediate="true">
                         <h:graphicImage value="/img/payroll.jpg" styleClass="select-image"
                                         title="Generar XML Jasper"/>
                     </h:commandLink>-->
 
-                    <a4j:commandLink id="enviarButton"
+                    <!--<a4j:commandLink id="enviarButton"
                                        action="#{printBillReportAction.sendMailAttachments(customerOrder)}"
                                        styleClass="button"
                                        immediate="true"
                                        rendered="#{salesAction.showActionsBilling(customerOrder)}"
                                        ajaxSingle="true">
                         <h:graphicImage value="/img/enviar.png" styleClass="select-image" title="Enviar email" />
-                    </a4j:commandLink>
+                    </a4j:commandLink>-->
 
 
                 </rich:column>
@@ -432,6 +432,18 @@
         <s:decorate id="confirmReversionCancelBillModalPanelContainer" template="/customers/confirmReversionCancelBillModalPanel.xhtml">
             <ui:param name="containerId" value="confirmReversionCancelBillModalPanelContainer"/>
             <ui:param name="dialogId" value="confirmReversionCancelBillModalPanel"/>
+        </s:decorate>
+
+
+        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+            <ui:param name="dialogId" value="progressModalPanel"/>
+            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
+            <ui:define name="progressTitle">Procesando archivos...</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['CustomerOrder.invoice.messageSent']}"/>
+                </p>
+            </ui:define>
         </s:decorate>
 
     </ui:define>

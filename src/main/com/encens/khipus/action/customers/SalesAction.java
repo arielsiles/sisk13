@@ -2,6 +2,7 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.action.billing.BillControllerAction;
+import com.encens.khipus.action.billing.BillingReportAction;
 import com.encens.khipus.action.billing.SendMessageAction;
 import com.encens.khipus.action.customers.reports.PrintBillReportAction;
 import com.encens.khipus.exception.EntryNotFoundException;
@@ -13,7 +14,6 @@ import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.rest.SignificantEventCodePOJO;
 import com.encens.khipus.model.warehouse.ProductItem;
-import com.encens.khipus.service.ReportService;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.*;
@@ -155,10 +155,10 @@ public class SalesAction extends GenericAction {
     private PrintBillReportAction printBillReportAction;
 
     @In(create = true)
-    private SendMessageAction sendMessageAction;
+    private BillingReportAction billingReportAction;
 
-    @In
-    private ReportService reportService;
+    @In(create = true)
+    private SendMessageAction sendMessageAction;
 
     @Factory(value = "subsidyEnumList")
     public SubsidyEnun[] getExperienceType() {
@@ -501,8 +501,6 @@ public class SalesAction extends GenericAction {
             clearAll();
             assignCustomerOrderTypeDefault();
         }
-
-        reportService.generateReportAsync(customerOrder);
     }
 
     public void generateInvoiceOnline(CustomerOrder customerOrder){
@@ -516,6 +514,12 @@ public class SalesAction extends GenericAction {
         } catch (IOException e) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion...");
         }
+    }
+
+    public String generateFilesPdfXml(CustomerOrder customerOrder){
+        generateFileXML(customerOrder);
+        printBillReportAction.generatePDFReport(customerOrder);
+        return Outcome.SUCCESS;
     }
 
     public void generateFileXML(CustomerOrder customerOrder) {

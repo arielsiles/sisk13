@@ -75,8 +75,9 @@ public class SendMessageAction {
         }
     }
 
-    public void sendEmailAttachment(CustomerOrder customerOrder) {
+    public boolean sendEmailAttachment(CustomerOrder customerOrder) {
 
+        boolean result = false;
         try {
             String correoDestino = customerOrder.getClient().getEmail();
 
@@ -138,11 +139,15 @@ public class SendMessageAction {
                 t.sendMessage(mensaje, mensaje.getAllRecipients());
                 t.close();
                 System.out.println("................Mensaje Enviado...............");
+                result = true;
+            } else {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "No se puede enviar, correo no registrado.");
             }
         }catch (Exception e){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No se puede enviar, debe generar los archivos PDF/XML.");
             e.printStackTrace();
         }
+        return result;
     }
 
     public void sendEmailAttachment_0(CustomerOrder customerOrder) {

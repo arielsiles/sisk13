@@ -13,6 +13,7 @@ import java.io.Serializable;
         pkColumnValue = "sin_tipopuntoventa",
         allocationSize = Constants.SEQUENCE_ALLOCATION_SIZE)
 
+/** 26.03.2025 No se usa **/
 @Entity
 @Table(schema = Constants.KHIPUS_SCHEMA, name = "sin_tipopuntoventa")
 public class PointOfSaleType implements BaseModel, Serializable {

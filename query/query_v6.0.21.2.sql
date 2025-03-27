@@ -1,5 +1,6 @@
 -- 22.03.2025
-/*CREATE TABLE sin_tipopuntoventa (
+-- No se usa
+CREATE TABLE sin_tipopuntoventa (
     idtipopuntoventa bigint PRIMARY KEY,
     codigo_clasificador int,
     descripcion VARCHAR(255) NOT NULL
@@ -11,7 +12,7 @@ INSERT INTO sin_tipopuntoventa (idtipopuntoventa, codigo_clasificador, descripci
 (3, 3, 'PUNTO DE VENTA MOVILES'),
 (4, 6, 'PUNTO DE VENTA CONJUNTA'),
 (5, 4, 'PUNTO DE VENTA YPFB'),
-(6, 5, 'PUNTO DE VENTA CAJEROS');*/
+(6, 5, 'PUNTO DE VENTA CAJEROS');
 
 --
 ALTER TABLE configuracion ADD COLUMN url_point_of_sale_types VARCHAR(300) AFTER url_reversion_cancel_bill;
@@ -26,6 +27,10 @@ ALTER TABLE sucursal ADD COLUMN tipo_pos int AFTER docsector;
 insert into sin_motivoanulacion (idmotivoanulacion, codigo, descripcion) values (4, 4, 'FACTURA O NOTA DE CREDITO-DEBITO DEVUELTA');
 
 alter table pedidos add column idmotivoanulacion bigint after idmovimiento;
+--
+alter table pedidos add column envio int after idmotivoanulacion;
+update pedidos set envio = 0 where envio is null;
+
 
 -- ------------------------------------------
 -- AUX

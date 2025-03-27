@@ -334,8 +334,8 @@ public final class Constants {
     public static final String PREFIX_NAME_INVOICE = "FACTURA-";
 
     public static final String EMAIL_TEXT_1 =
-            "Estimado/a: {0},\n\nEn fecha {1}, se realizó la EMISION DE FACTURA DE COMPRA-VENTA Nro. {2}, en el cual usted, figura como beneficiario.\n" +
-            "Al pie del presente correo, se adjunta la representación gráfica y el archivo XML.\n\n" +
+            "Estimado/a: {0},\n\nEn fecha {1} se realizó la emisión de la FACTURA DE COMPRA-VENTA Nro. {2}, en el cual usted figura como beneficiario.\n" +
+            "Adjunto al presente correo, encontrará la representación gráfica y el archivo XML.\n\n" +
             "Atentamente,\nCOOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\nINDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
     public static final String EMAIL_SUBJECT_ANNULLED = "FACTURA DE COMPRA-VENTA ANULADA, CAISC R.L.";
     public static final String EMAIL_SUBJECT_REVERSION_CANCEL_BILL = "REVERSION DE ANULACION FACTURA DE COMPRA-VENTA, CAISC R.L.";
