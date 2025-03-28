@@ -69,6 +69,9 @@ public class BranchOffice implements BaseModel {
     @Column(name="tipo_pos")
     private Integer pointOfSaleType;
 
+    @Column(name="desc_tipopos")
+    private String posTypeDescription;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -205,5 +208,13 @@ public class BranchOffice implements BaseModel {
 
     public void setPointOfSaleType(Integer pointOfSaleType) {
         this.pointOfSaleType = pointOfSaleType;
+    }
+
+    public String getPosTypeDescription() {
+        return posTypeDescription;
+    }
+
+    public void setPosTypeDescription(String posTypeDescription) {
+        this.posTypeDescription = posTypeDescription;
     }
 }

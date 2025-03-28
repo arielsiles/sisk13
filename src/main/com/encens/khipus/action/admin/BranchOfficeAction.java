@@ -82,6 +82,7 @@ public class BranchOfficeAction extends GenericAction<BranchOffice> {
             branchOffice.setPosName(nombrePos);
             branchOffice.setSectorDocumentCode(Constants.DOC_SECTOR);
             branchOffice.setPointOfSaleType(getPointOfSaleTypeCode().getCodigoClasificador());
+            branchOffice.setPosTypeDescription(getPointOfSaleTypeCode().getDescripcion());
             branchOffice.setDescription(descripcionPos);
             branchOffice.setActivity(Constants.ACTIVIDAD_ECONOMICA_SUC2);
             branchOffice.setCompanyName(Constants.NOMBRE_EMPRESA_CAISC);

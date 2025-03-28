@@ -23,6 +23,7 @@ UPDATE configuracion SET url_register_pos ='http://10.0.0.106:8080/api/billing-o
 
 -- añadir columna tipo_pos int en tabla sucursal despues de docsector
 ALTER TABLE sucursal ADD COLUMN tipo_pos int AFTER docsector;
+ALTER TABLE sucursal ADD COLUMN desc_tipopos varchar(100) AFTER tipo_pos;
 
 insert into sin_motivoanulacion (idmotivoanulacion, codigo, descripcion) values (4, 4, 'FACTURA O NOTA DE CREDITO-DEBITO DEVUELTA');
 

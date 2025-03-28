@@ -30,13 +30,13 @@
                      action="#{branchOfficeAction.create}"
                      value="#{messages['Common.save']}"
                      styleClass="button"
-                     rendered="#{!businessUnitAction.managed and s:hasPermission('BRANCHOFFICE','CREATE')}">
+                     rendered="#{!branchOfficeAction.managed and s:hasPermission('BRANCHOFFICE','CREATE')}">
         <s:defaultAction/>
     </h:commandButton>
 
     <a4j:commandButton id="updateButtonId"
                        action="#{branchOfficeAction.update}"
-                       value="#{messages['Common.save']}"
+                       value="#{messages['Common.saveChange']}"
                        styleClass="button"
                        rendered="#{branchOfficeAction.managed and s:hasPermission('BRANCHOFFICE','UPDATE')}"
                        reRender="branchOfficeForm">
@@ -68,6 +68,7 @@
     <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['BranchOffice.name']}</ui:define>
         <h:inputText id="name" value="#{branchOffice.name}"
+                     readonly="#{branchOfficeAction.managed}"
                      required="true"
                      tabindex="1"
                      styleClass="input"/>
@@ -77,6 +78,7 @@
         <ui:define name="label">#{messages['BranchOffice.officeCode']}</ui:define>
         <h:inputText id="officeCode" value="#{branchOffice.officeCode}"
                      required="true"
+                     readonly="#{branchOfficeAction.managed}"
                      tabindex="2"
                      styleClass="inputTiny"/>
     </s:decorate>
@@ -85,11 +87,12 @@
         <ui:define name="label">#{messages['BranchOffice.posCode']}</ui:define>
         <h:inputText id="posCode" value="#{branchOffice.posCode}"
                      required="true"
+                     readonly="#{branchOfficeAction.managed}"
                      tabindex="3"
                      styleClass="inputTiny"/>
     </s:decorate>
 
-    <s:decorate id="pointOfSaleTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <s:decorate id="pointOfSaleTypeField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{!branchOfficeAction.managed}">
         <ui:define name="label">#{messages['BranchOffice.pointOfSaleType']}</ui:define>
         <h:selectOneMenu id="pointOfSaleType"
                          value="#{branchOfficeAction.pointOfSaleTypeCode}" converter="pointOfSaleTypeCodeConverter"
@@ -103,14 +106,18 @@
                            hideNoSelectionLabel="false"/>
             <f:attribute name="pointOfSaleTypeCodeList" value="#{branchOfficeAction.pointOfSaleTypeCodeList}" />
         </h:selectOneMenu>
-
         <!--<h:selectOneMenu value="#{branchOfficeAction.pointOfSaleTypeCode}" converter="pointOfSaleCodeConverter">
             <f:selectItems value="#{branchOfficeAction.pointOfSaleTypeCodeList}" var="pos"
                            itemValue="#{pos}" itemLabel="#{pos.descripcion}" />
             <f:attribute name="pointOfSaleTypeCodeList" value="#{branchOfficeAction.pointOfSaleTypeCodeList}" />
         </h:selectOneMenu>-->
-
     </s:decorate>
+
+    <s:decorate id="posTypeDescField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{branchOfficeAction.managed}">
+        <ui:define name="label">#{messages['BranchOffice.pointOfSaleType']}</ui:define>
+        <h:outputLabel styleClass="input" value="#{branchOffice.pointOfSaleType} - #{branchOffice.posTypeDescription}"/>
+    </s:decorate>
+
 
     <c:if test="#{branchOfficeAction.managed}">
 
@@ -126,6 +133,7 @@
             <ui:define name="label">#{messages['BranchOffice.sectorDocumentCode']}</ui:define>
             <h:inputText id="sectorDocumentCode" value="#{branchOffice.sectorDocumentCode}"
                          required="true"
+                         readonly="#{branchOfficeAction.managed}"
                          tabindex="5"
                          styleClass="inputTiny"/>
         </s:decorate>
@@ -197,13 +205,13 @@
     <h:commandButton action="#{branchOfficeAction.create}"
                      value="#{messages['Common.save']}"
                      styleClass="button"
-                     rendered="#{!businessUnitAction.managed and s:hasPermission('BRANCHOFFICE','CREATE')}"
+                     rendered="#{!branchOfficeAction.managed and s:hasPermission('BRANCHOFFICE','CREATE')}"
                      tabindex="18"/>
 
     <a4j:commandButton action="#{branchOfficeAction.update}"
-                       value="#{messages['Common.save']}"
+                       value="#{messages['Common.saveChange']}"
                        styleClass="button"
-                       rendered="#{businessUnitAction.managed and s:hasPermission('BRANCHOFFICE','UPDATE')}"
+                       rendered="#{branchOfficeAction.managed and s:hasPermission('BRANCHOFFICE','UPDATE')}"
                        reRender="branchOfficeForm"
                        tabindex="19">
         <s:defaultAction/>
