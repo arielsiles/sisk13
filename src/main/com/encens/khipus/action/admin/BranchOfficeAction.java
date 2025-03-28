@@ -6,6 +6,7 @@ import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.BranchOffice;
+import com.encens.khipus.model.customers.Dosage;
 import com.encens.khipus.model.rest.PointOfSaleTypeCode;
 import com.encens.khipus.model.rest.RegistroPosResponsePOJO;
 import com.encens.khipus.util.Constants;
@@ -15,6 +16,7 @@ import org.jboss.seam.international.StatusMessage;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -89,6 +91,19 @@ public class BranchOfficeAction extends GenericAction<BranchOffice> {
             branchOffice.setAddress(Constants.DIRECCION_SUC2);
 
             genericService.create(getInstance());
+
+            Dosage dosage = new Dosage();
+            dosage.setAuthorizationNumber(1L);
+            dosage.setState("ACTIVO");
+            dosage.setActive(Boolean.TRUE);
+            dosage.setCurrentNumber(1L);
+            dosage.setCompanyNit("1008741021");
+            dosage.setStartDate(new Date());
+            dosage.setControlDate(new Date());
+            dosage.setBranchOffice(branchOffice);
+
+            genericService.create(dosage);
+
             addCreatedMessage();
             return Outcome.SUCCESS;
 
