@@ -4,6 +4,7 @@ import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.customers.Movement;
 import com.encens.khipus.model.purchases.PurchaseDocument;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -113,6 +114,14 @@ public class Voucher implements BaseModel{
     @Column(name = "glosa", updatable = true, length = 1000)
     @Length(max = 1000)
     private String gloss;
+
+    @Column(name = "open", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean openingSeat = Boolean.FALSE;
+
+    @Column(name = "close", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean closingSeat = Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name = "idmovimiento", referencedColumnName = "idmovimiento")
@@ -627,5 +636,21 @@ public class Voucher implements BaseModel{
         String modificado = updatedBy != null ? " >> " + updatedBy : "";
 
         return creado + modificado;
+    }
+
+    public Boolean getOpeningSeat() {
+        return openingSeat;
+    }
+
+    public void setOpeningSeat(Boolean openingSeat) {
+        this.openingSeat = openingSeat;
+    }
+
+    public Boolean getClosingSeat() {
+        return closingSeat;
+    }
+
+    public void setClosingSeat(Boolean closingSeat) {
+        this.closingSeat = closingSeat;
     }
 }

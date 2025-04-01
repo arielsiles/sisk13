@@ -336,6 +336,7 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucher.getDetails().add(voucherDetail);
         }
 
+        voucher.setClosingSeat(Boolean.TRUE);
         voucherAccoutingService.saveVoucher(voucher);
 
     }
@@ -422,6 +423,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         System.out.println("===> TOTAL HABER: " + totalCredit);
         System.out.println("===> TOTAL DIFF: " + BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
 
+        voucher.setClosingSeat(Boolean.TRUE);
+        voucher.setOpeningSeat(Boolean.FALSE);
         voucherAccoutingService.saveVoucher(voucher);
 
     }
@@ -484,6 +487,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             if (amountAux > 0)
                 newVoucher.getDetails().add(newVoucherDetail);
         }
+        voucher.setOpeningSeat(Boolean.TRUE);
+        voucher.setClosingSeat(Boolean.FALSE);
         voucherAccoutingService.saveVoucher(newVoucher);
     }
 
