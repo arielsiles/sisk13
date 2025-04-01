@@ -643,6 +643,39 @@ public class BillControllerAction {
         System.out.println(result);
     }
 
+    public ClosePosResponsePOJO closePos(Integer codSuc, Integer codPos, Integer codPosClose) {
+
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        ClosePosPOJO closePosPOJO = new ClosePosPOJO(codSuc, codPos, codPosClose);
+
+        System.out.println("-----------------------closePos-------------------");
+
+        ClosePosResponsePOJO closePosResponsePOJO = null;
+
+        try {
+            String jsonString = Json.prettyPrint(Json.toJson(closePosPOJO));
+            ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getClosePosURL(), jsonString);
+
+            if (serverResponse.getResponseJson() != null) {
+                JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+                closePosResponsePOJO = Json.fromJson(jsonNodeResponse, ClosePosResponsePOJO.class);
+
+                System.out.println("-----------------------CLOSE POS POJO-------------------");
+                String result = Json.prettyPrint(jsonNodeResponse);
+                System.out.println(result);
+
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Punto de Venta Cerrado!!!");
+            } else {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (2).");
+            }
+        } catch (JsonProcessingException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (3).");
+        } catch (IOException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (4).");
+        }
+        return closePosResponsePOJO;
+    }
+
     public RegistroPosResponsePOJO registerPos(Integer codigoSucursal, Integer codigoPuntoVenta, Integer codigoTipoPuntoVenta, String descripcion, String nombrePos) {
         //User user = getUser(currentUser.getId());
         CompanyConfiguration companyConfiguration = getCompanyConfiguration();

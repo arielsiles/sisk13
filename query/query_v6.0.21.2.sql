@@ -21,9 +21,14 @@ UPDATE configuracion SET url_point_of_sale_types='http://10.0.0.106:8080/api/syn
 ALTER TABLE configuracion ADD COLUMN url_register_pos VARCHAR(300) AFTER url_point_of_sale_types;
 UPDATE configuracion SET url_register_pos ='http://10.0.0.106:8080/api/billing-operations/register-pos' where no_cia = '01';
 
+ALTER TABLE configuracion ADD COLUMN url_close_pos VARCHAR(300) AFTER url_register_pos;
+UPDATE configuracion SET url_close_pos ='http://10.0.0.106:8080/api/billing-operations/close-pos' where no_cia = '01';
+
 -- añadir columna tipo_pos int en tabla sucursal despues de docsector
 ALTER TABLE sucursal ADD COLUMN tipo_pos int AFTER docsector;
 ALTER TABLE sucursal ADD COLUMN desc_tipopos varchar(100) AFTER tipo_pos;
+ALTER TABLE sucursal ADD COLUMN pos_activo int after tipo_pos; -- Actualizar manualmente
+
 
 insert into sin_motivoanulacion (idmotivoanulacion, codigo, descripcion) values (4, 4, 'FACTURA O NOTA DE CREDITO-DEBITO DEVUELTA');
 
@@ -31,7 +36,6 @@ alter table pedidos add column idmotivoanulacion bigint after idmovimiento;
 --
 alter table pedidos add column envio int after idmotivoanulacion;
 update pedidos set envio = 0 where envio is null;
-
 
 -- ------------------------------------------
 -- AUX

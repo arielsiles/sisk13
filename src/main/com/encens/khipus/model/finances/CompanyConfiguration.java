@@ -120,6 +120,9 @@ public class CompanyConfiguration {
     @Column(name = "url_register_pos")
     private String registerPosURL;
 
+    @Column(name = "url_close_pos")
+    private String closePosURL;
+
     @Column(name = "ctadiftipcam", length = 20, nullable = false)
     @Length(max = 20)
     @NotNull
@@ -1854,5 +1857,13 @@ public class CompanyConfiguration {
 
     public void setRegisterPosURL(String registerPosURL) {
         this.registerPosURL = registerPosURL;
+    }
+
+    public String getClosePosURL() {
+        return closePosURL;
+    }
+
+    public void setClosePosURL(String closePosURL) {
+        this.closePosURL = closePosURL;
     }
 }

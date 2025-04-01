@@ -2,11 +2,13 @@ package com.encens.khipus.action.admin;
 
 import com.encens.khipus.action.billing.BillControllerAction;
 import com.encens.khipus.action.billing.SyncControllerAction;
+import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.BranchOffice;
 import com.encens.khipus.model.customers.Dosage;
+import com.encens.khipus.model.rest.ClosePosResponsePOJO;
 import com.encens.khipus.model.rest.PointOfSaleTypeCode;
 import com.encens.khipus.model.rest.RegistroPosResponsePOJO;
 import com.encens.khipus.util.Constants;
@@ -82,6 +84,7 @@ public class BranchOfficeAction extends GenericAction<BranchOffice> {
             branchOffice.setPosName(nombrePos);
             branchOffice.setSectorDocumentCode(Constants.DOC_SECTOR);
             branchOffice.setPointOfSaleType(getPointOfSaleTypeCode().getCodigoClasificador());
+            branchOffice.setActivePos(registroPosResponsePOJO.getTransaccion()); // Transaccion exitosa
             branchOffice.setPosTypeDescription(getPointOfSaleTypeCode().getDescripcion());
             branchOffice.setDescription(descripcionPos);
             branchOffice.setActivity(Constants.ACTIVIDAD_ECONOMICA_SUC2);
@@ -114,6 +117,29 @@ public class BranchOfficeAction extends GenericAction<BranchOffice> {
         }
     }
 
+    @End
+    public String closePos(){
+
+        BranchOffice branchOffice = getInstance();
+        ClosePosResponsePOJO closePosResponsePOJO = billControllerAction.closePos(branchOffice.getOfficeCode(), 0, branchOffice.getPosCode());
+
+        if ( closePosResponsePOJO == null ){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (1).");
+            return Outcome.REDISPLAY;
+        }
+
+        branchOffice.setActivePos(Boolean.FALSE);
+        branchOffice.setDescription(branchOffice.getDescription() + " / Close" );
+        try {
+            genericService.update(branchOffice);
+        } catch (EntryDuplicatedException e) {
+            throw new RuntimeException(e);
+        } catch (ConcurrencyException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Outcome.SUCCESS;
+    }
 
     public List<PointOfSaleTypeCode> getPointOfSaleTypeCodeList() {
         return pointOfSaleTypeCodeList;

@@ -3,8 +3,10 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -68,6 +70,10 @@ public class BranchOffice implements BaseModel {
 
     @Column(name="tipo_pos")
     private Integer pointOfSaleType;
+
+    @Column(name = "pos_activo", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private boolean activePos;
 
     @Column(name="desc_tipopos")
     private String posTypeDescription;
@@ -216,5 +222,13 @@ public class BranchOffice implements BaseModel {
 
     public void setPosTypeDescription(String posTypeDescription) {
         this.posTypeDescription = posTypeDescription;
+    }
+
+    public boolean isActivePos() {
+        return activePos;
+    }
+
+    public void setActivePos(boolean activePos) {
+        this.activePos = activePos;
     }
 }

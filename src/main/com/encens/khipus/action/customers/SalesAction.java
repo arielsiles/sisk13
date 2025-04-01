@@ -1193,6 +1193,7 @@ public class SalesAction extends GenericAction {
 
     public String changeToOnlineBillingMode() throws IOException {
         billControllerAction.changeToOnlineBillingMode();
+        setOnline(true);
         return Outcome.SUCCESS;
     }
 

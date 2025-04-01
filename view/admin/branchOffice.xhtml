@@ -26,6 +26,14 @@
 <h:form id="branchOfficeForm">
 
 <div class="buttons">
+
+    <h:commandButton id="closePosButtonId"
+                     action="#{branchOfficeAction.closePos()}"
+                     value="#{messages['BranchOffice.closePos']}"
+                     styleClass="button"
+                     rendered="#{branchOfficeAction.managed and s:hasPermission('BRANCHOFFICE','DELETE')}">
+    </h:commandButton>
+
     <h:commandButton id="createButtonId"
                      action="#{branchOfficeAction.create}"
                      value="#{messages['Common.save']}"
