@@ -327,8 +327,10 @@ public final class Constants {
     public static final String ONLINE = "ONLINE";
     public static final String OFFLINE = "OFFLINE";
 
-    public static final String EMAIL_FROM = "ariel.siles@gmail.com";
-    public static final String EMAIL_PASSW = "wwlatgldmmoboiep";
+    public static final String SMTP_HOST = "";
+    public static final String SMTP_PORT = "";
+    public static final String EMAIL_FROM = "";
+    public static final String EMAIL_PASSW = "";
     public static final String EMAIL_SUBJECT = "EMISION DE FACTURA COMPRA-VENTA, CAISC R.L.";
     public static final String PATH_FILE_INVOICE = "C:/TEMP/";
     public static final String PREFIX_NAME_INVOICE = "FACTURA-";

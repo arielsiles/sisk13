@@ -28,12 +28,10 @@ import java.util.Properties;
 @Scope(ScopeType.PAGE)
 public class SendMessageAction {
 
-    //private static final String correo = Constants.EMAIL_FROM;
-    //private static final String contra = Constants.EMAIL_PASSW;
-    private static final String SMTP_HOST = "mail.ilvabolivia.com";
-    private static final String SMTP_PORT = "587";
-    private static final String EMAIL_FROM = "ariel.siles@ilvabolivia.com";
-    private static final String EMAIL_PASSWORD = "Miracula.13";
+    private static final String SMTP_HOST = Constants.SMTP_HOST;
+    private static final String SMTP_PORT = Constants.SMTP_PORT;
+    private static final String EMAIL_FROM = Constants.EMAIL_FROM;
+    private static final String EMAIL_PASSWORD = Constants.EMAIL_PASSW;
 
     @In
     private FacesMessages facesMessages;
@@ -169,7 +167,7 @@ public class SendMessageAction {
             // Crear sesión de correo
             Session emailSession = Session.getInstance(emailProperties, new javax.mail.Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication("ariel.siles@gmail.com", "wwlatgldmmoboiep");
+                    return new PasswordAuthentication("ariel.siles@gmail.com", "");
                 }
             });
 

@@ -16,11 +16,6 @@ public class EmailSender {
     private static final String EMAIL_FROM = "ariel.siles@ilvabolivia.com";
     private static final String EMAIL_PASSWORD = "Miracula.13";
 
-    /*private static final String SMTP_HOST = "smtp.gmail.com";
-    private static final String SMTP_PORT = "587";
-    private static final String EMAIL_FROM = "ariel.siles@gmail.com";
-    private static final String EMAIL_PASSWORD = "wwlatgldmmoboiep";*/
-
     public void sendEmailWithAttachment(String toEmail, String subject, String bodyText, String attachmentPath) {
         try {
             // Habilitar manualmente TLSv1.2
