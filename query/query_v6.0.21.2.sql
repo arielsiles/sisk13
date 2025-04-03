@@ -36,6 +36,8 @@ alter table pedidos add column idmotivoanulacion bigint after idmovimiento;
 --
 alter table pedidos add column envio int after idmotivoanulacion;
 update pedidos set envio = 0 where envio is null;
+--
+alter table dosificacion add foreign key (idsucursal) references sucursal (idsucursal);
 
 -- ------------------------------------------
 -- AUX
