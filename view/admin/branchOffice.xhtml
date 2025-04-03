@@ -76,7 +76,6 @@
     <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['BranchOffice.name']}</ui:define>
         <h:inputText id="name" value="#{branchOffice.name}"
-                     readonly="#{branchOfficeAction.managed}"
                      required="true"
                      tabindex="1"
                      styleClass="input"/>

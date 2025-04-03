@@ -1378,28 +1378,48 @@ public class SalesAction extends GenericAction {
                         if (getClient().getNitNumber().equals("99001") || getClient().getNitNumber().equals("99002") || getClient().getNitNumber().equals("99003")) {
                             validNitCi = Boolean.TRUE;
                         } else
-                            validNitCi = Boolean.FALSE; /** FALSE Para controlar que no continue la venta en caso de un NIT inexistente **/
+                            validNitCi = Boolean.TRUE; /** FALSE Para controlar que no continue la venta en caso de un NIT inexistente **/
                     }
-                    if (result.equals("NIT ACTIVO")) {
+                    if (result.equals("NIT ACTIVO") || result.equals("NIT INACTIVO")) {
                         validNitCi = Boolean.TRUE;
                     }
-                    if (result.equals("NIT INACTIVO")) {
-                        validNitCi = Boolean.FALSE;
-                    }
-
                 }else {
                     result = "CI/CEX/PAS/OD";
-                    if (!isOnlineMode)
+
+                    if ( docType.getSinCode() == 1 ) { // codsin 1: CARNET DE IDENTIDAD
+                        try {
+                            Long nitNumber = Long.parseLong(getClient().getNitNumber());
+                        } catch (NumberFormatException e) {
+                            validNitCi = Boolean.FALSE;
+                            nitCiHasBeenValidated = Boolean.FALSE;
+                            setNitValidationMessage("Número de CI inválido...");
+                            return;
+                        }
+                    }
+
+                    if (!isOnlineMode) {
                         result = "Fuera de línea";
 
+                        if ( docType.getSinCode() == 1 ) { // codsin 1: CARNET DE IDENTIDAD
+                            try {
+                                Long nitNumber = Long.parseLong(getClient().getNitNumber());
+                            } catch (NumberFormatException e) {
+                                validNitCi = Boolean.FALSE;
+                                nitCiHasBeenValidated = Boolean.FALSE;
+                                setNitValidationMessage("Número de CI inválido... .");
+                                return;
+                            }
+                        }
+
+                    }
                     setNitValidationMessage(result);
                     validNitCi = Boolean.TRUE;
                     nitCiHasBeenValidated = Boolean.TRUE;
                 }
             } catch (NumberFormatException e) {
-                setNitValidationMessage("Número de NIT/CI inválido.");
-                validNitCi = Boolean.FALSE;
-                nitCiHasBeenValidated = Boolean.FALSE;
+                setNitValidationMessage("Número de NIT/CI inválido...");
+                validNitCi = Boolean.TRUE;
+                nitCiHasBeenValidated = Boolean.TRUE;
                 return;
             } catch (Exception e) {
                 e.printStackTrace();

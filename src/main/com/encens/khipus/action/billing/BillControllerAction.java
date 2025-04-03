@@ -278,7 +278,7 @@ public class BillControllerAction {
         try {
             URL url = new URL(urlEndpoint);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(7000);
+            con.setConnectTimeout(15000);
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; utf-8");
             con.setRequestProperty("Accept", "application/json");
@@ -810,12 +810,23 @@ public class BillControllerAction {
         boolean isOnlineMode = checkBillingMode();
 
         if (isOnlineMode && pedidoPOJO.getCodigoTipoDocumentoIdentidad()==5){
-            String validNitResult = nitVerification(new Long(pedidoPOJO.getNumeroDocumento()));
-            System.out.println("******************>>>>>> validNitResult: " + pedidoPOJO.getNumeroDocumento() + " - "  + validNitResult);
-            if (validNitResult.equals("NIT INEXISTENTE")){
-                System.out.println("**********> NIT INEXISTENTE, CODIGO EXCEPCION 1");
+
+            try {
+                String validNitResult = nitVerification(new Long(pedidoPOJO.getNumeroDocumento()));
+                System.out.println("******************>>>>>> validNitResult: " + pedidoPOJO.getNumeroDocumento() + " - "  + validNitResult);
+                if (validNitResult.equals("NIT INEXISTENTE")){
+                    System.out.println("**********> NIT INEXISTENTE, CODIGO EXCEPCION 1");
+                    pedidoPOJO.setCodigoExcepcion(1);
+                }
+                if (validNitResult.equals("NIT INACTIVO")){
+                    System.out.println("**********> NIT INACTIVO, CODIGO EXCEPCION 1");
+                    pedidoPOJO.setCodigoExcepcion(1);
+                }
+            } catch (NumberFormatException e){
+                System.out.println("**********> NIT INVALIDO..., CODIGO EXCEPCION 1");
                 pedidoPOJO.setCodigoExcepcion(1);
             }
+
         }
 
 
