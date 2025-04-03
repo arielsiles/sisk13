@@ -39,6 +39,9 @@ update pedidos set envio = 0 where envio is null;
 --
 alter table dosificacion add foreign key (idsucursal) references sucursal (idsucursal);
 
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(408, 'SYNC_BILLING_SFE', 2, 1, 'Functionality.admin.syncCatalogsBillingSFE', 1);
+
 -- ------------------------------------------
 -- AUX
 update personacliente p set p.email = 'ariel.siles@gmail.com' where p.idpersonacliente >= 1;

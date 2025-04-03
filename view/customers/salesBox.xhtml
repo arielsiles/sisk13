@@ -225,21 +225,21 @@
 
             <!-- -->
 
-            <a4j:commandButton id="enviarButton"
+            <!--<a4j:commandButton id="enviarButton"
                                action="#{printBillReportAction.sendMailAttachments()}"
                                value="Enviar Mail"
                                styleClass="button"
                                immediate="true"
                                rendered="#{s:hasPermission('SEND_MAIL_INVOICE','VIEW')}"
                                ajaxSingle="true">
-            </a4j:commandButton>
+            </a4j:commandButton>-->
 
             <a4j:commandButton id="syncButton"
                                action="#{syncControllerAction.syncData()}"
                                value="SYNC"
                                styleClass="button"
                                immediate="true"
-                               rendered="#{s:hasPermission('BILLING_MANAGE_SFE','VIEW')}"
+                               rendered="#{s:hasPermission('SYNC_BILLING_SFE','VIEW')}"
                                ajaxSingle="true">
             </a4j:commandButton>
 
