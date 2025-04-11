@@ -65,6 +65,8 @@ public class SalesAction extends GenericAction {
     private SubsidyEnun subsidyEnun;
     private CustomerCategoryType customerCategoryTypeEnum;
 
+    private PaymentMethodSin paymentMethodSin;
+
     /** For special billing **/
     private Date billingSpecialDate = new Date();
     private String nameSpecialBill = "";
@@ -404,6 +406,7 @@ public class SalesAction extends GenericAction {
         setCustomerCategoryTypeEnum(null);
         setFinalConsumer(Boolean.FALSE);
         setMoneyReturned(BigDecimal.ZERO);
+        setPaymentMethodSin(null);
 
         this.nitCiHasBeenValidated = Boolean.FALSE;
         this.validNitCi = Boolean.FALSE;
@@ -602,6 +605,10 @@ public class SalesAction extends GenericAction {
         customerOrder.setClient(client);
         customerOrder.setDistributor(distributor);
         customerOrder.setState(SaleStatus.PENDIENTE);
+
+        System.out.println("---------> paymentMethodSin: " + paymentMethodSin);
+
+        customerOrder.setPaymentMethod(paymentMethodSin);
 
         if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH))
             customerOrder.setState(SaleStatus.CONTABILIZADO);
@@ -1400,6 +1407,18 @@ public class SalesAction extends GenericAction {
                     if (!isOnlineMode) {
                         result = "Fuera de línea";
 
+                        if (docType.getSinCode() == 5) { // codsin 5: NIT - NUMERO DE IDENTIFICACION TRIBUTARIA
+                            try {
+                                Long nitAux = new Long(getClient().getNitNumber());
+                            } catch (NumberFormatException e) {
+                                validNitCi = Boolean.FALSE;
+                                nitCiHasBeenValidated = Boolean.FALSE;
+                                setNitValidationMessage("Número de NIT inválido... ..");
+                                return;
+                            }
+
+                        }
+
                         if ( docType.getSinCode() == 1 ) { // codsin 1: CARNET DE IDENTIDAD
                             try {
                                 Long nitNumber = Long.parseLong(getClient().getNitNumber());
@@ -1418,8 +1437,8 @@ public class SalesAction extends GenericAction {
                 }
             } catch (NumberFormatException e) {
                 setNitValidationMessage("Número de NIT/CI inválido...");
-                validNitCi = Boolean.TRUE;
-                nitCiHasBeenValidated = Boolean.TRUE;
+                validNitCi = Boolean.FALSE;
+                nitCiHasBeenValidated = Boolean.FALSE;
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1428,7 +1447,9 @@ public class SalesAction extends GenericAction {
         }else {
 
             Boolean isOnlineMode =  billControllerAction.checkBillingMode();
-            if (isOnlineMode != null){ // ebilling conexion ok
+            if (isOnlineMode != null){
+
+
                 if (!isOnlineMode){
                     setNitValidationMessage("Modo Fuera de Línea, continuar.");
                     validNitCi = Boolean.TRUE;
@@ -1693,5 +1714,13 @@ public class SalesAction extends GenericAction {
 
     public void setOnline(Boolean online) {
         isOnline = online;
+    }
+
+    public PaymentMethodSin getPaymentMethodSin() {
+        return paymentMethodSin;
+    }
+
+    public void setPaymentMethodSin(PaymentMethodSin paymentMethodSin) {
+        this.paymentMethodSin = paymentMethodSin;
     }
 }

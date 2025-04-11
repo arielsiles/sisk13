@@ -293,6 +293,7 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
                 + "con razón social " + movement.getName() + ", NIT/CI " + movement.getNit()
                 + " y Código de Autorización " + movement.getCuf() + " ha sido ANULADA.\n"
                 + "Motivo de Anulación: " + (customerOrder.getCancellationReason() != null ? customerOrder.getCancellationReason().getDescription() : "No especificado") + "\n"
+                + (customerOrder.getObservation() != null ? customerOrder.getObservation() + "\n" : "")
                 + "Por favor tomar las consideraciones necesarias.\n\n"
                 + "Atte.\n"
                 + "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\n"

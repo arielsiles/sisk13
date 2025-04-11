@@ -1,6 +1,8 @@
 package com.encens.khipus.model.customers;
 
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -26,6 +28,10 @@ public class PaymentMethodSin {
     @Column(name = "descripcion")
     private String description;
 
+    @Column(name = "activo", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private boolean active;
+
     public Long getId() {
         return id;
     }
@@ -48,5 +54,13 @@ public class PaymentMethodSin {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

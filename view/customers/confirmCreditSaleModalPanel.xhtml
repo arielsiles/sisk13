@@ -63,13 +63,13 @@
                                action="#{salesAction.registerSaleAndInvoice()}"
                                styleClass="button"
                                rendered="#{s:hasPermission('CREDITSALE_INVOICE','VIEW')}"
-                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"/>
+                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,paymentMethodField,customerCategoryTypeId"/>
 
             <a4j:commandButton id="confirmRegisterButton" value="Aceptar"
                                action="#{salesAction.registerSale()}"
                                styleClass="button"
                                rendered="#{s:hasPermission('CREDITSALE_REGISTER','VIEW')}"
-                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,customerCategoryTypeId"/>
+                               reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,paymentMethodField,customerCategoryTypeId"/>
 
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">
                 <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>

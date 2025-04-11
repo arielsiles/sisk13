@@ -807,6 +807,9 @@ public class BillControllerAction {
         pedidoPOJO.setMontoTotalMoneda(amountValue);
         pedidoPOJO.setDescuentoAdicional(customerOrder.getAdditionalDiscountValue());
 
+        if ( customerOrder.getPaymentMethod() != null )
+            pedidoPOJO.setCodigoMetodoPago(customerOrder.getPaymentMethod().getCode());
+
         boolean isOnlineMode = checkBillingMode();
 
         if (isOnlineMode && pedidoPOJO.getCodigoTipoDocumentoIdentidad()==5){

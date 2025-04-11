@@ -172,6 +172,10 @@ public class CustomerOrder implements BaseModel  {
     @ManyToOne(optional = true)
     private CancellationReason cancellationReason;
 
+    @JoinColumn(name = "idmetodopago", referencedColumnName = "idmetodopago")
+    @ManyToOne(optional = true)
+    private PaymentMethodSin paymentMethod;
+
     @Column(name = "envio", nullable = false)
     @Type(type = IntegerBooleanUserType.NAME)
     private Boolean sent = Boolean.FALSE;
@@ -472,5 +476,13 @@ public class CustomerOrder implements BaseModel  {
 
     public void setSent(Boolean sent) {
         this.sent = sent;
+    }
+
+    public PaymentMethodSin getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethodSin paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }
