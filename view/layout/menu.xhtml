@@ -755,7 +755,7 @@
 
             <rich:dropDownMenu value="#{messages['menu.xproduction.configuration']}" rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
 
-                <!--<rich:menuItem submitMode="none"
+                <rich:menuItem submitMode="none"
                                styleClass="main-menu-item">
                     <s:link view="/xproduction/materialConfigurationList.xhtml"
                             value="#{messages['menu.xproduction.inputMaterialConfiguration']}"
@@ -774,7 +774,7 @@
                     <s:link view="/xproduction/indirectCostsList.xhtml"
                             value="#{messages['menu.xproduction.configuration.indirectCostRegistration']}"
                             propagation="none"/>
-                </rich:menuItem>-->
+                </rich:menuItem>
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
