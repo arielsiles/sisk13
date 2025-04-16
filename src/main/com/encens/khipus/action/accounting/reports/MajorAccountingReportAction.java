@@ -163,7 +163,26 @@ public class MajorAccountingReportAction extends GenericReportAction {
                     //if (balance > 0){
                         flag = true;
 
-                        String gloss = voucherTransaction.getGloss().replaceAll("[\n\r]", "");
+                    /*String     CUENTA       = ca.getFullName();
+                    String     FECHA        = voucherTransaction.getDate();
+                    String     TIPO     = voucherTransaction.getDocumentType();
+                    String     NO_DOC       = voucherTransaction.getDocumentNumber();
+                    String     GLOSA        = voucherTransaction.getGloss();
+                    BigDecimal DEBE     = voucherTransaction.getDebit();
+                    BigDecimal HABER        = voucherTransaction.getCredit();
+                    Double SALDO        = balance;
+
+                    System.out.println( "CUENTA: "  + CUENTA  +
+                                        " FECHA: "  + FECHA  +
+                                        " TIPO: "   + TIPO  +
+                                        " NO_DOC: " + NO_DOC  +
+                                        " GLOSA: "  + GLOSA  +
+                                        " DEBE: "   + DEBE  +
+                                        " HABER: "  + HABER  +
+                                        " SALDO: "  + SALDO );*/
+
+
+                    String gloss = voucherTransaction.getGloss() != null ? voucherTransaction.getGloss().replaceAll("[\n\r]", "") : "";
 
                         fw.append(ca.getFullName()).append(delim);
                         fw.append(voucherTransaction.getDate()).append(delim);
