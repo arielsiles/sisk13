@@ -200,7 +200,7 @@ public class VoucherAction extends GenericAction<Voucher> {
         }
 
         VoucherDetail totalVoucherDetail = new VoucherDetail();
-        totalVoucherDetail.setAccount("4420110201"); // 4420110201 - Costo Productos Mirabel
+        totalVoucherDetail.setAccount("5220010101"); // 5220010101 - COSTO DE PRODUCTOS TERMINADOS
         if (totalDebit.doubleValue() > totalCredit.doubleValue()){
             totalVoucherDetail.setDebit(BigDecimal.ZERO);
             totalVoucherDetail.setCredit(BigDecimalUtil.subtract(totalDebit, totalCredit));

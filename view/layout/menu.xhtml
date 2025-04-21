@@ -715,6 +715,14 @@
                             value="#{messages['menu.xproduction.process.distributionIndirectCost']}"
                             propagation="begin"/>
                 </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item">
+                    <s:link view="/accounting/generateClosingProductionCostAccounts.xhtml"
+                            value="Cierre de Ctas - Costo de Producción"
+                            propagation="none" />
+                </rich:menuItem>
+
             </rich:dropDownMenu>
 
             <!--
