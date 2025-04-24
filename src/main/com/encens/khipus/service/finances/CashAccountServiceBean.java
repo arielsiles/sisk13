@@ -84,13 +84,16 @@ public class CashAccountServiceBean implements CashAccountService {
         }
 
         String rootAccountCode = cashAccount.getRootCashAccount() != null ? cashAccount.getRootCashAccount().getAccountCode() : null;
+        String level3AccountCode = cashAccount.getCashAccountLeve3() != null ? cashAccount.getCashAccountLeve3().getAccountCode() : null;
 
         try {
-            em.createNativeQuery("insert into arcgms (cuenta, descri, cta_raiz, no_cia, tipo, tipo_gasto, activa, moneda, exije_cc, ind_mov, permiso_inv, permite_iva) " +
-                    "values(:cuenta, :descri, :cta_raiz, :no_cia, :tipo, :tipo_gasto, :activa, :moneda, :exije_cc, :ind_mov, :permiso_inv, :permite_iva)")
+            em.createNativeQuery("insert into arcgms (cuenta, descri, cta_raiz, cta_niv3, cn_nivel, no_cia, tipo, tipo_gasto, activa, moneda, exije_cc, ind_mov, permiso_inv, permite_iva) " +
+                    "values(:cuenta, :descri, :cta_raiz, :cta_niv3, :cn_nivel, :no_cia, :tipo, :tipo_gasto, :activa, :moneda, :exije_cc, :ind_mov, :permiso_inv, :permite_iva)")
                     .setParameter("cuenta", cashAccount.getAccountCode())
                     .setParameter("descri", cashAccount.getDescription())
                     .setParameter("cta_raiz", rootAccountCode)
+                    .setParameter("cta_niv3", level3AccountCode)
+                    .setParameter("cn_nivel", cashAccount.getAccountLevel())
                     .setParameter("no_cia", Constants.defaultCompanyNumber)
                     .setParameter("tipo", cashAccount.getAccountType().toString())
                     .setParameter("tipo_gasto", expenseType)

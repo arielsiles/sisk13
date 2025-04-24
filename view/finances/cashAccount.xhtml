@@ -117,6 +117,20 @@
                 </h:selectOneMenu>
             </s:decorate>
 
+            <s:decorate id="accountLevelsField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CashAccount.accountLevel']}</ui:define>
+                <h:selectOneMenu id="accountLevels"
+                                 value="#{cashAccount.accountLevel}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="4">
+                    <s:selectItems value="#{accountLevelList}" var="level"
+                                   label="#{level}"
+                                   noSelectionLabel=""
+                                   hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
             <s:decorate id="activeAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CashAccount.activeAccount']}</ui:define>
                 <h:selectBooleanCheckbox id="activeAccount" value="#{cashAccount.active}"
@@ -140,6 +154,19 @@
                                  dataModel="#{cashAccountDataModel}"
                                  reRender="itemAccountField"
                                  tabindex="11" hotKeySelect="alt+1">
+                </app:selectPopUp>
+            </s:decorate>
+            <s:decorate id="itemLevel3AccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CashAccount.level3Account']}:</ui:define>
+                <app:selectPopUp id="itemLevel3Account"
+                                 required="false"
+                                 textValue="#{cashAccount.cashAccountLeve3 != null ? cashAccount.cashAccountLeve3.fullName : ''}"
+                                 value="#{cashAccount.cashAccountLeve3}"
+                                 clearAction="#{cashAccountAction.clearLevel3Account()}"
+                                 searchModalPanel="levelAccountListModalPanel"
+                                 dataModel="#{cashAccountDataModel}"
+                                 reRender="itemLevel3AccountField"
+                                 tabindex="12" hotKeySelect="alt+1">
                 </app:selectPopUp>
             </s:decorate>
         </app:fieldset>
@@ -224,6 +251,20 @@
                            styleClass="select-image-middle"
                            reRender="itemAccountField"
                            oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="levelAccountListModalPanelContainer" template="/finances/rootCashAccountListModalPanel.xhtml">
+    <ui:param name="hasWarehousePermission" value="true"/>
+    <ui:param name="containerId" value="levelAccountListModalPanelContainer"/>
+    <ui:param name="dialogId" value="levelAccountListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton"
+                           action="#{cashAccountAction.assignLevel3Account(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           reRender="itemLevel3AccountField"
+                           oncomplete="Richfaces.hideModalPanel('levelAccountListModalPanel');"/>
     </ui:define>
 </s:decorate>
 

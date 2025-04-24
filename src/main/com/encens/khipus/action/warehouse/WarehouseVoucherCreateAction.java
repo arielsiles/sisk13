@@ -70,8 +70,19 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
                 ExpenseType.PROD,
                 ExpenseType.ADM,
                 ExpenseType.COM,
-                ExpenseType.LAB
+                ExpenseType.LAB,
+                ExpenseType.PROJ
         };
+    }
+
+    @Factory(value = "accountLevelList", scope = ScopeType.STATELESS)
+    public List<Integer> getAccountLevels(){
+        // retornar una lista de 6 niveles de valor Integer
+        List<Integer> levels = new ArrayList<Integer>();
+        for (int i = 1; i <= 6; i++) {
+            levels.add(i);
+        }
+        return levels;
     }
 
     @Factory(value = "productionProcessList", scope = ScopeType.STATELESS)

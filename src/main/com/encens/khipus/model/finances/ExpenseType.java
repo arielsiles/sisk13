@@ -6,6 +6,7 @@ public enum ExpenseType {
     ADM("WarehouseVoucher.expenseType.adm"),
     COM("WarehouseVoucher.expenseType.com"),
     LAB("WarehouseVoucher.expenseType.lab"),
+    PROJ("WarehouseVoucher.expenseType.projects"),
 
     ADMINISTRATIVE("WarehouseVoucher.expenseType.administrative"),
     PRODUCTION("WarehouseVoucher.expenseType.production");

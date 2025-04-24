@@ -73,8 +73,17 @@ public class CashAccountAction extends GenericAction<CashAccount> {
         getInstance().setRootCashAccount(null);
     }
 
+    public void clearLevel3Account() {
+        getInstance().setCashAccountLeve3(null);
+    }
+
     public void assignRootCashAccount(CashAccount cashAccount) {
         getInstance().setRootCashAccount(cashAccount);
         getInstance().setRootAccountCode(cashAccount.getAccountCode());
+    }
+
+    public void assignLevel3Account(CashAccount cashAccount) {
+        getInstance().setCashAccountLeve3(cashAccount);
+        getInstance().setAccountLevel3Code(cashAccount.getAccountCode());
     }
 }
