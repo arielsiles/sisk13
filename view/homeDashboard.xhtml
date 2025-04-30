@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="layout/templateDashboard.xhtml">
+
+    <ui:define name="pageTitle">Dashboard</ui:define>
+
+    <ui:define name="body">
+
+        <style>
+            #chartsContainer, #chartsContainer2 {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+                padding: 20px;
+            }
+            .chart-wrapper {
+                flex: 1 1 400px;
+                max-width: 600px;
+                box-sizing: border-box;
+            }
+            .chart-fullwidth {
+                width: 100%;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            canvas {
+                width: 100% !important;
+                height: auto !important;
+                border: 1px solid black;
+            }
+        </style>
+
+        <!-- Segunda fila -->
+        <div id="chartsContainer2">
+            <div class="chart-wrapper">
+                <div id="myChart" style="width: 100%; height: 400px;"></div>
+            </div>
+            <div class="chart-wrapper">
+                <div id="myChart4"></div><!-- Dona -->
+            </div>
+        </div>
+
+        <div class="chart-fullwidth">
+            <div id="zonePieChart" style="width: 100%; height: 500px;"></div>
+        </div>
+
+        <script id="collectMaterialProducerData" type="application/json">#{dashboardReportAction.collectMaterialByProducerChartData}</script>
+        <script id="materiaPrimaData" type="application/json">#{dashboardReportAction.materiaPrimaChartData}</script>
+        <script id="collectMaterialZoneData" type="application/json">#{dashboardReportAction.collectMaterialByZoneChartData}</script>
+
+        <script>
+            window.addEventListener('load', function () {
+                const jsonData = document.getElementById('collectMaterialProducerData').textContent;
+                const data = JSON.parse(jsonData);
+
+                console.log(data); // (puedes borrar luego)
+
+                const categories = data.map(item => item.name);  // Ej: ["Ariel", "Juan"]
+                const pesos = data.map(item => item.peso);     // Ej: [12.50, 50.20]
+
+                Highcharts.chart('myChart', {
+                    chart: {
+                        type: 'bar'   // bar para barras horizontales
+                    },
+                    title: {
+                        text: 'Acopio de Proveedores por Peso'
+                    },
+                    xAxis: {
+                        categories: categories,
+                        title: {
+                            text: 'Proveedores'
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Peso en Toneladas',
+                            align: 'high'
+                        },
+                        labels: {
+                            overflow: 'justify'
+                        }
+                    },
+                    tooltip: {
+                        valueSuffix: ' Tn'
+                    },
+                    plotOptions: {
+                        bar: {
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.y:.2f} Tn'  // Mostrar 2 decimales
+                            }
+                        }
+                    },
+                    credits: {
+                        enabled: false // Quitar el logo de Highcharts
+                    },
+                    series: [{
+                        name: 'Peso Total',
+                        data: pesos
+                    }]
+                });
+            });
+        </script>
+
+        <script>
+            window.addEventListener('load', function () {
+                const jsonData = document.getElementById('materiaPrimaData').textContent;
+                const data = JSON.parse(jsonData);
+
+                console.log(data); // para depuración
+
+                // Transformar los datos para Highcharts
+                const chartData = data.map(item => ({
+                    name: item.name,
+                    y: item.peso
+                }));
+
+                // Crear el gráfico Highcharts
+                Highcharts.chart('myChart4', {
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: 'Distribución de Materias Primas por Peso'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b><br /> Peso: <b>{point.y:.2f} Toneladas</b>'
+                    },
+                    accessibility: {
+                        point: {
+                            valueSuffix: '%'
+                        }
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            innerSize: '50%',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Participación',
+                        colorByPoint: true,
+                        data: chartData
+                    }]
+                });
+            });
+        </script>
+
+        <script>
+            window.addEventListener('load', function () {
+                const jsonData = document.getElementById('collectMaterialZoneData').textContent;
+                const data = JSON.parse(jsonData);
+
+                console.log(data); // (puedes quitarlo luego)
+
+                // Transformar data para Highcharts
+                const pieData = data.map(item => ({
+                    name: item.name,     // Zona
+                    y: item.peso         // Peso
+                }));
+
+                Highcharts.chart('zonePieChart', {
+                    chart: {
+                        type: 'pie',
+                        animation: {
+                            duration: 1500,       // Duración de la animación
+                            easing: 'easeOutBounce' // Tipo de animación (puedes cambiar por 'easeOutElastic', etc.)
+                        }
+                    },
+                    title: {
+                        text: 'Distribución de Acopio por Zonas'
+                    },
+                    tooltip: {
+                        pointFormat: '<b>{point.percentage:.1f}%</b> ({point.y:.2f} Tn)'
+                    },
+                    accessibility: {
+                        point: {
+                            valueSuffix: '%'
+                        }
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                            },
+                            showInLegend: true
+                        }
+                    },
+                    credits: {
+                        enabled: false // Quitar el logo de Highcharts
+                    },
+                    series: [{
+                        name: 'Peso en toneladas',
+                        colorByPoint: true,
+                        data: pieData
+                    }]
+                });
+            });
+        </script>
+
+    </ui:define>
+
+
+</ui:composition>

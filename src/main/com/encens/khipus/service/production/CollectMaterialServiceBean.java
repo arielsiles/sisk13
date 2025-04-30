@@ -289,4 +289,38 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
         }
     }
 
+
+    @Override
+    public List<Object[]> findCollectMaterial() {
+        List<Object[]> resultList = em.createQuery("select m.name, sum(c.balanceWeight) as peso " +
+                        "from CollectMaterial c " +
+                        "join c.metaProduct m " +
+                        "group by m.name")
+                .getResultList();
+
+        return resultList;
+    }
+
+    @Override
+    public List<Object[]> findCollectMaterialByProducer(){
+        List<Object[]> resultList = em.createQuery("select p.firstName as name, sum(c.balanceWeight) as peso " +
+                        " from CollectMaterial c " +
+                        " left join c.producer p " +
+                        " group by p.firstName ")
+                .getResultList();
+
+        return resultList;
+    }
+
+    @Override
+    public List<Object[]> findCollectMaterialByZone(){
+        List<Object[]> resultList = em.createQuery("select p.name, sum(c.balanceWeight) as peso " +
+                        " from CollectMaterial c " +
+                        " left join c.productiveZone p " +
+                        " group by p.name ")
+                .getResultList();
+
+        return resultList;
+    }
+
 }

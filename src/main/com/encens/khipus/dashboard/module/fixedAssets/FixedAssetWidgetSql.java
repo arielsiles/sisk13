@@ -25,9 +25,7 @@ public class FixedAssetWidgetSql implements SqlQuery {
         sql += "O.ESTADO!='PEN' \n" +
                 "AND O.ESTADO!='ANL' \n" +
                 "AND O.TIPO='FIXEDASSET' \n" +
-                "AND (V.ESTADO IS NULL OR V.ESTADO!='APR') \n" +
-                "AND trunc(SYSDATE-(    DECODE (SIGN(SYSDATE-O.FECHA_RECEPCION), 1, O.FECHA_RECEPCION ,SYSDATE ) )) >=" + lowerBound + "\n" +
-                "AND trunc(SYSDATE-(    DECODE (SIGN(SYSDATE-O.FECHA_RECEPCION), 1, O.FECHA_RECEPCION ,SYSDATE ) )) <=" + upperBound + "\n";
+                "AND (V.ESTADO IS NULL OR V.ESTADO!='APR') \n";
 
         return sql;
     }

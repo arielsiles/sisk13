@@ -14,4 +14,10 @@ public interface CollectMaterialService {
     List<CollectMaterial> findApprovedCollectMaterialByCode(String productItemCode, Date startDate, Date endDate);
 
     String createCollectMaterialListAccounting(List<CollectMaterial> collectMaterialList,Date starDate,Date endDate);
+
+    List<Object[]> findCollectMaterial();
+
+    List<Object[]> findCollectMaterialByProducer();
+
+    List<Object[]> findCollectMaterialByZone();
 }

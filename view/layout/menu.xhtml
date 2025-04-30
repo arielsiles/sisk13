@@ -12,10 +12,15 @@
                activeTabClass="rich-toolbar active-tab"
                tabClass="default-tab">
 <rich:tab id="home" label="#{messages['menu.home']}">
-    <h:panelGrid columns="1" cellpadding="0" cellspacing="0" border="0"
-                 columnClasses="tab-end-separator">
-        <s:link view="/home.xhtml"
+    <h:panelGrid columns="2" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-end-separator">
+        <!--<s:link view="/home.xhtml"
                 value="#{messages['dashboard']}"
+                styleClass="tab-cell"
+                propagation="none"/>-->
+
+        <s:link view="/homeDashboard.xhtml"
+                value="#{messages['Dashboard.dashboard']}"
+                rendered="#{s:hasPermission('DASHBOARD_VIEW','VIEW')}"
                 styleClass="tab-cell"
                 propagation="none"/>
     </h:panelGrid>
