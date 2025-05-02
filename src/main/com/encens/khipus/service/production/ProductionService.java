@@ -1,7 +1,6 @@
 package com.encens.khipus.service.production;
 
 import com.encens.khipus.model.production.*;
-import com.encens.khipus.model.xproduction.XProduction;
 
 import javax.ejb.Local;
 import java.util.List;

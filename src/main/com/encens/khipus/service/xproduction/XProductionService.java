@@ -4,6 +4,7 @@ import com.encens.khipus.model.production.SupplyType;
 import com.encens.khipus.model.xproduction.*;
 
 import javax.ejb.Local;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,4 +31,6 @@ public interface XProductionService {
     List<Object[]> getAllProductionSuplies(XProduction production);
 
     List<XProductionLabor> getLaborList(XProduction instance);
+
+    List<Object[]> findProductionInputsByDates(Date initDate, Date endDate);
 }

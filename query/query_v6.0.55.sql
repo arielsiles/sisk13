@@ -8,3 +8,4 @@ insert into funcionalidad values (313, 'FIXEDASSETWIDGET', null, 7, 1, 'Dashboar
 */
 
 insert into funcionalidad values (314, 'DASHBOARD_VIEW', null, 7, 1, 'Dashboard.accessRight.panelAccess', 1);
+insert into funcionalidad values (315, 'PRODUCTION_INPUTS_REPORT', null, 11, 1, 'menu.xproduction.productionInputsReport', 1);

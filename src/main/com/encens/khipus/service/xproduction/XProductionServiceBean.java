@@ -10,6 +10,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -204,4 +205,23 @@ public class XProductionServiceBean implements XProductionService {
 
         return resultInputList;
     }
+
+    @Override
+    public List<Object[]> findProductionInputsByDates(Date initDate, Date endDate){
+        List<Object[]> resultList = em.createQuery("select w.name as warehouse, p.productItemCode, p.name, p.usageMeasureCode as unitMeasure, sum(s.quantity) as quantity " +
+                        " from XSupply s " +
+                        " left join s.production pr " +
+                        " left join pr.productionPlan pl " +
+                        " left join s.productItem p " +
+                        " left join p.warehouse w " +
+                        " where pl.date between :initDate and :endDate " +
+                        " group by w.name, p.productItemCode, p.name, p.usageMeasureCode " +
+                        " order by w.name, p.name ")
+                .setParameter("initDate", initDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+
+        return resultList;
+    }
+
 }
