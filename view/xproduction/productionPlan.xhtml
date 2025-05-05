@@ -114,19 +114,19 @@
     <c:if test="#{xproductionPlanAction.managed}">
     <rich:tabPanel switchType="ajax" selectedTab="productionTab">
 
-        <rich:tab name="productionTab" label="#{messages['ProductionPlan.production']}" ajaxSingle="true" immediate="true">
+        <rich:tab name="productionTab" label="#{messages['ProductionPlan.productionOrder']}" ajaxSingle="true" immediate="true">
             <rich:dataTable id="productionListId"
                             value="#{xproductionDataModel}"
                             var="productionItem"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="5%, 35%, 10%, 20%, 10%, 10%, 10%">
+                            columnsWidth="5%, 35%, 15%, 15%, 10%, 10%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column><h:outputText value="#{messages['Production.code']}" /></rich:column>
-                        <rich:column><h:outputText value="#{messages['Production.formulation']}" /></rich:column>
-                        <rich:column><h:outputText value="#{messages['XProductionPlan.usedRawMaterial']}" /></rich:column>
-                        <rich:column><h:outputText value="#{messages['Production.category']}" /></rich:column>
+                        <rich:column><h:outputText value="#{messages['ProductionPlan.production']}" /></rich:column>
+                        <rich:column><h:outputText value="#{messages['XProductionPlan.rawMaterial']}" /></rich:column>
+                        <rich:column><h:outputText value="#{messages['XProduction.shift']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['Production.state']}" /></rich:column>
                         <rich:column><h:outputText value="#{messages['XProduction.ends']}" /></rich:column>
                         <rich:column styleClass="center"><h:outputText value="#{messages['Common.action']}" /></rich:column>
@@ -147,8 +147,8 @@
                     </h:outputText>
                 </rich:column>
 
-                <rich:column>
-                    <h:outputText value="#{productionItem.formulation.category.name}" />
+                <rich:column styleClass="center">
+                    <h:outputText value="#{productionItem.getProductionShiftFullString()}" />
                 </rich:column>
 
                 <rich:column styleClass="center">

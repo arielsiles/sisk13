@@ -738,6 +738,15 @@
                             value="#{messages['menu.xproduction.productionInputsReport']}"
                             propagation="none" />
                 </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{false}">
+                    <s:link view="/xproduction/dailyProductionReport.xhtml"
+                            value="Reporte Produccion Diaria"
+                            propagation="none" />
+                </rich:menuItem>
+
             </rich:dropDownMenu>
 
             <!--

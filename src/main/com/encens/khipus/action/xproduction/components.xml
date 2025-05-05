@@ -124,6 +124,10 @@
     <framework:entity-query name="productionLineQuery"
                             ejbql="select o from ProductionLine o order by o.name ASC"/>
 
+    <factory name="productionShiftList" value="#{productionShiftQuery}"/>
+    <framework:entity-query name="productionShiftQuery"
+                            ejbql="select o from ProductionShift o order by o.name ASC"/>
+
     <!--Enumerations-->
 
     <factory name="xrawMaterialPaymentTypeEnum"
@@ -134,5 +138,8 @@
 
     <factory name="xrawMaterialDiscountTypeEnum"
              value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialDiscountType')}"/>
+
+    <factory name="productionShiftTypesEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.ProductionShiftType')}"/>
 
 </components>

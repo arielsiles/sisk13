@@ -1,3 +1,4 @@
+
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:s="http://jboss.com/products/seam/taglib"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -212,6 +213,42 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
+                <s:decorate id="productionShiftField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProduction.productionShift']}</ui:define>
+                    <h:selectOneMenu id="productionShift"
+                                     value="#{xproductionAction.productionShift}"
+                                     styleClass="inputMedium"
+                                     required="true"
+                                     tabindex="7">
+                        <s:selectItems value="#{productionShiftList}"
+                                       var="productionShift"
+                                       label="#{productionShift.name}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="productionShiftTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProduction.productionShiftType']}</ui:define>
+                    <h:selectOneMenu id="productionShiftType"
+                                     value="#{xproductionAction.productionShiftType}"
+                                     styleClass="inputMedium"
+                                     required="true"
+                                     tabindex="1000">
+                        <s:selectItems value="#{productionShiftTypesEnum}"
+                                       var="element"
+                                       label="#{messages[element.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <!--<a4j:support event="onchange"
+                                     action="#{rawMaterialPaymentAction.paymentTypeChanged()}"
+                                     reRender="cashBoxCashAccountDiv, bankDiv"
+                                     ajaxSingle="true"/>-->
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
                 <s:decorate id="totalCostField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Production.totalCost']}</ui:define>
                     <h:outputText value="#{xproductionAction.calculateTotalCost()}">
@@ -250,7 +287,7 @@
                                                tabindex="3">
                                     <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
                                                        timeZone="#{sessionUser.timeZone}"
-                                                       type="dateTime"/>
+                                                       type="both"/>
                                 </rich:calendar>
                             </s:decorate>
 
@@ -267,55 +304,22 @@
                                                tabindex="4">
                                     <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
                                                        timeZone="#{sessionUser.timeZone}"
-                                                       type="dateTime"/>
+                                                       type="both"/>
                                 </rich:calendar>
                             </s:decorate>
-
-                            <!--<h:outputText value="Inicio:"/>
-                            <s:decorate id="initDateField" template="/include/validateField.xhtml" styleClass="formRow">
-                                <rich:calendar id="initDate"
-                                               value="#{xproduction.initDate}"
-                                               styleClass="inputSmall"
-                                               datePattern="#{messages['patterns.date']}"
-                                               enableManualInput="true"
-                                               tabindex="9">
-                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                                </rich:calendar>
-                                <h:inputText id="startTime"
-                                             value="#{xproduction.startTime}"
-                                             styleClass="inputSmall"
-                                             rendered="#{not readOnly}"
-                                             maxlength="150"
-                                             tabindex="7">
-                                    <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" timeZone="#{sessionUser.timeZone}" type="time"/>
-                                    <a4j:support event="onblur" reRender="startTimeField, endTimeField"/>
-                                </h:inputText>
-                            </s:decorate>-->
-
                         </h:panelGrid>
 
+                        <s:div>
+                            <h:inputTextarea  id="observation"
+                                              value="#{xproduction.observation}"
+                                              required="false"
+                                              style="width: 98%; height: 27px;"
+                                              rows="3"
+                                              tabindex="3">
+                                <f:validateLength maximum="500"/>
+                            </h:inputTextarea>
+                        </s:div>
 
-
-                        <!--<s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Production.end']}</ui:define>
-                            <rich:calendar value="#{xproduction.endDate}"
-                                           popup="true"
-                                           datePattern="#{messages['patterns.date']}"
-                                           styleClass="inputSmall"
-                                           enableManualInput="true"
-                                           tabindex="9">
-                                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                            </rich:calendar>
-                            <h:inputText id="endTime"
-                                         value="#{xproduction.endTime}"
-                                         styleClass="inputSmall"
-                                         rendered="#{not readOnly}"
-                                         maxlength="150"
-                                         tabindex="8">
-                                <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}" timeZone="#{sessionUser.timeZone}" type="time"/>
-                                <a4j:support event="onblur" reRender="endTimeField, startTimeField"/>
-                            </h:inputText>
-                        </s:decorate>-->
                     </c:if>
                 </s:div>
 

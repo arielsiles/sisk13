@@ -111,8 +111,7 @@ public class Voucher implements BaseModel{
     @Length(max = 4)
     private String userNumber;
 
-    @Column(name = "glosa", updatable = true, length = 1000)
-    @Length(max = 1000)
+    @Column(name = "glosa", updatable = true)
     private String gloss;
 
     @Column(name = "open", nullable = false)
@@ -163,8 +162,7 @@ public class Voucher implements BaseModel{
     @Length(max = 660)
     private String receiver;
 
-    @Column(name = "observacion", updatable = true, length = 1000)
-    @Length(max = 1000)
+    @Column(name = "observacion", updatable = true)
     private String observation;
 
     @Column(name = "no_trans_rel", length = 10)

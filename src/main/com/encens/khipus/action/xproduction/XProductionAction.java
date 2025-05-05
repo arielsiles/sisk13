@@ -35,6 +35,8 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XProductionPlan productionPlan;
     private ProductionProcess process;
     private ProductionLine productionLine;
+    private ProductionShift productionShift;
+    private ProductionShiftType productionShiftType;
 
     private List<XSupply> ingredientSupplyList = new ArrayList<XSupply>();
     private List<XSupply> materialSupplyList = new ArrayList<XSupply>();
@@ -72,6 +74,10 @@ public class XProductionAction extends GenericAction<XProduction> {
         setProductionTank(getInstance().getProductionTank());
         setProcess(getInstance().getProcess());
         setProductionPlan(getInstance().getProductionPlan());
+        setProductionLine(getInstance().getProductionLine());
+        setProductionShift(getInstance().getProductionShift());
+        setProductionShiftType(getInstance().getProductionShiftType());
+
         setIngredientSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.INGREDIENT));
         setMaterialSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.MATERIAL));
         setLaborList(xproductionService.getLaborList(getInstance()));
@@ -89,6 +95,8 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setProductionPlan(productionPlan);
         production.setProcess(process);
         production.setProductionLine(productionLine);
+        production.setProductionShift(productionShift);
+        production.setProductionShiftType(productionShiftType);
 
         Long seq = sequenceService.createOrUpdateNextSequenceValue(Constants.PRODUCTION_CODE);
         production.setCode(seq.intValue());
@@ -106,6 +114,8 @@ public class XProductionAction extends GenericAction<XProduction> {
         XProduction production = getInstance();
         production.setProductionTank(productionTank);
         production.setFormulation(formulation);
+        production.setProductionShift(productionShift);
+        production.setProductionShiftType(productionShiftType);
 
         production.setTotalCost(calculateTotalCost());
         production.setTotalRawMaterial(calculateRawMaterial());
@@ -271,6 +281,10 @@ public class XProductionAction extends GenericAction<XProduction> {
         setInstance(null);
         setProductionTank(null);
         setFormulation(null);
+        setProductionLine(null);
+        setProductionShift(null);
+        setProductionShiftType(null);
+
         setIngredientSupplyList(new ArrayList<XSupply>());
         setMaterialSupplyList(new ArrayList<XSupply>());
     }
@@ -697,6 +711,22 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void setProductionLine(ProductionLine productionLine) {
         this.productionLine = productionLine;
+    }
+
+    public ProductionShift getProductionShift() {
+        return productionShift;
+    }
+
+    public void setProductionShift(ProductionShift productionShift) {
+        this.productionShift = productionShift;
+    }
+
+    public ProductionShiftType getProductionShiftType() {
+        return productionShiftType;
+    }
+
+    public void setProductionShiftType(ProductionShiftType productionShiftType) {
+        this.productionShiftType = productionShiftType;
     }
 
     /*public BigDecimal getTotalCost() {

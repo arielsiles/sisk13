@@ -82,6 +82,18 @@ public class XProduction implements BaseModel {
     @JoinColumn(name = "idlinea", nullable = true, updatable = false, insertable = true)
     private ProductionLine productionLine;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idturno", nullable = true, updatable = true, insertable = true)
+    private ProductionShift productionShift;
+
+    @Column(name = "tipoturno", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private ProductionShiftType productionShiftType;
+
+    @Lob
+    @Column(name = "observacion", nullable = true)
+    private String observation;
+
     @OneToMany(mappedBy = "production", fetch = FetchType.LAZY)
     private List<XSupply> supplyList = new ArrayList<XSupply>(0);
 
@@ -267,5 +279,37 @@ public class XProduction implements BaseModel {
 
     public void setProductionLine(ProductionLine productionLine) {
         this.productionLine = productionLine;
+    }
+
+    public ProductionShift getProductionShift() {
+        return productionShift;
+    }
+
+    public void setProductionShift(ProductionShift productionShift) {
+        this.productionShift = productionShift;
+    }
+
+    public ProductionShiftType getProductionShiftType() {
+        return productionShiftType;
+    }
+
+    public void setProductionShiftType(ProductionShiftType productionShiftType) {
+        this.productionShiftType = productionShiftType;
+    }
+
+    public String getProductionShiftFullString() {
+
+        String result = getProductionShift() != null ? getProductionShift().getName() : "";
+        result += getProductionShiftType() != null ? " - " + getProductionShiftType().getType() : "";
+
+        return result;
+    }
+
+    public String getObservation() {
+        return observation;
+    }
+
+    public void setObservation(String observation) {
+        this.observation = observation;
     }
 }
