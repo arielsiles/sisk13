@@ -35,7 +35,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XProductionPlan productionPlan;
     private ProductionProcess process;
     private ProductionLine productionLine;
-    private ProductionShift productionShift;
+    private ProductionGroup productionGroup;
     private ProductionShiftType productionShiftType;
 
     private List<XSupply> ingredientSupplyList = new ArrayList<XSupply>();
@@ -75,7 +75,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         setProcess(getInstance().getProcess());
         setProductionPlan(getInstance().getProductionPlan());
         setProductionLine(getInstance().getProductionLine());
-        setProductionShift(getInstance().getProductionShift());
+        setProductionGroup(getInstance().getProductionGroup());
         setProductionShiftType(getInstance().getProductionShiftType());
 
         setIngredientSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.INGREDIENT));
@@ -95,7 +95,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setProductionPlan(productionPlan);
         production.setProcess(process);
         production.setProductionLine(productionLine);
-        production.setProductionShift(productionShift);
+        production.setProductionGroup(productionGroup);
         production.setProductionShiftType(productionShiftType);
 
         Long seq = sequenceService.createOrUpdateNextSequenceValue(Constants.PRODUCTION_CODE);
@@ -114,7 +114,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         XProduction production = getInstance();
         production.setProductionTank(productionTank);
         production.setFormulation(formulation);
-        production.setProductionShift(productionShift);
+        production.setProductionGroup(productionGroup);
         production.setProductionShiftType(productionShiftType);
 
         production.setTotalCost(calculateTotalCost());
@@ -282,7 +282,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         setProductionTank(null);
         setFormulation(null);
         setProductionLine(null);
-        setProductionShift(null);
+        setProductionGroup(null);
         setProductionShiftType(null);
 
         setIngredientSupplyList(new ArrayList<XSupply>());
@@ -713,12 +713,12 @@ public class XProductionAction extends GenericAction<XProduction> {
         this.productionLine = productionLine;
     }
 
-    public ProductionShift getProductionShift() {
-        return productionShift;
+    public ProductionGroup getProductionGroup() {
+        return productionGroup;
     }
 
-    public void setProductionShift(ProductionShift productionShift) {
-        this.productionShift = productionShift;
+    public void setProductionGroup(ProductionGroup productionGroup) {
+        this.productionGroup = productionGroup;
     }
 
     public ProductionShiftType getProductionShiftType() {

@@ -83,12 +83,15 @@ public class XProduction implements BaseModel {
     private ProductionLine productionLine;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "idturno", nullable = true, updatable = true, insertable = true)
-    private ProductionShift productionShift;
+    @JoinColumn(name = "idgrupo", nullable = true, updatable = true, insertable = true)
+    private ProductionGroup productionGroup;
 
     @Column(name = "tipoturno", nullable = true)
     @Enumerated(EnumType.STRING)
     private ProductionShiftType productionShiftType;
+
+    @Column(name = "tipoturno", insertable = false, updatable = false)
+    private String shiftType;
 
     @Lob
     @Column(name = "observacion", nullable = true)
@@ -281,12 +284,12 @@ public class XProduction implements BaseModel {
         this.productionLine = productionLine;
     }
 
-    public ProductionShift getProductionShift() {
-        return productionShift;
+    public ProductionGroup getProductionGroup() {
+        return productionGroup;
     }
 
-    public void setProductionShift(ProductionShift productionShift) {
-        this.productionShift = productionShift;
+    public void setProductionGroup(ProductionGroup productionGroup) {
+        this.productionGroup = productionGroup;
     }
 
     public ProductionShiftType getProductionShiftType() {
@@ -297,9 +300,9 @@ public class XProduction implements BaseModel {
         this.productionShiftType = productionShiftType;
     }
 
-    public String getProductionShiftFullString() {
+    public String getProductionGroupFullString() {
 
-        String result = getProductionShift() != null ? getProductionShift().getName() : "";
+        String result = getProductionGroup() != null ? getProductionGroup().getName() : "";
         result += getProductionShiftType() != null ? " - " + getProductionShiftType().getType() : "";
 
         return result;
@@ -311,5 +314,14 @@ public class XProduction implements BaseModel {
 
     public void setObservation(String observation) {
         this.observation = observation;
+    }
+
+
+    public String getShiftType() {
+        return shiftType;
+    }
+
+    public void setShiftType(String shiftType) {
+        this.shiftType = shiftType;
     }
 }

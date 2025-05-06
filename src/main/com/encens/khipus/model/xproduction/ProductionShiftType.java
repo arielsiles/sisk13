@@ -2,8 +2,8 @@ package com.encens.khipus.model.xproduction;
 
 public enum ProductionShiftType {
 
-    NIGHT("N", "ProductionShift.nightShift"),
-    DAY("D", "ProductionShift.dayShift");
+    N("N", "ProductionShift.nightShift"),
+    D("D", "ProductionShift.dayShift");
 
     private String type;
     private String resourceKey;

@@ -8,7 +8,7 @@ import org.hibernate.annotations.Filter;
 import javax.persistence.*;
 
 /**
- * Entity for ProductionShift
+ * Entity for ProductionGroup
  *
  * @author:
  */
@@ -17,22 +17,22 @@ import javax.persistence.*;
 
 })
 
-@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionShift.tableGenerator",
+@TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "ProductionGroup.tableGenerator",
         table = com.encens.khipus.util.Constants.SEQUENCE_TABLE_NAME,
         pkColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_PK_COLUMN_NAME,
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
-        pkColumnValue = "xpr_turno",
+        pkColumnValue = "xpr_grupo",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners(CompanyListener.class)
-@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_turno")
-public class ProductionShift implements BaseModel {
+@Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "xpr_grupo")
+public class ProductionGroup implements BaseModel {
 
     @Id
-    @Column(name = "idturno")
-    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionShift.tableGenerator")
+    @Column(name = "idgrupo")
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "ProductionGroup.tableGenerator")
     private Long id;
 
     @Column(name = "nombre", nullable = false)

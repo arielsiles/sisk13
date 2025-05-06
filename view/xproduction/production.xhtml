@@ -213,16 +213,16 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
-                <s:decorate id="productionShiftField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['XProduction.productionShift']}</ui:define>
-                    <h:selectOneMenu id="productionShift"
-                                     value="#{xproductionAction.productionShift}"
+                <s:decorate id="productionGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProduction.productionGroup']}</ui:define>
+                    <h:selectOneMenu id="productionGroup"
+                                     value="#{xproductionAction.productionGroup}"
                                      styleClass="inputMedium"
                                      required="true"
                                      tabindex="7">
-                        <s:selectItems value="#{productionShiftList}"
-                                       var="productionShift"
-                                       label="#{productionShift.name}"
+                        <s:selectItems value="#{productionGroupList}"
+                                       var="productionGroup"
+                                       label="#{productionGroup.name}"
                                        noSelectionLabel=""
                                        hideNoSelectionLabel="false"/>
                         <s:convertEntity/>
@@ -230,7 +230,7 @@
                 </s:decorate>
 
                 <s:decorate id="productionShiftTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['XProduction.productionShiftType']}</ui:define>
+                    <ui:define name="label">#{messages['XProduction.productionShift']}</ui:define>
                     <h:selectOneMenu id="productionShiftType"
                                      value="#{xproductionAction.productionShiftType}"
                                      styleClass="inputMedium"

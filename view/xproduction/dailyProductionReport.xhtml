@@ -12,7 +12,7 @@
 
     <ui:param name="selectedTab" value="products"/>
     <ui:define name="body">
-        <h:form id="estimationStockReportForm">
+        <h:form id="dailyProductionReportReportForm">
 
             <rich:panel>
                 <f:facet name="header">
@@ -22,7 +22,7 @@
                 <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Common.initDate']}</ui:define>
                     <rich:calendar id="startDate"
-                                   value="#{productionInputsReportAction.startDate}"
+                                   value="#{dailyProductionReportAction.initDate}"
                                    datePattern="#{messages['patterns.date']}"
                                    enableManualInput="true"
                                    required="true"
@@ -36,7 +36,7 @@
                 <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Common.endDate']}</ui:define>
                     <rich:calendar id="endDate"
-                                   value="#{productionInputsReportAction.endDate}"
+                                   value="#{dailyProductionReportAction.endDate}"
                                    datePattern="#{messages['patterns.date']}"
                                    enableManualInput="true"
                                    required="true"
@@ -49,12 +49,12 @@
 
             </rich:panel>
 
-            <app:reportDefaultOptions reportAction="#{rawMilkReportAction}" showPageFormat="false"
+            <app:reportDefaultOptions reportAction="#{dailyProductionReportAction}" showPageFormat="false"
                                       tabIndex="3"
                                       showReportTitle="false"/>
 
             <div class="buttons">
-                <h:commandButton action="#{productionInputsReportAction.generateReport}"
+                <h:commandButton action="#{dailyProductionReportAction.generateReport}"
                                  styleClass="button"
                                  value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
                     <s:defaultAction/>
