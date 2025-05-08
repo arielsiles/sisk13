@@ -52,7 +52,7 @@ public class ProductionInputsReportAction {
         CompanyConfiguration companyConfiguration = null;
         try {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");}
 
         try {
             List<Object[]> datos = xproductionService.findProductionInputsByDates(startDate, endDate);

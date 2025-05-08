@@ -1,4 +1,4 @@
-select xp.fecha, pr.codigo, pr.tipoturno, g.codigo, p.cod_art, a.descri, p.cantidad
+select xp.fecha, pr.codigo, pr.tipoturno, g.codigo, p.cod_art, a.descri, p.cantidad, pr.totalmp
 from xpr_producto p
 join xpr_produccion pr on p.idproduccion = pr.idproduccion
 join xpr_plan xp       on pr.idplan      = xp.idplan

@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="productionReport" pageWidth="612" pageHeight="792" columnWidth="542" leftMargin="42" rightMargin="28" topMargin="28" bottomMargin="28">
+	<property name="ireport.zoom" value="1.7715610000000042"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Crosstab Data Text"/>
+	<parameter name="reportTitle" class="java.lang.String"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="systemName" class="java.lang.String"/>
+	<parameter name="locationName" class="java.lang.String"/>
+	<parameter name="initDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<field name="date" class="java.util.Date">
+		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
+	</field>
+	<field name="prodCode" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
+	</field>
+	<field name="shiftType" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
+	</field>
+	<field name="groupCode" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
+	</field>
+	<field name="codeArt" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
+	</field>
+	<field name="name" class="java.lang.String">
+		<fieldDescription><![CDATA[COLUMN_6]]></fieldDescription>
+	</field>
+	<field name="quantity" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_7]]></fieldDescription>
+	</field>
+	<field name="totalmp" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[COLUMN_8]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="53" splitType="Stretch">
+			<textField>
+				<reportElement x="135" y="22" width="256" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="9" width="178" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="178" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="265" y="36" width="45" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="259" y="36" width="6" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[-]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="213" y="36" width="45" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{initDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="114" splitType="Stretch">
+			<crosstab>
+				<reportElement x="0" y="10" width="542" height="73"/>
+				<rowGroup name="date" width="30" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.util.Date"><![CDATA[$F{date}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField pattern="dd-MMM">
+								<reportElement x="0" y="0" width="30" height="18"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="6" isBold="true"/>
+								</textElement>
+								<textFieldExpression class="java.util.Date"><![CDATA[$V{date}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#E3E3E3" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement x="0" y="0" width="30" height="18"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="6"/>
+								</textElement>
+								<text><![CDATA[Total:]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="name" height="18">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{name}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement x="0" y="0" width="60" height="18"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="5"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{name}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="groupCode" height="18" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{groupCode}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#E3E3E3" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement x="30" y="0" width="30" height="18"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="5" isBold="true"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{groupCode}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="18"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="5" isBold="true"/>
+								</textElement>
+								<text><![CDATA[MP]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#E3E3E3">
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<staticText>
+								<reportElement style="Crosstab Data Text" x="30" y="0" width="30" height="18"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="5" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total P]]></text>
+							</staticText>
+							<staticText>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="18"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="5" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total MP]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="quantityMeasure" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{quantity}]]></measureExpression>
+				</measure>
+				<measure name="totalmp" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{totalmp}]]></measureExpression>
+				</measure>
+				<crosstabCell width="60" height="18">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;(#,##0.00)">
+							<reportElement x="30" y="0" width="30" height="18"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial" size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{quantityMeasure}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00;(#,##0.00)">
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="18"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial" size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalmp}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="18" rowTotalGroup="date">
+					<cellContents backcolor="#E3E3E3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;(#,##0.00)">
+							<reportElement x="30" y="0" width="30" height="18"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial" size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{quantityMeasure}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00;(#,##0.00)">
+							<reportElement x="0" y="0" width="30" height="18"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial" size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalmp}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="30" height="20" columnTotalGroup="name">
+					<cellContents backcolor="#00B3B3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="30" rowTotalGroup="date" columnTotalGroup="name">
+					<cellContents backcolor="#00B3B3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="18" columnTotalGroup="groupCode">
+					<cellContents backcolor="#E3E3E3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;(#,##0.00)">
+							<reportElement x="30" y="0" width="30" height="18"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial" size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{quantityMeasure}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00;(#,##0.00)">
+							<reportElement x="0" y="0" width="30" height="18"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial" size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalmp}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="18" rowTotalGroup="date" columnTotalGroup="groupCode">
+					<cellContents backcolor="#E3E3E3" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00;(#,##0.00)">
+							<reportElement x="30" y="0" width="30" height="18"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial" size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{quantityMeasure}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00;(#,##0.00)">
+							<reportElement x="0" y="0" width="30" height="18"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial" size="6"/>
+							</textElement>
+							<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalmp}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

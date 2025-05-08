@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ProductInventoryReport" pageWidth="611" pageHeight="791" whenNoDataType="AllSectionsNoDetail" columnWidth="561" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19">
-	<property name="ireport.zoom" value="1.8627639691774704"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="3.6300000000000114"/>
+	<property name="ireport.x" value="995"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="reportTitle" class="java.lang.String"/>
 	<parameter name="startDate" class="java.util.Date"/>
