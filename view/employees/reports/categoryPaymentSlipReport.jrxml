@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportTemplate" pageWidth="609" pageHeight="793" whenNoDataType="AllSectionsNoDetail" columnWidth="553" leftMargin="28" rightMargin="28" topMargin="28" bottomMargin="28">
 	<property name="ireport.zoom" value="2.1435888100000104"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="96"/>
 	<field name="fiscalPayroll.id" class="java.lang.Long">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -1215,7 +1215,7 @@
 					<textElement textAlignment="Center">
 						<font fontName="Arial" size="8" isBold="true"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA["Lic. Juana de Dios Pozo"]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA["Lic. Jhonny Fernandez"]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="228" y="335" width="100" height="10"/>
