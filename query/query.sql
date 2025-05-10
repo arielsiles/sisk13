@@ -1,3 +1,4 @@
+-- Reporte de produccion diaria
 select xp.fecha, pr.codigo, pr.tipoturno, g.codigo, p.cod_art, a.descri, p.cantidad, pr.totalmp
 from xpr_producto p
 join xpr_produccion pr on p.idproduccion = pr.idproduccion
@@ -5,4 +6,16 @@ join xpr_plan xp       on pr.idplan      = xp.idplan
 join inv_articulos a   on p.cod_art      = a.cod_art
 join xpr_grupo g       on pr.idgrupo     = g.idgrupo
 where xp.fecha between '2025-01-01' and '2025-12-31'
+;
+
+-- Reporte de Gastos (EGR), vales
+select v.no_trans, v.fecha, v.no_vale, v.estado, v.tipo_gasto, v.iddestino, d.nombre, a.descri, de.cantidad, de.costounitario, de.monto,  v.idproceso, v.cod_prod
+from inv_vales v
+join inv_destino d   on v.iddestino = d.iddestino
+join inv_mov m       on v.no_trans = m.no_trans
+join inv_movdet de   on m.no_trans = de.no_trans
+join inv_articulos a on de.cod_art = a.cod_art
+where v.fecha between '2025-04-01' and '2025-12-31'
+and v.cod_doc = 'EGR'
+and v.idproceso is null
 ;

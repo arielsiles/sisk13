@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="utf8mb4" collation="utf8mb4_0900_ai_ci">terdemol</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="inv_destino" view="colnames">
+<left>218</left>
+<top>320</top>
+<width>196</width>
+<height>178</height>
+<sql_create_table>CREATE TABLE `inv_destino` (
+  `iddestino` bigint NOT NULL,
+  `codigo` varchar(50) DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `activo` int DEFAULT NULL,
+  `tipo_area` varchar(100) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`iddestino`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="detalleanalitica" view="colnames">
+<left>1001</left>
+<top>286</top>
+<width>197</width>
+<height>178</height>
+<sql_create_table>CREATE TABLE `detalleanalitica` (
+  `iddetalleanalitica` bigint NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `iddestino` bigint NOT NULL,
+  `idcompania` bigint NOT NULL,
+  `version` bigint NOT NULL,
+  PRIMARY KEY (`iddetalleanalitica`),
+  KEY `iddestino` (`iddestino`),
+  KEY `idcompania` (`idcompania`),
+  CONSTRAINT `detalleanalitica_ibfk_1` FOREIGN KEY (`iddestino`) REFERENCES `inv_destino` (`iddestino`),
+  CONSTRAINT `detalleanalitica_ibfk_2` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci</sql_create_table>
+</table>
+<table name="inv_vales" view="colnames">
+<left>597</left>
+<top>122</top>
+<width>220</width>
+<height>180</height>
+<sql_create_table>CREATE TABLE `inv_vales` (
+  `no_cia` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `no_trans` varchar(10) NOT NULL,
+  `contracuenta` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `cod_cc` varchar(8) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `cod_doc` varchar(3) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `no_vale` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `id_com_encoc` bigint DEFAULT NULL,
+  `no_trans_rec` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `estado` varchar(3) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `cta_gasto` varchar(20) DEFAULT NULL,
+  `baja` int DEFAULT NULL,
+  `fechacreacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `tipo_gasto` varchar(100) DEFAULT NULL,
+  `oper` varchar(6) DEFAULT NULL,
+  `dest` varchar(10) DEFAULT NULL,
+  `orig` varchar(10) DEFAULT NULL,
+  `dest_cod_cc` varchar(8) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `cod_alm_dest` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `cod_alm` varchar(6) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `tiporecepcion` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `idunidadnegocio` bigint DEFAULT NULL,
+  `no_cia_raiz` varchar(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `no_trans_raiz` varchar(10) DEFAULT NULL,
+  `idcontratopuestosol` bigint DEFAULT NULL,
+  `id_responsable` bigint DEFAULT NULL,
+  `idunidadnegocio_dest` bigint DEFAULT NULL,
+  `id_responsable_dest` bigint DEFAULT NULL,
+  `idordenproduccion` bigint DEFAULT NULL,
+  `idproductobase` bigint DEFAULT NULL,
+  `idtmpenc` bigint DEFAULT NULL,
+  `idpedidostr` bigint DEFAULT NULL,
+  `iddestino` bigint DEFAULT NULL,
+  `idproceso` bigint DEFAULT NULL,
+  `cod_prod` varchar(6) DEFAULT NULL,
+  `iddetalleanalitica` bigint DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(100) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` varchar(100) DEFAULT NULL,
+  UNIQUE KEY `no_trans_UNIQUE` (`no_trans`),
+  KEY `id_com_encoc` (`id_com_encoc`),
+  KEY `idtmpenc` (`idtmpenc`),
+  KEY `idpedidostr` (`idpedidostr`),
+  KEY `iddestino` (`iddestino`),
+  KEY `idcontratopuestosol` (`idcontratopuestosol`),
+  KEY `id_responsable` (`id_responsable`),
+  KEY `idproceso` (`idproceso`),
+  KEY `iddetalleanalitica` (`iddetalleanalitica`),
+  CONSTRAINT `inv_vales_ibfk_1` FOREIGN KEY (`id_com_encoc`) REFERENCES `com_encoc` (`id_com_encoc`),
+  CONSTRAINT `inv_vales_ibfk_2` FOREIGN KEY (`idtmpenc`) REFERENCES `sf_tmpenc` (`id_tmpenc`),
+  CONSTRAINT `inv_vales_ibfk_3` FOREIGN KEY (`idpedidostr`) REFERENCES `pedidos` (`IDPEDIDOS`),
+  CONSTRAINT `inv_vales_ibfk_4` FOREIGN KEY (`iddestino`) REFERENCES `inv_destino` (`iddestino`),
+  CONSTRAINT `inv_vales_ibfk_5` FOREIGN KEY (`idcontratopuestosol`) REFERENCES `contratopuesto` (`idcontratopuesto`),
+  CONSTRAINT `inv_vales_ibfk_6` FOREIGN KEY (`id_responsable`) REFERENCES `empleado` (`idempleado`),
+  CONSTRAINT `inv_vales_ibfk_7` FOREIGN KEY (`idproceso`) REFERENCES `xpr_proceso` (`idproceso`),
+  CONSTRAINT `inv_vales_ibfk_8` FOREIGN KEY (`iddetalleanalitica`) REFERENCES `detalleanalitica` (`iddetalleanalitica`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="xpr_proceso" view="colnames">
+<left>1002</left>
+<top>127</top>
+<width>191</width>
+<height>151</height>
+<sql_create_table>CREATE TABLE `xpr_proceso` (
+  `idproceso` bigint NOT NULL,
+  `codigo` varchar(20) DEFAULT NULL,
+  `posicion` int DEFAULT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `estado` varchar(20) DEFAULT NULL,
+  `idlinea` bigint DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`idproceso`),
+  UNIQUE KEY `codigo` (`codigo`),
+  KEY `idlinea` (`idlinea`),
+  CONSTRAINT `xpr_proceso_ibfk_1` FOREIGN KEY (`idlinea`) REFERENCES `xpr_linea` (`idlinea`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci</sql_create_table>
+</table>
+<table name="xpr_linea" view="colnames">
+<left>1254</left>
+<top>126</top>
+<width>161</width>
+<height>153</height>
+<sql_create_table>CREATE TABLE `xpr_linea` (
+  `idlinea` bigint NOT NULL,
+  `codigo` varchar(100) DEFAULT NULL,
+  `nombre` varchar(255) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`idlinea`),
+  KEY `idcompania` (`idcompania`),
+  CONSTRAINT `xpr_linea_ibfk_1` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>
