@@ -327,6 +327,14 @@
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WAREHOUSEVOUCHER_INVENTORYEXPENSE_REPORT','VIEW')}">
+                    <s:link view="/warehouse/inventoryExpenseSummaryReport.xhtml"
+                            value="#{messages['menu.warehouse.report.inventoryExpenseSummary']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
                                rendered="#{s:hasPermission('VALUED_PHYSICAL_INVENTORY_REPORT','VIEW')}">
                     <s:link view="/warehouse/valuedPhysicalInventory.xhtml"
                             value="#{messages['menu.warehouse.report.valuedPhysicalInventory']}"
