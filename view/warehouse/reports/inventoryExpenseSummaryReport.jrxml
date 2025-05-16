@@ -81,7 +81,7 @@
 	<columnHeader>
 		<band height="20">
 			<staticText>
-				<reportElement x="101" y="0" width="57" height="20"/>
+				<reportElement mode="Opaque" x="101" y="0" width="57" height="20" backcolor="#CCCCCC"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -95,7 +95,7 @@
 				<text><![CDATA[CODIGO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="158" y="0" width="199" height="20"/>
+				<reportElement mode="Opaque" x="158" y="0" width="199" height="20" backcolor="#CCCCCC"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -109,7 +109,7 @@
 				<text><![CDATA[AREA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="357" y="0" width="84" height="20"/>
+				<reportElement mode="Opaque" x="357" y="0" width="84" height="20" backcolor="#CCCCCC"/>
 				<box rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -173,7 +173,7 @@
 	<summary>
 		<band height="114" splitType="Stretch">
 			<textField pattern="#,##0.00;(#,##0.00)">
-				<reportElement x="357" y="0" width="84" height="20"/>
+				<reportElement mode="Opaque" x="357" y="0" width="84" height="20" backcolor="#CCCCCC"/>
 				<box rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>

@@ -45,3 +45,27 @@ where v.fecha between '2025-04-01' and '2025-04-30'
   and v.estado = 'APR'
 group by a.cod_art, a.descri
 ;
+
+-- PARA REPORTE DE GASTOS, CON ANALITICA
+select v.no_trans, v.fecha, v.no_vale, d.nombre as area, da.nombre as ana_nombre, de.cod_art, de.cantidad, de.monto
+from inv_movdet de
+    join inv_mov m           on de.no_trans = m.no_trans
+    join inv_vales v         on m.no_trans = v.no_trans
+    join detalleanalitica da on v.iddetalleanalitica = da.iddetalleanalitica
+    join inv_destino d       on v.iddestino = d.iddestino
+where v.fecha between '2025-04-01' and '2025-04-30'
+and v.cod_doc = 'EGR'
+and v.estado = 'APR'
+;
+
+select d.nombre as area, da.nombre as ana_nombre, count(v.no_trans) as no_vales, sum(de.monto) as monto
+from inv_movdet de
+    join inv_mov m           on de.no_trans = m.no_trans
+    join inv_vales v         on m.no_trans = v.no_trans
+    join detalleanalitica da on v.iddetalleanalitica = da.iddetalleanalitica
+    join inv_destino d       on v.iddestino = d.iddestino
+where v.fecha between '2025-04-01' and '2025-04-30'
+and v.cod_doc = 'EGR'
+and v.estado = 'APR'
+group by d.nombre, da.nombre
+;
