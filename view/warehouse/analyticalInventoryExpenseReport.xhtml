@@ -58,9 +58,15 @@
                                       showReportTitle="false"/>
 
             <div class="buttons">
-                <h:commandButton action="#{analyticalInventoryExpenseReportAction.generateReport}"
+                <h:commandButton action="#{analyticalInventoryExpenseReportAction.generateAnalyticalReport}"
                                  styleClass="button"
-                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                                 value="Reporte Gral" id="generateAnalyticButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{analyticalInventoryExpenseReportAction.generateAnalyticalProductionReport}"
+                                 styleClass="button"
+                                 value="Reporte Prod" id="generateAnalyticProductionButtonId" tabindex="5">
                     <s:defaultAction/>
                 </h:commandButton>
             </div>

@@ -58,6 +58,7 @@ and v.cod_doc = 'EGR'
 and v.estado = 'APR'
 ;
 
+-- REPORTE DE GASTOS CON ANALITICA 1
 select d.nombre as area, da.nombre as ana_nombre, count(v.no_trans) as no_vales, sum(de.monto) as monto
 from inv_movdet de
     join inv_mov m           on de.no_trans = m.no_trans
@@ -68,4 +69,34 @@ where v.fecha between '2025-04-01' and '2025-04-30'
 and v.cod_doc = 'EGR'
 and v.estado = 'APR'
 group by d.nombre, da.nombre
+;
+
+-- PARA REPORTE DE GASTOS, CON ANALITICA MANTENIMIENTO, PRODUCCION
+select v.no_trans, v.fecha, v.no_vale, d.nombre as area, xl.nombre as linea, xp.nombre as proceso, p.descri as producto, de.cod_art, de.cantidad, de.monto
+from inv_movdet de
+         join inv_mov m      on de.no_trans = m.no_trans
+         join inv_vales v    on m.no_trans = v.no_trans
+         join inv_destino d  on v.iddestino = d.iddestino
+         join xpr_proceso xp on v.idproceso = xp.idproceso
+         join xpr_linea xl   on xp.idlinea  = xl.idlinea
+         left join inv_articulos p on v.cod_prod = p.cod_art
+         -- left join detalleanalitica da on v.iddetalleanalitica = da.iddetalleanalitica
+where v.fecha between '2025-04-01' and '2025-04-30'
+  and v.cod_doc = 'EGR'
+  and v.estado = 'APR'
+;
+
+-- PARA REPORTE DE GASTOS, CON ANALITICA MANTENIMIENTO, PRODUCCION
+select d.nombre as area, xl.nombre as linea, xp.nombre as proceso, count(v.no_trans) as frecuencia, sum(de.monto) as monto
+from inv_movdet de
+         join inv_mov m      on de.no_trans = m.no_trans
+         join inv_vales v    on m.no_trans = v.no_trans
+         join inv_destino d  on v.iddestino = d.iddestino
+         join xpr_proceso xp on v.idproceso = xp.idproceso
+         join xpr_linea xl   on xp.idlinea  = xl.idlinea
+where v.fecha between '2025-03-01' and '2025-04-30'
+  and v.cod_doc = 'EGR'
+  and v.estado = 'APR'
+group by d.nombre, xl.nombre, xp.nombre
+order by d.nombre, xl.nombre, xp.nombre
 ;
