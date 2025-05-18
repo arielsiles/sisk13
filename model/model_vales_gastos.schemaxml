@@ -6,8 +6,8 @@
 <canvas zoom="100">
 <tables>
 <table name="inv_destino" view="colnames">
-<left>218</left>
-<top>320</top>
+<left>259</left>
+<top>426</top>
 <width>196</width>
 <height>178</height>
 <sql_create_table>CREATE TABLE `inv_destino` (
@@ -22,8 +22,8 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
 </table>
 <table name="detalleanalitica" view="colnames">
-<left>1001</left>
-<top>286</top>
+<left>1004</left>
+<top>393</top>
 <width>197</width>
 <height>178</height>
 <sql_create_table>CREATE TABLE `detalleanalitica` (
