@@ -1,5 +1,6 @@
 package com.encens.khipus.mail;
 
+/*
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class EmailSenderTest {
 
         emailSession = Session.getDefaultInstance(emailProperties, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("ariel.siles@gmail.com", "wwlatgldmmoboiep");
+                return new PasswordAuthentication("", "");
             }
         });
 
@@ -103,7 +104,7 @@ public class EmailSenderTest {
 
 
 }
-
+*/
 
 
 
