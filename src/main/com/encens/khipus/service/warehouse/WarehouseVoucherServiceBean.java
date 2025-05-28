@@ -153,7 +153,8 @@ public class WarehouseVoucherServiceBean implements WarehouseVoucherService {
     public List<AnalyticDetail> getAnalyticDetails(Destination destination) {
 
             List<AnalyticDetail> resultList = em.createQuery("select a from AnalyticDetail a" +
-                    " where a.destination =:destination")
+                            " where a.destination =:destination" +
+                            " order by a.name")
                     .setParameter("destination", destination)
                     .getResultList();
 
