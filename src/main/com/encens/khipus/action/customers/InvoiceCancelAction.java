@@ -33,6 +33,13 @@ public class InvoiceCancelAction {
         }
     }
 
+    public void cleanData() {
+        setBranchOffice(null);
+        setCancellationReason(null);
+        setCuf(null);
+        setResultMessage(null);
+    }
+
     public BranchOffice getBranchOffice() {
         return branchOffice;
     }

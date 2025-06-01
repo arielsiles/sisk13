@@ -94,6 +94,9 @@
     <factory name="customerSaleTypes"
              value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.customers.SaleTypeEnum')}"/>
 
+    <factory name="saleStatusList"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.customers.SaleStatus')}"/>
+
     <factory name="branchOfficeList" value="#{branchOfficeQuery}"/>
     <framework:entity-query name="branchOfficeQuery" ejbql="select d from BranchOffice d "/>
 

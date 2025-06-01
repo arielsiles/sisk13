@@ -24,6 +24,7 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -85,6 +86,9 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     }
 
 
+    public List<String> getInvoiceStatusList() {
+        return Arrays.asList("VALIDADA", "ANULACION CONFIRMADA", "RECHAZADA");
+    }
 
     public void cancelOrderInvoice(CustomerOrder customerOrder){
 

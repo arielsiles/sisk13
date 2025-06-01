@@ -126,6 +126,25 @@
                         </h:selectOneMenu>
                     </s:decorate>
 
+                    <s:decorate id="saleStatusField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.orderStatus']}</ui:define>
+                        <h:selectOneMenu id="saleStatus" value="#{customerOrderDataModel.orderState}"
+                                         styleClass="inputMedium" tabindex="4">
+                            <s:selectItems value="#{saleStatusList}" var="saleStatus" label="#{messages[saleStatus.resourceKey]}"
+                                           hideNoSelectionLabel="false"
+                                           noSelectionLabel=""/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['CustomerOrder.invoiceStatus']}</ui:define>
+                        <h:inputText id="invoiceStatus"
+                                     value="#{customerOrderDataModel.invoiceStatus}"
+                                     tabindex="6" styleClass="inputMedium">
+                        </h:inputText>
+                    </s:decorate>
+
                     <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                         <a4j:commandButton action="#{customerOrderDataModel.search}"
                                            reRender="customerOrderList, dataScroller"
@@ -177,44 +196,6 @@
                 </s:div>
 
                 <s:div styleClass="buttonsRight">
-                    <!-- Services Test
-                    <h:commandButton id="rest5ClientActionId"
-                                     action="#{restClientAction.executeService5()}"
-                                     styleClass="button"
-                                     value="Service Bill" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-
-                    <h:commandButton id="rest4ClientActionId"
-                                     action="#{restClientAction.executeService4()}"
-                                     styleClass="button"
-                                     value="service4 Post" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-
-                    <h:commandButton id="rest3ClientActionId"
-                                     action="#{restClientAction.executeService3()}"
-                                     styleClass="button"
-                                     value="Servicio 3" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-
-                    <h:commandButton id="rest2ClientActionId"
-                                     action="#{restClientAction.executeService2()}"
-                                     styleClass="button"
-                                     value="Servicio 2" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-
-                    <h:commandButton id="rest1ClientActionId"
-                                     action="#{restClientAction.executeService1()}"
-                                     styleClass="button"
-                                     value="Servicio 1" >
-                                     rendered="#{s:hasPermission('CREDITSALE_INVOICING','VIEW')}"
-                                     value="Fact. Especial 2" >
-                        <s:defaultAction/>
-                    </h:commandButton>
-                    -->
 
                     <h:commandButton id="searchButtonId"
                                      action="#{salesAction.processBilling(customerOrderDataModel.selectedCustomerOrdes)}"
@@ -250,6 +231,12 @@
                                      value="#{messages['CustomerOrder.printInvoicesCopy']}" >
 
                     </h:commandButton>
+
+                    <s:button value="#{messages['menu.customers.directInvoiceCancel']}"
+                              view="/customers/directInvoiceCancel.xhtml"
+                              styleClass="button"
+                              propagation="begin"
+                              rendered="#{s:hasPermission('DIRECTINVOICECANCEL','VIEW')}"/>
 
                     <s:button value="#{messages['CustomerOrder.accounting']}"
                               view="/customers/accountingCreditSale.xhtml"

@@ -46,7 +46,7 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
-                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <s:decorate id="cufField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Invoice.cuf']}</ui:define>
                     <h:inputText id="cuf"
                                  required="true"
@@ -64,6 +64,14 @@
                                        rendered="#{s:hasPermission('DIRECTINVOICECANCEL','VIEW')}"
                                        styleClass="button"
                                        reRender="resultStatus">
+                    </a4j:commandButton>
+
+                    <a4j:commandButton id="cleanDataId"
+                                       value="#{messages['Common.clear']}"
+                                       action="#{invoiceCancelAction.cleanData()}"
+                                       rendered="#{s:hasPermission('DIRECTINVOICECANCEL','VIEW')}"
+                                       styleClass="button"
+                                       reRender="branchOfficeField, cancellationReasonField, cufField, resultStatus">
                     </a4j:commandButton>
                 </s:decorate>
 

@@ -1,10 +1,7 @@
 package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.QueryDataModel;
-import com.encens.khipus.model.customers.CustomerOrder;
-import com.encens.khipus.model.customers.CustomerOrderType;
-import com.encens.khipus.model.customers.SaleTypeEnum;
-import com.encens.khipus.model.customers.Territoriotrabajo;
+import com.encens.khipus.model.customers.*;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -34,12 +31,17 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
     private Integer invoice;
     private Date initDate;
     private Date endDate;
+    private String invoiceStatus;
+
+    private SaleStatus orderState;
 
     private static final String[] RESTRICTIONS = {
             "customerOrder.saleType = #{customerOrderDataModel.saleType}",
             "customerOrder.customerOrderType = #{customerOrderDataModel.customerOrderType}",
             "customerOrder.client.territoriotrabajo = #{customerOrderDataModel.territoriotrabajo}",
             "customerOrder.movement.number = #{customerOrderDataModel.invoice}",
+            "customerOrder.state = #{customerOrderDataModel.orderState}",
+            "lower(customerOrder.movement.stateDescription) like concat('%', concat(lower(#{customerOrderDataModel.invoiceStatus}), '%'))",
             "customerOrder.orderDate >= #{customerOrderDataModel.initDate}",
             "customerOrder.orderDate <= #{customerOrderDataModel.endDate}",
             "lower(customerOrder.code) like concat('%', concat(lower(#{customerOrderDataModel.criteria.code}), '%'))",
@@ -146,5 +148,21 @@ public class CustomerOrderDataModel extends QueryDataModel<Long, CustomerOrder> 
 
     public void setTerritoriotrabajo(Territoriotrabajo territoriotrabajo) {
         this.territoriotrabajo = territoriotrabajo;
+    }
+
+    public String getInvoiceStatus() {
+        return invoiceStatus;
+    }
+
+    public void setInvoiceStatus(String invoiceStatus) {
+        this.invoiceStatus = invoiceStatus;
+    }
+
+    public SaleStatus getOrderState() {
+        return orderState;
+    }
+
+    public void setOrderState(SaleStatus orderState) {
+        this.orderState = orderState;
     }
 }
