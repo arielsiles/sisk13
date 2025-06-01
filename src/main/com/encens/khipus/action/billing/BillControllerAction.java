@@ -366,6 +366,63 @@ public class BillControllerAction {
 
     }
 
+    public String directInvoiceCancel(BranchOffice branchOffice, CancellationReason cancellationReason, String cuf) throws IOException {
+
+        String resultMessage = "";
+        System.out.println("---------- DIRECT INVOICE CANCEL ----------");
+
+        if (branchOffice != null && cuf != null) {
+            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO(branchOffice.getOfficeCode(), branchOffice.getPosCode(), cancellationReason.getCode() , cuf);
+
+            String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
+            System.out.println(jsonCancelBill);
+
+            if (connectionTest()) {
+                System.out.println(">>>>> CONEXION EXITOSA!!!");
+                ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCancelbillURL(), jsonCancelBill);
+                if (serverResponse.getResponseJson() != null) {
+                    System.out.println("---------- RESPONSE CANCEL BILL ----------");
+                    JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
+                    String resultJson = Json.prettyPrint(jsonNode);
+
+                    CancelBillResponsePOJO cancelBillResponse = Json.fromJson(jsonNode, CancelBillResponsePOJO.class);
+                    resultMessage += ":: " + cancelBillResponse.getCodigoDescripcion() + " | ";
+                    resultMessage += "Codigo Estado: " + cancelBillResponse.getCodigoEstado() + " | ";
+                    resultMessage += "Codigo Recepcion: " + cancelBillResponse.getCodigoRecepcion() + " | ";
+                    resultMessage += "Transaccion: " + cancelBillResponse.getTransaccion() + " | ";
+
+                    System.out.println("---------- CANCEL BILL RESPONSE ----------");
+                    System.out.println("Codigo Descripcion: " + cancelBillResponse.getCodigoDescripcion());
+                    System.out.println("Codigo Estado: " + cancelBillResponse.getCodigoEstado());
+                    System.out.println("Codigo Recepcion: " + cancelBillResponse.getCodigoRecepcion());
+                    System.out.println("Transaccion: " + cancelBillResponse.getTransaccion());
+
+                    List<CancelBillResponseMessagePOJO> mensajesList = cancelBillResponse.getMensajesList();
+                    System.out.println("---------- MESSAGE LIST ----------");
+                    for (CancelBillResponseMessagePOJO message : mensajesList) {
+                        System.out.println("Mensaje Advertencia: " + message.getAdvertencia());
+                        System.out.println("Mensaje Codigo: " + message.getCodigo());
+                        System.out.println("Mensaje Descripcion: " + message.getDescripcion());
+                        System.out.println("Mensaje Numero Archivo: " + message.getNumeroArchivo());
+                        System.out.println("Mensaje Numero Detalle: " + message.getNumeroDetalle());
+                        resultMessage += ":: " + message.getDescripcion();
+                    }
+                    System.out.println("------------------------------");
+
+
+
+                } else {
+                    resultMessage = "¡ANULACION RECHAZADA!";
+                }
+            } else {
+                resultMessage = ">>>>> SIN CONEXION <<<<<";
+            }
+        }
+        return resultMessage;
+    }
+
+
     /** bkp cancelBill(...)
     public CancelBillResponsePOJO cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
         System.out.println("---------- CANCEL BILL ----------");

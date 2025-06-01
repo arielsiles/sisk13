@@ -4,4 +4,4 @@ UPDATE configuracion SET url_reversion_cancel_bill='http://10.0.0.106:8080/api/b
 
 -- 15.03.2025
 INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
-VALUES(409 , 'REVERSION_CANCEL_BILL_SFE', 1, 1, 'Functionality.customers.reversionCancelBillSFE', 1);
+VALUES(408 , 'REVERSION_CANCEL_BILL_SFE', 1, 1, 'Functionality.customers.reversionCancelBillSFE', 1);

@@ -40,7 +40,10 @@ update pedidos set envio = 0 where envio is null;
 alter table dosificacion add foreign key (idsucursal) references sucursal (idsucursal);
 
 INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
-VALUES(408, 'SYNC_BILLING_SFE', 2, 1, 'Functionality.admin.syncCatalogsBillingSFE', 1);
+VALUES(407, 'SYNC_BILLING_SFE', 2, 1, 'Functionality.admin.syncCatalogsBillingSFE', 1);
+
+INSERT INTO funcionalidad(idfuncionalidad, codigo, idmodulo, permiso, nombrerecurso, idcompania)
+VALUES(406, 'DIRECTINVOICECANCEL', 1, 1, 'Functionality.customers.directInvoiceCancel', 1);
 
 -- ------------------------------------------
 -- AUX
