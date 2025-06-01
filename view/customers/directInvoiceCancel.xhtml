@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Invoice.directInvoiceCancel.title']}</ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="customerOrderSearch">
+
+            <rich:panel>
+                <f:facet name="header">#{messages['Invoice.directInvoiceCancel.title']}</f:facet>
+
+                <s:decorate id="branchOfficeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Invoice.branchOfficeAndPos']}</ui:define>
+                    <h:selectOneMenu id="branchOffice"
+                                     value="#{invoiceCancelAction.branchOffice}"
+                                     styleClass="input"
+                                     required="true"
+                                     immediate="true"
+                                     tabindex="1">
+                        <s:selectItems value="#{branchOfficeList}" var="branchOffice"
+                                       label="#{branchOffice.description}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="true" />
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="cancellationReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Invoice.cancellationReason']}</ui:define>
+                    <h:selectOneMenu id="cancellationReason"
+                                     value="#{invoiceCancelAction.cancellationReason}"
+                                     styleClass="input"
+                                     required="true"
+                                     tabindex="2">
+                        <s:selectItems value="#{cancellationReasonList}"
+                                       var="cancellationReason"
+                                       label="#{cancellationReason.description}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Invoice.cuf']}</ui:define>
+                    <h:inputText id="cuf"
+                                 required="true"
+                                 value="#{invoiceCancelAction.cuf}"
+                                 tabindex="3" styleClass="inputLarge400">
+                    </h:inputText>
+
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label"></ui:define>
+                    <a4j:commandButton id="executeBillingId"
+                                       value="#{messages['Common.annul']}"
+                                       action="#{invoiceCancelAction.cancelDirectInvoice()}"
+                                       rendered="#{s:hasPermission('DIRECTINVOICECANCEL','VIEW')}"
+                                       styleClass="button"
+                                       reRender="resultStatus">
+                    </a4j:commandButton>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div id="cancelMessage">
+                <s:span id="resultStatus" styleClass="msgText1">
+                    <h:outputText>#{invoiceCancelAction.resultMessage}</h:outputText>
+                </s:span>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

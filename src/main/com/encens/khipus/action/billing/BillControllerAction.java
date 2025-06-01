@@ -278,7 +278,7 @@ public class BillControllerAction {
         try {
             URL url = new URL(urlEndpoint);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(7000);
+            con.setConnectTimeout(15000);
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; utf-8");
             con.setRequestProperty("Accept", "application/json");
@@ -348,7 +348,7 @@ public class BillControllerAction {
         movement.setLeyenda(billResponsePOJO.getLeyenda());
 
         if (billResponsePOJO.getRespuestaRecepcion() != null) {
-            movement.setDescri(billResponsePOJO.getRespuestaRecepcion().getCodigoDescripcion());
+            movement.setStateDescription(billResponsePOJO.getRespuestaRecepcion().getCodigoDescripcion());
             movement.setCodigoEstado(billResponsePOJO.getRespuestaRecepcion().getCodigoEstado().toString());
             movement.setCodigoRecepcion(billResponsePOJO.getRespuestaRecepcion().getCodigoRecepcion());
         }
@@ -366,6 +366,64 @@ public class BillControllerAction {
 
     }
 
+    public String directInvoiceCancel(BranchOffice branchOffice, CancellationReason cancellationReason, String cuf) throws IOException {
+
+        String resultMessage = "";
+        System.out.println("---------- DIRECT INVOICE CANCEL ----------");
+
+        if (branchOffice != null && cuf != null) {
+            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO(branchOffice.getOfficeCode(), branchOffice.getPosCode(), cancellationReason.getCode() , cuf);
+
+            String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
+            System.out.println(jsonCancelBill);
+
+            if (connectionTest()) {
+                System.out.println(">>>>> CONEXION EXITOSA!!!");
+                ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCancelbillURL(), jsonCancelBill);
+                if (serverResponse.getResponseJson() != null) {
+                    System.out.println("---------- RESPONSE CANCEL BILL ----------");
+                    JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
+                    String resultJson = Json.prettyPrint(jsonNode);
+
+                    CancelBillResponsePOJO cancelBillResponse = Json.fromJson(jsonNode, CancelBillResponsePOJO.class);
+                    resultMessage += ":: " + cancelBillResponse.getCodigoDescripcion() + " | ";
+                    resultMessage += "Codigo Estado: " + cancelBillResponse.getCodigoEstado() + " | ";
+                    resultMessage += "Codigo Recepcion: " + cancelBillResponse.getCodigoRecepcion() + " | ";
+                    resultMessage += "Transaccion: " + cancelBillResponse.getTransaccion() + " | ";
+
+                    System.out.println("---------- CANCEL BILL RESPONSE ----------");
+                    System.out.println("Codigo Descripcion: " + cancelBillResponse.getCodigoDescripcion());
+                    System.out.println("Codigo Estado: " + cancelBillResponse.getCodigoEstado());
+                    System.out.println("Codigo Recepcion: " + cancelBillResponse.getCodigoRecepcion());
+                    System.out.println("Transaccion: " + cancelBillResponse.getTransaccion());
+
+                    List<CancelBillResponseMessagePOJO> mensajesList = cancelBillResponse.getMensajesList();
+                    System.out.println("---------- MESSAGE LIST ----------");
+                    for (CancelBillResponseMessagePOJO message : mensajesList) {
+                        System.out.println("Mensaje Advertencia: " + message.getAdvertencia());
+                        System.out.println("Mensaje Codigo: " + message.getCodigo());
+                        System.out.println("Mensaje Descripcion: " + message.getDescripcion());
+                        System.out.println("Mensaje Numero Archivo: " + message.getNumeroArchivo());
+                        System.out.println("Mensaje Numero Detalle: " + message.getNumeroDetalle());
+                        resultMessage += ":: " + message.getDescripcion();
+                    }
+                    System.out.println("------------------------------");
+
+
+
+                } else {
+                    resultMessage = "¡ANULACION RECHAZADA!";
+                }
+            } else {
+                resultMessage = ">>>>> SIN CONEXION <<<<<";
+            }
+        }
+        return resultMessage;
+    }
+
+
+    /** bkp cancelBill(...)
     public CancelBillResponsePOJO cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
         System.out.println("---------- CANCEL BILL ----------");
         //User user = getUser(currentUser.getId()); //
@@ -375,7 +433,8 @@ public class BillControllerAction {
 
         if (customerOrder.getMovement() != null){
             CompanyConfiguration companyConfiguration = getCompanyConfiguration();
-            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO(dosage.getBranchOffice().getOfficeCode(), dosage.getBranchOffice().getPosCode(),
+            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO( dosage.getBranchOffice().getOfficeCode(),
+                    dosage.getBranchOffice().getPosCode(),
                     reasonCode, customerOrder.getMovement().getCuf());
 
             String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
@@ -391,7 +450,7 @@ public class BillControllerAction {
                     System.out.println(resultJson);
 
                     CancelBillResponsePOJO responsePOJO = Json.fromJson(jsonNode, CancelBillResponsePOJO.class);
-                    /** todo **/
+                    // todo
                     if (responsePOJO.getCodigoDescripcion().equals("ANULACION CONFIRMADA")){
                         responseResult = responsePOJO;
                         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"ANULACION CONFIRMADA ...");
@@ -401,6 +460,48 @@ public class BillControllerAction {
                 }else {
                     facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"ANULACION RECHAZADA ..");
                 }
+
+            } else {
+                System.out.println(">>>>> SIN CONEXION!!!");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"SIN CONEXION...");
+            }
+        }
+        return responseResult;
+    }
+    **/
+
+    public CancelBillResponsePOJO cancelBill(CustomerOrder customerOrder, Integer reasonCode) throws IOException {
+        System.out.println("---------- CANCEL BILL ----------");
+
+        Dosage dosage = dosageService.findDosageByOffice(customerOrder.getUser().getBranchOffice().getId());
+
+        CancelBillResponsePOJO responseResult = null;
+
+        if (customerOrder.getMovement() != null){
+            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+            CancelBillPOJO cancelBillPOJO = new CancelBillPOJO( dosage.getBranchOffice().getOfficeCode(),
+                                                                dosage.getBranchOffice().getPosCode(),
+                                                                reasonCode, customerOrder.getMovement().getCuf());
+
+            String jsonCancelBill = Json.prettyPrint(Json.toJson(cancelBillPOJO));
+            System.out.println(jsonCancelBill);
+
+            if (connectionTest()) {
+                System.out.println(">>>>> CONEXION EXITOSA!!!");
+                ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getCancelbillURL(), jsonCancelBill);
+                if (serverResponse.getResponseJson() != null) {
+                    System.out.println("---------- RESPONSE CANCEL BILL ----------");
+                    JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
+                    String resultJson = Json.prettyPrint(jsonNode);
+                    System.out.println(resultJson);
+
+                    CancelBillResponsePOJO responsePOJO = Json.fromJson(jsonNode, CancelBillResponsePOJO.class);
+                    responseResult = responsePOJO;
+
+                }else {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"ANULACION RECHAZADA ...");
+                }
+
             } else {
                 System.out.println(">>>>> SIN CONEXION!!!");
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"SIN CONEXION...");
@@ -409,6 +510,41 @@ public class BillControllerAction {
         return responseResult;
     }
 
+    public ReversionCancelBillResponsePOJO reversionCancelBill(CustomerOrder customerOrder) throws IOException {
+
+        System.out.println("---------- REVERSION CANCEL BILL ----------");
+        Dosage dosage = dosageService.findDosageByOffice(customerOrder.getUser().getBranchOffice().getId());
+        ReversionCancelBillResponsePOJO responseResult = null;
+
+        if (customerOrder.getMovement() != null){
+            CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+            ReversionCancelBillPOJO reversionCancelBillPOJO = new ReversionCancelBillPOJO(  dosage.getBranchOffice().getOfficeCode(),
+                                                                                            dosage.getBranchOffice().getPosCode(),
+                                                                                            customerOrder.getMovement().getCuf() );
+            String jsonReversionCancelBill = Json.prettyPrint(Json.toJson(reversionCancelBillPOJO));
+            System.out.println(jsonReversionCancelBill);
+
+            if (connectionTest()) {
+                System.out.println(">>>>> CONEXION EXITOSA!!!");
+                ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getReversionCancelBillURL(), jsonReversionCancelBill);
+                if (serverResponse.getResponseJson() != null) {
+                    System.out.println("---------- RESPONSE REVERSION CANCEL BILL ----------");
+                    JsonNode jsonNode = Json.parse(serverResponse.getResponseJson());
+                    String resultJson = Json.prettyPrint(jsonNode);
+                    System.out.println(resultJson);
+
+                    responseResult = Json.fromJson(jsonNode, ReversionCancelBillResponsePOJO.class);
+
+                }else {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"REVERSION RECHAZADA ...");
+                }
+            } else {
+                System.out.println(">>>>> SIN CONEXION!!!");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"SIN CONEXION...");
+            }
+        }
+        return responseResult;
+    }
 
     public String nitVerification(Long nit) {
 
@@ -564,6 +700,72 @@ public class BillControllerAction {
         System.out.println(result);
     }
 
+    public ClosePosResponsePOJO closePos(Integer codSuc, Integer codPos, Integer codPosClose) {
+
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        ClosePosPOJO closePosPOJO = new ClosePosPOJO(codSuc, codPos, codPosClose);
+
+        System.out.println("-----------------------closePos-------------------");
+
+        ClosePosResponsePOJO closePosResponsePOJO = null;
+
+        try {
+            String jsonString = Json.prettyPrint(Json.toJson(closePosPOJO));
+            ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getClosePosURL(), jsonString);
+
+            if (serverResponse.getResponseJson() != null) {
+                JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+                closePosResponsePOJO = Json.fromJson(jsonNodeResponse, ClosePosResponsePOJO.class);
+
+                System.out.println("-----------------------CLOSE POS POJO-------------------");
+                String result = Json.prettyPrint(jsonNodeResponse);
+                System.out.println(result);
+
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Punto de Venta Cerrado!!!");
+            } else {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (2).");
+            }
+        } catch (JsonProcessingException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (3).");
+        } catch (IOException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (4).");
+        }
+        return closePosResponsePOJO;
+    }
+
+    public RegistroPosResponsePOJO registerPos(Integer codigoSucursal, Integer codigoPuntoVenta, Integer codigoTipoPuntoVenta, String descripcion, String nombrePos) {
+        //User user = getUser(currentUser.getId());
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        RegistroPosPOJO registroPosPOJO = new RegistroPosPOJO(codigoSucursal, codigoPuntoVenta, codigoTipoPuntoVenta, nombrePos, descripcion);
+
+        RegistroPosResponsePOJO registroPosResponsePOJO = null;
+
+        try {
+            String jsonString = Json.prettyPrint(Json.toJson(registroPosPOJO));
+            ServerResponse serverResponse = doPostHttpConnection(companyConfiguration.getRegisterPosURL(), jsonString);
+
+            if (serverResponse.getResponseJson() != null) {
+                JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+                registroPosResponsePOJO = Json.fromJson(jsonNodeResponse, RegistroPosResponsePOJO.class);
+
+                System.out.println("-----------------------REGISTER POS-------------------");
+                String result = Json.prettyPrint(jsonNodeResponse);
+                System.out.println(result);
+
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Nuevo Punto de Venta Registrado: " + registroPosResponsePOJO.getCodigoPuntoVenta());
+            } else {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (2).");
+            }
+        } catch (JsonProcessingException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (3).");
+            return null;
+        } catch (IOException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "No es posible en este momento, intentelo mas tarde (4).");
+            return null;
+        }
+        return registroPosResponsePOJO;
+    }
+
     // No usado
     public List<SignificantEventCodePOJO> querySignificantEvents() throws IOException {
         User user = getUser(currentUser.getId());
@@ -662,15 +864,29 @@ public class BillControllerAction {
         pedidoPOJO.setMontoTotalMoneda(amountValue);
         pedidoPOJO.setDescuentoAdicional(customerOrder.getAdditionalDiscountValue());
 
+        if ( customerOrder.getPaymentMethod() != null )
+            pedidoPOJO.setCodigoMetodoPago(customerOrder.getPaymentMethod().getCode());
+
         boolean isOnlineMode = checkBillingMode();
 
         if (isOnlineMode && pedidoPOJO.getCodigoTipoDocumentoIdentidad()==5){
-            String validNitResult = nitVerification(new Long(pedidoPOJO.getNumeroDocumento()));
-            System.out.println("******************>>>>>> validNitResult: " + pedidoPOJO.getNumeroDocumento() + " - "  + validNitResult);
-            if (validNitResult.equals("NIT INEXISTENTE")){
-                System.out.println("**********> NIT INEXISTENTE, CODIGO EXCEPCION 1");
+
+            try {
+                String validNitResult = nitVerification(new Long(pedidoPOJO.getNumeroDocumento()));
+                System.out.println("******************>>>>>> validNitResult: " + pedidoPOJO.getNumeroDocumento() + " - "  + validNitResult);
+                if (validNitResult.equals("NIT INEXISTENTE")){
+                    System.out.println("**********> NIT INEXISTENTE, CODIGO EXCEPCION 1");
+                    pedidoPOJO.setCodigoExcepcion(1);
+                }
+                if (validNitResult.equals("NIT INACTIVO")){
+                    System.out.println("**********> NIT INACTIVO, CODIGO EXCEPCION 1");
+                    pedidoPOJO.setCodigoExcepcion(1);
+                }
+            } catch (NumberFormatException e){
+                System.out.println("**********> NIT INVALIDO..., CODIGO EXCEPCION 1");
                 pedidoPOJO.setCodigoExcepcion(1);
             }
+
         }
 
 
@@ -743,10 +959,22 @@ public class BillControllerAction {
         boolean result = false;
 
         if (customerOrder.getMovement() != null){
-            if (customerOrder.getMovement().getCuf() != null)
+            if (customerOrder.getMovement().getCuf() != null && customerOrder.getMovement().getStateDescription().equals("VALIDADA"))
                 result = true;
+
+            if (customerOrder.getMovement().getStateDescription() != null)
+                if (customerOrder.getMovement().getStateDescription().equals("ANULACION CONFIRMADA"))
+                    result = true;
+
         }
         return result;
+    }
+
+    /** La expresión customerOrder.getMovement() != null se evalúa primero.
+     *  Si getMovement() es null, la expresión completa se evalúa como false sin intentar evaluar customerOrder.getMovement().getCuf(),
+     *  evitando así un NullPointerException. **/
+    public boolean hasInvoice1(CustomerOrder customerOrder) {
+        return customerOrder.getMovement() != null && customerOrder.getMovement().getCuf() != null;
     }
 
     public CompanyConfiguration getCompanyConfiguration(){

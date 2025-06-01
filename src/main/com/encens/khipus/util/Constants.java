@@ -327,15 +327,21 @@ public final class Constants {
     public static final String ONLINE = "ONLINE";
     public static final String OFFLINE = "OFFLINE";
 
-    public static final String EMAIL_FROM = "ariel.siles@gmail.com";
-    public static final String EMAIL_PASSW = "wwlatgldmmoboiep";
-    public static final String EMAIL_SUBJECT = "Factura Electrónica en Línea {0}, CISC Ltda. - ILVA";
+    public static final String SMTP_HOST = "";
+    public static final String SMTP_PORT = "";
+    public static final String EMAIL_FROM = "";
+    public static final String EMAIL_PASSW = "";
+    public static final String EMAIL_SUBJECT = "EMISION DE FACTURA COMPRA-VENTA, CAISC R.L.";
     public static final String PATH_FILE_INVOICE = "C:/TEMP/";
     public static final String PREFIX_NAME_INVOICE = "FACTURA-";
 
-    public static final String EMAIL_TEXT_1 = "Usted tiene una Factura Electrónica en Línea, por favor revise sus archivos adjuntos.";
-    public static final String EMAIL_SUBJECT_ANNULLED = "Factura Electrónica en Línea ANULADA, CISC Ltda. - ILVA";
-    public static final String EMAIL_BUSINESS_NAME = "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS \"COCHABAMBA\" R.L.";
+    public static final String EMAIL_TEXT_1 =
+            "Estimado/a: {0},\n\nEn fecha {1} se realizó la emisión de la FACTURA DE COMPRA-VENTA Nro. {2}, en el cual usted figura como beneficiario.\n" +
+            "Adjunto al presente correo, encontrará la representación gráfica y el archivo XML.\n\n" +
+            "Atentamente,\nCOOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\nINDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
+    public static final String EMAIL_SUBJECT_ANNULLED = "FACTURA DE COMPRA-VENTA ANULADA, CAISC R.L.";
+    public static final String EMAIL_SUBJECT_REVERSION_CANCEL_BILL = "REVERSION DE ANULACION FACTURA DE COMPRA-VENTA, CAISC R.L.";
+    public static final String EMAIL_BUSINESS_NAME = "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.";
 
     public static final String ACCOUNT_LECHECRUDA = "1580110400";
     public static final String ACCOUNT_FONDOSCUSTODIA = "2429910400";
@@ -347,6 +353,17 @@ public final class Constants {
     public static final String PROVIDER_CODE_PRODUCTORES = "433";
 
     public static final String NIT_COMPANY = "1008741021";
+
+    // Datos para crear Sucursal
+    public static final String NOMBRE_PUNTOVENTA = "No. Punto de Venta {0}";
+    public static final String DESCRIPCION = "ILVA - SUC({0}) POS({1})";
+    public static final Integer DOC_SECTOR = 1;
+    public static final String ACTIVIDAD_ECONOMICA_SUC2 = "ELABORACIÓN DE PRODUCTOS LÁCTEOS";
+    public static final String NOMBRE_EMPRESA_CAISC = "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.";
+    public static final String SUCURSAL = "SUCURSAL {0}";
+    public static final String LUGAR = "PUNATA - COCHABAMBA";
+    public static final String TELEFONO = "Teléfono: 4577003";
+    public static final String DIRECCION_SUC2 = "AVENIDA LIBERTADORES NRO.454 ZONA LOCALIDAD MIRABEL";
 
     private Constants() {
     }

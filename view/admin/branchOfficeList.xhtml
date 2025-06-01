@@ -42,7 +42,7 @@
             <rich:dataTable value="#{branchOfficeDataModel}" var="branchOfficeItem" id="branchOfficeList"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="15%, 20%, 40%, 10%, 10%, 5%">
+                            columnsWidth="10%, 14%, 50%, 7%, 7%, 7%, 5%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -51,6 +51,7 @@
                         <rich:column>#{messages['BranchOffice.economicActivity']}</rich:column>
                         <rich:column>#{messages['BranchOffice.officeCode']}</rich:column>
                         <rich:column>#{messages['BranchOffice.posCode']}</rich:column>
+                        <rich:column>#{messages['BranchOffice.pointOfSaleType']}</rich:column>
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
                         </rich:column>
@@ -71,6 +72,9 @@
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{branchOfficeItem.posCode}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{branchOfficeItem.pointOfSaleType}"/>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}"

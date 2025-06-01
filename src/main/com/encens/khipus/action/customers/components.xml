@@ -22,7 +22,11 @@
     <framework:entity-query name="creditTypeQuery" ejbql="select c from CreditType c"/>
 
     <factory name="paymentMethodSinList" value="#{PaymentMethodSinQuery}"/>
-    <framework:entity-query name="PaymentMethodSinQuery" ejbql="select p from PaymentMethodSin p"/>
+    <framework:entity-query name="PaymentMethodSinQuery" ejbql="select p from PaymentMethodSin p">
+        <framework:restrictions>
+            <value>p.active = #{true}</value>
+        </framework:restrictions>
+    </framework:entity-query>
 
     <factory name="discountPolicyTypeList" value="#{discountPolicyTypeQuery}"/>
     <framework:entity-query name="discountPolicyTypeQuery" ejbql="select d from DiscountPolicyType d"
@@ -98,5 +102,8 @@
 
     <factory name="significantEventSINList" value="#{significantEventSINQuery}"/>
     <framework:entity-query name="significantEventSINQuery" ejbql="select d from SignificantEventSIN d "/>
+
+    <factory name="dosageList" value="#{dosageQuery}"/>
+    <framework:entity-query name="dosageQuery" ejbql="select d from Dosage d "/>
 
 </components>

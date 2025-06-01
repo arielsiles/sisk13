@@ -101,7 +101,8 @@
                 <h:outputText value="#{clientItem.nitNumberComplement}"/>
             </rich:column>
             <rich:column styleClass="center">
-                <s:div rendered="#{clientItem.validNitNumber()}">
+                <!--rendered="#{clientItem.validNitNumber()}"-->
+                <s:div>
                     <ui:insert name="assignButton"/>
                     <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide" event="onclick"/>
                 </s:div>

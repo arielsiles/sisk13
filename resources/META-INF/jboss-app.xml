@@ -1,5 +1,6 @@
 <jboss-app>
    <loader-repository> 
       seam.jboss.org:loader=khipus
-   </loader-repository> 
-</jboss-app> 
+      <loader-repository-config>java2ParentDelegation=false</loader-repository-config>
+   </loader-repository>
+</jboss-app>

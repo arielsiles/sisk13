@@ -100,4 +100,8 @@
         <converter-id>realNumberConverter</converter-id>
         <converter-class>com.encens.khipus.converter.RealNumberConverter</converter-class>
     </converter>
+    <converter>
+        <converter-id>pointOfSaleTypeCodeConverter</converter-id>
+        <converter-class>com.encens.khipus.converter.PointOfSaleTypeCodeConverter</converter-class>
+    </converter>
 </faces-config>

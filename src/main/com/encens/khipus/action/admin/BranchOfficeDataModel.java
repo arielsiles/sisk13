@@ -3,6 +3,7 @@ package com.encens.khipus.action.admin;
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.customers.BranchOffice;
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
@@ -25,6 +26,12 @@ public class BranchOfficeDataModel extends QueryDataModel<Long, BranchOffice> {
     @Override
     public String getEjbql() {
         return "select branchOffice from BranchOffice branchOffice";
+    }
+
+    @Create
+    public void init() {
+        sortProperty = "branchOffice.id";
+        sortAsc = false;
     }
 
     @Override

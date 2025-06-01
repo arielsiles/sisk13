@@ -1,6 +1,5 @@
 package com.encens.khipus.mail;
 
-/*
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public class EmailSenderTest {
 
         emailSession = Session.getDefaultInstance(emailProperties, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("", "");
+                return new PasswordAuthentication("ariel.siles@gmail.com", "");
             }
         });
 
@@ -75,7 +74,7 @@ public class EmailSenderTest {
 
             // Crear el archivo adjunto
             BodyPart attachmentBodyPart = new MimeBodyPart();
-            String filename = "C:/TEMP/FACTURA-1.pdf"; // Cambia esto a la ruta de tu archivo
+            String filename = "C:/TEMP/FACTURA-12.pdf"; // Cambia esto a la ruta de tu archivo
             FileDataSource source = new FileDataSource(filename);
             attachmentBodyPart.setDataHandler(new DataHandler(source));
             attachmentBodyPart.setFileName(filename);
@@ -104,7 +103,7 @@ public class EmailSenderTest {
 
 
 }
-*/
+
 
 
 

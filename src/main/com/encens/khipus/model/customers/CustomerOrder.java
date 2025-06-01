@@ -3,6 +3,7 @@ package com.encens.khipus.model.customers;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Type;
 
@@ -166,6 +167,18 @@ public class CustomerOrder implements BaseModel  {
     @JoinColumn(name = "idmovimiento", referencedColumnName = "idmovimiento")
     @ManyToOne(optional = true)
     private Movement movement;
+
+    @JoinColumn(name = "idmotivoanulacion", referencedColumnName = "idmotivoanulacion")
+    @ManyToOne(optional = true)
+    private CancellationReason cancellationReason;
+
+    @JoinColumn(name = "idmetodopago", referencedColumnName = "idmetodopago")
+    @ManyToOne(optional = true)
+    private PaymentMethodSin paymentMethod;
+
+    @Column(name = "envio", nullable = false)
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean sent = Boolean.FALSE;
 
     @JoinColumn(name = "iddistribuidor", referencedColumnName = "iddistribuidor")
     @ManyToOne(optional = true)
@@ -408,7 +421,7 @@ public class CustomerOrder implements BaseModel  {
         String result = "";
         if (getMovement() != null){
             if (getMovement().getCuf() != null){
-                result = getMovement().getDescri();
+                result = getMovement().getStateDescription();
                 if (result != null)
                     if (result.equals("ANULACION CONFIRMADA"))
                         result = "ANULADA";
@@ -447,5 +460,29 @@ public class CustomerOrder implements BaseModel  {
 
     public void setInvoiceNumberCafc(String invoiceNumberCafc) {
         this.invoiceNumberCafc = invoiceNumberCafc;
+    }
+
+    public CancellationReason getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(CancellationReason cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+
+    public Boolean getSent() {
+        return sent;
+    }
+
+    public void setSent(Boolean sent) {
+        this.sent = sent;
+    }
+
+    public PaymentMethodSin getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethodSin paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

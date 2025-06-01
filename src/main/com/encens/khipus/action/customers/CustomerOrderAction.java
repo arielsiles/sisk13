@@ -10,6 +10,7 @@ import com.encens.khipus.model.customers.SaleStatus;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.VoucherState;
 import com.encens.khipus.model.rest.CancelBillResponsePOJO;
+import com.encens.khipus.model.rest.ReversionCancelBillResponsePOJO;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.DosageService;
@@ -70,28 +71,83 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
         return outCome;
     }
 
-    public void cancelOrderInvoice(CustomerOrder customerOrder){
+    public void cancelOrderAndInvoice(CustomerOrder customerOrder){
 
-        customerOrder.setState(SaleStatus.ANULADO);
-        inventoryService.updateInventoryForSalesAnnuled(customerOrder);
-        saleService.updateCustomerOrder(customerOrder);
-
-        if (customerOrder.getVoucher() != null) {
-            customerOrder.getVoucher().setState(VoucherState.ANL.toString());
-            voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
+        if ( customerOrder.getMovement() != null ) {
+            // Anular Factura
+            // Si Fact ANL,   Anular Pedido
+            // Si Pedido ANL, Anular Asiento
+        } else {
+            // Anular Pedido
+            // Anular Asiento
         }
+
+    }
+
+
+
+    public void cancelOrderInvoice(CustomerOrder customerOrder){
 
         /** Anular Factura En Linea **/
         if (customerOrder.getMovement() != null){
-            if (customerOrder.getMovement().getDescri().equals("VALIDADA")){
-                annulOrder(customerOrder);
+
+            verifyInvoiceCancelDates(customerOrder); // Verifica fechas de anulacion (Cambiar fechas en configuracion)
+            if (customerOrder.getMovement().getStateDescription().equals("VALIDADA")){
+
+                CancelBillResponsePOJO cancelResponse = null;
+                try {
+                    cancelResponse = billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());
+
+                } catch (IOException e) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorAnnulOrder");
+                    return;
+                }
+
+                if ( cancelResponse != null ) {
+                    if (cancelResponse.getCodigoDescripcion().equals("ANULACION CONFIRMADA")) {
+                        // Anular Factura
+                        Movement movement = customerOrder.getMovement();
+                        movement.setState("A");
+                        movement.setCodigoEstado(cancelResponse.getCodigoEstado().toString());
+                        movement.setStateDescription(cancelResponse.getCodigoDescripcion());
+                        movementService.updateMovement(movement);
+                        // Anular Pedido
+                        customerOrder.setState(SaleStatus.ANULADO);
+                        customerOrder.setCancellationReason(cancellationReason);
+                        inventoryService.updateInventoryForSalesAnnuled(customerOrder);
+                        saleService.updateCustomerOrder(customerOrder);
+                        // Anular Asiento
+                        if (customerOrder.getVoucher() != null) {
+                            customerOrder.getVoucher().setState(VoucherState.ANL.toString());
+                            voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
+                        }
+                        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "ANULACION CONFIRMADA ...");
+                        sendMessageAnnulledInvoice(customerOrder);
+                        cleanAnnulOrder();
+                    } else {
+                        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, cancelResponse.getCodigoDescripcion());
+                    }
+                } else  {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FALLA DE CONEXION ...");
+                    cleanAnnulOrder();
+                }
+
+                /*if (cancelResponse != null) {
+                    Movement movement = customerOrder.getMovement();
+                    movement.setState("A");
+                    movement.setCodigoEstado(cancelResponse.getCodigoEstado().toString());
+                    movement.setStateDescription(cancelResponse.getCodigoDescripcion());
+                    movementService.updateMovement(movement);
+
+                    sendMessageAnnulledInvoice(customerOrder);
+                }*/
+
             }
         }
-        cleanAnnulOrder();
+
     }
 
-    public void annulOrder(CustomerOrder customerOrder) {
-
+    public void verifyInvoiceCancelDates(CustomerOrder customerOrder){
         CompanyConfiguration companyConfiguration = billControllerAction.getCompanyConfiguration();
 
         Date controlAnnulDate = DateUtils.removeTime(companyConfiguration.getInvoiceAnnulDate());
@@ -106,28 +162,60 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No es posible anular, se encuentra fuera de la fecha valida.");
             return;
         }
+    }
 
-        CancelBillResponsePOJO cancelResponse = null;
+    public void reversionCancelBill (CustomerOrder customerOrder){
+
+        ReversionCancelBillResponsePOJO reversionResponse = null;
         try {
-            cancelResponse = billControllerAction.cancelBill(customerOrder, cancellationReason.getCode());
+            reversionResponse = billControllerAction.reversionCancelBill(customerOrder);
         } catch (IOException e) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorAnnulOrder");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorReversionCancelBill");
             return;
         }
 
-        if (cancelResponse != null) {
-            Movement movement = customerOrder.getMovement();
-            movement.setState("A");
-            movement.setCodigoEstado(cancelResponse.getCodigoEstado().toString());
-            movement.setDescri(cancelResponse.getCodigoDescripcion());
-            movementService.updateMovement(movement);
+        if ( reversionResponse != null ){
+            if (reversionResponse.getCodigoDescripcion().equals("REVERSION DE ANULACION CONFIRMADA")) {
+                /** Movimiento **/
+                Movement movement = customerOrder.getMovement();
+                movement.setState("V");
+                movement.setStateDescription("VALIDADA");
+                movement.setCodigoEstado(reversionResponse.getCodigoEstado().toString());
 
-            sendMessageAnnulledInvoice(customerOrder);
+                String gloss =  "codigoDescripcion:" + reversionResponse.getCodigoDescripcion() + "|" +
+                                "codigoEstado:" + reversionResponse.getCodigoEstado() + "|" +
+                                "codigoRecepcion:" + reversionResponse.getCodigoRecepcion();
+                movement.setGloss(gloss);
+                movementService.updateMovement(movement);
+
+                /** Revertir pedido, asiento **/
+                if (customerOrder.getVoucher() != null) {
+                    customerOrder.setState(SaleStatus.CONTABILIZADO);
+                    saleService.updateCustomerOrder(customerOrder);
+
+                    customerOrder.getVoucher().setState(VoucherState.APR.toString());
+                    voucherAccoutingService.approveVoucher(customerOrder.getVoucher());
+                } else {
+                    customerOrder.setState(SaleStatus.PENDIENTE);
+                    saleService.updateCustomerOrder(customerOrder);
+                }
+
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "REVERSION DE ANULACION CONFIRMADA ...");
+                sendMessageReversionCancelInvoice(customerOrder);
+
+            } else {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, reversionResponse.getCodigoDescripcion());
+            }
+
+
+        } else  {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FALLA DE CONEXION ...");
+            cleanAnnulOrder();
         }
-        cleanAnnulOrder();
+
+
+
     }
-
-
 
     public void annulOrder0(CustomerOrder customerOrder) {
         System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " +
@@ -182,7 +270,7 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
             Movement movement = customerOrder.getMovement();
             movement.setState("A");
             movement.setCodigoEstado(cancelResponse.getCodigoEstado().toString());
-            movement.setDescri(cancelResponse.getCodigoDescripcion());
+            movement.setStateDescription(cancelResponse.getCodigoDescripcion());
             movementService.updateMovement(movement);
 
             if (customerOrder.getVoucher() != null) {
@@ -199,19 +287,36 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
 
     public void sendMessageAnnulledInvoice(CustomerOrder customerOrder){
         Movement movement = customerOrder.getMovement();
-        String text = "La Factura "  + movement.getNumber() + " de fecha "
-                                        + DateUtils.format(movement.getDate(), "dd/MM/yyyy")
-                                        + " emitida por " + Constants.EMAIL_BUSINESS_NAME
-                                        + " \ncon razón social " + movement.getName() + ", NIT/CI " + movement.getNit()
-                                        + " y Código de Autorización " + movement.getCuf()
-                                        + " ha sido ANULADA."
-                                        + "\nPor favor tomar las previsiones necesarias."
-                                        + "\n\nAtte."
-                                        + "\nCOOPERATIVA INTEGRAL DE SERVICIOS CBBA LTDA"
-                                        + "\nINDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
+        String text = "La Factura Nro. "  + movement.getNumber() + " de fecha "
+                + DateUtils.format(movement.getDate(), "dd/MM/yyyy")
+                + " emitida por " + Constants.EMAIL_BUSINESS_NAME + "\n"
+                + "con razón social " + movement.getName() + ", NIT/CI " + movement.getNit()
+                + " y Código de Autorización " + movement.getCuf() + " ha sido ANULADA.\n"
+                + "Motivo de Anulación: " + (customerOrder.getCancellationReason() != null ? customerOrder.getCancellationReason().getDescription() : "No especificado") + "\n"
+                + (customerOrder.getObservation() != null ? customerOrder.getObservation() + "\n" : "")
+                + "Por favor tomar las consideraciones necesarias.\n\n"
+                + "Atte.\n"
+                + "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\n"
+                + "INDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
 
         sendMessageAction.sendEmail(customerOrder, Constants.EMAIL_SUBJECT_ANNULLED, text);
         System.out.println("................" + Constants.EMAIL_SUBJECT_ANNULLED + "................");
+    }
+
+    public void sendMessageReversionCancelInvoice(CustomerOrder customerOrder){
+        Movement movement = customerOrder.getMovement();
+        String text = "La Factura Nro. "  + movement.getNumber() + " de fecha "
+                + DateUtils.format(movement.getDate(), "dd/MM/yyyy")
+                + " emitida por " + Constants.EMAIL_BUSINESS_NAME + "\n"
+                + "con razón social " + movement.getName() + ", NIT/CI " + movement.getNit()
+                + " y Código de Autorización " + movement.getCuf() + " ha sido REVERTIDA DE SU ANULACIÓN\n"
+                + "Por favor tomar las consideraciones necesarias.\n\n"
+                + "Atte.\n"
+                + "COOPERATIVA AGROPECUARIA INTEGRAL DE SERVICIOS COCHABAMBA R.L.\n"
+                + "INDUSTRIAS LACTEAS DEL VALLE ALTO - ILVA";
+
+        sendMessageAction.sendEmail(customerOrder, Constants.EMAIL_SUBJECT_REVERSION_CANCEL_BILL, text);
+        System.out.println("................" + Constants.EMAIL_SUBJECT_REVERSION_CANCEL_BILL + "................");
     }
 
     public void executeBilling(List<CustomerOrder> customerOrderList) {
@@ -220,7 +325,7 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
             System.out.println("--->> " +   customerOrder.getCode() + " - " + customerOrder.getClient().getFullName() + " - " + customerOrder.getTotalAmount());
 
             if (customerOrder.getMovement() == null) {
-                Movement movement = salesAction.createInvoice(customerOrder);
+                Movement movement = salesAction.createInvoice(customerOrder); // Se crea la factura (Movimiento) para ser validada
                 customerOrder.setMovement(movement);
                 saleService.updateCustomerOrder(customerOrder);
             }
@@ -231,6 +336,7 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
                 if (!billControllerAction.hasInvoice(customerOrder)){
                     billControllerAction.createBill(customerOrder);
                 }
+
 
             } catch (IOException e) {
                 //facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Invoice.messages.errorExecuteBilling");

@@ -2,6 +2,7 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.action.SessionUser;
 import com.encens.khipus.action.billing.BillControllerAction;
+import com.encens.khipus.action.billing.BillingReportAction;
 import com.encens.khipus.action.billing.SendMessageAction;
 import com.encens.khipus.action.customers.reports.PrintBillReportAction;
 import com.encens.khipus.exception.EntryNotFoundException;
@@ -64,6 +65,8 @@ public class SalesAction extends GenericAction {
     private SubsidyEnun subsidyEnun;
     private CustomerCategoryType customerCategoryTypeEnum;
 
+    private PaymentMethodSin paymentMethodSin;
+
     /** For special billing **/
     private Date billingSpecialDate = new Date();
     private String nameSpecialBill = "";
@@ -77,6 +80,8 @@ public class SalesAction extends GenericAction {
     private boolean showCAFC = false;
     private String nitValidationMessage;
     private Boolean validateSale = Boolean.FALSE;
+
+    private Boolean isOnline = Boolean.TRUE;
 
     private UserCashBox userCashBox;
 
@@ -150,6 +155,9 @@ public class SalesAction extends GenericAction {
 
     @In(create = true)
     private PrintBillReportAction printBillReportAction;
+
+    @In(create = true)
+    private BillingReportAction billingReportAction;
 
     @In(create = true)
     private SendMessageAction sendMessageAction;
@@ -236,10 +244,10 @@ public class SalesAction extends GenericAction {
 
         if (client == null) return;
 
-        if (!isThereInventory(productItem)){
+        /*if (!isThereInventory(productItem)){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No existe inventario suficiente...");
             return;
-        }
+        }*/
 
         System.out.println("--------------->>>----> VALIDAR VENTA PARAM: " + this.validateSale);
 
@@ -398,6 +406,7 @@ public class SalesAction extends GenericAction {
         setCustomerCategoryTypeEnum(null);
         setFinalConsumer(Boolean.FALSE);
         setMoneyReturned(BigDecimal.ZERO);
+        setPaymentMethodSin(null);
 
         this.nitCiHasBeenValidated = Boolean.FALSE;
         this.validNitCi = Boolean.FALSE;
@@ -510,6 +519,12 @@ public class SalesAction extends GenericAction {
         }
     }
 
+    public String generateFilesPdfXml(CustomerOrder customerOrder){
+        generateFileXML(customerOrder);
+        printBillReportAction.generatePDFReport(customerOrder);
+        return Outcome.SUCCESS;
+    }
+
     public void generateFileXML(CustomerOrder customerOrder) {
 
         if (customerOrder.getMovement() != null) {
@@ -590,6 +605,10 @@ public class SalesAction extends GenericAction {
         customerOrder.setClient(client);
         customerOrder.setDistributor(distributor);
         customerOrder.setState(SaleStatus.PENDIENTE);
+
+        System.out.println("---------> paymentMethodSin: " + paymentMethodSin);
+
+        customerOrder.setPaymentMethod(paymentMethodSin);
 
         if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH))
             customerOrder.setState(SaleStatus.CONTABILIZADO);
@@ -1047,8 +1066,8 @@ public class SalesAction extends GenericAction {
         if (customerOrder.getState().equals(SaleStatus.ANULADO))
             result = false;
         if (customerOrder.getMovement() != null){
-            if (customerOrder.getMovement().getDescri() != null)
-                if (customerOrder.getMovement().getDescri().equals("RECHAZADA"))
+            if (customerOrder.getMovement().getStateDescription() != null)
+                if (customerOrder.getMovement().getStateDescription().equals("RECHAZADA"))
                     result = false;
         }
         return result;
@@ -1058,11 +1077,22 @@ public class SalesAction extends GenericAction {
         return customerOrder.getState().equals(SaleStatus.ANULADO);
     }
 
+    public boolean invoiceAnnulled(CustomerOrder customerOrder){
+        boolean result = false;
+        if (customerOrder.getMovement() != null){
+            if (customerOrder.getMovement().getStateDescription() != null)
+                result = customerOrder.getMovement().getStateDescription().equals("ANULACION CONFIRMADA");
+        }
+
+        return result;
+
+    }
+
     public boolean isRejected(CustomerOrder customerOrder){
         boolean result = false;
         if (customerOrder.getMovement() != null){
-            if (customerOrder.getMovement().getDescri() != null)
-                result = customerOrder.getMovement().getDescri().equals("RECHAZADA");
+            if (customerOrder.getMovement().getStateDescription() != null)
+                result = customerOrder.getMovement().getStateDescription().equals("RECHAZADA");
         }
 
         return result;
@@ -1170,6 +1200,7 @@ public class SalesAction extends GenericAction {
 
     public String changeToOnlineBillingMode() throws IOException {
         billControllerAction.changeToOnlineBillingMode();
+        setOnline(true);
         return Outcome.SUCCESS;
     }
 
@@ -1188,6 +1219,22 @@ public class SalesAction extends GenericAction {
     public String validateOfflineBillPackages() throws IOException {
         billControllerAction.validateOfflineBillPackages();
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"VALIDANDO: FACTURAS OFFLINE!!!");
+        return Outcome.SUCCESS;
+    }
+
+    public String startInvoiceValidationOffline(){
+
+        try {
+            prepareOfflineBillPackages();
+            processOfflineBillPackages();
+            validateOfflineBillPackages();
+
+            movementService.updateAsValidated();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         return Outcome.SUCCESS;
     }
 
@@ -1328,7 +1375,7 @@ public class SalesAction extends GenericAction {
                 DocumentType docType = getClient().getInvoiceDocumentType();
                 boolean isOnlineMode =  billControllerAction.checkBillingMode();
 
-                if (docType.getSinCode() == 5 && isOnlineMode) {
+                if (docType.getSinCode() == 5 && isOnlineMode) { // codsin 5: NIT - NUMERO DE IDENTIFICACION TRIBUTARIA
                     result = billControllerAction.nitVerification(new Long(getClient().getNitNumber()));
                     System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>> RESULT NIT: " + result);
                     setNitValidationMessage(result);
@@ -1345,13 +1392,54 @@ public class SalesAction extends GenericAction {
                     }
                 }else {
                     result = "CI/CEX/PAS/OD";
-                    if (!isOnlineMode)
+
+                    if ( docType.getSinCode() == 1 ) { // codsin 1: CARNET DE IDENTIDAD
+                        try {
+                            Long nitNumber = Long.parseLong(getClient().getNitNumber());
+                        } catch (NumberFormatException e) {
+                            validNitCi = Boolean.FALSE;
+                            nitCiHasBeenValidated = Boolean.FALSE;
+                            setNitValidationMessage("Número de CI inválido...");
+                            return;
+                        }
+                    }
+
+                    if (!isOnlineMode) {
                         result = "Fuera de línea";
 
+                        if (docType.getSinCode() == 5) { // codsin 5: NIT - NUMERO DE IDENTIFICACION TRIBUTARIA
+                            try {
+                                Long nitAux = new Long(getClient().getNitNumber());
+                            } catch (NumberFormatException e) {
+                                validNitCi = Boolean.FALSE;
+                                nitCiHasBeenValidated = Boolean.FALSE;
+                                setNitValidationMessage("Número de NIT inválido... ..");
+                                return;
+                            }
+
+                        }
+
+                        if ( docType.getSinCode() == 1 ) { // codsin 1: CARNET DE IDENTIDAD
+                            try {
+                                Long nitNumber = Long.parseLong(getClient().getNitNumber());
+                            } catch (NumberFormatException e) {
+                                validNitCi = Boolean.FALSE;
+                                nitCiHasBeenValidated = Boolean.FALSE;
+                                setNitValidationMessage("Número de CI inválido... .");
+                                return;
+                            }
+                        }
+
+                    }
                     setNitValidationMessage(result);
                     validNitCi = Boolean.TRUE;
                     nitCiHasBeenValidated = Boolean.TRUE;
                 }
+            } catch (NumberFormatException e) {
+                setNitValidationMessage("Número de NIT/CI inválido...");
+                validNitCi = Boolean.FALSE;
+                nitCiHasBeenValidated = Boolean.FALSE;
+                return;
             } catch (Exception e) {
                 e.printStackTrace();
                 setNitValidationMessage("¡No se pudo validar!");
@@ -1359,7 +1447,9 @@ public class SalesAction extends GenericAction {
         }else {
 
             Boolean isOnlineMode =  billControllerAction.checkBillingMode();
-            if (isOnlineMode != null){ // ebilling conexion ok
+            if (isOnlineMode != null){
+
+
                 if (!isOnlineMode){
                     setNitValidationMessage("Modo Fuera de Línea, continuar.");
                     validNitCi = Boolean.TRUE;
@@ -1385,11 +1475,13 @@ public class SalesAction extends GenericAction {
 
     public void chekBillingMode() throws IOException {
 
-        if (billControllerAction.checkBillingMode())
+        if (billControllerAction.checkBillingMode()) {
             this.setBillingMode("En Linea");
-        else
+            setOnline(Boolean.TRUE);
+        } else {
             this.setBillingMode("Fuera de Linea");
-
+            setOnline(Boolean.FALSE);
+        }
     }
 
     public Date getOrderDate() {
@@ -1614,5 +1706,21 @@ public class SalesAction extends GenericAction {
 
     public void setValidateSale(Boolean validateSale) {
         this.validateSale = validateSale;
+    }
+
+    public Boolean getOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(Boolean online) {
+        isOnline = online;
+    }
+
+    public PaymentMethodSin getPaymentMethodSin() {
+        return paymentMethodSin;
+    }
+
+    public void setPaymentMethodSin(PaymentMethodSin paymentMethodSin) {
+        this.paymentMethodSin = paymentMethodSin;
     }
 }

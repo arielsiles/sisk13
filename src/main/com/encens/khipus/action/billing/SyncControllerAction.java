@@ -148,6 +148,33 @@ public class SyncControllerAction {
 
     }
 
+    public List<PointOfSaleTypeCode> getPointOfSaleTypes() {
+
+        List<PointOfSaleTypeCode> resultList = new ArrayList<PointOfSaleTypeCode>();
+        User user = getUser(currentUser.getId());
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+
+        PointOfSaleTypesPOJO pointOfSaleTypesPOJO = new PointOfSaleTypesPOJO(user.getBranchOffice().getOfficeCode(), user.getBranchOffice().getPosCode());
+        String jsonString = null;
+        try {
+            jsonString = Json.prettyPrint(Json.toJson(pointOfSaleTypesPOJO));
+            ServerResponse serverResponse = billControllerAction.doPostHttpConnection(companyConfiguration.getPointOfSaleTypesURL(), jsonString);
+
+            if (serverResponse.getResponseJson() != null) {
+                JsonNode jsonNodeResponse = Json.parse(serverResponse.getResponseJson());
+                PointOfSaleTypesResponsePOJO pointOfSaleTypesResponsePOJO = Json.fromJson(jsonNodeResponse, PointOfSaleTypesResponsePOJO.class);
+
+                System.out.println("+++++++++ SYNC POINT FO SALES TYPES  ++++++++");
+
+                resultList = pointOfSaleTypesResponsePOJO.getListaCodigos();
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return resultList;
+    }
 
 
     private User getUser(Long id) {

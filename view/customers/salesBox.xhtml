@@ -33,7 +33,7 @@
                                      clearAction="#{salesAction.clearClient()}"
                                      searchModalPanel="clientListModalPanel"
                                      dataModel="#{clientDataModel}"
-                                     reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, customerCategoryTypeId, distributorField, productDataTable"
+                                     reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, paymentMethodField, customerCategoryTypeId, distributorField, productDataTable"
                                      tabindex="12">
                     </app:selectPopUp>
 
@@ -43,7 +43,7 @@
                                              tabindex="14">
                         <a4j:support event="onchange"
                                      action="#{salesAction.updateSaleWithInvoiceParam()}"
-                                     reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, customerCategoryTypeId, distributorField, productDataTable"
+                                     reRender="clientField, totalAmount, customerOrderTypeField, subsidyField, paymentMethodField, customerCategoryTypeId, distributorField, productDataTable"
                                      ajaxSingle="true"/>
                     </h:selectBooleanCheckbox>
 
@@ -166,7 +166,8 @@
                     </h:selectOneMenu>
                 </s:decorate>
 
-                <s:decorate id="subsidyField" template="/include/inputField.xhtml" styleClass="formRow">
+                <!-- Caso Subsidios -->
+                <!--<s:decorate id="subsidyField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CustomerOrder.subsidy']}</ui:define>
                     <h:selectOneMenu id="subsidy"
                                      value="#{salesAction.subsidyEnun}"
@@ -178,6 +179,22 @@
                                        noSelectionLabel=""/>
                         <s:convertEnum/>
                         <a4j:support event="onchange" ajaxSingle="true" />
+                    </h:selectOneMenu>
+                </s:decorate>-->
+
+                <s:decorate id="paymentMethodField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">M.Pago</ui:define>
+                    <h:selectOneMenu id="paymentMethod"
+                                     value="#{salesAction.paymentMethodSin}"
+                                     styleClass="input"
+                                     required="false"
+                                     tabindex="8">
+                        <s:selectItems value="#{paymentMethodSinList}"
+                                       var="paymentMethod"
+                                       label="#{paymentMethod.code} - #{paymentMethod.description}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                        <a4j:support event="onchange" ajaxSingle="true" reRender="paymentMethodField"/>
                     </h:selectOneMenu>
                 </s:decorate>
 
@@ -225,21 +242,21 @@
 
             <!-- -->
 
-            <a4j:commandButton id="enviarButton"
+            <!--<a4j:commandButton id="enviarButton"
                                action="#{printBillReportAction.sendMailAttachments()}"
                                value="Enviar Mail"
                                styleClass="button"
                                immediate="true"
                                rendered="#{s:hasPermission('SEND_MAIL_INVOICE','VIEW')}"
                                ajaxSingle="true">
-            </a4j:commandButton>
+            </a4j:commandButton>-->
 
             <a4j:commandButton id="syncButton"
                                action="#{syncControllerAction.syncData()}"
                                value="SYNC"
                                styleClass="button"
                                immediate="true"
-                               rendered="#{s:hasPermission('BILLING_MANAGE_SFE','VIEW')}"
+                               rendered="#{s:hasPermission('SYNC_BILLING_SFE','VIEW')}"
                                ajaxSingle="true">
             </a4j:commandButton>
 

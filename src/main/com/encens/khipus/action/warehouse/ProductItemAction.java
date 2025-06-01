@@ -113,7 +113,7 @@ public class ProductItemAction extends GenericAction<ProductItem> {
             }
 
             productItemService.createProductItem(getInstance());
-            createProductionItem(getInstance());
+            //createProductionItem(getInstance()); //Crea MetaproductoProduccion
             addCreatedMessage();
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {
@@ -203,7 +203,7 @@ public class ProductItemAction extends GenericAction<ProductItem> {
             }
 
             productItemService.updateProductItem(getInstance());
-            updateProductionItem(getInstance());
+            //updateProductionItem(getInstance());
             addUpdatedMessage();
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {

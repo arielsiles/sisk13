@@ -94,8 +94,8 @@ public class PrintBillReportAction extends GenericReportAction {
 
 
         if (lastCustomerOrder.getMovement() != null){
-            if (lastCustomerOrder.getMovement().getDescri() != null) {
-                if (lastCustomerOrder.getMovement().getDescri().equals("RECHAZADA")) {
+            if (lastCustomerOrder.getMovement().getStateDescription() != null) {
+                if (lastCustomerOrder.getMovement().getStateDescription().equals("RECHAZADA")) {
                     facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURA RECHAZADA, No se puede imprimir.");
                     return;
                 }
@@ -110,6 +110,58 @@ public class PrintBillReportAction extends GenericReportAction {
             GenerationReportData generationReportData = new GenerationReportData(reportData);
             generationReportData.exportReport();
             generatePdfFileReport(lastCustomerOrder, generationReportData);
+
+            boolean messageSent = false;
+            if ( !customerOrder.getSent() )
+                messageSent = sendMessageAction.sendEmailAttachment(lastCustomerOrder);
+
+            System.out.println("------------->----------> envio: " + messageSent);
+            if ( messageSent ) {
+                customerOrder.setSent(true);
+                saleService.updateCustomerOrder(customerOrder);
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generatePDFReport(CustomerOrder customerOrder) {
+        log.debug("Generate BillInvoiceReportAction......");
+
+        User user = getUser(currentUser.getId());
+        Dosage dosage = dosageService.findDosageByOffice(user.getBranchOffice().getId()); /** Solo es impresion, revisar la dosificacion que obtiene??? **/
+        //this.customerOrderId = saleService.findLastSaleId(user);
+        this.lastCustomerOrder = customerOrder;
+        setReportFormat(ReportFormat.PDF);
+
+
+        if (!hasValidInvoice(lastCustomerOrder)){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURACION INVALIDA, Consulte con el Administrador");
+            return;
+        }
+
+
+        if (lastCustomerOrder.getMovement() != null){
+            if (lastCustomerOrder.getMovement().getStateDescription() != null) {
+                if (lastCustomerOrder.getMovement().getStateDescription().equals("RECHAZADA")) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FACTURA RECHAZADA, No se puede imprimir.");
+                    return;
+                }
+            }
+        }
+
+        Map params = new HashMap();
+        params.putAll(getReportParams(dosage, lastCustomerOrder));
+        TypedReportData reportData = addDetailReport(params, lastCustomerOrder);
+
+        try {
+            GenerationReportData generationReportData = new GenerationReportData(reportData);
+            generationReportData.exportReport();
+            generatePdfFileReport(lastCustomerOrder, generationReportData);
+
+            sendMessageAction.sendEmailAttachment(lastCustomerOrder);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -128,6 +180,33 @@ public class PrintBillReportAction extends GenericReportAction {
         }
     }
 
+
+    /*public void generatePdfFileReport(CustomerOrder customerOrder, GenerationReportData generationReportData) {
+        // Directorio donde deseas guardar el archivo PDF
+        //String outputDirectory = "/path/to/your/directory/"; // Reemplaza con el directorio real
+        String outputDirectory = Constants.PATH_FILE_INVOICE;
+        // Asegúrate de que el directorio exista, si no, créalo
+        File directory = new File(outputDirectory);
+        if (!directory.exists()) {
+            directory.mkdirs(); // Crea el directorio si no existe
+        }
+
+        // Definir el nombre del archivo PDF, agregando un prefijo y número de la factura
+        String destFileName = outputDirectory + Constants.PREFIX_NAME_INVOICE + customerOrder.getMovement().getNumber() + ".pdf";
+
+        JasperPrint jasperPrint = generationReportData.getExportReport().getJasperPrint();
+
+        try {
+            // Generar el archivo PDF
+            JasperExportManager.exportReportToPdfFile(jasperPrint, destFileName);
+            System.out.println("PDF generado en: " + destFileName); // Confirmación
+        } catch (JRException e) {
+            e.printStackTrace(); // Imprimir detalles del error en caso de fallo
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al generar el reporte PDF");
+        }
+    }*/
+
+
     public void sendMailAttachments(){
 
         User user = getUser(currentUser.getId());
@@ -135,6 +214,16 @@ public class PrintBillReportAction extends GenericReportAction {
         this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
 
         sendMessageAction.sendEmailAttachment(lastCustomerOrder);
+
+    }
+
+    public void sendMailAttachments(CustomerOrder customerOrder){
+
+        //User user = getUser(currentUser.getId());
+        //this.customerOrderId = saleService.findLastSaleId(user);
+        //this.lastCustomerOrder = saleService.findSaleById(getCustomerOrderId());
+
+        sendMessageAction.sendEmailAttachment(customerOrder);
 
     }
 
