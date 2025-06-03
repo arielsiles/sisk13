@@ -24,7 +24,6 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -75,22 +74,32 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
     public void cancelOrderAndInvoice(CustomerOrder customerOrder){
 
         if ( customerOrder.getMovement() != null ) {
-            // Anular Factura
-            // Si Fact ANL,   Anular Pedido
-            // Si Pedido ANL, Anular Asiento
+            cancelInvoice(customerOrder);  // Anula Factura online, Movimiento
+            cancelOrderOnly(customerOrder);     // Anula Pedido, Asiento
+            sendMessageAnnulledInvoice(customerOrder);
+            cleanAnnulOrder();
         } else {
-            // Anular Pedido
-            // Anular Asiento
+            // Anula Pedido, Asiento
+            cancelOrderOnly(customerOrder);
         }
 
     }
 
-
-    public List<String> getInvoiceStatusList() {
-        return Arrays.asList("VALIDADA", "ANULACION CONFIRMADA", "RECHAZADA");
+    public void cancelOrderOnly(CustomerOrder customerOrder){
+        // Anular Pedido
+        customerOrder.setState(SaleStatus.ANULADO);
+        customerOrder.setCancellationReason(cancellationReason);
+        inventoryService.updateInventoryForSalesAnnuled(customerOrder);
+        saleService.updateCustomerOrder(customerOrder);
+        // Anular Asiento
+        if (customerOrder.getVoucher() != null) {
+            customerOrder.getVoucher().setState(VoucherState.ANL.toString());
+            voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
+        }
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "ANULACION CONFIRMADA ...");
     }
 
-    public void cancelOrderInvoice(CustomerOrder customerOrder){
+    public void cancelInvoice(CustomerOrder customerOrder){
 
         /** Anular Factura En Linea **/
         if (customerOrder.getMovement() != null){
@@ -109,25 +118,13 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
 
                 if ( cancelResponse != null ) {
                     if (cancelResponse.getCodigoDescripcion().equals("ANULACION CONFIRMADA")) {
-                        // Anular Factura
+                        // Anular Factura-Movimiento
                         Movement movement = customerOrder.getMovement();
                         movement.setState("A");
                         movement.setCodigoEstado(cancelResponse.getCodigoEstado().toString());
                         movement.setStateDescription(cancelResponse.getCodigoDescripcion());
                         movementService.updateMovement(movement);
-                        // Anular Pedido
-                        customerOrder.setState(SaleStatus.ANULADO);
-                        customerOrder.setCancellationReason(cancellationReason);
-                        inventoryService.updateInventoryForSalesAnnuled(customerOrder);
-                        saleService.updateCustomerOrder(customerOrder);
-                        // Anular Asiento
-                        if (customerOrder.getVoucher() != null) {
-                            customerOrder.getVoucher().setState(VoucherState.ANL.toString());
-                            voucherAccoutingService.annulVoucher(customerOrder.getVoucher());
-                        }
-                        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "ANULACION CONFIRMADA ...");
-                        sendMessageAnnulledInvoice(customerOrder);
-                        cleanAnnulOrder();
+
                     } else {
                         facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, cancelResponse.getCodigoDescripcion());
                     }
@@ -135,17 +132,6 @@ public class CustomerOrderAction extends GenericAction<CustomerOrder> {
                     facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "FALLA DE CONEXION ...");
                     cleanAnnulOrder();
                 }
-
-                /*if (cancelResponse != null) {
-                    Movement movement = customerOrder.getMovement();
-                    movement.setState("A");
-                    movement.setCodigoEstado(cancelResponse.getCodigoEstado().toString());
-                    movement.setStateDescription(cancelResponse.getCodigoDescripcion());
-                    movementService.updateMovement(movement);
-
-                    sendMessageAnnulledInvoice(customerOrder);
-                }*/
-
             }
         }
 
