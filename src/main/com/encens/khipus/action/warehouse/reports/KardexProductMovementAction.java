@@ -9,12 +9,15 @@ import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.model.xproduction.XProductionProduct;
+import com.encens.khipus.model.xproduction.XSupply;
 import com.encens.khipus.service.customers.ArticleOrderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.CollectMaterialService;
 import com.encens.khipus.service.production.ProductionOrderService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.ProductItemService;
+import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.JSFUtil;
@@ -69,6 +72,9 @@ public class KardexProductMovementAction extends GenericReportAction {
     private CompanyConfigurationService companyConfigurationService;
     @In
     private FacesMessages facesMessages;
+
+    @In
+    private XProductionService xproductionService;
 
     @Create
     public void init() {
@@ -135,7 +141,11 @@ public class KardexProductMovementAction extends GenericReportAction {
         //List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
 
         List<ProductionProduct> productionProductList = productionOrderService.findProductionByProductItem(productItem.getProductItemCode(), startDate, endDate);
+        List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByProductItem(productItem.getProductItemCode(), startDate, endDate);
+
         List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterialByCode(productItem.getProductItemCode(), startDate, endDate);
+
+        List<XSupply> supplyList = xproductionService.getRawMaterialInProduction( productItem.getProductItemCode(), startDate, endDate);
 
         /*for (ProductionOrder po:productionOrderList){
             CollectionData collectionData = new CollectionData(
@@ -170,6 +180,17 @@ public class KardexProductMovementAction extends GenericReportAction {
                     "ORDEN DE PRODUCCION FECHA " + DateUtils.format(product.getProductionPlan().getDate(), "dd/MM/yyyy") );
             datas.add(collectionData);
         }
+        // XProduction...
+        for (XProductionProduct product : xproductionProductList){
+            CollectionData collectionData = new CollectionData(
+                    formatearFecha(product.getProductionPlan().getDate(), "E"),
+                    product.getProductItemCode() ,
+                    product.getQuantity() ,
+                    BigDecimal.ZERO,
+                    "E",
+                    "ORDEN DE PRODUCCION FECHA " + DateUtils.format(product.getProductionPlan().getDate(), "dd/MM/yyyy") );
+            datas.add(collectionData);
+        }
 
         /*for (BaseProduct baseProduct:baseProductList){
             for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
@@ -195,6 +216,17 @@ public class KardexProductMovementAction extends GenericReportAction {
                     md.getMovementType().name().equals("S") ? md.getQuantity() : BigDecimal.ZERO,
                     md.getMovementType().name(),
                     md.getInventoryMovement().getDescription());
+            datas.add(collectionData);
+        }
+
+        for ( XSupply supply : supplyList ){
+            String dateString = DateUtils.format(supply.getProduction().getProductionPlan().getDate(), "dd/MM/yyyy");
+            CollectionData collectionData = new CollectionData( formatearFecha(supply.getProduction().getProductionPlan().getDate(), "S"),
+                    supply.getProduction().getCode().toString(),
+                    BigDecimal.ZERO,
+                    supply.getQuantity(),
+                    "S",
+                    "Materia prima en produccion " + supply.getProduction().getCode() + " " + dateString);
             datas.add(collectionData);
         }
 

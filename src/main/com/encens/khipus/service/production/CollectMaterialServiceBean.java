@@ -71,11 +71,12 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
     public List<CollectMaterial> findApprovedCollectMaterialByCode(String productItemCode, Date startDate, Date endDate) {
 
         List<CollectMaterial> resultList = em.createQuery("select c from CollectMaterial c " +
-                "where c.date between :startDate and :endDate and c.metaProduct.productItemCode = :productItemCode and c.state = :state")
+                "where c.date between :startDate and :endDate and c.metaProduct.productItemCode = :productItemCode and c.state in (:stateApr, :stateConta)")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("productItemCode", productItemCode)
-                .setParameter("state", CollectMaterialState.APR)
+                .setParameter("stateApr", CollectMaterialState.APR)
+                .setParameter("stateConta", CollectMaterialState.CONTA)
                 .getResultList();
 
         return resultList;

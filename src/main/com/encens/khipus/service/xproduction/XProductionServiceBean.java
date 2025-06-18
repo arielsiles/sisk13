@@ -2,6 +2,7 @@ package com.encens.khipus.service.xproduction;
 
 
 import com.encens.khipus.model.production.SupplyType;
+import com.encens.khipus.model.warehouse.WarehouseType;
 import com.encens.khipus.model.xproduction.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -219,6 +220,42 @@ public class XProductionServiceBean implements XProductionService {
                         " order by w.name, p.name ")
                 .setParameter("initDate", initDate)
                 .setParameter("endDate", endDate)
+                .getResultList();
+
+        return resultList;
+    }
+
+    public List<Object[]> getSumRawMaterialInProduction(Date initDate, Date endDate){
+
+        List<Object[]> resultList = em.createQuery("select p.productItemCode, sum(s.quantity) as quantity " +
+                        " from XSupply s " +
+                        " left join s.production pr " +
+                        " left join pr.productionPlan pl " +
+                        " left join s.productItem p " +
+                        " left join p.warehouse w " +
+                        " where pl.date between :initDate and :endDate " +
+                        " and w.warehouseType = :warehouseType " +
+                        " group by p.productItemCode " +
+                        "")
+                .setParameter("initDate", initDate)
+                .setParameter("endDate", endDate)
+                .setParameter("warehouseType", WarehouseType.RAW_MATERIAL)
+                .getResultList();
+
+        return resultList;
+    }
+
+    public List<XSupply> getRawMaterialInProduction(String productItemCode, Date initDate, Date endDate){
+
+        List<XSupply> resultList = em.createQuery("select s " +
+                        " from XSupply s " +
+                        " left join s.production pr " +
+                        " left join pr.productionPlan pl " +
+                        " where pl.date between :initDate and :endDate " +
+                        " and s.productItemCode = :productItemCode ")
+                .setParameter("initDate", initDate)
+                .setParameter("endDate", endDate)
+                .setParameter("productItemCode", productItemCode)
                 .getResultList();
 
         return resultList;

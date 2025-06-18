@@ -9,6 +9,7 @@ public enum WarehouseType {
     INPUTS("WarehouseType.productionInputs"),
     DAIRY("WarehouseType.dairyProducts"),
     FINISHED_GOODS("WarehouseType.finishedGoods"),
+    RAW_MATERIAL("WarehouseType.rawMaterial"),
     MATERIAL("WarehouseType.productionMaterial"),
     SERVICE("WarehouseType.materialService"),
     VETERINARY("WarehouseType.veterinaryProducts"),

@@ -6,6 +6,7 @@ import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.production.ProductionProduct;
+import com.encens.khipus.model.xproduction.XProductionProduct;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -84,6 +85,22 @@ public class ProductionOrderServiceBean extends GenericServiceBean implements Pr
         return em.createNamedQuery("BaseProduct.findBaseProductByDate")
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
+    /** XProductionProduct **/
+    public List<XProductionProduct> findXProductionByDate(Date startDate, Date endDate){
+        return em.createNamedQuery("XProductionProduct.findProductionByDates")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
+    }
+
+    public List<XProductionProduct> findXProductionByProductItem(String productItemCode, Date startDate, Date endDate){
+        return em.createNamedQuery("XProductionProduct.findProductionByProductItem")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("productItemCode", productItemCode)
                 .getResultList();
     }
 

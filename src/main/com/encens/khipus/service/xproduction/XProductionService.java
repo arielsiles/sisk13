@@ -33,4 +33,8 @@ public interface XProductionService {
     List<XProductionLabor> getLaborList(XProduction instance);
 
     List<Object[]> findProductionInputsByDates(Date initDate, Date endDate);
+
+    List<Object[]> getSumRawMaterialInProduction(Date initDate, Date endDate);
+
+    List<XSupply> getRawMaterialInProduction(String productItemCode, Date initDate, Date endDate);
 }

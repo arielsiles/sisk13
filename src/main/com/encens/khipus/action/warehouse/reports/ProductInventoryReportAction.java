@@ -6,6 +6,7 @@ import com.encens.khipus.model.customers.ArticleOrder;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.warehouse.*;
+import com.encens.khipus.model.xproduction.XProductionProduct;
 import com.encens.khipus.service.customers.ArticleOrderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.CollectMaterialService;
@@ -14,6 +15,7 @@ import com.encens.khipus.service.warehouse.InitialInventoryService;
 import com.encens.khipus.service.warehouse.MovementDetailService;
 import com.encens.khipus.service.warehouse.ProductInventoryService;
 import com.encens.khipus.service.warehouse.ProductItemService;
+import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.JSFUtil;
@@ -70,6 +72,8 @@ public class ProductInventoryReportAction extends GenericReportAction {
     private ProductionOrderService productionOrderService;
     @In
     private CollectMaterialService collectMaterialService;
+    @In
+    private XProductionService xproductionService;
     @In
     private CompanyConfigurationService companyConfigurationService;
     @In
@@ -281,7 +285,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         /** 2.- Obtiene en listas entradas y salidas de articulos: vales, ordenes de produccion, ventas, pedidos, etc. **/
         // Vales de movimiento
         List<MovementDetail> movementDetailList;
-        if (warehouse.getWarehouseCode().equals("2"))
+        if (warehouse.getWarehouseCode().equals(WarehouseType.DAIRY)) // Lacteos ALM 2
             movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeNull(warehouse.getWarehouseCode(), startDate, endDate, null);
         else
             movementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, null);
@@ -289,7 +293,9 @@ public class ProductInventoryReportAction extends GenericReportAction {
         // Ordenes de produccion
         List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(startDate, endDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
+
         List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(startDate, endDate);
+        List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByDate(startDate, endDate);
 
         List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(startDate, endDate);
 
@@ -344,6 +350,13 @@ public class ProductInventoryReportAction extends GenericReportAction {
                 }
             }
 
+            /** XPR_PRODUCCION **/
+            for (XProductionProduct product : xproductionProductList){
+                if (inventoryPeriod.getProductItemCode().equals(product.getProductItemCode())){
+                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), product.getQuantity(), 6));
+                }
+            }
+
             /** Ordenes de produccion **/
             for (ProductionOrder productionOrder:productionOrderList){
                 if (inventoryPeriod.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
@@ -367,6 +380,19 @@ public class ProductInventoryReportAction extends GenericReportAction {
                     }
                     if (detail.getMovementType().equals(MovementDetailType.S))
                         data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 6));
+                }
+            }
+
+            //MATERIA PRIMA en XProduccion
+            if (warehouse.getWarehouseType().equals(WarehouseType.RAW_MATERIAL)){
+                List rawMaterialProductionList = xproductionService.getSumRawMaterialInProduction(startDate, endDate);
+                for (int i = 0; i < rawMaterialProductionList.size(); i++) {
+                    Object[] row = (Object[]) rawMaterialProductionList.get(i);
+                    String codart = (String)row[0];
+                    BigDecimal total = (BigDecimal) row[1];
+                    if (inventoryPeriod.getProductItemCode().equals(codart)) {
+                        data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), total, 6));
+                    }
                 }
             }
 

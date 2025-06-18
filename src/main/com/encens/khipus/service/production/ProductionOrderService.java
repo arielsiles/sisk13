@@ -5,6 +5,7 @@ import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.model.production.BaseProduct;
 import com.encens.khipus.model.production.ProductionOrder;
 import com.encens.khipus.model.production.ProductionProduct;
+import com.encens.khipus.model.xproduction.XProductionProduct;
 
 import javax.ejb.Local;
 import java.util.Date;
@@ -28,5 +29,10 @@ public interface ProductionOrderService{
 
     public List<ProductionOrder> findProductionOrders(Date startDate, Date endDate);
     public List<BaseProduct> findBaseProductByDate(Date startDate, Date endDate);
+
+    /** xproduction... **/
+    List<XProductionProduct> findXProductionByDate(Date startDate, Date endDate);
+
+    List<XProductionProduct> findXProductionByProductItem(String productItemCode, Date startDate, Date endDate);
 
 }
