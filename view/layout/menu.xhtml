@@ -1730,11 +1730,15 @@
                         propagation="none"/>
             </rich:menuItem>
 
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           >
-                <s:link view="/customers/customerOrderList.xhtml"
-                        value="#{messages['menu.customers.configuration.customerOrderList']}"
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/finances/cashBoxList.xhtml"
+                        value="#{messages['menu.finances.configuration.cashBox']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+                <s:link view="/finances/cashBoxTypeList.xhtml"
+                        value="#{messages['menu.finances.configuration.cashBoxType']}"
                         propagation="none"/>
             </rich:menuItem>
 
@@ -1743,7 +1747,7 @@
 </rich:tab>
 
 <!-- Desabilitado -->
-<rich:tab id="finances2" label="#{messages['menu.finances']}" disabled="#{disableMenu}" rendered="false">
+<rich:tab id="finances2" label="#{messages['menu.finances']}" disabled="#{disableMenu}" rendered="true">
     <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
 
     <rich:dropDownMenu value="#{messages['menu.finances.accounting']}" rendered="#{s:hasPermission('ACCOUNTING','VIEW') or s:hasPermission('MAJORACCOUNTING','VIEW')}">
@@ -2753,17 +2757,7 @@
                     value="#{messages['menu.rrhh.configuration.costCenterGroup']}"
                     propagation="none"/>
         </rich:menuItem>
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/finances/cashBoxList.xhtml"
-                    value="#{messages['menu.finances.configuration.cashBox']}"
-                    propagation="none"/>
-        </rich:menuItem>
 
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/finances/cashBoxTypeList.xhtml"
-                    value="#{messages['menu.finances.configuration.cashBoxType']}"
-                    propagation="none"/>
-        </rich:menuItem>
 
         <rich:menuItem submitMode="none" styleClass="main-menu-item">
             <s:link view="/finances/taxRuleList.xhtml"

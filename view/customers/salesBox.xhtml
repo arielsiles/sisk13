@@ -64,7 +64,7 @@
 
                 </s:div>
 
-                <s:div id="customerCategoryTypeField" styleClass="formRow,left">
+                <s:div id="customerCategoryTypeField" styleClass="formRow,left" rendered="true">
                     <h:selectOneRadio id="customerCategoryTypeId" value="#{salesAction.customerCategoryTypeEnum}"
                                       layout="lineDirection">
                         <s:selectItems value="#{fixedCustomerCategoryTypes}"
@@ -101,15 +101,15 @@
                                            reRender="productDataTable, productField" />
 
                     <a4j:commandButton id="addProductItemCommandButton"
-                                       action="#{productItemByWarehouseDataModel.reset()}"
+                                       action="#{productItemsForSalesDataModel.reset()}"
                                        value="#{messages['SalesBox.addProducts']}"
                                        styleClass="button"
                                        immediate="true"
-                                       oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
+                                       oncomplete="Richfaces.showModalPanel('productItemsForSalesModalPanel');"
                                        actionListener="#{selectPopUpAction.select}"
-                                       reRender="productItemsByWarehouseListModalPanel">
+                                       reRender="productItemsForSalesModalPanel">
                         <f:attribute name="entityManagerName" value=""/>
-                        <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+                        <f:attribute name="dataModelObject" value="#{productItemsForSalesDataModel}"/>
                     </a4j:commandButton>
 
 
@@ -150,7 +150,8 @@
             </s:div>
 
             <s:div id="part3">
-                <s:decorate id="distributorField" template="/include/inputField.xhtml" styleClass="formRow">
+                <!-- Delivery -->
+                <!--<s:decorate id="distributorField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">Delivery</ui:define>
                     <h:selectOneMenu id="distributor"
                                      value="#{salesAction.distributor}"
@@ -164,9 +165,10 @@
                         <s:convertEntity/>
                         <a4j:support event="onchange" ajaxSingle="true" reRender="distributor"/>
                     </h:selectOneMenu>
-                </s:decorate>
+                </s:decorate>-->
 
-                <s:decorate id="subsidyField" template="/include/inputField.xhtml" styleClass="formRow">
+                <!-- Subsidio -->
+                <!--<s:decorate id="subsidyField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CustomerOrder.subsidy']}</ui:define>
                     <h:selectOneMenu id="subsidy"
                                      value="#{salesAction.subsidyEnun}"
@@ -179,7 +181,7 @@
                         <s:convertEnum/>
                         <a4j:support event="onchange" ajaxSingle="true" />
                     </h:selectOneMenu>
-                </s:decorate>
+                </s:decorate>-->
 
             </s:div>
         </h:panelGrid>
@@ -435,19 +437,19 @@
         <ui:param name="dialogId" value="confirmOnlineOfflineModeModalPanel"/>
     </s:decorate>
 
-    <s:decorate id="productItemsByWarehouseListModalPanelContainer"
-                template="/warehouse/productItemsByWarehouseListModalPanel.xhtml">
-        <ui:param name="containerId" value="productItemsByWarehouseListModalPanelContainer"/>
-        <ui:param name="dialogId" value="productItemsByWarehouseListModalPanel"/>
+    <s:decorate id="productItemsForSalesModalPanelContainer"
+                template="/warehouse/productItemsForSalesModalPanel.xhtml">
+        <ui:param name="containerId" value="productItemsForSalesModalPanelContainer"/>
+        <ui:param name="dialogId" value="productItemsForSalesModalPanel"/>
         <ui:define name="addButton">
             <a4j:commandButton id="addButton"
                                immediate="true"
                                ajaxSingle="true"
-                               action="#{salesAction.addProductItems(productItemByWarehouseDataModel.selectedProductItems)}"
+                               action="#{salesAction.addProductItems(productItemsForSalesDataModel.selectedProductItems)}"
                                value="#{messages['Common.add']}"
                                reRender="productDataTable"
                                styleClass="button"
-                               oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
+                               oncomplete="Richfaces.hideModalPanel('productItemsForSalesModalPanel');"/>
         </ui:define>
     </s:decorate>
 
