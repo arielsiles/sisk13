@@ -1931,13 +1931,14 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             if (warehouseVoucher.getDocumentType().getWarehouseVoucherType().equals(WarehouseVoucherType.B))
                 debitCashAccount = companyConfiguration.getLowAccount();
 
+            if (warehouseVoucher.getLowFlag()){
+                debitCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getLowCashAccount();
+            }
+
             /** Cuenta para reprocesos **/
             if (warehouseVoucher.getDocumentType().getWarehouseVoucherType().equals(WarehouseVoucherType.W))
                 debitCashAccount = companyConfiguration.getReworkAccount();
 
-            if (warehouseVoucher.getLowFlag()){
-                debitCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getLowCashAccount();
-            }
 
             System.out.println("======> aaaaa : " + movementDetail.getProductItem().getFullName() + " - " + detailAmount);
 

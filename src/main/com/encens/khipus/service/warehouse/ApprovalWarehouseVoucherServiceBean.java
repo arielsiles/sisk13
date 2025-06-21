@@ -132,6 +132,7 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         InventoryMovement pendantInventoryMovement = getPendantMovement(warehouseVoucher);
         getEntityManager().refresh(pendantInventoryMovement);
 
+        /** Aprobacion del vale **/
         if (warehouseVoucher.isTransfer() || warehouseVoucher.isExecutorUnitTransfer()) {
             validateOutputDetails(warehouseVoucher, warehouseVoucher.getWarehouse());
             updateWarehouseVoucher(warehouseVoucher);
@@ -210,9 +211,11 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         if (gloss[1] != null) {
             gloss[1] = gloss[1].replaceAll(Constants.WAREHOUSEVOUCHER_NUMBER_PARAM, warehouseVoucher.getNumber());
         }
+        /** End Aprobacion del vale **/
 
         System.out.println("===> gloss: " + gloss);
 
+        /** Generacion de Asiento Contable **/
         if(warehouseVoucher.getWarehouse().getId().equals(Constants.COD_WAREHUOSE_MILK_COLLECTED) && warehouseVoucher.getDocumentType().getName().equals("RECEPCION"))
             warehouseAccountEntryService.createAccountEntryFromCollection(warehouseVoucher, gloss);
         else{
@@ -225,6 +228,7 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             }
 
         }
+        /** End Generacion de Asiento Contable **/
 
         updatePendantVoucherWarningContent(productItemService.findByWarehouseVoucher(warehouseVoucher));
     }
