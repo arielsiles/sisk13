@@ -249,7 +249,7 @@ public final class Constants {
 
     //PRODUCTION
     //public static final Double PRICE_UNIT_MILK = 3.2; // Anterior
-    public static final Double PRICE_UNIT_MILK = 3.55;
+    public static final Double PRICE_UNIT_MILK = 4.50;
     public static final String FINACESS_USER_UNIT_DEFAULT = "ADM";
     public static final String DEFAULT_COST_CENTER_PRODUCTION = "0111";
     public static final String CODE_WAREHOUSE_PRODUCT_END = "2";
