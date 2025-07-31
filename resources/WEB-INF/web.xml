@@ -205,11 +205,26 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <!-- Dashboard Simple Servlet -->
+    <servlet>
+        <servlet-name>DashboardServlet</servlet-name>
+        <servlet-class>com.encens.khipus.servlet.DashboardServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+    
+
     <!-- Faces Servlet Mapping -->
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.jsf</url-pattern>
     </servlet-mapping>
+    
+    <!-- Dashboard API Mapping -->
+    <servlet-mapping>
+        <servlet-name>DashboardServlet</servlet-name>
+        <url-pattern>/dashboard-api</url-pattern>
+    </servlet-mapping>
+    
 
     <!-- Session timeout -->
     <session-config>
