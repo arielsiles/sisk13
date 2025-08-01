@@ -97,6 +97,16 @@
             padding: 10px;
         }
         
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-box.full-width {
+                grid-column: 1;
+            }
+        }
+        
         .chart-box.full-width {
             grid-column: 1 / -1;
         }
@@ -380,7 +390,20 @@
             producersChart = Highcharts.chart('producersChart', {
                 chart: {
                     type: 'bar',
-                    backgroundColor: 'transparent'
+                    backgroundColor: 'transparent',
+                    animation: false
+                },
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                enabled: false
+                            }
+                        }
+                    }]
                 },
                 title: {
                     text: 'Acopio de Proveedores por Peso',
@@ -443,7 +466,24 @@
             materialsChart = Highcharts.chart('materialsChart', {
                 chart: {
                     type: 'pie',
-                    backgroundColor: 'transparent'
+                    backgroundColor: 'transparent',
+                    animation: false
+                },
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            plotOptions: {
+                                pie: {
+                                    dataLabels: {
+                                        enabled: false
+                                    }
+                                }
+                            }
+                        }
+                    }]
                 },
                 title: {
                     text: 'Distribucion de Materias Primas por Peso',
@@ -502,7 +542,24 @@
             zonesChart = Highcharts.chart('zonesChart', {
                 chart: {
                     type: 'pie',
-                    backgroundColor: 'transparent'
+                    backgroundColor: 'transparent',
+                    animation: false
+                },
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            plotOptions: {
+                                pie: {
+                                    dataLabels: {
+                                        enabled: false
+                                    }
+                                }
+                            }
+                        }
+                    }]
                 },
                 title: {
                     text: 'Distribucion de Acopio por Zonas',
@@ -557,6 +614,22 @@
             document.getElementById('totalZones').textContent = totalZones;
         }
         
+        // Función para redimensionar gráficos
+        function resizeCharts() {
+            if (producersChart) {
+                producersChart.setSize(null, null, false);
+                producersChart.reflow();
+            }
+            if (materialsChart) {
+                materialsChart.setSize(null, null, false);
+                materialsChart.reflow();
+            }
+            if (zonesChart) {
+                zonesChart.setSize(null, null, false);
+                zonesChart.reflow();
+            }
+        }
+        
         // Inicializar cuando carga la pagina
         window.addEventListener('load', function() {
             console.log('Dashboard con Highcharts inicializado');
@@ -567,6 +640,35 @@
                 loadData();
             }, 1000);
         });
+        
+        // Listener para redimensionamiento de ventana
+        window.addEventListener('resize', function() {
+            // Debounce para evitar múltiples llamadas rápidas
+            clearTimeout(window.resizeTimeout);
+            window.resizeTimeout = setTimeout(function() {
+                console.log('Redimensionando gráficos...');
+                resizeCharts();
+            }, 250);
+        });
+        
+        // Observer para detectar cambios en el contenedor de gráficos
+        if (window.ResizeObserver) {
+            const chartsContainer = document.querySelector('.charts-container');
+            const resizeObserver = new ResizeObserver(function(entries) {
+                clearTimeout(window.observerTimeout);
+                window.observerTimeout = setTimeout(function() {
+                    console.log('ResizeObserver detectó cambio...');
+                    resizeCharts();
+                }, 100);
+            });
+            
+            // Observar después de que se carguen los datos
+            setTimeout(() => {
+                if (chartsContainer) {
+                    resizeObserver.observe(chartsContainer);
+                }
+            }, 2000);
+        }
     </script>
 </body>
 </html>
