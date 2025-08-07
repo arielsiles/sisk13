@@ -39,3 +39,48 @@
     height: 400px;
     width: 100%;
 }
+
+/* Loading and Error States */
+.chart-loading, .chart-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #6c757d;
+}
+
+.chart-loading p, .chart-error p {
+    margin: 15px 0 5px 0;
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+.chart-error {
+    background: #fff5f5;
+    color: #dc3545;
+}
+
+.chart-error small {
+    margin-top: 5px;
+    opacity: 0.7;
+    max-width: 80%;
+    text-align: center;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e9ecef;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

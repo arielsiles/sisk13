@@ -183,6 +183,69 @@ window.ChartUtils = (function() {
         };
     }
     
+    // Crear configuración para gráfico de columnas verticales
+    function createColumnChartConfig(containerId, title, data, options = {}) {
+        const sortedData = data.sort((a, b) => b.peso - a.peso).slice(0, 15); // Top 15 para mejor visibilidad
+        
+        return {
+            ...baseConfig,
+            chart: {
+                ...baseConfig.chart,
+                type: 'column'
+            },
+            title: {
+                text: title,
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                }
+            },
+            xAxis: {
+                categories: sortedData.map(item => item.name),
+                title: {
+                    text: options.xAxisTitle || 'Categorías'
+                },
+                labels: {
+                    rotation: options.rotateLabels ? -45 : 0,
+                    style: {
+                        fontSize: '11px'
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: options.yAxisTitle || 'Valores'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                column: {
+                    dataLabels: {
+                        enabled: options.showDataLabels || false, // Deshabilitado por defecto para mejor visualización
+                        format: options.dataLabelFormat || '{y:.2f}',
+                        rotation: options.rotateLabels ? -90 : 0,
+                        style: {
+                            fontSize: '10px'
+                        }
+                    },
+                    color: options.color || 'rgba(54, 162, 235, 0.8)',
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            tooltip: {
+                pointFormat: options.tooltipFormat || '<b>{point.category}</b>: {point.y:,.2f}'
+            },
+            series: [{
+                name: options.seriesName || 'Datos',
+                data: sortedData.map(item => item.peso || 0)
+            }]
+        };
+    }
+    
     // Función para redimensionar gráficos
     function resizeChart(chart) {
         if (chart) {
@@ -232,6 +295,7 @@ window.ChartUtils = (function() {
         createBarChartConfig,
         createDonutChartConfig,
         createPieChartConfig,
+        createColumnChartConfig,
         resizeChart,
         resizeCharts,
         setupResizeListeners

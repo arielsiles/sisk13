@@ -89,13 +89,13 @@ window.FinanceDashboard = (function() {
         document.getElementById('totalAccounts').textContent = totalAccounts;
     }
     
-    // Cargar datos específicos de finanzas (reutilizando tipos existentes)
+    // Cargar datos específicos de finanzas
     async function loadData(startDate, endDate) {
         try {
             const [incomeData, expensesData, cashFlowData] = await Promise.all([
-                DashboardCore.fetchData('producers', startDate, endDate),  // Reutilizar como ingresos
-                DashboardCore.fetchData('materials', startDate, endDate),  // Reutilizar como gastos
-                DashboardCore.fetchData('zones', startDate, endDate)       // Reutilizar como flujo de caja
+                fetchFinanceData('income', startDate, endDate),    // Datos de ingresos
+                fetchFinanceData('expenses', startDate, endDate),  // Datos de gastos
+                fetchFinanceData('cash_flow', startDate, endDate)  // Datos de flujo de caja
             ]);
             
             // Actualizar gráficos  
@@ -110,6 +110,56 @@ window.FinanceDashboard = (function() {
             console.error('Error cargando datos de finanzas:', error);
             throw error;
         }
+    }
+    
+    // Función específica para obtener datos de finanzas
+    async function fetchFinanceData(type, startDate, endDate) {
+        // Intentar nueva API primero, fallback a datos mock
+        try {
+            const url = `/khipus/finance-dashboard-api?type=${type}&startDate=${startDate}&endDate=${endDate}`;
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json; charset=utf-8',
+                    'Content-Type': 'application/json; charset=utf-8'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (!data.error) {
+                    return DashboardCore.fixDataEncoding(data);
+                }
+            }
+        } catch (error) {
+            console.log('Nueva API de finanzas no disponible, usando datos mock...');
+        }
+        
+        // Fallback a datos mock hasta que se despliegue el servlet
+        const mockData = {
+            'income': [
+                {"name":"Ventas Directas", "peso":25000},
+                {"name":"Servicios", "peso":18000},
+                {"name":"Comisiones", "peso":12000},
+                {"name":"Intereses", "peso":5500}
+            ],
+            'expenses': [
+                {"name":"Gastos Operativos", "peso":15000},
+                {"name":"Sueldos", "peso":22000},
+                {"name":"Materiales", "peso":8000},
+                {"name":"Servicios", "peso":6500}
+            ],
+            'cash_flow': [
+                {"name":"Enero", "peso":5000},
+                {"name":"Febrero", "peso":7500},
+                {"name":"Marzo", "peso":-2000},
+                {"name":"Abril", "peso":8200},
+                {"name":"Mayo", "peso":6800}
+            ]
+        };
+        
+        return mockData[type] || [];
     }
     
     // Inicializar dashboard de finanzas

@@ -76,9 +76,9 @@ window.ProductionDashboard = (function() {
     async function loadData(startDate, endDate) {
         try {
             const [producersData, materialsData, zonesData] = await Promise.all([
-                DashboardCore.fetchData('producers', startDate, endDate),
-                DashboardCore.fetchData('materials', startDate, endDate),
-                DashboardCore.fetchData('zones', startDate, endDate)
+                fetchProductionData('producers', startDate, endDate),
+                fetchProductionData('materials', startDate, endDate),
+                fetchProductionData('zones', startDate, endDate)
             ]);
             
             // Actualizar gráficos
@@ -93,6 +93,55 @@ window.ProductionDashboard = (function() {
             console.error('Error cargando datos de producción:', error);
             throw error;
         }
+    }
+    
+    // Función específica para obtener datos de producción
+    async function fetchProductionData(type, startDate, endDate) {
+        // Intentar nueva API primero, fallback a la original
+        let url = `/khipus/production-dashboard-api?type=${type}&startDate=${startDate}&endDate=${endDate}`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json; charset=utf-8',
+                    'Content-Type': 'application/json; charset=utf-8'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (!data.error) {
+                    return DashboardCore.fixDataEncoding(data);
+                }
+            }
+        } catch (error) {
+            console.log('Nueva API no disponible, usando API original...');
+        }
+        
+        // Fallback a la API original
+        url = `/khipus/dashboard-api?type=${type}&startDate=${startDate}&endDate=${endDate}`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json; charset=utf-8',
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Aplicar corrección de codificación a todos los datos
+        return DashboardCore.fixDataEncoding(data);
     }
     
     // Inicializar dashboard de producción

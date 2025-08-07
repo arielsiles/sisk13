@@ -212,6 +212,27 @@
         <load-on-startup>2</load-on-startup>
     </servlet>
     
+    <!-- Production Dashboard Servlet -->
+    <servlet>
+        <servlet-name>ProductionDashboardServlet</servlet-name>
+        <servlet-class>com.encens.khipus.servlet.ProductionDashboardServlet</servlet-class>
+        <load-on-startup>3</load-on-startup>
+    </servlet>
+    
+    <!-- Inventory Dashboard Servlet -->
+    <servlet>
+        <servlet-name>InventoryDashboardServlet</servlet-name>
+        <servlet-class>com.encens.khipus.servlet.InventoryDashboardServlet</servlet-class>
+        <load-on-startup>4</load-on-startup>
+    </servlet>
+    
+    <!-- Finance Dashboard Servlet -->
+    <servlet>
+        <servlet-name>FinanceDashboardServlet</servlet-name>
+        <servlet-class>com.encens.khipus.servlet.FinanceDashboardServlet</servlet-class>
+        <load-on-startup>5</load-on-startup>
+    </servlet>
+    
 
     <!-- Faces Servlet Mapping -->
     <servlet-mapping>
@@ -223,6 +244,24 @@
     <servlet-mapping>
         <servlet-name>DashboardServlet</servlet-name>
         <url-pattern>/dashboard-api</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Production Dashboard API Mapping -->
+    <servlet-mapping>
+        <servlet-name>ProductionDashboardServlet</servlet-name>
+        <url-pattern>/production-dashboard-api</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Inventory Dashboard API Mapping -->
+    <servlet-mapping>
+        <servlet-name>InventoryDashboardServlet</servlet-name>
+        <url-pattern>/inventory-dashboard-api</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Finance Dashboard API Mapping -->
+    <servlet-mapping>
+        <servlet-name>FinanceDashboardServlet</servlet-name>
+        <url-pattern>/finance-dashboard-api</url-pattern>
     </servlet-mapping>
     
 
