@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    
+    <!-- Highcharts CDN -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    
+    <!-- Estilos compartidos -->
+    <link rel="stylesheet" href="shared/styles/common.css">
+    <link rel="stylesheet" href="shared/styles/charts.css">
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+    
+    <!-- Controles principales -->
+    <div id="controls-container"></div>
+    
+    <!-- Contenedor principal de dashboards -->
+    <div id="dashboard-container">
+        <!-- El contenido de cada dashboard se cargará dinámicamente aquí -->
+    </div>
+    
+    <!-- Scripts compartidos -->
+    <script src="shared/js/dashboard-core.js"></script>
+    <script src="shared/js/chart-utils.js"></script>
+    <script src="shared/js/navigation.js"></script>
+    
+    <!-- Script principal -->
+    <script>
+        // Inicializar cuando carga la página
+        window.addEventListener('load', async function() {
+            try {
+                await DashboardCore.init();
+                DashboardNavigation.init();
+                
+                // Esperar un momento para asegurar que el DOM esté listo
+                setTimeout(async () => {
+                    await DashboardNavigation.loadDashboard('production');
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error inicializando dashboard:', error);
+            }
+        });
+    </script>
+</body>
+</html>

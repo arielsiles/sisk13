@@ -1,0 +1,27 @@
+<div class="controls">
+    <div class="nav-tabs">
+        <button class="tab-btn active" data-dashboard="production" onclick="DashboardNavigation.switchDashboard('production')">
+            Producción
+        </button>
+        <button class="tab-btn" data-dashboard="inventory" onclick="DashboardNavigation.switchDashboard('inventory')">
+            Inventarios
+        </button>
+        <button class="tab-btn" data-dashboard="finance" onclick="DashboardNavigation.switchDashboard('finance')">
+            Finanzas
+        </button>
+    </div>
+    <div class="controls-right">
+        <div class="control-group">
+            <input type="date" id="startDate">
+        </div>
+        <div class="control-group">
+            <input type="date" id="endDate">
+        </div>
+        <button class="btn" id="filterBtn" onclick="DashboardCore.loadData()">
+            Actualizar Datos
+        </button>
+        <button class="btn" onclick="DashboardCore.testConnection()" style="background: #28a745;">
+            Test Conexión
+        </button>
+    </div>
+</div>

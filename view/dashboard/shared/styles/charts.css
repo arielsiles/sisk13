@@ -1,0 +1,41 @@
+/* Estilos específicos para gráficos */
+.charts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+    padding: 10px;
+}
+
+@media (max-width: 768px) {
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-box.full-width {
+        grid-column: 1;
+    }
+}
+
+.chart-box.full-width {
+    grid-column: 1 / -1;
+}
+
+.chart-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chart-box h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #555;
+    font-size: 1.3em;
+}
+
+.chart-container {
+    height: 400px;
+    width: 100%;
+}
