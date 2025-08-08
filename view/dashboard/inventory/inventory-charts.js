@@ -2,7 +2,7 @@
 window.InventoryDashboard = (function() {
     'use strict';
     
-    let inventoryChart, subgroupsChart, warehousesChart;
+    let inventoryChart, subgroupsChart, areasChart;
     let charts = [];
     let currentSelectedGroup = null;
     let correlatedData = null;
@@ -49,34 +49,46 @@ window.InventoryDashboard = (function() {
         charts[1] = subgroupsChart;
     }
     
-    // Actualizar gráfico de almacenes (PIE)
-    function updateWarehousesChart(data) {
-        const config = ChartUtils.createPieChartConfig(
-            'warehousesChart',
-            DashboardCore.fixEncoding('Distribución por Almacenes'),
+    // Actualizar gráfico de gastos por área (COLUMNAS VERTICALES)
+    function updateAreasExpensesChart(data) {
+        // Calcular total de gastos
+        const total = data.reduce((sum, item) => sum + (item.peso || 0), 0);
+        const formattedTotal = total.toLocaleString('es-BO', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
+        });
+        
+        const config = ChartUtils.createColumnChartConfig(
+            'areasChart',
+            DashboardCore.fixEncoding('Gastos de Inventario por Área'),
             data,
             {
-                colors: ChartUtils.colors.inventory,
-                seriesName: 'Almacenes',
-                tooltipFormat: '<b>{point.name}</b>: {point.percentage:.1f}% ({point.y} unid.)'
+                xAxisTitle: 'Areas de Costo',
+                yAxisTitle: 'Monto Total (Bs)',
+                seriesName: 'Gastos',
+                color: 'rgba(255, 159, 64, 0.8)',
+                rotateLabels: true,
+                showDataLabels: false,
+                tooltipFormat: '<b>{point.category}</b>: {point.y:,.2f} Bs',
+                subtitle: `Total: ${formattedTotal} Bs`
             }
         );
         
-        warehousesChart = Highcharts.chart('warehousesChart', config);
-        charts[2] = warehousesChart;
+        areasChart = Highcharts.chart('areasChart', config);
+        charts[2] = areasChart;
     }
     
     // Actualizar estadísticas de inventarios
-    function updateInventoryStats(inventoryData, categoriesData, warehousesData) {
+    function updateInventoryStats(inventoryData, categoriesData, areasData) {
         const totalItems = inventoryData.length; // Total de productos distintos
         const totalValue = inventoryData.reduce((sum, item) => sum + (item.peso || 0), 0) * 100; // Usar peso como valor estimado
         const totalCategories = categoriesData.length;
-        const totalWarehouses = warehousesData.length;
+        const totalAreas = areasData.length;
         
         document.getElementById('totalItems').textContent = totalItems;
         document.getElementById('totalValue').textContent = Math.round(totalValue * 100) / 100;
         document.getElementById('totalCategories').textContent = totalCategories;
-        document.getElementById('totalWarehouses').textContent = totalWarehouses;
+        document.getElementById('totalWarehouses').textContent = totalAreas;
     }
     
     // Mostrar indicador de carga en un gráfico específico
@@ -98,14 +110,14 @@ window.InventoryDashboard = (function() {
             // Mostrar indicadores de carga
             showChartLoading('inventoryChart');
             showChartLoading('categoriesChart'); 
-            showChartLoading('warehousesChart');
+            showChartLoading('areasChart');
             
             console.log('Cargando datos de inventarios...', startDate, 'a', endDate);
             
             // Usar nueva API correlacionada - una sola llamada para ambos gráficos
-            const [correlatedResponse, warehousesData] = await Promise.all([
+            const [correlatedResponse, areasData] = await Promise.all([
                 fetchInventoryData('correlated_data', startDate, endDate),     // Datos correlacionados grupos + subgrupos
-                fetchInventoryData('warehouses', startDate, endDate)           // Datos de almacenes
+                fetchInventoryData('areas_expenses', startDate, endDate)       // Datos de gastos por área
             ]);
             
             // Guardar datos correlacionados globalmente
@@ -127,23 +139,23 @@ window.InventoryDashboard = (function() {
             console.log('Datos correlacionados de inventarios cargados:', {
                 groups: groupsData.length,
                 subgroups: subgroupsData.length,
-                warehouses: warehousesData.length,
+                areas: areasData.length,
                 totalGroupsInData: Object.keys(correlatedData.subgroupsByGroup || {}).length
             });
             
             // Actualizar gráficos con datos correlacionados
             updateInventoryChart(groupsData);  // Gráfico 1: grupos
             updateSubgroupsChart(subgroupsData, currentSelectedGroup ? currentSelectedGroup.name : null);  // Gráfico 2: subgrupos
-            updateWarehousesChart(warehousesData);
+            updateAreasExpensesChart(areasData);
             
             // Actualizar estadísticas
-            updateInventoryStats(groupsData, subgroupsData, warehousesData);
+            updateInventoryStats(groupsData, subgroupsData, areasData);
             
         } catch (error) {
             console.error('Error cargando datos de inventarios:', error);
             
             // Mostrar error en los gráficos
-            ['inventoryChart', 'categoriesChart', 'warehousesChart'].forEach(chartId => {
+            ['inventoryChart', 'categoriesChart', 'areasChart'].forEach(chartId => {
                 const container = document.getElementById(chartId);
                 if (container) {
                     container.innerHTML = `
@@ -230,6 +242,15 @@ window.InventoryDashboard = (function() {
                 {"name":"Almacén Central", "peso":2500},
                 {"name":"Almacén Norte", "peso":1800},
                 {"name":"Almacén Sur", "peso":1200}
+            ],
+            'areas_expenses': [
+                {"name":"ADMINISTRACIÓN", "peso":15001.59},
+                {"name":"PRODUCCIÓN", "peso":163221.34},
+                {"name":"ALMACÉN", "peso":5489.53},
+                {"name":"MANTENIMIENTO GRAL", "peso":14881.92},
+                {"name":"PROYECTOS", "peso":548237.87},
+                {"name":"COMERCIALIZACIÓN", "peso":950.28},
+                {"name":"LABORATORIO", "peso":7113.34}
             ]
         };
         
@@ -327,7 +348,7 @@ window.InventoryDashboard = (function() {
         loadData,
         updateInventoryChart,
         updateSubgroupsChart,
-        updateWarehousesChart,
+        updateAreasExpensesChart,
         updateInventoryStats,
         populateGroupSelector,
         updateGroupTotal

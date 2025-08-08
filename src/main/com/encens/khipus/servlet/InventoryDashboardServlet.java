@@ -59,6 +59,8 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
                 return getCorrelatedInventoryData(startDate, endDate);
             case "warehouses":
                 return getWarehousesData(startDate, endDate);
+            case "areas_expenses":
+                return getAreasExpensesData(startDate, endDate);
             case "test":
                 return getTestResponse();
             default:
@@ -394,5 +396,29 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
     private String getWarehousesData(String startDate, String endDate) {
         // Mock data para almacenes - se puede reemplazar con consulta real después
         return "[{\"name\":\"Almacén Central\",\"peso\":2500},{\"name\":\"Almacén Norte\",\"peso\":1800},{\"name\":\"Almacén Sur\",\"peso\":1200}]";
+    }
+    
+    /**
+     * Gastos de inventario por área - Basado en reporte InventoryExpenseSummaryReport
+     */
+    private String getAreasExpensesData(String startDate, String endDate) {
+        String sql = "SELECT " +
+                "d.nombre as name, " +
+                "SUM(md.monto) as peso " +
+                "FROM inv_movdet md " +
+                "JOIN inv_mov im ON md.no_cia = im.no_cia AND md.no_trans = im.no_trans AND md.estado = im.estado " +
+                "JOIN inv_vales wv ON im.no_cia = wv.no_cia AND im.no_trans = wv.no_trans " +
+                "JOIN inv_destino d ON wv.iddestino = d.iddestino " +
+                "WHERE wv.fecha BETWEEN ? AND ? " +
+                "AND wv.estado = 'APR' " +
+                "AND wv.cod_doc = 'EGR' " +
+                "AND wv.no_cia = '01' " +
+                "GROUP BY d.nombre " +
+                "HAVING SUM(md.monto) > 0 " +
+                "ORDER BY SUM(md.monto) DESC " +
+                "LIMIT 20";
+        
+        String errorFallback = "[{\"name\":\"ADMINISTRACIÓN\",\"peso\":15001.59},{\"name\":\"PRODUCCIÓN\",\"peso\":163221.34},{\"name\":\"ALMACÉN\",\"peso\":5489.53},{\"name\":\"MANTENIMIENTO GRAL\",\"peso\":14881.92},{\"name\":\"PROYECTOS\",\"peso\":548237.87}]";
+        return executeQueryToJson(sql, startDate, endDate, errorFallback);
     }
 }

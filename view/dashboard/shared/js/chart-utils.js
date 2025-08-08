@@ -200,6 +200,13 @@ window.ChartUtils = (function() {
                     fontWeight: 'bold'
                 }
             },
+            subtitle: {
+                text: options.subtitle || null,
+                style: {
+                    fontSize: '13px',
+                    color: '#666'
+                }
+            },
             xAxis: {
                 categories: sortedData.map(item => item.name),
                 title: {
