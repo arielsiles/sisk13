@@ -2,7 +2,7 @@
 window.InventoryDashboard = (function() {
     'use strict';
     
-    let inventoryChart, subgroupsChart, areasChart;
+    let inventoryChart, subgroupsChart, areasChart, areasDonutChart;
     let charts = [];
     let currentSelectedGroup = null;
     let correlatedData = null;
@@ -76,6 +76,41 @@ window.InventoryDashboard = (function() {
         
         areasChart = Highcharts.chart('areasChart', config);
         charts[2] = areasChart;
+        
+        // Crear también el gráfico de donut con los mismos datos
+        updateAreasDonutChart(data, total, formattedTotal);
+    }
+    
+    // Actualizar gráfico de gastos por área (DONUT/PIE CHART)
+    function updateAreasDonutChart(data, total, formattedTotal) {
+        // Aplicar la misma limitación que el gráfico de columnas (top 15)
+        const limitedData = data.sort((a, b) => b.peso - a.peso).slice(0, 15);
+        
+        const config = ChartUtils.createDonutChartConfig(
+            'areasDonutChart',
+            DashboardCore.fixEncoding('Gastos de Inventario por Área'),
+            limitedData,
+            {
+                colors: ChartUtils.colors.inventory,
+                seriesName: 'Gastos',
+                tooltipFormat: 'Monto Total: {point.y:,.2f} Bs<br>Porcentaje: {point.percentage:.1f}%',
+                subtitle: `Total: ${formattedTotal} Bs`,
+                innerSize: '30%',
+                showLegend: false
+            }
+        );
+        
+        // Personalizar configuración adicional para el donut
+        config.subtitle = {
+            text: `Total: ${formattedTotal} Bs`,
+            style: {
+                fontSize: '13px',
+                color: '#666'
+            }
+        };
+        
+        areasDonutChart = Highcharts.chart('areasDonutChart', config);
+        charts[3] = areasDonutChart; // Agregar como cuarto gráfico
     }
     
     // Actualizar estadísticas de inventarios
@@ -111,6 +146,7 @@ window.InventoryDashboard = (function() {
             showChartLoading('inventoryChart');
             showChartLoading('categoriesChart'); 
             showChartLoading('areasChart');
+            showChartLoading('areasDonutChart');
             
             console.log('Cargando datos de inventarios...', startDate, 'a', endDate);
             
@@ -155,7 +191,7 @@ window.InventoryDashboard = (function() {
             console.error('Error cargando datos de inventarios:', error);
             
             // Mostrar error en los gráficos
-            ['inventoryChart', 'categoriesChart', 'areasChart'].forEach(chartId => {
+            ['inventoryChart', 'categoriesChart', 'areasChart', 'areasDonutChart'].forEach(chartId => {
                 const container = document.getElementById(chartId);
                 if (container) {
                     container.innerHTML = `

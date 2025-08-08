@@ -116,13 +116,14 @@ window.ChartUtils = (function() {
                         enabled: true,
                         format: '<b>{point.name}</b>: {point.percentage:.1f}%'
                     },
-                    showInLegend: true
+                    showInLegend: options.showLegend !== false
                 }
             },
             tooltip: {
                 pointFormat: options.tooltipFormat || '<b>{point.name}</b>: {point.percentage:.1f}% ({point.y:.2f})'
             },
             legend: {
+                enabled: options.showLegend !== false,
                 align: 'center',
                 verticalAlign: 'bottom',
                 layout: 'horizontal'
