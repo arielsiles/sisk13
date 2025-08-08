@@ -236,6 +236,17 @@ window.InventoryDashboard = (function() {
         return mockData[type] || [];
     }
     
+    // Actualizar display del total del grupo seleccionado
+    function updateGroupTotal(group) {
+        const totalElement = document.getElementById('groupTotal');
+        if (totalElement && group && group.peso !== undefined) {
+            const formattedTotal = group.peso.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            totalElement.textContent = `Total: ${formattedTotal} Bs`;
+        } else if (totalElement) {
+            totalElement.textContent = 'Total: - Bs';
+        }
+    }
+    
     // Poblar selector de grupos
     function populateGroupSelector(groupsData) {
         const selector = document.getElementById('groupSelector');
@@ -258,6 +269,8 @@ window.InventoryDashboard = (function() {
         if (groupsData.length > 0) {
             selector.value = groupsData[0].id;
             currentSelectedGroup = groupsData[0];
+            // Mostrar total del grupo inicial
+            updateGroupTotal(currentSelectedGroup);
         }
         
         // Evento de cambio de grupo
@@ -270,6 +283,9 @@ window.InventoryDashboard = (function() {
             if (!selectedGroup) return;
             
             currentSelectedGroup = selectedGroup;
+            
+            // Actualizar total del grupo seleccionado
+            updateGroupTotal(selectedGroup);
             
             try {
                 // Obtener subgrupos del grupo seleccionado desde datos correlacionados en memoria
@@ -313,6 +329,7 @@ window.InventoryDashboard = (function() {
         updateSubgroupsChart,
         updateWarehousesChart,
         updateInventoryStats,
-        populateGroupSelector
+        populateGroupSelector,
+        updateGroupTotal
     };
 })();
