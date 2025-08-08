@@ -1,6 +1,10 @@
 package com.encens.khipus.servlet;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,13 +33,30 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
         }
     }
     
+    private String currentGroupId;
+    
+    @Override
+    protected void doGet(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+            throws javax.servlet.ServletException, java.io.IOException {
+        
+        // Obtener parámetro groupId específico para inventarios
+        currentGroupId = request.getParameter("groupId");
+        
+        // Llamar al método padre
+        super.doGet(request, response);
+    }
+
     @Override
     protected String handleDataRequest(String dataType, String startDate, String endDate) throws Exception {
         switch (dataType) {
             case "purchases_by_group":
                 return getPurchasesByGroupData(startDate, endDate);
-            case "categories":
-                return getCategoriesData(startDate, endDate);
+            case "groups":
+                return getGroupsData(startDate, endDate);
+            case "subgroups_by_group":
+                return getSubgroupsByGroupData(startDate, endDate, currentGroupId);
+            case "correlated_data":
+                return getCorrelatedInventoryData(startDate, endDate);
             case "warehouses":
                 return getWarehousesData(startDate, endDate);
             case "test":
@@ -104,13 +125,269 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
     }
     
     /**
-     * Datos de categorías (mock por ahora - se puede implementar después)
+     * Obtiene lista de grupos para el selector
      */
-    private String getCategoriesData(String startDate, String endDate) {
-        // Mock data para categorías - se puede reemplazar con consulta real después
-        return "[{\"name\":\"Categoría A\",\"peso\":1200},{\"name\":\"Categoría B\",\"peso\":800},{\"name\":\"Categoría C\",\"peso\":600}]";
+    private String getGroupsData(String startDate, String endDate) {
+        String cacheKey = "groups_" + startDate + "_" + endDate;
+        
+        CacheEntry cacheEntry = cache.get(cacheKey);
+        if (cacheEntry != null && !cacheEntry.isExpired()) {
+            System.out.println("Cache HIT para groups: " + cacheKey);
+            return cacheEntry.data;
+        }
+        
+        System.out.println("Cache MISS para groups: " + cacheKey);
+        
+        String sql = "SELECT DISTINCT " +
+                "g.cod_gru as id, " +
+                "g.descri as name " +
+                "FROM inv_grupos g " +
+                "JOIN inv_subgrupos s ON g.cod_gru = s.cod_gru " +
+                "JOIN inv_articulos i ON s.cod_sub = i.cod_sub " +
+                "JOIN com_detoc d ON i.cod_art = d.cod_art " +
+                "JOIN com_encoc e ON d.id_com_encoc = e.id_com_encoc " +
+                "WHERE e.fecha BETWEEN ? AND ? " +
+                "ORDER BY g.descri";
+        
+        String errorFallback = "[{\"id\":\"1\",\"name\":\"Alimentos\"},{\"id\":\"2\",\"name\":\"Materiales\"},{\"id\":\"3\",\"name\":\"Herramientas\"}]";
+        String result = executeQueryToJson(sql, startDate, endDate, errorFallback);
+        
+        cache.put(cacheKey, new CacheEntry(result));
+        cleanExpiredCache();
+        
+        return result;
     }
     
+    /**
+     * Volumen de compras por Subgrupo del grupo seleccionado
+     */
+    private String getSubgroupsByGroupData(String startDate, String endDate, String groupId) {
+        if (groupId == null || groupId.trim().isEmpty()) {
+            return "[{\"name\":\"Seleccione un grupo\",\"peso\":0}]";
+        }
+        
+        String cacheKey = "subgroups_" + groupId + "_" + startDate + "_" + endDate;
+        
+        CacheEntry cacheEntry = cache.get(cacheKey);
+        if (cacheEntry != null && !cacheEntry.isExpired()) {
+            System.out.println("Cache HIT para subgroups: " + cacheKey);
+            return cacheEntry.data;
+        }
+        
+        System.out.println("Cache MISS para subgroups: " + cacheKey);
+        
+        String sql = "SELECT " +
+                "s.descri as name, " +
+                "SUM(d.total) as peso " +
+                "FROM com_detoc d " +
+                "JOIN com_encoc e ON d.id_com_encoc = e.id_com_encoc " +
+                "JOIN inv_articulos i ON d.cod_art = i.cod_art " +
+                "JOIN inv_subgrupos s ON i.cod_sub = s.cod_sub " +
+                "JOIN inv_grupos g ON s.cod_gru = g.cod_gru " +
+                "WHERE i.cod_gru = s.cod_gru " +
+                "AND e.fecha BETWEEN ? AND ? " +
+                "AND g.cod_gru = ? " +
+                "GROUP BY s.descri, s.cod_sub " +
+                "HAVING SUM(d.total) > 50 " +
+                "ORDER BY SUM(d.total) DESC " +
+                "LIMIT 10";
+        
+        String errorFallback = "[{\"name\":\"Subgrupo A\",\"peso\":5000},{\"name\":\"Subgrupo B\",\"peso\":3000}]";
+        String result = executeQueryToJsonWithParam(sql, startDate, endDate, groupId, errorFallback);
+        
+        cache.put(cacheKey, new CacheEntry(result));
+        cleanExpiredCache();
+        
+        return result;
+    }
+    
+    /**
+     * Datos correlacionados: una consulta para ambos gráficos con correlación perfecta
+     * Usa la consulta base proporcionada y procesa los datos en memoria
+     */
+    private String getCorrelatedInventoryData(String startDate, String endDate) {
+        String cacheKey = "correlated_inventory_" + startDate + "_" + endDate;
+        
+        CacheEntry cacheEntry = cache.get(cacheKey);
+        if (cacheEntry != null && !cacheEntry.isExpired()) {
+            System.out.println("Cache HIT para correlated_inventory: " + cacheKey);
+            return cacheEntry.data;
+        }
+        
+        System.out.println("Cache MISS para correlated_inventory: " + cacheKey);
+        
+        // Consulta base exacta proporcionada
+        String sql = "SELECT e.id_com_encoc, e.fecha, g.descri as grupo, s.descri as subgrupo, " +
+                "d.cod_art, d.cant_sol, d.costo_uni, d.total as total_Bs, g.cod_gru, s.cod_sub " +
+                "FROM com_detoc d " +
+                "JOIN com_encoc e ON d.id_com_encoc = e.id_com_encoc " +
+                "JOIN inv_articulos i ON d.cod_art = i.cod_art " +
+                "JOIN inv_subgrupos s ON i.cod_sub = s.cod_sub " +
+                "JOIN inv_grupos g ON s.cod_gru = g.cod_gru " +
+                "WHERE i.cod_gru = s.cod_gru AND e.fecha BETWEEN ? AND ? " +
+                "ORDER BY g.descri, s.descri";
+        
+        try {
+            String result = executeCorrelatedQuery(sql, startDate, endDate);
+            cache.put(cacheKey, new CacheEntry(result));
+            cleanExpiredCache();
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error en consulta correlacionada: " + e.getMessage());
+            // Fallback con estructura correlacionada
+            return getCorrelatedFallbackData();
+        }
+    }
+    
+    /**
+     * Ejecuta la consulta correlacionada y procesa los resultados en memoria
+     */
+    private String executeCorrelatedQuery(String sql, String startDate, String endDate) throws Exception {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        // Maps para procesar datos en memoria
+        Map<String, Double> groupTotals = new LinkedHashMap<String, Double>();
+        Map<String, String> groupIds = new LinkedHashMap<String, String>();
+        Map<String, Map<String, Double>> subgroupsByGroup = new LinkedHashMap<String, Map<String, Double>>();
+        
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setQueryTimeout(30);
+            
+            System.out.println("Ejecutando consulta correlacionada: " + sql);
+            System.out.println("Fechas: " + startDate + " a " + endDate);
+            
+            stmt.setString(1, startDate);
+            stmt.setString(2, endDate);
+            
+            long startTime = System.currentTimeMillis();
+            rs = stmt.executeQuery();
+            
+            int totalRows = 0;
+            
+            while (rs.next()) {
+                String grupo = rs.getString("grupo");
+                String subgrupo = rs.getString("subgrupo");
+                String codGru = rs.getString("cod_gru");
+                double totalBs = rs.getDouble("total_Bs");
+                
+                // Procesar grupos
+                groupTotals.put(grupo, groupTotals.containsKey(grupo) ? 
+                    groupTotals.get(grupo) + totalBs : totalBs);
+                groupIds.put(grupo, codGru);
+                
+                // Procesar subgrupos por grupo
+                if (!subgroupsByGroup.containsKey(codGru)) {
+                    subgroupsByGroup.put(codGru, new LinkedHashMap<String, Double>());
+                }
+                Map<String, Double> subgroups = subgroupsByGroup.get(codGru);
+                subgroups.put(subgrupo, subgroups.containsKey(subgrupo) ? 
+                    subgroups.get(subgrupo) + totalBs : totalBs);
+                
+                totalRows++;
+            }
+            
+            long queryTime = System.currentTimeMillis() - startTime;
+            System.out.println("Consulta correlacionada ejecutada en " + queryTime + "ms. Filas procesadas: " + totalRows);
+            System.out.println("Grupos encontrados: " + groupTotals.size());
+            
+            // Construir JSON correlacionado
+            return buildCorrelatedJSON(groupTotals, groupIds, subgroupsByGroup);
+            
+        } finally {
+            // Cerrar recursos
+            if (rs != null) try { rs.close(); } catch (Exception e) { }
+            if (stmt != null) try { stmt.close(); } catch (Exception e) { }
+            if (conn != null) try { conn.close(); } catch (Exception e) { }
+        }
+    }
+    
+    /**
+     * Construye el JSON correlacionado con grupos, sus IDs y subgrupos organizados
+     */
+    private String buildCorrelatedJSON(Map<String, Double> groupTotals, Map<String, String> groupIds, 
+                                      Map<String, Map<String, Double>> subgroupsByGroup) {
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        
+        // 1. Grupos para el gráfico principal y selector
+        json.append("\"groups\":[");
+        boolean firstGroup = true;
+        for (Map.Entry<String, Double> entry : groupTotals.entrySet()) {
+            if (!firstGroup) json.append(",");
+            String groupName = entry.getKey();
+            String groupId = groupIds.get(groupName);
+            double total = entry.getValue();
+            
+            json.append("{")
+                .append("\"id\":\"").append(escapeJson(groupId)).append("\",")
+                .append("\"name\":\"").append(escapeJson(groupName)).append("\",")
+                .append("\"peso\":").append(Math.round(total * 100.0) / 100.0)
+                .append("}");
+            firstGroup = false;
+        }
+        json.append("],");
+        
+        // 2. Subgrupos organizados por grupo
+        json.append("\"subgroupsByGroup\":{");
+        boolean firstSubgroupGroup = true;
+        for (Map.Entry<String, Map<String, Double>> groupEntry : subgroupsByGroup.entrySet()) {
+            if (!firstSubgroupGroup) json.append(",");
+            String groupId = groupEntry.getKey();
+            Map<String, Double> subgroups = groupEntry.getValue();
+            
+            json.append("\"").append(groupId).append("\":[");
+            boolean firstSubgroup = true;
+            for (Map.Entry<String, Double> subgroupEntry : subgroups.entrySet()) {
+                if (!firstSubgroup) json.append(",");
+                json.append("{")
+                    .append("\"name\":\"").append(escapeJson(subgroupEntry.getKey())).append("\",")
+                    .append("\"peso\":").append(Math.round(subgroupEntry.getValue() * 100.0) / 100.0)
+                    .append("}");
+                firstSubgroup = false;
+            }
+            json.append("]");
+            firstSubgroupGroup = false;
+        }
+        json.append("}");
+        
+        json.append("}");
+        return json.toString();
+    }
+    
+    /**
+     * Datos de fallback con estructura correlacionada
+     */
+    private String getCorrelatedFallbackData() {
+        return "{" +
+            "\"groups\":[" +
+                "{\"id\":\"1\",\"name\":\"Productos Alimenticios\",\"peso\":15420.75}," +
+                "{\"id\":\"2\",\"name\":\"Materiales de Construcción\",\"peso\":12800.50}," +
+                "{\"id\":\"3\",\"name\":\"Herramientas y Equipos\",\"peso\":8900.25}" +
+            "]," +
+            "\"subgroupsByGroup\":{" +
+                "\"1\":[" +
+                    "{\"name\":\"Lácteos y Derivados\",\"peso\":8000}," +
+                    "{\"name\":\"Cereales y Granos\",\"peso\":5000}," +
+                    "{\"name\":\"Carnes y Embutidos\",\"peso\":2420.75}" +
+                "]," +
+                "\"2\":[" +
+                    "{\"name\":\"Cemento y Agregados\",\"peso\":7500}," +
+                    "{\"name\":\"Materiales Metálicos\",\"peso\":3300.50}," +
+                    "{\"name\":\"Pinturas y Acabados\",\"peso\":2000}" +
+                "]," +
+                "\"3\":[" +
+                    "{\"name\":\"Herramientas Manuales\",\"peso\":4500}," +
+                    "{\"name\":\"Equipos Eléctricos\",\"peso\":2900.25}," +
+                    "{\"name\":\"Maquinaria Menor\",\"peso\":1500}" +
+                "]" +
+            "}" +
+        "}";
+    }
+
     /**
      * Datos de almacenes (mock por ahora - se puede implementar después)
      */

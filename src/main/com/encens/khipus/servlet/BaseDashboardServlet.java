@@ -197,4 +197,85 @@ public abstract class BaseDashboardServlet extends HttpServlet {
         json.append("]");
         return json.toString();
     }
+    
+    /**
+     * Ejecutar consulta SQL con 3 parámetros y construir JSON con estructura name/peso
+     */
+    protected String executeQueryToJsonWithParam(String sql, String startDate, String endDate, String param3, String errorFallback) {
+        StringBuilder json = new StringBuilder("[");
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setQueryTimeout(30);
+            
+            System.out.println("Ejecutando consulta con 3 parámetros: " + sql);
+            System.out.println("Parámetros: " + startDate + ", " + endDate + ", " + param3);
+            
+            stmt.setString(1, startDate);
+            stmt.setString(2, endDate);
+            stmt.setString(3, param3);
+            
+            long startTime = System.currentTimeMillis();
+            rs = stmt.executeQuery();
+            long queryTime = System.currentTimeMillis() - startTime;
+            
+            boolean first = true;
+            int count = 0;
+            
+            while (rs.next()) {
+                if (!first) json.append(",");
+                
+                String name = rs.getString("name");
+                double value = rs.getDouble(2);
+                
+                json.append("{")
+                    .append("\"name\":\"").append(escapeJson(name != null ? name : "Sin Nombre")).append("\",")
+                    .append("\"peso\":").append(Math.round(value * 100.0) / 100.0)
+                    .append("}");
+                first = false;
+                count++;
+                
+                System.out.println("Resultado: " + name + " = " + value);
+            }
+            
+            System.out.println("Consulta con 3 parámetros ejecutada en " + queryTime + "ms. Total registros: " + count);
+            
+        } catch (SQLTimeoutException e) {
+            System.err.println("Query timeout después de 30 segundos. Usando datos fallback.");
+            return errorFallback;
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
+            return errorFallback;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    System.err.println("Error cerrando ResultSet: " + e.getMessage());
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    System.err.println("Error cerrando PreparedStatement: " + e.getMessage());
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("Error cerrando Connection: " + e.getMessage());
+                }
+            }
+        }
+        
+        json.append("]");
+        return json.toString();
+    }
 }

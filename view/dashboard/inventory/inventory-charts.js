@@ -2,8 +2,10 @@
 window.InventoryDashboard = (function() {
     'use strict';
     
-    let inventoryChart, categoriesChart, warehousesChart;
+    let inventoryChart, subgroupsChart, warehousesChart;
     let charts = [];
+    let currentSelectedGroup = null;
+    let correlatedData = null;
     
     // Actualizar gráfico de compras por grupo (COLUMNAS VERTICALES)
     function updateInventoryChart(data) {
@@ -26,21 +28,25 @@ window.InventoryDashboard = (function() {
         charts[0] = inventoryChart;
     }
     
-    // Actualizar gráfico de categorías (DONUT)
-    function updateCategoriesChart(data) {
-        const config = ChartUtils.createDonutChartConfig(
+    // Actualizar gráfico de subgrupos (COLUMNAS VERTICALES)
+    function updateSubgroupsChart(data, groupName) {
+        const config = ChartUtils.createColumnChartConfig(
             'categoriesChart',
-            DashboardCore.fixEncoding('Inventario por Categorías'),
+            DashboardCore.fixEncoding('Volumen de compras por Subgrupo'),
             data,
             {
-                colors: ChartUtils.colors.inventory,
-                seriesName: DashboardCore.fixEncoding('Categorías'),
-                tooltipFormat: '<b>{point.name}</b>: {point.percentage:.1f}% ({point.y} unid.)'
+                xAxisTitle: 'Subgrupos',
+                yAxisTitle: 'Monto Total (Bs)',
+                seriesName: 'Compras',
+                color: 'rgba(54, 162, 235, 0.8)',
+                rotateLabels: true,
+                showDataLabels: false,
+                tooltipFormat: '<b>{point.category}</b>: {point.y:,.2f} Bs'
             }
         );
         
-        categoriesChart = Highcharts.chart('categoriesChart', config);
-        charts[1] = categoriesChart;
+        subgroupsChart = Highcharts.chart('categoriesChart', config);
+        charts[1] = subgroupsChart;
     }
     
     // Actualizar gráfico de almacenes (PIE)
@@ -96,25 +102,42 @@ window.InventoryDashboard = (function() {
             
             console.log('Cargando datos de inventarios...', startDate, 'a', endDate);
             
-            const [inventoryData, categoriesData, warehousesData] = await Promise.all([
-                fetchInventoryData('purchases_by_group', startDate, endDate),  // Datos reales de compras por grupo
-                fetchInventoryData('categories', startDate, endDate),          // Datos de categorías  
+            // Usar nueva API correlacionada - una sola llamada para ambos gráficos
+            const [correlatedResponse, warehousesData] = await Promise.all([
+                fetchInventoryData('correlated_data', startDate, endDate),     // Datos correlacionados grupos + subgrupos
                 fetchInventoryData('warehouses', startDate, endDate)           // Datos de almacenes
             ]);
             
-            console.log('Datos de inventarios cargados:', {
-                inventory: inventoryData.length,
-                categories: categoriesData.length, 
-                warehouses: warehousesData.length
+            // Guardar datos correlacionados globalmente
+            correlatedData = correlatedResponse;
+            
+            // Extraer grupos para gráfico 1 y selector
+            const groupsData = correlatedData.groups || [];
+            
+            // Cargar grupos en el selector
+            populateGroupSelector(groupsData);
+            
+            // Obtener subgrupos del primer grupo seleccionado
+            let subgroupsData = [];
+            if (groupsData && groupsData.length > 0) {
+                currentSelectedGroup = groupsData[0];
+                subgroupsData = correlatedData.subgroupsByGroup[currentSelectedGroup.id] || [];
+            }
+            
+            console.log('Datos correlacionados de inventarios cargados:', {
+                groups: groupsData.length,
+                subgroups: subgroupsData.length,
+                warehouses: warehousesData.length,
+                totalGroupsInData: Object.keys(correlatedData.subgroupsByGroup || {}).length
             });
             
-            // Actualizar gráficos
-            updateInventoryChart(inventoryData);
-            updateCategoriesChart(categoriesData);
+            // Actualizar gráficos con datos correlacionados
+            updateInventoryChart(groupsData);  // Gráfico 1: grupos
+            updateSubgroupsChart(subgroupsData, currentSelectedGroup ? currentSelectedGroup.name : null);  // Gráfico 2: subgrupos
             updateWarehousesChart(warehousesData);
             
             // Actualizar estadísticas
-            updateInventoryStats(inventoryData, categoriesData, warehousesData);
+            updateInventoryStats(groupsData, subgroupsData, warehousesData);
             
         } catch (error) {
             console.error('Error cargando datos de inventarios:', error);
@@ -137,10 +160,13 @@ window.InventoryDashboard = (function() {
     }
     
     // Función específica para obtener datos de inventarios
-    async function fetchInventoryData(type, startDate, endDate) {
+    async function fetchInventoryData(type, startDate, endDate, groupId = null) {
         // Intentar nueva API primero, fallback a datos mock
         try {
-            const url = `/khipus/inventory-dashboard-api?type=${type}&startDate=${startDate}&endDate=${endDate}`;
+            let url = `/khipus/inventory-dashboard-api?type=${type}&startDate=${startDate}&endDate=${endDate}`;
+            if (groupId) {
+                url += `&groupId=${groupId}`;
+            }
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -171,11 +197,35 @@ window.InventoryDashboard = (function() {
                 {"name":"Insumos Médicos", "peso":3500.60},
                 {"name":"Combustibles", "peso":2800.40}
             ],
-            'categories': [
-                {"name":"Categoría A", "peso":1200},
-                {"name":"Categoría B", "peso":800},
-                {"name":"Categoría C", "peso":600}
+            'groups': [
+                {"id":"1", "name":"Alimentos"},
+                {"id":"2", "name":"Materiales de Construcción"},
+                {"id":"3", "name":"Herramientas"}
             ],
+            'correlated_data': {
+                "groups": [
+                    {"id":"1", "name":"Productos Alimenticios", "peso":15420.75},
+                    {"id":"2", "name":"Materiales de Construcción", "peso":12800.50},
+                    {"id":"3", "name":"Herramientas y Equipos", "peso":8900.25}
+                ],
+                "subgroupsByGroup": {
+                    "1": [
+                        {"name":"Lácteos y Derivados", "peso":8000},
+                        {"name":"Cereales y Granos", "peso":5000},
+                        {"name":"Carnes y Embutidos", "peso":2420.75}
+                    ],
+                    "2": [
+                        {"name":"Cemento y Agregados", "peso":7500},
+                        {"name":"Materiales Metálicos", "peso":3300.50},
+                        {"name":"Pinturas y Acabados", "peso":2000}
+                    ],
+                    "3": [
+                        {"name":"Herramientas Manuales", "peso":4500},
+                        {"name":"Equipos Eléctricos", "peso":2900.25},
+                        {"name":"Maquinaria Menor", "peso":1500}
+                    ]
+                }
+            },
             'warehouses': [
                 {"name":"Almacén Central", "peso":2500},
                 {"name":"Almacén Norte", "peso":1800},
@@ -184,6 +234,65 @@ window.InventoryDashboard = (function() {
         };
         
         return mockData[type] || [];
+    }
+    
+    // Poblar selector de grupos
+    function populateGroupSelector(groupsData) {
+        const selector = document.getElementById('groupSelector');
+        if (!selector || !groupsData || groupsData.length === 0) {
+            return;
+        }
+        
+        // Limpiar opciones existentes
+        selector.innerHTML = '<option value="">Seleccione un grupo</option>';
+        
+        // Agregar opciones de grupos
+        groupsData.forEach(group => {
+            const option = document.createElement('option');
+            option.value = group.id;
+            option.textContent = group.name;
+            selector.appendChild(option);
+        });
+        
+        // Seleccionar primer grupo por defecto
+        if (groupsData.length > 0) {
+            selector.value = groupsData[0].id;
+            currentSelectedGroup = groupsData[0];
+        }
+        
+        // Evento de cambio de grupo
+        selector.addEventListener('change', async function() {
+            const selectedGroupId = this.value;
+            if (!selectedGroupId) return;
+            
+            // Encontrar el grupo seleccionado
+            const selectedGroup = groupsData.find(g => g.id === selectedGroupId);
+            if (!selectedGroup) return;
+            
+            currentSelectedGroup = selectedGroup;
+            
+            try {
+                // Obtener subgrupos del grupo seleccionado desde datos correlacionados en memoria
+                const subgroupsData = correlatedData.subgroupsByGroup[selectedGroupId] || [];
+                
+                // Actualizar gráfico inmediatamente (no necesita loading ya que los datos están en memoria)
+                updateSubgroupsChart(subgroupsData, selectedGroup.name);
+                
+                console.log('Subgrupos cargados para grupo:', selectedGroup.name, subgroupsData.length, 'elementos desde datos correlacionados');
+                
+            } catch (error) {
+                console.error('Error cargando subgrupos:', error);
+                const container = document.getElementById('categoriesChart');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="chart-error">
+                            <p>Error cargando subgrupos</p>
+                            <small>${error.message}</small>
+                        </div>
+                    `;
+                }
+            }
+        });
     }
     
     // Inicializar dashboard de inventarios
@@ -201,8 +310,9 @@ window.InventoryDashboard = (function() {
         init,
         loadData,
         updateInventoryChart,
-        updateCategoriesChart,
+        updateSubgroupsChart,
         updateWarehousesChart,
-        updateInventoryStats
+        updateInventoryStats,
+        populateGroupSelector
     };
 })();

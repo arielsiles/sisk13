@@ -84,3 +84,38 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Chart Header and Controls */
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.chart-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.2em;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-select {
+    padding: 4px 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    font-size: 0.85em;
+    background: white;
+    min-width: 120px;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,.25);
+}
