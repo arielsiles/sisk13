@@ -244,7 +244,7 @@ window.ChartUtils = (function() {
                 }
             },
             tooltip: {
-                pointFormat: options.tooltipFormat || '<b>{point.category}</b>: {point.y:,.2f}'
+                pointFormat: options.tooltipFormat || 'Monto Total: {point.y:,.2f}'
             },
             series: [{
                 name: options.seriesName || 'Datos',

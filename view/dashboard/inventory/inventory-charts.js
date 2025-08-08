@@ -20,7 +20,7 @@ window.InventoryDashboard = (function() {
                 color: 'rgba(255, 99, 132, 0.8)',
                 rotateLabels: true,
                 showDataLabels: false, // No mostrar etiquetas sobre las barras
-                tooltipFormat: '<b>{point.category}</b>: {point.y:,.2f} Bs' // Tooltip con formato Bs
+                tooltipFormat: 'Monto Total: {point.y:,.2f} Bs' // Tooltip con formato Bs
             }
         );
         
@@ -41,7 +41,7 @@ window.InventoryDashboard = (function() {
                 color: 'rgba(54, 162, 235, 0.8)',
                 rotateLabels: true,
                 showDataLabels: false,
-                tooltipFormat: '<b>{point.category}</b>: {point.y:,.2f} Bs'
+                tooltipFormat: 'Monto Total: {point.y:,.2f} Bs'
             }
         );
         
@@ -69,7 +69,7 @@ window.InventoryDashboard = (function() {
                 color: 'rgba(255, 159, 64, 0.8)',
                 rotateLabels: true,
                 showDataLabels: false,
-                tooltipFormat: '<b>{point.category}</b>: {point.y:,.2f} Bs',
+                tooltipFormat: 'Monto Total: {point.y:,.2f} Bs',
                 subtitle: `Total: ${formattedTotal} Bs`
             }
         );
