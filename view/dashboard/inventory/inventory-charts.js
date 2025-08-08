@@ -115,14 +115,29 @@ window.InventoryDashboard = (function() {
     
     // Actualizar estadísticas de inventarios
     function updateInventoryStats(inventoryData, categoriesData, areasData) {
-        const totalItems = inventoryData.length; // Total de productos distintos
-        const totalValue = inventoryData.reduce((sum, item) => sum + (item.peso || 0), 0) * 100; // Usar peso como valor estimado
-        const totalCategories = categoriesData.length;
+        // Card 1: Total Compras Bs - Suma de todos los montos de compras por grupo
+        const totalPurchases = inventoryData.reduce((sum, item) => sum + (item.peso || 0), 0);
+        const formattedPurchases = totalPurchases.toLocaleString('es-BO', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
+        });
+        
+        // Card 2: Total Gastos Bs - Suma de todos los gastos por área
+        const totalExpenses = areasData.reduce((sum, item) => sum + (item.peso || 0), 0);
+        const formattedExpenses = totalExpenses.toLocaleString('es-BO', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
+        });
+        
+        // Card 3: Grupos - Número de grupos con compras del gráfico 1 (datos reales)
+        const totalGroups = inventoryData.length;
+        
+        // Card 4: Áreas - Número de áreas con gastos del gráfico 3 (datos reales)
         const totalAreas = areasData.length;
         
-        document.getElementById('totalItems').textContent = totalItems;
-        document.getElementById('totalValue').textContent = Math.round(totalValue * 100) / 100;
-        document.getElementById('totalCategories').textContent = totalCategories;
+        document.getElementById('totalItems').textContent = formattedPurchases;
+        document.getElementById('totalValue').textContent = formattedExpenses;
+        document.getElementById('totalCategories').textContent = totalGroups;
         document.getElementById('totalWarehouses').textContent = totalAreas;
     }
     
