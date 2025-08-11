@@ -53,6 +53,7 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    gap: 20px;
 }
 
 .nav-tabs {
@@ -83,9 +84,10 @@ body {
     border-color: #667eea;
 }
 
+
 .controls-right {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     align-items: center;
     flex-wrap: wrap;
 }
@@ -101,11 +103,31 @@ body {
     color: #555;
 }
 
-.control-group input {
+.control-group input, .control-group select {
     padding: 6px 8px;
     border: 1px solid #ddd;
     border-radius: 3px;
     font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.control-group input:disabled {
+    background: #f8f9fa;
+    color: #6c757d;
+    border-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+.control-group select {
+    cursor: pointer;
+    min-width: 140px;
+}
+
+.control-group select:focus, .control-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
 }
 
 .btn {
@@ -130,6 +152,7 @@ body {
     cursor: not-allowed;
     transform: none;
 }
+
 
 /* Estadísticas */
 .stats {
@@ -182,5 +205,16 @@ body {
     .nav-tabs {
         width: 100%;
         justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .controls-right {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .control-group select {
+        min-width: 120px;
     }
 }

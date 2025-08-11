@@ -67,6 +67,9 @@ window.DashboardCore = (function() {
         return data;
     }
     
+    // Variables para manejo de períodos
+    let isManualDateChange = false;
+    
     // Inicializar fechas
     function initDates() {
         const today = new Date();
@@ -80,6 +83,129 @@ window.DashboardCore = (function() {
         }
         if (startDateElement) {
             startDateElement.value = startOfYear.toISOString().split('T')[0];
+        }
+        
+        // Establecer período inicial como "Año actual"
+        const periodSelector = document.getElementById('periodSelector');
+        if (periodSelector) {
+            periodSelector.value = 'current_year';
+        }
+        
+        // Agregar listeners para detectar cambios manuales
+        setupDateChangeListeners();
+    }
+    
+    // Configurar listeners para detectar cambios manuales en fechas
+    function setupDateChangeListeners() {
+        const startDateElement = document.getElementById('startDate');
+        const endDateElement = document.getElementById('endDate');
+        
+        if (startDateElement) {
+            startDateElement.addEventListener('input', function() {
+                if (!isManualDateChange) {
+                    resetToCustomPeriod();
+                }
+            });
+        }
+        
+        if (endDateElement) {
+            endDateElement.addEventListener('input', function() {
+                if (!isManualDateChange) {
+                    resetToCustomPeriod();
+                }
+            });
+        }
+    }
+    
+    // Calcular fechas según el período seleccionado
+    function calculatePeriodDates(period) {
+        const today = new Date();
+        let startDate, endDate;
+        
+        switch (period) {
+            case 'current_month':
+                startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                endDate = new Date(today);
+                break;
+                
+            case 'last_quarter':
+                const currentQuarter = Math.floor(today.getMonth() / 3);
+                const lastQuarter = currentQuarter === 0 ? 3 : currentQuarter - 1;
+                const quarterYear = currentQuarter === 0 ? today.getFullYear() - 1 : today.getFullYear();
+                
+                startDate = new Date(quarterYear, lastQuarter * 3, 1);
+                endDate = new Date(quarterYear, lastQuarter * 3 + 3, 0); // Último día del trimestre
+                break;
+                
+            case 'current_year':
+                startDate = new Date(today.getFullYear(), 0, 1);
+                endDate = new Date(today);
+                break;
+                
+            case 'last_30_days':
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 30);
+                endDate = new Date(today);
+                break;
+                
+            case 'last_6_months':
+                startDate = new Date(today);
+                startDate.setMonth(today.getMonth() - 6);
+                endDate = new Date(today);
+                break;
+                
+            case 'custom':
+            default:
+                return null; // No calcular fechas para personalizado
+        }
+        
+        return {
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: endDate.toISOString().split('T')[0]
+        };
+    }
+    
+    // Aplicar período seleccionado
+    function applyDatePeriod(period) {
+        const periodData = calculatePeriodDates(period);
+        
+        if (periodData) {
+            // Período predefinido - actualizar fechas y cargar datos automáticamente
+            isManualDateChange = true; // Evitar trigger de resetToCustomPeriod
+            updateDateFields(periodData.startDate, periodData.endDate, true);
+            isManualDateChange = false;
+            
+            // Auto-ejecutar actualización de datos para períodos predefinidos
+            loadData();
+        } else {
+            // Período personalizado - solo habilitar campos, usuario decide cuándo actualizar
+            updateDateFields(null, null, false);
+        }
+    }
+    
+    // Actualizar campos de fecha y su estado
+    function updateDateFields(startDate, endDate, disabled) {
+        const startDateElement = document.getElementById('startDate');
+        const endDateElement = document.getElementById('endDate');
+        
+        if (startDateElement && endDateElement) {
+            if (startDate && endDate) {
+                startDateElement.value = startDate;
+                endDateElement.value = endDate;
+            }
+            
+            startDateElement.disabled = disabled;
+            endDateElement.disabled = disabled;
+        }
+    }
+    
+    
+    // Resetear a período personalizado (cuando usuario edita fechas manualmente)
+    function resetToCustomPeriod() {
+        const periodSelector = document.getElementById('periodSelector');
+        if (periodSelector && periodSelector.value !== 'custom') {
+            periodSelector.value = 'custom';
+            updateDateFields(null, null, false); // Habilitar campos
         }
     }
     
@@ -113,7 +239,7 @@ window.DashboardCore = (function() {
     
     // Test de conexión
     async function testConnection() {
-        showStatus('Probando conexión con el servidor...', 'loading');
+        showStatus('Probando conexion con el servidor...', 'loading');
         
         try {
             const response = await fetch(`${API_BASE}?type=test`);
@@ -127,7 +253,7 @@ window.DashboardCore = (function() {
             }
         } catch (error) {
             console.error('Error de conexión:', error);
-            showStatus(`Error de conexión: ${error.message}`, 'error');
+            showStatus(`Error de conexion: ${error.message}`, 'error');
         }
     }
     
@@ -245,6 +371,10 @@ window.DashboardCore = (function() {
         hideStatus,
         fixEncoding,
         fixDataEncoding,
-        loadComponent
+        loadComponent,
+        // Nuevas funciones para períodos
+        applyDatePeriod,
+        updateDateFields,
+        resetToCustomPeriod
     };
 })();
