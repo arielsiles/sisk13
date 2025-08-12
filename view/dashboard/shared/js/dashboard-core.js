@@ -154,6 +154,20 @@ window.DashboardCore = (function() {
                 endDate = new Date(today);
                 break;
                 
+            case 'first_semester':
+                startDate = new Date(today.getFullYear(), 0, 1); // 1 enero
+                const firstSemesterEnd = new Date(today.getFullYear(), 5, 30); // 30 junio
+                // Si hoy es menor al último día del semestre, usar hoy; si no, usar fin del semestre
+                endDate = today < firstSemesterEnd ? new Date(today) : firstSemesterEnd;
+                break;
+                
+            case 'second_semester':
+                startDate = new Date(today.getFullYear(), 6, 1); // 1 julio
+                const secondSemesterEnd = new Date(today.getFullYear(), 11, 31); // 31 diciembre
+                // Si hoy es menor al último día del semestre, usar hoy; si no, usar fin del semestre
+                endDate = today < secondSemesterEnd ? new Date(today) : secondSemesterEnd;
+                break;
+                
             case 'custom':
             default:
                 return null; // No calcular fechas para personalizado
