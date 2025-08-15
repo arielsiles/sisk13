@@ -7,47 +7,133 @@ window.FinanceDashboard = (function() {
     
     // Actualizar gráfico de ingresos (BARRA HORIZONTAL)
     function updateIncomeChart(data) {
-        // Convertir peso a monto para ingresos
+        // Los datos ya vienen con el formato correcto del servlet (peso representa monto real)
         const incomeData = data.map(item => ({
-            ...item,
-            peso: (item.peso || 0) * 1000
+            name: item.name,
+            y: item.peso || 0,  // Usar directamente el valor del servlet
+            color: (item.peso || 0) >= 0 ? 'rgba(40, 167, 69, 0.8)' : 'rgba(255, 99, 132, 0.8)'  // Verde para positivos, rojo para negativos
         }));
         
-        const config = ChartUtils.createBarChartConfig(
-            'incomeChart',
-            'Ingresos por Concepto',
-            incomeData,
-            {
-                xAxisTitle: 'Conceptos',
-                yAxisTitle: 'Monto ($)',
-                dataLabelFormat: '${y:.2f}',
-                seriesName: 'Ingresos',
-                color: 'rgba(40, 167, 69, 0.8)'
-            }
-        );
+        // Configuración específica para barras horizontales de ingresos
+        const config = {
+            chart: {
+                type: 'bar',  // Barras horizontales
+                height: 400,
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: 'Ingresos por Concepto (incluye descuentos)',
+                style: { color: '#333', fontSize: '16px', fontWeight: 'bold' }
+            },
+            xAxis: {
+                categories: incomeData.map(item => item.name),
+                title: { text: 'Conceptos de Ingresos' },
+                labels: { style: { fontSize: '11px' } }
+            },
+            yAxis: {
+                title: { text: 'Monto (Bs)' },
+                labels: {
+                    formatter: function() {
+                        return 'Bs ' + Highcharts.numberFormat(this.value, 0, '.', ',');
+                    }
+                },
+                plotLines: [{
+                    value: 0,
+                    color: '#666',
+                    width: 1,
+                    zIndex: 2
+                }]
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            const sign = this.y >= 0 ? '' : '-';
+                            return sign + 'Bs ' + Highcharts.numberFormat(Math.abs(this.y), 0, '.', ',');
+                        },
+                        style: { fontSize: '10px', fontWeight: 'bold' }
+                    },
+                    colorByPoint: true  // Permitir colores diferentes por punto
+                }
+            },
+            series: [{
+                name: 'Ingresos',
+                data: incomeData
+            }],
+            tooltip: {
+                formatter: function() {
+                    const tipo = this.y >= 0 ? 'Ingreso' : 'Descuento';
+                    return '<b>' + this.point.name + '</b><br/>' +
+                           tipo + ': Bs ' + Highcharts.numberFormat(this.y, 2, '.', ',');
+                }
+            },
+            legend: { enabled: false },
+            credits: { enabled: false }
+        };
         
         incomeChart = Highcharts.chart('incomeChart', config);
         charts[0] = incomeChart;
     }
     
-    // Actualizar gráfico de gastos (DONUT)
+    // Actualizar gráfico de gastos (BARRA HORIZONTAL) 
     function updateExpensesChart(data) {
-        // Convertir peso a monto para gastos
+        // Los datos ya vienen con el formato correcto del servlet (peso representa monto real)
         const expenseData = data.map(item => ({
             ...item,
-            peso: (item.peso || 0) * 800
+            peso: item.peso || 0  // Usar directamente el valor del servlet
         }));
         
-        const config = ChartUtils.createDonutChartConfig(
-            'expensesChart',
-            DashboardCore.fixEncoding('Distribución de Gastos'),
-            expenseData,
-            {
-                colors: ['#DC3545', '#FD7E14', '#FFC107', '#28A745', '#17A2B8', '#6F42C1', '#E83E8C', '#6C757D'],
-                seriesName: 'Gastos',
-                tooltipFormat: '<b>{point.name}</b>: {point.percentage:.1f}% (${point.y:.2f})'
-            }
-        );
+        // Configuración específica para barras horizontales de gastos
+        const config = {
+            chart: {
+                type: 'bar',  // Barras horizontales
+                height: 400,
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: 'Gastos por Concepto',
+                style: { color: '#333', fontSize: '16px', fontWeight: 'bold' }
+            },
+            xAxis: {
+                categories: expenseData.map(item => item.name),
+                title: { text: 'Conceptos de Gastos' },
+                labels: { style: { fontSize: '11px' } }
+            },
+            yAxis: {
+                title: { text: 'Monto (Bs)' },
+                labels: {
+                    formatter: function() {
+                        return 'Bs ' + Highcharts.numberFormat(this.value, 0, '.', ',');
+                    }
+                }
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            return 'Bs ' + Highcharts.numberFormat(this.y, 0, '.', ',');
+                        },
+                        style: { fontSize: '10px', fontWeight: 'bold' }
+                    },
+                    color: 'rgba(220, 53, 69, 0.8)'  // Rojo para gastos
+                }
+            },
+            series: [{
+                name: 'Gastos',
+                data: expenseData.map(item => item.peso),
+                color: 'rgba(220, 53, 69, 0.8)'
+            }],
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.point.category + '</b><br/>' +
+                           'Monto: Bs ' + Highcharts.numberFormat(this.y, 2, '.', ',');
+                }
+            },
+            legend: { enabled: false },
+            credits: { enabled: false }
+        };
         
         expensesChart = Highcharts.chart('expensesChart', config);
         charts[1] = expensesChart;
@@ -55,22 +141,52 @@ window.FinanceDashboard = (function() {
     
     // Actualizar gráfico de flujo de caja (PIE)
     function updateCashFlowChart(data) {
-        // Convertir peso a monto para flujo de caja
+        // Los datos ya vienen con el formato correcto del servlet (peso representa monto real)
         const cashFlowData = data.map(item => ({
-            ...item,
-            peso: (item.peso || 0) * 600
+            name: item.name || 'Período',
+            y: item.peso || 0,  // Usar directamente el valor del servlet
+            color: item.peso >= 0 ? '#28A745' : '#DC3545'  // Verde para positivo, rojo para negativo
         }));
         
-        const config = ChartUtils.createPieChartConfig(
-            'cashFlowChart',
-            DashboardCore.fixEncoding('Flujo de Caja por Período'),
-            cashFlowData,
-            {
-                colors: ['#28A745', '#DC3545', '#17A2B8', '#FFC107', '#6F42C1', '#FD7E14', '#20C997', '#6C757D'],
-                seriesName: 'Flujo',
-                tooltipFormat: '<b>{point.name}</b>: {point.percentage:.1f}% (${point.y:.2f})'
-            }
-        );
+        const config = {
+            chart: {
+                type: 'pie',
+                height: 350,
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: 'Flujo de Caja por Periodo',
+                style: { color: '#333', fontSize: '16px', fontWeight: 'bold' }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b><br>Bs {point.y:,.0f}',
+                        style: { fontSize: '10px' }
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: 'Flujo de Caja',
+                data: cashFlowData
+            }],
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.point.name + '</b><br/>' +
+                           'Flujo: Bs ' + Highcharts.numberFormat(this.y, 2, '.', ',') + '<br/>' +
+                           'Porcentaje: ' + Highcharts.numberFormat(this.percentage, 1) + '%';
+                }
+            },
+            legend: {
+                enabled: true,
+                itemStyle: { fontSize: '11px' }
+            },
+            credits: { enabled: false }
+        };
         
         cashFlowChart = Highcharts.chart('cashFlowChart', config);
         charts[2] = cashFlowChart;
@@ -78,14 +194,16 @@ window.FinanceDashboard = (function() {
     
     // Actualizar estadísticas de finanzas
     function updateFinanceStats(incomeData, expensesData, cashFlowData) {
-        const totalIncome = incomeData.reduce((sum, item) => sum + (item.peso || 0), 0) * 1000; // Usar peso como base monetaria
-        const totalExpenses = expensesData.reduce((sum, item) => sum + (item.peso || 0), 0) * 800; // Usar peso como base monetaria
+        // Usar directamente los valores reales del servlet (ya en Bolivianos)
+        const totalIncome = incomeData.reduce((sum, item) => sum + (item.peso || 0), 0);
+        const totalExpenses = expensesData.reduce((sum, item) => sum + (item.peso || 0), 0);
         const totalBalance = totalIncome - totalExpenses;
         const totalAccounts = incomeData.length + expensesData.length;
         
-        document.getElementById('totalIncome').textContent = Math.round(totalIncome * 100) / 100;
-        document.getElementById('totalExpenses').textContent = Math.round(totalExpenses * 100) / 100;
-        document.getElementById('totalBalance').textContent = Math.round(totalBalance * 100) / 100;
+        // Formatear números con separadores de miles
+        document.getElementById('totalIncome').textContent = 'Bs ' + Highcharts.numberFormat(totalIncome, 0, '.', ',');
+        document.getElementById('totalExpenses').textContent = 'Bs ' + Highcharts.numberFormat(totalExpenses, 0, '.', ',');
+        document.getElementById('totalBalance').textContent = 'Bs ' + Highcharts.numberFormat(totalBalance, 0, '.', ',');
         document.getElementById('totalAccounts').textContent = totalAccounts;
     }
     
