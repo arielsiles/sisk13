@@ -79,12 +79,14 @@ public class FinanceDashboardServlet extends BaseDashboardServlet {
     private String getFallbackDetailedData() {
         System.out.println("USANDO FALLBACK SIMPLE - La base de datos no está disponible");
         
-        // Fallback mínimo para desarrollo - sin cuentas específicas hardcodeadas
+        // Fallback con códigos reales de 10 dígitos
         return "[" +
-            // Ejemplo genérico de ingreso
-            "{\"accountType\":\"I\",\"rootAccount\":\"41000\",\"rootNameAccount\":\"INGRESOS GENERALES\",\"account\":\"41000001\",\"nameAccount\":\"INGRESOS DE DESARROLLO\",\"debit\":0,\"credit\":10000.00}," +
-            // Ejemplo genérico de egreso
-            "{\"accountType\":\"E\",\"rootAccount\":\"51000\",\"rootNameAccount\":\"GASTOS GENERALES\",\"account\":\"51000001\",\"nameAccount\":\"GASTOS DE DESARROLLO\",\"debit\":5000.00,\"credit\":0}" +
+            // INGRESOS - Usar códigos reales de 10 dígitos
+            "{\"accountType\":\"I\",\"rootAccount\":\"4110000000\",\"rootNameAccount\":\"VENTAS\",\"account\":\"4110000001\",\"nameAccount\":\"VENTAS DE DESARROLLO\",\"debit\":0,\"credit\":10000.00}," +
+            "{\"accountType\":\"I\",\"rootAccount\":\"4210000000\",\"rootNameAccount\":\"INGRESOS EXTRAORDINARIOS\",\"account\":\"4210000001\",\"nameAccount\":\"OTROS INGRESOS\",\"debit\":0,\"credit\":5000.00}," +
+            // EGRESOS - Usar códigos reales de 10 dígitos  
+            "{\"accountType\":\"E\",\"rootAccount\":\"5210000000\",\"rootNameAccount\":\"FLETES Y TRANSPORTES\",\"account\":\"5210000001\",\"nameAccount\":\"FLETES DE DESARROLLO\",\"debit\":3000.00,\"credit\":0}," +
+            "{\"accountType\":\"E\",\"rootAccount\":\"5310000000\",\"rootNameAccount\":\"MATERIAL DIRECTO\",\"account\":\"5310000001\",\"nameAccount\":\"MATERIALES\",\"debit\":2000.00,\"credit\":0}" +
             "]";
     }
     

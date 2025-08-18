@@ -14,8 +14,109 @@ window.FinanceDashboard = (function() {
         orderIngresosFirst: true // Ordenar: ingresos primero, luego egresos
     };
     
+    // Configuración de gráficos por rootAccount (códigos de 10 dígitos)
+    // Permite controlar qué gráficos mostrar/ocultar dinámicamente
+    const CHART_CONFIG = {
+        // INGRESOS
+        "4110000000": { 
+            enabled: true, 
+            accountType: "I", 
+            name: "VENTAS",
+            description: "Ventas de productos y servicios principales"
+        },
+        "4120000000": { 
+            enabled: true, 
+            accountType: "I", 
+            name: "DEVOLUCIONES, REBAJAS Y DESCUENTOS DE BIENES Y/O SE",
+            description: "Ajustes y correcciones en ventas"
+        },
+        "4150000000": {
+            enabled: true, 
+            accountType: "I", 
+            name: "OTROS INGRESOS",
+            description: "Otros Ingresos"
+        },
+        "4210000000": { 
+            enabled: true, 
+            accountType: "I", 
+            name: "INGRESOS EXTRAORDINARIOS",
+            description: "Ingresos no operacionales"
+        },
+        
+        // EGRESOS
+        "5210000000": { 
+            enabled: true, 
+            accountType: "E", 
+            name: "FLETES Y TRANSPORTES",
+            description: "Costos de transporte y logística"
+        },
+        "5310000000": { 
+            enabled: true, 
+            accountType: "E", 
+            name: "MATERIAL DIRECTO",
+            description: "Materias primas y materiales directos"
+        },
+        "5320000000": { 
+            enabled: true, 
+            accountType: "E", 
+            name: "MANO DE OBRA",
+            description: "Costos de personal y nómina"
+        },
+        "5340000000": { 
+            enabled: true, 
+            accountType: "E", 
+            name: "GASTOS DE COMERCIALIZACION",
+            description: "Gastos relacionados con ventas y marketing"
+        },
+        "5350000000": {
+            enabled: true,
+            accountType: "E",
+            name: "PROYECTOS",
+            description: "Gastos relacionados con PROYECTOS"
+        },
+        "5560000000": {
+            enabled: true,
+            accountType: "E",
+            name: "TRACTOCAMION",
+            description: "Gastos relacionados con TRACTOCAMION"
+        }
+    };
+    
     // ========================================================================
     // FUNCIONES PARA GRÁFICOS DETALLADOS DEL ESTADO DE RESULTADOS EXTENDIDO
+    // ========================================================================
+    
+    // Funciones de gestión de configuración
+    function isChartEnabled(rootAccount) {
+        const config = CHART_CONFIG[rootAccount];
+        return config && config.enabled;
+    }
+    
+    function getChartConfig(rootAccount) {
+        return CHART_CONFIG[rootAccount] || null;
+    }
+    
+    function toggleChart(rootAccount, enabled) {
+        if (CHART_CONFIG[rootAccount]) {
+            CHART_CONFIG[rootAccount].enabled = enabled;
+            return true;
+        }
+        return false;
+    }
+    
+    function getEnabledCharts() {
+        return Object.keys(CHART_CONFIG).filter(rootAccount => 
+            CHART_CONFIG[rootAccount].enabled
+        );
+    }
+    
+    function getChartsByType(accountType) {
+        return Object.keys(CHART_CONFIG).filter(rootAccount => 
+            CHART_CONFIG[rootAccount].accountType === accountType && 
+            CHART_CONFIG[rootAccount].enabled
+        );
+    }
+    
     // ========================================================================
     // Estas funciones procesan datos del reporte "Estado_Resultados_Ext.pdf"
     // que se genera desde view/accounting/profitAndLossExtendedReport.xhtml
@@ -26,18 +127,8 @@ window.FinanceDashboard = (function() {
     // - EGRESOS:  3) FLETES Y TRANSPORTES, 4) MATERIAL DIRECTO, 5) MANO DE OBRA
     // ========================================================================
     
-    // Función principal para procesar datos de la consulta unificada
-    function processUnifiedData(rawData) {
-        if (!rawData || !Array.isArray(rawData)) {
-            return {
-                summaryData: { ingresos: [], egresos: [] },
-                detailedGroups: [],
-                allGroups: []
-            };
-        }
-        
-        
-        // PASO 1: Agrupar automáticamente por rootNameAccount
+    // Función para procesar TODOS los datos (para summary y cards) - SIN FILTROS
+    function processAllDataForSummary(rawData) {
         const groups = {};
         
         rawData.forEach((item, index) => {
@@ -74,49 +165,133 @@ window.FinanceDashboard = (function() {
             groups[groupKey].totalAmount += montoNeto; // Sumar respetando signos
         });
         
-        // PASO 2: Obtener TODOS los grupos válidos (sin límites artificiales)
-        const allGroups = Object.values(groups).filter(group => 
+        return Object.values(groups).filter(group => 
             group.items.length > 0 && Math.abs(group.totalAmount) >= UNIFIED_CONFIG.minAmount
         );
+    }
+    
+    // Función para procesar datos CON FILTROS (para gráficos detallados) - CHART_CONFIG
+    function processDataWithChartConfig(rawData) {
+        const groups = {};
         
-        // PASO 3: Separar por tipo y ordenar por valor absoluto (pero mantener signos)
-        const ingresosGroups = allGroups
+        rawData.forEach((item, index) => {
+            // VALIDAR CONFIGURACIÓN: Solo procesar cuentas habilitadas
+            const rootAccount = item.rootAccount;
+            const chartConfig = CHART_CONFIG[rootAccount];
+            
+            if (!chartConfig || !chartConfig.enabled) {
+                // Saltar cuentas deshabilitadas en configuración
+                return;
+            }
+            
+            // VALIDAR CONSISTENCIA: Verificar que el accountType coincida
+            if (chartConfig.accountType !== item.accountType) {
+                console.warn(`⚠️ Inconsistencia en ${rootAccount}: esperado ${chartConfig.accountType}, encontrado ${item.accountType}`);
+            }
+            
+            // Calcular el monto neto según el tipo de cuenta
+            const isIngreso = item.accountType === 'I';
+            const montoNeto = isIngreso ? 
+                (item.credit || 0) - (item.debit || 0) :  // Para ingresos: crédito - débito
+                (item.debit || 0) - (item.credit || 0);   // Para egresos: débito - crédito
+            
+            if (Math.abs(montoNeto) < UNIFIED_CONFIG.minAmount) {
+                return; // Saltar montos insignificantes
+            }
+            
+            // Usar rootNameAccount como clave de agrupación
+            const groupKey = item.rootNameAccount || 'Sin Categoria';
+            
+            if (!groups[groupKey]) {
+                groups[groupKey] = {
+                    rootNameAccount: groupKey,
+                    rootAccount: item.rootAccount,
+                    accountType: item.accountType,
+                    items: [],
+                    totalAmount: 0,
+                    configName: chartConfig.name, // Nombre de configuración
+                    configDescription: chartConfig.description
+                };
+            }
+            
+            const dataPoint = {
+                name: item.nameAccount || 'Sin Nombre',
+                peso: montoNeto, // MANTENER valores negativos - NO usar Math.abs()
+                originalData: item
+            };
+            
+            groups[groupKey].items.push(dataPoint);
+            groups[groupKey].totalAmount += montoNeto; // Sumar respetando signos
+        });
+        
+        return Object.values(groups).filter(group => 
+            group.items.length > 0 && Math.abs(group.totalAmount) >= UNIFIED_CONFIG.minAmount
+        );
+    }
+    
+    // Función principal para procesar datos de la consulta unificada
+    function processUnifiedData(rawData) {
+        if (!rawData || !Array.isArray(rawData)) {
+            return {
+                summaryData: { ingresos: [], egresos: [] },
+                detailedGroups: [],
+                allGroups: []
+            };
+        }
+        
+        // FLUJO 1: Procesar TODOS los datos para summary y cards (SIN FILTROS)
+        const allGroups = processAllDataForSummary(rawData);
+        
+        // FLUJO 2: Procesar datos FILTRADOS para gráficos detallados (CON CHART_CONFIG)
+        const filteredGroups = processDataWithChartConfig(rawData);
+        
+        // Separar grupos completos por tipo para summary
+        const allIngresosGroups = allGroups
             .filter(group => group.accountType === 'I')
             .sort((a, b) => Math.abs(b.totalAmount) - Math.abs(a.totalAmount));
             
-        const egresosGroups = allGroups
+        const allEgresosGroups = allGroups
             .filter(group => group.accountType === 'E')
             .sort((a, b) => Math.abs(b.totalAmount) - Math.abs(a.totalAmount));
         
-        // PASO 4: Crear datos para gráficos summary (agregados por rootNameAccount)
-        const summaryIngresos = ingresosGroups.map(group => ({
+        // Crear datos para gráficos summary usando TODOS los datos
+        const summaryIngresos = allIngresosGroups.map(group => ({
             name: group.rootNameAccount,
             peso: group.totalAmount // Mantener valores negativos en summary
         }));
         
-        const summaryEgresos = egresosGroups.map(group => ({
+        const summaryEgresos = allEgresosGroups.map(group => ({
             name: group.rootNameAccount,
             peso: group.totalAmount // Mantener valores negativos en summary
         }));
         
-        // PASO 5: Ordenar grupos finales (ingresos primero, luego egresos)
-        const orderedGroups = UNIFIED_CONFIG.orderIngresosFirst ? 
-            [...ingresosGroups, ...egresosGroups] : 
-            [...egresosGroups, ...ingresosGroups];
+        // Separar grupos filtrados por tipo para detailed charts
+        const filteredIngresosGroups = filteredGroups
+            .filter(group => group.accountType === 'I')
+            .sort((a, b) => Math.abs(b.totalAmount) - Math.abs(a.totalAmount));
+            
+        const filteredEgresosGroups = filteredGroups
+            .filter(group => group.accountType === 'E')
+            .sort((a, b) => Math.abs(b.totalAmount) - Math.abs(a.totalAmount));
         
-        // Ordenar items dentro de cada grupo por valor absoluto (mantener signos)
-        orderedGroups.forEach(group => {
+        // Ordenar grupos filtrados para detailed charts (ingresos primero, luego egresos)
+        const orderedFilteredGroups = UNIFIED_CONFIG.orderIngresosFirst ? 
+            [...filteredIngresosGroups, ...filteredEgresosGroups] : 
+            [...filteredEgresosGroups, ...filteredIngresosGroups];
+        
+        // Ordenar items dentro de cada grupo filtrado por valor absoluto (mantener signos)
+        orderedFilteredGroups.forEach(group => {
             group.items.sort((a, b) => Math.abs(b.peso) - Math.abs(a.peso));
         });
         
         
         return {
             summaryData: {
-                ingresos: summaryIngresos,
-                egresos: summaryEgresos
+                ingresos: summaryIngresos,  // Basado en TODOS los datos
+                egresos: summaryEgresos     // Basado en TODOS los datos
             },
-            detailedGroups: orderedGroups,
-            allGroups: allGroups
+            detailedGroups: orderedFilteredGroups,  // Basado en datos FILTRADOS
+            allGroups: allGroups  // TODOS los grupos para cards y validaciones
         };
     }
     
@@ -585,21 +760,21 @@ window.FinanceDashboard = (function() {
     
     // Función para validar integridad de datos
     function validateDataIntegrity(processedData, summaryIncome, summaryExpenses) {
-        // Calcular totales de gráficos detallados respetando signos
-        let detailedIncome = 0;
-        let detailedExpenses = 0;
+        // Calcular totales usando allGroups (datos completos) respetando signos
+        let allDataIncome = 0;
+        let allDataExpenses = 0;
         
-        processedData.detailedGroups.forEach(group => {
+        processedData.allGroups.forEach(group => {
             if (group.accountType === 'I') {
-                detailedIncome += group.totalAmount; // Incluye negativos
+                allDataIncome += group.totalAmount; // Incluye negativos
             } else if (group.accountType === 'E') {
-                detailedExpenses += group.totalAmount; // Incluye negativos
+                allDataExpenses += group.totalAmount; // Incluye negativos
             }
         });
         
         // Verificar que los totales coincidan (considerando signos)
-        const incomeDifference = Math.abs(summaryIncome - detailedIncome);
-        const expensesDifference = Math.abs(summaryExpenses - detailedExpenses);
+        const incomeDifference = Math.abs(summaryIncome - allDataIncome);
+        const expensesDifference = Math.abs(summaryExpenses - allDataExpenses);
         const tolerance = 0.01; // Tolerancia para diferencias de redondeo
         
         // Solo alertar en caso de errores (mantener console.error)
@@ -609,6 +784,14 @@ window.FinanceDashboard = (function() {
         
         if (expensesDifference > tolerance) {
             console.error(`❌ ALERTA: Discrepancia en EGRESOS de Bs ${expensesDifference.toFixed(2)}`);
+        }
+        
+        // Log informativo sobre configuración aplicada
+        const totalEnabledCharts = processedData.detailedGroups.length;
+        const totalAllGroups = processedData.allGroups.length;
+        
+        if (totalEnabledCharts < totalAllGroups) {
+            console.info(`ℹ️ CONFIGURACIÓN: Mostrando ${totalEnabledCharts} de ${totalAllGroups} gráficos detallados disponibles`);
         }
     }
     
@@ -670,40 +853,40 @@ window.FinanceDashboard = (function() {
             console.warn('API no disponible, usando datos mock:', error.message);
         }
         
-        // Fallback: datos mock para desarrollo
+        // Fallback: datos mock con códigos reales de 10 dígitos
         return [
             // INGRESOS - VENTAS
-            {"accountType":"I", "rootAccount":"41001", "rootNameAccount":"VENTAS", "account":"41001001", "nameAccount":"VENTA DE MOLIENDA Y GRANULADO ULEXITA", "debit":0, "credit":7501126.06},
-            {"accountType":"I", "rootAccount":"41001", "rootNameAccount":"VENTAS", "account":"41001002", "nameAccount":"VENTA DE BENTONITA Y BARITINA", "debit":0, "credit":848367.48},
+            {"accountType":"I", "rootAccount":"4110000000", "rootNameAccount":"VENTAS", "account":"4110000001", "nameAccount":"VENTA DE MOLIENDA Y GRANULADO ULEXITA", "debit":0, "credit":7501126.06},
+            {"accountType":"I", "rootAccount":"4110000000", "rootNameAccount":"VENTAS", "account":"4110000002", "nameAccount":"VENTA DE BENTONITA Y BARITINA", "debit":0, "credit":848367.48},
             
-            // INGRESOS - OTROS INGRESOS
-            {"accountType":"I", "rootAccount":"41005", "rootNameAccount":"OTROS INGRESOS", "account":"41005001", "nameAccount":"INGRESOS POR SERVICIOS DE LABORATORIO", "debit":0, "credit":3422.00},
-            {"accountType":"I", "rootAccount":"41006", "rootNameAccount":"OTROS INGRESOS", "account":"41006001", "nameAccount":"OTROS INGRESOS", "debit":0, "credit":6770.82},
-            {"accountType":"I", "rootAccount":"41007", "rootNameAccount":"OTROS INGRESOS", "account":"41007001", "nameAccount":"INGRESO POR DEVOLUCIÓN DE REGALÍAS MINERAS", "debit":0, "credit":167454.82},
-            {"accountType":"I", "rootAccount":"41008", "rootNameAccount":"OTROS INGRESOS", "account":"41008001", "nameAccount":"DONACIONES PERSONALES", "debit":0, "credit":5000.00},
-            {"accountType":"I", "rootAccount":"41009", "rootNameAccount":"OTROS INGRESOS", "account":"41009001", "nameAccount":"INGRESOS POR SERVICIOS PRESTADOS TRANSPORTE", "debit":0, "credit":62640.00},
-            {"accountType":"I", "rootAccount":"41010", "rootNameAccount":"OTROS INGRESOS", "account":"41010001", "nameAccount":"INGRESOS POR SERVICIOS PRESTADOS TRANSPORTE", "debit":0, "credit":290933.00},
-            {"accountType":"I", "rootAccount":"41011", "rootNameAccount":"OTROS INGRESOS", "account":"41011001", "nameAccount":"INGRESO POR SERVICIO DE PESAJE EN BALANZA", "debit":0, "credit":4830.00},
+            // INGRESOS - INGRESOS EXTRAORDINARIOS
+            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000001", "nameAccount":"INGRESOS POR SERVICIOS DE LABORATORIO", "debit":0, "credit":3422.00},
+            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000002", "nameAccount":"OTROS INGRESOS", "debit":0, "credit":6770.82},
+            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000003", "nameAccount":"INGRESO POR DEVOLUCIÓN DE REGALÍAS MINERAS", "debit":0, "credit":167454.82},
+            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000004", "nameAccount":"DONACIONES PERSONALES", "debit":0, "credit":5000.00},
+            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000005", "nameAccount":"INGRESOS POR SERVICIOS PRESTADOS TRANSPORTE", "debit":0, "credit":62640.00},
+            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000006", "nameAccount":"INGRESOS POR SERVICIOS PRESTADOS TRANSPORTE", "debit":0, "credit":290933.00},
+            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000007", "nameAccount":"INGRESO POR SERVICIO DE PESAJE EN BALANZA", "debit":0, "credit":4830.00},
             
             // EGRESOS - FLETES Y TRANSPORTES
-            {"accountType":"E", "rootAccount":"51001", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"51001001", "nameAccount":"FLETES Y TRANSPORTES DE MATERIA PRIMA", "debit":380590.88, "credit":0},
-            {"accountType":"E", "rootAccount":"51002", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"51002001", "nameAccount":"FLETES Y TRANSPORTES DE PRODUCTOS TERMINADOS", "debit":95597.06, "credit":0},
-            {"accountType":"E", "rootAccount":"51003", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"51003001", "nameAccount":"FLETES Y TRANSPORTES EN GENERAL", "debit":5795.00, "credit":0},
-            {"accountType":"E", "rootAccount":"51004", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"51004001", "nameAccount":"DESCUENTOS SOBRE VENTAS", "debit":138800.03, "credit":0},
-            {"accountType":"E", "rootAccount":"51005", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"51005001", "nameAccount":"GASTOS DE ESTADIA EN FRONTERA", "debit":50605.38, "credit":0},
-            {"accountType":"E", "rootAccount":"51006", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"51006001", "nameAccount":"DESCUENTO SOBRE SERVICIOS", "debit":610.00, "credit":0},
+            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000001", "nameAccount":"FLETES Y TRANSPORTES DE MATERIA PRIMA", "debit":380590.88, "credit":0},
+            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000002", "nameAccount":"FLETES Y TRANSPORTES DE PRODUCTOS TERMINADOS", "debit":95597.06, "credit":0},
+            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000003", "nameAccount":"FLETES Y TRANSPORTES EN GENERAL", "debit":5795.00, "credit":0},
+            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000004", "nameAccount":"DESCUENTOS SOBRE VENTAS", "debit":138800.03, "credit":0},
+            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000005", "nameAccount":"GASTOS DE ESTADIA EN FRONTERA", "debit":50605.38, "credit":0},
+            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000006", "nameAccount":"DESCUENTO SOBRE SERVICIOS", "debit":610.00, "credit":0},
             
             // EGRESOS - MATERIAL DIRECTO
-            {"accountType":"E", "rootAccount":"52001", "rootNameAccount":"MATERIAL DIRECTO", "account":"52001001", "nameAccount":"BARITINA", "debit":500.00, "credit":0},
-            {"accountType":"E", "rootAccount":"52002", "rootNameAccount":"MATERIAL DIRECTO", "account":"52002001", "nameAccount":"ULEXITA", "debit":11188.12, "credit":0},
+            {"accountType":"E", "rootAccount":"5310000000", "rootNameAccount":"MATERIAL DIRECTO", "account":"5310000001", "nameAccount":"BARITINA", "debit":500.00, "credit":0},
+            {"accountType":"E", "rootAccount":"5310000000", "rootNameAccount":"MATERIAL DIRECTO", "account":"5310000002", "nameAccount":"ULEXITA", "debit":11188.12, "credit":0},
             
             // EGRESOS - MANO DE OBRA
-            {"accountType":"E", "rootAccount":"53001", "rootNameAccount":"MANO DE OBRA", "account":"53001001", "nameAccount":"SUELDOS Y SALARIOS", "debit":445161.35, "credit":0},
-            {"accountType":"E", "rootAccount":"53002", "rootNameAccount":"MANO DE OBRA", "account":"53002001", "nameAccount":"AGUINALDOS PRODUCCION", "debit":47641.78, "credit":0},
-            {"accountType":"E", "rootAccount":"53003", "rootNameAccount":"MANO DE OBRA", "account":"53003001", "nameAccount":"INDEMNIZACIONES PRODUCCION", "debit":41852.98, "credit":0},
-            {"accountType":"E", "rootAccount":"53004", "rootNameAccount":"MANO DE OBRA", "account":"53004001", "nameAccount":"BONOS AL PERSONAL DE PRODUCCION", "debit":9000.00, "credit":0},
-            {"accountType":"E", "rootAccount":"53005", "rootNameAccount":"MANO DE OBRA", "account":"53005001", "nameAccount":"PERSONAL EVENTUAL", "debit":13610.42, "credit":0},
-            {"accountType":"E", "rootAccount":"53006", "rootNameAccount":"MANO DE OBRA", "account":"53006001", "nameAccount":"SERVICIOS PRESTADOS POR TERCEROS", "debit":2000.00, "credit":0}
+            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000001", "nameAccount":"SUELDOS Y SALARIOS", "debit":445161.35, "credit":0},
+            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000002", "nameAccount":"AGUINALDOS PRODUCCION", "debit":47641.78, "credit":0},
+            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000003", "nameAccount":"INDEMNIZACIONES PRODUCCION", "debit":41852.98, "credit":0},
+            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000004", "nameAccount":"BONOS AL PERSONAL DE PRODUCCION", "debit":9000.00, "credit":0},
+            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000005", "nameAccount":"PERSONAL EVENTUAL", "debit":13610.42, "credit":0},
+            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000006", "nameAccount":"SERVICIOS PRESTADOS POR TERCEROS", "debit":2000.00, "credit":0}
         ];
     }
     
@@ -722,6 +905,8 @@ window.FinanceDashboard = (function() {
         loadData,
         // Funciones de arquitectura unificada
         processUnifiedData,
+        processAllDataForSummary,
+        processDataWithChartConfig,
         createSummaryCharts,
         createDetailedCharts,
         updateUnifiedStats,
@@ -732,6 +917,14 @@ window.FinanceDashboard = (function() {
         createSectionSeparator,
         createDynamicContainerWithLayout,
         clearDynamicContainers,
-        getMainChartsContainer
+        getMainChartsContainer,
+        // Funciones de configuración
+        isChartEnabled,
+        getChartConfig,
+        toggleChart,
+        getEnabledCharts,
+        getChartsByType,
+        // Acceso a configuración
+        CHART_CONFIG: CHART_CONFIG
     };
 })();
