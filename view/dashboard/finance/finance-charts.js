@@ -802,8 +802,22 @@ window.FinanceDashboard = (function() {
             // Cargar SOLO datos de detailed_report (consulta unificada)
             const rawData = await fetchFinanceData('detailed_report', startDate, endDate);
             
+            // Verificar si hay datos disponibles
+            if (!rawData || rawData.length === 0) {
+                console.warn('⚠️ No hay datos disponibles para el período seleccionado');
+                showNoDataMessage();
+                return;
+            }
+            
             // Procesar datos con la nueva arquitectura unificada
             const processedData = processUnifiedData(rawData);
+            
+            // Verificar si después del procesamiento hay datos válidos
+            if (processedData.allGroups.length === 0) {
+                console.warn('⚠️ No hay datos válidos después del procesamiento');
+                showNoDataMessage();
+                return;
+            }
             
             // Limpiar gráficos existentes
             clearAllCharts();
@@ -817,11 +831,51 @@ window.FinanceDashboard = (function() {
             // Actualizar estadísticas basadas en los datos procesados
             updateUnifiedStats(processedData);
             
+            console.info('✅ Dashboard cargado con datos dinámicos de la consulta SQL');
             
         } catch (error) {
             console.error('❌ Error cargando arquitectura unificada:', error);
+            showErrorMessage('Error al cargar datos: ' + error.message);
             throw error;
         }
+    }
+    
+    // Función para mostrar mensaje cuando no hay datos
+    function showNoDataMessage() {
+        // Limpiar gráficos existentes
+        clearAllCharts();
+        
+        // Actualizar cards con valores en cero
+        document.getElementById('totalIncome').textContent = 'Bs 0';
+        document.getElementById('totalExpenses').textContent = 'Bs 0';
+        document.getElementById('totalBalance').textContent = 'Bs 0';
+        document.getElementById('totalAccounts').textContent = '0';
+        
+        // Mostrar mensaje informativo en contenedor principal
+        const mainContainer = getMainChartsContainer();
+        mainContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <h3>📊 No hay datos disponibles</h3>
+                <p>No se encontraron registros para el período seleccionado.</p>
+                <p><small>Sistema dinámico - Los datos provienen directamente de la consulta SQL</small></p>
+            </div>
+        `;
+    }
+    
+    // Función para mostrar mensaje de error
+    function showErrorMessage(message) {
+        // Limpiar gráficos existentes
+        clearAllCharts();
+        
+        // Mostrar mensaje de error en contenedor principal
+        const mainContainer = getMainChartsContainer();
+        mainContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #dc3545;">
+                <h3>❌ Error al cargar dashboard</h3>
+                <p>${message}</p>
+                <p><small>Verificar conexión con base de datos y servlet</small></p>
+            </div>
+        `;
     }
     
     // Función para obtener datos de la consulta unificada
@@ -850,44 +904,13 @@ window.FinanceDashboard = (function() {
                 }
             }
         } catch (error) {
-            console.warn('API no disponible, usando datos mock:', error.message);
+            console.warn('❌ API no disponible - Sistema totalmente dinámico requiere consulta SQL:', error.message);
         }
         
-        // Fallback: datos mock con códigos reales de 10 dígitos
-        return [
-            // INGRESOS - VENTAS
-            {"accountType":"I", "rootAccount":"4110000000", "rootNameAccount":"VENTAS", "account":"4110000001", "nameAccount":"VENTA DE MOLIENDA Y GRANULADO ULEXITA", "debit":0, "credit":7501126.06},
-            {"accountType":"I", "rootAccount":"4110000000", "rootNameAccount":"VENTAS", "account":"4110000002", "nameAccount":"VENTA DE BENTONITA Y BARITINA", "debit":0, "credit":848367.48},
-            
-            // INGRESOS - INGRESOS EXTRAORDINARIOS
-            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000001", "nameAccount":"INGRESOS POR SERVICIOS DE LABORATORIO", "debit":0, "credit":3422.00},
-            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000002", "nameAccount":"OTROS INGRESOS", "debit":0, "credit":6770.82},
-            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000003", "nameAccount":"INGRESO POR DEVOLUCIÓN DE REGALÍAS MINERAS", "debit":0, "credit":167454.82},
-            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000004", "nameAccount":"DONACIONES PERSONALES", "debit":0, "credit":5000.00},
-            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000005", "nameAccount":"INGRESOS POR SERVICIOS PRESTADOS TRANSPORTE", "debit":0, "credit":62640.00},
-            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000006", "nameAccount":"INGRESOS POR SERVICIOS PRESTADOS TRANSPORTE", "debit":0, "credit":290933.00},
-            {"accountType":"I", "rootAccount":"4210000000", "rootNameAccount":"INGRESOS EXTRAORDINARIOS", "account":"4210000007", "nameAccount":"INGRESO POR SERVICIO DE PESAJE EN BALANZA", "debit":0, "credit":4830.00},
-            
-            // EGRESOS - FLETES Y TRANSPORTES
-            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000001", "nameAccount":"FLETES Y TRANSPORTES DE MATERIA PRIMA", "debit":380590.88, "credit":0},
-            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000002", "nameAccount":"FLETES Y TRANSPORTES DE PRODUCTOS TERMINADOS", "debit":95597.06, "credit":0},
-            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000003", "nameAccount":"FLETES Y TRANSPORTES EN GENERAL", "debit":5795.00, "credit":0},
-            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000004", "nameAccount":"DESCUENTOS SOBRE VENTAS", "debit":138800.03, "credit":0},
-            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000005", "nameAccount":"GASTOS DE ESTADIA EN FRONTERA", "debit":50605.38, "credit":0},
-            {"accountType":"E", "rootAccount":"5210000000", "rootNameAccount":"FLETES Y TRANSPORTES", "account":"5210000006", "nameAccount":"DESCUENTO SOBRE SERVICIOS", "debit":610.00, "credit":0},
-            
-            // EGRESOS - MATERIAL DIRECTO
-            {"accountType":"E", "rootAccount":"5310000000", "rootNameAccount":"MATERIAL DIRECTO", "account":"5310000001", "nameAccount":"BARITINA", "debit":500.00, "credit":0},
-            {"accountType":"E", "rootAccount":"5310000000", "rootNameAccount":"MATERIAL DIRECTO", "account":"5310000002", "nameAccount":"ULEXITA", "debit":11188.12, "credit":0},
-            
-            // EGRESOS - MANO DE OBRA
-            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000001", "nameAccount":"SUELDOS Y SALARIOS", "debit":445161.35, "credit":0},
-            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000002", "nameAccount":"AGUINALDOS PRODUCCION", "debit":47641.78, "credit":0},
-            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000003", "nameAccount":"INDEMNIZACIONES PRODUCCION", "debit":41852.98, "credit":0},
-            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000004", "nameAccount":"BONOS AL PERSONAL DE PRODUCCION", "debit":9000.00, "credit":0},
-            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000005", "nameAccount":"PERSONAL EVENTUAL", "debit":13610.42, "credit":0},
-            {"accountType":"E", "rootAccount":"5320000000", "rootNameAccount":"MANO DE OBRA", "account":"5320000006", "nameAccount":"SERVICIOS PRESTADOS POR TERCEROS", "debit":2000.00, "credit":0}
-        ];
+        // Sistema 100% dinámico: Sin datos mock predefinidos
+        // Si la API falla, retornar array vacío para mantener coherencia
+        console.info('ℹ️ No hay datos disponibles - Verificar conexión con base de datos');
+        return [];
     }
     
     // Inicializar dashboard de finanzas
@@ -924,6 +947,9 @@ window.FinanceDashboard = (function() {
         toggleChart,
         getEnabledCharts,
         getChartsByType,
+        // Funciones de manejo de errores
+        showNoDataMessage,
+        showErrorMessage,
         // Acceso a configuración
         CHART_CONFIG: CHART_CONFIG
     };
