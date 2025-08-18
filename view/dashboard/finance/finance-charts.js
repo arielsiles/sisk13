@@ -392,7 +392,7 @@ window.FinanceDashboard = (function() {
         }
     }
     
-    // Función para crear separadores de sección
+    // Función para crear separadores de sección (estilo minimalista)
     function createSectionSeparator(type, title) {
         const mainContainer = getMainChartsContainer();
         
@@ -400,20 +400,29 @@ window.FinanceDashboard = (function() {
         const separatorContainer = document.createElement('div');
         separatorContainer.className = 'section-separator';
         separatorContainer.style.width = '100%';
-        separatorContainer.style.marginTop = '40px';
-        separatorContainer.style.marginBottom = '30px';
+        separatorContainer.style.marginTop = '20px';  // Reducido de 40px
+        separatorContainer.style.marginBottom = '15px'; // Reducido de 30px
         separatorContainer.style.textAlign = 'center';
         
-        // Crear el título
+        // Determinar icono y título (usando símbolos HTML seguros)
+        const isIngresos = type === 'INGRESOS';
+        const icon = isIngresos ? '&uarr;' : '&darr;'; // ↑ flecha arriba, ↓ flecha abajo
+        const newTitle = isIngresos ? 'Detalle de Ingresos' : 'Detalle de Egresos';
+        const fullTitle = `${newTitle}`; // Por ahora solo el título, agregar icono después
+        
+        // Crear el título minimalista con icono HTML
         const titleElement = document.createElement('h3');
-        titleElement.style.color = type === 'INGRESOS' ? '#28a745' : '#dc3545';
-        titleElement.style.fontSize = '20px';
+        titleElement.style.color = isIngresos ? '#28a745' : '#dc3545';
+        titleElement.style.fontSize = '18px'; // Reducido de 20px
         titleElement.style.fontWeight = 'bold';
         titleElement.style.margin = '0';
-        titleElement.style.padding = '15px 0';
-        titleElement.style.borderTop = `3px solid ${type === 'INGRESOS' ? '#28a745' : '#dc3545'}`;
-        titleElement.style.borderBottom = `2px solid ${type === 'INGRESOS' ? '#28a745' : '#dc3545'}`;
-        titleElement.textContent = title;
+        titleElement.style.padding = '8px 0'; // Reducido de 15px
+        // Eliminar borderTop - solo mantener bottom más sutil
+        titleElement.style.borderBottom = `1px solid ${isIngresos ? '#28a745' : '#dc3545'}`; // Reducido de 2px
+        
+        // Usar innerHTML para símbolos HTML seguros
+        const arrowIcon = isIngresos ? '&#8593;' : '&#8595;'; // ↑ ↓
+        titleElement.innerHTML = `${arrowIcon} ${newTitle}`;
         
         separatorContainer.appendChild(titleElement);
         mainContainer.appendChild(separatorContainer);
