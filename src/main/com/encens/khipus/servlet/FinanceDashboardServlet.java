@@ -62,147 +62,33 @@ public class FinanceDashboardServlet extends BaseDashboardServlet {
             "ORDER BY ca3.cuenta, ca.cuenta";
         
         try {
-            System.out.println("=== CONSULTA UNIFICADA SIN RESTRICCIONES ===");
-            System.out.println("Fechas: " + startDate + " a " + endDate);
-            String result = executeDetailedReportQuery(sql, startDate, endDate, getFallbackDetailedData());
-            System.out.println("=== FIN CONSULTA UNIFICADA ===");
-            return result;
+            return executeDetailedReportQuery(sql, startDate, endDate, getFallbackDetailedData());
             
         } catch (Exception e) {
             System.err.println("Error en consulta unificada: " + e.getMessage());
             e.printStackTrace();
-            System.out.println("USANDO FALLBACK DATA");
             return getFallbackDetailedData();
         }
     }
     
-    /**
-     * Consulta específica para INGRESOS (replicando addCriteriaProfitSubReport)
-     */
-    private String getDetailedIncomesData(String startDate, String endDate) {
-        // Consulta EXACTA del reporte PDF (líneas 135-151 de ProfitAndLossExtendedReportAction.java)
-        String sql = 
-            "SELECT " +
-                "ca3.cuenta as rootAccount, " +
-                "ca3.descri as rootNameAccount, " +
-                "ca.cuenta as account, " +
-                "ca.descri as nameAccount, " +
-                "'I' as accountType, " +
-                "SUM(vd.debe) AS debit, " +
-                "SUM(vd.haber) AS credit " +
-            "FROM sf_tmpdet vd " +
-            "LEFT JOIN sf_tmpenc v ON vd.id_tmpenc = v.id_tmpenc " +
-            "LEFT JOIN arcgms ca ON vd.cuenta = ca.cuenta " +
-            "LEFT JOIN arcgms ca3 ON ca.cta_niv3 = ca3.cuenta " +
-            "WHERE ca.tipo = 'I' " +
-                "AND v.estado <> 'ANL' " +
-                "AND v.fecha BETWEEN ? AND ? " +
-                "AND ca.cn_nivel IN (5, 6) " +
-                "AND ca3.cuenta IS NOT NULL " +    // Asegurar que tenga cuenta de nivel 3
-                "AND ca.activa = 'S' " +           // Solo cuentas activas
-            "GROUP BY ca3.cuenta, ca3.descri, ca.cuenta, ca.descri " +
-            "HAVING (SUM(vd.debe) + SUM(vd.haber)) > 0 " +  // Solo cuentas con movimientos
-            "ORDER BY ca3.cuenta, ca.cuenta";
-        
-        String fallback = getFallbackIncomesData();
-        return executeDetailedReportQuery(sql, startDate, endDate, fallback);
-    }
+    
     
     /**
-     * Consulta específica para EGRESOS (replicando addCriteriaLossSubReport)
-     */
-    private String getDetailedExpensesData(String startDate, String endDate) {
-        // Consulta EXACTA del reporte PDF (líneas 184-200 de ProfitAndLossExtendedReportAction.java)
-        String sql = 
-            "SELECT " +
-                "ca3.cuenta as rootAccount, " +
-                "ca3.descri as rootNameAccount, " +
-                "ca.cuenta as account, " +
-                "ca.descri as nameAccount, " +
-                "'E' as accountType, " +
-                "SUM(vd.debe) AS debit, " +
-                "SUM(vd.haber) AS credit " +
-            "FROM sf_tmpdet vd " +
-            "LEFT JOIN sf_tmpenc v ON vd.id_tmpenc = v.id_tmpenc " +
-            "LEFT JOIN arcgms ca ON vd.cuenta = ca.cuenta " +
-            "LEFT JOIN arcgms ca3 ON ca.cta_niv3 = ca3.cuenta " +
-            "WHERE ca.tipo = 'E' " +
-                "AND v.estado <> 'ANL' " +
-                "AND v.fecha BETWEEN ? AND ? " +
-                "AND ca.cn_nivel IN (5, 6) " +
-                "AND ca3.cuenta IS NOT NULL " +    // Asegurar que tenga cuenta de nivel 3
-                "AND ca.activa = 'S' " +           // Solo cuentas activas
-            "GROUP BY ca3.cuenta, ca3.descri, ca.cuenta, ca.descri " +
-            "HAVING (SUM(vd.debe) + SUM(vd.haber)) > 0 " +  // Solo cuentas con movimientos
-            "ORDER BY ca3.cuenta, ca.cuenta";
-        
-        String fallback = getFallbackExpensesData();
-        return executeDetailedReportQuery(sql, startDate, endDate, fallback);
-    }
-    
-    /**
-     * Datos fallback combinados (mantener para compatibilidad)
+     * Datos fallback simples para desarrollo (sin datos hardcodeados)
      */
     private String getFallbackDetailedData() {
-        String ingresos = getFallbackIncomesData();
-        String egresos = getFallbackExpensesData();
+        System.out.println("USANDO FALLBACK SIMPLE - La base de datos no está disponible");
         
-        // Combinar sin duplicar [ ]
-        String combined = "[";
-        if (ingresos.length() > 2) {
-            combined += ingresos.substring(1, ingresos.length() - 1);
-        }
-        if (egresos.length() > 2) {
-            if (combined.length() > 1) combined += ",";
-            combined += egresos.substring(1, egresos.length() - 1);
-        }
-        combined += "]";
-        return combined;
-    }
-    
-    /**
-     * Datos fallback solo para INGRESOS
-     */
-    private String getFallbackIncomesData() {
+        // Fallback mínimo para desarrollo - sin cuentas específicas hardcodeadas
         return "[" +
-            // INGRESOS - VENTAS (2 items exactos del PDF)
-            "{\"accountType\":\"I\",\"rootAccount\":\"41001\",\"rootNameAccount\":\"VENTAS\",\"account\":\"41001001\",\"nameAccount\":\"VENTA DE MOLIENDA Y GRANULADO ULEXITA\",\"debit\":0,\"credit\":7501126.06}," +
-            "{\"accountType\":\"I\",\"rootAccount\":\"41001\",\"rootNameAccount\":\"VENTAS\",\"account\":\"41001002\",\"nameAccount\":\"VENTA DE BENTONITA Y BARITINA\",\"debit\":0,\"credit\":848367.48}," +
-            // INGRESOS - OTROS INGRESOS (7 items exactos del PDF)
-            "{\"accountType\":\"I\",\"rootAccount\":\"41005\",\"rootNameAccount\":\"OTROS INGRESOS\",\"account\":\"41005001\",\"nameAccount\":\"INGRESOS POR SERVICIOS DE LABORATORIO\",\"debit\":0,\"credit\":3422.00}," +
-            "{\"accountType\":\"I\",\"rootAccount\":\"41006\",\"rootNameAccount\":\"OTROS INGRESOS\",\"account\":\"41006001\",\"nameAccount\":\"OTROS INGRESOS\",\"debit\":0,\"credit\":6770.82}," +
-            "{\"accountType\":\"I\",\"rootAccount\":\"41007\",\"rootNameAccount\":\"OTROS INGRESOS\",\"account\":\"41007001\",\"nameAccount\":\"INGRESO POR DEVOLUCIÓN DE REGALÍAS MINERAS\",\"debit\":0,\"credit\":167454.82}," +
-            "{\"accountType\":\"I\",\"rootAccount\":\"41008\",\"rootNameAccount\":\"OTROS INGRESOS\",\"account\":\"41008001\",\"nameAccount\":\"DONACIONES PERSONALES\",\"debit\":0,\"credit\":5000.00}," +
-            "{\"accountType\":\"I\",\"rootAccount\":\"41009\",\"rootNameAccount\":\"OTROS INGRESOS\",\"account\":\"41009001\",\"nameAccount\":\"INGRESOS POR SERVICIOS PRESTADOS TRANSPORTE\",\"debit\":0,\"credit\":62640.00}," +
-            "{\"accountType\":\"I\",\"rootAccount\":\"41010\",\"rootNameAccount\":\"OTROS INGRESOS\",\"account\":\"41010001\",\"nameAccount\":\"INGRESOS POR SERVICIOS PRESTADOS TRANSPORTE\",\"debit\":0,\"credit\":290933.00}," +
-            "{\"accountType\":\"I\",\"rootAccount\":\"41011\",\"rootNameAccount\":\"OTROS INGRESOS\",\"account\":\"41011001\",\"nameAccount\":\"INGRESO POR SERVICIO DE PESAJE EN BALANZA\",\"debit\":0,\"credit\":4830.00}" +
+            // Ejemplo genérico de ingreso
+            "{\"accountType\":\"I\",\"rootAccount\":\"41000\",\"rootNameAccount\":\"INGRESOS GENERALES\",\"account\":\"41000001\",\"nameAccount\":\"INGRESOS DE DESARROLLO\",\"debit\":0,\"credit\":10000.00}," +
+            // Ejemplo genérico de egreso
+            "{\"accountType\":\"E\",\"rootAccount\":\"51000\",\"rootNameAccount\":\"GASTOS GENERALES\",\"account\":\"51000001\",\"nameAccount\":\"GASTOS DE DESARROLLO\",\"debit\":5000.00,\"credit\":0}" +
             "]";
     }
     
-    /**
-     * Datos fallback solo para EGRESOS
-     */
-    private String getFallbackExpensesData() {
-        return "[" +
-            // EGRESOS - FLETES Y TRANSPORTES (6 items exactos del PDF)
-            "{\"accountType\":\"E\",\"rootAccount\":\"51001\",\"rootNameAccount\":\"FLETES Y TRANSPORTES\",\"account\":\"51001001\",\"nameAccount\":\"FLETES Y TRANSPORTES DE MATERIA PRIMA\",\"debit\":380590.88,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"51002\",\"rootNameAccount\":\"FLETES Y TRANSPORTES\",\"account\":\"51002001\",\"nameAccount\":\"FLETES Y TRANSPORTES DE PRODUCTOS TERMINADOS\",\"debit\":95597.06,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"51003\",\"rootNameAccount\":\"FLETES Y TRANSPORTES\",\"account\":\"51003001\",\"nameAccount\":\"FLETES Y TRANSPORTES EN GENERAL\",\"debit\":5795.00,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"51004\",\"rootNameAccount\":\"FLETES Y TRANSPORTES\",\"account\":\"51004001\",\"nameAccount\":\"DESCUENTOS SOBRE VENTAS\",\"debit\":138800.03,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"51005\",\"rootNameAccount\":\"FLETES Y TRANSPORTES\",\"account\":\"51005001\",\"nameAccount\":\"GASTOS DE ESTADIA EN FRONTERA\",\"debit\":50605.38,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"51006\",\"rootNameAccount\":\"FLETES Y TRANSPORTES\",\"account\":\"51006001\",\"nameAccount\":\"DESCUENTO SOBRE SERVICIOS\",\"debit\":610.00,\"credit\":0}," +
-            // EGRESOS - MATERIAL DIRECTO (2 items exactos del PDF)
-            "{\"accountType\":\"E\",\"rootAccount\":\"52001\",\"rootNameAccount\":\"MATERIAL DIRECTO\",\"account\":\"52001001\",\"nameAccount\":\"BARITINA\",\"debit\":500.00,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"52002\",\"rootNameAccount\":\"MATERIAL DIRECTO\",\"account\":\"52002001\",\"nameAccount\":\"ULEXITA\",\"debit\":11188.12,\"credit\":0}," +
-            // EGRESOS - MANO DE OBRA (6 items exactos del PDF)
-            "{\"accountType\":\"E\",\"rootAccount\":\"53001\",\"rootNameAccount\":\"MANO DE OBRA\",\"account\":\"53001001\",\"nameAccount\":\"SUELDOS Y SALARIOS\",\"debit\":445161.35,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"53002\",\"rootNameAccount\":\"MANO DE OBRA\",\"account\":\"53002001\",\"nameAccount\":\"AGUINALDOS PRODUCCION\",\"debit\":47641.78,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"53003\",\"rootNameAccount\":\"MANO DE OBRA\",\"account\":\"53003001\",\"nameAccount\":\"INDEMNIZACIONES PRODUCCION\",\"debit\":41852.98,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"53004\",\"rootNameAccount\":\"MANO DE OBRA\",\"account\":\"53004001\",\"nameAccount\":\"BONOS AL PERSONAL DE PRODUCCION\",\"debit\":9000.00,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"53005\",\"rootNameAccount\":\"MANO DE OBRA\",\"account\":\"53005001\",\"nameAccount\":\"PERSONAL EVENTUAL\",\"debit\":13610.42,\"credit\":0}," +
-            "{\"accountType\":\"E\",\"rootAccount\":\"53006\",\"rootNameAccount\":\"MANO DE OBRA\",\"account\":\"53006001\",\"nameAccount\":\"SERVICIOS PRESTADOS POR TERCEROS\",\"debit\":2000.00,\"credit\":0}" +
-            "]";
-    }
+    
     
     /**
      * Ejecuta consulta específica para el reporte detallado que retorna estructura compleja
@@ -219,8 +105,6 @@ public class FinanceDashboardServlet extends BaseDashboardServlet {
             stmt = conn.prepareStatement(sql);
             stmt.setQueryTimeout(30);
             
-            System.out.println("Ejecutando consulta detailed_report: " + sql);
-            System.out.println("Fechas: " + startDate + " a " + endDate);
             
             stmt.setString(1, startDate);
             stmt.setString(2, endDate);
@@ -259,14 +143,12 @@ public class FinanceDashboardServlet extends BaseDashboardServlet {
             
             json.append("]");
             
-            System.out.println("Consulta detailed_report ejecutada en " + queryTime + "ms. Total registros: " + count);
             
             return json.toString();
             
         } catch (Exception e) {
             System.err.println("Error en consulta detailed_report: " + e.getMessage());
             e.printStackTrace();
-            System.out.println("Usando fallback para detailed_report");
             return errorFallback;
         } finally {
             try {

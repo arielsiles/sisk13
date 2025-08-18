@@ -36,8 +36,6 @@ window.FinanceDashboard = (function() {
             };
         }
         
-        console.log('=== PROCESANDO DATOS DE CONSULTA UNIFICADA ===');
-        console.log('Total items recibidos:', rawData.length);
         
         // PASO 1: Agrupar automáticamente por rootNameAccount
         const groups = {};
@@ -111,10 +109,6 @@ window.FinanceDashboard = (function() {
             group.items.sort((a, b) => Math.abs(b.peso) - Math.abs(a.peso));
         });
         
-        console.log(`\n=== RESULTADOS FINALES ===`);
-        console.log(`Total grupos: ${allGroups.length}`);
-        console.log(`Ingresos: ${ingresosGroups.length} grupos`);
-        console.log(`Egresos: ${egresosGroups.length} grupos`);
         
         return {
             summaryData: {
@@ -128,7 +122,6 @@ window.FinanceDashboard = (function() {
     
     // Función para crear los gráficos summary (2 gráficos: ingresos + egresos agregados)
     function createSummaryCharts(summaryData) {
-        console.log('=== CREANDO GRÁFICOS SUMMARY ===');
         
         // Limpiar gráficos summary existentes
         summaryCharts.forEach(chart => {
@@ -149,8 +142,6 @@ window.FinanceDashboard = (function() {
     
     // Función para crear los gráficos detallados (N gráficos: uno por rootNameAccount)
     function createDetailedCharts(detailedGroups) {
-        console.log('=== CREANDO GRÁFICOS DETALLADOS CON LAYOUT 2 POR FILA ===');
-        console.log(`Total grupos a graficar: ${detailedGroups.length}`);
         
         // Limpiar gráficos detallados existentes
         clearDetailedCharts();
@@ -171,7 +162,6 @@ window.FinanceDashboard = (function() {
             
             ingresosGroups.forEach((group, localIndex) => {
                 const containerId = createDynamicContainerWithLayout(group, globalIndex, localIndex, 'ingresos');
-                console.log(`📈 Creando gráfico ingreso ${localIndex + 1}: "${group.rootNameAccount}" en ${containerId}`);
                 createDetailedChart(group, containerId, globalIndex);
                 globalIndex++;
             });
@@ -183,13 +173,11 @@ window.FinanceDashboard = (function() {
             
             egresosGroups.forEach((group, localIndex) => {
                 const containerId = createDynamicContainerWithLayout(group, globalIndex, localIndex, 'egresos');
-                console.log(`📉 Creando gráfico egreso ${localIndex + 1}: "${group.rootNameAccount}" en ${containerId}`);
                 createDetailedChart(group, containerId, globalIndex);
                 globalIndex++;
             });
         }
         
-        console.log(`✅ ${detailedGroups.length} gráficos detallados creados en layout 2x2 (TODOS los datos mostrados)`);
     }
     
     // Función para crear un gráfico summary
@@ -282,7 +270,6 @@ window.FinanceDashboard = (function() {
         try {
             const chart = Highcharts.chart(containerId, config);
             summaryCharts.push(chart);
-            console.log(`✅ Gráfico summary creado: "${title}" con ${data.length} categorías`);
         } catch (error) {
             console.error(`❌ Error creando gráfico summary "${title}":`, error);
         }
@@ -386,7 +373,6 @@ window.FinanceDashboard = (function() {
         try {
             const chart = Highcharts.chart(containerId, config);
             detailedCharts.push(chart);
-            console.log(`✅ Gráfico detallado creado: "${group.rootNameAccount}" con ${group.items.length} items`);
         } catch (error) {
             console.error(`❌ Error creando gráfico detallado "${group.rootNameAccount}":`, error);
         }
@@ -589,10 +575,6 @@ window.FinanceDashboard = (function() {
         validateDataIntegrity(processedData, totalIncome, totalExpenses);
         
         // Log para diagnóstico
-        console.log('=== ESTADÍSTICALS FINALES ===');
-        console.log(`Total Ingresos (con negativos): Bs ${totalIncome.toFixed(2)}`);
-        console.log(`Total Egresos (con negativos): Bs ${totalExpenses.toFixed(2)}`);
-        console.log(`Balance Neto: Bs ${totalBalance.toFixed(2)}`);
         
         // Formatear números con separadores de miles (preservando signos)
         document.getElementById('totalIncome').textContent = 'Bs ' + Highcharts.numberFormat(totalIncome, 0, '.', ',');
@@ -603,8 +585,6 @@ window.FinanceDashboard = (function() {
     
     // Función para validar integridad de datos
     function validateDataIntegrity(processedData, summaryIncome, summaryExpenses) {
-        console.log('=== VALIDACIÓN DE INTEGRIDAD DE DATOS (CON VALORES NEGATIVOS) ===');
-        
         // Calcular totales de gráficos detallados respetando signos
         let detailedIncome = 0;
         let detailedExpenses = 0;
@@ -622,44 +602,19 @@ window.FinanceDashboard = (function() {
         const expensesDifference = Math.abs(summaryExpenses - detailedExpenses);
         const tolerance = 0.01; // Tolerancia para diferencias de redondeo
         
-        console.log(`Summary Ingresos (con negativos): Bs ${summaryIncome.toFixed(2)}`);
-        console.log(`Detallado Ingresos (con negativos): Bs ${detailedIncome.toFixed(2)}`);
-        console.log(`Diferencia Ingresos: Bs ${incomeDifference.toFixed(2)}`);
-        
-        console.log(`Summary Egresos (con negativos): Bs ${summaryExpenses.toFixed(2)}`);
-        console.log(`Detallado Egresos (con negativos): Bs ${detailedExpenses.toFixed(2)}`);
-        console.log(`Diferencia Egresos: Bs ${expensesDifference.toFixed(2)}`);
-        
-        // Mostrar desglose de valores positivos vs negativos
-        const ingresosPositivos = processedData.summaryData.ingresos.filter(item => item.peso >= 0);
-        const ingresosNegativos = processedData.summaryData.ingresos.filter(item => item.peso < 0);
-        const egresosPositivos = processedData.summaryData.egresos.filter(item => item.peso >= 0);
-        const egresosNegativos = processedData.summaryData.egresos.filter(item => item.peso < 0);
-        
-        console.log(`📈 Ingresos positivos: ${ingresosPositivos.length}, negativos: ${ingresosNegativos.length}`);
-        console.log(`📉 Egresos positivos: ${egresosPositivos.length}, negativos: ${egresosNegativos.length}`);
-        
-        // Alertar si hay discrepancias significativas
+        // Solo alertar en caso de errores (mantener console.error)
         if (incomeDifference > tolerance) {
             console.error(`❌ ALERTA: Discrepancia en INGRESOS de Bs ${incomeDifference.toFixed(2)}`);
-        } else {
-            console.log(`✅ INGRESOS: Datos cuadran correctamente (incluyendo negativos)`);
         }
         
         if (expensesDifference > tolerance) {
             console.error(`❌ ALERTA: Discrepancia en EGRESOS de Bs ${expensesDifference.toFixed(2)}`);
-        } else {
-            console.log(`✅ EGRESOS: Datos cuadran correctamente (incluyendo negativos)`);
         }
-        
-        console.log(`Total gráficos detallados creados: ${processedData.detailedGroups.length}`);
-        console.log('=== FIN VALIDACIÓN ===');
     }
     
     // Cargar datos de la consulta unificada
     async function loadData(startDate, endDate) {
         try {
-            console.log('=== CARGANDO DATOS ARQUITECTURA UNIFICADA ===');
             
             // Cargar SOLO datos de detailed_report (consulta unificada)
             const rawData = await fetchFinanceData('detailed_report', startDate, endDate);
@@ -679,7 +634,6 @@ window.FinanceDashboard = (function() {
             // Actualizar estadísticas basadas en los datos procesados
             updateUnifiedStats(processedData);
             
-            console.log('✅ Arquitectura unificada cargada exitosamente');
             
         } catch (error) {
             console.error('❌ Error cargando arquitectura unificada:', error);
@@ -717,7 +671,6 @@ window.FinanceDashboard = (function() {
         }
         
         // Fallback: datos mock para desarrollo
-        console.log('Usando datos mock para desarrollo');
         return [
             // INGRESOS - VENTAS
             {"accountType":"I", "rootAccount":"41001", "rootNameAccount":"VENTAS", "account":"41001001", "nameAccount":"VENTA DE MOLIENDA Y GRANULADO ULEXITA", "debit":0, "credit":7501126.06},
