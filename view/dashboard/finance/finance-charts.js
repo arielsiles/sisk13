@@ -5,6 +5,8 @@ window.FinanceDashboard = (function() {
     let charts = [];
     let summaryCharts = []; // 2 charts: ingresos summary, egresos summary
     let detailedCharts = []; // N charts: one per rootNameAccount
+    let explorerChart = null; // 1 chart: gráfico explorador dinámico
+    let currentExplorerData = null; // Datos actuales del explorador para paginación
     
     // Configuración para arquitectura unificada
     // Se muestran TODOS los resultados sin límites artificiales
@@ -62,11 +64,11 @@ window.FinanceDashboard = (function() {
             name: "MANO DE OBRA",
             description: "Costos de personal y nómina"
         },
-        "5340000000": { 
+        "5410000000": {
             enabled: true, 
             accountType: "E", 
-            name: "GASTOS DE COMERCIALIZACION",
-            description: "Gastos relacionados con ventas y marketing"
+            name: "COSTOS DE LABORATORIO",
+            description: "Gastos relacionados con LABORATORIO"
         },
         "5350000000": {
             enabled: true,
@@ -114,6 +116,36 @@ window.FinanceDashboard = (function() {
         return Object.keys(CHART_CONFIG).filter(rootAccount => 
             CHART_CONFIG[rootAccount].accountType === accountType && 
             CHART_CONFIG[rootAccount].enabled
+        );
+    }
+    
+    // Función para obtener cuentas NO configuradas (para gráfico explorador)
+    function getUnConfiguredAccounts(rawData) {
+        if (!rawData || !Array.isArray(rawData)) {
+            return [];
+        }
+        
+        const configuredAccounts = Object.keys(CHART_CONFIG);
+        const uniqueAccounts = [];
+        
+        rawData.forEach(item => {
+            // Solo incluir cuentas que NO están en CHART_CONFIG
+            if (!configuredAccounts.includes(item.rootAccount)) {
+                // Evitar duplicados por rootAccount
+                const exists = uniqueAccounts.find(acc => acc.rootAccount === item.rootAccount);
+                if (!exists) {
+                    uniqueAccounts.push({
+                        rootAccount: item.rootAccount,
+                        rootNameAccount: item.rootNameAccount || 'Sin Nombre',
+                        accountType: item.accountType
+                    });
+                }
+            }
+        });
+        
+        // Ordenar alfabéticamente por nombre de cuenta
+        return uniqueAccounts.sort((a, b) => 
+            a.rootNameAccount.localeCompare(b.rootNameAccount)
         );
     }
     
@@ -672,6 +704,557 @@ window.FinanceDashboard = (function() {
         return mainContainer;
     }
     
+    // ========================================================================
+    // GRÁFICO EXPLORADOR DINÁMICO - Para cuentas NO configuradas
+    // ========================================================================
+    
+    // Función principal para crear el gráfico explorador con selector
+    function createDynamicExplorerChart(rawData) {
+        // Obtener cuentas no configuradas
+        const unConfiguredAccounts = getUnConfiguredAccounts(rawData);
+        
+        if (unConfiguredAccounts.length === 0) {
+            console.info('ℹ️ No hay cuentas adicionales para explorar (todas están en CHART_CONFIG)');
+            return;
+        }
+        
+        // Crear contenedor del explorador
+        const explorerContainer = createExplorerContainer();
+        
+        // Crear selector con cuentas no configuradas
+        const selector = createExplorerSelector(unConfiguredAccounts, explorerContainer);
+        
+        // Crear gráfico inicial con la primera cuenta
+        const firstAccount = unConfiguredAccounts[0];
+        updateExplorerChart(firstAccount.rootAccount, rawData);
+        
+        console.info(`📊 Grafico explorador creado con ${unConfiguredAccounts.length} cuentas adicionales`);
+    }
+    
+    // Función para crear el contenedor del explorador
+    function createExplorerContainer() {
+        const mainContainer = getMainChartsContainer();
+        
+        // Crear separador visual simple
+        const separatorDiv = document.createElement('div');
+        separatorDiv.className = 'explorer-separator';
+        separatorDiv.style.width = '100%';
+        separatorDiv.style.marginTop = '40px';
+        separatorDiv.style.marginBottom = '20px';
+        separatorDiv.style.borderTop = '2px solid #e0e0e0';
+        separatorDiv.style.paddingTop = '20px';
+        
+        mainContainer.appendChild(separatorDiv);
+        
+        // Crear contenedor principal del explorador
+        const explorerSection = document.createElement('div');
+        explorerSection.id = 'explorerSection';
+        explorerSection.className = 'explorer-section';
+        explorerSection.style.width = '100%';
+        explorerSection.style.marginBottom = '20px';
+        
+        // Crear header compacto con flexbox (una sola fila)
+        const explorerHeader = document.createElement('div');
+        explorerHeader.className = 'explorer-header';
+        explorerHeader.style.display = 'flex';
+        explorerHeader.style.justifyContent = 'space-between';
+        explorerHeader.style.alignItems = 'center';
+        explorerHeader.style.marginBottom = '15px';
+        explorerHeader.style.padding = '10px 20px';
+        explorerHeader.style.backgroundColor = '#f8f9fa';
+        explorerHeader.style.borderRadius = '5px';
+        explorerHeader.style.border = '1px solid #dee2e6';
+        
+        // Crear sección izquierda (selector)
+        const leftSection = document.createElement('div');
+        leftSection.className = 'explorer-left';
+        leftSection.style.display = 'flex';
+        leftSection.style.alignItems = 'center';
+        
+        // Crear sección central (totales)
+        const centerSection = document.createElement('div');
+        centerSection.id = 'explorerCenter';
+        centerSection.className = 'explorer-center';
+        centerSection.style.display = 'flex';
+        centerSection.style.alignItems = 'center';
+        centerSection.style.fontSize = '14px';
+        centerSection.style.fontWeight = 'bold';
+        centerSection.style.color = '#495057';
+        
+        // Crear sección derecha (título)
+        const rightSection = document.createElement('div');
+        rightSection.className = 'explorer-right';
+        rightSection.style.display = 'flex';
+        rightSection.style.alignItems = 'center';
+        rightSection.style.fontSize = '16px';
+        rightSection.style.fontWeight = 'bold';
+        rightSection.style.color = '#666';
+        rightSection.innerHTML = '[+] Explorador Dinamico - Otras Cuentas'; // Sin acentos
+        
+        explorerHeader.appendChild(leftSection);
+        explorerHeader.appendChild(centerSection);
+        explorerHeader.appendChild(rightSection);
+        explorerSection.appendChild(explorerHeader);
+        
+        // Crear contenedor del gráfico (expandido 100%) con estilo consistente
+        const chartBox = document.createElement('div');
+        chartBox.className = 'chart-box';
+        chartBox.style.width = '100%';
+        chartBox.style.backgroundColor = '#fff';
+        chartBox.style.border = '1px solid #dee2e6';
+        chartBox.style.borderRadius = '5px';
+        chartBox.style.padding = '15px';
+        
+        const chartContainer = document.createElement('div');
+        chartContainer.id = 'explorerChart';
+        chartContainer.className = 'chart-container';
+        chartContainer.style.height = '450px'; // Ajustado para el nuevo header
+        
+        chartBox.appendChild(chartContainer);
+        explorerSection.appendChild(chartBox);
+        
+        mainContainer.appendChild(explorerSection);
+        
+        return explorerSection;
+    }
+    
+    // Función para crear el selector minimalista con checkboxes de paginación
+    function createExplorerSelector(unConfiguredAccounts, container) {
+        const leftSection = container.querySelector('.explorer-left');
+        
+        // Crear selector sin label (minimalista) con margen
+        const selector = document.createElement('select');
+        selector.id = 'explorerSelector';
+        selector.className = 'explorer-selector';
+        selector.style.padding = '8px 12px';
+        selector.style.border = '1px solid #ced4da';
+        selector.style.borderRadius = '4px';
+        selector.style.backgroundColor = '#fff';
+        selector.style.fontSize = '14px';
+        selector.style.minWidth = '280px';
+        selector.style.cursor = 'pointer';
+        selector.style.marginRight = '15px'; // Espacio para checkboxes
+        
+        // Agregar opciones con solo nombres (no códigos)
+        unConfiguredAccounts.forEach(account => {
+            const option = document.createElement('option');
+            option.value = account.rootAccount;
+            option.textContent = account.rootNameAccount;
+            selector.appendChild(option);
+        });
+        
+        // Agregar evento onChange
+        selector.addEventListener('change', function() {
+            const selectedAccount = this.value;
+            // Llamar a la función global para actualizar el gráfico
+            updateExplorerChart(selectedAccount, window.currentRawData);
+        });
+        
+        leftSection.appendChild(selector);
+        
+        // Crear checkboxes de paginación
+        createPaginationCheckboxes(leftSection);
+        
+        return selector;
+    }
+    
+    // Función para crear checkboxes de paginación
+    function createPaginationCheckboxes(leftSection) {
+        const checkboxLabels = ['1ros', '2dos', '3ros', '4tos'];
+        
+        checkboxLabels.forEach((label, index) => {
+            // Crear contenedor para checkbox y label
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.style.display = 'inline-flex';
+            checkboxContainer.style.alignItems = 'center';
+            checkboxContainer.style.marginRight = '12px';
+            checkboxContainer.style.fontSize = '13px';
+            
+            // Crear checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `pagination_${label}`;
+            checkbox.className = 'pagination-checkbox';
+            checkbox.checked = true; // Marcados por defecto
+            checkbox.disabled = true; // Deshabilitados por defecto
+            checkbox.style.marginRight = '4px';
+            checkbox.style.cursor = 'pointer';
+            
+            // Crear label
+            const labelElement = document.createElement('label');
+            labelElement.htmlFor = checkbox.id;
+            labelElement.textContent = label;
+            labelElement.style.cursor = 'pointer';
+            labelElement.style.userSelect = 'none';
+            labelElement.style.color = '#666';
+            
+            // Agregar evento change
+            checkbox.addEventListener('change', function() {
+                updateChartWithPagination();
+            });
+            
+            checkboxContainer.appendChild(checkbox);
+            checkboxContainer.appendChild(labelElement);
+            leftSection.appendChild(checkboxContainer);
+        });
+    }
+    
+    // Función para actualizar el gráfico explorador según la cuenta seleccionada
+    function updateExplorerChart(selectedRootAccount, rawData) {
+        if (!rawData || !Array.isArray(rawData)) {
+            console.warn('⚠️ No hay datos para actualizar grafico explorador');
+            return;
+        }
+        
+        // Filtrar datos por la cuenta seleccionada
+        const accountData = rawData.filter(item => item.rootAccount === selectedRootAccount);
+        
+        if (accountData.length === 0) {
+            console.warn(`⚠️ No hay datos para la cuenta ${selectedRootAccount}`);
+            return;
+        }
+        
+        // Procesar datos de la cuenta seleccionada
+        const processedItems = [];
+        let totalAmount = 0;
+        const firstItem = accountData[0];
+        const isIngreso = firstItem.accountType === 'I';
+        const accountName = firstItem.rootNameAccount || 'Sin Nombre';
+        
+        accountData.forEach(item => {
+            // Calcular monto neto según tipo de cuenta
+            const montoNeto = isIngreso ? 
+                (item.credit || 0) - (item.debit || 0) :  // Para ingresos: crédito - débito
+                (item.debit || 0) - (item.credit || 0);   // Para egresos: débito - crédito
+            
+            if (Math.abs(montoNeto) >= UNIFIED_CONFIG.minAmount) {
+                processedItems.push({
+                    name: item.nameAccount || 'Sin Nombre',
+                    peso: montoNeto,
+                    originalData: item
+                });
+                totalAmount += montoNeto;
+            }
+        });
+        
+        // Ordenar por valor absoluto (mantener signos)
+        processedItems.sort((a, b) => Math.abs(b.peso) - Math.abs(a.peso));
+        
+        // Guardar datos completos para paginación
+        currentExplorerData = {
+            allItems: processedItems,
+            accountName: accountName,
+            totalAmount: totalAmount,
+            isIngreso: isIngreso
+        };
+        
+        // Controlar checkboxes según cantidad de items
+        controlPaginationCheckboxes(processedItems.length);
+        
+        // Aplicar paginación si está activa
+        const filteredItems = applyPagination(processedItems);
+        
+        // Recalcular total para items filtrados
+        const filteredTotal = filteredItems.reduce((sum, item) => sum + (item.peso || 0), 0);
+        
+        // Crear datos del gráfico con colores dinámicos
+        const chartData = filteredItems.map(item => {
+            const valor = item.peso || 0;
+            const esPositivo = valor >= 0;
+            
+            // Colores según signo del valor
+            let color;
+            if (isIngreso) {
+                // Ingresos: verde si positivo, rojo si negativo (descuentos)
+                color = esPositivo ? 'rgba(40, 167, 69, 0.9)' : 'rgba(220, 53, 69, 0.9)';
+            } else {
+                // Egresos: rojo si positivo, verde si negativo (devoluciones)
+                color = esPositivo ? 'rgba(220, 53, 69, 0.9)' : 'rgba(40, 167, 69, 0.9)';
+            }
+            
+            return {
+                name: item.name,
+                y: valor, // Mantener valor original con signo
+                color: color
+            };
+        });
+        
+        // Actualizar información en el header central
+        const centerSection = document.getElementById('explorerCenter');
+        if (centerSection) {
+            const montoFormateado = 'Bs ' + Highcharts.numberFormat(filteredTotal, 0, '.', ',');
+            centerSection.innerHTML = `Total: ${montoFormateado} | ${filteredItems.length} conceptos`;
+        }
+        
+        // Configuración del gráfico explorador (barras horizontales, sin título)
+        const tipoLabel = isIngreso ? 'Ingresos' : 'Egresos';
+        
+        const config = {
+            chart: {
+                type: 'bar', // Cambio a barras horizontales
+                height: 450,
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: null // Sin título en el gráfico
+            },
+            xAxis: {
+                categories: filteredItems.map(item => item.name),
+                title: { text: `Conceptos de ${tipoLabel}` }, // Sin acentos
+                labels: { 
+                    style: { fontSize: '11px' }
+                    // Sin rotación para barras horizontales
+                }
+            },
+            yAxis: {
+                title: { text: 'Monto (Bs)' },
+                labels: {
+                    formatter: function() {
+                        return 'Bs ' + Highcharts.numberFormat(this.value, 0, '.', ',');
+                    }
+                },
+                plotLines: [{
+                    value: 0,
+                    color: '#666',
+                    width: 1,
+                    zIndex: 2
+                }]
+            },
+            plotOptions: {
+                bar: { // Barras horizontales
+                    dataLabels: {
+                        enabled: true, // Habilitado para barras horizontales
+                        formatter: function() {
+                            const signo = this.y >= 0 ? '' : '-';
+                            const valor = Math.abs(this.y);
+                            return signo + 'Bs ' + Highcharts.numberFormat(valor, 0, '.', ',');
+                        },
+                        style: { fontSize: '11px', fontWeight: 'bold' }
+                    },
+                    colorByPoint: true // Permitir colores diferentes por punto
+                }
+            },
+            series: [{
+                name: accountName,
+                data: chartData
+            }],
+            tooltip: {
+                formatter: function() {
+                    const tipoDetalle = this.y >= 0 ? 
+                        (isIngreso ? 'Ingreso' : 'Gasto') : 
+                        (isIngreso ? 'Descuento/Devolucion' : 'Credito/Ajuste'); // Sin acentos
+                    const signo = this.y >= 0 ? '' : '-';
+                    const valor = Math.abs(this.y);
+                    return '<b>' + this.point.name + '</b><br/>' +
+                           tipoDetalle + ': ' + signo + 'Bs ' + Highcharts.numberFormat(valor, 0, '.', ',');
+                }
+            },
+            legend: { enabled: false },
+            credits: { enabled: false }
+        };
+        
+        // Crear o actualizar el gráfico
+        try {
+            // Destruir gráfico anterior si existe
+            if (explorerChart && explorerChart.destroy) {
+                explorerChart.destroy();
+            }
+            
+            // Crear nuevo gráfico
+            explorerChart = Highcharts.chart('explorerChart', config);
+            
+        } catch (error) {
+            console.error(`❌ Error creando/actualizando grafico explorador:`, error);
+        }
+    }
+    
+    // Función para controlar la habilitación de checkboxes según cantidad de items
+    function controlPaginationCheckboxes(itemCount) {
+        const checkboxes = document.querySelectorAll('.pagination-checkbox');
+        const shouldEnable = itemCount > 30;
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.disabled = !shouldEnable;
+            checkbox.checked = shouldEnable; // Marcar todos si se habilita
+            
+            // Cambiar estilo visual
+            const label = checkbox.nextSibling;
+            if (label) {
+                label.style.color = shouldEnable ? '#495057' : '#ccc';
+                label.style.cursor = shouldEnable ? 'pointer' : 'default';
+            }
+        });
+    }
+    
+    // Función para aplicar paginación según checkboxes seleccionados
+    function applyPagination(allItems) {
+        const checkboxes = document.querySelectorAll('.pagination-checkbox');
+        const isAnyEnabled = Array.from(checkboxes).some(cb => !cb.disabled);
+        
+        // Si no hay paginación activa, retornar todos los items
+        if (!isAnyEnabled) {
+            return allItems;
+        }
+        
+        // Dividir en cuatro grupos (ya están ordenados por valor absoluto)
+        const cuartoSize = Math.ceil(allItems.length / 4);
+        const grupos = {
+            '1ros': allItems.slice(0, cuartoSize),
+            '2dos': allItems.slice(cuartoSize, cuartoSize * 2),
+            '3ros': allItems.slice(cuartoSize * 2, cuartoSize * 3),
+            '4tos': allItems.slice(cuartoSize * 3)
+        };
+        
+        // Obtener items según checkboxes seleccionados
+        let selectedItems = [];
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked && !checkbox.disabled) {
+                const grupo = checkbox.id.replace('pagination_', '');
+                selectedItems = selectedItems.concat(grupos[grupo] || []);
+            }
+        });
+        
+        return selectedItems;
+    }
+    
+    // Función para actualizar gráfico con paginación (llamada por checkboxes)
+    function updateChartWithPagination() {
+        if (!currentExplorerData) return;
+        
+        const filteredItems = applyPagination(currentExplorerData.allItems);
+        const filteredTotal = filteredItems.reduce((sum, item) => sum + (item.peso || 0), 0);
+        
+        // Actualizar información en el header central
+        const centerSection = document.getElementById('explorerCenter');
+        if (centerSection) {
+            const montoFormateado = 'Bs ' + Highcharts.numberFormat(filteredTotal, 0, '.', ',');
+            centerSection.innerHTML = `Total: ${montoFormateado} | ${filteredItems.length} conceptos`;
+        }
+        
+        // Recrear gráfico con items filtrados
+        createExplorerChartWithData(filteredItems, currentExplorerData.accountName, currentExplorerData.isIngreso);
+    }
+    
+    // Función auxiliar para crear gráfico con datos específicos
+    function createExplorerChartWithData(items, accountName, isIngreso) {
+        const tipoLabel = isIngreso ? 'Ingresos' : 'Egresos';
+        
+        // Crear datos del gráfico con colores dinámicos
+        const chartData = items.map(item => {
+            const valor = item.peso || 0;
+            const esPositivo = valor >= 0;
+            
+            // Colores según signo del valor
+            let color;
+            if (isIngreso) {
+                color = esPositivo ? 'rgba(40, 167, 69, 0.9)' : 'rgba(220, 53, 69, 0.9)';
+            } else {
+                color = esPositivo ? 'rgba(220, 53, 69, 0.9)' : 'rgba(40, 167, 69, 0.9)';
+            }
+            
+            return {
+                name: item.name,
+                y: valor,
+                color: color
+            };
+        });
+        
+        const config = {
+            chart: {
+                type: 'bar',
+                height: 450,
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: null
+            },
+            xAxis: {
+                categories: items.map(item => item.name),
+                title: { text: `Conceptos de ${tipoLabel}` },
+                labels: { 
+                    style: { fontSize: '11px' }
+                }
+            },
+            yAxis: {
+                title: { text: 'Monto (Bs)' },
+                labels: {
+                    formatter: function() {
+                        return 'Bs ' + Highcharts.numberFormat(this.value, 0, '.', ',');
+                    }
+                },
+                plotLines: [{
+                    value: 0,
+                    color: '#666',
+                    width: 1,
+                    zIndex: 2
+                }]
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function() {
+                            const signo = this.y >= 0 ? '' : '-';
+                            const valor = Math.abs(this.y);
+                            return signo + 'Bs ' + Highcharts.numberFormat(valor, 0, '.', ',');
+                        },
+                        style: { fontSize: '11px', fontWeight: 'bold' }
+                    },
+                    colorByPoint: true
+                }
+            },
+            series: [{
+                name: accountName,
+                data: chartData
+            }],
+            tooltip: {
+                formatter: function() {
+                    const tipoDetalle = this.y >= 0 ? 
+                        (isIngreso ? 'Ingreso' : 'Gasto') : 
+                        (isIngreso ? 'Descuento/Devolucion' : 'Credito/Ajuste');
+                    const signo = this.y >= 0 ? '' : '-';
+                    const valor = Math.abs(this.y);
+                    return '<b>' + this.point.name + '</b><br/>' +
+                           tipoDetalle + ': ' + signo + 'Bs ' + Highcharts.numberFormat(valor, 0, '.', ',');
+                }
+            },
+            legend: { enabled: false },
+            credits: { enabled: false }
+        };
+        
+        // Crear o actualizar el gráfico
+        try {
+            if (explorerChart && explorerChart.destroy) {
+                explorerChart.destroy();
+            }
+            explorerChart = Highcharts.chart('explorerChart', config);
+        } catch (error) {
+            console.error('❌ Error actualizando grafico con paginacion:', error);
+        }
+    }
+    
+    // Función para limpiar el gráfico explorador
+    function clearExplorerChart() {
+        if (explorerChart && explorerChart.destroy) {
+            explorerChart.destroy();
+            explorerChart = null;
+        }
+        
+        // Resetear datos del explorador
+        currentExplorerData = null;
+        
+        // Limpiar contenedor del explorador
+        const explorerSection = document.getElementById('explorerSection');
+        if (explorerSection) {
+            explorerSection.remove();
+        }
+        
+        // Limpiar separador del explorador
+        const explorerSeparator = document.querySelector('.explorer-separator');
+        if (explorerSeparator) {
+            explorerSeparator.remove();
+        }
+    }
     
     // Función para limpiar contenedores dinámicos
     function clearDynamicContainers() {
@@ -719,6 +1302,9 @@ window.FinanceDashboard = (function() {
         
         // Limpiar detailed charts
         clearDetailedCharts();
+        
+        // Limpiar explorer chart
+        clearExplorerChart();
         
         // Limpiar contenedores dinámicos
         clearDynamicContainers();
@@ -828,10 +1414,16 @@ window.FinanceDashboard = (function() {
             // Crear N gráficos detallados (uno por cada rootNameAccount)
             createDetailedCharts(processedData.detailedGroups);
             
+            // Guardar datos para el explorador (necesario para el selector)
+            window.currentRawData = rawData;
+            
+            // Crear gráfico explorador dinámico (cuentas NO configuradas)
+            createDynamicExplorerChart(rawData);
+            
             // Actualizar estadísticas basadas en los datos procesados
             updateUnifiedStats(processedData);
             
-            console.info('✅ Dashboard cargado con datos dinámicos de la consulta SQL');
+            console.info('✅ Dashboard cargado con datos dinamicos de la consulta SQL');
             
         } catch (error) {
             console.error('❌ Error cargando arquitectura unificada:', error);
@@ -904,12 +1496,12 @@ window.FinanceDashboard = (function() {
                 }
             }
         } catch (error) {
-            console.warn('❌ API no disponible - Sistema totalmente dinámico requiere consulta SQL:', error.message);
+            console.warn('❌ API no disponible - Sistema totalmente dinamico requiere consulta SQL:', error.message);
         }
         
-        // Sistema 100% dinámico: Sin datos mock predefinidos
-        // Si la API falla, retornar array vacío para mantener coherencia
-        console.info('ℹ️ No hay datos disponibles - Verificar conexión con base de datos');
+        // Sistema 100% dinamico: Sin datos mock predefinidos
+        // Si la API falla, retornar array vacio para mantener coherencia
+        console.info('ℹ️ No hay datos disponibles - Verificar conexion con base de datos');
         return [];
     }
     
@@ -947,6 +1539,16 @@ window.FinanceDashboard = (function() {
         toggleChart,
         getEnabledCharts,
         getChartsByType,
+        // Funciones de explorador dinámico
+        getUnConfiguredAccounts,
+        createDynamicExplorerChart,
+        updateExplorerChart,
+        clearExplorerChart,
+        // Funciones de paginación
+        controlPaginationCheckboxes,
+        applyPagination,
+        updateChartWithPagination,
+        createExplorerChartWithData,
         // Funciones de manejo de errores
         showNoDataMessage,
         showErrorMessage,
