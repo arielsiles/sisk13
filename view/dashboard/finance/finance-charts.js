@@ -143,10 +143,17 @@ window.FinanceDashboard = (function() {
             }
         });
         
-        // Ordenar alfabéticamente por nombre de cuenta
-        return uniqueAccounts.sort((a, b) => 
-            a.rootNameAccount.localeCompare(b.rootNameAccount)
-        );
+        // Separar por tipo y ordenar: Ingresos primero, luego Egresos
+        const ingresosAccounts = uniqueAccounts
+            .filter(acc => acc.accountType === 'I')
+            .sort((a, b) => a.rootNameAccount.localeCompare(b.rootNameAccount));
+            
+        const egresosAccounts = uniqueAccounts
+            .filter(acc => acc.accountType === 'E')
+            .sort((a, b) => a.rootNameAccount.localeCompare(b.rootNameAccount));
+        
+        // Combinar: Ingresos primero, Egresos después
+        return [...ingresosAccounts, ...egresosAccounts];
     }
     
     // ========================================================================
@@ -724,9 +731,15 @@ window.FinanceDashboard = (function() {
         // Crear selector con cuentas no configuradas
         const selector = createExplorerSelector(unConfiguredAccounts, explorerContainer);
         
-        // Crear gráfico inicial con la primera cuenta
-        const firstAccount = unConfiguredAccounts[0];
-        updateExplorerChart(firstAccount.rootAccount, rawData);
+        // Crear gráfico inicial con la primera cuenta de EGRESOS
+        const firstEgresoAccount = unConfiguredAccounts.find(account => account.accountType === 'E');
+        const defaultAccount = firstEgresoAccount || unConfiguredAccounts[0]; // Fallback al primero si no hay egresos
+        
+        // Sincronizar selector con la cuenta por defecto
+        selector.value = defaultAccount.rootAccount;
+        
+        // Actualizar gráfico con la cuenta por defecto
+        updateExplorerChart(defaultAccount.rootAccount, rawData);
         
         console.info(`📊 Grafico explorador creado con ${unConfiguredAccounts.length} cuentas adicionales`);
     }
@@ -835,8 +848,36 @@ window.FinanceDashboard = (function() {
         selector.style.cursor = 'pointer';
         selector.style.marginRight = '15px'; // Espacio para checkboxes
         
-        // Agregar opciones con solo nombres (no códigos)
-        unConfiguredAccounts.forEach(account => {
+        // Agregar opciones con separadores visuales por tipo
+        unConfiguredAccounts.forEach((account, index) => {
+            // Agregar separador "Ingresos" antes del primer ingreso
+            if (index === 0 && account.accountType === 'I') {
+                const separator = document.createElement('option');
+                separator.disabled = true;
+                separator.textContent = 'Ingresos';
+                separator.style.fontWeight = 'bold';
+                separator.style.textAlign = 'left';
+                separator.style.backgroundColor = '#f8f9fa';
+                separator.style.color = '#666';
+                selector.appendChild(separator);
+            }
+            
+            // Agregar separador "Egresos" antes del primer egreso
+            if (index > 0 && 
+                unConfiguredAccounts[index-1].accountType === 'I' && 
+                account.accountType === 'E') {
+                
+                const separator = document.createElement('option');
+                separator.disabled = true;
+                separator.textContent = 'Egresos';
+                separator.style.fontWeight = 'bold';
+                separator.style.textAlign = 'left';
+                separator.style.backgroundColor = '#f8f9fa';
+                separator.style.color = '#666';
+                selector.appendChild(separator);
+            }
+            
+            // Agregar opción normal sin identificadores
             const option = document.createElement('option');
             option.value = account.rootAccount;
             option.textContent = account.rootNameAccount;
