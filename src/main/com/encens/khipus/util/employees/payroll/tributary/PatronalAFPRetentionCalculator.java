@@ -65,8 +65,12 @@ public class PatronalAFPRetentionCalculator extends Calculator<CategoryTributary
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2868139")){ // Eliseo Camacho
             instance.setLaborIndividualAFP(BigDecimal.ZERO);
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
-
         }
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("3610767")){ // Rene Rocha
+            instance.setLaborIndividualAFP(BigDecimal.ZERO);
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+        }
+
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("921886")){
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
         }

@@ -103,6 +103,10 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
             BigDecimal solidaryAFPValue = BigDecimalUtil.getPercentage(difference, BigDecimalUtil.toBigDecimal("1.15"), TWO_DECIMAL_SCALE);
             instance.setSolidaryAFP(solidaryAFPValue);
         }
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("3610767")) { // Rene Rocha
+            instance.setLaborIndividualAFP(BigDecimal.ZERO);
+            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+        }
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("921886")){
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
         }
