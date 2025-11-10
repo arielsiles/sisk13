@@ -8,8 +8,13 @@ window.DashboardNavigation = (function() {
             path: 'production/production-dashboard.html',
             script: 'production/production-charts.js'
         },
+        materiaPrima: {
+            name: 'Materia Prima',
+            path: 'materia-prima/materia-prima-dashboard.html',
+            script: 'materia-prima/materia-prima-charts.js'
+        },
         inventory: {
-            name: 'Inventarios', 
+            name: 'Inventarios',
             path: 'inventory/inventory-dashboard.html',
             script: 'inventory/inventory-charts.js'
         },

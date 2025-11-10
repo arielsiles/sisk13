@@ -232,7 +232,14 @@
         <servlet-class>com.encens.khipus.servlet.FinanceDashboardServlet</servlet-class>
         <load-on-startup>5</load-on-startup>
     </servlet>
-    
+
+    <!-- Materia Prima Dashboard Servlet -->
+    <servlet>
+        <servlet-name>MateriaPrimaDashboardServlet</servlet-name>
+        <servlet-class>com.encens.khipus.servlet.MateriaPrimaDashboardServlet</servlet-class>
+        <load-on-startup>6</load-on-startup>
+    </servlet>
+
 
     <!-- Faces Servlet Mapping -->
     <servlet-mapping>
@@ -263,7 +270,13 @@
         <servlet-name>FinanceDashboardServlet</servlet-name>
         <url-pattern>/finance-dashboard-api</url-pattern>
     </servlet-mapping>
-    
+
+    <!-- Materia Prima Dashboard API Mapping -->
+    <servlet-mapping>
+        <servlet-name>MateriaPrimaDashboardServlet</servlet-name>
+        <url-pattern>/materia-prima-dashboard-api</url-pattern>
+    </servlet-mapping>
+
 
     <!-- Session timeout -->
     <session-config>
