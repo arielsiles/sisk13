@@ -99,11 +99,15 @@
         </framework:restrictions>
     </framework:entity-query>
 
-    <factory name="xformulationList" value="#{xformulationQuery}"/>
-    <framework:entity-query name="xformulationQuery" ejbql="select p from XFormulation p">
+    <factory name="xformulationAprList" value="#{xformulationAprQuery}"/>
+    <framework:entity-query name="xformulationAprQuery" ejbql="select p from XFormulation p">
         <framework:restrictions>
             <value>p.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.production.FormulationState', 'APR')}</value>
         </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="xformulationList" value="#{xformulationAllQuery}"/>
+    <framework:entity-query name="xformulationAllQuery" ejbql="select p from XFormulation p">
     </framework:entity-query>
 
     <factory name="xproductionProductList" value="#{xproductionProductQuery}"/>

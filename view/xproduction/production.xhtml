@@ -198,13 +198,22 @@
                                      required="true"
                                      disabled="#{xproductionAction.approved or xproductionAction.managed}"
                                      tabindex="7">
-                        <s:selectItems value="#{xformulationList}"
-                                       var="formulation"
-                                       label="#{formulation.name}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
+                        <c:if test="#{xproductionAction.pending or !xproductionAction.managed}">
+                            <s:selectItems value="#{xformulationAprList}"
+                                           var="formulation"
+                                           label="#{formulation.name}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </c:if>
+                        <c:if test="#{xproductionAction.approved or xproductionAction.managed}">
+                            <s:selectItems value="#{xformulationList}"
+                                           var="formulation"
+                                           label="#{formulation.name}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                        </c:if>
 
+                        <s:convertEntity/>
                         <a4j:support event="onchange"
                                      action="#{xproductionAction.loadSupplies()}"
                                      reRender="ingredientPanel"
