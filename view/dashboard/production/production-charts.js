@@ -107,7 +107,7 @@ window.ProductionDashboard = (function() {
                 type: 'line',
                 backgroundColor: 'transparent',
                 zoomType: 'x',
-                marginBottom: 120,
+                marginBottom: 60,
                 marginRight: 180,
                 marginTop: 50,
                 spacingBottom: 20
@@ -135,7 +135,7 @@ window.ProductionDashboard = (function() {
                         fontSize: '10px',
                         whiteSpace: 'normal'
                     },
-                    y: 10,
+                    y: 20,
                     padding: 5,
                     overflow: 'allow'
                 },
@@ -175,7 +175,13 @@ window.ProductionDashboard = (function() {
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 borderRadius: 8,
                 formatter: function() {
-                    let tooltip = '<b>' + this.x + '</b><br/>';
+                    // Obtener la fecha real del array processed.dates usando el índice del punto
+                    const dateIndex = this.points[0].point.index;
+                    const dateStr = processed.dates[dateIndex]; // "2025-05-17"
+                    const parts = dateStr.split('-');
+                    const formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0]; // "17/05/2025"
+
+                    let tooltip = '<b>' + formattedDate + '</b><br/>';
                     let total = 0;
                     this.points.forEach(point => {
                         tooltip += '<span style="color:' + point.color + '">\u25CF</span> ' +
