@@ -39,7 +39,7 @@ window.ProductionDashboard = (function() {
      */
     function processDailyProductionData(rawData) {
         if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
-            console.log('No hay datos de producción diaria disponibles');
+            console.log('No hay datos de produccion diaria disponibles');
             return { dates: [], series: [] };
         }
 
@@ -97,7 +97,7 @@ window.ProductionDashboard = (function() {
             const container = document.getElementById('dailyProductionChart');
             if (container) {
                 container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">' +
-                    'No hay datos de producción para el período seleccionado</div>';
+                    'No hay datos de produccion para el periodo seleccionado</div>';
             }
             return null;
         }

@@ -260,13 +260,13 @@ window.DashboardCore = (function() {
             const data = await response.json();
             
             if (data.status === 'ok') {
-                showStatus('Conexión exitosa con el servidor!', 'success');
+                showStatus('Conexion exitosa con el servidor!', 'success');
                 setTimeout(hideStatus, 3000);
             } else {
                 showStatus('Error en la respuesta del servidor', 'error');
             }
         } catch (error) {
-            console.error('Error de conexión:', error);
+            console.error('Error de conexion:', error);
             showStatus(`Error de conexion: ${error.message}`, 'error');
         }
     }
