@@ -3,6 +3,7 @@ window.ProductionDashboard = (function() {
     'use strict';
 
     let dailyProductionChart;
+    let productionVsRawMaterialChart;
     let charts = [];
 
     /**
@@ -70,6 +71,53 @@ window.ProductionDashboard = (function() {
         });
 
         console.log(`Datos procesados: ${dates.length} fechas, ${series.length} productos`);
+        return { dates, series };
+    }
+
+    /**
+     * Procesa datos para el gráfico de Producción vs Materia Prima
+     * Agrupa por fecha sumando todos los productos para obtener totales diarios
+     */
+    function processProductionVsRawMaterialData(rawData) {
+        if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
+            console.log('No hay datos disponibles para Producción vs Materia Prima');
+            return { dates: [], series: [] };
+        }
+
+        // Agrupar por fecha sumando todos los productos
+        const dateMap = {};
+
+        rawData.forEach(item => {
+            const fecha = item.fecha;
+            const cantidadProducto = item.cantidad_producto_tn || 0;
+            const cantidadMateriaPrima = item.cantidad_materia_prima_tn || 0;
+
+            if (!dateMap[fecha]) {
+                dateMap[fecha] = {
+                    produccion: 0,
+                    materiaPrima: 0
+                };
+            }
+            dateMap[fecha].produccion += cantidadProducto;
+            dateMap[fecha].materiaPrima += cantidadMateriaPrima;
+        });
+
+        // Convertir a arrays ordenados
+        const dates = Object.keys(dateMap).sort();
+        const series = [
+            {
+                name: 'Produccion Total',
+                data: dates.map(fecha => dateMap[fecha].produccion),
+                color: '#28a745'
+            },
+            {
+                name: 'Materia Prima Total',
+                data: dates.map(fecha => dateMap[fecha].materiaPrima),
+                color: '#555'
+            }
+        ];
+
+        console.log(`Datos procesados Producción vs Materia Prima: ${dates.length} fechas`);
         return { dates, series };
     }
 
@@ -227,6 +275,151 @@ window.ProductionDashboard = (function() {
     }
 
     /**
+     * Crea el gráfico de líneas de Producción vs Materia Prima
+     */
+    function createProductionVsRawMaterialChart(data) {
+        // Destruir chart existente para evitar distorsión al actualizar
+        if (productionVsRawMaterialChart) {
+            productionVsRawMaterialChart.destroy();
+            productionVsRawMaterialChart = null;
+        }
+
+        // Limpiar completamente el contenedor para evitar residuos de DOM
+        const container = document.getElementById('productionVsRawMaterialChart');
+        if (container) {
+            container.innerHTML = '';
+        }
+
+        const processed = processProductionVsRawMaterialData(data);
+
+        if (processed.dates.length === 0) {
+            console.log('No hay datos para mostrar en el gráfico Producción vs Materia Prima');
+            if (container) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">' +
+                    'No hay datos de producción vs materia prima para el periodo seleccionado</div>';
+            }
+            return null;
+        }
+
+        const config = {
+            chart: {
+                type: 'line',
+                backgroundColor: 'transparent',
+                zoomType: 'x',
+                marginBottom: 60,
+                marginRight: 180,
+                marginTop: 50,
+                spacingBottom: 20
+            },
+            title: {
+                text: DashboardCore.fixEncoding('Uso de Materia Prima en Produccion'),
+                style: {
+                    color: '#333',
+                    fontSize: '20px',
+                    fontWeight: 'bold'
+                }
+            },
+            xAxis: {
+                categories: createHierarchicalDateLabels(processed.dates),
+                visible: true,
+                title: {
+                    text: ''
+                },
+                labels: {
+                    enabled: true,
+                    useHTML: false,
+                    rotation: 0,
+                    align: 'center',
+                    style: {
+                        fontSize: '10px',
+                        whiteSpace: 'normal'
+                    },
+                    y: 20,
+                    padding: 5,
+                    overflow: 'allow'
+                },
+                tickLength: 5,
+                tickmarkPlacement: 'on',
+                crosshair: true
+            },
+            yAxis: {
+                title: {
+                    text: 'Cantidad (Tn)',
+                    style: { fontSize: '14px' }
+                },
+                labels: {
+                    formatter: function() {
+                        return Highcharts.numberFormat(this.value, 1, '.', ',') + ' Tn';
+                    }
+                },
+                min: 0
+            },
+            plotOptions: {
+                line: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    marker: {
+                        enabled: true,
+                        radius: 4,
+                        symbol: 'circle'
+                    },
+                    lineWidth: 2
+                }
+            },
+            series: processed.series,
+            tooltip: {
+                shared: true,
+                crosshairs: true,
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: 8,
+                formatter: function() {
+                    // Obtener la fecha real del array processed.dates usando el índice del punto
+                    const dateIndex = this.points[0].point.index;
+                    const dateStr = processed.dates[dateIndex]; // "2025-05-17"
+                    const parts = dateStr.split('-');
+                    const formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0]; // "17/05/2025"
+
+                    let tooltip = '<b>' + formattedDate + '</b><br/>';
+                    this.points.forEach(point => {
+                        tooltip += '<span style="color:' + point.color + '">\u25CF</span> ' +
+                                   point.series.name + ': <b>' +
+                                   Highcharts.numberFormat(point.y, 2, '.', ',') + ' Tn</b><br/>';
+                    });
+                    return tooltip;
+                }
+            },
+            legend: {
+                enabled: true,
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                itemStyle: {
+                    fontSize: '11px',
+                    color: '#333',
+                    cursor: 'pointer'
+                },
+                itemHoverStyle: {
+                    color: '#000'
+                },
+                itemHiddenStyle: {
+                    color: '#ccc'
+                },
+                symbolRadius: 5,
+                symbolHeight: 10,
+                symbolWidth: 10,
+                itemDistance: 8
+            },
+            credits: { enabled: false }
+        };
+
+        productionVsRawMaterialChart = Highcharts.chart('productionVsRawMaterialChart', config);
+        charts[1] = productionVsRawMaterialChart;
+
+        return productionVsRawMaterialChart;
+    }
+
+    /**
      * Actualiza las estadísticas en las cards superiores
      */
     function updateProductionStats(data) {
@@ -281,8 +474,11 @@ window.ProductionDashboard = (function() {
             // Actualizar estadísticas (cards)
             updateProductionStats(dailyData);
 
-            // Crear gráfico de líneas
+            // Crear gráfico de líneas de Producción Diaria
             createDailyProductionChart(dailyData);
+
+            // Crear gráfico de Producción vs Materia Prima
+            createProductionVsRawMaterialChart(dailyData);
 
             console.log('Dashboard de producción cargado exitosamente');
 
@@ -365,6 +561,8 @@ window.ProductionDashboard = (function() {
         fetchProductionData,
         processDailyProductionData,
         createDailyProductionChart,
+        processProductionVsRawMaterialData,
+        createProductionVsRawMaterialChart,
         updateProductionStats
     };
 })();
