@@ -1,16 +1,23 @@
 package com.encens.khipus.servlet;
 
+import com.encens.khipus.dataintegration.configuration.Configuration;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Servlet simple para dashboard - Sin dependencias de Seam/JSF
@@ -83,11 +90,8 @@ public class DashboardServlet extends HttpServlet {
     
     private String getProducerData(String startDate, String endDate) {
         StringBuilder json = new StringBuilder("[");
-        
-        try (Connection conn = DriverManager.getConnection(
-                DatabaseConfig.getDbUrl(), 
-                DatabaseConfig.getDbUser(), 
-                DatabaseConfig.getDbPassword())) {
+
+        try (Connection conn = getConnection()) {
             
             // Consulta corregida: productormateriaprima hereda de persona
             String sql = "SELECT " +
@@ -141,11 +145,8 @@ public class DashboardServlet extends HttpServlet {
     
     private String getMaterialData(String startDate, String endDate) {
         StringBuilder json = new StringBuilder("[");
-        
-        try (Connection conn = DriverManager.getConnection(
-                DatabaseConfig.getDbUrl(), 
-                DatabaseConfig.getDbUser(), 
-                DatabaseConfig.getDbPassword())) {
+
+        try (Connection conn = getConnection()) {
             
             // Consulta corregida con nombres reales de tablas
             String sql = "SELECT " +
@@ -198,11 +199,8 @@ public class DashboardServlet extends HttpServlet {
     
     private String getZoneData(String startDate, String endDate) {
         StringBuilder json = new StringBuilder("[");
-        
-        try (Connection conn = DriverManager.getConnection(
-                DatabaseConfig.getDbUrl(), 
-                DatabaseConfig.getDbUser(), 
-                DatabaseConfig.getDbPassword())) {
+
+        try (Connection conn = getConnection()) {
             
             // Consulta corregida con nombres reales de tablas
             String sql = "SELECT " +
@@ -257,7 +255,29 @@ public class DashboardServlet extends HttpServlet {
         if (str == null) return "";
         return str.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
     }
-    
+
+    /**
+     * Obtener conexión a la base de datos via JNDI DataSource
+     * Usa el mismo datasource que el resto de la aplicación KHIPUS
+     */
+    private Connection getConnection() throws SQLException {
+        String dataSourceJNDI = Configuration.i.getLocalDataSource();
+        try {
+            Context context = new InitialContext();
+            DataSource dataSource = (DataSource) context.lookup(dataSourceJNDI);
+
+            if (dataSource == null) {
+                throw new SQLException("DataSource not found: " + dataSourceJNDI);
+            }
+
+            System.out.println("Getting connection from JNDI DataSource: " + dataSourceJNDI);
+            return dataSource.getConnection();
+
+        } catch (NamingException e) {
+            throw new SQLException("Cannot lookup JNDI DataSource: " + dataSourceJNDI, e);
+        }
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {

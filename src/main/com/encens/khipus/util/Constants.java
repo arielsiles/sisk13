@@ -37,6 +37,11 @@ public final class Constants {
     public static final String CASHBOX_SCHEMA   = "terdemol";
     public static final String ACADEMIC_SCHEMA  = "terdemol";
 
+    /*public static final String KHIPUS_SCHEMA    = "sic_terdemol";
+    public static final String FINANCES_SCHEMA  = "sic_terdemol";
+    public static final String CASHBOX_SCHEMA   = "sic_terdemol";
+    public static final String ACADEMIC_SCHEMA  = "sic_terdemol";*/
+
     /*public static final String KHIPUS_SCHEMA    = "ilva3";
     public static final String FINANCES_SCHEMA  = "ilva3";
     public static final String CASHBOX_SCHEMA   = "ilva3";

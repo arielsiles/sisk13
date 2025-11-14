@@ -1,9 +1,15 @@
 package com.encens.khipus.servlet;
 
+import com.encens.khipus.dataintegration.configuration.Configuration;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
@@ -87,13 +93,25 @@ public abstract class BaseDashboardServlet extends HttpServlet {
     }
     
     /**
-     * Obtener conexión a la base de datos
+     * Obtener conexión a la base de datos via JNDI DataSource
+     * Usa el mismo datasource que el resto de la aplicación KHIPUS
      */
     protected Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-            DatabaseConfig.getDbUrl(), 
-            DatabaseConfig.getDbUser(), 
-            DatabaseConfig.getDbPassword());
+        String dataSourceJNDI = Configuration.i.getLocalDataSource();
+        try {
+            Context context = new InitialContext();
+            DataSource dataSource = (DataSource) context.lookup(dataSourceJNDI);
+
+            if (dataSource == null) {
+                throw new SQLException("DataSource not found: " + dataSourceJNDI);
+            }
+
+            System.out.println("Getting connection from JNDI DataSource: " + dataSourceJNDI);
+            return dataSource.getConnection();
+
+        } catch (NamingException e) {
+            throw new SQLException("Cannot lookup JNDI DataSource: " + dataSourceJNDI, e);
+        }
     }
     
     /**
