@@ -39,10 +39,10 @@ public class ProductionDashboardServlet extends BaseDashboardServlet {
                 "GROUP BY pe.nombres " +
                 "ORDER BY peso DESC";
         
-        String errorFallback = "[{\"name\":\"Productor Mock 1\",\"peso\":150.5},{\"name\":\"Productor Mock 2\",\"peso\":200.25}]";
+        String errorFallback = "[]";
         return executeQueryToJson(sql, startDate, endDate, errorFallback);
     }
-    
+
     private String getMaterialData(String startDate, String endDate) {
         String sql = "SELECT " +
                 "COALESCE(m.nombre, 'Material Desconocido') as name, " +
@@ -52,11 +52,11 @@ public class ProductionDashboardServlet extends BaseDashboardServlet {
                 "WHERE c.fecha BETWEEN ? AND ? " +
                 "GROUP BY m.nombre " +
                 "ORDER BY peso DESC";
-        
-        String errorFallback = "[{\"name\":\"Material Mock 1\",\"peso\":300.5},{\"name\":\"Material Mock 2\",\"peso\":250.75}]";
+
+        String errorFallback = "[]";
         return executeQueryToJson(sql, startDate, endDate, errorFallback);
     }
-    
+
     private String getZoneData(String startDate, String endDate) {
         String sql = "SELECT " +
                 "COALESCE(z.nombre, 'Zona Desconocida') as name, " +
@@ -67,7 +67,7 @@ public class ProductionDashboardServlet extends BaseDashboardServlet {
                 "GROUP BY z.nombre " +
                 "ORDER BY peso DESC";
 
-        String errorFallback = "[{\"name\":\"Zona Mock 1\",\"peso\":400.75},{\"name\":\"Zona Mock 2\",\"peso\":350.25}]";
+        String errorFallback = "[]";
         return executeQueryToJson(sql, startDate, endDate, errorFallback);
     }
 

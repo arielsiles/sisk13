@@ -97,7 +97,7 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
                 "ORDER BY SUM(d.total) DESC " +
                 "LIMIT 15";  // Solo top 15 grupos
         
-        String errorFallback = "[{\"name\":\"Alimentos\",\"peso\":15000.50},{\"name\":\"Materiales\",\"peso\":12000.25},{\"name\":\"Herramientas\",\"peso\":8500.75}]";
+        String errorFallback = "[]";
         String result = executeQueryToJson(sql, startDate, endDate, errorFallback);
         
         // Guardar en cache
@@ -151,7 +151,7 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
                 "WHERE e.fecha BETWEEN ? AND ? " +
                 "ORDER BY g.descri";
         
-        String errorFallback = "[{\"id\":\"1\",\"name\":\"Alimentos\"},{\"id\":\"2\",\"name\":\"Materiales\"},{\"id\":\"3\",\"name\":\"Herramientas\"}]";
+        String errorFallback = "[]";
         String result = executeQueryToJson(sql, startDate, endDate, errorFallback);
         
         cache.put(cacheKey, new CacheEntry(result));
@@ -165,7 +165,7 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
      */
     private String getSubgroupsByGroupData(String startDate, String endDate, String groupId) {
         if (groupId == null || groupId.trim().isEmpty()) {
-            return "[{\"name\":\"Seleccione un grupo\",\"peso\":0}]";
+            return "[]";
         }
         
         String cacheKey = "subgroups_" + groupId + "_" + startDate + "_" + endDate;
@@ -194,7 +194,7 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
                 "ORDER BY SUM(d.total) DESC " +
                 "LIMIT 10";
         
-        String errorFallback = "[{\"name\":\"Subgrupo A\",\"peso\":5000},{\"name\":\"Subgrupo B\",\"peso\":3000}]";
+        String errorFallback = "[]";
         String result = executeQueryToJsonWithParam(sql, startDate, endDate, groupId, errorFallback);
         
         cache.put(cacheKey, new CacheEntry(result));
@@ -361,41 +361,17 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
     }
     
     /**
-     * Datos de fallback con estructura correlacionada
+     * Datos de fallback con estructura correlacionada (sin datos mock)
      */
     private String getCorrelatedFallbackData() {
-        return "{" +
-            "\"groups\":[" +
-                "{\"id\":\"1\",\"name\":\"Productos Alimenticios\",\"peso\":15420.75}," +
-                "{\"id\":\"2\",\"name\":\"Materiales de Construcción\",\"peso\":12800.50}," +
-                "{\"id\":\"3\",\"name\":\"Herramientas y Equipos\",\"peso\":8900.25}" +
-            "]," +
-            "\"subgroupsByGroup\":{" +
-                "\"1\":[" +
-                    "{\"name\":\"Lácteos y Derivados\",\"peso\":8000}," +
-                    "{\"name\":\"Cereales y Granos\",\"peso\":5000}," +
-                    "{\"name\":\"Carnes y Embutidos\",\"peso\":2420.75}" +
-                "]," +
-                "\"2\":[" +
-                    "{\"name\":\"Cemento y Agregados\",\"peso\":7500}," +
-                    "{\"name\":\"Materiales Metálicos\",\"peso\":3300.50}," +
-                    "{\"name\":\"Pinturas y Acabados\",\"peso\":2000}" +
-                "]," +
-                "\"3\":[" +
-                    "{\"name\":\"Herramientas Manuales\",\"peso\":4500}," +
-                    "{\"name\":\"Equipos Eléctricos\",\"peso\":2900.25}," +
-                    "{\"name\":\"Maquinaria Menor\",\"peso\":1500}" +
-                "]" +
-            "}" +
-        "}";
+        return "{\"groups\":[],\"subgroupsByGroup\":{}}";
     }
 
     /**
-     * Datos de almacenes (mock por ahora - se puede implementar después)
+     * Datos de almacenes (sin datos por implementar consulta real)
      */
     private String getWarehousesData(String startDate, String endDate) {
-        // Mock data para almacenes - se puede reemplazar con consulta real después
-        return "[{\"name\":\"Almacén Central\",\"peso\":2500},{\"name\":\"Almacén Norte\",\"peso\":1800},{\"name\":\"Almacén Sur\",\"peso\":1200}]";
+        return "[]";
     }
     
     /**
@@ -418,7 +394,7 @@ public class InventoryDashboardServlet extends BaseDashboardServlet {
                 "ORDER BY SUM(md.monto) DESC " +
                 "LIMIT 20";
         
-        String errorFallback = "[{\"name\":\"ADMINISTRACIÓN\",\"peso\":15001.59},{\"name\":\"PRODUCCIÓN\",\"peso\":163221.34},{\"name\":\"ALMACÉN\",\"peso\":5489.53},{\"name\":\"MANTENIMIENTO GRAL\",\"peso\":14881.92},{\"name\":\"PROYECTOS\",\"peso\":548237.87}]";
+        String errorFallback = "[]";
         return executeQueryToJson(sql, startDate, endDate, errorFallback);
     }
 }
