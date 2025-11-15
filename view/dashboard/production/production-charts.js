@@ -296,7 +296,7 @@ window.ProductionDashboard = (function() {
             console.log('No hay datos para mostrar en el gráfico Producción vs Materia Prima');
             if (container) {
                 container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">' +
-                    'No hay datos de producción vs materia prima para el periodo seleccionado</div>';
+                    'No hay datos de produccion vs materia prima para el periodo seleccionado</div>';
             }
             return null;
         }
