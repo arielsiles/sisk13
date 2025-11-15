@@ -312,7 +312,7 @@ window.ProductionDashboard = (function() {
                 spacingBottom: 20
             },
             title: {
-                text: DashboardCore.fixEncoding('Uso de Materia Prima en Produccion'),
+                text: DashboardCore.fixEncoding('Producción Total vs Materia Prima'),
                 style: {
                     color: '#333',
                     fontSize: '20px',
