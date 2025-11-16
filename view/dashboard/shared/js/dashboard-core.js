@@ -85,10 +85,17 @@ window.DashboardCore = (function() {
             startDateElement.value = startOfYear.toISOString().split('T')[0];
         }
         
-        // Establecer período inicial como "Año actual"
+        // Establecer período inicial según el semestre actual
         const periodSelector = document.getElementById('periodSelector');
         if (periodSelector) {
-            periodSelector.value = 'current_year';
+            const currentMonth = today.getMonth(); // 0-11
+            // Enero-Junio (0-5) = Primer Semestre
+            // Julio-Diciembre (6-11) = Segundo Semestre
+            const defaultPeriod = currentMonth < 6 ? 'first_semester' : 'second_semester';
+            periodSelector.value = defaultPeriod;
+
+            // Aplicar el período calculado automáticamente
+            applyDatePeriod(defaultPeriod);
         }
         
         // Agregar listeners para detectar cambios manuales
