@@ -1,9 +1,10 @@
 # Dashboard Moderno - Estado del Proyecto
 
-**Última actualización:** 2025-11-14
-**Versión:** 1.0 - Estable
+**Última actualización:** 2025-11-15
+**Versión:** 1.1 - Estable (con gráfico Acopio Diario)
 **Branch:** terdemol_dashboard
 **Commits importantes:**
+- `4c5cb26d` Dashboard, release v6.0.62
 - `0d6e9832` Dashboard, quitando mocks de ejemplo
 - `a47a4207` Uso datasource java:/khipusDatasource en Dashboard
 - `9fe992dc` v6.0.61 dashboard rev1
@@ -28,12 +29,13 @@
   - Leyenda en lado derecho, vertical, sin decoración
   - SQL: `xpr_producto` + `xpr_produccion` + `xpr_plan` + `inv_articulos`
 
-- **Gráfico 2: Uso de Materia Prima en Producción**
+- **Gráfico 2: Producción Total vs Materia Prima**
   - 2 líneas comparativas:
     - Verde: Total Producción (agregado de todos los productos)
     - Gris oscuro: Total Materia Prima usada
   - Agregación por fecha (suma de todos los productos por día)
   - Mismo formato de eje X jerárquico
+  - Título actualizado: "Producción Total vs Materia Prima"
 
 **Cards Estadísticas (4):**
 1. Productos (cantidad de productos diferentes)
@@ -50,15 +52,37 @@
 
 **Estado:** ✅ Completamente funcional
 
-**Gráficos (3 sunburst):**
-1. Acopio por Productores
-2. Acopio por Materiales
-3. Acopio por Zonas
+**Gráficos:**
+- **Gráfico 1: Acopio diario x Materia Prima** (line chart) ⭐ NUEVO
+  - Múltiples líneas, una por cada tipo de material
+  - Eje X: Fechas jerárquicas (días arriba, meses agrupados abajo)
+  - Eje Y: Peso en toneladas (Tn)
+  - Leyenda derecha con totales por material (ej: "BARITINA 277.74 Tn")
+  - Título de leyenda muestra total general: "Acopio Total: 8,121.32 Tn"
+  - Tooltips compartidos con fecha dd/MM/yyyy
+  - Fondo blanco con padding y sombra (estilo card)
+  - SQL: `acopiomp` + `metaproductoproduccion` agrupado por fecha y material
+  - Procesamiento manual de ResultSet (columnas: fecha, material, peso_diario_tn)
+
+- **Gráfico 2: Acopio de Proveedores por Peso** (barra horizontal)
+  - Top 10 productores por peso total
+
+- **Gráfico 3: Distribución de Materias Primas por Peso** (donut)
+  - Distribución porcentual por tipo de material
+
+- **Gráfico 4: Distribución de Acopio por Zonas** (pie)
+  - Distribución por zonas productivas
+
+**Cards Estadísticas (4):**
+1. Total Productores
+2. Peso Total (Tn) - ⚠️ Corregido: ahora suma solo materialsData (evita duplicación)
+3. Tipos de Material
+4. Zonas Activas
 
 **Características:**
 - Datos de tabla `acopiomp`
 - Unidades en toneladas (Tn)
-- Gráficos sunburst interactivos
+- Gráficos interactivos (line, bar, donut, pie)
 - JOIN con `productormateriaprima`, `persona`, `metaproductoproduccion`, `zonaproductiva`
 
 **Archivos:**
@@ -370,6 +394,19 @@ GROUP BY xp.fecha, a.descri
 ORDER BY xp.fecha ASC, a.descri ASC
 ```
 
+### Materia Prima - Acopio Diario ⭐ NUEVO
+```sql
+SELECT c.fecha as fecha,
+       COALESCE(m.nombre, 'Material Desconocido') as material,
+       COALESCE(SUM(c.pesobal), 0) / 1000 as peso_diario_tn
+FROM acopiomp c
+JOIN metaproductoproduccion m ON c.idmetaproductoproduccion = m.idmetaproductoproduccion
+WHERE c.fecha BETWEEN ? AND ?
+GROUP BY c.fecha, m.idmetaproductoproduccion, m.nombre
+ORDER BY c.fecha ASC, m.nombre ASC
+```
+**Nota:** Procesamiento manual de ResultSet (no usa `executeQueryToJson` porque necesita columnas específicas: fecha, material, peso_diario_tn)
+
 ### Materia Prima - Productores
 ```sql
 SELECT COALESCE(pe.nombres, 'Sin Nombre') as name,
@@ -506,6 +543,13 @@ ant -Dprofile=prod deploy
    - Finanzas: Bolivianos (Bs)
    - Fechas: yyyy-MM-dd en SQL, dd/MM/yyyy en tooltips
 
+8. **Período Inicial Automático** ⭐ NUEVO
+   - Al cargar dashboard, se selecciona automáticamente el semestre según fecha actual
+   - Enero-Junio (meses 0-5): "Primer Semestre" (01/01 - 30/06)
+   - Julio-Diciembre (meses 6-11): "Segundo Semestre" (01/07 - 31/12)
+   - Implementado en `dashboard-core.js` función `initDates()`
+   - Reduce carga inicial: 6 meses vs 12 meses completos
+
 ### 🔧 Troubleshooting Común
 
 **Chart no se ve / se corta:**
@@ -547,6 +591,25 @@ ant -Dprofile=prod deploy
 ---
 
 ## Historial de Cambios
+
+### v1.1 - 2025-11-15 (Gráfico Acopio Diario + Mejoras)
+- ✅ **NUEVO:** Gráfico de líneas "Acopio diario x Materia Prima" en dashboard Materia Prima
+  - Múltiples series por tipo de material
+  - Fechas jerárquicas (días/meses) reutilizando patrón de Producción
+  - Totales por material en leyenda (ej: "BARITINA 277.74 Tn")
+  - Total general en título de leyenda ("Acopio Total: 8,121.32 Tn")
+  - Fondo blanco con estilo card consistente
+- ✅ **FIX:** Corregido bug de duplicación en card "Peso Total" (sumaba producersData + materialsData)
+- ✅ **Backend:** Nuevo endpoint `daily_acopio` en MateriaPrimaDashboardServlet
+  - Procesamiento manual de ResultSet para estructura específica
+  - SQL: GROUP BY fecha + material con agregación diaria
+- ✅ **Mejoras UI:**
+  - Actualizado título gráfico Producción: "Producción Total vs Materia Prima"
+  - Actualizado título gráfico Materia Prima: "Acopio diario x Materia Prima"
+- ✅ **UX:** Período inicial cambiado de "Año actual" a semestre automático
+  - Enero-Junio: selecciona "Primer Semestre"
+  - Julio-Diciembre: selecciona "Segundo Semestre"
+  - Reduce carga inicial de datos (6 meses vs 12 meses)
 
 ### v1.0 - 2025-11-14 (Versión Estable)
 - ✅ 4 dashboards implementados y funcionales
@@ -591,8 +654,8 @@ D:\Intellij\sisk13\
 │   │   ├── components/
 │   │   │   ├── controls.html (sin Test Conexión)
 │   │   │   └── loading-overlay.html
-│   │   ├── scripts/
-│   │   │   ├── dashboard-core.js ⭐ (carga datos, períodos)
+│   │   ├── js/
+│   │   │   ├── dashboard-core.js ⭐ (períodos, semestre automático)
 │   │   │   └── dashboard-navigation.js (cambio tabs)
 │   │   └── styles/
 │   │       ├── base.css
@@ -604,8 +667,8 @@ D:\Intellij\sisk13\
 │   │   └── production-charts.js ⭐ (fechas jerárquicas)
 │   │
 │   ├── materiaPrima/
-│   │   ├── materia-prima-dashboard.html (3 sunburst)
-│   │   └── materia-prima-charts.js
+│   │   ├── materia-prima-dashboard.html (4 cards + 1 line chart + 3 charts)
+│   │   └── materia-prima-charts.js ⭐ (fechas jerárquicas + totales)
 │   │
 │   ├── inventory/
 │   │   ├── inventory-dashboard.html (selector + 3 charts)
