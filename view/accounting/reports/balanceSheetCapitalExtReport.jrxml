@@ -28,14 +28,14 @@
 	</variable>
 	<variable name="totalCreditBalance" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$V{creditBalance}]]></variableExpression>
-		<initialValueExpression><![CDATA[]]></initialValueExpression>
+		<initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
 	</variable>
 	<variable name="totalCapital" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[$V{totalCreditBalance}.add( $P{profitOrLoss} )]]></variableExpression>
+		<variableExpression><![CDATA[($V{totalCreditBalance} != null ? $V{totalCreditBalance} : java.math.BigDecimal.ZERO).add($P{profitOrLoss} != null ? $P{profitOrLoss} : java.math.BigDecimal.ZERO)]]></variableExpression>
 	</variable>
 	<variable name="totalPasivoPatrimonio" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[$P{totalLiabilities}.add( $V{totalCapital} )]]></variableExpression>
-		<initialValueExpression><![CDATA[]]></initialValueExpression>
+		<variableExpression><![CDATA[($P{totalLiabilities} != null ? $P{totalLiabilities} : java.math.BigDecimal.ZERO).add($V{totalCapital} != null ? $V{totalCapital} : java.math.BigDecimal.ZERO)]]></variableExpression>
+		<initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
 	</variable>
 	<group name="GroupRoot">
 		<groupExpression><![CDATA[$F{rootAccount}]]></groupExpression>
@@ -130,14 +130,14 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalCapital}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($V{totalCreditBalance} != null ? $V{totalCreditBalance} : java.math.BigDecimal.ZERO).add($P{profitOrLoss} != null ? $P{profitOrLoss} : java.math.BigDecimal.ZERO)]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="200" y="27" width="60" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalPasivoPatrimonio}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($P{totalLiabilities} != null ? $P{totalLiabilities} : java.math.BigDecimal.ZERO).add(($V{totalCreditBalance} != null ? $V{totalCreditBalance} : java.math.BigDecimal.ZERO).add($P{profitOrLoss} != null ? $P{profitOrLoss} : java.math.BigDecimal.ZERO))]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
