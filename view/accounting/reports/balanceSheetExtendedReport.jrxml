@@ -28,22 +28,22 @@
 	<field name="credit" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
 	</field>
-	<group name="ZoneA">
-		<groupExpression><![CDATA[$F{account}]]></groupExpression>
+	<group name="ZoneA" isStartNewPage="false">
+		<groupExpression><![CDATA[1]]></groupExpression>
 		<groupHeader>
-			<band height="424">
+			<band height="100" splitType="Stretch">
 				<subreport isUsingCache="true">
-					<reportElement x="0" y="0" width="71" height="44"/>
+					<reportElement x="0" y="0" width="258" height="1"/>
 					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
 					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BALANCESHEETSUBREPORT}]]></subreportExpression>
 				</subreport>
 				<subreport isUsingCache="true">
-					<reportElement x="276" y="0" width="71" height="44"/>
+					<reportElement x="276" y="0" width="258" height="1"/>
 					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
 					<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{BALANCELIABILITIESSUBREPORT}]]></subreportExpression>
 				</subreport>
 				<subreport isUsingCache="true">
-					<reportElement x="276" y="378" width="71" height="44"/>
+					<reportElement positionType="Float" x="276" y="15" width="258" height="1"/>
 					<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
 					<subreportParameter name="totalLiabilities">
 						<subreportParameterExpression><![CDATA[$P{totalLiabilities}]]></subreportParameterExpression>
@@ -109,10 +109,4 @@
 			</textField>
 		</band>
 	</title>
-	<pageHeader>
-		<band splitType="Stretch"/>
-	</pageHeader>
-	<columnHeader>
-		<band splitType="Stretch"/>
-	</columnHeader>
 </jasperReport>
