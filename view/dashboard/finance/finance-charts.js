@@ -1020,14 +1020,14 @@ window.FinanceDashboard = (function() {
         
         // Actualizar información en el header central
         const centerSection = document.getElementById('explorerCenter');
+        const montoFormateado = 'Bs ' + Highcharts.numberFormat(filteredTotal, 0, '.', ',');
         if (centerSection) {
-            const montoFormateado = 'Bs ' + Highcharts.numberFormat(filteredTotal, 0, '.', ',');
             centerSection.innerHTML = `Total: ${montoFormateado} | ${filteredItems.length} conceptos`;
         }
-        
+
         // Configuración del gráfico explorador (barras horizontales, sin título)
         const tipoLabel = isIngreso ? 'Ingresos' : 'Egresos';
-        
+
         const config = {
             chart: {
                 type: 'bar', // Cambio a barras horizontales
@@ -1040,13 +1040,13 @@ window.FinanceDashboard = (function() {
             xAxis: {
                 categories: filteredItems.map(item => item.name),
                 title: { text: `Conceptos de ${tipoLabel}` }, // Sin acentos
-                labels: { 
+                labels: {
                     style: { fontSize: '11px' }
                     // Sin rotación para barras horizontales
                 }
             },
             yAxis: {
-                title: { text: 'Monto (Bs)' },
+                title: { text: `Monto (Bs) - Total: ${montoFormateado}` },
                 labels: {
                     formatter: function() {
                         return 'Bs ' + Highcharts.numberFormat(this.value, 0, '.', ',');
@@ -1177,12 +1177,16 @@ window.FinanceDashboard = (function() {
     // Función auxiliar para crear gráfico con datos específicos
     function createExplorerChartWithData(items, accountName, isIngreso) {
         const tipoLabel = isIngreso ? 'Ingresos' : 'Egresos';
-        
+
+        // Calcular total de los items
+        const totalAmount = items.reduce((sum, item) => sum + (item.peso || 0), 0);
+        const montoFormateado = 'Bs ' + Highcharts.numberFormat(totalAmount, 0, '.', ',');
+
         // Crear datos del gráfico con colores dinámicos
         const chartData = items.map(item => {
             const valor = item.peso || 0;
             const esPositivo = valor >= 0;
-            
+
             // Colores según signo del valor
             let color;
             if (isIngreso) {
@@ -1190,14 +1194,14 @@ window.FinanceDashboard = (function() {
             } else {
                 color = esPositivo ? 'rgba(220, 53, 69, 0.9)' : 'rgba(40, 167, 69, 0.9)';
             }
-            
+
             return {
                 name: item.name,
                 y: valor,
                 color: color
             };
         });
-        
+
         const config = {
             chart: {
                 type: 'bar',
@@ -1210,12 +1214,12 @@ window.FinanceDashboard = (function() {
             xAxis: {
                 categories: items.map(item => item.name),
                 title: { text: `Conceptos de ${tipoLabel}` },
-                labels: { 
+                labels: {
                     style: { fontSize: '11px' }
                 }
             },
             yAxis: {
-                title: { text: 'Monto (Bs)' },
+                title: { text: `Monto (Bs) - Total: ${montoFormateado}` },
                 labels: {
                     formatter: function() {
                         return 'Bs ' + Highcharts.numberFormat(this.value, 0, '.', ',');
