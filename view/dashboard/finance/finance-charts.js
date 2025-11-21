@@ -119,39 +119,36 @@ window.FinanceDashboard = (function() {
         );
     }
     
-    // Función para obtener cuentas NO configuradas (para gráfico explorador)
+    // Función para obtener TODAS las cuentas (para gráfico explorador)
     function getUnConfiguredAccounts(rawData) {
         if (!rawData || !Array.isArray(rawData)) {
             return [];
         }
-        
-        const configuredAccounts = Object.keys(CHART_CONFIG);
+
         const uniqueAccounts = [];
-        
+
         rawData.forEach(item => {
-            // Solo incluir cuentas que NO están en CHART_CONFIG
-            if (!configuredAccounts.includes(item.rootAccount)) {
-                // Evitar duplicados por rootAccount
-                const exists = uniqueAccounts.find(acc => acc.rootAccount === item.rootAccount);
-                if (!exists) {
-                    uniqueAccounts.push({
-                        rootAccount: item.rootAccount,
-                        rootNameAccount: item.rootNameAccount || 'Sin Nombre',
-                        accountType: item.accountType
-                    });
-                }
+            // Incluir TODAS las cuentas (configuradas y no configuradas)
+            // Evitar duplicados por rootAccount
+            const exists = uniqueAccounts.find(acc => acc.rootAccount === item.rootAccount);
+            if (!exists) {
+                uniqueAccounts.push({
+                    rootAccount: item.rootAccount,
+                    rootNameAccount: item.rootNameAccount || 'Sin Nombre',
+                    accountType: item.accountType
+                });
             }
         });
-        
+
         // Separar por tipo y ordenar: Ingresos primero, luego Egresos
         const ingresosAccounts = uniqueAccounts
             .filter(acc => acc.accountType === 'I')
             .sort((a, b) => a.rootNameAccount.localeCompare(b.rootNameAccount));
-            
+
         const egresosAccounts = uniqueAccounts
             .filter(acc => acc.accountType === 'E')
             .sort((a, b) => a.rootNameAccount.localeCompare(b.rootNameAccount));
-        
+
         // Combinar: Ingresos primero, Egresos después
         return [...ingresosAccounts, ...egresosAccounts];
     }
@@ -712,36 +709,36 @@ window.FinanceDashboard = (function() {
     }
     
     // ========================================================================
-    // GRÁFICO EXPLORADOR DINÁMICO - Para cuentas NO configuradas
+    // GRÁFICO EXPLORADOR DINÁMICO - Para TODAS las cuentas
     // ========================================================================
     
     // Función principal para crear el gráfico explorador con selector
     function createDynamicExplorerChart(rawData) {
-        // Obtener cuentas no configuradas
+        // Obtener TODAS las cuentas (Ingresos y Egresos)
         const unConfiguredAccounts = getUnConfiguredAccounts(rawData);
-        
+
         if (unConfiguredAccounts.length === 0) {
-            console.info('ℹ️ No hay cuentas adicionales para explorar (todas están en CHART_CONFIG)');
+            console.info('ℹ️ No hay cuentas disponibles para explorar');
             return;
         }
-        
+
         // Crear contenedor del explorador
         const explorerContainer = createExplorerContainer();
-        
-        // Crear selector con cuentas no configuradas
+
+        // Crear selector con todas las cuentas
         const selector = createExplorerSelector(unConfiguredAccounts, explorerContainer);
-        
+
         // Crear gráfico inicial con la primera cuenta de EGRESOS
         const firstEgresoAccount = unConfiguredAccounts.find(account => account.accountType === 'E');
         const defaultAccount = firstEgresoAccount || unConfiguredAccounts[0]; // Fallback al primero si no hay egresos
-        
+
         // Sincronizar selector con la cuenta por defecto
         selector.value = defaultAccount.rootAccount;
-        
+
         // Actualizar gráfico con la cuenta por defecto
         updateExplorerChart(defaultAccount.rootAccount, rawData);
-        
-        console.info(`📊 Grafico explorador creado con ${unConfiguredAccounts.length} cuentas adicionales`);
+
+        console.info(`📊 Grafico explorador creado con ${unConfiguredAccounts.length} cuentas disponibles`);
     }
     
     // Función para crear el contenedor del explorador
