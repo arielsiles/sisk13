@@ -1,7 +1,7 @@
 # Dashboard Moderno - Estado del Proyecto
 
-**Última actualización:** 2025-11-15
-**Versión:** 1.1 - Estable (con gráfico Acopio Diario)
+**Última actualización:** 2025-11-21
+**Versión:** 1.2 - Estable (Dashboard Finanzas mejorado)
 **Branch:** terdemol_dashboard
 **Commits importantes:**
 - `4c5cb26d` Dashboard, release v6.0.62
@@ -119,22 +119,69 @@
 
 #### 4. Finanzas (`/view/dashboard/finance/`)
 
-**Estado:** ✅ Implementado
+**Estado:** ✅ Completamente funcional con arquitectura unificada
 
 **Cards Estadísticas (4):**
-1. Total Ingresos
-2. Total Gastos
-3. Balance Neto
-4. Conceptos Registrados
+1. Total Ingresos (suma de todos los ingresos con signo)
+2. Total Gastos (suma de todos los gastos con signo)
+3. Balance Neto (ingresos - gastos)
+4. Conceptos Registrados (cantidad total de cuentas)
 
-**Gráficos (2):**
-1. Gráfico de Ingresos
-2. Gráfico de Gastos
+**Gráficos Summary (2 principales):**
+1. **Gráfico INGRESOS** (barra horizontal)
+   - Muestra TODAS las categorías de ingresos de la consulta SQL
+   - Agrupa por `rootNameAccount` (cuenta nivel 3)
+   - Colores dinámicos: verde para positivos, rojo para negativos
+   - Total mostrado en título del gráfico
+
+2. **Gráfico EGRESOS** (barra horizontal)
+   - Muestra TODAS las categorías de egresos de la consulta SQL
+   - Agrupa por `rootNameAccount` (cuenta nivel 3)
+   - Colores dinámicos: rojo para positivos, verde para negativos
+   - Total mostrado en título del gráfico
+
+**Gráficos Detallados (N gráficos dinámicos):**
+- Sistema basado en `CHART_CONFIG` para configurar qué cuentas mostrar con gráficos detallados
+- Layout 2x2 (dos gráficos por fila)
+- Secciones separadas: "Detalle de Ingresos" y "Detalle de Egresos"
+- Cuentas configuradas actualmente:
+  - **INGRESOS:** VENTAS, DEVOLUCIONES/REBAJAS, OTROS INGRESOS, INGRESOS EXTRAORDINARIOS
+  - **EGRESOS:** FLETES Y TRANSPORTES, MATERIAL DIRECTO, MANO DE OBRA, COSTOS DE LABORATORIO, PROYECTOS, TRACTOCAMION
+- Cada gráfico muestra las subcuentas (nivel 5-6) de la cuenta raíz
+
+**Gráfico Explorador Dinámico (1):**
+- **Nombre:** "Explorador Dinámico - Otras Cuentas"
+- **Función:** Permite explorar TODAS las cuentas (configuradas y no configuradas) mediante lista desplegable
+- **Características:**
+  - Lista desplegable con todas las categorías de Ingresos y Egresos
+  - Separadores visuales entre Ingresos y Egresos en el dropdown
+  - Cuenta por defecto: Primera cuenta de Egresos
+  - Header compacto con selector, totales y título en una sola fila
+  - Total mostrado en: header central Y título del eje Y
+  - Checkboxes de paginación (1ros, 2dos, 3ros, 4tos) habilitados cuando items > 30
+  - Gráfico de barras horizontales con altura 450px
+
+**Características Técnicas:**
+- **Arquitectura Unificada:** Una sola consulta SQL para todos los gráficos
+- **Consulta SQL:** `detailed_report` agrupa por `rootAccount` (niv3) y `account` (niv5-6)
+- **Procesamiento dual:**
+  - TODOS los datos para summary charts y cards (sin filtros)
+  - Datos filtrados por `CHART_CONFIG` para detailed charts
+- **Validación de integridad:** Verifica que totales de summary coincidan con allGroups
+- **Colores dinámicos:** Según signo del valor (positivo/negativo) y tipo de cuenta (I/E)
+- **Márgenes consistentes:** Padding de 10px en todos los contenedores de gráficos
+- **Sin datos mock:** Sistema 100% dinámico basado en consulta SQL real
 
 **Archivos:**
-- `finance-dashboard.html`
-- `finance-charts.js`
-- `FinanceDashboardServlet.java`
+- `finance-dashboard.html` - Estructura HTML con 2 gráficos summary
+- `finance-charts.js` - Lógica de gráficos (1599 líneas, arquitectura unificada)
+  - `CHART_CONFIG`: Configuración de cuentas para detailed charts
+  - `processUnifiedData()`: Procesa datos para todos los flujos
+  - `createSummaryCharts()`: Crea 2 gráficos agregados
+  - `createDetailedCharts()`: Crea N gráficos detallados
+  - `createDynamicExplorerChart()`: Crea gráfico explorador con dropdown
+  - `getUnConfiguredAccounts()`: Retorna TODAS las cuentas para el explorador
+- `FinanceDashboardServlet.java` - API backend con consulta unificada
 
 ---
 
@@ -452,6 +499,36 @@ ORDER BY SUM(md.monto) DESC
 LIMIT 20
 ```
 
+### Finanzas - Estado de Resultados Detallado (Consulta Unificada)
+```sql
+SELECT ca3.cuenta AS rootAccount,
+       ca3.descri AS rootNameAccount,
+       ca.cuenta AS account,
+       ca.descri AS nameAccount,
+       ca.tipo AS accountType,
+       SUM(vd.debe) AS debit,
+       SUM(vd.haber) AS credit
+FROM sf_tmpdet vd
+LEFT JOIN sf_tmpenc v ON vd.id_tmpenc = v.id_tmpenc
+LEFT JOIN arcgms ca ON vd.cuenta = ca.cuenta
+LEFT JOIN arcgms ca3 ON ca.cta_niv3 = ca3.cuenta
+WHERE ca.tipo IN ('I', 'E')
+  AND v.estado <> 'ANL'
+  AND v.fecha BETWEEN ? AND ?
+  AND ca.cn_nivel IN (5, 6)
+GROUP BY ca3.cuenta, ca3.descri, ca.cuenta, ca.descri, ca.tipo
+HAVING (SUM(vd.debe) + SUM(vd.haber)) > 0
+ORDER BY ca3.cuenta, ca.cuenta
+```
+**Notas:**
+- Consulta unificada que alimenta TODOS los gráficos del dashboard
+- `ca3`: Cuenta nivel 3 (rootAccount) - agrupa en summary charts
+- `ca`: Cuenta nivel 5-6 (account) - detalle en detailed charts
+- `tipo`: 'I' (Ingresos) o 'E' (Egresos)
+- Cálculo de monto neto en JavaScript:
+  - Ingresos: `credit - debit`
+  - Egresos: `debit - credit`
+
 ---
 
 ## Configuración y Despliegue
@@ -591,6 +668,24 @@ ant -Dprofile=prod deploy
 ---
 
 ## Historial de Cambios
+
+### v1.2 - 2025-11-21 (Dashboard Finanzas - Mejoras UX)
+- ✅ **MEJORA:** Explorador Dinámico ahora muestra TODAS las cuentas
+  - Modificada función `getUnConfiguredAccounts()` para incluir cuentas configuradas y no configuradas
+  - Dropdown ahora contiene todos los items visibles en gráficos Summary (Ingresos y Egresos)
+  - Permite explorar cualquier cuenta del sistema mediante la lista desplegable
+- ✅ **FIX:** Corregidos márgenes laterales en gráficos detallados
+  - Agregado `padding: '0 10px'` al contenedor `detailedChartsMainContainer`
+  - Ahora todos los gráficos (summary y detallados) tienen márgenes consistentes
+  - Elimina el problema de gráficos pegados a los bordes de la página
+- ✅ **MEJORA:** Total agregado en eje Y del Explorador Dinámico
+  - Eje Y ahora muestra "Monto (Bs) - Total: Bs X,XXX,XXX"
+  - Implementado en funciones `updateExplorerChart()` y `createExplorerChartWithData()`
+  - Mejora la visualización de información sin necesidad de ver el header
+- ✅ **Actualización:** Documentación completa en DASHBOARD_STATUS.md
+  - Sección Dashboard Finanzas expandida con detalles técnicos
+  - Agregada consulta SQL unificada en sección "Consultas SQL Importantes"
+  - Documentación de arquitectura unificada y flujos de procesamiento
 
 ### v1.1 - 2025-11-15 (Gráfico Acopio Diario + Mejoras)
 - ✅ **NUEVO:** Gráfico de líneas "Acopio diario x Materia Prima" en dashboard Materia Prima
