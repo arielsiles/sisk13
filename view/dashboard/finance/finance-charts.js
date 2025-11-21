@@ -693,7 +693,8 @@ window.FinanceDashboard = (function() {
             mainContainer.id = 'detailedChartsMainContainer';
             mainContainer.style.width = '100%';
             mainContainer.style.marginTop = '30px';
-            
+            mainContainer.style.padding = '0 10px'; // Mismo padding lateral que .charts-container
+
             // Insertar después de los gráficos summary
             const summaryContainer = document.querySelector('.charts-container');
             if (summaryContainer && summaryContainer.nextSibling) {
