@@ -105,7 +105,7 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
         }
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("3610767")) { // Rene Rocha
             instance.setLaborIndividualAFP(BigDecimal.ZERO);
-            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
+            //instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
         }
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("921886")){
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
