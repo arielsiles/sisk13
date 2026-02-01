@@ -137,68 +137,40 @@ public class MajorAccountingReportAction extends GenericReportAction {
         String start = DateUtils.format(startDate, "yyyy-MM-dd");
         String end = DateUtils.format(endDate, "yyyy-MM-dd");
 
-
         try {
             FileWriter fw = new FileWriter(fileName);
 
-            //List<CashAccount> cashAccountList = cashAccountService.findCashAccountList();
+            // Optimización: una sola query en lugar de N+1
+            Map<String, List<VoucherServiceBean.VoucherTransaction>> transactionsByAccount =
+                    voucherService.getTransactionMajorAccountingByType(start, end, this.cashAccountType);
 
-            List<CashAccount> cashAccountList = cashAccountService.findCashAccountListByType(this.cashAccountType);
-
-            boolean flag = false;
             fw.append("CUENTA").append(delim).append("FECHA").append(delim).append("TIPO").append(delim).append("NO_DOC").append(delim).append("GLOSA").append(delim).append("DEBE").append(delim).append("HABER").append(delim).append("SALDO").append(NEXT_LINE);
-            for (CashAccount ca:cashAccountList){
 
-                BigDecimal debit  = BigDecimal.ZERO;
-                BigDecimal credit = BigDecimal.ZERO;
-                // Double balance = voucherAccoutingService.getBalance(startDate, ca.getAccountCode());
+            for (Map.Entry<String, List<VoucherServiceBean.VoucherTransaction>> entry : transactionsByAccount.entrySet()) {
+                String fullName = entry.getKey();
+                List<VoucherServiceBean.VoucherTransaction> voucherTransactionList = entry.getValue();
+
+                BigDecimal debit;
+                BigDecimal credit;
                 Double balance = 0.0;
 
-                List<VoucherServiceBean.VoucherTransaction> voucherTransactionList = voucherService.getTransactionMajorAccounting(start, end, ca.getAccountCode());
-                for(VoucherServiceBean.VoucherTransaction voucherTransaction:voucherTransactionList){
+                for (VoucherServiceBean.VoucherTransaction voucherTransaction : voucherTransactionList) {
                     debit = voucherTransaction.getDebit();
                     credit = voucherTransaction.getCredit();
-                    balance = balance.doubleValue() + debit.doubleValue() - credit.doubleValue();
-
-                    //if (balance > 0){
-                        flag = true;
-
-                    /*String     CUENTA       = ca.getFullName();
-                    String     FECHA        = voucherTransaction.getDate();
-                    String     TIPO     = voucherTransaction.getDocumentType();
-                    String     NO_DOC       = voucherTransaction.getDocumentNumber();
-                    String     GLOSA        = voucherTransaction.getGloss();
-                    BigDecimal DEBE     = voucherTransaction.getDebit();
-                    BigDecimal HABER        = voucherTransaction.getCredit();
-                    Double SALDO        = balance;
-
-                    System.out.println( "CUENTA: "  + CUENTA  +
-                                        " FECHA: "  + FECHA  +
-                                        " TIPO: "   + TIPO  +
-                                        " NO_DOC: " + NO_DOC  +
-                                        " GLOSA: "  + GLOSA  +
-                                        " DEBE: "   + DEBE  +
-                                        " HABER: "  + HABER  +
-                                        " SALDO: "  + SALDO );*/
-
+                    balance = balance + debit.doubleValue() - credit.doubleValue();
 
                     String gloss = voucherTransaction.getGloss() != null ? voucherTransaction.getGloss().replaceAll("[\n\r]", "") : "";
 
-                        fw.append(ca.getFullName()).append(delim);
-                        fw.append(voucherTransaction.getDate()).append(delim);
-                        fw.append(voucherTransaction.getDocumentType()).append(delim);
-                        fw.append(voucherTransaction.getDocumentNumber()).append(delim);
-                        fw.append(gloss).append(delim);
-                        fw.append(voucherTransaction.getDebit().toString()).append(delim);
-                        fw.append(voucherTransaction.getCredit().toString()).append(delim);
-                        fw.append(balance.toString()).append(NEXT_LINE);
-                    //}
+                    fw.append(fullName).append(delim);
+                    fw.append(voucherTransaction.getDate()).append(delim);
+                    fw.append(voucherTransaction.getDocumentType()).append(delim);
+                    fw.append(voucherTransaction.getDocumentNumber()).append(delim);
+                    fw.append(gloss).append(delim);
+                    fw.append(voucherTransaction.getDebit().toString()).append(delim);
+                    fw.append(voucherTransaction.getCredit().toString()).append(delim);
+                    fw.append(balance.toString()).append(NEXT_LINE);
                 }
                 fw.append(NEXT_LINE);
-                /*if (flag){
-                    fw.append(NEXT_LINE);
-                    flag = false;
-                }*/
             }
 
             fw.flush();

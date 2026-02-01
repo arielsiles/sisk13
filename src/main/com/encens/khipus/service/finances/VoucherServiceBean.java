@@ -18,10 +18,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.TemporalType;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Creates integration vouchers in finances system
@@ -275,6 +272,59 @@ public class VoucherServiceBean implements VoucherService {
 
 
         return  voucherTransactionList;
+    }
+
+    public Map<String, List<VoucherTransaction>> getTransactionMajorAccountingByType(
+            String start, String end, CashAccountType accountType) {
+
+        Map<String, List<VoucherTransaction>> transactionsByAccount = new LinkedHashMap<String, List<VoucherTransaction>>();
+
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {
+            return transactionsByAccount;
+        }
+
+        List<Object[]> resultList = em.createNativeQuery(
+                "SELECT e.fecha, d.cuenta, e.tipo_doc, e.no_doc, e.glosa, d.debe, d.haber, ca.descri " +
+                "FROM sf_tmpdet d " +
+                "LEFT JOIN sf_tmpenc e ON d.id_tmpenc = e.id_tmpenc " +
+                "INNER JOIN arcgms ca ON d.cuenta = ca.cuenta AND ca.no_cia = :companyNumber " +
+                "WHERE e.fecha BETWEEN :start AND :end " +
+                "AND ca.tipo = :accountType " +
+                "AND e.estado <> 'ANL' " +
+                "ORDER BY d.cuenta, e.fecha")
+                .setParameter("companyNumber", companyConfiguration.getCompanyNumber())
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .setParameter("accountType", accountType.name())
+                .getResultList();
+
+        for (Object[] data : resultList) {
+            String cuenta = (String) data[1];
+            String descripcion = (String) data[7];
+            String fullName = cuenta + " - " + descripcion;
+
+            VoucherTransaction transaction = new VoucherTransaction(
+                    DateUtils.format((Date) data[0], "dd/MM/yyyy"),
+                    cuenta,
+                    (String) data[2],
+                    (String) data[3],
+                    (String) data[4],
+                    (BigDecimal) data[5],
+                    (BigDecimal) data[6]
+            );
+
+            List<VoucherTransaction> accountTransactions = transactionsByAccount.get(fullName);
+            if (accountTransactions == null) {
+                accountTransactions = new ArrayList<VoucherTransaction>();
+                transactionsByAccount.put(fullName, accountTransactions);
+            }
+            accountTransactions.add(transaction);
+        }
+
+        return transactionsByAccount;
     }
 
     public List<String> getMinMaxNumber(Date start, Date end, String documentType){
