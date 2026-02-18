@@ -90,13 +90,13 @@ CREATE TABLE `xpr_material` (
                                 `tipo` varchar(15) DEFAULT NULL,
                                 `vol1` decimal(10,2) DEFAULT NULL,
                                 `peso1` decimal(10,2) DEFAULT NULL,
-                                `VERSION` bigint(20) NOT NULL,
+                                `version` bigint(20) NOT NULL,
                                 `idcompania` bigint(20) NOT NULL,
                                 PRIMARY KEY (`idmaterial`),
                                 KEY `cod_art` (`cod_art`),
-                                KEY `cod_art_mat` (`cod_art_mat`),
-                                CONSTRAINT `xpr_material_ibfk_1` FOREIGN KEY (`cod_art`) REFERENCES `inv_articulos` (`cod_art`),
-                                CONSTRAINT `xpr_material_ibfk_2` FOREIGN KEY (`cod_art_mat`) REFERENCES `inv_articulos` (`cod_art`)
+                                KEY `cod_art_mat` (`cod_art_mat`)
+                                -- CONSTRAINT `xpr_material_ibfk_1` FOREIGN KEY (`cod_art`) REFERENCES `inv_articulos` (`cod_art`),
+                                -- CONSTRAINT `xpr_material_ibfk_2` FOREIGN KEY (`cod_art_mat`) REFERENCES `inv_articulos` (`cod_art`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `pr_plan` */
