@@ -75,7 +75,8 @@
     <framework:entity-query name="economicActivityQuery" ejbql="select c from EconomicActivity c where c.active = true" />
 
     <factory name="ProductsAndServicesList" value="#{productsAndServices}"/>
-    <framework:entity-query name="productsAndServices" ejbql="select p from ProductsServices p">
+    <framework:entity-query name="productsAndServices" ejbql="select p from ProductsServices p"
+                            order="p.description">
         <framework:restrictions>
             <value>p.economicActivity = #{productItemAction.economicActivity}</value>
         </framework:restrictions>
@@ -101,7 +102,7 @@
     <framework:entity-query name="branchOfficeQuery" ejbql="select d from BranchOffice d "/>
 
     <factory name="measureUnitSINList" value="#{measureUnitSINQuery}"/>
-    <framework:entity-query name="measureUnitSINQuery" ejbql="select d from MeasureUnitSIN d "/>
+    <framework:entity-query name="measureUnitSINQuery" ejbql="select d from MeasureUnitSIN d order by d.description"/>
 
     <factory name="significantEventSINList" value="#{significantEventSINQuery}"/>
     <framework:entity-query name="significantEventSINQuery" ejbql="select d from SignificantEventSIN d "/>
