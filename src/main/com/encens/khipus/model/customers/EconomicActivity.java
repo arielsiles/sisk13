@@ -31,6 +31,9 @@ public class EconomicActivity implements BaseModel {
     @Column(name = "tipoactividad")
     private String activityType;
 
+    @Column(name = "activo")
+    private Boolean active = true;
+
     @Override
     public Long getId() {
         return id;
@@ -62,6 +65,14 @@ public class EconomicActivity implements BaseModel {
 
     public void setActivityCode(String activityCode) {
         this.activityCode = activityCode;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public String toString(){

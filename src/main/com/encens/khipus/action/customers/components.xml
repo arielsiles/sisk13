@@ -72,7 +72,7 @@
     <framework:entity-query name="cancellationReasonQuery" ejbql="select c from CancellationReason c" />
 
     <factory name="economicActivityList" value="#{economicActivityQuery}"/>
-    <framework:entity-query name="economicActivityQuery" ejbql="select c from EconomicActivity c" />
+    <framework:entity-query name="economicActivityQuery" ejbql="select c from EconomicActivity c where c.active = true" />
 
     <factory name="ProductsAndServicesList" value="#{productsAndServices}"/>
     <framework:entity-query name="productsAndServices" ejbql="select p from ProductsServices p">
