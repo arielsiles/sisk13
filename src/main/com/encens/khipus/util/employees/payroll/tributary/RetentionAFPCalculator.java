@@ -110,6 +110,15 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
         if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("921886")){
             instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
         }
+
+        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("5151362")) { // Limbert Camacho
+            /** Aporte Nal. Solidario, temporal **/
+            BigDecimal difference = BigDecimalUtil.subtract(instance.getTotalGrained(), BigDecimalUtil.toBigDecimal("13000"));
+            BigDecimal solidaryAFPValue = BigDecimalUtil.getPercentage(difference, BigDecimalUtil.toBigDecimal("1.15"), TWO_DECIMAL_SCALE);
+            instance.setSolidaryAFP(solidaryAFPValue);
+
+        }
+
         /** **/
 
         retentionAFP = BigDecimalUtil.sum(
