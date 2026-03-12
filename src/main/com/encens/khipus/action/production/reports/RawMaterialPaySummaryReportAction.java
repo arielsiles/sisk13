@@ -140,12 +140,12 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         summaryTotal = rawMaterialPayRollService.getSumaryTotal(startDate, endDate, zone, metaProduct);
 
         Double totalMoneyCollected = discounts.mount;
-        Double totalDifferencesMoney = rawMaterialPayRollService.getTotalMoneyDiff(discounts.unitPrice, startDate, endDate, metaProduct);
-        Double diffTotal = rawMaterialPayRollService.getTotalDiff(discounts.unitPrice, startDate, endDate, metaProduct);
-        Double balanceWeightTotal = rawMaterialPayRollService.getBalanceWeightTotal(discounts.unitPrice, startDate, endDate, metaProduct);
+        Double totalDifferencesMoney = discounts.adjustment;
+        Double diffTotal = (discounts.unitPrice != 0) ? discounts.adjustment / discounts.unitPrice : 0.0;
+        Double balanceWeightTotal = discounts.collected + diffTotal;
         Double totalMoneyBalance = totalMoneyCollected + totalDifferencesMoney;
-        Double reservProducer = rawMaterialPayRollService.getReservProducer(startDate,endDate);
-        Double reserveGA = discounts.collected * Constants.DISCOUNT_GA;
+        Double reservProducer = discounts.reserve;
+        Double reserveGA = discounts.ga;
 
         Double total = totalMoneyBalance + discounts.otherIncome;
         params.put("total_collected", df.format(discounts.collected));
@@ -205,12 +205,12 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         summaryTotal = rawMaterialPayRollService.getSumaryTotal(startDate, endDate, zone, metaProduct);
 
         Double totalMoneyCollected = discounts.mount;
-        Double totalDifferencesMoney = rawMaterialPayRollService.getTotalMoneyDiff(discounts.unitPrice, startDate, endDate, metaProduct);
-        Double diffTotal = rawMaterialPayRollService.getTotalDiff(discounts.unitPrice, startDate, endDate, metaProduct);
-        Double balanceWeightTotal = rawMaterialPayRollService.getBalanceWeightTotal(discounts.unitPrice, startDate, endDate, metaProduct);
+        Double totalDifferencesMoney = discounts.adjustment;
+        Double diffTotal = (discounts.unitPrice != 0) ? discounts.adjustment / discounts.unitPrice : 0.0;
+        Double balanceWeightTotal = discounts.collected + diffTotal;
         Double totalMoneyBalance = totalMoneyCollected + totalDifferencesMoney;
-        Double reservProducer = rawMaterialPayRollService.getReservProducer(startDate,endDate);
-        Double reserveGA = discounts.collected * Constants.DISCOUNT_GA;
+        Double reservProducer = discounts.reserve;
+        Double reserveGA = discounts.ga;
         Double total = totalMoneyBalance + discounts.otherIncome;
 
         Double totalDiscount = discounts.alcohol + discounts.concentrated + discounts.yogurt

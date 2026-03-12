@@ -673,6 +673,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             discounts.adjustment = ((Double) datas.get(0)[13] != null) ? ((Double) datas.get(0)[13]).doubleValue() : 0.0;
             discounts.commission = ((Double) datas.get(0)[14] != null) ? ((Double) datas.get(0)[14]).doubleValue() : 0.0;
             discounts.unitPrice = ((Double) datas.get(0)[15] != null) ? ((Double) datas.get(0)[15]).doubleValue() : 0.0;
+            discounts.reserve = ((Double) datas.get(0)[16] != null) ? ((Double) datas.get(0)[16]).doubleValue() : 0.0;
+            discounts.ga = ((Double) datas.get(0)[17] != null) ? ((Double) datas.get(0)[17]).doubleValue() : 0.0;
         } else {
             discounts.mount = 0.0;
             discounts.collected = 0.0;
@@ -690,6 +692,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             discounts.adjustment = 0.0;
             discounts.unitPrice = 0.0;
             discounts.commission = 0.0;
+            discounts.reserve = 0.0;
+            discounts.ga = 0.0;
         }
 
         return discounts;
@@ -1270,6 +1274,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         public Double commission;
         public Double otherIncome;
         public Double adjustment;
+        public Double reserve;
+        public Double ga;
     }
 
     public class SummaryTotal {

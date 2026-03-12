@@ -137,7 +137,9 @@ import java.util.List;
                         " sum(rawMaterialPayRoll.totalOtherIncomeByGAB) as totalOtherIncome, " +
                         " sum(rawMaterialPayRoll.totalAdjustmentByGAB) as totalAdjustment, " +
                         " sum(rawMaterialPayRoll.totalCommission) as totalCommission, " +
-                        " rawMaterialPayRoll.unitPrice as unitPrice " +
+                        " rawMaterialPayRoll.unitPrice as unitPrice, " +
+                        " sum(rawMaterialPayRoll.totalReserveDicount) as totalReserve, " +
+                        " sum(rawMaterialPayRoll.totalGA) as totalGA " +
                         "from RawMaterialPayRoll rawMaterialPayRoll " +
                         "where rawMaterialPayRoll.startDate = :startDate " +
                         "and rawMaterialPayRoll.endDate <= :endDate " +
