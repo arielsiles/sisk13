@@ -165,7 +165,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     @Override
     public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException {
         Double totalReservaGAB = 0.0;
-        if(discountProducer != null) {
+        if(discountProducer != null && dayFilter != 2) {
             /** @Claude OPT-6: Usa totalWeightFortnight pre-calculado en vez de recalcular por zona **/
             Double totalWeightFortnightGAB = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), rawMaterialPayRoll.getProductiveZone(), dayFilter);
             Double percentageReserveGAB = ((totalWeightFortnightGAB * 100) / totalWeightFortnight) / 100;
@@ -178,10 +178,12 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         Map<Long, ProducerTax> producerTaxCache = preloadProducerTaxes(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
         Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache, dayFilter);
-        Double alcoholByGAB = salaryMovementGABService.getAlcoholBayGAB(rawMaterialPayRoll.getProductiveZone(), rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+        Double alcoholByGAB = (dayFilter == 2) ? 0.0 : salaryMovementGABService.getAlcoholBayGAB(rawMaterialPayRoll.getProductiveZone(), rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
         /** @Claude OPT-4: Pre-carga batch de descuentos por zona en vez de por productor **/
-        Map<Long, RawMaterialProducerDiscount> discountsBatch = salaryMovementProducerService.prepareDiscountsBatch(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getProductiveZone());
+        Map<Long, RawMaterialProducerDiscount> discountsBatch = (dayFilter == 2)
+                ? new HashMap<Long, RawMaterialProducerDiscount>()
+                : salaryMovementProducerService.prepareDiscountsBatch(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getProductiveZone());
 
         Double totalAmountCollected = 0.0;
         Double totalPayCollected = 0.0;
@@ -918,13 +920,13 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 hasLic = hasLicenseFromTax(producerTax);
                 licenseCache.put(rawMaterialProducer.getId(), hasLic);
             }
-            Double withholding = (hasLic ? 0.0 : earned * taxRate);
+            Double withholding = (dayFilter == 2) ? 0.0 : (hasLic ? 0.0 : earned * taxRate);
 
             aux.collectedAmount += amount;
             aux.earnedMoney += earned;
             aux.collectedTotalMoney += earned;
             aux.withholdingTax += withholding;
-            aux.discountGA += amount * Constants.DISCOUNT_GA;
+            aux.discountGA += (dayFilter == 2) ? 0.0 : amount * Constants.DISCOUNT_GA;
 
             totalMoneyCollectedByGab += earned;
         }
