@@ -9,6 +9,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ## [6.0.31] - 2026-03-12
 
+### Agregado
+- **R0 - Precio Unitario editable**: Campo `Precio Unitario` visible y editable en la pantalla de generacion de planillas de acopio de leche. Permite ajustar el precio antes de generar.
+- **R1 - Filtro "Sin domingos"**: Checkbox `Sin domingos` en generacion de planillas de acopio. Al activarse, excluye los registros de acopio correspondientes a dias domingo del calculo de la planilla.
+- **R2 - Filtro "Solo domingos"**: Checkbox `Solo domingos` en generacion de planillas de acopio. Al activarse, genera la planilla considerando unicamente los registros de acopio de dias domingo.
+- **R3 - Solo domingos sin descuentos**: Cuando se genera planilla con filtro "Solo domingos" (`dayFilter=2`), se anulan todos los descuentos (retencion impositiva, alcohol, concentrados, credito, veterinario, yogurt, tachos, otros egresos, comision, reserva, descuento GA). Se mantiene el ajuste por diferencias de peso en zona productiva (`productiveZoneAdjustment`).
+
 ### Optimizado
 - **Generacion de planillas de acopio de leche**: Reduccion de ~2000+ queries a ~50-70 en el proceso `generateAll()`.
   Tiempo estimado de 5+ min a <30 seg para ~100 productores en ~20 zonas.
