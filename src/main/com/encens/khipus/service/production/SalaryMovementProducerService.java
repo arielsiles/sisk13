@@ -9,6 +9,7 @@ import com.encens.khipus.model.production.*;
 import javax.ejb.Local;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Local
 public interface SalaryMovementProducerService extends GenericService {
@@ -29,5 +30,8 @@ public interface SalaryMovementProducerService extends GenericService {
     void createSalaryMovementProducer(List<SalaryMovementProducer> salaryMovementProducerList);
 
     List<SalaryMovementProducer> findSalaryMovementProducerList(Date starDate, Date endDate, TypeMovementProducer typeMovementProducer);
+
+    /** @Claude OPT-4: Firma batch para pre-cargar descuentos de todos los productores de una zona **/
+    Map<Long, RawMaterialProducerDiscount> prepareDiscountsBatch(Date startDate, Date endDate, ProductiveZone productiveZone);
 
 }

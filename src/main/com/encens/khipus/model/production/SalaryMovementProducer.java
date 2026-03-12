@@ -14,6 +14,15 @@ import java.util.Date;
                                 " join SalaryMovementProducer.typeMovementProducer typeMovementProducer" +
                                 " where salaryMovementProducer.date between :startDate and :endDate " +
                                 " and salaryMovementProducer.rawMaterialProducer = :rawMaterialProducer " +
+                                " and salaryMovementProducer.rawMaterialProducer.productiveZone = :productiveZone"),
+
+            /** @Claude OPT-4: Query batch para descuentos por zona en vez de por productor **/
+            @NamedQuery(name = "SalaryMovementProducer.getDiscountByZone",
+                        query = " select salaryMovementProducer.rawMaterialProducer.id, " +
+                                " salaryMovementProducer.valor, typeMovementProducer.typeMovement, typeMovementProducer.name " +
+                                " from SalaryMovementProducer salaryMovementProducer " +
+                                " join salaryMovementProducer.typeMovementProducer typeMovementProducer" +
+                                " where salaryMovementProducer.date between :startDate and :endDate " +
                                 " and salaryMovementProducer.rawMaterialProducer.productiveZone = :productiveZone")
         }
 )

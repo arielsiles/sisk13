@@ -21,6 +21,7 @@ import javax.persistence.TemporalType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -386,6 +387,74 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
             em.flush();
         }
 
+    }
+
+    /**
+     * @Claude OPT-4: Pre-carga batch de descuentos para todos los productores de una zona.
+     * Reemplaza las llamadas individuales a prepareDiscount() por productor
+     * con una sola query SQL que trae todos los movimientos de la zona.
+     */
+    @Override
+    public Map<Long, RawMaterialProducerDiscount> prepareDiscountsBatch(Date startDate, Date endDate, ProductiveZone productiveZone) {
+        Map<Long, RawMaterialProducerDiscount> result = new java.util.HashMap<Long, RawMaterialProducerDiscount>();
+
+        List<Object[]> salaryMovements = getEntityManager().createNamedQuery("SalaryMovementProducer.getDiscountByZone")
+                .setParameter("startDate", startDate, TemporalType.DATE)
+                .setParameter("endDate", endDate, TemporalType.DATE)
+                .setParameter("productiveZone", productiveZone)
+                .getResultList();
+
+        for (Object[] row : salaryMovements) {
+            Long producerId = (Long) row[0];
+            Double valor = (Double) row[1];
+            String typeDiscount = (String) row[3];
+
+            RawMaterialProducerDiscount discount = result.get(producerId);
+            if (discount == null) {
+                discount = new RawMaterialProducerDiscount();
+                discount.setConcentrated(0.0);
+                discount.setCommission(0.0);
+                discount.setYogurt(0.0);
+                discount.setVeterinary(0.0);
+                discount.setCredit(0.0);
+                discount.setCans(0.0);
+                discount.setOtherDiscount(0.0);
+                discount.setOtherIncoming(0.0);
+                result.put(producerId, discount);
+            }
+
+            if ("CONCENTRADOS".equals(typeDiscount)) {
+                discount.setConcentrated(discount.getConcentrated() + valor);
+            } else if ("COMISION BANCO".equals(typeDiscount)) {
+                discount.setCommission(discount.getCommission() + valor);
+            } else if ("YOGURT".equals(typeDiscount)) {
+                discount.setYogurt(discount.getYogurt() + valor);
+            } else if ("VETERINARIO".equals(typeDiscount)) {
+                discount.setVeterinary(discount.getVeterinary() + valor);
+            } else if ("TACHOS".equals(typeDiscount)) {
+                discount.setCans(discount.getCans() + valor);
+            } else if ("OTROS EGRESOS".equals(typeDiscount)) {
+                discount.setOtherDiscount(discount.getOtherDiscount() + valor);
+            } else if ("OTROS INGRESOS".equals(typeDiscount)) {
+                discount.setOtherIncoming(discount.getOtherIncoming() + valor);
+            } else if ("CREDITO".equals(typeDiscount)) {
+                discount.setCredit(discount.getCredit() + valor);
+            }
+        }
+
+        // Redondear valores finales
+        for (RawMaterialProducerDiscount discount : result.values()) {
+            discount.setConcentrated(RoundUtil.getRoundValue(discount.getConcentrated(), 2, RoundUtil.RoundMode.SYMMETRIC));
+            discount.setCommission(RoundUtil.getRoundValue(discount.getCommission(), 2, RoundUtil.RoundMode.SYMMETRIC));
+            discount.setYogurt(RoundUtil.getRoundValue(discount.getYogurt(), 2, RoundUtil.RoundMode.SYMMETRIC));
+            discount.setVeterinary(RoundUtil.getRoundValue(discount.getVeterinary(), 2, RoundUtil.RoundMode.SYMMETRIC));
+            discount.setCredit(RoundUtil.getRoundValue(discount.getCredit(), 2, RoundUtil.RoundMode.SYMMETRIC));
+            discount.setCans(RoundUtil.getRoundValue(discount.getCans(), 2, RoundUtil.RoundMode.SYMMETRIC));
+            discount.setOtherDiscount(RoundUtil.getRoundValue(discount.getOtherDiscount(), 2, RoundUtil.RoundMode.SYMMETRIC));
+            discount.setOtherIncoming(RoundUtil.getRoundValue(discount.getOtherIncoming(), 2, RoundUtil.RoundMode.SYMMETRIC));
+        }
+
+        return result;
     }
 
     @Override

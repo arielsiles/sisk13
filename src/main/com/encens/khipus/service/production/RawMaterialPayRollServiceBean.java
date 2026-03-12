@@ -162,19 +162,27 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return result;
     }
 
+    /** @Claude OPT-6: Parametro totalWeightFortnight agregado para evitar recalculo por zona **/
     @Override
-    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll,DiscountProducer discountProducer) throws EntryNotFoundException, RawMaterialPayRollException {
+    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight) throws EntryNotFoundException, RawMaterialPayRollException {
         Double totalReservaGAB = 0.0;
         if(discountProducer != null) {
-            Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct());
+            /** @Claude OPT-6: Usa totalWeightFortnight pre-calculado en vez de recalcular por zona **/
             Double totalWeightFortnightGAB = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), rawMaterialPayRoll.getProductiveZone());
             Double percentageReserveGAB = ((totalWeightFortnightGAB * 100) / totalWeightFortnight) / 100;
-            totalReservaGAB = (RoundUtil.getRoundValue(totalWeightFortnight * discountProducer.getReserve(), 2, RoundUtil.RoundMode.SYMMETRIC) * Constants.PRICE_UNIT_MILK) * percentageReserveGAB;//discountProducer.getReserveFortnight() * percentageReserveGAB;
+            totalReservaGAB = (RoundUtil.getRoundValue(totalWeightFortnight * discountProducer.getReserve(), 2, RoundUtil.RoundMode.SYMMETRIC) * Constants.PRICE_UNIT_MILK) * percentageReserveGAB;
         }
 
         Map<Date, Double> differences = createMapOfDifferencesWeights(rawMaterialPayRoll);
-        Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences,totalReservaGAB,discountProducer);
+
+        /** @Claude OPT-3: Pre-carga batch de ProducerTax para evitar lazy loading N+1 **/
+        Map<Long, ProducerTax> producerTaxCache = preloadProducerTaxes(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+
+        Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache);
         Double alcoholByGAB = salaryMovementGABService.getAlcoholBayGAB(rawMaterialPayRoll.getProductiveZone(), rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+
+        /** @Claude OPT-4: Pre-carga batch de descuentos por zona en vez de por productor **/
+        Map<Long, RawMaterialProducerDiscount> discountsBatch = salaryMovementProducerService.prepareDiscountsBatch(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getProductiveZone());
 
         Double totalAmountCollected = 0.0;
         Double totalPayCollected = 0.0;
@@ -208,7 +216,9 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             auxearnedMoney = aux.earnedMoney;
             auxcollectedTotalMoney = aux.collectedTotalMoney;
             record.setTotalPayCollected(RoundUtil.getRoundValue(rawMaterialPayRoll.getUnitPrice() * auxcollectedAmount, 2, RoundUtil.RoundMode.SYMMETRIC));
-            ProducerTax producerTax = getProducerTaxValid(aux.producer,rawMaterialPayRoll.getStartDate(),rawMaterialPayRoll.getEndDate());
+
+            /** @Claude OPT-3: Usa cache pre-cargado de ProducerTax en vez de lazy loading **/
+            ProducerTax producerTax = producerTaxCache.get(aux.producer.getId());
             String codTaxLicence = producerTax != null ? producerTax.getFormNumber(): null;
             Date taxStartDate = producerTax != null ? producerTax.getGestionTax().getStartDate():null;
             Date taxEndDate = producerTax != null ? producerTax.getGestionTax().getEndDate():null;
@@ -218,7 +228,20 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 record.setStartDateTaxLicence(taxEndDate);
             }
 
-            RawMaterialProducerDiscount discount = salaryMovementProducerService.prepareDiscount(aux.producer, rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(),rawMaterialPayRoll.getProductiveZone());
+            /** @Claude OPT-4: Usa descuentos pre-cargados por zona en vez de query individual **/
+            RawMaterialProducerDiscount discount = discountsBatch.get(aux.producer.getId());
+            if (discount == null) {
+                discount = new RawMaterialProducerDiscount();
+                discount.setConcentrated(0.0);
+                discount.setCommission(0.0);
+                discount.setYogurt(0.0);
+                discount.setVeterinary(0.0);
+                discount.setCredit(0.0);
+                discount.setCans(0.0);
+                discount.setOtherDiscount(0.0);
+                discount.setOtherIncoming(0.0);
+            }
+            discount.setRawMaterialProducer(aux.producer);
             alcoholDiff += ((alcoholByGAB * (aux.procentaje)) - RoundUtil.getRoundValue(alcoholByGAB * (aux.procentaje), 2, RoundUtil.RoundMode.SYMMETRIC));
             discount.setAlcohol(RoundUtil.getRoundValue(alcoholByGAB * (aux.procentaje), 2, RoundUtil.RoundMode.SYMMETRIC));
             auxwithholdingTax = aux.withholdingTax;
@@ -227,7 +250,6 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             record.setRawMaterialProducerDiscount(discount);
             record.setDiscountReserve(aux.reserveDiscount);
             record.setDiscountGA(aux.discountGA);
-            //record.setDiscountGA(aux.collectedAmount * Constants.DISCOUNT_GA);
 
             rawMaterialPayRoll.getRawMaterialPayRecordList().add(record);
             record.setRawMaterialPayRoll(rawMaterialPayRoll);
@@ -248,13 +270,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             totalOtherDiscount += discount.getOtherDiscount();
             totalIncome += discount.getOtherIncoming();
 
-            try {
-                rawMaterialProducerService.update(rawMaterialProducerService.findById(RawMaterialProducer.class,aux.producer.getId()) );
-            } catch (EntryDuplicatedException e) {
-                e.printStackTrace();
-            } catch (ConcurrencyException e) {
-                e.printStackTrace();
-            }
+            /** @Claude OPT-5: Eliminado findById+update redundante - DiscountReserve se persiste directamente en applyProrations **/
 
         }
         alcoholDiff = RoundUtil.getRoundValue(alcoholDiff, 2, RoundUtil.RoundMode.SYMMETRIC);
@@ -869,11 +885,16 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return result;
     }
 
-    private Map<Long, Aux> createMapOfProducers(RawMaterialPayRoll rawMaterialPayRoll, Map<Date, Double> differences,Double totalReservaGAB,DiscountProducer discountProducer) throws RawMaterialPayRollException {
+    /** @Claude OPT-2, OPT-3: Parametro producerTaxCache para evitar lazy loading N+1 **/
+    private Map<Long, Aux> createMapOfProducers(RawMaterialPayRoll rawMaterialPayRoll, Map<Date, Double> differences, Double totalReservaGAB, DiscountProducer discountProducer, Map<Long, ProducerTax> producerTaxCache) throws RawMaterialPayRollException {
         double taxRate = rawMaterialPayRoll.getTaxRate() / 100;
         List<Object[]> collectedProducers = find("RawMaterialPayRoll.findCollectedAmountByMetaProductBetweenDates", rawMaterialPayRoll);
         Map<Long, Aux> map = new HashMap<Long, Aux>();
         Double totalMoneyCollectedByGab = 0.0;
+
+        /** @Claude OPT-2: Cache de licencia fiscal por productor para evitar N+1 queries **/
+        Map<Long, Boolean> licenseCache = new HashMap<Long, Boolean>();
+
         for (Object[] obj : collectedProducers) {
             Date date = (Date) obj[0];
             RawMaterialProducer rawMaterialProducer = (RawMaterialProducer) obj[1];
@@ -887,8 +908,16 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             }
 
             Double earned = amount * rawMaterialPayRoll.getUnitPrice();
-            //si tiene el registro del impuesto no se le hace el descuento
-            Double withholding = (hasLicense(rawMaterialProducer, rawMaterialPayRoll.getStartDate(),rawMaterialPayRoll.getEndDate()) ? 0.0 : earned * taxRate);
+
+            /** @Claude OPT-2: Usa cache de licencia en vez de recalcular por cada fila **/
+            Boolean hasLic = licenseCache.get(rawMaterialProducer.getId());
+            if (hasLic == null) {
+                /** @Claude OPT-3: Usa ProducerTax pre-cargado en vez de lazy loading **/
+                ProducerTax producerTax = producerTaxCache.get(rawMaterialProducer.getId());
+                hasLic = hasLicenseFromTax(producerTax);
+                licenseCache.put(rawMaterialProducer.getId(), hasLic);
+            }
+            Double withholding = (hasLic ? 0.0 : earned * taxRate);
 
             aux.collectedAmount += amount;
             aux.earnedMoney += earned;
@@ -898,10 +927,10 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
 
             totalMoneyCollectedByGab += earned;
         }
-        addProrationAlcohol(map, rawMaterialPayRoll, totalMoneyCollectedByGab);
-        addProrationPorcentaje(map, rawMaterialPayRoll, totalMoneyCollectedByGab, getDiffMoneyTotalGab(differences));
-        if(totalReservaGAB >0.0)
-        addReserveDiscountPorcentaje(map,rawMaterialPayRoll,totalReservaGAB,discountProducer,totalMoneyCollectedByGab);
+
+        /** @Claude OPT-7: Consolidacion de addProrationAlcohol + addProrationPorcentaje + addReserveDiscountPorcentaje en una sola iteracion **/
+        applyProrations(map, rawMaterialPayRoll, totalMoneyCollectedByGab, getDiffMoneyTotalGab(differences), totalReservaGAB, discountProducer);
+
         return map;
     }
 
@@ -918,26 +947,78 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return RoundUtil.getRoundValue(totaldiff, 2, RoundUtil.RoundMode.SYMMETRIC);
     }
 
-    private void addProrationAlcohol(Map<Long, Aux> map, RawMaterialPayRoll rawMaterialPayRoll, Double totalMoneyCollected) {
-        Iterator collections = map.entrySet().iterator();
-        while (collections.hasNext()) {
+    /**
+     * @Claude OPT-3: Pre-carga batch de ProducerTax para evitar lazy loading N+1.
+     * Reemplaza las llamadas individuales a getProducerTaxValid() por productor
+     * con una sola query SQL que trae todos los registros fiscales validos.
+     */
+    private Map<Long, ProducerTax> preloadProducerTaxes(Date startDate, Date endDate) {
+        List<ProducerTax> taxes = getEntityManager().createQuery(
+                "SELECT pt FROM ProducerTax pt JOIN FETCH pt.gestionTax " +
+                "WHERE pt.gestionTax.startDate <= :startDate " +
+                "AND pt.gestionTax.endDate >= :endDate")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .getResultList();
 
-            Map.Entry thisEntry = (Map.Entry) collections.next();
-            Aux aux = (Aux) thisEntry.getValue();
-            Map<Date, Double> rawMaterialCollected = getRawMaterialCollected(aux.producer, rawMaterialPayRoll);
-            //Double porcentage =RoundUtil.getRoundValue( ((aux.earnedMoney *100)/totalMoneyCollected)/100,2, RoundUtil.RoundMode.SYMMETRIC);
-            //todo: lanzar un mensaje de advertencia
-            Double porcentage;
-            if (totalMoneyCollected != 0)
-                porcentage = ((aux.earnedMoney * 100) / totalMoneyCollected) / 100;
-            else
-                porcentage = 0.0;
-            //Double porcentage =RoundUtil.getRoundValue( ((aux.earnedMoney *100)/totalMoneyCollected)/100,5, RoundUtil.RoundMode.SYMMETRIC);
-            ((Aux) thisEntry.getValue()).totaDiffMoney = totalMoneyCollected;
-            ((Aux) thisEntry.getValue()).procentaje = porcentage;
+        Map<Long, ProducerTax> result = new HashMap<Long, ProducerTax>();
+        for (ProducerTax pt : taxes) {
+            result.put(pt.getRawMaterialProducerTax().getId(), pt);
+        }
+        return result;
+    }
+
+    /** @Claude OPT-2: Evalua licencia desde ProducerTax pre-cargado sin lazy loading **/
+    private boolean hasLicenseFromTax(ProducerTax producerTax) {
+        if (producerTax == null)
+            return false;
+        if (!isValidLicence(producerTax.getFormNumber(), producerTax.getGestionTax().getStartDate(), producerTax.getGestionTax().getEndDate()))
+            return false;
+        return true;
+    }
+
+    /**
+     * @Claude OPT-7: Consolida addProrationAlcohol + addProrationPorcentaje + addReserveDiscountPorcentaje
+     * en una sola iteracion del mapa de productores. OPT-1: Eliminada query muerta de getRawMaterialCollected.
+     * OPT-5: DiscountReserve se persiste directamente con getEntityManager().persist().
+     */
+    private void applyProrations(Map<Long, Aux> map, RawMaterialPayRoll rawMaterialPayRoll,
+            Double totalMoneyCollected, Double totalDifference,
+            Double totalReservaGAB, DiscountProducer discountProducer) {
+        for (Aux aux : map.values()) {
+            Double porcentage = (totalMoneyCollected != 0)
+                    ? ((aux.earnedMoney * 100) / totalMoneyCollected) / 100
+                    : 0.0;
+
+            // Porcentaje (antes addProrationAlcohol)
+            /** @Claude OPT-1: Eliminada query muerta getRawMaterialCollected - resultado nunca se usaba **/
+            aux.totaDiffMoney = totalMoneyCollected;
+            aux.procentaje = porcentage;
+
+            // Ajuste por diferencia de peso (antes addProrationPorcentaje)
+            Double proration = totalDifference * porcentage;
+            aux.adjustmentAmount = proration;
+            aux.earnedMoney += proration;
+
+            // Descuento de reserva (antes addReserveDiscountPorcentaje)
+            if (totalReservaGAB > 0.0 && discountProducer != null) {
+                Double reserveProration = RoundUtil.getRoundValue(totalReservaGAB * porcentage, 2, RoundUtil.RoundMode.SYMMETRIC);
+                aux.reserveDiscount = reserveProration;
+                aux.earnedMoney -= reserveProration;
+
+                /** @Claude OPT-5: Persiste DiscountReserve directamente en vez de cascade via producer **/
+                DiscountReserve discountReserve = new DiscountReserve();
+                discountReserve.setDiscountProducer(discountProducer);
+                discountReserve.setStartDate(rawMaterialPayRoll.getStartDate());
+                discountReserve.setEndDate(rawMaterialPayRoll.getEndDate());
+                discountReserve.setMaterialProducer(aux.producer);
+                discountReserve.setAmount(reserveProration);
+                getEntityManager().persist(discountReserve);
+            }
         }
     }
 
+    /** @Claude: Metodo legacy conservado para compatibilidad con generateDetails() **/
     private void addProration(Map<Long, Aux> map, RawMaterialPayRoll rawMaterialPayRoll, Map<Date, Double> totalCollectedByGab, Map<Date, Double> differences) throws RawMaterialPayRollException {
         Iterator collections = map.entrySet().iterator();
         while (collections.hasNext()) {
@@ -947,56 +1028,6 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             Map<Date, Double> rawMaterialCollected = getRawMaterialCollected(aux.producer, rawMaterialPayRoll);
             Double proration = calculateDelta(rawMaterialCollected, differences, totalCollectedByGab);
             ((Aux) thisEntry.getValue()).adjustmentAmount = proration;
-            //((Aux) thisEntry.getValue()).earnedMoney = ((Aux) thisEntry.getValue()).earnedMoney - proration;
-        }
-    }
-
-    private void addProrationPorcentaje(Map<Long, Aux> map, RawMaterialPayRoll rawMaterialPayRoll, Double totalMoneyCollected, Double totalDiference) {
-        Iterator collections = map.entrySet().iterator();
-        while (collections.hasNext()) {
-
-            Map.Entry thisEntry = (Map.Entry) collections.next();
-            Aux aux = (Aux) thisEntry.getValue();
-            //Double porcentage =RoundUtil.getRoundValue( ((aux.earnedMoney *100)/totalMoneyCollected)/100,2, RoundUtil.RoundMode.SYMMETRIC);
-            //todo: lanzar un mensaje de advertencia
-            Double porcentage;
-            if (totalMoneyCollected != 0)
-                porcentage = ((aux.earnedMoney * 100) / totalMoneyCollected) / 100;
-            else
-                porcentage = 0.0;
-
-            Double proration = totalDiference * porcentage;
-            ((Aux) thisEntry.getValue()).adjustmentAmount = proration;
-            ((Aux) thisEntry.getValue()).earnedMoney = ((Aux) thisEntry.getValue()).earnedMoney + proration;
-        }
-    }
-
-    private void addReserveDiscountPorcentaje(Map<Long, Aux> map,RawMaterialPayRoll rawMaterialPayRoll, Double totalReservaGAB,  DiscountProducer discountProducer,Double totalMoneyCollected ) {
-        Iterator collections = map.entrySet().iterator();
-        while (collections.hasNext()) {
-
-            Map.Entry thisEntry = (Map.Entry) collections.next();
-            Aux aux = (Aux) thisEntry.getValue();
-            DiscountReserve discountReserve = new DiscountReserve();
-            discountReserve.setDiscountProducer(discountProducer);
-            discountReserve.setStartDate(rawMaterialPayRoll.getStartDate());
-            discountReserve.setEndDate(rawMaterialPayRoll.getEndDate());
-            discountReserve.setMaterialProducer(aux.producer);
-
-            //Double porcentage =RoundUtil.getRoundValue( ((aux.earnedMoney *100)/totalMoneyCollected)/100,2, RoundUtil.RoundMode.SYMMETRIC);
-            //todo: lanzar un mensaje de advertencia
-            Double porcentage;
-            if (totalMoneyCollected != 0)
-                porcentage = ((aux.earnedMoney * 100) / totalMoneyCollected) / 100;
-            else
-                porcentage = 0.0;
-
-            Double proration = totalReservaGAB * porcentage;
-            proration = RoundUtil.getRoundValue(proration,2, RoundUtil.RoundMode.SYMMETRIC);
-            ((Aux) thisEntry.getValue()).reserveDiscount = proration;
-            ((Aux) thisEntry.getValue()).earnedMoney = ((Aux) thisEntry.getValue()).earnedMoney - proration;
-            discountReserve.setAmount(proration);
-            aux.producer.getDiscountReserves().add(discountReserve);
         }
     }
 

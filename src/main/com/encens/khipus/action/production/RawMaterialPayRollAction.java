@@ -13,6 +13,7 @@ import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.service.employees.GestionService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.production.CollectedRawMaterialCalculatorService;
 import com.encens.khipus.service.production.ProductiveZoneService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
 import com.encens.khipus.util.Constants;
@@ -62,6 +63,10 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
 
     @In
     private CompanyConfigurationService companyConfigurationService;
+
+    /** @Claude OPT-6: Inyeccion de servicio para pre-calcular peso total quincenal **/
+    @In
+    private CollectedRawMaterialCalculatorService collectedRawMaterialCalculatorService;
 
     @Override
     protected GenericService getService() {
@@ -219,7 +224,10 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
             if (rawMaterialPayRoll.getProductiveZone() != null) {
                 rawMaterialPayRollService.validate(rawMaterialPayRoll);
                 rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
-                rawMaterialPayRollService.generatePayroll(rawMaterialPayRoll,discountProducer);
+                /** @Claude OPT-6: Pre-calcula peso total quincenal para zona unica **/
+                Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
+                        rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct());
+                rawMaterialPayRollService.generatePayroll(rawMaterialPayRoll, discountProducer, totalWeightFortnight);
                 readonly = true;
             } else {
                 /*CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
@@ -309,6 +317,11 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"RawMaterialPayRoll.info.NoFoundReserve");
 
             List<ProductiveZone> productiveZones = productiveZoneService.findAllThatDoNotHaveCollectionForm(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+
+            /** @Claude OPT-6: Pre-calcula peso total quincenal una sola vez antes del loop de zonas **/
+            Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
+                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct());
+
             for (ProductiveZone productiveZone : productiveZones) {
 
                 if (productiveZone.getGroup().equals("ILVA")) { /** MODIFYID Zonas productivas ILVA **/
@@ -325,7 +338,7 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                     payRoll.setIue(rawMaterialPayRoll.getIue());
                     rawMaterialPayRollService.validate(payRoll);
                     rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
-                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer);
+                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight);
                     rawMaterialPayRollService.createAll(payRoll);
                 }
             }
