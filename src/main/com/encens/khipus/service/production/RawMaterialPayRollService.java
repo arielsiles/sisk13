@@ -20,7 +20,7 @@ public interface RawMaterialPayRollService extends GenericService {
     public List<DiscountProducer> findDiscountsProducerByDate(Date date);
 
     /** @Claude OPT-6: Parametro totalWeightFortnight agregado para evitar recalculo por zona **/
-    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight) throws EntryNotFoundException, RawMaterialPayRollException;
+    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException;
 
     void calculateLiquidPayable(RawMaterialPayRoll rawMaterialPayRoll);
 

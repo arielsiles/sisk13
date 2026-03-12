@@ -45,6 +45,21 @@ import java.util.List;
                         "where productionOrder.productionPlanning.date <= :date " +
                         "and productionOrder.productionPlanning.state <> com.encens.khipus.model.production.ProductionPlanningState.PENDING " +
                         "and inputProductionVoucher.metaProduct = :metaProduct"),
+        @NamedQuery(name = "CollectionForm.weightedAmountPerDayByMetaProduct",
+                query = "select collectionRecord.collectionForm.date, sum(collectionRecord.weightedAmount) " +
+                        "from CollectionRecord collectionRecord " +
+                        "where collectionRecord.collectionForm.date between :startDate and :endDate " +
+                        "and collectionRecord.collectionForm.metaProduct = :metaProduct " +
+                        "group by collectionRecord.collectionForm.date"),
+
+        @NamedQuery(name = "CollectionForm.weightedAmountPerDayByMetaProductAndGAB",
+                query = "select collectionRecord.collectionForm.date, sum(collectionRecord.weightedAmount) " +
+                        "from CollectionRecord collectionRecord " +
+                        "where collectionRecord.collectionForm.date between :startDate and :endDate " +
+                        "and collectionRecord.productiveZone = :productiveZone " +
+                        "and collectionRecord.collectionForm.metaProduct = :metaProduct " +
+                        "group by collectionRecord.collectionForm.date"),
+
         @NamedQuery(name = "CollectionForm.calculateCollectedAmountOnDateByMetaProduct",
                 query = "select collectedRawMaterial.rawMaterialCollectionSession.productiveZone.id, sum(collectedRawMaterial.amount) " +
                         "from CollectedRawMaterial collectedRawMaterial " +

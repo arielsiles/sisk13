@@ -9,7 +9,9 @@ import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @Name("collectedRawMaterialCalculatorService")
 @Stateless
@@ -38,6 +40,59 @@ public class CollectedRawMaterialCalculatorServiceBean implements CollectedRawMa
                 .setParameter("metaProduct", rawMaterial)
                 .getSingleResult();
         return cast(sum);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public double calculateCollectedAmountBetweenDates(Date startDate, Date endDate, MetaProduct rawMaterial, int dayFilter) {
+        if (dayFilter == 0) {
+            return calculateCollectedAmountBetweenDates(startDate, endDate, rawMaterial);
+        }
+        List<Object[]> perDay = em.createNamedQuery("CollectionForm.weightedAmountPerDayByMetaProduct")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("metaProduct", rawMaterial)
+                .getResultList();
+        double sum = 0;
+        for (Object[] row : perDay) {
+            Date date = (Date) row[0];
+            if (shouldIncludeDate(date, dayFilter)) {
+                sum += cast((Double) row[1]);
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public double calculateCollectedAmountBetweenDates(Date startDate, Date endDate, MetaProduct rawMaterial, ProductiveZone productiveZone, int dayFilter) {
+        if (dayFilter == 0) {
+            return calculateCollectedAmountBetweenDates(startDate, endDate, rawMaterial, productiveZone);
+        }
+        List<Object[]> perDay = em.createNamedQuery("CollectionForm.weightedAmountPerDayByMetaProductAndGAB")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("metaProduct", rawMaterial)
+                .setParameter("productiveZone", productiveZone)
+                .getResultList();
+        double sum = 0;
+        for (Object[] row : perDay) {
+            Date date = (Date) row[0];
+            if (shouldIncludeDate(date, dayFilter)) {
+                sum += cast((Double) row[1]);
+            }
+        }
+        return sum;
+    }
+
+    private boolean shouldIncludeDate(Date date, int dayFilter) {
+        if (dayFilter == 0) return true;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        boolean isSunday = (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
+        if (dayFilter == 1) return !isSunday;
+        if (dayFilter == 2) return isSunday;
+        return true;
     }
 
     @Override

@@ -48,6 +48,8 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     private Month month;
     private Periodo periodo;
     private List<GestionPayroll> gestionPayrollList;
+    private boolean sinDomingos = false;
+    private boolean soloDomingos = false;
     private ProductiveZone productiveZone = null;
 
     private List<RawMaterialPayRoll> rawMaterialPayRollList;
@@ -90,11 +92,13 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         } catch (CompanyConfigurationNotFoundException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }*/
-        getInstance().setIt(0.3);
-        getInstance().setIue(0.5);
-        //getInstance().setUnitPrice(3.5);
-        getInstance().setUnitPrice(Constants.PRICE_UNIT_MILK);
-        getInstance().setTaxRate(getInstance().getIt() + getInstance().getIue());
+        if (getInstance().getUnitPrice() == 0.0) {
+            getInstance().setIt(0.3);
+            getInstance().setIue(0.5);
+            //getInstance().setUnitPrice(3.5);
+            getInstance().setUnitPrice(Constants.PRICE_UNIT_MILK);
+            getInstance().setTaxRate(getInstance().getIt() + getInstance().getIue());
+        }
         return getInstance();
     }
 
@@ -226,8 +230,8 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                 rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
                 /** @Claude OPT-6: Pre-calcula peso total quincenal para zona unica **/
                 Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
-                        rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct());
-                rawMaterialPayRollService.generatePayroll(rawMaterialPayRoll, discountProducer, totalWeightFortnight);
+                        rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), getDayFilter());
+                rawMaterialPayRollService.generatePayroll(rawMaterialPayRoll, discountProducer, totalWeightFortnight, getDayFilter());
                 readonly = true;
             } else {
                 /*CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
@@ -320,7 +324,7 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
 
             /** @Claude OPT-6: Pre-calcula peso total quincenal una sola vez antes del loop de zonas **/
             Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
-                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct());
+                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), getDayFilter());
 
             for (ProductiveZone productiveZone : productiveZones) {
 
@@ -338,7 +342,7 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                     payRoll.setIue(rawMaterialPayRoll.getIue());
                     rawMaterialPayRollService.validate(payRoll);
                     rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
-                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight);
+                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight, getDayFilter());
                     rawMaterialPayRollService.createAll(payRoll);
                 }
             }
@@ -568,5 +572,29 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
 
     public void setEditIT(boolean editIT) {
         this.editIT = editIT;
+    }
+
+    public boolean isSinDomingos() {
+        return sinDomingos;
+    }
+
+    public void setSinDomingos(boolean sinDomingos) {
+        this.sinDomingos = sinDomingos;
+        if (sinDomingos) this.soloDomingos = false;
+    }
+
+    public boolean isSoloDomingos() {
+        return soloDomingos;
+    }
+
+    public void setSoloDomingos(boolean soloDomingos) {
+        this.soloDomingos = soloDomingos;
+        if (soloDomingos) this.sinDomingos = false;
+    }
+
+    private int getDayFilter() {
+        if (sinDomingos) return 1;
+        if (soloDomingos) return 2;
+        return 0;
     }
 }

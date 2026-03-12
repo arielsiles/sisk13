@@ -1,6 +1,5 @@
 package com.encens.khipus.service.production;
 
-import com.encens.khipus.exception.ConcurrencyException;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.exception.production.RawMaterialPayRollException;
@@ -164,21 +163,21 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
 
     /** @Claude OPT-6: Parametro totalWeightFortnight agregado para evitar recalculo por zona **/
     @Override
-    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight) throws EntryNotFoundException, RawMaterialPayRollException {
+    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException {
         Double totalReservaGAB = 0.0;
         if(discountProducer != null) {
             /** @Claude OPT-6: Usa totalWeightFortnight pre-calculado en vez de recalcular por zona **/
-            Double totalWeightFortnightGAB = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), rawMaterialPayRoll.getProductiveZone());
+            Double totalWeightFortnightGAB = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), rawMaterialPayRoll.getProductiveZone(), dayFilter);
             Double percentageReserveGAB = ((totalWeightFortnightGAB * 100) / totalWeightFortnight) / 100;
-            totalReservaGAB = (RoundUtil.getRoundValue(totalWeightFortnight * discountProducer.getReserve(), 2, RoundUtil.RoundMode.SYMMETRIC) * Constants.PRICE_UNIT_MILK) * percentageReserveGAB;
+            totalReservaGAB = (RoundUtil.getRoundValue(totalWeightFortnight * discountProducer.getReserve(), 2, RoundUtil.RoundMode.SYMMETRIC) * rawMaterialPayRoll.getUnitPrice()) * percentageReserveGAB;
         }
 
-        Map<Date, Double> differences = createMapOfDifferencesWeights(rawMaterialPayRoll);
+        Map<Date, Double> differences = createMapOfDifferencesWeights(rawMaterialPayRoll, dayFilter);
 
         /** @Claude OPT-3: Pre-carga batch de ProducerTax para evitar lazy loading N+1 **/
         Map<Long, ProducerTax> producerTaxCache = preloadProducerTaxes(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
-        Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache);
+        Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache, dayFilter);
         Double alcoholByGAB = salaryMovementGABService.getAlcoholBayGAB(rawMaterialPayRoll.getProductiveZone(), rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
         /** @Claude OPT-4: Pre-carga batch de descuentos por zona en vez de por productor **/
@@ -712,13 +711,14 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return summaryTotal;
     }
 
-    private Map<Date, Double> createMapOfDifferencesWeights(RawMaterialPayRoll rawMaterialPayRoll) {
+    private Map<Date, Double> createMapOfDifferencesWeights(RawMaterialPayRoll rawMaterialPayRoll, int dayFilter) {
         List<Object[]> datas = findDifferencesWeights("RawMaterialPayRoll.differenceRawMaterialBetweenDates", rawMaterialPayRoll);
 
         Map<Date, Double> differences = new HashMap<Date, Double>();
 
         for (Object[] obj : datas) {
             Date date = (Date) obj[0];
+            if (!shouldIncludeDate(date, dayFilter)) continue;
             Double receivedAmount = (Double) obj[1];
             Double weightedAmount = (Double) obj[2];
             /*Double diffs =  RoundUtil.getRoundValue((receivedAmount.doubleValue() * rawMaterialPayRoll.getUnitPrice()),2, RoundUtil.RoundMode.SYMMETRIC) -
@@ -886,7 +886,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     }
 
     /** @Claude OPT-2, OPT-3: Parametro producerTaxCache para evitar lazy loading N+1 **/
-    private Map<Long, Aux> createMapOfProducers(RawMaterialPayRoll rawMaterialPayRoll, Map<Date, Double> differences, Double totalReservaGAB, DiscountProducer discountProducer, Map<Long, ProducerTax> producerTaxCache) throws RawMaterialPayRollException {
+    private Map<Long, Aux> createMapOfProducers(RawMaterialPayRoll rawMaterialPayRoll, Map<Date, Double> differences, Double totalReservaGAB, DiscountProducer discountProducer, Map<Long, ProducerTax> producerTaxCache, int dayFilter) throws RawMaterialPayRollException {
         double taxRate = rawMaterialPayRoll.getTaxRate() / 100;
         List<Object[]> collectedProducers = find("RawMaterialPayRoll.findCollectedAmountByMetaProductBetweenDates", rawMaterialPayRoll);
         Map<Long, Aux> map = new HashMap<Long, Aux>();
@@ -897,6 +897,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
 
         for (Object[] obj : collectedProducers) {
             Date date = (Date) obj[0];
+            if (!shouldIncludeDate(date, dayFilter)) continue;
             RawMaterialProducer rawMaterialProducer = (RawMaterialProducer) obj[1];
             Double amount = (Double) obj[2];
 
@@ -932,6 +933,16 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         applyProrations(map, rawMaterialPayRoll, totalMoneyCollectedByGab, getDiffMoneyTotalGab(differences), totalReservaGAB, discountProducer);
 
         return map;
+    }
+
+    private boolean shouldIncludeDate(Date date, int dayFilter) {
+        if (dayFilter == 0) return true;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        boolean isSunday = (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
+        if (dayFilter == 1) return !isSunday;
+        if (dayFilter == 2) return isSunday;
+        return true;
     }
 
     public Double getDiffTotalMoney(Map<Date, Double> differences) {
