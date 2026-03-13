@@ -14,6 +14,7 @@ import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialPayRoll;
 import com.encens.khipus.reports.GenerationReportData;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.production.CollectedRawMaterialCalculatorService;
 import com.encens.khipus.service.production.ProductiveZoneService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
 import com.encens.khipus.service.production.RawMaterialPayRollServiceBean;
@@ -52,6 +53,8 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
     @In
     ProductiveZoneService productiveZoneService;
     @In
+    CollectedRawMaterialCalculatorService collectedRawMaterialCalculatorService;
+    @In
     private CompanyConfigurationService companyConfigurationService;
     @In
     private FacesMessages facesMessages;
@@ -80,6 +83,7 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
     private Date endDate;
     private Calendar dateIni;
     private Calendar dateEnd;
+    private boolean soloDomingos;
 
     private List<GestionPayroll> gestionPayrollList;
 
@@ -127,7 +131,19 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
         params.put("companyName", companyConfiguration.getCompanyName());
         params.put("systemName", companyConfiguration.getSystemName());
         params.put("locationName", companyConfiguration.getLocationName());
-        params.put("periodo", (periodo.getResourceKey().toString() == "Periodo.first") ? "1RA QUINCENA" : "2DA QUINCENA" + " " + getMes(month));
+        String periodoText = (periodo.getResourceKey().equals("Periodo.first") ? "1RA QUINCENA " : "2DA QUINCENA ")
+                + getMes(month).toUpperCase() + " " + gestion.getYear();
+        if (soloDomingos) {
+            List<Integer> sundayDays = collectedRawMaterialCalculatorService
+                    .getSundayDaysWithCollection(startDate, endDate, metaProduct);
+            StringBuilder sb = new StringBuilder(" - DOMINGOS ");
+            for (int i = 0; i < sundayDays.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(sundayDays.get(i));
+            }
+            periodoText += sb.toString();
+        }
+        params.put("periodo", periodoText);
         params.put("startDate", df.format(dateIni.getTime()));
         params.put("endDate", df.format(dateEnd.getTime()));
 
@@ -370,5 +386,13 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isSoloDomingos() {
+        return soloDomingos;
+    }
+
+    public void setSoloDomingos(boolean soloDomingos) {
+        this.soloDomingos = soloDomingos;
     }
 }

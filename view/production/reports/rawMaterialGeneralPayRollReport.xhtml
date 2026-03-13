@@ -95,6 +95,12 @@
                         </h:selectOneMenu>
                     </s:decorate>
 
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">Solo Domingos</ui:define>
+                        <h:selectBooleanCheckbox id="soloDomingos"
+                            value="#{rawMaterialGeneralPayRollReportAction.soloDomingos}"/>
+                    </s:decorate>
+
                 </h:panelGroup>
             </h:panelGrid>
 

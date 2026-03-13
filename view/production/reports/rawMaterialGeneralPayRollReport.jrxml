@@ -53,7 +53,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodo}+" - "+$P{startDate}+" al "+$P{endDate}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodo}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="0" width="370" height="12"/>

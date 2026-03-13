@@ -126,7 +126,19 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
         rawMaterialPayRoll = rawMaterialPayRollService.getTotalsRawMaterialPayRoll(startDate, endDate, zone, metaProduct);
 
         params.put("reportTitle", messages.get("Report.titleGeneral"));
-        params.put("periodo", (periodo.getResourceKey().toString() == "Periodo.first") ? "1RA QUINCENA" : "2DA QUINCENA" + " " + getMes(month));
+        String periodoText = (periodo.getResourceKey().equals("Periodo.first") ? "1RA QUINCENA " : "2DA QUINCENA ")
+                + getMes(month).toUpperCase() + " " + gestion.getYear();
+        if (soloDomingos) {
+            List<Integer> sundayDays = collectedRawMaterialCalculatorService
+                    .getSundayDaysWithCollection(startDate, endDate, metaProduct);
+            StringBuilder sb = new StringBuilder(" - DOMINGOS ");
+            for (int i = 0; i < sundayDays.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(sundayDays.get(i));
+            }
+            periodoText += sb.toString();
+        }
+        params.put("periodo", periodoText);
         params.put("startDate", df.format(dateIni.getTime()));
         params.put("endDate", df.format(dateEnd.getTime()));
         params.put("nombre_gab", "GAB: " + zone.getNumber() + " - " + zone.getName());
@@ -156,19 +168,6 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
         Double liquidPayable = rawMaterialPayRoll.getTotalLiquidByGAB();
         MoneyUtil moneyUtil = new MoneyUtil();
         params.put("literally_money", moneyUtil.Convertir(liquidPayable.toString(), true, messages.get("Reports.cashAvailable.bs")));
-
-        if (soloDomingos) {
-            List<Integer> sundayDays = collectedRawMaterialCalculatorService
-                    .getSundayDaysWithCollection(startDate, endDate, metaProduct);
-            StringBuilder sb = new StringBuilder("Domingos: ");
-            for (int i = 0; i < sundayDays.size(); i++) {
-                if (i > 0) sb.append(", ");
-                sb.append(sundayDays.get(i));
-            }
-            params.put("domingos_acopio", sb.toString());
-        } else {
-            params.put("domingos_acopio", "");
-        }
 
         typedReportData = super.getReport("rotatoryFundReport"
                 , "/production/reports/rawMaterialPayRollReport.jrxml"
@@ -212,7 +211,19 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
 
             System.out.println("=====> PERIODO: " + periodo.getResourceKey().toString());
             params.put("reportTitle", messages.get("Report.titleGeneral"));
-            params.put("periodo", (periodo.getResourceKey().toString() == "Periodo.first") ? "1RA QUINCENA" : "2DA QUINCENA" + " " + getMes(month));
+            String periodoText = (periodo.getResourceKey().equals("Periodo.first") ? "1RA QUINCENA " : "2DA QUINCENA ")
+                    + getMes(month).toUpperCase() + " " + gestion.getYear();
+            if (soloDomingos) {
+                List<Integer> sundayDays = collectedRawMaterialCalculatorService
+                        .getSundayDaysWithCollection(startDate, endDate, metaProduct);
+                StringBuilder sb = new StringBuilder(" - DOMINGOS ");
+                for (int i = 0; i < sundayDays.size(); i++) {
+                    if (i > 0) sb.append(", ");
+                    sb.append(sundayDays.get(i));
+                }
+                periodoText += sb.toString();
+            }
+            params.put("periodo", periodoText);
             params.put("startDate", df.format(dateIni.getTime()));
             params.put("endDate", df.format(dateEnd.getTime()));
             params.put("nombre_gab", "GAB: " + zone.getNumber() + " - " + zone.getName());
@@ -239,19 +250,6 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
             Double liquidPayable = rawMaterialPayRoll.getTotalLiquidByGAB();
             MoneyUtil moneyUtil = new MoneyUtil();
             params.put("literally_money", moneyUtil.Convertir(liquidPayable.toString(), true, messages.get("Reports.cashAvailable.bs")));
-
-            if (soloDomingos) {
-                List<Integer> sundayDays = collectedRawMaterialCalculatorService
-                        .getSundayDaysWithCollection(startDate, endDate, metaProduct);
-                StringBuilder sb = new StringBuilder("Domingos: ");
-                for (int i = 0; i < sundayDays.size(); i++) {
-                    if (i > 0) sb.append(", ");
-                    sb.append(sundayDays.get(i));
-                }
-                params.put("domingos_acopio", sb.toString());
-            } else {
-                params.put("domingos_acopio", "");
-            }
 
             typedReportData = super.getReport("RawMaterialPayRollReport", "/production/reports/rawMaterialPayRollReport.jrxml", MessageUtils.getMessage("Report.rawMaterialPayRollReportAction"), params);
 
