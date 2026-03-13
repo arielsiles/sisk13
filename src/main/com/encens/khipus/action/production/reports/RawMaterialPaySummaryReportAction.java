@@ -15,10 +15,7 @@ import com.encens.khipus.model.finances.VoucherDetail;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.ClientService;
-import com.encens.khipus.service.production.RawMaterialPayRollService;
-import com.encens.khipus.service.production.RawMaterialPayRollServiceBean;
-import com.encens.khipus.service.production.SalaryMovementProducerService;
-import com.encens.khipus.service.production.TypeMovementProducerService;
+import com.encens.khipus.service.production.*;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
@@ -61,6 +58,8 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
     private SalaryMovementProducerService salaryMovementProducerService;
     @In
     private ClientService clientService;
+    @In
+    CollectedRawMaterialCalculatorService collectedRawMaterialCalculatorService;
 
     private String summaryReportTitle;
     private String gestionTitle;
@@ -85,6 +84,8 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
 
     private Calendar dateIni;
     private Calendar dateEnd;
+
+    private boolean soloDomingos;
 
     private List<GestionPayroll> gestionPayrollList;
 
@@ -117,6 +118,27 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         reportParameters.put("period", messages.get("Report.period"));
         reportParameters.put("startDate", df.format(dateIni.getTime()));
         reportParameters.put("endDate", df.format(dateEnd.getTime()));
+
+        if (soloDomingos) {
+            try {
+                DateFormat dateFormat2 = new SimpleDateFormat("yyyy/MM/dd");
+                Date startDateSun = dateFormat2.parse(dateFormat2.format(dateIni.getTime()));
+                Date endDateSun = dateFormat2.parse(dateFormat2.format(dateEnd.getTime()));
+                java.util.List<Integer> sundayDays = collectedRawMaterialCalculatorService
+                        .getSundayDaysWithCollection(startDateSun, endDateSun, metaProduct);
+                StringBuilder sb = new StringBuilder("Domingos: ");
+                for (int i = 0; i < sundayDays.size(); i++) {
+                    if (i > 0) sb.append(", ");
+                    sb.append(sundayDays.get(i));
+                }
+                reportParameters.put("domingos_acopio", sb.toString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+                reportParameters.put("domingos_acopio", "");
+            }
+        } else {
+            reportParameters.put("domingos_acopio", "");
+        }
 
         super.generateReport(
                 "rawMaterialPaySummaryReportAction",
@@ -575,6 +597,14 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
 
     public void setFullNameOfProductiveZone(String fullName) {
 
+    }
+
+    public boolean isSoloDomingos() {
+        return soloDomingos;
+    }
+
+    public void setSoloDomingos(boolean soloDomingos) {
+        this.soloDomingos = soloDomingos;
     }
 
     protected GenericService getService() {

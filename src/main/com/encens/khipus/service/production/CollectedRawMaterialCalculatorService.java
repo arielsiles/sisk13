@@ -5,6 +5,7 @@ import com.encens.khipus.model.production.ProductiveZone;
 
 import javax.ejb.Local;
 import java.util.Date;
+import java.util.List;
 
 @Local
 public interface CollectedRawMaterialCalculatorService {
@@ -22,4 +23,6 @@ public interface CollectedRawMaterialCalculatorService {
     public double calculateAvailableAmount(Date date, MetaProduct rawMaterial);
 
     public double calculateUsedAmount(Date date, MetaProduct rawMaterial);
+
+    public List<Integer> getSundayDaysWithCollection(Date startDate, Date endDate, MetaProduct metaProduct);
 }

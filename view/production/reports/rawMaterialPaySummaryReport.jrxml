@@ -3,6 +3,7 @@
 	<property name="ireport.zoom" value="1.7715610000000022"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
+	<parameter name="domingos_acopio" class="java.lang.String"/>
 	<field name="total_collected" class="java.lang.Double"/>
 	<field name="price_unit" class="java.lang.Double"/>
 	<field name="total_differences" class="java.lang.Double"/>
@@ -33,7 +34,7 @@
 	<group name="rowGroup">
 		<groupExpression><![CDATA[]]></groupExpression>
 		<groupHeader>
-			<band height="27">
+			<band height="40">
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement key="date_text" positionType="Float" x="63" y="12" width="450" height="13"/>
 					<box padding="1">
@@ -53,6 +54,15 @@
 						<font fontName="Arial" size="9" isBold="true"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitle}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement x="63" y="25" width="450" height="13" isRemoveLineWhenBlank="true">
+						<printWhenExpression><![CDATA[$P{domingos_acopio} != null && !$P{domingos_acopio}.isEmpty()]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{domingos_acopio}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>

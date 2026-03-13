@@ -9,6 +9,7 @@ import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -131,5 +132,25 @@ public class CollectedRawMaterialCalculatorServiceBean implements CollectedRawMa
                                  .getSingleResult();
 
         return cast(used);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Integer> getSundayDaysWithCollection(Date startDate, Date endDate, MetaProduct metaProduct) {
+        List<Object[]> perDay = em.createNamedQuery("CollectionForm.weightedAmountPerDayByMetaProduct")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("metaProduct", metaProduct)
+                .getResultList();
+        List<Integer> sundayDays = new ArrayList<Integer>();
+        for (Object[] row : perDay) {
+            Date date = (Date) row[0];
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+                sundayDays.add(cal.get(Calendar.DAY_OF_MONTH));
+            }
+        }
+        return sundayDays;
     }
 }

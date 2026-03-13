@@ -11,6 +11,7 @@ import com.encens.khipus.model.production.Periodo;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialPayRoll;
 import com.encens.khipus.reports.GenerationReportData;
+import com.encens.khipus.service.production.CollectedRawMaterialCalculatorService;
 import com.encens.khipus.service.production.ProductiveZoneService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
 import com.encens.khipus.service.production.RawMaterialPayRollServiceBean;
@@ -46,6 +47,9 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
     @In
     ProductiveZoneService productiveZoneService;
 
+    @In
+    CollectedRawMaterialCalculatorService collectedRawMaterialCalculatorService;
+
     private String summaryReportTitle;
     private String gestionTitle;
 
@@ -70,6 +74,8 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
     private Date endDate;
     private Calendar dateIni;
     private Calendar dateEnd;
+
+    private boolean soloDomingos;
 
     private List<GestionPayroll> gestionPayrollList;
 
@@ -150,6 +156,20 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
         Double liquidPayable = rawMaterialPayRoll.getTotalLiquidByGAB();
         MoneyUtil moneyUtil = new MoneyUtil();
         params.put("literally_money", moneyUtil.Convertir(liquidPayable.toString(), true, messages.get("Reports.cashAvailable.bs")));
+
+        if (soloDomingos) {
+            List<Integer> sundayDays = collectedRawMaterialCalculatorService
+                    .getSundayDaysWithCollection(startDate, endDate, metaProduct);
+            StringBuilder sb = new StringBuilder("Domingos: ");
+            for (int i = 0; i < sundayDays.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(sundayDays.get(i));
+            }
+            params.put("domingos_acopio", sb.toString());
+        } else {
+            params.put("domingos_acopio", "");
+        }
+
         typedReportData = super.getReport("rotatoryFundReport"
                 , "/production/reports/rawMaterialPayRollReport.jrxml"
                 , MessageUtils.getMessage("Report.rawMaterialPayRollReportAction")
@@ -219,6 +239,19 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
             Double liquidPayable = rawMaterialPayRoll.getTotalLiquidByGAB();
             MoneyUtil moneyUtil = new MoneyUtil();
             params.put("literally_money", moneyUtil.Convertir(liquidPayable.toString(), true, messages.get("Reports.cashAvailable.bs")));
+
+            if (soloDomingos) {
+                List<Integer> sundayDays = collectedRawMaterialCalculatorService
+                        .getSundayDaysWithCollection(startDate, endDate, metaProduct);
+                StringBuilder sb = new StringBuilder("Domingos: ");
+                for (int i = 0; i < sundayDays.size(); i++) {
+                    if (i > 0) sb.append(", ");
+                    sb.append(sundayDays.get(i));
+                }
+                params.put("domingos_acopio", sb.toString());
+            } else {
+                params.put("domingos_acopio", "");
+            }
 
             typedReportData = super.getReport("RawMaterialPayRollReport", "/production/reports/rawMaterialPayRollReport.jrxml", MessageUtils.getMessage("Report.rawMaterialPayRollReportAction"), params);
 
@@ -798,5 +831,13 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isSoloDomingos() {
+        return soloDomingos;
+    }
+
+    public void setSoloDomingos(boolean soloDomingos) {
+        this.soloDomingos = soloDomingos;
     }
 }

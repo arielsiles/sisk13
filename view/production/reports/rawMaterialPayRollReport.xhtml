@@ -1,10 +1,8 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:s="http://jboss.com/products/seam/taglib"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
-                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:rich="http://richfaces.org/rich" xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
@@ -96,6 +94,12 @@
                                            hideNoSelectionLabel="false"/>
                             <s:convertEnum/>
                         </h:selectOneMenu>
+                    </s:decorate>
+
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">Solo Domingos</ui:define>
+                        <h:selectBooleanCheckbox id="soloDomingos"
+                            value="#{rawMaterialPayRollReportAction.soloDomingos}"/>
                     </s:decorate>
 
                 </h:panelGroup>

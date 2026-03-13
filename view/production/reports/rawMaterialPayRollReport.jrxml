@@ -22,6 +22,7 @@
 	<parameter name="unitPrice" class="java.lang.String"/>
 	<parameter name="totalReserveDicount" class="java.lang.Double"/>
 	<parameter name="totalDiscountGA" class="java.lang.Double"/>
+	<parameter name="domingos_acopio" class="java.lang.String"/>
 	<field name="rawMaterialPayRecord.id" class="java.lang.Long">
 		<fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
 	</field>
@@ -86,7 +87,7 @@
 		<fieldDescription><![CDATA[COLUMN_21]]></fieldDescription>
 	</field>
 	<title>
-		<band height="49" splitType="Stretch">
+		<band height="62" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement key="date_text" positionType="Float" x="0" y="0" width="216" height="12"/>
 				<box padding="1">
@@ -136,6 +137,15 @@
 					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["INDUSTRIAS LACTEAS DEL VALLE ALTO"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="49" width="598" height="13" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$P{domingos_acopio} != null && !$P{domingos_acopio}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{domingos_acopio}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
