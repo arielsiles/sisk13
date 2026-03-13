@@ -143,6 +143,10 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
             }
             periodoText += sb.toString();
         }
+        List<RawMaterialPayRoll> payRolls = rawMaterialPayRollService.findAll(startDate, endDate, metaProduct);
+        if (payRolls != null && !payRolls.isEmpty()) {
+            periodoText += "    Precio: " + String.format("%.2f", payRolls.get(0).getUnitPrice());
+        }
         params.put("periodo", periodoText);
         params.put("startDate", df.format(dateIni.getTime()));
         params.put("endDate", df.format(dateEnd.getTime()));
