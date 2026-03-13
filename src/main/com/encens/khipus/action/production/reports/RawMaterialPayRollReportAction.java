@@ -333,7 +333,6 @@ public class RawMaterialPayRollReportAction extends GenericReportAction {
         restrictions = new String[]{"rawMaterialPayRoll.productiveZone = #{rawMaterialPayRollReportAction.zone}",
                 "rawMaterialPayRoll.metaProduct = #{rawMaterialPayRollReportAction.metaProduct}",
                 "rawMaterialPayRoll.startDate = #{rawMaterialPayRollReportAction.startDate}",
-                "rawMaterialPayRecord.totalAmount <> #{0.0}",
                 "rawMaterialPayRoll.endDate = #{rawMaterialPayRollReportAction.endDate}"
         };
 

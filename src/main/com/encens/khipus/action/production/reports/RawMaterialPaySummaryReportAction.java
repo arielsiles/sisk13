@@ -140,8 +140,8 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         summaryTotal = rawMaterialPayRollService.getSumaryTotal(startDate, endDate, zone, metaProduct);
 
         Double totalMoneyCollected = discounts.mount;
-        Double totalDifferencesMoney = discounts.adjustment;
-        Double diffTotal = (discounts.unitPrice != 0) ? discounts.adjustment / discounts.unitPrice : 0.0;
+        Double totalDifferencesMoney = rawMaterialPayRollService.getSumAdjustmentFromRecords(startDate, endDate, metaProduct);
+        Double diffTotal = (discounts.unitPrice != 0) ? totalDifferencesMoney / discounts.unitPrice : 0.0;
         Double balanceWeightTotal = discounts.collected + diffTotal;
         Double totalMoneyBalance = totalMoneyCollected + totalDifferencesMoney;
         Double reservProducer = discounts.reserve;
@@ -185,10 +185,7 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         params.put("reserva_productores", df.format(reservProducer));
         params.put("reserveGA", df.format(reserveGA));
         params.put("total_differences", df.format(totalDiscount));
-        //todo: modificar ajustar el prorrateo
-        Double totalLiquid = total - totalDiscount;
-        //params.put("liquid_pay", df.format(discounts.liquid));
-        params.put("liquid_pay", df.format(totalLiquid));
+        params.put("liquid_pay", df.format(discounts.liquid));
 
     }
 
@@ -222,7 +219,7 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         porcentageIUE = rawMaterialPayRoll.getIue() / rawMaterialPayRoll.getTaxRate();
         iue = discounts.retention * porcentageIUE;
         it = discounts.retention - iue;
-        Double totalLiquid = total - totalDiscount;
+        Double totalLiquid = discounts.liquid;
 
 
         System.out.println(".......PARA CONTABILIZAR......");

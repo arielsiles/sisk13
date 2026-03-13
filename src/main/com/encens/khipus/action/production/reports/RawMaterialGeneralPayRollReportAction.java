@@ -215,7 +215,6 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
         restrictions = new String[]{
                 "rawMaterialPayRoll.metaProduct = #{rawMaterialGeneralPayRollReportAction.metaProduct}",
                 "rawMaterialPayRoll.startDate = #{rawMaterialGeneralPayRollReportAction.startDate}",
-                "rawMaterialPayRecord.totalAmount <> #{0.0}",
                 "rawMaterialPayRoll.endDate = #{rawMaterialGeneralPayRollReportAction.endDate}"
         };
 

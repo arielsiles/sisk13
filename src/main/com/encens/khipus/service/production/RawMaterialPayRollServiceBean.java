@@ -656,47 +656,61 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 .setParameter("metaProduct", metaProduct)
                 .getResultList();
 
-        if (datas.size() > 0) {
-            discounts.mount = ((Double) datas.get(0)[0] != null) ? ((Double) datas.get(0)[0]).doubleValue() : 0.0;
-            discounts.collected = ((Double) datas.get(0)[1] != null) ? ((Double) datas.get(0)[1]).doubleValue() : 0.0;
-            discounts.alcohol = ((Double) datas.get(0)[2] != null) ? ((Double) datas.get(0)[2]).doubleValue() : 0.0;
-            discounts.concentrated = ((Double) datas.get(0)[3] != null) ? ((Double) datas.get(0)[3]).doubleValue() : 0.0;
-            discounts.yogurt = ((Double) datas.get(0)[4] != null) ? ((Double) datas.get(0)[4]).doubleValue() : 0.0;
-            discounts.recip = ((Double) datas.get(0)[5] != null) ? ((Double) datas.get(0)[5]).doubleValue() : 0.0;
-            discounts.retention = ((Double) datas.get(0)[6] != null) ? ((Double) datas.get(0)[6]).doubleValue() : 0.0;
-            discounts.veterinary = ((Double) datas.get(0)[7] != null) ? ((Double) datas.get(0)[7]).doubleValue() : 0.0;
-            discounts.credit = ((Double) datas.get(0)[8] != null) ? ((Double) datas.get(0)[8]).doubleValue() : 0.0;
-            discounts.discount = ((Double) datas.get(0)[9] != null) ? ((Double) datas.get(0)[9]).doubleValue() : 0.0;
-            discounts.liquid = ((Double) datas.get(0)[10] != null) ? ((Double) datas.get(0)[10]).doubleValue() : 0.0;
-            discounts.otherDiscount = ((Double) datas.get(0)[11] != null) ? ((Double) datas.get(0)[11]).doubleValue() : 0.0;
-            discounts.otherIncome = ((Double) datas.get(0)[12] != null) ? ((Double) datas.get(0)[12]).doubleValue() : 0.0;
-            discounts.adjustment = ((Double) datas.get(0)[13] != null) ? ((Double) datas.get(0)[13]).doubleValue() : 0.0;
-            discounts.commission = ((Double) datas.get(0)[14] != null) ? ((Double) datas.get(0)[14]).doubleValue() : 0.0;
-            discounts.unitPrice = ((Double) datas.get(0)[15] != null) ? ((Double) datas.get(0)[15]).doubleValue() : 0.0;
-            discounts.reserve = ((Double) datas.get(0)[16] != null) ? ((Double) datas.get(0)[16]).doubleValue() : 0.0;
-            discounts.ga = ((Double) datas.get(0)[17] != null) ? ((Double) datas.get(0)[17]).doubleValue() : 0.0;
-        } else {
-            discounts.mount = 0.0;
-            discounts.collected = 0.0;
-            discounts.alcohol = 0.0;
-            discounts.concentrated = 0.0;
-            discounts.yogurt = 0.0;
-            discounts.recip = 0.0;
-            discounts.retention = 0.0;
-            discounts.veterinary = 0.0;
-            discounts.credit = 0.0;
-            discounts.discount = 0.0;
-            discounts.liquid = 0.0;
-            discounts.otherDiscount = 0.0;
-            discounts.otherIncome = 0.0;
-            discounts.adjustment = 0.0;
-            discounts.unitPrice = 0.0;
-            discounts.commission = 0.0;
-            discounts.reserve = 0.0;
-            discounts.ga = 0.0;
+        discounts.mount = 0.0;
+        discounts.collected = 0.0;
+        discounts.alcohol = 0.0;
+        discounts.concentrated = 0.0;
+        discounts.yogurt = 0.0;
+        discounts.recip = 0.0;
+        discounts.retention = 0.0;
+        discounts.veterinary = 0.0;
+        discounts.credit = 0.0;
+        discounts.discount = 0.0;
+        discounts.liquid = 0.0;
+        discounts.otherDiscount = 0.0;
+        discounts.otherIncome = 0.0;
+        discounts.adjustment = 0.0;
+        discounts.unitPrice = 0.0;
+        discounts.commission = 0.0;
+        discounts.reserve = 0.0;
+        discounts.ga = 0.0;
+
+        for (Object[] row : datas) {
+            discounts.mount += row[0] != null ? (Double) row[0] : 0.0;
+            discounts.collected += row[1] != null ? (Double) row[1] : 0.0;
+            discounts.alcohol += row[2] != null ? (Double) row[2] : 0.0;
+            discounts.concentrated += row[3] != null ? (Double) row[3] : 0.0;
+            discounts.yogurt += row[4] != null ? (Double) row[4] : 0.0;
+            discounts.recip += row[5] != null ? (Double) row[5] : 0.0;
+            discounts.retention += row[6] != null ? (Double) row[6] : 0.0;
+            discounts.veterinary += row[7] != null ? (Double) row[7] : 0.0;
+            discounts.credit += row[8] != null ? (Double) row[8] : 0.0;
+            discounts.discount += row[9] != null ? (Double) row[9] : 0.0;
+            discounts.liquid += row[10] != null ? (Double) row[10] : 0.0;
+            discounts.otherDiscount += row[11] != null ? (Double) row[11] : 0.0;
+            discounts.otherIncome += row[12] != null ? (Double) row[12] : 0.0;
+            discounts.adjustment += row[13] != null ? (Double) row[13] : 0.0;
+            discounts.commission += row[14] != null ? (Double) row[14] : 0.0;
+            if (row[15] != null) discounts.unitPrice = (Double) row[15];
+            discounts.reserve += row[16] != null ? (Double) row[16] : 0.0;
+            discounts.ga += row[17] != null ? (Double) row[17] : 0.0;
         }
 
         return discounts;
+    }
+
+    public Double getSumAdjustmentFromRecords(Date startDate, Date endDate, MetaProduct metaProduct) {
+        List<Double> result = getEntityManager().createQuery(
+                "SELECT COALESCE(SUM(r.productiveZoneAdjustment), 0.0) " +
+                "FROM RawMaterialPayRecord r " +
+                "WHERE r.rawMaterialPayRoll.startDate = :startDate " +
+                "AND r.rawMaterialPayRoll.endDate <= :endDate " +
+                "AND r.rawMaterialPayRoll.metaProduct = :metaProduct")
+                .setParameter("startDate", startDate, TemporalType.DATE)
+                .setParameter("endDate", endDate, TemporalType.DATE)
+                .setParameter("metaProduct", metaProduct)
+                .getResultList();
+        return result.isEmpty() || result.get(0) == null ? 0.0 : result.get(0);
     }
 
     public SummaryTotal getSumaryTotal(Date dateIni, Date dateEnd, ProductiveZone zone, MetaProduct metaProduct) {

@@ -75,4 +75,6 @@ public interface RawMaterialPayRollService extends GenericService {
     public List<BoletaPagoProductor> findBoletaDePago(Date fechaIni,Date fechaFin, RawMaterialProducer rawMaterialProducer,ProductiveZone productiveZone,MetaProduct metaProduct);
 
     public List<BoletaPagoProductor> findBoletaDePagoGA(Date fechaIni,Date fechaFin, RawMaterialProducer rawMaterialProducer,ProductiveZone productiveZone,MetaProduct metaProduct);
+
+    Double getSumAdjustmentFromRecords(Date startDate, Date endDate, MetaProduct metaProduct);
 }
