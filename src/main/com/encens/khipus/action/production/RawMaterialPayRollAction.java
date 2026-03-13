@@ -232,6 +232,17 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                 Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
                         rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), getDayFilter());
                 rawMaterialPayRollService.generatePayroll(rawMaterialPayRoll, discountProducer, totalWeightFortnight, getDayFilter());
+
+                // R8. Alerta de productores con liquido pagable negativo
+                for (int i = 0; i < rawMaterialPayRoll.getRawMaterialPayRecordList().size(); i++) {
+                    RawMaterialPayRecord rec = rawMaterialPayRoll.getRawMaterialPayRecordList().get(i);
+                    if (rec.getLiquidPayable() < 0) {
+                        String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
+                        facesMessages.add(StatusMessage.Severity.ERROR,
+                            "Liquido pagable negativo: " + producerName + " = " + rec.getLiquidPayable() + " Bs");
+                    }
+                }
+
                 readonly = true;
             } else {
                 /*CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
@@ -344,6 +355,16 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                     rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
                     rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight, getDayFilter());
                     rawMaterialPayRollService.createAll(payRoll);
+
+                    // R8. Alerta de productores con liquido pagable negativo
+                    for (int i = 0; i < payRoll.getRawMaterialPayRecordList().size(); i++) {
+                        RawMaterialPayRecord rec = payRoll.getRawMaterialPayRecordList().get(i);
+                        if (rec.getLiquidPayable() < 0) {
+                            String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
+                            facesMessages.add(StatusMessage.Severity.ERROR,
+                                "Liquido pagable negativo: " + producerName + " (" + productiveZone.getFullName() + ") = " + rec.getLiquidPayable() + " Bs");
+                        }
+                    }
                 }
             }
 
