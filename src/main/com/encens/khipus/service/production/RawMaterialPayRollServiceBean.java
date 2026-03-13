@@ -952,6 +952,14 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         /** @Claude OPT-7: Consolidacion de addProrationAlcohol + addProrationPorcentaje + addReserveDiscountPorcentaje en una sola iteracion **/
         applyProrations(map, rawMaterialPayRoll, totalMoneyCollectedByGab, getDiffMoneyTotalGab(differences), totalReservaGAB, discountProducer);
 
+        // R7. Excluir productores sin acopio: no generar registros ni aplicar descuentos
+        Iterator<Aux> it = map.values().iterator();
+        while (it.hasNext()) {
+            if (it.next().collectedAmount <= 0.0) {
+                it.remove();
+            }
+        }
+
         return map;
     }
 
@@ -1591,3 +1599,4 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         }
     }
 }
+
