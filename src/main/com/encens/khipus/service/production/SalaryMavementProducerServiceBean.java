@@ -463,6 +463,8 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
         jpql.append("SELECT salaryMovementProducer FROM SalaryMovementProducer salaryMovementProducer");
         jpql.append(" LEFT JOIN FETCH salaryMovementProducer.rawMaterialProducer rawMaterialProducer");
         jpql.append(" LEFT JOIN FETCH salaryMovementProducer.typeMovementProducer typeMovementProducer");
+        jpql.append(" LEFT JOIN FETCH salaryMovementProducer.productiveZone productiveZone");
+        jpql.append(" LEFT JOIN FETCH salaryMovementProducer.company company");
         jpql.append(" WHERE 1=1");
 
         if (startDate != null) {

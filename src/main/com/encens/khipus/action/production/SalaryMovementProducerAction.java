@@ -123,12 +123,16 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
             HSSFRow header = sheet.createRow(0);
             header.createCell(0).setCellValue("FECHA");
             header.createCell(1).setCellValue("CI");
-            header.createCell(2).setCellValue("ID PRODUCTOR");
+            header.createCell(2).setCellValue("IDPRODUCTORMATERIAPRIMA");
             header.createCell(3).setCellValue("NOMBRE COMPLETO");
             header.createCell(4).setCellValue("DESCRIPCION");
-            header.createCell(5).setCellValue("MONTO");
+            header.createCell(5).setCellValue("VALOR");
             header.createCell(6).setCellValue("CONCEPTO");
-            header.createCell(7).setCellValue("ID TIPO MOV.");
+            header.createCell(7).setCellValue("IDTIPOMOVIMIENTOPRODUCTOR");
+            header.createCell(8).setCellValue("IDCOMPANIA");
+            header.createCell(9).setCellValue("IDZONAPRODUCTIVA");
+            header.createCell(10).setCellValue("NOMBRE");
+            header.createCell(11).setCellValue("NUMERO");
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             int rowNum = 1;
@@ -144,6 +148,11 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
                 TypeMovementProducer type = item.getTypeMovementProducer();
                 row.createCell(6).setCellValue(type != null ? type.getName() : "");
                 row.createCell(7).setCellValue(type != null && type.getId() != null ? type.getId().toString() : "");
+                row.createCell(8).setCellValue(item.getCompany() != null && item.getCompany().getId() != null ? item.getCompany().getId().toString() : "");
+                com.encens.khipus.model.production.ProductiveZone zone = item.getProductiveZone();
+                row.createCell(9).setCellValue(zone != null && zone.getId() != null ? zone.getId().toString() : "");
+                row.createCell(10).setCellValue(zone != null && zone.getName() != null ? zone.getName() : "");
+                row.createCell(11).setCellValue(zone != null && zone.getNumber() != null ? zone.getNumber() : "");
             }
 
             HttpServletResponse response = JSFUtil.getHttpServletResponse();
