@@ -100,6 +100,10 @@
 
             <div class="buttons">
 
+                <h:commandButton value="Exportar"
+                                 action="#{salaryMovementProducerAction.exportToExcel()}"
+                                 styleClass="button"/>
+
                 <s:button value="#{messages['SalaryMovementProducer.generalDiscountProducer']}"
                           view="/production/salaryMovementProducerGral.xhtml"
                           styleClass="button"

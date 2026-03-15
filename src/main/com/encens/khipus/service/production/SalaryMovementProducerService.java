@@ -31,6 +31,8 @@ public interface SalaryMovementProducerService extends GenericService {
 
     List<SalaryMovementProducer> findSalaryMovementProducerList(Date starDate, Date endDate, TypeMovementProducer typeMovementProducer);
 
+    List<SalaryMovementProducer> findFiltered(Date startDate, Date endDate, TypeMovementProducer typeMovementProducer, String firstName, String lastName, String maidenName);
+
     /** @Claude OPT-4: Firma batch para pre-cargar descuentos de todos los productores de una zona **/
     Map<Long, RawMaterialProducerDiscount> prepareDiscountsBatch(Date startDate, Date endDate, ProductiveZone productiveZone);
 

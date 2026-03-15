@@ -458,6 +458,58 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
     }
 
     @Override
+    public List<SalaryMovementProducer> findFiltered(Date startDate, Date endDate, TypeMovementProducer typeMovementProducer, String firstName, String lastName, String maidenName) {
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("SELECT salaryMovementProducer FROM SalaryMovementProducer salaryMovementProducer");
+        jpql.append(" LEFT JOIN FETCH salaryMovementProducer.rawMaterialProducer rawMaterialProducer");
+        jpql.append(" LEFT JOIN FETCH salaryMovementProducer.typeMovementProducer typeMovementProducer");
+        jpql.append(" WHERE 1=1");
+
+        if (startDate != null) {
+            jpql.append(" AND salaryMovementProducer.date >= :startDate");
+        }
+        if (endDate != null) {
+            jpql.append(" AND salaryMovementProducer.date <= :endDate");
+        }
+        if (typeMovementProducer != null) {
+            jpql.append(" AND salaryMovementProducer.typeMovementProducer = :typeMovementProducer");
+        }
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            jpql.append(" AND upper(rawMaterialProducer.firstName) LIKE :firstName");
+        }
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            jpql.append(" AND upper(rawMaterialProducer.lastName) LIKE :lastName");
+        }
+        if (maidenName != null && !maidenName.trim().isEmpty()) {
+            jpql.append(" AND upper(rawMaterialProducer.maidenName) LIKE :maidenName");
+        }
+        jpql.append(" ORDER BY salaryMovementProducer.date DESC");
+
+        javax.persistence.Query query = em.createQuery(jpql.toString());
+
+        if (startDate != null) {
+            query.setParameter("startDate", startDate, TemporalType.DATE);
+        }
+        if (endDate != null) {
+            query.setParameter("endDate", endDate, TemporalType.DATE);
+        }
+        if (typeMovementProducer != null) {
+            query.setParameter("typeMovementProducer", typeMovementProducer);
+        }
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            query.setParameter("firstName", "%" + firstName.trim().toUpperCase() + "%");
+        }
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            query.setParameter("lastName", "%" + lastName.trim().toUpperCase() + "%");
+        }
+        if (maidenName != null && !maidenName.trim().isEmpty()) {
+            query.setParameter("maidenName", "%" + maidenName.trim().toUpperCase() + "%");
+        }
+
+        return query.getResultList();
+    }
+
+    @Override
     public List<SalaryMovementProducer> findSalaryMovementProducerList(Date startDate, Date endDate, TypeMovementProducer typeMovementProducer) {
 
         List<SalaryMovementProducer> salaryMovementProducerList = em.createQuery("" +

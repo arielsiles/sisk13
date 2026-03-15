@@ -8,10 +8,18 @@ import com.encens.khipus.model.production.RawMaterialProducer;
 import com.encens.khipus.model.production.SalaryMovementProducer;
 import com.encens.khipus.model.production.TypeMovementProducer;
 import com.encens.khipus.service.production.SalaryMovementProducerService;
+import com.encens.khipus.util.JSFUtil;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +32,9 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
 
     @In
     private SalaryMovementProducerService salaryMovementProducerService;
+
+    @In(required = false)
+    private SalaryMovementProducerDataModel salaryMovementProducerDataModel;
 
     private boolean readonly;
 
@@ -91,6 +102,61 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
         salaryMovementProducerService.createSalaryMovementProducer(salaryMovementProducerList);
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"SalaryMovementProducer.message.generalDiscountCreated");
         return Outcome.SUCCESS;
+    }
+
+    public void exportToExcel() {
+        try {
+            Date filterStartDate = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getStartDate() : null;
+            Date filterEndDate = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getEndDate() : null;
+            TypeMovementProducer filterType = salaryMovementProducerDataModel != null && salaryMovementProducerDataModel.getCriteria() != null
+                    ? salaryMovementProducerDataModel.getCriteria().getTypeMovementProducer() : null;
+            String filterFirstName = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getFirstName() : null;
+            String filterLastName = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getLastName() : null;
+            String filterMaidenName = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getMaidenName() : null;
+
+            List<SalaryMovementProducer> list = salaryMovementProducerService.findFiltered(
+                    filterStartDate, filterEndDate, filterType, filterFirstName, filterLastName, filterMaidenName);
+
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet = workbook.createSheet("Descuentos");
+
+            HSSFRow header = sheet.createRow(0);
+            header.createCell(0).setCellValue("FECHA");
+            header.createCell(1).setCellValue("CI");
+            header.createCell(2).setCellValue("ID PRODUCTOR");
+            header.createCell(3).setCellValue("NOMBRE COMPLETO");
+            header.createCell(4).setCellValue("DESCRIPCION");
+            header.createCell(5).setCellValue("MONTO");
+            header.createCell(6).setCellValue("CONCEPTO");
+            header.createCell(7).setCellValue("ID TIPO MOV.");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            int rowNum = 1;
+            for (SalaryMovementProducer item : list) {
+                HSSFRow row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(item.getDate() != null ? sdf.format(item.getDate()) : "");
+                RawMaterialProducer producer = item.getRawMaterialProducer();
+                row.createCell(1).setCellValue(producer != null ? (producer.getIdNumber() != null ? producer.getIdNumber() : "") : "");
+                row.createCell(2).setCellValue(producer != null && producer.getId() != null ? producer.getId().toString() : "");
+                row.createCell(3).setCellValue(producer != null ? producer.getFullName() : "");
+                row.createCell(4).setCellValue(item.getDescription() != null ? item.getDescription() : "");
+                row.createCell(5).setCellValue(item.getValor());
+                TypeMovementProducer type = item.getTypeMovementProducer();
+                row.createCell(6).setCellValue(type != null ? type.getName() : "");
+                row.createCell(7).setCellValue(type != null && type.getId() != null ? type.getId().toString() : "");
+            }
+
+            HttpServletResponse response = JSFUtil.getHttpServletResponse();
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-Disposition", "attachment; filename=descuentos_productor.xls");
+            workbook.write(response.getOutputStream());
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+            FacesContext.getCurrentInstance().responseComplete();
+        } catch (IOException e) {
+            log.error("Error exporting to Excel", e);
+            facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
+        }
     }
 
     private void addMessgeFailBalance(String fullName,Double totalCollected ) {
