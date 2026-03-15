@@ -9,6 +9,14 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ## [6.0.31]
 
+### 2026-03-15
+
+#### Modificado
+- **Importacion de descuentos desde Excel**: Simplificada la asignacion de zona productiva en `importFromExcel()`.
+  - Eliminada validacion que comparaba IDZONAPRODUCTIVA del Excel (col 9) con la zona del productor encontrado por CI. Ya no genera error si la zona del Excel no coincide.
+  - En la creacion del registro, se usa directamente `producer.getProductiveZone()` en lugar de leer la zona desde el Excel con `em.getReference()`.
+  - Archivos: `SalaryMovementProducerAction.java`
+
 ### 2026-03-14
 
 #### Modificado

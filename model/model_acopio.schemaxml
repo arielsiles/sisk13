@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemadesigner version="6.5">
 <source>
-<database charset="utf8" collation="utf8_general_ci">khipus</database>
+<database charset="utf8mb4" collation="utf8mb4_0900_ai_ci">khipus</database>
 </source>
 <canvas zoom="100">
 <tables>
 <table name="acopiomateriaprima" view="colnames">
-<left>1158</left>
-<top>353</top>
+<left>1298</left>
+<top>330</top>
 <width>188</width>
 <height>180</height>
 <sql_create_table>CREATE TABLE `acopiomateriaprima` (
-  `idacopiomateriaprima` bigint(20) NOT NULL,
+  `idacopiomateriaprima` bigint NOT NULL,
   `cantidad` decimal(16,2) DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  `idsesionacopio` bigint(20) DEFAULT NULL,
-  `idproductormateriaprima` bigint(20) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idsesionacopio` bigint DEFAULT NULL,
+  `idproductormateriaprima` bigint DEFAULT NULL,
   PRIMARY KEY (`idacopiomateriaprima`),
   KEY `fk_companiaacopiomateriaprima` (`idcompania`),
   KEY `fk_productormateriaprimaacopiomateriaprima` (`idproductormateriaprima`),
@@ -27,35 +27,35 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="planillaacopio" view="colnames">
-<left>1210</left>
-<top>76</top>
+<left>1304</left>
+<top>69</top>
 <width>197</width>
 <height>214</height>
 <sql_create_table>CREATE TABLE `planillaacopio` (
-  `idplanillaacopio` bigint(20) NOT NULL,
+  `idplanillaacopio` bigint NOT NULL,
   `fecha` date DEFAULT NULL,
   `porcentajegrasa` decimal(16,2) DEFAULT NULL,
   `estado` varchar(3) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
   `totalpesado` decimal(16,2) DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  `idmetaproductoproduccion` bigint(20) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idmetaproductoproduccion` bigint DEFAULT NULL,
   PRIMARY KEY (`idplanillaacopio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="registroacopio" view="colnames">
-<left>1452</left>
-<top>294</top>
+<left>1585</left>
+<top>258</top>
 <width>153</width>
-<height>194</height>
+<height>197</height>
 <sql_create_table>CREATE TABLE `registroacopio` (
-  `idregistroacopio` bigint(20) NOT NULL,
+  `idregistroacopio` bigint NOT NULL,
   `cantidadrecibida` decimal(16,2) DEFAULT NULL,
   `cantidadrechazada` decimal(16,2) DEFAULT NULL,
   `cantidadpesada` decimal(16,2) DEFAULT NULL,
-  `idplanillaacopio` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  `idzonaproductiva` bigint(20) DEFAULT NULL,
+  `idplanillaacopio` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idzonaproductiva` bigint DEFAULT NULL,
   PRIMARY KEY (`idregistroacopio`),
   KEY `idplanillaacopio` (`idplanillaacopio`),
   KEY `idzonaproductiva` (`idzonaproductiva`),
@@ -64,54 +64,58 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="sesionacopio" view="colnames">
-<left>836</left>
-<top>104</top>
+<left>966</left>
+<top>109</top>
 <width>197</width>
 <height>197</height>
 <sql_create_table>CREATE TABLE `sesionacopio` (
-  `idsesionacopio` bigint(20) NOT NULL,
+  `idsesionacopio` bigint NOT NULL,
   `fecha` date DEFAULT NULL,
   `estado` varchar(255) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  `idmetaproductoproduccion` bigint(20) DEFAULT NULL,
-  `idzonaproductiva` bigint(20) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idmetaproductoproduccion` bigint DEFAULT NULL,
+  `idzonaproductiva` bigint DEFAULT NULL,
   PRIMARY KEY (`idsesionacopio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="zonaproductiva" view="colnames">
-<left>1270</left>
-<top>625</top>
+<left>1384</left>
+<top>604</top>
 <width>143</width>
-<height>180</height>
+<height>214</height>
 <sql_create_table>CREATE TABLE `zonaproductiva` (
-  `idzonaproductiva` bigint(20) NOT NULL,
+  `idzonaproductiva` bigint NOT NULL,
   `grupo` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
   `nombre` varchar(200) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
   `numero` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`idzonaproductiva`)
+  `tienecns` int DEFAULT NULL,
+  `idciudad` bigint DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`idzonaproductiva`),
+  KEY `idciudad` (`idciudad`),
+  CONSTRAINT `zonaproductiva_ibfk_1` FOREIGN KEY (`idciudad`) REFERENCES `ciudad` (`idciudad`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="productormateriaprima" view="colnames">
-<left>836</left>
-<top>438</top>
+<left>980</left>
+<top>394</top>
 <width>207</width>
-<height>265</height>
+<height>282</height>
 <sql_create_table>CREATE TABLE `productormateriaprima` (
-  `idproductormateriaprima` bigint(20) NOT NULL,
+  `idproductormateriaprima` bigint NOT NULL,
   `licenciaimpuestos` varchar(200) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
   `licenciaimpuestos2011` varchar(200) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
   `fechaexpiralicenciaimpuesto` date DEFAULT NULL,
   `fechafinimpuesto2011` date DEFAULT NULL,
-  `esresponsable` int(11) DEFAULT NULL,
-  `activo` int(1) DEFAULT NULL,
+  `esresponsable` int DEFAULT NULL,
+  `activo` int DEFAULT NULL,
   `numerocuenta` varchar(50) DEFAULT NULL,
   `fechainicialicenciaimpuesto` date DEFAULT NULL,
   `fechainiimpuesto2011` date DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  `idzonaproductiva` bigint(20) DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idzonaproductiva` bigint DEFAULT NULL,
   PRIMARY KEY (`idproductormateriaprima`),
   KEY `idzonaproductiva` (`idzonaproductiva`),
   CONSTRAINT `productormateriaprima_ibfk_1` FOREIGN KEY (`idproductormateriaprima`) REFERENCES `persona` (`idpersona`),
@@ -119,12 +123,12 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="planillapagomateriaprima" view="colnames">
-<left>416</left>
-<top>60</top>
-<width>252</width>
-<height>205</height>
+<left>671</left>
+<top>6</top>
+<width>250</width>
+<height>359</height>
 <sql_create_table>CREATE TABLE `planillapagomateriaprima` (
-  `idplanillapagomateriaprima` bigint(20) NOT NULL,
+  `idplanillapagomateriaprima` bigint NOT NULL,
   `fechafin` date DEFAULT NULL,
   `it` decimal(3,2) DEFAULT NULL,
   `iue` decimal(3,2) DEFAULT NULL,
@@ -150,44 +154,46 @@
   `totalacopiadoxgab` decimal(16,2) DEFAULT NULL,
   `totalyogurdxgab` decimal(16,2) DEFAULT NULL,
   `preciounitario` decimal(9,2) DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  `idmetaproductoproduccion` bigint(20) DEFAULT NULL,
-  `idzonaproductiva` bigint(20) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idmetaproductoproduccion` bigint DEFAULT NULL,
+  `idzonaproductiva` bigint DEFAULT NULL,
   PRIMARY KEY (`idplanillapagomateriaprima`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="descuentproductmateriaprima" view="colnames">
-<left>430</left>
-<top>524</top>
-<width>243</width>
-<height>281</height>
+<left>424</left>
+<top>274</top>
+<width>240</width>
+<height>341</height>
 <sql_create_table>CREATE TABLE `descuentproductmateriaprima` (
-  `iddescuentproductmateriaprima` bigint(20) NOT NULL,
+  `iddescuentproductmateriaprima` bigint NOT NULL,
   `alcohol` decimal(16,2) DEFAULT NULL,
   `tachos` decimal(16,2) DEFAULT NULL,
-  `codigo` bigint(20) DEFAULT NULL,
+  `codigo` bigint DEFAULT NULL,
   `concentrados` decimal(16,2) DEFAULT NULL,
   `credito` decimal(16,2) DEFAULT NULL,
   `otrosdescuentos` decimal(16,2) DEFAULT NULL,
   `comision` decimal(16,2) DEFAULT NULL,
   `otrosingresos` decimal(16,2) DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
   `veterinario` decimal(16,2) DEFAULT NULL,
   `retencion` decimal(16,2) DEFAULT NULL,
   `yogurt` decimal(16,2) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  `idproductormateriaprima` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`iddescuentproductmateriaprima`)
+  `idcompania` bigint DEFAULT NULL,
+  `idproductormateriaprima` bigint DEFAULT NULL,
+  PRIMARY KEY (`iddescuentproductmateriaprima`),
+  KEY `fk_descuentproductmp_productormateriaprima` (`idproductormateriaprima`),
+  CONSTRAINT `fk_descuentproductmp_productormateriaprima` FOREIGN KEY (`idproductormateriaprima`) REFERENCES `productormateriaprima` (`idproductormateriaprima`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 <table name="registropagomateriaprima" view="colnames">
-<left>39</left>
-<top>49</top>
-<width>263</width>
-<height>311</height>
+<left>96</left>
+<top>38</top>
+<width>260</width>
+<height>336</height>
 <sql_create_table>CREATE TABLE `registropagomateriaprima` (
-  `idregistropagomateriaprima` bigint(20) NOT NULL,
+  `idregistropagomateriaprima` bigint NOT NULL,
   `descuentoreserva` decimal(16,2) DEFAULT NULL,
   `ga` decimal(16,2) DEFAULT NULL,
   `totalganado` decimal(16,2) DEFAULT NULL,
@@ -198,15 +204,35 @@
   `licenciaimpuestos` varchar(200) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
   `cantidadtotal` decimal(24,2) DEFAULT NULL,
   `totalpagoacopio` decimal(16,2) DEFAULT NULL,
-  `version` bigint(20) DEFAULT NULL,
-  `idcompania` bigint(20) DEFAULT NULL,
-  `idplanillapagomateriaprima` bigint(20) DEFAULT NULL,
-  `iddescuentproductmateriaprima` bigint(20) DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idplanillapagomateriaprima` bigint DEFAULT NULL,
+  `iddescuentproductmateriaprima` bigint DEFAULT NULL,
   PRIMARY KEY (`idregistropagomateriaprima`),
   KEY `idplanillapagomateriaprima` (`idplanillapagomateriaprima`),
   KEY `iddescuentproductmateriaprima` (`iddescuentproductmateriaprima`),
-  CONSTRAINT `registropagomateriaprima_ibfk_2` FOREIGN KEY (`iddescuentproductmateriaprima`) REFERENCES `descuentproductmateriaprima` (`iddescuentproductmateriaprima`),
-  CONSTRAINT `registropagomateriaprima_ibfk_1` FOREIGN KEY (`idplanillapagomateriaprima`) REFERENCES `planillapagomateriaprima` (`idplanillapagomateriaprima`)
+  CONSTRAINT `registropagomateriaprima_ibfk_1` FOREIGN KEY (`idplanillapagomateriaprima`) REFERENCES `planillapagomateriaprima` (`idplanillapagomateriaprima`),
+  CONSTRAINT `registropagomateriaprima_ibfk_2` FOREIGN KEY (`iddescuentproductmateriaprima`) REFERENCES `descuentproductmateriaprima` (`iddescuentproductmateriaprima`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
+</table>
+<table name="movimientosalarioproductor" view="colnames">
+<left>681</left>
+<top>574</top>
+<width>241</width>
+<height>234</height>
+<sql_create_table>CREATE TABLE `movimientosalarioproductor` (
+  `idmovimientosalarioproductor` bigint NOT NULL,
+  `fecha` date DEFAULT NULL,
+  `descripcion` varchar(255) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `estado` varchar(255) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `valor` decimal(16,2) DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idzonaproductiva` bigint DEFAULT NULL,
+  `idproductormateriaprima` bigint DEFAULT NULL,
+  `idtipomovimientoproductor` bigint DEFAULT NULL,
+  PRIMARY KEY (`idmovimientosalarioproductor`),
+  KEY `fk_movsalarioproductor_productormateriaprima` (`idproductormateriaprima`),
+  CONSTRAINT `fk_movsalarioproductor_productormateriaprima` FOREIGN KEY (`idproductormateriaprima`) REFERENCES `productormateriaprima` (`idproductormateriaprima`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
 </table>
 </tables>
