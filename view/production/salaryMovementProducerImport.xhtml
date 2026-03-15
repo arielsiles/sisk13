@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">Importar Descuentos al Productor</ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="salaryMovementProducerImportForm" enctype="multipart/form-data">
+            <div class="buttons">
+                <h:commandButton action="#{salaryMovementProducerAction.importFromExcel}"
+                                 value="Importar"
+                                 styleClass="button"
+                                 onclick="Richfaces.showModalPanel('progressModalPanel');"/>
+
+                <h:commandButton action="#{salaryMovementProducerAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">Importar Descuentos desde Excel</f:facet>
+
+                <s:decorate id="fileField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">Archivo Excel (.xls)</ui:define>
+                    <s:fileUpload data="#{salaryMovementProducerAction.file.value}"
+                                  contentType="#{salaryMovementProducerAction.file.contentType}"
+                                  fileName="#{salaryMovementProducerAction.file.name}"
+                                  fileSize="#{salaryMovementProducerAction.file.size}"
+                                  accept="application/vnd.ms-excel"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <rich:messages styleClass="message" errorClass="errormsg" infoClass="infomsg" warnClass="warnmsg"/>
+
+        </h:form>
+
+        <ui:include src="/include/progressDialog.xhtml">
+            <ui:param name="dialogId" value="progressModalPanel"/>
+        </ui:include>
+
+    </ui:define>
+</ui:composition>

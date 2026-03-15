@@ -104,6 +104,12 @@
                                  action="#{salaryMovementProducerAction.exportToExcel()}"
                                  styleClass="button"/>
 
+                <s:button value="Importar"
+                          view="/production/salaryMovementProducerImport.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('SALARYMOVEMENTDISCOUNTPRODUCER','CREATE')}"/>
+
                 <s:button value="#{messages['SalaryMovementProducer.generalDiscountProducer']}"
                           view="/production/salaryMovementProducerGral.xhtml"
                           styleClass="button"

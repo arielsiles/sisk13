@@ -512,6 +512,14 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
     }
 
     @Override
+    public void importSalaryMovements(List<SalaryMovementProducer> list) {
+        for (SalaryMovementProducer salaryMovementProducer : list) {
+            em.persist(salaryMovementProducer);
+        }
+        em.flush();
+    }
+
+    @Override
     public List<SalaryMovementProducer> findSalaryMovementProducerList(Date startDate, Date endDate, TypeMovementProducer typeMovementProducer) {
 
         List<SalaryMovementProducer> salaryMovementProducerList = em.createQuery("" +

@@ -3,12 +3,16 @@ package com.encens.khipus.action.production;
 import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.common.File;
 import com.encens.khipus.model.production.ProductionCollectionState;
 import com.encens.khipus.model.production.RawMaterialProducer;
 import com.encens.khipus.model.production.SalaryMovementProducer;
 import com.encens.khipus.model.production.TypeMovementProducer;
+import com.encens.khipus.service.production.RawMaterialProducerService;
 import com.encens.khipus.service.production.SalaryMovementProducerService;
 import com.encens.khipus.util.JSFUtil;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -17,8 +21,11 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import javax.faces.context.FacesContext;
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +40,12 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
     @In
     private SalaryMovementProducerService salaryMovementProducerService;
 
+    @In
+    private RawMaterialProducerService rawMaterialProducerService;
+
+    @In("#{entityManager}")
+    private EntityManager em;
+
     @In(required = false)
     private SalaryMovementProducerDataModel salaryMovementProducerDataModel;
 
@@ -43,6 +56,9 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
     private Date endDate;
     private Double amount;
     private String description;
+
+    private File file = new File();
+    private List<String> importErrors = new ArrayList<String>();
 
     @Factory(value = "salaryMovementProducer", scope = ScopeType.STATELESS)
     public SalaryMovementProducer initSalaryMovementProducer() {
@@ -228,5 +244,168 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public List<String> getImportErrors() {
+        return importErrors;
+    }
+
+    public void setImportErrors(List<String> importErrors) {
+        this.importErrors = importErrors;
+    }
+
+    private String getCellStringValue(HSSFRow row, int col) {
+        HSSFCell cell = row.getCell(col);
+        if (cell == null) return "";
+        switch (cell.getCellType()) {
+            case HSSFCell.CELL_TYPE_STRING:
+                return cell.getStringCellValue() != null ? cell.getStringCellValue().trim() : "";
+            case HSSFCell.CELL_TYPE_NUMERIC:
+                return String.valueOf((long) cell.getNumericCellValue());
+            default:
+                return "";
+        }
+    }
+
+    private Double getCellDoubleValue(HSSFRow row, int col) {
+        HSSFCell cell = row.getCell(col);
+        if (cell == null) return 0.0;
+        switch (cell.getCellType()) {
+            case HSSFCell.CELL_TYPE_NUMERIC:
+                return cell.getNumericCellValue();
+            case HSSFCell.CELL_TYPE_STRING:
+                try {
+                    return Double.parseDouble(cell.getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    return 0.0;
+                }
+            default:
+                return 0.0;
+        }
+    }
+
+    public String importFromExcel() {
+        importErrors = new ArrayList<String>();
+
+        if (file == null || file.getValue() == null || file.getValue().length == 0) {
+            facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
+            return Outcome.REDISPLAY;
+        }
+
+        try {
+            ByteArrayInputStream bis = new ByteArrayInputStream(file.getValue());
+            HSSFWorkbook workbook = new HSSFWorkbook(bis);
+            HSSFSheet sheet = workbook.getSheetAt(0);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+            int lastRow = sheet.getLastRowNum();
+
+            // Pasada 1: Validacion
+            List<RawMaterialProducer> producers = new ArrayList<RawMaterialProducer>();
+            for (int i = 1; i <= lastRow; i++) {
+                HSSFRow row = sheet.getRow(i);
+                if (row == null) continue;
+
+                String ci = getCellStringValue(row, 1);
+                if (ci.isEmpty()) {
+                    importErrors.add("Fila " + (i + 1) + ": CI vacio");
+                    producers.add(null);
+                    continue;
+                }
+
+                RawMaterialProducer producer = rawMaterialProducerService.findProducerByIdNumber(ci);
+                if (producer == null) {
+                    importErrors.add("Fila " + (i + 1) + ": Productor con CI " + ci + " no encontrado");
+                    producers.add(null);
+                    continue;
+                }
+
+                producers.add(producer);
+            }
+
+            if (!importErrors.isEmpty()) {
+                for (String error : importErrors) {
+                    facesMessages.add(StatusMessage.Severity.ERROR, error);
+                }
+                return Outcome.REDISPLAY;
+            }
+
+            // Pasada 2: Creacion
+            List<SalaryMovementProducer> salaryMovementProducerList = new ArrayList<SalaryMovementProducer>();
+            int producerIndex = 0;
+            for (int i = 1; i <= lastRow; i++) {
+                HSSFRow row = sheet.getRow(i);
+                if (row == null) continue;
+
+                RawMaterialProducer producer = producers.get(producerIndex++);
+
+                SalaryMovementProducer smp = new SalaryMovementProducer();
+
+                // Fecha
+                String dateStr = getCellStringValue(row, 0);
+                if (!dateStr.isEmpty()) {
+                    try {
+                        smp.setDate(sdf.parse(dateStr));
+                    } catch (ParseException e) {
+                        HSSFCell dateCell = row.getCell(0);
+                        if (dateCell != null && dateCell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                            smp.setDate(dateCell.getDateCellValue());
+                        } else {
+                            smp.setDate(new Date());
+                        }
+                    }
+                } else {
+                    HSSFCell dateCell = row.getCell(0);
+                    if (dateCell != null && dateCell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+                        smp.setDate(dateCell.getDateCellValue());
+                    } else {
+                        smp.setDate(new Date());
+                    }
+                }
+
+                smp.setRawMaterialProducer(producer);
+                smp.setDescription(getCellStringValue(row, 4));
+                smp.setValor(getCellDoubleValue(row, 5));
+                smp.setState(ProductionCollectionState.PENDING);
+
+                // TypeMovementProducer via em.getReference
+                String typeIdStr = getCellStringValue(row, 7);
+                if (!typeIdStr.isEmpty()) {
+                    Long typeId = Long.parseLong(typeIdStr);
+                    TypeMovementProducer typeRef = em.getReference(TypeMovementProducer.class, typeId);
+                    smp.setTypeMovementProducer(typeRef);
+                }
+
+                // Company via em.getReference
+                String companyIdStr = getCellStringValue(row, 8);
+                if (!companyIdStr.isEmpty()) {
+                    Long companyId = Long.parseLong(companyIdStr);
+                    Company companyRef = em.getReference(Company.class, companyId);
+                    smp.setCompany(companyRef);
+                }
+
+                // ProductiveZone del productor
+                smp.setProductiveZone(producer.getProductiveZone());
+
+                salaryMovementProducerList.add(smp);
+            }
+
+            salaryMovementProducerService.importSalaryMovements(salaryMovementProducerList);
+            facesMessages.add(StatusMessage.Severity.INFO, "Se importaron " + salaryMovementProducerList.size() + " registros exitosamente.");
+            return Outcome.SUCCESS;
+
+        } catch (IOException e) {
+            log.error("Error importing from Excel", e);
+            facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
+            return Outcome.REDISPLAY;
+        }
     }
 }

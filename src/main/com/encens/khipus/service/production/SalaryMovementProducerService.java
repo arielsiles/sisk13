@@ -36,4 +36,6 @@ public interface SalaryMovementProducerService extends GenericService {
     /** @Claude OPT-4: Firma batch para pre-cargar descuentos de todos los productores de una zona **/
     Map<Long, RawMaterialProducerDiscount> prepareDiscountsBatch(Date startDate, Date endDate, ProductiveZone productiveZone);
 
+    void importSalaryMovements(List<SalaryMovementProducer> list);
+
 }
