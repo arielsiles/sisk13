@@ -7,7 +7,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ---
 
-## [6.0.31]
+## [6.0.40]
 
 ### 2026-03-15
 

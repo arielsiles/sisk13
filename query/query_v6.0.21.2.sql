@@ -29,6 +29,7 @@ ALTER TABLE sucursal ADD COLUMN tipo_pos int AFTER docsector;
 ALTER TABLE sucursal ADD COLUMN desc_tipopos varchar(100) AFTER tipo_pos;
 ALTER TABLE sucursal ADD COLUMN pos_activo int after tipo_pos; -- Actualizar manualmente
 
+update sucursal set pos_activo = 1; -- Revisar manualmente que sucursales se activan
 
 insert into sin_motivoanulacion (idmotivoanulacion, codigo, descripcion) values (4, 4, 'FACTURA O NOTA DE CREDITO-DEBITO DEVUELTA');
 
