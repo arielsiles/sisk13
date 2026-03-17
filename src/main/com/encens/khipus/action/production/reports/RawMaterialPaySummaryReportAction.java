@@ -224,8 +224,8 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         summaryTotal = rawMaterialPayRollService.getSumaryTotal(startDate, endDate, zone, metaProduct);
 
         Double totalMoneyCollected = discounts.mount;
-        Double totalDifferencesMoney = discounts.adjustment;
-        Double diffTotal = (discounts.unitPrice != 0) ? discounts.adjustment / discounts.unitPrice : 0.0;
+        Double totalDifferencesMoney = rawMaterialPayRollService.getSumAdjustmentFromRecords(startDate, endDate, metaProduct);
+        Double diffTotal = (discounts.unitPrice != 0) ? totalDifferencesMoney / discounts.unitPrice : 0.0;
         Double balanceWeightTotal = discounts.collected + diffTotal;
         Double totalMoneyBalance = totalMoneyCollected + totalDifferencesMoney;
         Double reservProducer = discounts.reserve;
@@ -348,17 +348,6 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
                 voucherCredt4.setClient(client);
                 voucher.addVoucherDetail(voucherCredt4);
             }
-
-
-            /*VoucherDetail voucherCredt4 = new VoucherDetail();
-            voucherCredt4.setAccount(Constants.ACCOUNT_CLIENTESPRODUCTORES);
-            voucherCredt4.setDebit(BigDecimal.ZERO);
-            voucherCredt4.setCredit(BigDecimalUtil.toBigDecimal(discounts.veterinary));
-            voucherCredt4.setCurrency(FinancesCurrencyType.P);
-            voucherCredt4.setExchangeAmount(BigDecimal.ONE);
-            voucherCredt4.setDebitMe(BigDecimal.ZERO);
-            voucherCredt4.setCreditMe(BigDecimal.ZERO);
-            voucher.addVoucherDetail(voucherCredt4);*/
         }
 
         if (discounts.yogurt > 0){
@@ -378,15 +367,6 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
                 voucherCredt5.setClient(client);
                 voucher.addVoucherDetail(voucherCredt5);
             }
-            /*VoucherDetail voucherCredt5 = new VoucherDetail();
-            voucherCredt5.setAccount(Constants.ACCOUNT_CLIENTES);
-            voucherCredt5.setDebit(BigDecimal.ZERO);
-            voucherCredt5.setCredit(BigDecimalUtil.toBigDecimal(discounts.yogurt));
-            voucherCredt5.setCurrency(FinancesCurrencyType.P);
-            voucherCredt5.setExchangeAmount(BigDecimal.ONE);
-            voucherCredt5.setDebitMe(BigDecimal.ZERO);
-            voucherCredt5.setCreditMe(BigDecimal.ZERO);
-            voucher.addVoucherDetail(voucherCredt5);*/
         }
 
         if (discounts.credit > 0){
