@@ -20,6 +20,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import static com.encens.khipus.exception.production.RawMaterialPayRollException.*;
@@ -250,7 +251,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             discount.setRawMaterialPayRecord(record);
             record.setRawMaterialProducerDiscount(discount);
             record.setDiscountReserve(aux.reserveDiscount);
-            record.setDiscountGA(aux.discountGA);
+            record.setDiscountGA(RoundUtil.getRoundValue(aux.discountGA, 2, RoundUtil.RoundMode.SYMMETRIC));
 
             rawMaterialPayRoll.getRawMaterialPayRecordList().add(record);
             record.setRawMaterialPayRoll(rawMaterialPayRoll);
@@ -1330,25 +1331,30 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
 
     @Override
     public void calculateLiquidPayable(RawMaterialPayRoll rawMaterialPayRoll) {
-        Double totalLiquidPay = 0.0;
+        BigDecimal totalLiquidPay = BigDecimal.ZERO;
         for (RawMaterialPayRecord record : rawMaterialPayRoll.getRawMaterialPayRecordList()) {
             RawMaterialProducerDiscount discount = record.getRawMaterialProducerDiscount();
-            double totalDiscount = 0.0;
-            totalDiscount += discount.getAlcohol();
-            totalDiscount += discount.getConcentrated();
-            totalDiscount += discount.getWithholdingTax();
-            totalDiscount += discount.getCans();
-            totalDiscount += discount.getCredit();
-            totalDiscount += discount.getVeterinary();
-            totalDiscount += discount.getYogurt();
-            totalDiscount += discount.getOtherDiscount();
-            totalDiscount += discount.getCommission();
-            double liquidPayable = record.getEarnedMoney() - totalDiscount + discount.getOtherIncoming() - record.getDiscountGA();
-            totalLiquidPay += liquidPayable;
-            record.setLiquidPayable(RoundUtil.getRoundValue(liquidPayable, 2, RoundUtil.RoundMode.SYMMETRIC));
+            BigDecimal totalDiscount = BigDecimal.ZERO;
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getAlcohol()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getConcentrated()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getWithholdingTax()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getCans()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getCredit()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getVeterinary()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getYogurt()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getOtherDiscount()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getCommission()));
+
+            BigDecimal liquidPayable = BigDecimal.valueOf(record.getEarnedMoney())
+                    .subtract(totalDiscount)
+                    .add(BigDecimal.valueOf(discount.getOtherIncoming()))
+                    .subtract(BigDecimal.valueOf(record.getDiscountGA()));
+
+            record.setLiquidPayable(liquidPayable.setScale(2, RoundingMode.HALF_UP).doubleValue());
+            totalLiquidPay = totalLiquidPay.add(liquidPayable);
         }
 
-        rawMaterialPayRoll.setTotalLiquidByGAB(RoundUtil.getRoundValue(totalLiquidPay, 2, RoundUtil.RoundMode.SYMMETRIC));
+        rawMaterialPayRoll.setTotalLiquidByGAB(totalLiquidPay.setScale(2, RoundingMode.HALF_UP).doubleValue());
     }
 
     public RawMaterialPayRoll getTotalsRawMaterialPayRoll(Date dateIni, Date dateEnd, ProductiveZone productiveZone, MetaProduct metaProduct) {
