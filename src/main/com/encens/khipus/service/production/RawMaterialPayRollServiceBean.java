@@ -1036,7 +1036,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             aux.procentaje = porcentage;
 
             // Ajuste por diferencia de peso (antes addProrationPorcentaje)
-            Double proration = totalDifference * porcentage;
+            Double proration = RoundUtil.getRoundValue(totalDifference * porcentage, 2, RoundUtil.RoundMode.SYMMETRIC);
             aux.adjustmentAmount = proration;
             aux.earnedMoney += proration;
 
