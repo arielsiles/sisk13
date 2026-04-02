@@ -26,6 +26,8 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRTextExporterParameter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -123,7 +125,11 @@ public class KardexProductMovementAction extends GenericReportAction {
         try{
             File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/kardexProductMovement.jasper"));
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
-            exportarPDF(jasperPrint);
+            if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
+                exportarExcel(jasperPrint);
+            } else {
+                exportarPDF(jasperPrint);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -357,6 +363,19 @@ public class KardexProductMovementAction extends GenericReportAction {
         }
 
         return  initialQuantity;
+    }
+
+    public void exportarExcel(JasperPrint jasperPrint) throws IOException, JRException {
+        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        response.addHeader("Content-disposition", "attachment; filename=kardexProductMovement.xlsx");
+        ServletOutputStream stream = response.getOutputStream();
+        JRXlsxExporter exporter = new JRXlsxExporter();
+        exporter.setParameter(JRTextExporterParameter.JASPER_PRINT, jasperPrint);
+        exporter.setParameter(JRTextExporterParameter.OUTPUT_STREAM, stream);
+        exporter.exportReport();
+        stream.flush();
+        stream.close();
+        FacesContext.getCurrentInstance().responseComplete();
     }
 
     public void exportarPDF(JasperPrint jasperPrint) throws IOException, JRException {
