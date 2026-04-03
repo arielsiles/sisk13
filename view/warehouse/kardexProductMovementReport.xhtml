@@ -78,9 +78,22 @@
 
             </rich:panel>
 
-            <app:reportDefaultOptions reportAction="#{kardexProductMovementAction}" showPageFormat="false"
-                                      tabIndex="3"
-                                      showReportTitle="false"/>
+            <rich:panel id="reportDefaultOptionsPanel">
+                <f:facet name="header">
+                    #{messages['Reports.options']}
+                </f:facet>
+                <s:decorate id="formatField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.format']}</ui:define>
+                    <h:selectOneMenu id="reportFormat"
+                                     value="#{kardexProductMovementAction.reportFormat}"
+                                     styleClass="input"
+                                     tabindex="3">
+                        <f:selectItem itemLabel="PDF" itemValue="#{enumerationUtil.getEnumValue('com.encens.khipus.action.reports.ReportFormat', 'PDF')}"/>
+                        <f:selectItem itemLabel="EXCEL" itemValue="#{enumerationUtil.getEnumValue('com.encens.khipus.action.reports.ReportFormat', 'XLS')}"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </rich:panel>
 
             <div class="buttons">
                 <h:commandButton action="#{kardexProductMovementAction.generateReport}"
