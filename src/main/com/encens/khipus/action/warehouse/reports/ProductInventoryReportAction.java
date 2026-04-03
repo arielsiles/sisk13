@@ -235,9 +235,13 @@ public class ProductInventoryReportAction extends GenericReportAction {
         }
 
         try{
-            File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
-            exportarPDF(jasperPrint);
+            if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
+                exportarExcel(beanCollection, companyConfiguration, subGroupName);
+            } else {
+                File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+                exportarPDF(jasperPrint);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
