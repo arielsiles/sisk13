@@ -189,9 +189,13 @@ public class ProductInventoryReportAction extends GenericReportAction {
         }
 
         try{
-            File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryGroupedReport.jasper"));
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
-            exportarPDF(jasperPrint);
+            if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
+                exportarExcelAgrupado(beanCollection, companyConfiguration, period);
+            } else {
+                File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryGroupedReport.jasper"));
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+                exportarPDF(jasperPrint);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -1010,6 +1014,133 @@ public class ProductInventoryReportAction extends GenericReportAction {
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
         response.setContentType("application/vnd.ms-excel");
         response.addHeader("Content-disposition", "attachment; filename=ReporteGeneralInv.xls");
+        ServletOutputStream stream = response.getOutputStream();
+        workbook.write(stream);
+        stream.flush();
+        stream.close();
+        FacesContext.getCurrentInstance().responseComplete();
+    }
+
+    public void exportarExcelAgrupado(Collection<CollectionData> beanCollection, CompanyConfiguration companyConfiguration, String period) throws IOException {
+
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("Inventario Agrupado");
+
+        // Estilos
+        HSSFCellStyle headerStyle = workbook.createCellStyle();
+        HSSFFont headerFont = workbook.createFont();
+        headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        headerStyle.setFont(headerFont);
+
+        HSSFCellStyle groupStyle = workbook.createCellStyle();
+        HSSFFont groupFont = workbook.createFont();
+        groupFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        groupStyle.setFont(groupFont);
+
+        HSSFCellStyle numberStyle = workbook.createCellStyle();
+        HSSFDataFormat numFormat = workbook.createDataFormat();
+        numberStyle.setDataFormat(numFormat.getFormat("#,##0.00"));
+
+        // Encabezado
+        int rowNum = 0;
+        HSSFRow row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue(companyConfiguration.getCompanyName());
+        row.getCell(0).setCellStyle(headerStyle);
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue(companyConfiguration.getLocationName());
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue(companyConfiguration.getSystemName());
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("REPORTE GENERAL DE INVENTARIO - " + warehouse.getName());
+        row.getCell(0).setCellStyle(headerStyle);
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue(period);
+
+        rowNum++; // fila vacia
+
+        // Datos agrupados por subgroupName
+        String currentGroup = null;
+        BigDecimal totalEntradas = BigDecimal.ZERO;
+        BigDecimal totalSalidas = BigDecimal.ZERO;
+        BigDecimal totalSaldo = BigDecimal.ZERO;
+
+        for (CollectionData data : beanCollection) {
+
+            // Cabecera de grupo
+            String subgroup = data.getSubgroupName() != null ? data.getSubgroupName() : "";
+            if (!subgroup.equals(currentGroup)) {
+                currentGroup = subgroup;
+                row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(currentGroup);
+                row.getCell(0).setCellStyle(groupStyle);
+
+                // Cabecera de columnas
+                row = sheet.createRow(rowNum++);
+                String[] headers = {"Codigo", "Articulo", "Unidad", "Inv. Inicial", "Entradas", "Salidas", "Saldo"};
+                for (int i = 0; i < headers.length; i++) {
+                    HSSFCell cell = row.createCell(i);
+                    cell.setCellValue(headers[i]);
+                    cell.setCellStyle(headerStyle);
+                }
+            }
+
+            row = sheet.createRow(rowNum++);
+
+            row.createCell(0).setCellValue(data.getCode());
+            row.createCell(1).setCellValue(data.getProductName());
+            row.createCell(2).setCellValue(data.getUnit());
+
+            HSSFCell inicialCell = row.createCell(3);
+            inicialCell.setCellValue(data.getInitialAmount() != null ? data.getInitialAmount().doubleValue() : 0);
+            inicialCell.setCellStyle(numberStyle);
+
+            HSSFCell entryCell = row.createCell(4);
+            entryCell.setCellValue(data.getEntryAmount() != null ? data.getEntryAmount().doubleValue() : 0);
+            entryCell.setCellStyle(numberStyle);
+
+            HSSFCell outputCell = row.createCell(5);
+            outputCell.setCellValue(data.getOutputAmount() != null ? data.getOutputAmount().doubleValue() : 0);
+            outputCell.setCellStyle(numberStyle);
+
+            HSSFCell balanceCell = row.createCell(6);
+            balanceCell.setCellValue(data.getBalance() != null ? data.getBalance().doubleValue() : 0);
+            balanceCell.setCellStyle(numberStyle);
+
+            totalEntradas = BigDecimalUtil.sum(totalEntradas, data.getEntryAmount() != null ? data.getEntryAmount() : BigDecimal.ZERO, 2);
+            totalSalidas = BigDecimalUtil.sum(totalSalidas, data.getOutputAmount() != null ? data.getOutputAmount() : BigDecimal.ZERO, 2);
+            totalSaldo = BigDecimalUtil.sum(totalSaldo, data.getBalance() != null ? data.getBalance() : BigDecimal.ZERO, 2);
+        }
+
+        // Fila de totales
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("TOTALES");
+        row.getCell(0).setCellStyle(headerStyle);
+
+        HSSFCell tEntryCell = row.createCell(4);
+        tEntryCell.setCellValue(totalEntradas.doubleValue());
+        tEntryCell.setCellStyle(numberStyle);
+
+        HSSFCell tOutputCell = row.createCell(5);
+        tOutputCell.setCellValue(totalSalidas.doubleValue());
+        tOutputCell.setCellStyle(numberStyle);
+
+        HSSFCell tBalanceCell = row.createCell(6);
+        tBalanceCell.setCellValue(totalSaldo.doubleValue());
+        tBalanceCell.setCellStyle(numberStyle);
+
+        // Autoajustar columnas
+        for (int i = 0; i < 7; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Enviar respuesta
+        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        response.setContentType("application/vnd.ms-excel");
+        response.addHeader("Content-disposition", "attachment; filename=ReporteInventarioAgrupado.xls");
         ServletOutputStream stream = response.getOutputStream();
         workbook.write(stream);
         stream.flush();
