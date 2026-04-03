@@ -26,8 +26,7 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.export.JRTextExporterParameter;
-import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import org.apache.poi.hssf.usermodel.*;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -123,11 +122,11 @@ public class KardexProductMovementAction extends GenericReportAction {
         parameters.putAll(paramMap);
 
         try{
-            File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/kardexProductMovement.jasper"));
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
             if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
-                exportarExcel(jasperPrint);
+                exportarExcel(beanCollection, companyConfiguration, previousAmount);
             } else {
+                File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/kardexProductMovement.jasper"));
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
                 exportarPDF(jasperPrint);
             }
         }catch (Exception e){
@@ -365,14 +364,130 @@ public class KardexProductMovementAction extends GenericReportAction {
         return  initialQuantity;
     }
 
-    public void exportarExcel(JasperPrint jasperPrint) throws IOException, JRException {
+    public void exportarExcel(Collection<CollectionData> beanCollection, CompanyConfiguration companyConfiguration, BigDecimal previousAmount) throws IOException {
+
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("Kardex");
+
+        // Estilos
+        HSSFCellStyle headerStyle = workbook.createCellStyle();
+        HSSFFont headerFont = workbook.createFont();
+        headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        headerStyle.setFont(headerFont);
+
+        HSSFCellStyle dateStyle = workbook.createCellStyle();
+        HSSFDataFormat dateFormat = workbook.createDataFormat();
+        dateStyle.setDataFormat(dateFormat.getFormat("dd/MM/yyyy"));
+
+        HSSFCellStyle numberStyle = workbook.createCellStyle();
+        HSSFDataFormat numFormat = workbook.createDataFormat();
+        numberStyle.setDataFormat(numFormat.getFormat("#,##0.00"));
+
+        // Encabezado
+        int rowNum = 0;
+        HSSFRow row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue(companyConfiguration.getCompanyName());
+        row.getCell(0).setCellStyle(headerStyle);
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("REPORTE DE MOVIMIENTOS - KARDEX");
+        row.getCell(0).setCellStyle(headerStyle);
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("Articulo:");
+        row.createCell(1).setCellValue(productItem.getFullName());
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("Unidad:");
+        row.createCell(1).setCellValue(productItem.getUsageMeasureCode());
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("Periodo:");
+        row.createCell(1).setCellValue(sdf.format(startDate) + " - " + sdf.format(endDate));
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("Saldo Anterior:");
+        HSSFCell prevCell = row.createCell(1);
+        prevCell.setCellValue(previousAmount.doubleValue());
+        prevCell.setCellStyle(numberStyle);
+
+        rowNum++; // fila vacia
+
+        // Cabecera de tabla
+        row = sheet.createRow(rowNum++);
+        String[] headers = {"Fecha", "Codigo", "Entradas", "Salidas", "Saldo", "Tipo", "Descripcion"};
+        for (int i = 0; i < headers.length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Datos
+        BigDecimal saldo = previousAmount;
+        BigDecimal totalEntradas = BigDecimal.ZERO;
+        BigDecimal totalSalidas = BigDecimal.ZERO;
+
+        for (CollectionData data : beanCollection) {
+            row = sheet.createRow(rowNum++);
+
+            HSSFCell dateCell = row.createCell(0);
+            dateCell.setCellValue(data.getDate());
+            dateCell.setCellStyle(dateStyle);
+
+            row.createCell(1).setCellValue(data.getCode());
+
+            HSSFCell entryCell = row.createCell(2);
+            entryCell.setCellValue(data.getAmountEntry().doubleValue());
+            entryCell.setCellStyle(numberStyle);
+
+            HSSFCell outputCell = row.createCell(3);
+            outputCell.setCellValue(data.getAmountOutput().doubleValue());
+            outputCell.setCellStyle(numberStyle);
+
+            saldo = BigDecimalUtil.sum(saldo, data.getAmountEntry(), 2);
+            saldo = BigDecimalUtil.subtract(saldo, data.getAmountOutput(), 2);
+
+            HSSFCell saldoCell = row.createCell(4);
+            saldoCell.setCellValue(saldo.doubleValue());
+            saldoCell.setCellStyle(numberStyle);
+
+            row.createCell(5).setCellValue(data.getMovementType());
+            row.createCell(6).setCellValue(data.getDescription());
+
+            totalEntradas = BigDecimalUtil.sum(totalEntradas, data.getAmountEntry(), 2);
+            totalSalidas = BigDecimalUtil.sum(totalSalidas, data.getAmountOutput(), 2);
+        }
+
+        // Fila de totales
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("TOTALES");
+        row.getCell(0).setCellStyle(headerStyle);
+
+        HSSFCell totalEntCell = row.createCell(2);
+        totalEntCell.setCellValue(totalEntradas.doubleValue());
+        totalEntCell.setCellStyle(numberStyle);
+
+        HSSFCell totalSalCell = row.createCell(3);
+        totalSalCell.setCellValue(totalSalidas.doubleValue());
+        totalSalCell.setCellStyle(numberStyle);
+
+        HSSFCell saldoFinalCell = row.createCell(4);
+        saldoFinalCell.setCellValue(saldo.doubleValue());
+        saldoFinalCell.setCellStyle(numberStyle);
+
+        // Autoajustar columnas
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Enviar respuesta
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-        response.addHeader("Content-disposition", "attachment; filename=kardexProductMovement.xlsx");
+        response.setContentType("application/vnd.ms-excel");
+        response.addHeader("Content-disposition", "attachment; filename=kardexProductMovement.xls");
         ServletOutputStream stream = response.getOutputStream();
-        JRXlsxExporter exporter = new JRXlsxExporter();
-        exporter.setParameter(JRTextExporterParameter.JASPER_PRINT, jasperPrint);
-        exporter.setParameter(JRTextExporterParameter.OUTPUT_STREAM, stream);
-        exporter.exportReport();
+        workbook.write(stream);
         stream.flush();
         stream.close();
         FacesContext.getCurrentInstance().responseComplete();
