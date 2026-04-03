@@ -24,6 +24,7 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.poi.hssf.usermodel.*;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -140,10 +141,13 @@ public class ProductInventoryReportAction extends GenericReportAction {
         }
 
         try{
-            /* iReport 3 */
-            File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
-            exportarPDF(jasperPrint);
+            if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
+                exportarExcel(beanCollection, companyConfiguration, groupName);
+            } else {
+                File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+                exportarPDF(jasperPrint);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -894,6 +898,124 @@ public class ProductInventoryReportAction extends GenericReportAction {
         return beanCollection;
     }
 
+
+    public void exportarExcel(Collection<CollectionData> beanCollection, CompanyConfiguration companyConfiguration, String groupName) throws IOException {
+
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("Inventario");
+
+        // Estilos
+        HSSFCellStyle headerStyle = workbook.createCellStyle();
+        HSSFFont headerFont = workbook.createFont();
+        headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        headerStyle.setFont(headerFont);
+
+        HSSFCellStyle numberStyle = workbook.createCellStyle();
+        HSSFDataFormat numFormat = workbook.createDataFormat();
+        numberStyle.setDataFormat(numFormat.getFormat("#,##0.00"));
+
+        // Encabezado
+        int rowNum = 0;
+        HSSFRow row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue(companyConfiguration.getCompanyName());
+        row.getCell(0).setCellStyle(headerStyle);
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("REPORTE GENERAL DE INVENTARIO");
+        row.getCell(0).setCellStyle(headerStyle);
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("Almacen:");
+        row.createCell(1).setCellValue(warehouse.getFullName() + groupName);
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("Periodo:");
+        row.createCell(1).setCellValue(sdf.format(startDate) + " - " + sdf.format(endDate));
+
+        rowNum++; // fila vacia
+
+        // Cabecera de tabla
+        row = sheet.createRow(rowNum++);
+        String[] headers = {"Codigo", "Articulo", "Unidad", "Inv. Inicial", "Entradas", "Salidas", "Saldo"};
+        for (int i = 0; i < headers.length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Datos
+        BigDecimal totalInicial = BigDecimal.ZERO;
+        BigDecimal totalEntradas = BigDecimal.ZERO;
+        BigDecimal totalSalidas = BigDecimal.ZERO;
+        BigDecimal totalSaldo = BigDecimal.ZERO;
+
+        for (CollectionData data : beanCollection) {
+            row = sheet.createRow(rowNum++);
+
+            row.createCell(0).setCellValue(data.getCode());
+            row.createCell(1).setCellValue(data.getProductName());
+            row.createCell(2).setCellValue(data.getUnit());
+
+            HSSFCell inicialCell = row.createCell(3);
+            inicialCell.setCellValue(data.getInitialAmount() != null ? data.getInitialAmount().doubleValue() : 0);
+            inicialCell.setCellStyle(numberStyle);
+
+            HSSFCell entryCell = row.createCell(4);
+            entryCell.setCellValue(data.getEntryAmount() != null ? data.getEntryAmount().doubleValue() : 0);
+            entryCell.setCellStyle(numberStyle);
+
+            HSSFCell outputCell = row.createCell(5);
+            outputCell.setCellValue(data.getOutputAmount() != null ? data.getOutputAmount().doubleValue() : 0);
+            outputCell.setCellStyle(numberStyle);
+
+            HSSFCell balanceCell = row.createCell(6);
+            balanceCell.setCellValue(data.getBalance() != null ? data.getBalance().doubleValue() : 0);
+            balanceCell.setCellStyle(numberStyle);
+
+            totalInicial = BigDecimalUtil.sum(totalInicial, data.getInitialAmount() != null ? data.getInitialAmount() : BigDecimal.ZERO, 2);
+            totalEntradas = BigDecimalUtil.sum(totalEntradas, data.getEntryAmount() != null ? data.getEntryAmount() : BigDecimal.ZERO, 2);
+            totalSalidas = BigDecimalUtil.sum(totalSalidas, data.getOutputAmount() != null ? data.getOutputAmount() : BigDecimal.ZERO, 2);
+            totalSaldo = BigDecimalUtil.sum(totalSaldo, data.getBalance() != null ? data.getBalance() : BigDecimal.ZERO, 2);
+        }
+
+        // Fila de totales
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("TOTALES");
+        row.getCell(0).setCellStyle(headerStyle);
+
+        HSSFCell tInicialCell = row.createCell(3);
+        tInicialCell.setCellValue(totalInicial.doubleValue());
+        tInicialCell.setCellStyle(numberStyle);
+
+        HSSFCell tEntryCell = row.createCell(4);
+        tEntryCell.setCellValue(totalEntradas.doubleValue());
+        tEntryCell.setCellStyle(numberStyle);
+
+        HSSFCell tOutputCell = row.createCell(5);
+        tOutputCell.setCellValue(totalSalidas.doubleValue());
+        tOutputCell.setCellStyle(numberStyle);
+
+        HSSFCell tBalanceCell = row.createCell(6);
+        tBalanceCell.setCellValue(totalSaldo.doubleValue());
+        tBalanceCell.setCellStyle(numberStyle);
+
+        // Autoajustar columnas
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Enviar respuesta
+        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+        response.setContentType("application/vnd.ms-excel");
+        response.addHeader("Content-disposition", "attachment; filename=ReporteGeneralInv.xls");
+        ServletOutputStream stream = response.getOutputStream();
+        workbook.write(stream);
+        stream.flush();
+        stream.close();
+        FacesContext.getCurrentInstance().responseComplete();
+    }
 
     public void exportarPDF(JasperPrint jasperPrint) throws IOException, JRException {
 
