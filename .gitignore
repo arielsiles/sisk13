@@ -8,5 +8,4 @@ out/
 *.iml
 build.properties
 *.~m2
-resources/khipus-dev-ds.xml
 .claude/
