@@ -1136,8 +1136,20 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 dayAbsences = dayAbsences * 2;
                 System.out.println("====> > > Absences: " + employee.getFullName() + " - " + dayAbsences);
                 List<Date> specialDateUnpaidList = specialDateService.getSpecialDateRangeUnpaid(employee, gestionPayroll.getInitDate(), gestionPayroll.getEndDate());
-                System.out.println("====> > > SpecialDate Unpaid: " + (specialDateUnpaidList.size()));
-                dayAbsences = dayAbsences - BigDecimalUtil.toBigDecimal(specialDateUnpaidList.size()).doubleValue();
+
+                // Permisos generales (BU/OU) con goce prevalecen sobre permisos individuales sin goce.
+                // Filtrar los dias sin goce que ya estan cubiertos por feriados/permisos generales pagados.
+                List<Date> effectiveUnpaidList = new ArrayList<Date>(specialDateUnpaidList);
+                effectiveUnpaidList.removeAll(specialDate4BusinessUnit);
+                for (List<Date> ouDates : specialDate4OrganizationalUnit.values()) {
+                    effectiveUnpaidList.removeAll(ouDates);
+                }
+
+                System.out.println("====> > > SpecialDate Unpaid: " + specialDateUnpaidList.size() + " effective: " + effectiveUnpaidList.size());
+                dayAbsences = dayAbsences - BigDecimalUtil.toBigDecimal(effectiveUnpaidList.size()).doubleValue();
+                if (dayAbsences < 0) {
+                    dayAbsences = 0.0;
+                }
                 mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences);
 
                 //System.out.println("======> mensualTotalSalary: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + mensualTotalSalary);
