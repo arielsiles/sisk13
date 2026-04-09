@@ -96,15 +96,10 @@
 
                 <s:decorate id="subGroupField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductItem.report.subGroup']}</ui:define>
-                    <app:quickSearch id="quickSearchSubGroup"
-                                     textValue="#{extendedInventoryReportAction.subGroup.subGroupCode}"
-                                     value="#{extendedInventoryReportAction.subGroup}"
-                                     searchField="subGroupCode"
-                                     reRender="subGroupField"
-                                     tabindex="10"/>
                     <app:selectPopUp id="subGroup"
                                      textValue="#{extendedInventoryReportAction.subGroup.name}"
                                      value="#{extendedInventoryReportAction.subGroup}"
+                                     selectAction="#{subGroupSearchDataModel.setGroupCode(extendedInventoryReportAction.group.groupCode)}"
                                      dataModel="#{subGroupSearchDataModel}"
                                      clearAction="#{extendedInventoryReportAction.cleanSubGroupField()}"
                                      searchModalPanel="subGroupListModalPanel"

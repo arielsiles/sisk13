@@ -483,7 +483,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         HSSFFont articleFont = workbook.createFont();
         articleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
         articleStyle.setFont(articleFont);
-        articleStyle.setFillForegroundColor(org.apache.poi.hssf.util.HSSFColor.LIGHT_CORNFLOWER_BLUE.index);
+        articleStyle.setFillForegroundColor(org.apache.poi.hssf.util.HSSFColor.GREY_25_PERCENT.index);
         articleStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 
         HSSFCellStyle dateStyle = workbook.createCellStyle();
@@ -527,7 +527,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
 
         for (ArticleReportData article : reportData) {
 
-            // Cabecera del articulo
+            // Cabecera del articulo: codigo + nombre | Unidad | Subgrupo (fondo gris A-E)
             row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(article.getArticleCode());
             row.getCell(0).setCellStyle(articleStyle);
@@ -537,8 +537,10 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
             row.getCell(2).setCellStyle(articleStyle);
             row.createCell(3).setCellValue("Subgrupo: " + article.getSubgroupName());
             row.getCell(3).setCellStyle(articleStyle);
+            row.createCell(4).setCellValue("");
+            row.getCell(4).setCellStyle(articleStyle);
 
-            // Inv. Inicial
+            // Inventario Inicial + Cabecera de columnas en misma fila
             row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue("Inventario Inicial:");
             row.getCell(0).setCellStyle(headerStyle);
@@ -613,9 +615,12 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         gtOutputCell.setCellValue(grandTotalOutput.doubleValue());
         gtOutputCell.setCellStyle(numberBoldStyle);
 
-        for (int i = 0; i < 5; i++) {
-            sheet.autoSizeColumn(i);
-        }
+        // Anchos fijos de columnas (en unidades de 1/256 de caracter)
+        sheet.setColumnWidth(0, 16 * 256); // Fecha/Codigo
+        sheet.setColumnWidth(1, 14 * 256); // Entrada
+        sheet.setColumnWidth(2, 14 * 256); // Salida
+        sheet.setColumnWidth(3, 14 * 256); // Saldo
+        sheet.setColumnWidth(4, 80 * 256); // Glosa
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
         response.setContentType("application/vnd.ms-excel");
