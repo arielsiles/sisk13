@@ -9,3 +9,4 @@ out/
 build.properties
 *.~m2
 .claude/
+resources/khipus-dev-ds.xml
