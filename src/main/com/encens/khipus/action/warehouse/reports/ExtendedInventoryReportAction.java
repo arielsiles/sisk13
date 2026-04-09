@@ -527,17 +527,16 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
 
         for (ArticleReportData article : reportData) {
 
-            // Cabecera del articulo: codigo + nombre | Unidad | Subgrupo (fondo gris A-E)
+            // Cabecera del articulo (fondo gris A-E)
             row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(article.getArticleCode());
+            row.createCell(0).setCellValue(article.getArticleCode() + " - " + article.getArticleName());
             row.getCell(0).setCellStyle(articleStyle);
-            row.createCell(1).setCellValue(article.getArticleName());
-            row.getCell(1).setCellStyle(articleStyle);
-            row.createCell(2).setCellValue("Unidad: " + article.getUnit());
-            row.getCell(2).setCellStyle(articleStyle);
-            row.createCell(3).setCellValue("Subgrupo: " + article.getSubgroupName());
+            // B y C: solo fondo gris, sin texto para que A se desborde visualmente
+            row.createCell(1).setCellStyle(articleStyle);
+            row.createCell(2).setCellStyle(articleStyle);
+            row.createCell(3).setCellValue("Unidad: " + article.getUnit());
             row.getCell(3).setCellStyle(articleStyle);
-            row.createCell(4).setCellValue("");
+            row.createCell(4).setCellValue("Subgrupo: " + article.getSubgroupName());
             row.getCell(4).setCellStyle(articleStyle);
 
             // Inventario Inicial + Cabecera de columnas en misma fila
@@ -560,7 +559,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
             BigDecimal articleTotalEntry = BigDecimal.ZERO;
             BigDecimal articleTotalOutput = BigDecimal.ZERO;
 
-            if (article.getMovements() != null) {
+            if (article.getMovements() != null && !article.getMovements().isEmpty()) {
                 for (MovementRow mov : article.getMovements()) {
                     row = sheet.createRow(rowNum++);
 
@@ -585,6 +584,20 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
                     articleTotalEntry = BigDecimalUtil.sum(articleTotalEntry, mov.getEntryAmount(), 2);
                     articleTotalOutput = BigDecimalUtil.sum(articleTotalOutput, mov.getOutputAmount(), 2);
                 }
+            } else {
+                // Sin movimiento: mostrar saldo = inventario inicial
+                row = sheet.createRow(rowNum++);
+                row.createCell(0);
+                HSSFCell entryCell = row.createCell(1);
+                entryCell.setCellValue(0);
+                entryCell.setCellStyle(numberStyle);
+                HSSFCell outputCell = row.createCell(2);
+                outputCell.setCellValue(0);
+                outputCell.setCellStyle(numberStyle);
+                HSSFCell balanceCell = row.createCell(3);
+                balanceCell.setCellValue(article.getInitialBalance().doubleValue());
+                balanceCell.setCellStyle(numberStyle);
+                row.createCell(4).setCellValue("Sin movimiento en el periodo");
             }
 
             // Totales del articulo
@@ -616,11 +629,11 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         gtOutputCell.setCellStyle(numberBoldStyle);
 
         // Anchos fijos de columnas (en unidades de 1/256 de caracter)
-        sheet.setColumnWidth(0, 16 * 256); // Fecha/Codigo
-        sheet.setColumnWidth(1, 14 * 256); // Entrada
-        sheet.setColumnWidth(2, 14 * 256); // Salida
-        sheet.setColumnWidth(3, 14 * 256); // Saldo
-        sheet.setColumnWidth(4, 80 * 256); // Glosa
+        sheet.setColumnWidth(0, 18 * 256);
+        sheet.setColumnWidth(1, 18 * 256);
+        sheet.setColumnWidth(2, 18 * 256);
+        sheet.setColumnWidth(3, 14 * 256);
+        sheet.setColumnWidth(4, 80 * 256);
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
         response.setContentType("application/vnd.ms-excel");
