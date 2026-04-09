@@ -980,6 +980,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 List<Integer> cumulativePerformanceMinutesIntheMonthByContractList = new ArrayList();
                 List<Integer> cumulativeLatenessMinutesIntheMonthByContractList = new ArrayList();
                 List<Double> cumulativeDayAbsencesIntheMonthByContractList = new ArrayList();
+                List<Double> cumulativeUnpaidHalfDayAbsencesIntheMonthByContractList = new ArrayList();
 
                 List<Double> contractsPriceList = new ArrayList();
 
@@ -1011,6 +1012,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 // The current values of SpecialDate for payroll generation
                 List<Date> specialDate4Employee = specialDateService.getSpecialDateRange(employee, gestionPayroll.getInitDate(), gestionPayroll.getEndDate());
                 Map<Date, List<TimeInterval>> specialDateTime4Employee = specialDateService.getSpecialDateTimeRange(employee, gestionPayroll.getInitDate(), gestionPayroll.getEndDate());
+                Map<Date, List<TimeInterval>> specialDateTimeUnpaid4Employee = specialDateService.getSpecialDateTimeRangeUnpaid(employee, gestionPayroll.getInitDate(), gestionPayroll.getEndDate());
                 //todo: implementar rotaciones en las badas horarias
                 // here is the control because, each contract may have different variables of cost
                 for (Contract contract : employeeValidContractsList) {
@@ -1023,6 +1025,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                         List<Integer> cumulativePerformanceMinutesIntheMonth4ContractList = new ArrayList<Integer>(0);
                         List<Integer> cumulativeLatenessMinutesIntheMonth4ContractList = new ArrayList<Integer>(0);
                         List<Double> cumulativeDayAbsencesIntheMonth4ContractList = new ArrayList<Double>(0);
+                        List<Double> cumulativeUnpaidHalfDayAbsencesIntheMonth4ContractList = new ArrayList<Double>(0);
 
                         // this var is to control the days of the month. It is initially setted to the first day of the month
                         Calendar currentDate = Calendar.getInstance();
@@ -1062,10 +1065,12 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                     specialDateTimeForOrganizationalUnit.get(job.getOrganizationalUnit().getId()),
                                     specialDate4Employee,
                                     specialDateTime4Employee,
+                                    specialDateTimeUnpaid4Employee,
                                     cumulativeMinutesIntheMonth4ContractList,
                                     cumulativePerformanceMinutesIntheMonth4ContractList,
                                     cumulativeLatenessMinutesIntheMonth4ContractList,
                                     cumulativeDayAbsencesIntheMonth4ContractList,
+                                    cumulativeUnpaidHalfDayAbsencesIntheMonth4ContractList,
                                     totalSumOfMinuteBandAbsencesList);
                         else
                         executeAttendanceControlManagers(endDate, currentDate, generatedPayroll,
@@ -1077,23 +1082,28 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                 specialDateTimeForOrganizationalUnit.get(job.getOrganizationalUnit().getId()),
                                 specialDate4Employee,
                                 specialDateTime4Employee,
+                                specialDateTimeUnpaid4Employee,
                                 cumulativeMinutesIntheMonth4ContractList,
                                 cumulativePerformanceMinutesIntheMonth4ContractList,
                                 cumulativeLatenessMinutesIntheMonth4ContractList,
                                 cumulativeDayAbsencesIntheMonth4ContractList,
+                                cumulativeUnpaidHalfDayAbsencesIntheMonth4ContractList,
                                 totalSumOfMinuteBandAbsencesList);
 
                         int bandDuration = 0;
                         int performance = 0;
                         double dayAbsences = 0.0;
+                        double unpaidHalfDayAbsences = 0.0;
                         int tardinessMonth = 0;
                         for (int k = 0; k < cumulativeMinutesIntheMonth4ContractList.size(); k++) {
                             bandDuration += cumulativeMinutesIntheMonth4ContractList.get(k);
                             performance += cumulativePerformanceMinutesIntheMonth4ContractList.get(k);
                             dayAbsences += cumulativeDayAbsencesIntheMonth4ContractList.get(k);
+                            unpaidHalfDayAbsences += cumulativeUnpaidHalfDayAbsencesIntheMonth4ContractList.get(k);
                             tardinessMonth += cumulativeLatenessMinutesIntheMonth4ContractList.get(k);
                         }
                         cumulativeDayAbsencesIntheMonthByContractList.add(dayAbsences);
+                        cumulativeUnpaidHalfDayAbsencesIntheMonthByContractList.add(unpaidHalfDayAbsences);
                         cumulativeLatenessMinutesIntheMonthByContractList.add(tardinessMonth);
                         cumulativeMinutesIntheMonthByContractList.add(bandDuration);
                         cumulativePerformanceMinutesIntheMonthByContractList.add(performance);
@@ -1101,10 +1111,12 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 }
                 Double pricePerMinute = 0.0;
                 Double dayAbsences = 0.0;
+                Double totalUnpaidHalfDayAbsences = 0.0;
                 Integer tardinessTotal = 0;
 
                 for (int i = 0; i < cumulativeMinutesIntheMonthByContractList.size(); i++) {
                     dayAbsences += cumulativeDayAbsencesIntheMonthByContractList.get(i);
+                    totalUnpaidHalfDayAbsences += cumulativeUnpaidHalfDayAbsencesIntheMonthByContractList.get(i);
                     tardinessTotal += cumulativeLatenessMinutesIntheMonthByContractList.get(i);
                     Integer minutes = cumulativeMinutesIntheMonthByContractList.get(i);
                     Integer performanceMinutes = cumulativePerformanceMinutesIntheMonthByContractList.get(i);
@@ -1133,8 +1145,15 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 log.debug(">>> day Absences: " + dayAbsences);
                 //mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences);
 
+                // Faltas injustificadas se duplican (penalidad x2)
                 dayAbsences = dayAbsences * 2;
-                System.out.println("====> > > Absences: " + employee.getFullName() + " - " + dayAbsences);
+                System.out.println("====> > > Absences (x2): " + employee.getFullName() + " - " + dayAbsences);
+
+                // Medios dias sin goce (parcial, con horas) a 1x - NO se duplican
+                dayAbsences = dayAbsences + totalUnpaidHalfDayAbsences;
+                System.out.println("====> > > Unpaid Half Days: " + totalUnpaidHalfDayAbsences);
+
+                // Dias completos sin goce (allDay=true) - ajuste de x2 a x1
                 List<Date> specialDateUnpaidList = specialDateService.getSpecialDateRangeUnpaid(employee, gestionPayroll.getInitDate(), gestionPayroll.getEndDate());
 
                 // Permisos generales (BU/OU) con goce prevalecen sobre permisos individuales sin goce.
@@ -1145,11 +1164,12 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                     effectiveUnpaidList.removeAll(ouDates);
                 }
 
-                System.out.println("====> > > SpecialDate Unpaid: " + specialDateUnpaidList.size() + " effective: " + effectiveUnpaidList.size());
+                System.out.println("====> > > SpecialDate Unpaid FullDay: " + specialDateUnpaidList.size() + " effective: " + effectiveUnpaidList.size());
                 dayAbsences = dayAbsences - BigDecimalUtil.toBigDecimal(effectiveUnpaidList.size()).doubleValue();
                 if (dayAbsences < 0) {
                     dayAbsences = 0.0;
                 }
+                System.out.println("====> > > Total dayAbsences: " + dayAbsences + " workedDays: " + workedDays);
                 mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences);
 
                 //System.out.println("======> mensualTotalSalary: " + currentJobContract.getContract().getEmployee().getFullName() + " - " + mensualTotalSalary);
@@ -1740,10 +1760,12 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                                   Map<Date, List<TimeInterval>> specialDateTimeForOrganizationalUnit,
                                                   List<Date> specialDate4Employee,
                                                   Map<Date, List<TimeInterval>> specialDateTime4Employee,
+                                                  Map<Date, List<TimeInterval>> specialDateTimeUnpaid4Employee,
                                                   List<Integer> cumulativeMinutesIntheMonth4ContractList,
                                                   List<Integer> cumulativePerformanceMinutesIntheMonth4ContractList,
                                                   List<Integer> cumulativeLatenessMinutesIntheMonth4ContractList,
                                                   List<Double> cumulativeDayAbsencesIntheMonth4ContractList,
+                                                  List<Double> cumulativeUnpaidHalfDayAbsencesList,
                                                   List<Integer> totalSumOfMinuteBandAbsencesList) {
         double perMinuteSalary = 0;
 
@@ -1752,6 +1774,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
             Integer cumulativeMinuteBandAbsencesInADay = 0;
             Integer cumulativeNumberBandAbsencesInADay = 0;
             Double dayAbsences = 0.0;
+            Double unpaidHalfDayAbsences = 0.0;
             Integer minutosRetrasoAcum = 0;
             Integer cumulativeMinuteLatenessInADay4AllContractBands = 0;
             Integer cumulativeBandsDurationInADay4AllContractBands = 0;
@@ -1775,6 +1798,31 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 // lista de bandas horarias contrato por dia
                 List<HoraryBandContract> validDayHoraryBand4DateList = horaryBandContractMapByDay.get(currentDate.get(Calendar.DAY_OF_WEEK));
                 // check what bands are valid for this date of the month. Checks all the valid bands for the month.*/
+
+                // Recolectar intervalos de permisos parciales para hoy
+                List<TimeInterval> unpaidIntervalsForToday = null;
+                if (specialDateTimeUnpaid4Employee.containsKey(currentDate.getTime())) {
+                    unpaidIntervalsForToday = specialDateTimeUnpaid4Employee.get(currentDate.getTime());
+                }
+                List<TimeInterval> paidIntervalsForToday = new ArrayList<TimeInterval>();
+                if (specialDateTime4BusinessUnit.containsKey(currentDate.getTime())) {
+                    paidIntervalsForToday.addAll(specialDateTime4BusinessUnit.get(currentDate.getTime()));
+                }
+                if (specialDateTimeForOrganizationalUnit.containsKey(currentDate.getTime())) {
+                    paidIntervalsForToday.addAll(specialDateTimeForOrganizationalUnit.get(currentDate.getTime()));
+                }
+                if (specialDateTime4Employee.containsKey(currentDate.getTime())) {
+                    paidIntervalsForToday.addAll(specialDateTime4Employee.get(currentDate.getTime()));
+                }
+
+                // Pre-calcular duracion total del dia (suma de todas las bandas de rotacion)
+                int totalDayBandDuration = 0;
+                for (HoraryBand hb : validDayHoraryBandContract4Date.getTypeHoraryBand().getHoraryBands()) {
+                    Calendar ib = DateUtils.toCalendar(hb.getInitHour());
+                    Calendar eb = DateUtils.toCalendar(hb.getEndHour());
+                    List<Long> diff = getDifferenceInHoursMinutesSecondsBetweenMarks(ib, eb);
+                    totalDayBandDuration += (int) (diff.get(0) * 60 + diff.get(1));
+                }
 
                 int bandAbsences = 0;
 
@@ -1800,19 +1848,49 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                             specialDateTime4Employee,
                             horaryBand);
                     log.debug("hasPermission4BandInterval: " + hasPermission4BandInterval);
+
+                    // Verificar si hay permiso UNPAID parcial que cubra parte de esta banda
+                    boolean hasUnpaidHalfDayPermission = false;
+                    if (unpaidIntervalsForToday != null) {
+                        for (TimeInterval ti : unpaidIntervalsForToday) {
+                            if (hasTimeIntervalPermissionForBand(horaryBand, ti)) {
+                                hasUnpaidHalfDayPermission = true;
+                                break;
+                            }
+                        }
+                    }
+
                     // if it isn't sunday
                     if (!hasPermission4Today) {
                         // if there are no valid quantity of marks for the HoraryBand It is absence.
                         // si es A procede a descontar la banda si no tiene ambas marcas
                         if (employee.getControlFlag() && correctMarks.size() < 2) {
-                            //discount HoraryBand duration
-                            if (!hasPermission4BandInterval) {
+                            // Permiso parcial (PAID o UNPAID) cubre una fraccion de la banda.
+                            // La fraccion cubierta se calcula proporcional a las horas exactas.
+                            if (hasPermission4BandInterval || hasUnpaidHalfDayPermission) {
+                                double paidFraction = calculatePermissionFractionForBand(
+                                        horaryBand, paidIntervalsForToday, totalDayBandDuration);
+                                double unpaidFraction = calculatePermissionFractionForBand(
+                                        horaryBand, unpaidIntervalsForToday, totalDayBandDuration);
+                                // Fraccion de esta banda respecto al dia
+                                double bandFractionOfDay = (double) bandDuration / totalDayBandDuration;
+                                // Fraccion no cubierta por permisos DENTRO de esta banda
+                                double coveredFractionOfBand = Math.min((paidFraction + unpaidFraction) / bandFractionOfDay, 1.0);
+                                double unjustifiedFraction = (1.0 - coveredFractionOfBand) * bandFractionOfDay;
+
+                                // UNPAID: fraccion proporcional a 1x (no se duplica)
+                                if (hasUnpaidHalfDayPermission) {
+                                    unpaidHalfDayAbsences += unpaidFraction;
+                                }
+                                // Fraccion no cubierta sin marcas: falta injustificada (se duplicara x2)
+                                dayAbsences += unjustifiedFraction;
+                            } else {
+                                // Sin ningun permiso: falta completa de la banda
                                 cumulativeMinuteBandAbsencesInADay += bandDuration;
                                 cumulativeNumberBandAbsencesInADay++;
-
-                                // compute the absences only in the last band
                                 bandAbsences++;
                             }
+
                             if ((k == (bandsNumber - 1)) && (bandAbsences > 0)) {
                                 if (bandAbsences < bandsNumber) {
                                     dayAbsences += 0.5;
@@ -1829,14 +1907,20 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                     }
                                 }
                             }
-                            if (!hasPermission4BandInterval) {
+                            if (!hasPermission4BandInterval && !hasUnpaidHalfDayPermission) {
                                 minuteBandAbsences = bandDuration;
                                 totalSumOfMinuteBandAbsencesList.add(minuteBandAbsences);
                             }
                         }
+                        // Empleado con marcas + permiso UNPAID parcial: cobrar fraccion UNPAID a 1x
+                        if (employee.getControlFlag() && hasUnpaidHalfDayPermission && correctMarks.size() >= 2) {
+                            double unpaidFraction = calculatePermissionFractionForBand(
+                                    validDayHoraryBandContract4Date.getHoraryBand(), unpaidIntervalsForToday, totalDayBandDuration);
+                            unpaidHalfDayAbsences += unpaidFraction;
+                        }
                         // check in case of lateness
                         // si es d no descuenta nada
-                        if (employee.getControlFlag() && !hasPermission4BandInterval && correctMarks.size() >= 1) {
+                        if (employee.getControlFlag() && !hasPermission4BandInterval && !hasUnpaidHalfDayPermission && correctMarks.size() >= 1) {
                             Calendar employeeInitMarkCalendar = DateUtils.toCalendar(correctMarks.get(0));
                             // set year and month in case marTime saves only time mark
                             employeeInitMarkCalendar.set(Calendar.YEAR, correctMarks.get(0).getYear());
@@ -1929,6 +2013,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
             int performance = bandDuration - tardiness;
 
             cumulativeDayAbsencesIntheMonth4ContractList.add(dayAbsences);
+            cumulativeUnpaidHalfDayAbsencesList.add(unpaidHalfDayAbsences);
             cumulativeLatenessMinutesIntheMonth4ContractList.add(tardiness);
             cumulativeMinutesIntheMonth4ContractList.add(bandDuration);
             cumulativePerformanceMinutesIntheMonth4ContractList.add(performance);
@@ -1948,10 +2033,12 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                                   Map<Date, List<TimeInterval>> specialDateTimeForOrganizationalUnit,
                                                   List<Date> specialDate4Employee,
                                                   Map<Date, List<TimeInterval>> specialDateTime4Employee,
+                                                  Map<Date, List<TimeInterval>> specialDateTimeUnpaid4Employee,
                                                   List<Integer> cumulativeMinutesIntheMonth4ContractList,
                                                   List<Integer> cumulativePerformanceMinutesIntheMonth4ContractList,
                                                   List<Integer> cumulativeLatenessMinutesIntheMonth4ContractList,
                                                   List<Double> cumulativeDayAbsencesIntheMonth4ContractList,
+                                                  List<Double> cumulativeUnpaidHalfDayAbsencesList,
                                                   List<Integer> totalSumOfMinuteBandAbsencesList) {
         double perMinuteSalary = 0;
 
@@ -1960,6 +2047,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
             Integer cumulativeMinuteBandAbsencesInADay = 0;
             Integer cumulativeNumberBandAbsencesInADay = 0;
             Double dayAbsences = 0.0;
+            Double unpaidHalfDayAbsences = 0.0;
             Integer minutosRetrasoAcum = 0;
             Integer cumulativeMinuteLatenessInADay4AllContractBands = 0;
             Integer cumulativeBandsDurationInADay4AllContractBands = 0;
@@ -1983,6 +2071,31 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 // lista de bandas horarias contrato por dia
                 List<HoraryBandContract> validDayHoraryBand4DateList = horaryBandContractMapByDay.get(currentDate.get(Calendar.DAY_OF_WEEK));
                 // check what bands are valid for this date of the month. Checks all the valid bands for the month.
+
+                // Recolectar intervalos de permisos parciales para hoy
+                List<TimeInterval> unpaidIntervalsForToday = null;
+                if (specialDateTimeUnpaid4Employee.containsKey(currentDate.getTime())) {
+                    unpaidIntervalsForToday = specialDateTimeUnpaid4Employee.get(currentDate.getTime());
+                }
+                List<TimeInterval> paidIntervalsForToday = new ArrayList<TimeInterval>();
+                if (specialDateTime4BusinessUnit.containsKey(currentDate.getTime())) {
+                    paidIntervalsForToday.addAll(specialDateTime4BusinessUnit.get(currentDate.getTime()));
+                }
+                if (specialDateTimeForOrganizationalUnit.containsKey(currentDate.getTime())) {
+                    paidIntervalsForToday.addAll(specialDateTimeForOrganizationalUnit.get(currentDate.getTime()));
+                }
+                if (specialDateTime4Employee.containsKey(currentDate.getTime())) {
+                    paidIntervalsForToday.addAll(specialDateTime4Employee.get(currentDate.getTime()));
+                }
+
+                // Pre-calcular duracion total del dia (suma de todas las bandas)
+                int totalDayBandDuration = 0;
+                for (HoraryBandContract hbc : validDayHoraryBand4DateList) {
+                    Calendar ib = DateUtils.toCalendar(hbc.getHoraryBand().getInitHour());
+                    Calendar eb = DateUtils.toCalendar(hbc.getHoraryBand().getEndHour());
+                    List<Long> diff = getDifferenceInHoursMinutesSecondsBetweenMarks(ib, eb);
+                    totalDayBandDuration += (int) (diff.get(0) * 60 + diff.get(1));
+                }
 
                 int bandAbsences = 0;
 
@@ -2008,19 +2121,49 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                             specialDateTime4Employee,
                             validDayHoraryBandContract4Date);
                     log.debug("hasPermission4BandInterval: " + hasPermission4BandInterval);
+
+                    // Verificar si hay permiso UNPAID parcial que cubra parte de esta banda
+                    boolean hasUnpaidHalfDayPermission = false;
+                    if (unpaidIntervalsForToday != null) {
+                        for (TimeInterval ti : unpaidIntervalsForToday) {
+                            if (hasTimeIntervalPermissionForBand(validDayHoraryBandContract4Date.getHoraryBand(), ti)) {
+                                hasUnpaidHalfDayPermission = true;
+                                break;
+                            }
+                        }
+                    }
+
                     // if it isn't sunday
                     if (!hasPermission4Today) {
                         // if there are no valid quantity of marks for the HoraryBand It is absence.
                         // si es A procede a descontar la banda si no tiene ambas marcas
                         if (employee.getControlFlag() && correctMarks.size() < 2) {
-                            //discount HoraryBand duration
-                            if (!hasPermission4BandInterval) {
+                            // Permiso parcial (PAID o UNPAID) cubre una fraccion de la banda.
+                            // La fraccion cubierta se calcula proporcional a las horas exactas.
+                            if (hasPermission4BandInterval || hasUnpaidHalfDayPermission) {
+                                double paidFraction = calculatePermissionFractionForBand(
+                                        validDayHoraryBandContract4Date.getHoraryBand(), paidIntervalsForToday, totalDayBandDuration);
+                                double unpaidFraction = calculatePermissionFractionForBand(
+                                        validDayHoraryBandContract4Date.getHoraryBand(), unpaidIntervalsForToday, totalDayBandDuration);
+                                // Fraccion de esta banda respecto al dia
+                                double bandFractionOfDay = (double) bandDuration / totalDayBandDuration;
+                                // Fraccion no cubierta por permisos DENTRO de esta banda
+                                double coveredFractionOfBand = Math.min((paidFraction + unpaidFraction) / bandFractionOfDay, 1.0);
+                                double unjustifiedFraction = (1.0 - coveredFractionOfBand) * bandFractionOfDay;
+
+                                // UNPAID: fraccion proporcional a 1x (no se duplica)
+                                if (hasUnpaidHalfDayPermission) {
+                                    unpaidHalfDayAbsences += unpaidFraction;
+                                }
+                                // Fraccion no cubierta sin marcas: falta injustificada (se duplicara x2)
+                                dayAbsences += unjustifiedFraction;
+                            } else {
+                                // Sin ningun permiso: falta completa de la banda
                                 cumulativeMinuteBandAbsencesInADay += bandDuration;
                                 cumulativeNumberBandAbsencesInADay++;
-
-                                // compute the absences only in the last band
                                 bandAbsences++;
                             }
+
                             if ((k == (bandsNumber - 1)) && (bandAbsences > 0)) {
                                 if (bandAbsences < bandsNumber) {
                                     dayAbsences += 0.5;
@@ -2048,14 +2191,20 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                     }
                                 }
                             }
-                            if (!hasPermission4BandInterval) {
+                            if (!hasPermission4BandInterval && !hasUnpaidHalfDayPermission) {
                                 minuteBandAbsences = bandDuration;
                                 totalSumOfMinuteBandAbsencesList.add(minuteBandAbsences);
                             }
                         }
+                        // Empleado con marcas + permiso UNPAID parcial: cobrar fraccion UNPAID a 1x
+                        if (employee.getControlFlag() && hasUnpaidHalfDayPermission && correctMarks.size() >= 2) {
+                            double unpaidFraction = calculatePermissionFractionForBand(
+                                    validDayHoraryBandContract4Date.getHoraryBand(), unpaidIntervalsForToday, totalDayBandDuration);
+                            unpaidHalfDayAbsences += unpaidFraction;
+                        }
                         // check in case of lateness
                         // si es d no descuenta nada
-                        if (employee.getControlFlag() && !hasPermission4BandInterval && correctMarks.size() >= 1) {
+                        if (employee.getControlFlag() && !hasPermission4BandInterval && !hasUnpaidHalfDayPermission && correctMarks.size() >= 1) {
                             Calendar employeeInitMarkCalendar = DateUtils.toCalendar(correctMarks.get(0));
                             // set year and month in case marTime saves only time mark
                             employeeInitMarkCalendar.set(Calendar.YEAR, correctMarks.get(0).getYear());
@@ -2148,6 +2297,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
             int performance = bandDuration - tardiness;
 
             cumulativeDayAbsencesIntheMonth4ContractList.add(dayAbsences);
+            cumulativeUnpaidHalfDayAbsencesList.add(unpaidHalfDayAbsences);
             cumulativeLatenessMinutesIntheMonth4ContractList.add(tardiness);
             cumulativeMinutesIntheMonth4ContractList.add(bandDuration);
             cumulativePerformanceMinutesIntheMonth4ContractList.add(performance);
@@ -2624,7 +2774,40 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
 
     private boolean hasTimeIntervalPermissionForBand(HoraryBand horaryBand, TimeInterval timeInterval) {
         return (horaryBand.getInitHour().compareTo(timeInterval.getStart()) >= 0 && horaryBand.getInitHour().compareTo(timeInterval.getEnd()) <= 0)
-                || (horaryBand.getEndHour().compareTo(timeInterval.getStart()) >= 0 && horaryBand.getEndHour().compareTo(timeInterval.getEnd()) <= 0);
+                || (horaryBand.getEndHour().compareTo(timeInterval.getStart()) >= 0 && horaryBand.getEndHour().compareTo(timeInterval.getEnd()) <= 0)
+                // Permiso contenido dentro de la banda (ej: banda 07:00-14:00, permiso 08:00-11:30)
+                || (timeInterval.getStart().compareTo(horaryBand.getInitHour()) >= 0 && timeInterval.getEnd().compareTo(horaryBand.getEndHour()) <= 0);
+    }
+
+    /**
+     * Calcula la fraccion de la banda horaria cubierta por los intervalos de permiso.
+     * Ej: banda 07:00-14:00 (420 min), permiso 09:00-10:30 (90 min) -> fraccion = 90/420 = 0.2143
+     */
+    /**
+     * Calcula la fraccion del dia cubierta por los intervalos de permiso que solapan con la banda.
+     * Ej: banda 08:00-12:00, permiso 08:00-12:00, totalDayMinutes=480 -> fraccion = 240/480 = 0.5
+     * @param totalDayMinutes duracion total del dia (suma de todas las bandas)
+     */
+    private double calculatePermissionFractionForBand(HoraryBand horaryBand, List<TimeInterval> intervals, int totalDayMinutes) {
+        if (intervals == null || intervals.isEmpty() || totalDayMinutes <= 0) return 0.0;
+
+        long bandInitMin = horaryBand.getInitHour().getHours() * 60 + horaryBand.getInitHour().getMinutes();
+        long bandEndMin = horaryBand.getEndHour().getHours() * 60 + horaryBand.getEndHour().getMinutes();
+
+        long totalOverlap = 0;
+        for (TimeInterval ti : intervals) {
+            long tiStart = ti.getStart().getHours() * 60 + ti.getStart().getMinutes();
+            long tiEnd = ti.getEnd().getHours() * 60 + ti.getEnd().getMinutes();
+
+            long overlapStart = Math.max(bandInitMin, tiStart);
+            long overlapEnd = Math.min(bandEndMin, tiEnd);
+            if (overlapEnd > overlapStart) {
+                totalOverlap += (overlapEnd - overlapStart);
+            }
+        }
+
+        double fraction = (double) totalOverlap / totalDayMinutes;
+        return Math.min(fraction, 1.0);
     }
 
     private List<Date> filterDateTimeRHMarkByDate(Map<Date, List<Date>> rhMarkTimeDateMap4Employee, Date currentDate) {
