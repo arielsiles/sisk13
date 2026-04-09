@@ -37,4 +37,6 @@ public interface XProductionService {
     List<Object[]> getSumRawMaterialInProduction(Date initDate, Date endDate);
 
     List<XSupply> getRawMaterialInProduction(String productItemCode, Date initDate, Date endDate);
+
+    List<XSupply> getAllRawMaterialInProduction(Date initDate, Date endDate);
 }

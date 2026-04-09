@@ -286,200 +286,184 @@ public class ProductInventoryReportAction extends GenericReportAction {
      */
     public Collection<CollectionData> calculateCollectionData2(){
 
-        //Collection<CollectionData> beanCollection = new ArrayList(); Se cambio por la lista sgte, para ordenar
         List<CollectionData> beanCollection2 = new ArrayList();
 
         /** 1.- Listado de articulos con saldos iniciales de gestion **/
-        // Inventario inicio gestion
-        //List<InitialInventory> initialInventoryList   = productInventoryService.findInitialInventory(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
-        List<InventoryPeriod> InventoryPeriodList   = productInventoryService.findInitialInventoryAll(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
+        List<InventoryPeriod> InventoryPeriodList = productInventoryService.findInitialInventoryAll(warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
 
-        /** 2.- Obtiene en listas entradas y salidas de articulos: vales, ordenes de produccion, ventas, pedidos, etc. **/
-        // Vales de movimiento
+        /** 2.- Obtiene en listas entradas y salidas de articulos **/
         List<MovementDetail> movementDetailList;
-        if (warehouse.getWarehouseCode().equals(WarehouseType.DAIRY)) // Lacteos ALM 2
+        if (warehouse.getWarehouseCode().equals(WarehouseType.DAIRY))
             movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeNull(warehouse.getWarehouseCode(), startDate, endDate, null);
         else
             movementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, null);
 
-        // Ordenes de produccion
         List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(startDate, endDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
-
         List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(startDate, endDate);
         List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByDate(startDate, endDate);
-
         List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(startDate, endDate);
-
-        // Ventas al contado y pedidos
         List cashSaleDetailList = articleOrderService.findCashSaleDetailListGroupBy(startDate, endDate);
         List orderDetailList    = articleOrderService.findCustomerOrderDetailListGroupBy(startDate, endDate);
 
-        /** 3.-  Calcula (x almacen) en la lista los saldos de los articulos, desde el 1er dia de la gestion hasta la fecha de inicio seleccionada **/
-        // solo calcula correctamente saldos fisicos ?
+        /** 3.- Pre-calcular HashMaps para lookups O(1) en vez de O(N) **/
+        Map<String, BigDecimal> initialBalanceMap = new HashMap<String, BigDecimal>();
         Collection<CollectionData> initialArticleList = calculateInitialArticle(warehouse.getWarehouseCode(), startDate);
+        for (CollectionData article : initialArticleList) {
+            initialBalanceMap.put(article.getCode(), article.getBalance());
+        }
 
-        /** Se va llenando la lista final, con saldos fisicos a la fecha de inicio seleccionada **/
-        /**  **/
-        //* Inventario inicial inv_inicio **/
-        //for (InitialInventory initialInventory:initialInventoryList){
-        for (InventoryPeriod inventoryPeriod:InventoryPeriodList){
+        // Acopio MP por codigo
+        Map<String, BigDecimal> collectMaterialMap = new HashMap<String, BigDecimal>();
+        for (CollectMaterial cm : collectMaterialList) {
+            String code = cm.getMetaProduct().getProductItemCode();
+            BigDecimal prev = collectMaterialMap.get(code);
+            collectMaterialMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, cm.getBalanceWeight(), 6));
+        }
 
-            /** Fijando el saldo inicial de un articulo **/
-            BigDecimal initQuantity = BigDecimal.ZERO;
-            for (CollectionData article:initialArticleList){
-                if (inventoryPeriod.getProductItemCode().equals(article.getCode())){
-                    initQuantity = article.getBalance(); // Fijando solo el saldo fisico inicial
-                    break;
-                }
+        // Produccion por codigo
+        Map<String, BigDecimal> productionMap = new HashMap<String, BigDecimal>();
+        for (ProductionProduct product : productionProductList) {
+            String code = product.getProductItemCode();
+            BigDecimal prev = productionMap.get(code);
+            productionMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, product.getQuantity(), 6));
+        }
+
+        // XProduccion por codigo
+        Map<String, BigDecimal> xproductionMap = new HashMap<String, BigDecimal>();
+        for (XProductionProduct product : xproductionProductList) {
+            String code = product.getProductItemCode();
+            BigDecimal prev = xproductionMap.get(code);
+            xproductionMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, product.getQuantity(), 6));
+        }
+
+        // Ordenes de produccion por codigo
+        Map<String, BigDecimal> productionOrderMap = new HashMap<String, BigDecimal>();
+        for (ProductionOrder po : productionOrderList) {
+            String code = po.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode();
+            BigDecimal prev = productionOrderMap.get(code);
+            productionOrderMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, BigDecimalUtil.toBigDecimal(po.getProducedAmount()), 6));
+        }
+
+        // Reprocesos por codigo
+        Map<String, BigDecimal> reprocessMap = new HashMap<String, BigDecimal>();
+        for (BaseProduct baseProduct : baseProductList) {
+            for (SingleProduct singleProduct : baseProduct.getSingleProducts()) {
+                String code = singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode();
+                BigDecimal prev = reprocessMap.get(code);
+                reprocessMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 6));
             }
+        }
+
+        // Movimientos entrada/salida por codigo
+        Map<String, BigDecimal> movEntryMap = new HashMap<String, BigDecimal>();
+        Map<String, BigDecimal> movOutputMap = new HashMap<String, BigDecimal>();
+        for (MovementDetail detail : movementDetailList) {
+            String code = detail.getProductItemCode();
+            if (detail.getMovementType().equals(MovementDetailType.E)) {
+                BigDecimal prev = movEntryMap.get(code);
+                movEntryMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, detail.getQuantity(), 6));
+            }
+            if (detail.getMovementType().equals(MovementDetailType.S)) {
+                BigDecimal prev = movOutputMap.get(code);
+                movOutputMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, detail.getQuantity(), 6));
+            }
+        }
+
+        // Materia prima en XProduccion - FUERA del loop
+        Map<String, BigDecimal> rawMaterialMap = new HashMap<String, BigDecimal>();
+        if (warehouse.getWarehouseType().equals(WarehouseType.RAW_MATERIAL)) {
+            List rawMaterialProductionList = xproductionService.getSumRawMaterialInProduction(startDate, endDate);
+            for (int i = 0; i < rawMaterialProductionList.size(); i++) {
+                Object[] row = (Object[]) rawMaterialProductionList.get(i);
+                rawMaterialMap.put((String) row[0], (BigDecimal) row[1]);
+            }
+        }
+
+        // Ventas al contado por codigo
+        Map<String, BigDecimal> cashSaleMap = new HashMap<String, BigDecimal>();
+        for (int i = 0; i < cashSaleDetailList.size(); i++) {
+            Object[] row = (Object[]) cashSaleDetailList.get(i);
+            cashSaleMap.put((String) row[0], BigDecimalUtil.toBigDecimal((Long) row[1]));
+        }
+
+        // Pedidos por codigo
+        Map<String, BigDecimal> orderMap = new HashMap<String, BigDecimal>();
+        for (int i = 0; i < orderDetailList.size(); i++) {
+            Object[] row = (Object[]) orderDetailList.get(i);
+            orderMap.put((String) row[0], BigDecimalUtil.toBigDecimal((Long) row[1]));
+        }
+
+        /** 4.- Iterar articulos usando lookups O(1) **/
+        for (InventoryPeriod inventoryPeriod : InventoryPeriodList) {
+
+            String code = inventoryPeriod.getProductItemCode();
+
+            BigDecimal initQuantity = initialBalanceMap.containsKey(code) ? initialBalanceMap.get(code) : BigDecimal.ZERO;
 
             CollectionData data = new CollectionData(
                     inventoryPeriod.getProductItem().getSubGroup().getName(),
-                    inventoryPeriod.getProductItemCode(),
+                    code,
                     inventoryPeriod.getProductItem().getName(),
                     inventoryPeriod.getProductItem().getUsageMeasureCode(),
                     initQuantity,
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
-                    //initialInventory.getUnitCost()
                     BigDecimal.ZERO
             );
 
-            /** Acopio MP **/
-            for (CollectMaterial collectMaterial : collectMaterialList) {
-                if (inventoryPeriod.getProductItemCode().equals(collectMaterial.getMetaProduct().getProductItemCode())){
-                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), collectMaterial.getBalanceWeight(), 6));
-                }
-            }
+            // Sumar entradas
+            if (collectMaterialMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), collectMaterialMap.get(code), 6));
+            if (productionMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), productionMap.get(code), 6));
+            if (xproductionMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), xproductionMap.get(code), 6));
+            if (productionOrderMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), productionOrderMap.get(code), 6));
+            if (reprocessMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), reprocessMap.get(code), 6));
+            if (movEntryMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), movEntryMap.get(code), 6));
 
+            // Sumar salidas
+            if (movOutputMap.containsKey(code))
+                data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), movOutputMap.get(code), 6));
+            if (rawMaterialMap.containsKey(code))
+                data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), rawMaterialMap.get(code), 6));
+            if (cashSaleMap.containsKey(code))
+                data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), cashSaleMap.get(code), 6));
+            if (orderMap.containsKey(code))
+                data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), orderMap.get(code), 6));
 
-            /** PR_PRODUCCION **/
-            for (ProductionProduct product : productionProductList){
-                if (inventoryPeriod.getProductItemCode().equals(product.getProductItemCode())){
-                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), product.getQuantity(), 6));
-                }
-            }
-
-            /** XPR_PRODUCCION **/
-            for (XProductionProduct product : xproductionProductList){
-                if (inventoryPeriod.getProductItemCode().equals(product.getProductItemCode())){
-                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), product.getQuantity(), 6));
-                }
-            }
-
-            /** Ordenes de produccion **/
-            for (ProductionOrder productionOrder:productionOrderList){
-                if (inventoryPeriod.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
-                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 6));
-                }
-            }
-            /** Reprocesos **/
-            for (BaseProduct baseProduct:baseProductList){
-                for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
-                    if (inventoryPeriod.getProductItemCode().equals(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode())){
-                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 6));
-                    }
-                }
-            }
-
-            /** Sum Entry an Output **/
-            for (MovementDetail detail:movementDetailList){
-                if (inventoryPeriod.getProductItemCode().equals(detail.getProductItemCode())) {
-                    if (detail.getMovementType().equals(MovementDetailType.E)) {
-                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 6));
-                    }
-                    if (detail.getMovementType().equals(MovementDetailType.S))
-                        data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 6));
-                }
-            }
-
-            //MATERIA PRIMA en XProduccion
-            if (warehouse.getWarehouseType().equals(WarehouseType.RAW_MATERIAL)){
-                List rawMaterialProductionList = xproductionService.getSumRawMaterialInProduction(startDate, endDate);
-                for (int i = 0; i < rawMaterialProductionList.size(); i++) {
-                    Object[] row = (Object[]) rawMaterialProductionList.get(i);
-                    String codart = (String)row[0];
-                    BigDecimal total = (BigDecimal) row[1];
-                    if (inventoryPeriod.getProductItemCode().equals(codart)) {
-                        data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), total, 6));
-                    }
-                }
-            }
-
-            /** Ventas al contado **/
-            for (int i = 0; i < cashSaleDetailList.size(); i++) {
-                Object[] row = (Object[]) cashSaleDetailList.get(i);
-                String codart = (String)row[0];
-                Long total = (Long) row[1];
-                if (inventoryPeriod.getProductItemCode().equals(codart)) {
-                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 6));
-                }
-            }
-
-            /** Pedidos **/
-            for (int i = 0; i < orderDetailList.size(); i++) {
-                Object[] row = (Object[]) orderDetailList.get(i);
-                String codart = (String)row[0];
-                Long total = (Long) row[1];
-                if (inventoryPeriod.getProductItemCode().equals(codart)) {
-                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 6));
-                }
-            }
-
-            /** Añade a la lista Todos los articulos ó solo los con movimiento, segun se elija en la vista**/
-            if (articlesWithMovement){ // Articulos solo con Movimiento o inventario inicial
+            if (articlesWithMovement) {
                 if (data.getInitialAmount().compareTo(BigDecimal.ZERO) > 0 ||
                         data.getEntryAmount().compareTo(BigDecimal.ZERO)   > 0 ||
-                        data.getOutputAmount().compareTo(BigDecimal.ZERO)  > 0){
-                    //beanCollection.add(data);
+                        data.getOutputAmount().compareTo(BigDecimal.ZERO)  > 0) {
                     beanCollection2.add(data);
                 }
-            }else {
-                //beanCollection.add(data);
+            } else {
                 beanCollection2.add(data);
             }
         }
 
-        /*for (CollectionData data:beanCollection){
-            data.setBalance(BigDecimalUtil.sum(data.getInitialAmount(), data.getEntryAmount(), 6));
-            data.setBalance(BigDecimalUtil.subtract(data.getBalance(), data.getOutputAmount(), 6));
-        }*/
-
-        for (CollectionData data:beanCollection2){
+        for (CollectionData data : beanCollection2) {
             data.setBalance(BigDecimalUtil.sum(data.getInitialAmount(), data.getEntryAmount(), 6));
             data.setBalance(BigDecimalUtil.subtract(data.getBalance(), data.getOutputAmount(), 6));
         }
 
-        // Ordenamiento por producto
-        /*Collections.sort(beanCollection2, new Comparator<CollectionData>() {
-            @Override
-            public int compare(CollectionData o1, CollectionData o2) {
-                return o1.getProductName().compareTo(o2.getProductName());
-            }
-        });*/
-
-        // Ordenamiento por Subgroup y producto
         Collections.sort(beanCollection2, new Comparator<CollectionData>() {
             @Override
             public int compare(CollectionData o1, CollectionData o2) {
-                // Primero, compara por Subgroup
                 int subgroupComparison = o1.getSubgroupName().compareTo(o2.getSubgroupName());
-
-                // Si los Subgroup son iguales, compara por ProductName
                 if (subgroupComparison == 0) {
                     return o1.getProductName().compareTo(o2.getProductName());
                 }
-
-                // Si los Subgroup no son iguales, retorna el resultado de la comparación por Subgroup
                 return subgroupComparison;
             }
         });
 
-
-
-        //return beanCollection;
         return beanCollection2;
     }
 
@@ -795,111 +779,141 @@ public class ProductInventoryReportAction extends GenericReportAction {
         calendar.setTime(initDate);
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         initDate = calendar.getTime();
-        /** ---- **/
 
         Collection<CollectionData> beanCollection = new ArrayList();
-        /** Inventario inicio gestion ok **/
-        List<InitialInventory> initialInventoryList   = productInventoryService.findInitialInventory(warehouseCode, DateUtils.getCurrentYear(startDate).toString());
-        /** Vales de movimiento **/
+        List<InitialInventory> initialInventoryList = productInventoryService.findInitialInventory(warehouseCode, DateUtils.getCurrentYear(startDate).toString());
+
         List<MovementDetail> movementDetailList;
         if (warehouse.getWarehouseCode().equals("2"))
             movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeNull(warehouseCode, firstDate, initDate, null);
         else
             movementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouseCode, firstDate, initDate, null);
 
-        /** Ordenes de produccion **/
         List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(firstDate, initDate);
         List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(firstDate, initDate);
-        /** Ventas al contado y pedidos **/
         List cashSaleDetailList = articleOrderService.findCashSaleDetailListGroupBy(firstDate, initDate);
         List orderDetailList    = articleOrderService.findCustomerOrderDetailListGroupBy(firstDate, initDate);
 
-        /** Inventario inicial inv_inicio **/
-        for (InitialInventory initialInventory:initialInventoryList){
+        /** Pre-calcular HashMaps para lookups O(1) **/
+        // Ordenes de produccion por codigo
+        Map<String, BigDecimal> prodOrderEntryMap = new HashMap<String, BigDecimal>();
+        Map<String, BigDecimal> prodOrderQtyMap = new HashMap<String, BigDecimal>();
+        Map<String, BigDecimal> prodOrderCostMap = new HashMap<String, BigDecimal>();
+        for (ProductionOrder po : productionOrderList) {
+            String code = po.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode();
+            BigDecimal prev = prodOrderEntryMap.get(code);
+            prodOrderEntryMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, BigDecimalUtil.toBigDecimal(po.getProducedAmount()), 2));
+            BigDecimal prevQty = prodOrderQtyMap.get(code);
+            prodOrderQtyMap.put(code, BigDecimalUtil.sum(prevQty != null ? prevQty : BigDecimal.ZERO, BigDecimalUtil.toBigDecimal(po.getProducedAmount()), 6));
+            BigDecimal prevCost = prodOrderCostMap.get(code);
+            prodOrderCostMap.put(code, BigDecimalUtil.sum(prevCost != null ? prevCost : BigDecimal.ZERO, BigDecimalUtil.toBigDecimal(po.getTotalCostProduction()), 6));
+        }
+
+        // Reprocesos por codigo
+        Map<String, BigDecimal> reprocessMap = new HashMap<String, BigDecimal>();
+        for (BaseProduct baseProduct : baseProductList) {
+            for (SingleProduct singleProduct : baseProduct.getSingleProducts()) {
+                String code = singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode();
+                BigDecimal prev = reprocessMap.get(code);
+                reprocessMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 2));
+            }
+        }
+
+        // Movimientos entrada/salida, cantidad y monto por codigo
+        Map<String, BigDecimal> movEntryMap = new HashMap<String, BigDecimal>();
+        Map<String, BigDecimal> movOutputMap = new HashMap<String, BigDecimal>();
+        Map<String, BigDecimal> movEntryQtyMap = new HashMap<String, BigDecimal>();
+        Map<String, BigDecimal> movEntryCostMap = new HashMap<String, BigDecimal>();
+        for (MovementDetail detail : movementDetailList) {
+            String code = detail.getProductItemCode();
+            if (detail.getMovementType().equals(MovementDetailType.E)) {
+                BigDecimal prev = movEntryMap.get(code);
+                movEntryMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, detail.getQuantity(), 2));
+                BigDecimal prevQty = movEntryQtyMap.get(code);
+                movEntryQtyMap.put(code, BigDecimalUtil.sum(prevQty != null ? prevQty : BigDecimal.ZERO, BigDecimalUtil.toBigDecimal(detail.getQuantity()), 6));
+                BigDecimal prevCost = movEntryCostMap.get(code);
+                movEntryCostMap.put(code, BigDecimalUtil.sum(prevCost != null ? prevCost : BigDecimal.ZERO, BigDecimalUtil.toBigDecimal(detail.getAmount()), 6));
+            }
+            if (detail.getMovementType().equals(MovementDetailType.S)) {
+                BigDecimal prev = movOutputMap.get(code);
+                movOutputMap.put(code, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, detail.getQuantity(), 2));
+            }
+        }
+
+        // Ventas al contado por codigo
+        Map<String, BigDecimal> cashSaleMap = new HashMap<String, BigDecimal>();
+        for (int i = 0; i < cashSaleDetailList.size(); i++) {
+            Object[] row = (Object[]) cashSaleDetailList.get(i);
+            cashSaleMap.put((String) row[0], BigDecimalUtil.toBigDecimal((Long) row[1]));
+        }
+
+        // Pedidos por codigo
+        Map<String, BigDecimal> orderMap = new HashMap<String, BigDecimal>();
+        for (int i = 0; i < orderDetailList.size(); i++) {
+            Object[] row = (Object[]) orderDetailList.get(i);
+            orderMap.put((String) row[0], BigDecimalUtil.toBigDecimal((Long) row[1]));
+        }
+
+        /** Iterar inventario inicial con lookups O(1) **/
+        for (InitialInventory initialInventory : initialInventoryList) {
+
+            String code = initialInventory.getProductItemCode();
+
             CollectionData data = new CollectionData(
                     initialInventory.getProductItem().getSubGroup().getName(),
-                    initialInventory.getProductItemCode(),
+                    code,
                     initialInventory.getProductItem().getName(),
                     initialInventory.getProductItem().getUsageMeasureCode(),
                     initialInventory.getQuantity(),
-                    //kardexProductMovementAction.calculateInitialAmountToKardex(initialInventory.getProductItemCode(), startDate),
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
                     initialInventory.getUnitCost());
 
-            /** Ordenes de produccion **/
-            for (ProductionOrder productionOrder:productionOrderList){
-                if (initialInventory.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
-                    data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 2));
-                }
-            }
-            /** Reprocesos **/
-            for (BaseProduct baseProduct:baseProductList){
-                for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
-                    if (initialInventory.getProductItemCode().equals(singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode())){
-                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 2));
-                    }
-                }
+            // Entradas: ordenes de produccion
+            if (prodOrderEntryMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), prodOrderEntryMap.get(code), 2));
 
-            }
+            // Entradas: reprocesos
+            if (reprocessMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), reprocessMap.get(code), 2));
 
-            /** Sum Entry an Output **/
-            BigDecimal quantity  = BigDecimal.ZERO;
-            BigDecimal totalCost = BigDecimal.ZERO;
-            for (MovementDetail detail:movementDetailList){
-                if (initialInventory.getProductItemCode().equals(detail.getProductItemCode())) {
-                    if (detail.getMovementType().equals(MovementDetailType.E)) {
-                        data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), detail.getQuantity(), 2));
+            // Entradas: movimientos
+            if (movEntryMap.containsKey(code))
+                data.setEntryAmount(BigDecimalUtil.sum(data.getEntryAmount(), movEntryMap.get(code), 2));
 
-                        quantity  = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(detail.getQuantity()), 6);
-                        totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(detail.getAmount()), 6);
-                        if (quantity.doubleValue()>0) data.setUnitCost(BigDecimalUtil.divide(totalCost, quantity, 2));
-
-                    }
-                    if (detail.getMovementType().equals(MovementDetailType.S))
-                        data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), detail.getQuantity(), 2));
-                }
+            // Unit cost por movimientos de entrada
+            if (movEntryQtyMap.containsKey(code)) {
+                BigDecimal qty = movEntryQtyMap.get(code);
+                BigDecimal cost = movEntryCostMap.get(code);
+                if (qty.doubleValue() > 0) data.setUnitCost(BigDecimalUtil.divide(cost, qty, 2));
             }
 
-            for (int i = 0; i < cashSaleDetailList.size(); i++) {
-                Object[] row = (Object[]) cashSaleDetailList.get(i);
-                String codart = (String)row[0];
-                Long total = (Long) row[1];
-                if (initialInventory.getProductItemCode().equals(codart)) {
-                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 2));
-                }
-            }
+            // Salidas: movimientos
+            if (movOutputMap.containsKey(code))
+                data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), movOutputMap.get(code), 2));
 
-            for (int i = 0; i < orderDetailList.size(); i++) {
-                Object[] row = (Object[]) orderDetailList.get(i);
-                String codart = (String)row[0];
-                Long total = (Long) row[1];
-                if (initialInventory.getProductItemCode().equals(codart)) {
-                    data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), BigDecimalUtil.toBigDecimal(total), 2));
-                }
-            }
+            // Salidas: ventas al contado
+            if (cashSaleMap.containsKey(code))
+                data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), cashSaleMap.get(code), 2));
 
-            /** Unit cost **/
-            quantity  = BigDecimal.ZERO;
-            totalCost = BigDecimal.ZERO;
-            for (ProductionOrder productionOrder:productionOrderList){
-                if (initialInventory.getProductItemCode().equals(productionOrder.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode())){
-                    quantity  = BigDecimalUtil.sum(quantity, BigDecimalUtil.toBigDecimal(productionOrder.getProducedAmount()), 6);
-                    totalCost = BigDecimalUtil.sum(totalCost, BigDecimalUtil.toBigDecimal(productionOrder.getTotalCostProduction()), 6);
+            // Salidas: pedidos
+            if (orderMap.containsKey(code))
+                data.setOutputAmount(BigDecimalUtil.sum(data.getOutputAmount(), orderMap.get(code), 2));
 
-                    if (quantity.doubleValue()>0) data.setUnitCost(BigDecimalUtil.divide(totalCost, quantity, 2));
-
-                }
+            // Unit cost por ordenes de produccion (sobreescribe si hay datos)
+            if (prodOrderQtyMap.containsKey(code)) {
+                BigDecimal qty = prodOrderQtyMap.get(code);
+                BigDecimal cost = prodOrderCostMap.get(code);
+                if (qty.doubleValue() > 0) data.setUnitCost(BigDecimalUtil.divide(cost, qty, 2));
             }
 
             beanCollection.add(data);
         }
 
-        for (CollectionData data:beanCollection){
+        for (CollectionData data : beanCollection) {
             data.setBalance(BigDecimalUtil.sum(data.getInitialAmount(), data.getEntryAmount(), 2));
             data.setBalance(BigDecimalUtil.subtract(data.getBalance(), data.getOutputAmount(), 2));
-
             data.setValuedBalance(BigDecimalUtil.multiply(data.getBalance(), data.getUnitCost(), 2));
         }
 
@@ -1459,6 +1473,6 @@ public class ProductInventoryReportAction extends GenericReportAction {
     }
 
     public void cleanSubGroupField() {
-        setGroup(null);
+        setSubGroup(null);
     }
 }

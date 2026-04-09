@@ -261,4 +261,22 @@ public class XProductionServiceBean implements XProductionService {
         return resultList;
     }
 
+    public List<XSupply> getAllRawMaterialInProduction(Date initDate, Date endDate){
+
+        List<XSupply> resultList = em.createQuery("select s " +
+                        " from XSupply s " +
+                        " left join s.production pr " +
+                        " left join pr.productionPlan pl " +
+                        " left join s.productItem p " +
+                        " left join p.warehouse w " +
+                        " where pl.date between :initDate and :endDate " +
+                        " and w.warehouseType = :warehouseType ")
+                .setParameter("initDate", initDate)
+                .setParameter("endDate", endDate)
+                .setParameter("warehouseType", WarehouseType.RAW_MATERIAL)
+                .getResultList();
+
+        return resultList;
+    }
+
 }

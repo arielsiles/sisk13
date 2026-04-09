@@ -1,0 +1,182 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Reports.kardex.extendedInventoryReport.titleReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="70%"/>
+
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="extendedInventoryReportForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['Reports.kardex.extendedInventoryReport.titleReport']}
+                </f:facet>
+
+                <s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryManagement.warehouse']}</ui:define>
+                    <app:quickSearch id="quickSearchWarehouse"
+                                     textValue="extendedInventoryReportAction.warehouse.warehouseCode"
+                                     value="#{extendedInventoryReportAction.warehouse}"
+                                     searchField="warehouseCode"
+                                     alias="warehouse"
+                                     reRender="warehouseField"
+                                     tabindex="3">
+                    </app:quickSearch>
+                    <app:selectPopUp id="warehouse"
+                                     textValue="#{extendedInventoryReportAction.warehouse.name}"
+                                     value="#{extendedInventoryReportAction.warehouse}"
+                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(productItemCostUnitReportAction.executorUnit)"
+                                     clearAction="#{extendedInventoryReportAction.cleanWarehouseField()}"
+                                     searchModalPanel="warehouseModalPanel"
+                                     dataModel="#{warehouseSearchDataModel}"
+                                     reRender="warehouseField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{extendedInventoryReportAction.startDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="1">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.kardex.movement.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{extendedInventoryReportAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="startDate"
+                                                forLabel="#{messages['Reports.kardex.movement.startDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="groupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.report.group']}</ui:define>
+                    <app:quickSearch id="quickSearchGroup"
+                                     textValue="#{extendedInventoryReportAction.group.groupCode}"
+                                     value="#{extendedInventoryReportAction.group}"
+                                     searchField="groupCode"
+                                     reRender="groupField"
+                                     tabindex="9"/>
+                    <app:selectPopUp id="group"
+                                     textValue="#{extendedInventoryReportAction.group.fullName}"
+                                     value="#{extendedInventoryReportAction.group}"
+                                     dataModel="#{groupSearchDataModel}"
+                                     clearAction="#{extendedInventoryReportAction.cleanGroupField()}"
+                                     searchModalPanel="groupListModalPanel"
+                                     reRender="groupField"
+                                     hotKeySelect="alt+3">
+                    </app:selectPopUp>
+                </s:decorate>
+
+                <s:decorate id="subGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.report.subGroup']}</ui:define>
+                    <app:quickSearch id="quickSearchSubGroup"
+                                     textValue="#{extendedInventoryReportAction.subGroup.subGroupCode}"
+                                     value="#{extendedInventoryReportAction.subGroup}"
+                                     searchField="subGroupCode"
+                                     reRender="subGroupField"
+                                     tabindex="10"/>
+                    <app:selectPopUp id="subGroup"
+                                     textValue="#{extendedInventoryReportAction.subGroup.name}"
+                                     value="#{extendedInventoryReportAction.subGroup}"
+                                     dataModel="#{subGroupSearchDataModel}"
+                                     clearAction="#{extendedInventoryReportAction.cleanSubGroupField()}"
+                                     searchModalPanel="subGroupListModalPanel"
+                                     reRender="subGroupField"
+                                     hotKeySelect="alt+4">
+                    </app:selectPopUp>
+                </s:decorate>
+
+            </rich:panel>
+
+            <rich:panel id="reportDefaultOptionsPanel">
+                <f:facet name="header">
+                    #{messages['Reports.options']}
+                </f:facet>
+                <s:decorate id="formatField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Reports.format']}</ui:define>
+                    <h:selectOneMenu id="reportFormat"
+                                     value="#{extendedInventoryReportAction.reportFormat}"
+                                     styleClass="input"
+                                     tabindex="6">
+                        <f:selectItem itemLabel="PDF" itemValue="#{enumerationUtil.getEnumValue('com.encens.khipus.action.reports.ReportFormat', 'PDF')}"/>
+                        <f:selectItem itemLabel="EXCEL" itemValue="#{enumerationUtil.getEnumValue('com.encens.khipus.action.reports.ReportFormat', 'XLS')}"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{extendedInventoryReportAction.generateReport}"
+                                 styleClass="button"
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                    <s:defaultAction/>
+                </h:commandButton>
+            </div>
+
+        </h:form>
+
+        <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+            <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+            <ui:param name="dialogId" value="warehouseModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{extendedInventoryReportAction.setWarehouse(warehouseItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   reRender="warehouseField"
+                                   oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="groupListModalPanelContainer" template="/warehouse/groupListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{extendedInventoryReportAction.setGroup(groupItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="groupField"
+                                   oncomplete="Richfaces.hideModalPanel('groupListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="subGroupListModalPanelContainer" template="/warehouse/subGroupListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{extendedInventoryReportAction.setSubGroup(subGroupItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="subGroupField"
+                                   oncomplete="Richfaces.hideModalPanel('subGroupListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

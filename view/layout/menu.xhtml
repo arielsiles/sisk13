@@ -305,6 +305,14 @@
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('EXTENDED_INVENTORY_REPORT','VIEW')}">
+                    <s:link view="/warehouse/extendedInventoryReport.xhtml"
+                            value="#{messages['menu.warehouse.report.extendedInventoryReport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
                                rendered="#{s:hasPermission('PRODUCT_MOVEMENT_REPORT','VIEW')}"> <!-- cambiar permisos -->
                     <s:link view="/warehouse/kardexProductMovementReport.xhtml"
                             value="#{messages['Reports.kardex.movement.menu.title']}"

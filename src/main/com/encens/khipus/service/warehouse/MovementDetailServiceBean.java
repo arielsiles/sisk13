@@ -423,11 +423,10 @@ public class MovementDetailServiceBean implements MovementDetailService {
     @SuppressWarnings(value = "unchecked")
     public List<MovementDetail> findListMovementByWarehouseAndType(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType){
         return em.createNamedQuery("MovementDetail.findListMovementByWarehouseAndType")
-                /*.setParameter("warehouseCode", warehouseCode)*/
+                .setParameter("warehouseCode", warehouseCode)
                 .setParameter("startDate", startDate)
                 .setParameter("endDate", endDate)
                 .setParameter("state", WarehouseVoucherState.APR)
-                /*.setParameter("movementType", movementDetailType)*/
                 .getResultList();
     }
 
