@@ -144,8 +144,12 @@ public class ProductInventoryReportAction extends GenericReportAction {
             if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
                 exportarExcel(beanCollection, companyConfiguration, groupName);
             } else {
-                File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+                File jrxmlFile = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jrxml"));
+                String jrxmlContent = new String(java.nio.file.Files.readAllBytes(jrxmlFile.toPath()), "UTF-8");
+                jrxmlContent = preprocessJrxml(jrxmlContent);
+                java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(jrxmlContent.getBytes("UTF-8"));
+                net.sf.jasperreports.engine.JasperReport jasperReport = net.sf.jasperreports.engine.JasperCompileManager.compileReport(bais);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JRBeanCollectionDataSource(beanCollection));
                 exportarPDF(jasperPrint);
             }
         }catch (Exception e){
@@ -192,8 +196,12 @@ public class ProductInventoryReportAction extends GenericReportAction {
             if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
                 exportarExcelAgrupado(beanCollection, companyConfiguration, period);
             } else {
-                File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryGroupedReport.jasper"));
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+                File jrxmlFile = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryGroupedReport.jrxml"));
+                String jrxmlContent = new String(java.nio.file.Files.readAllBytes(jrxmlFile.toPath()), "UTF-8");
+                jrxmlContent = preprocessJrxml(jrxmlContent);
+                java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(jrxmlContent.getBytes("UTF-8"));
+                net.sf.jasperreports.engine.JasperReport jasperReport = net.sf.jasperreports.engine.JasperCompileManager.compileReport(bais);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JRBeanCollectionDataSource(beanCollection));
                 exportarPDF(jasperPrint);
             }
         }catch (Exception e){
@@ -238,8 +246,12 @@ public class ProductInventoryReportAction extends GenericReportAction {
             if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
                 exportarExcel(beanCollection, companyConfiguration, subGroupName);
             } else {
-                File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jasper"));
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+                File jrxmlFile = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryReport.jrxml"));
+                String jrxmlContent = new String(java.nio.file.Files.readAllBytes(jrxmlFile.toPath()), "UTF-8");
+                jrxmlContent = preprocessJrxml(jrxmlContent);
+                java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(jrxmlContent.getBytes("UTF-8"));
+                net.sf.jasperreports.engine.JasperReport jasperReport = net.sf.jasperreports.engine.JasperCompileManager.compileReport(bais);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JRBeanCollectionDataSource(beanCollection));
                 exportarPDF(jasperPrint);
             }
         }catch (Exception e){
@@ -1026,6 +1038,42 @@ public class ProductInventoryReportAction extends GenericReportAction {
     }
 
 
+    /**
+     * Preprocesa jrxml para compatibilidad entre iReport 5.6 y JasperReports 3.7:
+     * - Elimina uuid (no soportado en JR 3.7)
+     * - Agrega class a textFieldExpression (requerido en JR 3.7)
+     */
+    private String preprocessJrxml(String jrxmlContent) {
+        jrxmlContent = jrxmlContent.replaceAll(" uuid=\"[^\"]*\"", "");
+        // BigDecimal fields
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$F{initialAmount}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$F{initialAmount}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$F{entryAmount}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$F{entryAmount}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$F{outputAmount}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$F{outputAmount}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$F{balance}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$F{balance}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$F{valuedBalance}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$F{valuedBalance}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$F{initialBalance}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$F{initialBalance}");
+        // BigDecimal variables
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{totalEntry}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{totalEntry}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{totalOutput}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{totalOutput}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{totalBalance}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{totalBalance}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{totalInitial}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{totalInitial}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{totalValuedBalance}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{totalValuedBalance}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{groupInitial}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{groupInitial}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{groupEntry}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{groupEntry}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{groupOutput}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{groupOutput}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{groupBalance}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{groupBalance}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{grandTotalEntry}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{grandTotalEntry}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{grandTotalOutput}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{grandTotalOutput}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$P{grandTotalBalance}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$P{grandTotalBalance}");
+        // Date fields
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$P{startDate}", "<textFieldExpression class=\"java.util.Date\"><![CDATA[$P{startDate}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$P{endDate}", "<textFieldExpression class=\"java.util.Date\"><![CDATA[$P{endDate}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$F{date}", "<textFieldExpression class=\"java.util.Date\"><![CDATA[$F{date}");
+        // All remaining without class are String
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[", "<textFieldExpression class=\"java.lang.String\"><![CDATA[");
+        return jrxmlContent;
+    }
+
     public void exportarExcel(Collection<CollectionData> beanCollection, CompanyConfiguration companyConfiguration, String groupName) throws IOException {
 
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
@@ -1187,15 +1235,47 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         // Datos agrupados por subgroupName
         String currentGroup = null;
+        BigDecimal totalInicial = BigDecimal.ZERO;
         BigDecimal totalEntradas = BigDecimal.ZERO;
         BigDecimal totalSalidas = BigDecimal.ZERO;
         BigDecimal totalSaldo = BigDecimal.ZERO;
+
+        BigDecimal grpInicial = BigDecimal.ZERO;
+        BigDecimal grpEntradas = BigDecimal.ZERO;
+        BigDecimal grpSalidas = BigDecimal.ZERO;
+        BigDecimal grpSaldo = BigDecimal.ZERO;
+
+        HSSFCellStyle numberBoldStyle = workbook.createCellStyle();
+        numberBoldStyle.setDataFormat(numFormat.getFormat("#,##0.00"));
+        numberBoldStyle.setFont(headerFont);
 
         for (CollectionData data : beanCollection) {
 
             // Cabecera de grupo
             String subgroup = data.getSubgroupName() != null ? data.getSubgroupName() : "";
             if (!subgroup.equals(currentGroup)) {
+                // Subtotal del grupo anterior
+                if (currentGroup != null) {
+                    row = sheet.createRow(rowNum++);
+                    HSSFCell sgInicialCell = row.createCell(3);
+                    sgInicialCell.setCellValue(grpInicial.doubleValue());
+                    sgInicialCell.setCellStyle(numberBoldStyle);
+                    HSSFCell sgEntryCell = row.createCell(4);
+                    sgEntryCell.setCellValue(grpEntradas.doubleValue());
+                    sgEntryCell.setCellStyle(numberBoldStyle);
+                    HSSFCell sgOutputCell = row.createCell(5);
+                    sgOutputCell.setCellValue(grpSalidas.doubleValue());
+                    sgOutputCell.setCellStyle(numberBoldStyle);
+                    HSSFCell sgBalanceCell = row.createCell(6);
+                    sgBalanceCell.setCellValue(grpSaldo.doubleValue());
+                    sgBalanceCell.setCellStyle(numberBoldStyle);
+                    rowNum++;
+                }
+                grpInicial = BigDecimal.ZERO;
+                grpEntradas = BigDecimal.ZERO;
+                grpSalidas = BigDecimal.ZERO;
+                grpSaldo = BigDecimal.ZERO;
+
                 currentGroup = subgroup;
                 row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(currentGroup);
@@ -1233,27 +1313,60 @@ public class ProductInventoryReportAction extends GenericReportAction {
             balanceCell.setCellValue(data.getBalance() != null ? data.getBalance().doubleValue() : 0);
             balanceCell.setCellStyle(numberStyle);
 
-            totalEntradas = BigDecimalUtil.sum(totalEntradas, data.getEntryAmount() != null ? data.getEntryAmount() : BigDecimal.ZERO, 2);
-            totalSalidas = BigDecimalUtil.sum(totalSalidas, data.getOutputAmount() != null ? data.getOutputAmount() : BigDecimal.ZERO, 2);
-            totalSaldo = BigDecimalUtil.sum(totalSaldo, data.getBalance() != null ? data.getBalance() : BigDecimal.ZERO, 2);
+            BigDecimal ini = data.getInitialAmount() != null ? data.getInitialAmount() : BigDecimal.ZERO;
+            BigDecimal ent = data.getEntryAmount() != null ? data.getEntryAmount() : BigDecimal.ZERO;
+            BigDecimal sal = data.getOutputAmount() != null ? data.getOutputAmount() : BigDecimal.ZERO;
+            BigDecimal sld = data.getBalance() != null ? data.getBalance() : BigDecimal.ZERO;
+
+            grpInicial = BigDecimalUtil.sum(grpInicial, ini, 2);
+            grpEntradas = BigDecimalUtil.sum(grpEntradas, ent, 2);
+            grpSalidas = BigDecimalUtil.sum(grpSalidas, sal, 2);
+            grpSaldo = BigDecimalUtil.sum(grpSaldo, sld, 2);
+
+            totalInicial = BigDecimalUtil.sum(totalInicial, ini, 2);
+            totalEntradas = BigDecimalUtil.sum(totalEntradas, ent, 2);
+            totalSalidas = BigDecimalUtil.sum(totalSalidas, sal, 2);
+            totalSaldo = BigDecimalUtil.sum(totalSaldo, sld, 2);
         }
 
-        // Fila de totales
+        // Subtotal del ultimo grupo
+        if (currentGroup != null) {
+            row = sheet.createRow(rowNum++);
+            HSSFCell sgInicialCell = row.createCell(3);
+            sgInicialCell.setCellValue(grpInicial.doubleValue());
+            sgInicialCell.setCellStyle(numberBoldStyle);
+            HSSFCell sgEntryCell = row.createCell(4);
+            sgEntryCell.setCellValue(grpEntradas.doubleValue());
+            sgEntryCell.setCellStyle(numberBoldStyle);
+            HSSFCell sgOutputCell = row.createCell(5);
+            sgOutputCell.setCellValue(grpSalidas.doubleValue());
+            sgOutputCell.setCellStyle(numberBoldStyle);
+            HSSFCell sgBalanceCell = row.createCell(6);
+            sgBalanceCell.setCellValue(grpSaldo.doubleValue());
+            sgBalanceCell.setCellStyle(numberBoldStyle);
+        }
+
+        // Fila de totales generales
+        rowNum++;
         row = sheet.createRow(rowNum++);
         row.createCell(0).setCellValue("TOTALES");
         row.getCell(0).setCellStyle(headerStyle);
 
+        HSSFCell tInicialCell = row.createCell(3);
+        tInicialCell.setCellValue(totalInicial.doubleValue());
+        tInicialCell.setCellStyle(numberBoldStyle);
+
         HSSFCell tEntryCell = row.createCell(4);
         tEntryCell.setCellValue(totalEntradas.doubleValue());
-        tEntryCell.setCellStyle(numberStyle);
+        tEntryCell.setCellStyle(numberBoldStyle);
 
         HSSFCell tOutputCell = row.createCell(5);
         tOutputCell.setCellValue(totalSalidas.doubleValue());
-        tOutputCell.setCellStyle(numberStyle);
+        tOutputCell.setCellStyle(numberBoldStyle);
 
         HSSFCell tBalanceCell = row.createCell(6);
         tBalanceCell.setCellValue(totalSaldo.doubleValue());
-        tBalanceCell.setCellStyle(numberStyle);
+        tBalanceCell.setCellStyle(numberBoldStyle);
 
         // Autoajustar columnas
         for (int i = 0; i < 7; i++) {
