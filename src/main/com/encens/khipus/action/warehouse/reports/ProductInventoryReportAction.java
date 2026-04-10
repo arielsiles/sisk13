@@ -176,7 +176,6 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         String filterLabel = warehouse.getName();
         if (group != null) filterLabel += " | " + group.getName();
-        if (subGroup != null) filterLabel += " | " + subGroup.getName();
 
         String period = "Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy");
         HashMap parameters = new HashMap();
@@ -1241,6 +1240,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         row.createCell(0).setCellValue("ALMACEN:");
         row.getCell(0).setCellStyle(headerStyle);
         row.createCell(1).setCellValue(filterName);
+        row.getCell(1).setCellStyle(headerStyle);
 
         rowNum++; // fila vacia
 
