@@ -384,6 +384,33 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
             balanceMap.put(code, BigDecimalUtil.sum(current, product.getQuantity(), 2));
         }
 
+        // XProduccion (entrada)
+        List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByDate(firstDate, endInitDate);
+        for (XProductionProduct product : xproductionProductList) {
+            String code = product.getProductItemCode();
+            BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
+            balanceMap.put(code, BigDecimalUtil.sum(current, product.getQuantity(), 2));
+        }
+
+        // Acopio MP (entrada)
+        List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(firstDate, endInitDate);
+        for (CollectMaterial cm : collectMaterialList) {
+            String code = cm.getMetaProduct().getProductItemCode();
+            BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
+            balanceMap.put(code, BigDecimalUtil.sum(current, cm.getBalanceWeight(), 2));
+        }
+
+        // Materia prima en XProduccion (salida)
+        if (warehouse.getWarehouseType().equals(WarehouseType.RAW_MATERIAL)) {
+            List rawMaterialList = xproductionService.getSumRawMaterialInProduction(firstDate, endInitDate);
+            for (int i = 0; i < rawMaterialList.size(); i++) {
+                Object[] row = (Object[]) rawMaterialList.get(i);
+                String code = (String) row[0];
+                BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
+                balanceMap.put(code, BigDecimalUtil.subtract(current, (BigDecimal) row[1], 2));
+            }
+        }
+
         // Ventas al contado
         List cashSaleDetailList = articleOrderService.findCashSaleDetailListGroupBy(firstDate, endInitDate);
         for (int i = 0; i < cashSaleDetailList.size(); i++) {
@@ -435,6 +462,18 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         parameters.put("period", period);
         parameters.put("warehouse", warehouse.getFullName() + filterName);
 
+        // Calcular total de saldos finales
+        BigDecimal grandTotalBalance = BigDecimal.ZERO;
+        for (ArticleReportData article : reportData) {
+            if (article.getMovements() != null && !article.getMovements().isEmpty()) {
+                BigDecimal lastBalance = article.getMovements().get(article.getMovements().size() - 1).getBalance();
+                grandTotalBalance = BigDecimalUtil.sum(grandTotalBalance, lastBalance, 2);
+            } else {
+                grandTotalBalance = BigDecimalUtil.sum(grandTotalBalance, article.getInitialBalance(), 2);
+            }
+        }
+        parameters.put("grandTotalBalance", grandTotalBalance);
+
         File jrxmlFile = new File(JSFUtil.getRealPath("/warehouse/reports/extendedInventoryReport.jrxml"));
         String jrxmlContent = new String(java.nio.file.Files.readAllBytes(jrxmlFile.toPath()), "UTF-8");
         // Compatibilidad: iReport 5.6 agrega uuid (no soportado en JR 3.7) y quita class de textFieldExpression (requerido en JR 3.7)
@@ -448,6 +487,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{totalOutput}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{totalOutput}");
         jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{grandTotalEntry}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{grandTotalEntry}");
         jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{grandTotalOutput}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$V{grandTotalOutput}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$P{grandTotalBalance}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$P{grandTotalBalance}");
         // Date field
         jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$F{date}", "<textFieldExpression class=\"java.util.Date\"><![CDATA[$F{date}");
         // All remaining textFieldExpression without class are String
@@ -524,6 +564,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
 
         BigDecimal grandTotalEntry = BigDecimal.ZERO;
         BigDecimal grandTotalOutput = BigDecimal.ZERO;
+        BigDecimal grandTotalBalance = BigDecimal.ZERO;
 
         for (ArticleReportData article : reportData) {
 
@@ -613,6 +654,13 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
 
             grandTotalEntry = BigDecimalUtil.sum(grandTotalEntry, articleTotalEntry, 2);
             grandTotalOutput = BigDecimalUtil.sum(grandTotalOutput, articleTotalOutput, 2);
+            // Saldo final del articulo
+            if (article.getMovements() != null && !article.getMovements().isEmpty()) {
+                BigDecimal lastBalance = article.getMovements().get(article.getMovements().size() - 1).getBalance();
+                grandTotalBalance = BigDecimalUtil.sum(grandTotalBalance, lastBalance, 2);
+            } else {
+                grandTotalBalance = BigDecimalUtil.sum(grandTotalBalance, article.getInitialBalance(), 2);
+            }
 
             rowNum++; // fila vacia separadora
         }
@@ -627,6 +675,9 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         HSSFCell gtOutputCell = row.createCell(2);
         gtOutputCell.setCellValue(grandTotalOutput.doubleValue());
         gtOutputCell.setCellStyle(numberBoldStyle);
+        HSSFCell gtBalanceCell = row.createCell(3);
+        gtBalanceCell.setCellValue(grandTotalBalance.doubleValue());
+        gtBalanceCell.setCellStyle(numberBoldStyle);
 
         // Anchos fijos de columnas (en unidades de 1/256 de caracter)
         sheet.setColumnWidth(0, 18 * 256);

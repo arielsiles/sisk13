@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="extendedInventoryReport" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="792" leftMargin="25" rightMargin="25" topMargin="19" bottomMargin="19" uuid="4fe200b6-d755-4b64-8df3-f92bcba3fd31">
-	<property name="ireport.zoom" value="1.9487171000000019"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="3.4522712143931047"/>
+	<property name="ireport.x" value="85"/>
+	<property name="ireport.y" value="17"/>
 	<parameter name="reportTitle" class="java.lang.String"/>
 	<parameter name="period" class="java.lang.String"/>
 	<parameter name="warehouse" class="java.lang.String"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="locationName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
+	<parameter name="grandTotalBalance" class="java.math.BigDecimal"/>
 	<field name="articleCode" class="java.lang.String"/>
 	<field name="articleName" class="java.lang.String"/>
 	<field name="unit" class="java.lang.String"/>
@@ -188,7 +189,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Almacen: " + $P{warehouse}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{warehouse}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -277,6 +278,13 @@
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{grandTotalOutput}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="236" y="2" width="80" height="14" uuid="541a7805-6b39-42ef-991c-daed77e32b1d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{grandTotalBalance}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
