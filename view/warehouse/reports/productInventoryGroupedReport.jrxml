@@ -11,6 +11,7 @@
 	<parameter name="systemName" class="java.lang.String"/>
 	<parameter name="locationName" class="java.lang.String"/>
 	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="filterLabel" class="java.lang.String"/>
 	<field name="subgroupName" class="java.lang.String"/>
 	<field name="code" class="java.lang.String"/>
 	<field name="productName" class="java.lang.String"/>
@@ -162,7 +163,7 @@
 		</groupFooter>
 	</group>
 	<title>
-		<band height="46" splitType="Stretch">
+		<band height="56" splitType="Stretch">
 			<textField>
 				<reportElement x="126" y="26" width="314" height="11"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -197,6 +198,20 @@
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{period}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="46" width="45" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ALMACEN:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="51" y="46" width="400" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{filterLabel}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

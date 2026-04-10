@@ -167,16 +167,22 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         Collection<CollectionData> beanCollection = calculateCollectionData2();
 
-        String groupName = "";
         if (group != null) {
             beanCollection = filterByGroup(beanCollection, group);
-            groupName = " - " + group.getName();
         }
+        if (subGroup != null) {
+            beanCollection = filterBySubGroup(beanCollection, subGroup);
+        }
+
+        String filterLabel = warehouse.getName();
+        if (group != null) filterLabel += " | " + group.getName();
+        if (subGroup != null) filterLabel += " | " + subGroup.getName();
 
         String period = "Del " + DateUtils.format(startDate, "dd/MM/yyyy") + " al " + DateUtils.format(endDate, "dd/MM/yyyy");
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("reportTitle", "REPORTE GENERAL DE INVENTARIO - " + warehouse.getName());
+        paramMap.put("reportTitle", "REPORTE GENERAL DE INVENTARIO");
+        paramMap.put("filterLabel", filterLabel);
         paramMap.put("companyName", companyConfiguration.getCompanyName());
         paramMap.put("systemName", companyConfiguration.getSystemName());
         paramMap.put("locationName", companyConfiguration.getLocationName());
@@ -194,7 +200,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         try{
             if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
-                exportarExcelAgrupado(beanCollection, companyConfiguration, period);
+                exportarExcelAgrupado(beanCollection, companyConfiguration, period, filterLabel);
             } else {
                 File jrxmlFile = new File(JSFUtil.getRealPath("/warehouse/reports/productInventoryGroupedReport.jrxml"));
                 String jrxmlContent = new String(java.nio.file.Files.readAllBytes(jrxmlFile.toPath()), "UTF-8");
@@ -1192,7 +1198,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         FacesContext.getCurrentInstance().responseComplete();
     }
 
-    public void exportarExcelAgrupado(Collection<CollectionData> beanCollection, CompanyConfiguration companyConfiguration, String period) throws IOException {
+    public void exportarExcelAgrupado(Collection<CollectionData> beanCollection, CompanyConfiguration companyConfiguration, String period, String filterName) throws IOException {
 
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Inventario Agrupado");
@@ -1225,11 +1231,16 @@ public class ProductInventoryReportAction extends GenericReportAction {
         row.createCell(0).setCellValue(companyConfiguration.getSystemName());
 
         row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue("REPORTE GENERAL DE INVENTARIO - " + warehouse.getName());
+        row.createCell(0).setCellValue("REPORTE GENERAL DE INVENTARIO");
         row.getCell(0).setCellStyle(headerStyle);
 
         row = sheet.createRow(rowNum++);
         row.createCell(0).setCellValue(period);
+
+        row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue("ALMACEN:");
+        row.getCell(0).setCellStyle(headerStyle);
+        row.createCell(1).setCellValue(filterName);
 
         rowNum++; // fila vacia
 

@@ -100,6 +100,20 @@
                 </s:decorate>
 
 
+                <s:decorate id="subGroupField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductItem.report.subGroup']}</ui:define>
+                    <app:selectPopUp id="subGroup"
+                                     textValue="#{productInventoryReportAction.subGroup.name}"
+                                     value="#{productInventoryReportAction.subGroup}"
+                                     selectAction="#{subGroupSearchDataModel.setGroupCode(productInventoryReportAction.group.groupCode)}"
+                                     dataModel="#{subGroupSearchDataModel}"
+                                     clearAction="#{productInventoryReportAction.cleanSubGroupField()}"
+                                     searchModalPanel="subGroupListModalPanel"
+                                     reRender="subGroupField"
+                                     hotKeySelect="alt+4">
+                    </app:selectPopUp>
+                </s:decorate>
+
                 <s:decorate id="compareFlagField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Reports.inventoryReport.articlesOnlyMovement']}</ui:define>
                     <h:selectBooleanCheckbox id="compareFlag"
@@ -160,6 +174,17 @@
                                    styleClass="select-image-middle"
                                    reRender="groupField"
                                    oncomplete="Richfaces.hideModalPanel('groupListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="subGroupListModalPanelContainer" template="/warehouse/subGroupListModalPanel.xhtml">
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productInventoryReportAction.setSubGroup(subGroupItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="subGroupField"
+                                   oncomplete="Richfaces.hideModalPanel('subGroupListModalPanel');"/>
             </ui:define>
         </s:decorate>
 
