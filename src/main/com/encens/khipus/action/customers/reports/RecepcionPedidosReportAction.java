@@ -201,17 +201,25 @@ public class RecepcionPedidosReportAction {
     @SuppressWarnings("unchecked")
     public List<Territoriotrabajo> getTerritoriosConPedidos() {
         if (fechaEntrega == null) return new ArrayList<Territoriotrabajo>();
-        return em.createQuery(
-                "SELECT t FROM Territoriotrabajo t" +
-                " WHERE t IN (SELECT DISTINCT co.client.territoriotrabajo FROM CustomerOrder co" +
-                " WHERE co.orderDate = :fechaEntrega" +
-                " AND co.state <> :estadoAnulado" +
-                " AND co.saleType = :tipoVenta)" +
-                " ORDER BY t.nombre")
+
+        StringBuilder sub = new StringBuilder();
+        sub.append("SELECT DISTINCT co.client.territoriotrabajo FROM CustomerOrder co JOIN co.articleOrderList ao");
+        sub.append(" WHERE co.orderDate = :fechaEntrega");
+        sub.append(" AND co.state <> :estadoAnulado");
+        sub.append(" AND co.saleType = :tipoVenta");
+        if (warehouse != null) {
+            sub.append(" AND ao.productItem.warehouseCode = :warehouseCode");
+        }
+
+        javax.persistence.Query query = em.createQuery(
+                "SELECT t FROM Territoriotrabajo t WHERE t IN (" + sub + ") ORDER BY t.nombre")
                 .setParameter("fechaEntrega", fechaEntrega, TemporalType.DATE)
                 .setParameter("estadoAnulado", SaleStatus.ANULADO)
-                .setParameter("tipoVenta", SaleTypeEnum.CREDIT)
-                .getResultList();
+                .setParameter("tipoVenta", SaleTypeEnum.CREDIT);
+        if (warehouse != null) {
+            query.setParameter("warehouseCode", warehouse.getId().getWarehouseCode());
+        }
+        return query.getResultList();
     }
 
     public Date getFechaEntrega() {

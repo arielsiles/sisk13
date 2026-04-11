@@ -440,7 +440,18 @@
             </ui:define>
         </s:decorate>
 
-        <rich:modalPanel id="recepcionPedidosModalPanel" width="520" height="430" resizeable="false">
+        <script type="text/javascript">
+            function clearTerritorioCheckboxes() {
+                var container = document.getElementById('recepcionPedidosForm:territorioContainer');
+                if (container) {
+                    var cbs = container.getElementsByTagName('input');
+                    for (var i = 0; i < cbs.length; i++) {
+                        if (cbs[i].type === 'checkbox') cbs[i].checked = false;
+                    }
+                }
+            }
+        </script>
+        <rich:modalPanel id="recepcionPedidosModalPanel" width="480" height="380" resizeable="false">
             <f:facet name="header">Recepci&#243;n de Pedidos</f:facet>
             <f:facet name="controls">
                 <h:panelGroup>
@@ -452,64 +463,73 @@
                 </h:panelGroup>
             </f:facet>
             <h:form id="recepcionPedidosForm">
-                <h:panelGrid columns="2" cellpadding="5" columnClasses="width120,">
-
-                    <h:outputLabel value="Fecha Entrega: *"/>
-                    <a4j:region>
-                        <rich:calendar id="fechaEntregaInput"
-                                       value="#{recepcionPedidosReportAction.fechaEntrega}"
-                                       datePattern="dd/MM/yyyy"
-                                       inputClass="input"
-                                       enableManualInput="true"
-                                       popup="true"
-                                       required="true"
-                                       requiredMessage="La fecha de entrega es requerida">
-                            <a4j:support event="onchanged"
-                                         action="#{recepcionPedidosReportAction.onFechaChanged}"
-                                         reRender="territorioPanel"
-                                         ajaxSingle="true"/>
-                        </rich:calendar>
-                    </a4j:region>
-
-                    <h:outputLabel value="Almac&#233;n: *"/>
-                    <h:selectOneMenu id="warehouseSelect"
-                                     value="#{recepcionPedidosReportAction.warehouse}"
-                                     style="width:250px;" required="true"
-                                     requiredMessage="Seleccione un almac&#233;n">
-                        <s:selectItems value="#{warehouseList}" var="wh"
-                                       label="#{wh.name}"
-                                       noSelectionLabel="-- Seleccione --"
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                    </h:selectOneMenu>
-                </h:panelGrid>
-
-                <a4j:outputPanel id="territorioPanel">
-                    <a4j:status>
-                        <f:facet name="start">
-                            <h:panelGroup style="padding:10px;">
-                                <h:graphicImage value="/img/loading.gif" style="vertical-align:middle;"/>
-                                <h:outputText value=" Cargando territorios..." style="margin-left:5px;"/>
-                            </h:panelGroup>
-                        </f:facet>
-                    </a4j:status>
-                    <h:panelGroup rendered="#{recepcionPedidosReportAction.fechaEntrega != null}">
-                        <h:outputText value="Territorio:" style="font-weight:bold; display:block; margin:5px 0 3px 5px;"/>
-                        <s:div style="max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:5px; margin:0 5px;">
-                            <h:selectManyCheckbox id="territorioSelect"
-                                                  value="#{recepcionPedidosReportAction.selectedTerritorios}"
-                                                  layout="pageDirection">
-                                <s:selectItems value="#{recepcionPedidosReportAction.territoriosConPedidos}" var="terr"
-                                               label="#{terr.nombre}"/>
+                <table cellpadding="4" cellspacing="0" style="width:100%;">
+                    <tr>
+                        <td style="width:110px; text-align:right; white-space:nowrap;"><h:outputText value="Fecha Entrega: *" style="font-weight:bold;"/></td>
+                        <td>
+                            <rich:calendar id="fechaEntregaInput"
+                                           value="#{recepcionPedidosReportAction.fechaEntrega}"
+                                           datePattern="dd/MM/yyyy"
+                                           inputClass="input"
+                                           enableManualInput="true"
+                                           popup="true"
+                                           required="true"
+                                           requiredMessage="La fecha de entrega es requerida">
+                                <a4j:support event="onchanged"
+                                             action="#{recepcionPedidosReportAction.onFechaChanged}"
+                                             reRender="territorioContainer"
+                                             ajaxSingle="true"
+                                             onsubmit="clearTerritorioCheckboxes()"/>
+                            </rich:calendar>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right; white-space:nowrap;"><h:outputText value="Almac&#233;n: *" style="font-weight:bold;"/></td>
+                        <td>
+                            <h:selectOneMenu id="warehouseSelect"
+                                             value="#{recepcionPedidosReportAction.warehouse}"
+                                             style="width:310px;" required="true"
+                                             requiredMessage="Seleccione un almac&#233;n">
+                                <s:selectItems value="#{warehouseList}" var="wh"
+                                               label="#{wh.name}"
+                                               noSelectionLabel="-- Seleccione --"
+                                               hideNoSelectionLabel="false"/>
                                 <s:convertEntity/>
-                            </h:selectManyCheckbox>
-                        </s:div>
-                        <h:outputText value="Sin selecci&#243;n = Todos los territorios"
-                                      style="font-size:10px; color:#888; margin-left:5px;"/>
-                    </h:panelGroup>
-                </a4j:outputPanel>
-
-                <div class="buttons" style="text-align:center; margin-top:10px;">
+                                <a4j:support event="onchange"
+                                             action="#{recepcionPedidosReportAction.onFechaChanged}"
+                                             reRender="territorioContainer"
+                                             ajaxSingle="true"
+                                             onsubmit="clearTerritorioCheckboxes()"/>
+                            </h:selectOneMenu>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right; vertical-align:top; padding-top:8px;"><h:outputText value="Territorio:" style="font-weight:bold;"/></td>
+                        <td>
+                            <a4j:outputPanel id="territorioContainer" layout="block"
+                                             style="height:200px; overflow-y:auto; border:1px solid #bbb; background:#fff; padding:4px;">
+                                <h:panelGroup id="territorioContent">
+                                    <h:panelGroup rendered="#{recepcionPedidosReportAction.fechaEntrega == null}">
+                                        <h:outputText value="Seleccione una fecha para ver los territorios disponibles"
+                                                      style="color:#999; font-style:italic; font-size:11px;"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{recepcionPedidosReportAction.fechaEntrega != null}">
+                                        <h:selectManyCheckbox id="territorioSelect"
+                                                              value="#{recepcionPedidosReportAction.selectedTerritorios}"
+                                                              layout="pageDirection">
+                                            <s:selectItems value="#{recepcionPedidosReportAction.territoriosConPedidos}" var="terr"
+                                                           label="#{terr.nombre}"/>
+                                            <s:convertEntity/>
+                                        </h:selectManyCheckbox>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </a4j:outputPanel>
+                            <h:outputText value="Sin selecci&#243;n = Todos los territorios"
+                                          style="font-size:10px; color:#888;"/>
+                        </td>
+                    </tr>
+                </table>
+                <div class="buttons" style="text-align:center; margin-top:8px;">
                     <h:commandButton id="generateRecepcionBtn"
                                      action="#{recepcionPedidosReportAction.generateReport}"
                                      value="Generar"
