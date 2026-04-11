@@ -193,6 +193,13 @@
                                      value="Imprimir Nota" >
                     </h:commandButton>
 
+                    <a4j:commandButton id="recepcionPedidosBtn"
+                                       value="Recepci&#243;n Pedidos"
+                                       styleClass="button"
+                                       immediate="true"
+                                       oncomplete="Richfaces.showModalPanel('recepcionPedidosModalPanel');"
+                                       reRender="recepcionPedidosModalPanel"/>
+
                 </s:div>
 
                 <s:div styleClass="buttonsRight">
@@ -432,6 +439,88 @@
                 </p>
             </ui:define>
         </s:decorate>
+
+        <rich:modalPanel id="recepcionPedidosModalPanel" width="520" height="430" resizeable="false">
+            <f:facet name="header">Recepci&#243;n de Pedidos</f:facet>
+            <f:facet name="controls">
+                <h:panelGroup>
+                    <h:graphicImage value="/img/close.png" styleClass="hidelink"
+                                    id="closeRecepcionPanel"/>
+                    <rich:componentControl for="recepcionPedidosModalPanel"
+                                           attachTo="closeRecepcionPanel"
+                                           operation="hide" event="onclick"/>
+                </h:panelGroup>
+            </f:facet>
+            <h:form id="recepcionPedidosForm">
+                <h:panelGrid columns="2" cellpadding="5" columnClasses="width120,">
+
+                    <h:outputLabel value="Fecha Entrega: *"/>
+                    <a4j:region>
+                        <rich:calendar id="fechaEntregaInput"
+                                       value="#{recepcionPedidosReportAction.fechaEntrega}"
+                                       datePattern="dd/MM/yyyy"
+                                       inputClass="input"
+                                       enableManualInput="true"
+                                       popup="true"
+                                       required="true"
+                                       requiredMessage="La fecha de entrega es requerida">
+                            <a4j:support event="onchanged"
+                                         action="#{recepcionPedidosReportAction.onFechaChanged}"
+                                         reRender="territorioPanel"
+                                         ajaxSingle="true"/>
+                        </rich:calendar>
+                    </a4j:region>
+
+                    <h:outputLabel value="Almac&#233;n: *"/>
+                    <h:selectOneMenu id="warehouseSelect"
+                                     value="#{recepcionPedidosReportAction.warehouse}"
+                                     style="width:250px;" required="true"
+                                     requiredMessage="Seleccione un almac&#233;n">
+                        <s:selectItems value="#{warehouseList}" var="wh"
+                                       label="#{wh.name}"
+                                       noSelectionLabel="-- Seleccione --"
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+
+                <a4j:outputPanel id="territorioPanel">
+                    <a4j:status>
+                        <f:facet name="start">
+                            <h:panelGroup style="padding:10px;">
+                                <h:graphicImage value="/img/loading.gif" style="vertical-align:middle;"/>
+                                <h:outputText value=" Cargando territorios..." style="margin-left:5px;"/>
+                            </h:panelGroup>
+                        </f:facet>
+                    </a4j:status>
+                    <h:panelGroup rendered="#{recepcionPedidosReportAction.fechaEntrega != null}">
+                        <h:outputText value="Territorio:" style="font-weight:bold; display:block; margin:5px 0 3px 5px;"/>
+                        <s:div style="max-height:200px; overflow-y:auto; border:1px solid #ccc; padding:5px; margin:0 5px;">
+                            <h:selectManyCheckbox id="territorioSelect"
+                                                  value="#{recepcionPedidosReportAction.selectedTerritorios}"
+                                                  layout="pageDirection">
+                                <s:selectItems value="#{recepcionPedidosReportAction.territoriosConPedidos}" var="terr"
+                                               label="#{terr.nombre}"/>
+                                <s:convertEntity/>
+                            </h:selectManyCheckbox>
+                        </s:div>
+                        <h:outputText value="Sin selecci&#243;n = Todos los territorios"
+                                      style="font-size:10px; color:#888; margin-left:5px;"/>
+                    </h:panelGroup>
+                </a4j:outputPanel>
+
+                <div class="buttons" style="text-align:center; margin-top:10px;">
+                    <h:commandButton id="generateRecepcionBtn"
+                                     action="#{recepcionPedidosReportAction.generateReport}"
+                                     value="Generar"
+                                     styleClass="button"/>
+                    <a4j:commandButton value="Cerrar"
+                                       styleClass="button"
+                                       immediate="true"
+                                       onclick="Richfaces.hideModalPanel('recepcionPedidosModalPanel'); return false;"/>
+                </div>
+            </h:form>
+        </rich:modalPanel>
 
     </ui:define>
 </ui:composition>
