@@ -11,6 +11,7 @@ import javax.ejb.Local;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Local
 public interface RawMaterialPayRollService extends GenericService {
@@ -19,8 +20,9 @@ public interface RawMaterialPayRollService extends GenericService {
 
     public List<DiscountProducer> findDiscountsProducerByDate(Date date);
 
-    /** @Claude OPT-6: Parametro totalWeightFortnight agregado para evitar recalculo por zona **/
-    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException;
+    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, Map<Long, ProducerTax> producerTaxCache, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException;
+
+    Map<Long, ProducerTax> preloadProducerTaxes(Date startDate, Date endDate);
 
     void calculateLiquidPayable(RawMaterialPayRoll rawMaterialPayRoll);
 

@@ -66,24 +66,13 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void createAll(RawMaterialPayRoll rawMaterialPayRoll) throws EntryDuplicatedException, RawMaterialPayRollException {
         try {
-            //validate(rawMaterialPayRoll);
-            //Object args = preCreate(rawMaterialPayRoll);
-            //processCreate(rawMaterialPayRoll);
-            //postCreate(rawMaterialPayRoll, args);
-            //getEntityManager().merge(rawMaterialPayRoll);
-            //getEntityManager().flush();
-
-            validate(rawMaterialPayRoll);
             Object args = preCreate(rawMaterialPayRoll);
             processCreate(rawMaterialPayRoll);
             postCreate(rawMaterialPayRoll, args);
             getEntityManager().flush();
-
-        } catch (PersistenceException e) { //TODO when hibernate will fix this http://opensource.atlassian.com/projects/hibernate/browse/EJB-382, we have to restore EntityExistsException here.
+        } catch (PersistenceException e) {
             log.debug("Persistence error..", e);
             log.info("PersistenceException caught");
-            //log.error(e);
-            //throw new EntryDuplicatedException(e);
         }
     }
 
@@ -162,21 +151,16 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return result;
     }
 
-    /** @Claude OPT-6: Parametro totalWeightFortnight agregado para evitar recalculo por zona **/
     @Override
-    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException {
+    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, Map<Long, ProducerTax> producerTaxCache, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException {
         Double totalReservaGAB = 0.0;
         if(discountProducer != null && dayFilter != 2) {
-            /** @Claude OPT-6: Usa totalWeightFortnight pre-calculado en vez de recalcular por zona **/
             Double totalWeightFortnightGAB = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), rawMaterialPayRoll.getProductiveZone(), dayFilter);
             Double percentageReserveGAB = ((totalWeightFortnightGAB * 100) / totalWeightFortnight) / 100;
             totalReservaGAB = (RoundUtil.getRoundValue(totalWeightFortnight * discountProducer.getReserve(), 2, RoundUtil.RoundMode.SYMMETRIC) * rawMaterialPayRoll.getUnitPrice()) * percentageReserveGAB;
         }
 
         Map<Date, Double> differences = createMapOfDifferencesWeights(rawMaterialPayRoll, dayFilter);
-
-        /** @Claude OPT-3: Pre-carga batch de ProducerTax para evitar lazy loading N+1 **/
-        Map<Long, ProducerTax> producerTaxCache = preloadProducerTaxes(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
         Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache, dayFilter);
         Double alcoholByGAB = (dayFilter == 2) ? 0.0 : salaryMovementGABService.getAlcoholBayGAB(rawMaterialPayRoll.getProductiveZone(), rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
@@ -987,12 +971,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return RoundUtil.getRoundValue(totaldiff, 2, RoundUtil.RoundMode.SYMMETRIC);
     }
 
-    /**
-     * @Claude OPT-3: Pre-carga batch de ProducerTax para evitar lazy loading N+1.
-     * Reemplaza las llamadas individuales a getProducerTaxValid() por productor
-     * con una sola query SQL que trae todos los registros fiscales validos.
-     */
-    private Map<Long, ProducerTax> preloadProducerTaxes(Date startDate, Date endDate) {
+    @Override
+    public Map<Long, ProducerTax> preloadProducerTaxes(Date startDate, Date endDate) {
         List<ProducerTax> taxes = getEntityManager().createQuery(
                 "SELECT pt FROM ProducerTax pt JOIN FETCH pt.gestionTax " +
                 "WHERE pt.gestionTax.startDate <= :startDate " +
@@ -1569,6 +1549,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     @Override
     public List<RawMaterialPayRoll> findAll() {
         List<RawMaterialPayRoll> rawMaterialPayRolls = getEntityManager().createNamedQuery("RawMaterialPayRoll.getAllMaterialPayRoll")
+                .setMaxResults(1)
                 .getResultList();
         return rawMaterialPayRolls;
     }

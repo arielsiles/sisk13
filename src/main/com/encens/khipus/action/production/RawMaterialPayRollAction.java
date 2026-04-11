@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static com.encens.khipus.exception.production.RawMaterialPayRollException.*;
 import static org.jboss.seam.international.StatusMessage.Severity.ERROR;
@@ -39,7 +40,6 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     //private Date month;
     private int fortnight;
     private boolean readonly;
-    private boolean generateAll = true;
     private boolean delete = false;
     private boolean editPriceMilk = false;
     private boolean editIUE = false;
@@ -197,7 +197,6 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         try {
             this.productiveZone = getService().findById(ProductiveZone.class, productiveZone.getId());
             getInstance().setProductiveZone(productiveZone);
-            generateAll = false;
         } catch (Exception ex) {
             log.error("Caught Error", ex);
             facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
@@ -215,62 +214,76 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
 
             rawMaterialPayRoll.setStartDate(dateFormat.parse(dateFormat.format(dateIni.getTime())));
             rawMaterialPayRoll.setEndDate(dateFormat.parse(dateFormat.format(dateEnd.getTime())));
-            DiscountProducer discountProducer = rawMaterialPayRollService.findDiscountProducerByDate(rawMaterialPayRoll.getEndDate());
-            if(rawMaterialPayRollService.findDiscountsProducerByDate(rawMaterialPayRoll.getEndDate()).size() > 1)
-            {
-                addDatesDuplicatesMessage();
-                return com.encens.khipus.framework.action.Outcome.REDISPLAY;
-            }
+
             if (rawMaterialPayRoll.getStartDate().compareTo(rawMaterialPayRoll.getEndDate()) > 0) {
                 facesMessages.addFromResourceBundle(WARN, "RawMaterialPayRoll.warning.startDateGreaterThanEndDate");
                 return Outcome.FAIL;
             }
-            if (rawMaterialPayRoll.getProductiveZone() != null) {
-                rawMaterialPayRollService.validate(rawMaterialPayRoll);
-                rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
-                /** @Claude OPT-6: Pre-calcula peso total quincenal para zona unica **/
-                Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
-                        rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), getDayFilter());
-                rawMaterialPayRollService.generatePayroll(rawMaterialPayRoll, discountProducer, totalWeightFortnight, getDayFilter());
 
-                // R8. Alerta de productores con liquido pagable negativo
-                for (int i = 0; i < rawMaterialPayRoll.getRawMaterialPayRecordList().size(); i++) {
-                    RawMaterialPayRecord rec = rawMaterialPayRoll.getRawMaterialPayRecordList().get(i);
-                    if (rec.getLiquidPayable() < 0) {
-                        String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
-                        facesMessages.add(StatusMessage.Severity.ERROR,
-                            "Liquido pagable negativo: " + producerName + " = " + rec.getLiquidPayable() + " Bs");
+            List<DiscountProducer> discountProducers = rawMaterialPayRollService.findDiscountsProducerByDate(rawMaterialPayRoll.getEndDate());
+            if (discountProducers.size() > 1) {
+                addDatesDuplicatesMessage();
+                return Outcome.REDISPLAY;
+            }
+            DiscountProducer discountProducer = discountProducers.isEmpty() ? null : discountProducers.get(0);
+
+            if (discountProducer == null || discountProducer.getReserve() == 0.0)
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "RawMaterialPayRoll.info.NoFoundReserve");
+
+            List<ProductiveZone> productiveZones = productiveZoneService.findAllThatDoNotHaveCollectionForm(
+                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+
+            Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
+                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), getDayFilter());
+
+            Map<Long, ProducerTax> producerTaxCache = rawMaterialPayRollService.preloadProducerTaxes(
+                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+
+            for (ProductiveZone zone : productiveZones) {
+                if (zone.getGroup().equals("ILVA")) {
+                    RawMaterialPayRoll payRoll = new RawMaterialPayRoll();
+                    payRoll.setEndDate(rawMaterialPayRoll.getEndDate());
+                    payRoll.setStartDate(rawMaterialPayRoll.getStartDate());
+                    payRoll.setCompany(rawMaterialPayRoll.getCompany());
+                    payRoll.setMetaProduct(rawMaterialPayRoll.getMetaProduct());
+                    payRoll.setUnitPrice(rawMaterialPayRoll.getUnitPrice());
+                    payRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
+                    payRoll.setProductiveZone(zone);
+                    payRoll.setIt(rawMaterialPayRoll.getIt());
+                    payRoll.setIue(rawMaterialPayRoll.getIue());
+
+                    rawMaterialPayRollService.validate(payRoll);
+                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight, producerTaxCache, getDayFilter());
+                    rawMaterialPayRollService.createAll(payRoll);
+
+                    for (int i = 0; i < payRoll.getRawMaterialPayRecordList().size(); i++) {
+                        RawMaterialPayRecord rec = payRoll.getRawMaterialPayRecordList().get(i);
+                        if (rec.getLiquidPayable() < 0) {
+                            String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
+                            facesMessages.add(StatusMessage.Severity.ERROR,
+                                "Liquido pagable negativo: " + producerName + " (" + zone.getFullName() + ") = " + rec.getLiquidPayable() + " Bs");
+                        }
                     }
                 }
-
-                readonly = true;
-            } else {
-                /*CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-                if(editPriceMilk)
-                {
-                    companyConfiguration.setUnitPriceMilk(getInstance().getUnitPrice());
-                }
-                if(editIT)
-                {
-                    companyConfiguration.setIt(getInstance().getIt());
-                }
-                if(editIUE)
-                {
-                    companyConfiguration.setIue(getInstance().getIue());
-                }
-
-                if(editPriceMilk || editIUE || editIT)
-                {
-                    companyConfigurationService.update(companyConfiguration);
-                }*/
-
-                return generateAll();
             }
+
+            addSuccessGenerateAllPayRoll(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+            return Outcome.SUCCESS;
+
         } catch (RawMaterialPayRollException ex) {
             print(ex);
+        } catch (EntryDuplicatedException e) {
+            addDuplicatedMessage();
+            return Outcome.REDISPLAY;
         } catch (Exception ex) {
-            log.error("Caught Error", ex);
-            facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
+            if (ex.getCause() instanceof RawMaterialPayRollException) {
+                print((RawMaterialPayRollException) ex.getCause());
+                return Outcome.REDISPLAY;
+            } else {
+                log.error("Caught Error", ex);
+                facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
+                return Outcome.REDISPLAY;
+            }
         }
         return Outcome.REDISPLAY;
     }
@@ -312,79 +325,6 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"RawMaterialPayRoll.error.NotFoundPayRolles",startDate.getTime(),endDate.getTime());
     }
 
-    public String generateAll() {
-        try {
-
-            RawMaterialPayRoll rawMaterialPayRoll = getInstance();
-            Calendar dateIni = Calendar.getInstance();
-            Calendar dateEnd = Calendar.getInstance();
-            dateIni.set(gestion.getYear(), month.getValue(), periodo.getInitDay());
-            dateEnd.set(gestion.getYear(), month.getValue(), periodo.getEndDay(month.getValue() + 1, gestion.getYear()));
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-
-            rawMaterialPayRoll.setStartDate(dateFormat.parse(dateFormat.format(dateIni.getTime())));
-            rawMaterialPayRoll.setEndDate(dateFormat.parse(dateFormat.format(dateEnd.getTime())));
-            DiscountProducer discountProducer = rawMaterialPayRollService.findDiscountProducerByDate(rawMaterialPayRoll.getEndDate());
-            if(discountProducer == null)
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"RawMaterialPayRoll.info.NoFoundReserve");
-            else
-            if(discountProducer.getReserve() == 0.0 )
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"RawMaterialPayRoll.info.NoFoundReserve");
-
-            List<ProductiveZone> productiveZones = productiveZoneService.findAllThatDoNotHaveCollectionForm(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
-
-            /** @Claude OPT-6: Pre-calcula peso total quincenal una sola vez antes del loop de zonas **/
-            Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
-                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), getDayFilter());
-
-            for (ProductiveZone productiveZone : productiveZones) {
-
-                if (productiveZone.getGroup().equals("ILVA")) { /** MODIFYID Zonas productivas ILVA **/
-                    RawMaterialPayRoll payRoll = new RawMaterialPayRoll();
-                    payRoll.setEndDate(rawMaterialPayRoll.getEndDate());
-                    payRoll.setStartDate(rawMaterialPayRoll.getStartDate());
-                    payRoll.setCompany(rawMaterialPayRoll.getCompany());
-                    payRoll.setMetaProduct(rawMaterialPayRoll.getMetaProduct());
-                    payRoll.setUnitPrice(rawMaterialPayRoll.getUnitPrice());
-                    payRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
-                    payRoll.setProductiveZone(productiveZone);
-                    payRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
-                    payRoll.setIt(rawMaterialPayRoll.getIt());
-                    payRoll.setIue(rawMaterialPayRoll.getIue());
-                    rawMaterialPayRollService.validate(payRoll);
-                    rawMaterialPayRoll.getRawMaterialPayRecordList().clear();
-                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight, getDayFilter());
-                    rawMaterialPayRollService.createAll(payRoll);
-
-                    // R8. Alerta de productores con liquido pagable negativo
-                    for (int i = 0; i < payRoll.getRawMaterialPayRecordList().size(); i++) {
-                        RawMaterialPayRecord rec = payRoll.getRawMaterialPayRecordList().get(i);
-                        if (rec.getLiquidPayable() < 0) {
-                            String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
-                            facesMessages.add(StatusMessage.Severity.ERROR,
-                                "Liquido pagable negativo: " + producerName + " (" + productiveZone.getFullName() + ") = " + rec.getLiquidPayable() + " Bs");
-                        }
-                    }
-                }
-            }
-
-        } catch (RawMaterialPayRollException ex) {
-            print(ex);
-        } catch (EntryDuplicatedException e) {
-            addDuplicatedMessage();
-            return Outcome.REDISPLAY;
-        } catch (Exception ex) {
-            if (ex.getCause() instanceof RawMaterialPayRollException) {
-                print((RawMaterialPayRollException) ex.getCause());
-                return Outcome.REDISPLAY;
-            } else {
-                facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
-                return Outcome.REDISPLAY;
-            }
-        }
-        addSuccessGenerateAllPayRoll(initRawMaterialPayRoll().getStartDate(), initRawMaterialPayRoll().getEndDate());
-        return Outcome.SUCCESS;
-    }
 
     private void addSuccessGenerateAllPayRoll(Date startDate, Date endDate) {
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"RawMaterialPayRoll.info.SuccessGenerateAllPayRoll",startDate,endDate);
@@ -460,17 +400,9 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         this.rawMaterialPayRollList = rawMaterialPayRollList;
     }
 
-    public boolean isGenerateAll() {
-        return generateAll;
-    }
-
-    public void setGenerateAll(boolean generateAll) {
-        this.generateAll = generateAll;
-    }
-
     public boolean isDelete() {
         List<RawMaterialPayRoll> rawMaterialPayRolls = rawMaterialPayRollService.findAll();
-        return (rawMaterialPayRolls.size() > 0) ? true : false;
+        return !rawMaterialPayRolls.isEmpty();
     }
 
     public void setDelete(boolean delete) {
