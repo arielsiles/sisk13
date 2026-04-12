@@ -113,7 +113,7 @@
 				</rowGroup>
 				<rowGroup name="cliente" width="95" totalPosition="End">
 					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{cliente}]]></bucketExpression>
+						<bucketExpression><![CDATA[$F{cliente} + "||" + $F{nota}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#FFFFFF" mode="Opaque">
@@ -125,7 +125,7 @@
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Arial" size="6"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{cliente}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{cliente}.substring(0, $V{cliente}.indexOf("||"))]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
