@@ -169,7 +169,7 @@
 							<textField>
 								<reportElement style="Crosstab Data Text" x="2" y="0" width="93" height="15" uuid="c3c92e94-80cf-4faf-b941-40b5b139ba5d"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
-									<font fontName="Arial Narrow" size="5"/>
+									<font fontName="Arial" size="6"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{cliente}]]></textFieldExpression>
 							</textField>

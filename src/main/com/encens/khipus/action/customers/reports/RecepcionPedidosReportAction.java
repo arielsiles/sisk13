@@ -126,11 +126,16 @@ public class RecepcionPedidosReportAction {
 
         InputStream jrxmlStream = JSFUtil.getResourceAsStream("/customers/reports/recepcionPedidos.jrxml");
         byte[] jrxmlBytes = readAllBytes(jrxmlStream);
-        String jrxmlContent = new String(jrxmlBytes, "UTF-8")
-                .replaceAll(" uuid=\"[^\"]*\"", "")
-                .replaceAll("<bucket class=\"[^\"]*\">", "<bucket>")
-                .replaceAll("<bucketExpression>", "<bucketExpression class=\"java.lang.String\">")
-                .replaceAll("<measureExpression class=\"[^\"]*\">", "<measureExpression>");
+        String jrxmlContent = new String(jrxmlBytes, "UTF-8");
+        jrxmlContent = jrxmlContent.replace(" uuid=\"", " _uuid=\"");
+        jrxmlContent = jrxmlContent.replaceAll(" _uuid=\"[^\"]*\"", "");
+        jrxmlContent = jrxmlContent.replaceAll("<bucket class=\"[^\"]*\">", "<bucket>");
+        jrxmlContent = jrxmlContent.replace("<bucketExpression>", "<bucketExpression class=\"java.lang.String\">");
+        jrxmlContent = jrxmlContent.replace("<measureExpression class=", "<measureExpression _class=");
+        jrxmlContent = jrxmlContent.replaceAll("<measureExpression _class=\"[^\"]*\">", "<measureExpression>");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$P{importe}", "<textFieldExpression class=\"java.math.BigDecimal\"><![CDATA[$P{importe}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression><![CDATA[$V{cantidadMeasure}", "<textFieldExpression class=\"java.lang.Integer\"><![CDATA[$V{cantidadMeasure}");
+        jrxmlContent = jrxmlContent.replace("<textFieldExpression>", "<textFieldExpression class=\"java.lang.String\">");
         InputStream cleanStream = new java.io.ByteArrayInputStream(jrxmlContent.getBytes("UTF-8"));
         JasperReport jasperReport = JasperCompileManager.compileReport(cleanStream);
         JRDataSource dataSource = new JRMapCollectionDataSource(rows);
