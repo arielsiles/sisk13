@@ -5,6 +5,17 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ## [Sin publicar]
 
+### 2026-04-12
+
+#### Agregado
+- **Reporte Recepcion de Pedidos**: Migrado desde khipus2 al listado de pedidos (`customerOrderList.xhtml`).
+  - Modal con filtros: Fecha de entrega, Almacen (default DAIRY), Territorio (multi-select dinamico por fecha y almacen).
+  - Reporte Jasper (crosstab) con columnas: Cliente, Nota (codigo pedido), productos como columnas dinamicas.
+  - Cabecera: titulo y compania desde tabla configuracion, cantidad y monto calculados.
+  - Compatibilidad iReport 5.6.0: sanitizador automatico de atributos incompatibles con JasperReports 3.7.4 (uuid, bucket class, measureExpression class, textFieldExpression class).
+  - Filtros: tipoventa=CREDIT, estado<>ANULADO, almacen del producto.
+  - Archivos: `RecepcionPedidosReportAction.java`, `recepcionPedidos.jrxml`, `customerOrderList.xhtml`
+
 ---
 
 ## [6.0.40]

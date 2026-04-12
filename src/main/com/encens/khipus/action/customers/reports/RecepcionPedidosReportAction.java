@@ -1,11 +1,14 @@
 package com.encens.khipus.action.customers.reports;
 
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.customers.SaleStatus;
 import com.encens.khipus.model.customers.SaleTypeEnum;
 import com.encens.khipus.model.customers.Territoriotrabajo;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.model.warehouse.WarehouseType;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.JSFUtil;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
@@ -35,6 +38,9 @@ public class RecepcionPedidosReportAction {
 
     @In
     private User currentUser;
+
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     private Date fechaEntrega;
     private List<Territoriotrabajo> selectedTerritorios;
@@ -122,12 +128,24 @@ public class RecepcionPedidosReportAction {
         int cantidadPedidos = countPedidos(warehouseCode, filterByTerritory);
         BigDecimal importe = calculateImporte(warehouseCode, filterByTerritory);
 
+        String title = "";
+        String companyName = "";
+        try {
+            CompanyConfiguration cc = companyConfigurationService.findCompanyConfiguration();
+            title = cc.getTitle();
+            companyName = cc.getCompanyName();
+        } catch (CompanyConfigurationNotFoundException e) {
+            // ignore
+        }
+
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("fecha", df.format(fechaEntrega));
         params.put("cantidadPedidos", String.valueOf(cantidadPedidos));
         params.put("nomUsr", currentUser.getUsername());
         params.put("nombreTerritorio", buildTerritorioLabel());
+        params.put("title", title);
+        params.put("companyName", companyName);
         params.put("importe", importe);
 
         InputStream jrxmlStream = JSFUtil.getResourceAsStream("/customers/reports/recepcionPedidos.jrxml");
