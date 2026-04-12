@@ -125,7 +125,14 @@ public class RecepcionPedidosReportAction {
         params.put("importe", importe);
 
         InputStream jrxmlStream = JSFUtil.getResourceAsStream("/customers/reports/recepcionPedidos.jrxml");
-        JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
+        byte[] jrxmlBytes = readAllBytes(jrxmlStream);
+        String jrxmlContent = new String(jrxmlBytes, "UTF-8")
+                .replaceAll(" uuid=\"[^\"]*\"", "")
+                .replaceAll("<bucket class=\"[^\"]*\">", "<bucket>")
+                .replaceAll("<bucketExpression>", "<bucketExpression class=\"java.lang.String\">")
+                .replaceAll("<measureExpression class=\"[^\"]*\">", "<measureExpression>");
+        InputStream cleanStream = new java.io.ByteArrayInputStream(jrxmlContent.getBytes("UTF-8"));
+        JasperReport jasperReport = JasperCompileManager.compileReport(cleanStream);
         JRDataSource dataSource = new JRMapCollectionDataSource(rows);
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, dataSource);
 
@@ -246,5 +253,15 @@ public class RecepcionPedidosReportAction {
 
     public void setWarehouse(Warehouse warehouse) {
         this.warehouse = warehouse;
+    }
+
+    private byte[] readAllBytes(InputStream is) throws IOException {
+        java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+        byte[] chunk = new byte[4096];
+        int n;
+        while ((n = is.read(chunk)) != -1) {
+            buffer.write(chunk, 0, n);
+        }
+        return buffer.toByteArray();
     }
 }
