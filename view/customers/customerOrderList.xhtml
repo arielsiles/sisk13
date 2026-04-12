@@ -196,6 +196,7 @@
                     <a4j:commandButton id="recepcionPedidosBtn"
                                        value="Recepci&#243;n Pedidos"
                                        styleClass="button"
+                                       action="#{recepcionPedidosReportAction.resetFilters}"
                                        immediate="true"
                                        oncomplete="Richfaces.showModalPanel('recepcionPedidosModalPanel');"
                                        reRender="recepcionPedidosModalPanel"/>
@@ -473,7 +474,8 @@
                                            value="#{recepcionPedidosReportAction.fechaEntrega}"
                                            datePattern="dd/MM/yyyy"
                                            inputClass="input"
-                                           enableManualInput="true"
+                                           inputStyle="width:80px;"
+                                           enableManualInput="false"
                                            popup="true"
                                            required="true"
                                            requiredMessage="La fecha de entrega es requerida">

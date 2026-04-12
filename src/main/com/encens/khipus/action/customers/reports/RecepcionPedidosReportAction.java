@@ -61,6 +61,12 @@ public class RecepcionPedidosReportAction {
         }
     }
 
+    public void resetFilters() {
+        fechaEntrega = null;
+        selectedTerritorios = null;
+        loadDefaultWarehouse();
+    }
+
     public void onFechaChanged() {
         selectedTerritorios = null;
     }
