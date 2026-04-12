@@ -74,7 +74,8 @@ public class RecepcionPedidosReportAction {
         String warehouseCode = warehouse.getId().getWarehouseCode();
 
         StringBuilder jpql = new StringBuilder();
-        jpql.append("SELECT CONCAT(co.client.name,' ',co.client.lastName,' ',COALESCE(co.client.maidenName,''),' ',co.code),");
+        jpql.append("SELECT CONCAT(co.client.name,' ',co.client.lastName,' ',COALESCE(co.client.maidenName,'')),");
+        jpql.append(" co.code,");
         jpql.append(" ao.productItem.nameShort,");
         jpql.append(" (COALESCE(ao.quantity,0) + COALESCE(ao.reposicion,0) + COALESCE(ao.promotion,0)),");
         jpql.append(" co.client.territoriotrabajo.nombre");
@@ -105,9 +106,10 @@ public class RecepcionPedidosReportAction {
         for (Object[] row : results) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("cliente", row[0] != null ? row[0].toString() : "");
-            map.put("producto", row[1] != null ? row[1].toString() : "");
-            map.put("cantidad", row[2] != null ? ((Number) row[2]).intValue() : 0);
-            map.put("distribuidor", row[3] != null ? row[3].toString() : "");
+            map.put("nota", row[1] != null ? row[1].toString() : "");
+            map.put("producto", row[2] != null ? row[2].toString() : "");
+            map.put("cantidad", row[3] != null ? ((Number) row[3]).intValue() : 0);
+            map.put("distribuidor", row[4] != null ? row[4].toString() : "");
             rows.add(map);
         }
 

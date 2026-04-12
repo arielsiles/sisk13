@@ -10,6 +10,7 @@
 	<parameter name="nombreTerritorio" class="java.lang.String"/>
 	<parameter name="importe" class="java.math.BigDecimal"/>
 	<field name="cliente" class="java.lang.String"/>
+	<field name="nota" class="java.lang.String"/>
 	<field name="producto" class="java.lang.String"/>
 	<field name="cantidad" class="java.lang.Integer"/>
 	<field name="distribuidor" class="java.lang.String"/>
@@ -113,6 +114,23 @@
 		<band height="132" splitType="Stretch">
 			<crosstab>
 				<reportElement x="20" y="5" width="898" height="107"/>
+				<crosstabHeaderCell>
+					<cellContents mode="Transparent">
+						<box>
+							<pen lineWidth="0.0"/>
+						</box>
+						<staticText>
+							<reportElement x="95" y="0" width="30" height="17" backcolor="#CCCCCC" mode="Opaque"/>
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="Arial Narrow" size="6" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Nota]]></text>
+						</staticText>
+					</cellContents>
+				</crosstabHeaderCell>
 				<rowGroup name="distribuidor" width="0" totalPosition="End">
 					<bucket>
 						<bucketExpression class="java.lang.String"><![CDATA[$F{distribuidor}]]></bucketExpression>
@@ -130,7 +148,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement x="0" y="0" width="85" height="10" forecolor="#000000"/>
+								<reportElement x="0" y="0" width="125" height="10" forecolor="#000000"/>
 								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font fontName="Arial Narrow" size="6" isBold="true"/>
 								</textElement>
@@ -139,7 +157,7 @@
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<rowGroup name="cliente" width="85" totalPosition="End">
+				<rowGroup name="cliente" width="95" totalPosition="End">
 					<bucket>
 						<bucketExpression class="java.lang.String"><![CDATA[$F{cliente}]]></bucketExpression>
 					</bucket>
@@ -149,7 +167,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement style="Crosstab Data Text" x="0" y="0" width="85" height="13"/>
+								<reportElement style="Crosstab Data Text" x="2" y="0" width="93" height="13"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font fontName="Arial Narrow" size="5"/>
 								</textElement>
@@ -163,13 +181,35 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement style="Crosstab Data Text" x="0" y="0" width="83" height="13" backcolor="#FFFFFF"/>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="95" height="13" backcolor="#FFFFFF"/>
 								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font size="6"/>
 								</textElement>
 								<textFieldExpression class="java.lang.String"><![CDATA[$V{distribuidor}]]></textFieldExpression>
 							</textField>
 						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="nota" width="30">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{nota}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="13"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial Narrow" size="5"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{nota}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="producto" height="17">
