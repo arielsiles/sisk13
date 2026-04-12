@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="recepcionPedidos" pageWidth="935" pageHeight="609" orientation="Landscape" columnWidth="935" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f9127358-4b72-4a99-9871-98cdf2b83610">
 	<property name="ireport.zoom" value="4.177248169415659"/>
-	<property name="ireport.x" value="2652"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
 	<parameter name="fecha" class="java.lang.String"/>
@@ -25,18 +25,18 @@
 	<pageHeader>
 		<band height="28" splitType="Stretch">
 			<textField>
-				<reportElement x="20" y="9" width="180" height="10" uuid="ae7015d8-f595-41dd-b613-5b06ecabd697"/>
-				<textElement verticalAlignment="Bottom">
-					<font fontName="Arial" size="8"/>
+				<reportElement x="20" y="16" width="80" height="12" uuid="82de5174-7223-4116-ae30-caec91583ec5"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Cantidad:  " + $P{cantidadPedidos}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
-				<reportElement x="20" y="18" width="180" height="10" uuid="1dcc9001-920b-4c47-be4c-1e74f60e96e8"/>
-				<textElement verticalAlignment="Bottom">
-					<font fontName="Arial" size="8"/>
+				<reportElement x="110" y="16" width="160" height="12" uuid="c6321ca8-7936-4ca4-8a20-aa59dc2a5194"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Monto:       " + new java.text.DecimalFormat("#,##0.00").format($P{importe})]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Monto:  " + new java.text.DecimalFormat("#,##0.00").format($P{importe})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="280" y="6" width="380" height="20" uuid="217dadc0-4391-447d-9233-72774f07b207"/>
@@ -149,7 +149,7 @@
 						<bucketExpression><![CDATA[$F{nota}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents backcolor="#FFFFFF" mode="Opaque">
+						<cellContents backcolor="#F0F0F0" mode="Opaque">
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
