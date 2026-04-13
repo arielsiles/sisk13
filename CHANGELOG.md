@@ -5,6 +5,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ## [Sin publicar]
 
+---
+
+## [6.0.43]
+
 ### 2026-04-12
 
 #### Agregado
