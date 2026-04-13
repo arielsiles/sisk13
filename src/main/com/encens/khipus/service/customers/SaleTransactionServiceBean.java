@@ -6,6 +6,7 @@ import com.encens.khipus.model.warehouse.Inventory;
 import com.encens.khipus.model.warehouse.InventoryDetail;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.Constants;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.Name;
 
@@ -13,7 +14,6 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
@@ -100,18 +100,27 @@ public class SaleTransactionServiceBean implements SaleTransactionService {
     }
 
     /**
-     * Busca Inventory por codigo de producto con lock de escritura (JPA 1.0 WRITE).
-     * En Hibernate 3.3 esto ejecuta SELECT FOR UPDATE + version check,
-     * serializando actualizaciones concurrentes al mismo producto.
+     * Busca Inventory por codigo de producto con locking pesimista real.
+     * Usa native SELECT FOR UPDATE para bloquear la fila hasta el commit,
+     * serializando accesos concurrentes (JPA 1.0 no tiene PESSIMISTIC_WRITE).
      */
     private Inventory findInventoryWithLock(String productItemCode) {
+        String schema = Constants.FINANCES_SCHEMA;
+
+        // 1. Adquirir row lock via SELECT FOR UPDATE nativo (bloquea hasta commit)
+        java.util.List<?> rows = em.createNativeQuery(
+                "SELECT cod_art FROM " + schema + ".inv_inventario WHERE cod_art = :code FOR UPDATE")
+                .setParameter("code", productItemCode)
+                .getResultList();
+
+        if (rows.isEmpty()) return null;
+
+        // 2. Cargar entidad fresca (fila ya bloqueada, version correcta)
         try {
-            Inventory inventory = (Inventory) em.createQuery(
+            return (Inventory) em.createQuery(
                     "SELECT i FROM Inventory i WHERE i.productItem.productItemCode = :productItemCode")
                     .setParameter("productItemCode", productItemCode)
                     .getSingleResult();
-            em.lock(inventory, LockModeType.WRITE);
-            return inventory;
         } catch (NoResultException e) {
             return null;
         }
