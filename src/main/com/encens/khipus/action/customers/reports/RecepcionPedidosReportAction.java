@@ -200,7 +200,7 @@ public class RecepcionPedidosReportAction {
 
     private BigDecimal calculateImporte(String warehouseCode, boolean filterByTerritory) {
         StringBuilder jpql = new StringBuilder();
-        jpql.append("SELECT COALESCE(SUM(co.totalAmount), 0.0) FROM CustomerOrder co JOIN co.articleOrderList ao");
+        jpql.append("SELECT COALESCE(SUM(ao.amount), 0.0) FROM CustomerOrder co JOIN co.articleOrderList ao");
         jpql.append(" WHERE co.orderDate = :fechaEntrega");
         jpql.append(" AND co.state <> :estadoAnulado");
         jpql.append(" AND co.saleType = :tipoVenta");

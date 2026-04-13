@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="recepcionPedidos" pageWidth="935" pageHeight="609" orientation="Landscape" columnWidth="935" leftMargin="0" rightMargin="0" topMargin="10" bottomMargin="0" uuid="f9127358-4b72-4a99-9871-98cdf2b83610">
-	<property name="ireport.zoom" value="3.4522712143931096"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="recepcionPedidos" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="f9127358-4b72-4a99-9871-98cdf2b83610">
+	<property name="ireport.zoom" value="2.1435888100000056"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
@@ -23,51 +23,48 @@
 		<band splitType="Stretch"/>
 	</title>
 	<pageHeader>
-		<band height="21" splitType="Stretch">
+		<band height="35" splitType="Stretch">
 			<textField>
-				<reportElement x="274" y="12" width="80" height="9" uuid="82de5174-7223-4116-ae30-caec91583ec5"/>
+				<reportElement x="1" y="26" width="80" height="9" uuid="82de5174-7223-4116-ae30-caec91583ec5"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Cantidad:  " + $P{cantidadPedidos}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
-				<reportElement x="364" y="12" width="160" height="9" uuid="c6321ca8-7936-4ca4-8a20-aa59dc2a5194"/>
+				<reportElement x="91" y="26" width="160" height="9" uuid="c6321ca8-7936-4ca4-8a20-aa59dc2a5194"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Monto:  " + new java.text.DecimalFormat("#,##0.00").format($P{importe})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="20" y="6" width="250" height="15" uuid="217dadc0-4391-447d-9233-72774f07b207"/>
-				<textElement verticalAlignment="Bottom">
+				<reportElement x="285" y="13" width="197" height="12" uuid="217dadc0-4391-447d-9233-72774f07b207"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="Arial" size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["RESUMEN DE PEDIDOS  -  " + $P{fecha}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="537" y="0" width="381" height="11" uuid="05550fa6-4507-49d4-890d-f906ddc8db45"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
+				<reportElement x="0" y="0" width="285" height="11" uuid="05550fa6-4507-49d4-890d-f906ddc8db45"/>
+				<textElement verticalAlignment="Bottom">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{title}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="537" y="10" width="381" height="11" uuid="c9c62898-e769-4663-a7a7-48e35cea5ed8"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
+				<reportElement x="0" y="10" width="285" height="11" uuid="c9c62898-e769-4663-a7a7-48e35cea5ed8"/>
+				<textElement verticalAlignment="Bottom">
 					<font fontName="Arial" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{companyName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
-	<pageFooter>
-		<band height="6"/>
-	</pageFooter>
 	<summary>
 		<band height="132" splitType="Stretch">
 			<crosstab>
-				<reportElement x="20" y="5" width="898" height="107" uuid="fd916eb7-d614-4462-91cd-f5e99f0e1581"/>
+				<reportElement x="0" y="1" width="736" height="131" uuid="fd916eb7-d614-4462-91cd-f5e99f0e1581"/>
 				<crosstabHeaderCell>
 					<cellContents mode="Transparent">
 						<box>
