@@ -17,10 +17,11 @@
     <script type="text/javascript">
         //<![CDATA[
         function clearTerritorioCheckboxes() {
-            var inputs = document.getElementsByTagName('input');
-            for (var i = 0; i < inputs.length; i++) {
-                if (inputs[i].id && inputs[i].id.indexOf('territorioSelect') >= 0 && inputs[i].type === 'checkbox') {
-                    inputs[i].checked = false;
+            var containers = document.getElementsByTagName('div');
+            for (var i = 0; i < containers.length; i++) {
+                if (containers[i].id && containers[i].id.indexOf('territorioContainer') >= 0) {
+                    containers[i].innerHTML = '<span style="color:#999; font-style:italic; font-size:11px;">Cargando territorios...</span>';
+                    break;
                 }
             }
         }

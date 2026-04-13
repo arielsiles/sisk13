@@ -197,6 +197,7 @@
                                        value="Recepci&#243;n Pedidos"
                                        styleClass="button"
                                        action="#{recepcionPedidosReportAction.resetFilters}"
+                                       rendered="#{s:hasPermission('PRINT_DELIVERY_NOTE','VIEW')}"
                                        immediate="true"
                                        oncomplete="Richfaces.showModalPanel('recepcionPedidosModalPanel');"
                                        reRender="recepcionPedidosModalPanel"/>

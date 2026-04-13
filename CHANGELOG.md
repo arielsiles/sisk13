@@ -14,7 +14,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
   - Cabecera: titulo y compania desde tabla configuracion, cantidad y monto calculados.
   - Compatibilidad iReport 5.6.0: sanitizador automatico de atributos incompatibles con JasperReports 3.7.4 (uuid, bucket class, measureExpression class, textFieldExpression class).
   - Filtros: tipoventa=CREDIT, estado<>ANULADO, almacen del producto.
-  - Archivos: `RecepcionPedidosReportAction.java`, `recepcionPedidos.jrxml`, `customerOrderList.xhtml`
+  - Modal panel separado en `recepcionPedidosModalPanel.xhtml` (patron existente con `s:decorate`).
+  - UX: loading "Cargando territorios..." al cambiar fecha/almacen, reset de filtros al abrir modal, calendar solo seleccion.
+  - Cada pedido del mismo cliente se muestra en fila independiente (no celdas combinadas).
+  - Columna Nota con fondo gris claro para diferenciacion visual.
+  - Archivos: `RecepcionPedidosReportAction.java`, `recepcionPedidos.jrxml`, `customerOrderList.xhtml`, `recepcionPedidosModalPanel.xhtml`
 
 ---
 
