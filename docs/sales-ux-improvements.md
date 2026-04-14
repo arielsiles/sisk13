@@ -115,7 +115,7 @@ URL: `/khipus/customers/salesBox?actionMethod=home.xhtml%3AsalesAction.openSale(
 | Tarea | Descripcion | Prioridad | Estado |
 |-------|-------------|-----------|--------|
 | T01 | Fix checkMinimumValues() | Alta | **Completado** |
-| T02 | Proteccion doble-click | Alta | Pendiente |
+| T02 | Proteccion doble-click | Alta | **Completado** |
 | T03 | Try-catch en registro | Alta | Pendiente |
 | T04 | Spinner/loading AJAX | Media | Pendiente |
 | T05 | Columna Existencia | Media | Pendiente |
