@@ -83,6 +83,7 @@ public class SalesAction extends GenericAction {
     private Boolean validateSale = Boolean.FALSE;
 
     private Boolean isOnline = Boolean.TRUE;
+    private boolean validForSale = false;
 
     private UserCashBox userCashBox;
 
@@ -369,8 +370,8 @@ public class SalesAction extends GenericAction {
         if (getClient() != null) {
             for (ArticleOrder articleOrder : articleOrderList) {
                 totalAmount = BigDecimalUtil.sum(totalAmount, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
-                if (articleOrder.getQuantity() == 0)
-                    setZeroProduct(Boolean.TRUE); /** Verifica productos con cantidad CERO **/
+                if (articleOrder.getQuantity() == null || articleOrder.getQuantity() <= 0)
+                    setZeroProduct(Boolean.TRUE);
             }
 
             BigDecimal discount = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(getClient().getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED, 4));
@@ -428,21 +429,22 @@ public class SalesAction extends GenericAction {
         setNameSpecialBill("");
     }
 
-    public void checkMinimumValues(){
+    public boolean checkMinimumValues(){
         if (client == null) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Seleccionar un cliente !");
-            return;
+            return false;
         }
 
         if (articleOrderList.isEmpty()){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Seleccionar al menos un producto !");
-            return;
+            return false;
         }
 
         if (zeroProduct){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Revisar productos con cantidad CERO !");
-            return;
+            return false;
         }
+        return true;
     }
 
     /** Venta a credito **/
@@ -451,7 +453,7 @@ public class SalesAction extends GenericAction {
         System.out.println("------------> Description: " + getObservation());
         System.out.println("------------> Fecha: " + DateUtils.format(getOrderDate(), "dd/MM/yyyy"));
 
-        checkMinimumValues();
+        if (!checkMinimumValues()) return;
 
         CustomerOrder customerOrder = createSale();
         if (customerOrder == null) return;
@@ -464,7 +466,7 @@ public class SalesAction extends GenericAction {
 
     /** Venta a credito y factura y asiento **/
     public void registerSaleAndInvoice(){
-        checkMinimumValues();
+        if (!checkMinimumValues()) return;
 
         CustomerOrder customerOrder = createSale();
         if (customerOrder == null) return;
@@ -487,9 +489,9 @@ public class SalesAction extends GenericAction {
 
     public void registerCashSale() throws IOException {
         System.out.println("......Registrando Venta al Contado...");
-        checkMinimumValues();
+        if (!checkMinimumValues()) return;
 
-        if (this.client == null || totalAmount.compareTo(BigDecimal.ZERO) == 0){
+        if (totalAmount.compareTo(BigDecimal.ZERO) == 0){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No se puede realizar la venta, monto incorrecto.");
             return;
         }
@@ -571,6 +573,8 @@ public class SalesAction extends GenericAction {
 
     public void registerCashSaleNoInvoice(){
         System.out.println("......Registrando Venta al Contado SF...");
+        if (!checkMinimumValues()) return;
+
         CustomerOrder customerOrder = createSale();
         if (customerOrder == null) return;
 
@@ -1138,7 +1142,7 @@ public class SalesAction extends GenericAction {
     public void initCreditSale(){
         setSaleType(SaleTypeEnum.CREDIT);
         calculateTotalAmount();
-        System.out.println("====>Credit Sale Fecha: " + this.orderDate);
+        validForSale = checkMinimumValues();
     }
 
     public void initSpecialBill(List<CustomerOrder> customerOrderList){
@@ -1155,9 +1159,9 @@ public class SalesAction extends GenericAction {
     }
 
     public void initCashSale(){
-        System.out.println("====>Cash Sale Fecha: " + this.orderDate);
         setSaleType(SaleTypeEnum.CASH);
         setMoneyReceived(calculateTotalAmount());
+        validForSale = checkMinimumValues();
     }
 
     public List<ProductItem> getBestProductList(){
@@ -1716,6 +1720,10 @@ public class SalesAction extends GenericAction {
 
     public void setValidateSale(Boolean validateSale) {
         this.validateSale = validateSale;
+    }
+
+    public boolean isValidForSale() {
+        return validForSale;
     }
 
     public Boolean getOnline() {
