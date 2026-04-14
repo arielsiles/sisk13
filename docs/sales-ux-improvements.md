@@ -59,7 +59,10 @@ URL: `/khipus/customers/salesBox?actionMethod=home.xhtml%3AsalesAction.openSale(
 - **Estado:** Pendiente
 - **Problema:** `registerSale()`, `registerCashSale()`, `registerCashSaleNoInvoice()`, `registerSaleAndInvoice()` no tienen try-catch. Si falla `createInvoice()`, `accountingCashSale()`, o el servicio de transaccion, el usuario ve una excepcion cruda en pantalla.
 - **Solucion:** Envolver el cuerpo de cada metodo en try-catch, mostrar `facesMessages.addFromResourceBundle(ERROR, "mensaje")` y hacer log del error. Limpiar el formulario solo si la venta fue exitosa.
-- **Archivos:** `SalesAction.java`
+- **Secuencia protegida:** Generacion de secuencia movida dentro de `createSaleWithInventory()` para que sea parte de la misma transaccion atomica. Si falla el persist, la secuencia se revierte.
+- **Estado parcial:** Si la venta se registra pero falla factura o asiento, se muestra WARN con numero de venta y se limpia el formulario. La factura se puede generar posteriormente (funcionalidad existente: `processBilling`).
+- **TODO pendiente:** Implementar generacion de asiento contable posterior para ventas que quedaron sin asiento.
+- **Archivos:** `SalesAction.java`, `SaleTransactionService.java`, `SaleTransactionServiceBean.java`
 
 ### Prioridad Media (UX y calidad)
 
@@ -116,7 +119,7 @@ URL: `/khipus/customers/salesBox?actionMethod=home.xhtml%3AsalesAction.openSale(
 |-------|-------------|-----------|--------|
 | T01 | Fix checkMinimumValues() | Alta | **Completado** |
 | T02 | Proteccion doble-click | Alta | **Completado** |
-| T03 | Try-catch en registro | Alta | Pendiente |
+| T03 | Try-catch en registro + secuencia protegida | Alta | **Completado** |
 | T04 | Spinner/loading AJAX | Media | Pendiente |
 | T05 | Columna Existencia | Media | Pendiente |
 | T06 | Logging Seam | Media | Pendiente |

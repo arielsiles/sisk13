@@ -449,46 +449,53 @@ public class SalesAction extends GenericAction {
 
     /** Venta a credito **/
     public void registerSale(){
-        System.out.println("------------> Registrando venta Total: " + getTotalAmount());
-        System.out.println("------------> Description: " + getObservation());
-        System.out.println("------------> Fecha: " + DateUtils.format(getOrderDate(), "dd/MM/yyyy"));
-
         if (!checkMinimumValues()) return;
+        try {
+            CustomerOrder customerOrder = createSale();
+            if (customerOrder == null) return;
 
-        CustomerOrder customerOrder = createSale();
-        if (customerOrder == null) return;
+            saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
 
-        saleTransactionService.createSaleWithInventory(customerOrder);
-
-        clearAll();
-        assignCustomerOrderTypeDefault();
+            clearAll();
+            assignCustomerOrderTypeDefault();
+        } catch (Exception e) {
+            e.printStackTrace();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
+        }
     }
 
     /** Venta a credito y factura y asiento **/
     public void registerSaleAndInvoice(){
         if (!checkMinimumValues()) return;
+        try {
+            CustomerOrder customerOrder = createSale();
+            if (customerOrder == null) return;
 
-        CustomerOrder customerOrder = createSale();
-        if (customerOrder == null) return;
+            saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
 
-        saleTransactionService.createSaleWithInventory(customerOrder);
+            try {
+                Movement movement = createInvoice(customerOrder);
+                customerOrder.setMovement(movement);
+                saleService.updateCustomerOrder(customerOrder);
+                generateInvoiceOnline(customerOrder);
+                if (customerOrder.getTotalAmount() > 0)
+                    generateFileXML(customerOrder);
+            } catch (Exception e) {
+                e.printStackTrace();
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                        "Venta Nro " + customerOrder.getCode() + " registrada. Error al generar factura, se puede facturar posteriormente.");
+            }
 
-        Movement movement = createInvoice(customerOrder);
-        customerOrder.setMovement(movement);
-        saleService.updateCustomerOrder(customerOrder);
-
-        generateInvoiceOnline(customerOrder);
-
-        if ( customerOrder.getTotalAmount() > 0)
-            generateFileXML(customerOrder);
-
-        clearAll();
-        assignCustomerOrderTypeDefault();
+            clearAll();
+            assignCustomerOrderTypeDefault();
+        } catch (Exception e) {
+            e.printStackTrace();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
+        }
     }
 
 
-    public void registerCashSale() throws IOException {
-        System.out.println("......Registrando Venta al Contado...");
+    public void registerCashSale() {
         if (!checkMinimumValues()) return;
 
         if (totalAmount.compareTo(BigDecimal.ZERO) == 0){
@@ -496,25 +503,42 @@ public class SalesAction extends GenericAction {
             return;
         }
 
-        CustomerOrder customerOrder = createSale();
-        System.out.println("======> customerOrder???? " + customerOrder);
-        if (customerOrder!= null) {
-            saleTransactionService.createSaleWithInventory(customerOrder);
+        try {
+            CustomerOrder customerOrder = createSale();
+            if (customerOrder == null) return;
 
-            Movement movement = createInvoice(customerOrder);
-            customerOrder.setMovement(movement);
-            Voucher voucher = accountingCashSale(customerOrder, movement);
-            customerOrder.setVoucher(voucher);
-            customerOrder.setAccounted(Boolean.TRUE);
-            saleService.updateCustomerOrder(customerOrder);
+            saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
 
-            generateInvoiceOnline(customerOrder);
+            try {
+                Movement movement = createInvoice(customerOrder);
+                customerOrder.setMovement(movement);
 
-            if ( customerOrder.getTotalAmount() > 0)
-                generateFileXML(customerOrder);
+                try {
+                    Voucher voucher = accountingCashSale(customerOrder, movement);
+                    customerOrder.setVoucher(voucher);
+                    customerOrder.setAccounted(Boolean.TRUE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                            "Venta Nro " + customerOrder.getCode() + " registrada y facturada. Asiento contable pendiente.");
+                    // TODO: implementar generacion de asiento contable posterior
+                }
+
+                saleService.updateCustomerOrder(customerOrder);
+                generateInvoiceOnline(customerOrder);
+                if (customerOrder.getTotalAmount() > 0)
+                    generateFileXML(customerOrder);
+            } catch (Exception e) {
+                e.printStackTrace();
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                        "Venta Nro " + customerOrder.getCode() + " registrada. Error al generar factura, se puede facturar posteriormente.");
+            }
 
             clearAll();
             assignCustomerOrderTypeDefault();
+        } catch (Exception e) {
+            e.printStackTrace();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
         }
     }
 
@@ -572,21 +596,31 @@ public class SalesAction extends GenericAction {
     }
 
     public void registerCashSaleNoInvoice(){
-        System.out.println("......Registrando Venta al Contado SF...");
         if (!checkMinimumValues()) return;
+        try {
+            CustomerOrder customerOrder = createSale();
+            if (customerOrder == null) return;
 
-        CustomerOrder customerOrder = createSale();
-        if (customerOrder == null) return;
+            saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
 
-        saleTransactionService.createSaleWithInventory(customerOrder);
+            try {
+                Voucher voucher = accountingCashSaleNoInvoice(customerOrder);
+                customerOrder.setVoucher(voucher);
+                customerOrder.setAccounted(Boolean.TRUE);
+                saleService.updateCustomerOrder(customerOrder);
+            } catch (Exception e) {
+                e.printStackTrace();
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                        "Venta Nro " + customerOrder.getCode() + " registrada. Asiento contable pendiente.");
+                // TODO: implementar generacion de asiento contable posterior
+            }
 
-        Voucher voucher = accountingCashSaleNoInvoice(customerOrder);
-        customerOrder.setVoucher(voucher);
-        customerOrder.setAccounted(Boolean.TRUE);
-        saleService.updateCustomerOrder(customerOrder);
-
-        clearAll();
-        assignCustomerOrderTypeDefault();
+            clearAll();
+            assignCustomerOrderTypeDefault();
+        } catch (Exception e) {
+            e.printStackTrace();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
+        }
     }
 
     public CustomerOrder createSale(){
@@ -611,8 +645,6 @@ public class SalesAction extends GenericAction {
         if (this.invoiceNumberCafc != null)
             customerOrder.setInvoiceNumberCafc(this.invoiceNumberCafc.toString());
 
-        Long saleCode = saleSequenceService.getNextValue(saleType.getSequenceName());
-        customerOrder.setCode(saleCode);
         customerOrder.setUser(currentUser);
         customerOrder.setOrderDate(orderDate);
         customerOrder.setObservation(observation);

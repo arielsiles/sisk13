@@ -18,6 +18,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Servicio transaccional para creacion atomica de ventas.
@@ -37,9 +38,13 @@ public class SaleTransactionServiceBean implements SaleTransactionService {
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void createSaleWithInventory(CustomerOrder customerOrder) {
+    public void createSaleWithInventory(CustomerOrder customerOrder, String sequenceName) {
 
-        /** 1. Persistir pedido y articulos **/
+        /** 1. Generar secuencia en la misma transaccion **/
+        long saleCode = generateSequence(sequenceName);
+        customerOrder.setCode(saleCode);
+
+        /** 2. Persistir pedido y articulos **/
         Collection<ArticleOrder> articleOrderList = customerOrder.getArticleOrderList();
         for (ArticleOrder articleOrder : articleOrderList) {
             articleOrder.setCustomerOrder(customerOrder);
@@ -48,7 +53,7 @@ public class SaleTransactionServiceBean implements SaleTransactionService {
         em.persist(customerOrder);
         em.flush();
 
-        /** 2. Actualizar inventario con locking pesimista **/
+        /** 3. Actualizar inventario con locking pesimista **/
         for (ArticleOrder articleOrder : articleOrderList) {
             updateInventory(articleOrder);
             updateArticleCosts(articleOrder);
@@ -124,6 +129,34 @@ public class SaleTransactionServiceBean implements SaleTransactionService {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    /**
+     * Genera el siguiente valor de secuencia dentro de la transaccion actual.
+     * Si la transaccion hace rollback, la secuencia tambien se revierte.
+     */
+    private long generateSequence(String sequenceName) {
+        String schema = Constants.FINANCES_SCHEMA;
+
+        int updated = em.createNativeQuery(
+                "UPDATE " + schema + "._sequence SET seq_val = seq_val + 1 WHERE seq_name = :name")
+                .setParameter("name", sequenceName)
+                .executeUpdate();
+
+        if (updated == 0) {
+            em.createNativeQuery(
+                    "INSERT INTO " + schema + "._sequence (seq_name, seq_val) VALUES (:name, 1)")
+                    .setParameter("name", sequenceName)
+                    .executeUpdate();
+            return 1;
+        }
+
+        Number result = (Number) em.createNativeQuery(
+                "SELECT seq_val FROM " + schema + "._sequence WHERE seq_name = :name")
+                .setParameter("name", sequenceName)
+                .getSingleResult();
+
+        return result.longValue();
     }
 
     private InventoryDetail findInventoryDetail(String productItemCode) {
