@@ -5,6 +5,19 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
 ## [Sin publicar]
 
+### 2026-04-13
+
+#### Corregido
+- **Fix concurrencia ventas a credito**: Error `TransactionRequiredException: no transaction is in progress` cuando dos o mas usuarios registraban ventas simultaneamente sobre el mismo producto.
+  - **Causa raiz**: La funcion MySQL `getNextSeq()` retenia un row lock en la tabla `_sequence` durante toda la transaccion de Seam (persist pedido + actualizacion inventario + costos). Si la transaccion duraba mas de `innodb_lock_wait_timeout` (50s), MySQL hacia rollback de la segunda transaccion.
+  - **Nuevo `SaleSequenceService`**: Generador de secuencias con `@TransactionAttribute(REQUIRES_NEW)` y `@PersistenceContext`. Micro-transaccion independiente que libera el lock en ~1ms. Reemplaza llamada a `getNextSeq()` en ventas.
+  - **Nuevo `SaleTransactionService`**: Operacion atomica de venta (persist pedido + actualizacion inventario + costos ProductItem) en una sola transaccion `REQUIRES_NEW`. Usa `LockModeType.WRITE` en Inventory para serializar accesos concurrentes al mismo producto.
+  - **Atomicidad**: Si falla la actualizacion de inventario, se revierte el pedido completo (antes quedaban pedidos huerfanos sin descuento de inventario).
+  - **Codigo legacy intacto**: `SaleServiceBean`, `InventoryServiceBean`, `FinancesPkGeneratorServiceBean` sin cambios. Solo se modifica `SalesAction` para usar los nuevos servicios.
+  - Archivos nuevos: `SaleSequenceService.java`, `SaleSequenceServiceBean.java`, `SaleTransactionService.java`, `SaleTransactionServiceBean.java`
+  - Archivo modificado: `SalesAction.java`
+  - Tests: 15 tests de concurrencia (secuencias, inventario, atomicidad, anotaciones)
+
 ---
 
 ## [6.0.43]

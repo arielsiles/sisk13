@@ -19,6 +19,7 @@ import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.*;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
+import com.encens.khipus.service.finances.SaleSequenceService;
 import com.encens.khipus.service.finances.UserCashBoxService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.InventoryService;
@@ -143,6 +144,12 @@ public class SalesAction extends GenericAction {
 
     @In
     private InventoryService inventoryService;
+
+    @In
+    private SaleSequenceService saleSequenceService;
+
+    @In
+    private SaleTransactionService saleTransactionService;
 
     /*@Create
     public void initialize() {
@@ -447,8 +454,9 @@ public class SalesAction extends GenericAction {
         checkMinimumValues();
 
         CustomerOrder customerOrder = createSale();
+        if (customerOrder == null) return;
 
-        inventoryService.updateInventoryForSales(customerOrder);
+        saleTransactionService.createSaleWithInventory(customerOrder);
 
         clearAll();
         assignCustomerOrderTypeDefault();
@@ -459,11 +467,13 @@ public class SalesAction extends GenericAction {
         checkMinimumValues();
 
         CustomerOrder customerOrder = createSale();
+        if (customerOrder == null) return;
+
+        saleTransactionService.createSaleWithInventory(customerOrder);
 
         Movement movement = createInvoice(customerOrder);
         customerOrder.setMovement(movement);
         saleService.updateCustomerOrder(customerOrder);
-        inventoryService.updateInventoryForSales(customerOrder);
 
         generateInvoiceOnline(customerOrder);
 
@@ -487,14 +497,14 @@ public class SalesAction extends GenericAction {
         CustomerOrder customerOrder = createSale();
         System.out.println("======> customerOrder???? " + customerOrder);
         if (customerOrder!= null) {
+            saleTransactionService.createSaleWithInventory(customerOrder);
+
             Movement movement = createInvoice(customerOrder);
             customerOrder.setMovement(movement);
             Voucher voucher = accountingCashSale(customerOrder, movement);
             customerOrder.setVoucher(voucher);
             customerOrder.setAccounted(Boolean.TRUE);
             saleService.updateCustomerOrder(customerOrder);
-
-            inventoryService.updateInventoryForSales(customerOrder);
 
             generateInvoiceOnline(customerOrder);
 
@@ -562,12 +572,14 @@ public class SalesAction extends GenericAction {
     public void registerCashSaleNoInvoice(){
         System.out.println("......Registrando Venta al Contado SF...");
         CustomerOrder customerOrder = createSale();
+        if (customerOrder == null) return;
+
+        saleTransactionService.createSaleWithInventory(customerOrder);
+
         Voucher voucher = accountingCashSaleNoInvoice(customerOrder);
         customerOrder.setVoucher(voucher);
         customerOrder.setAccounted(Boolean.TRUE);
         saleService.updateCustomerOrder(customerOrder);
-
-        inventoryService.updateInventoryForSales(customerOrder);
 
         clearAll();
         assignCustomerOrderTypeDefault();
@@ -595,7 +607,7 @@ public class SalesAction extends GenericAction {
         if (this.invoiceNumberCafc != null)
             customerOrder.setInvoiceNumberCafc(this.invoiceNumberCafc.toString());
 
-        Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
+        Long saleCode = saleSequenceService.getNextValue(saleType.getSequenceName());
         customerOrder.setCode(saleCode);
         customerOrder.setUser(currentUser);
         customerOrder.setOrderDate(orderDate);
@@ -662,9 +674,7 @@ public class SalesAction extends GenericAction {
             customerOrder.setObservation(observation);
         }
 
-        if (customerOrder.getTotalAmount() > 0){
-            String outcome = saleService.createSale(customerOrder);
-        }else {
+        if (customerOrder.getTotalAmount() <= 0){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Monto total incorrecto para facturar, revise el % descuento.");
             customerOrder = null;
         }
