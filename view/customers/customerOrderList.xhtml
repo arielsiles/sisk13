@@ -336,8 +336,13 @@
                     </h:outputText>
                 </rich:column>
 
-                <rich:column styleClass="center">
+                <rich:column styleClass="center"
+                             style="#{salesAction.isIncomplete(customerOrder) ? 'background:#FFF3CD;' : ''}">
                     <h:outputText value="#{messages[customerOrder.state.status]}"/>
+                    <h:graphicImage value="/img/warnIcon.gif"
+                                    rendered="#{salesAction.isIncomplete(customerOrder)}"
+                                    title="#{salesAction.getIncompleteMessage(customerOrder)}"
+                                    style="margin-left:4px; vertical-align:middle;"/>
                 </rich:column>
 
                 <rich:column styleClass="center">
