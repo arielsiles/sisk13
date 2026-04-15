@@ -3,11 +3,32 @@
 Todos los cambios notables de este proyecto se documentan aqui.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
-## [Sin publicar]
+## [6.0.46] - 2026-04-14
 
-### 2026-04-13
+### Agregado
+- **Toast notifications global**: Mensajes del sistema como notificaciones flotantes (top-right) con boton X para cerrar. No empuja contenido. Auto-renderizado en cada request AJAX (`ajaxRendered=true`). Estilos diferenciados por tipo: error (rojo), warn (naranja), info (verde).
+- **Iconos de estado en listado de pedidos**: `pending.png` (PENDIENTE), `file-check.png` (CONTABILIZADO), `anulado.png` (ANULADO). Columna Estado movida a posicion 2.
+- **Indicador ventas incompletas**: Icono `warn.png` en ventas al contado sin asiento contable con tooltip "Asiento contable pendiente".
+- **Indicador facturacion pendiente**: Icono `pending.png` en columna Estado SIN cuando factura existe pero sin estado.
 
-#### Corregido
+### Corregido
+- **Fix error handling en registro de ventas** (T01-T03):
+  - `checkMinimumValues()` ahora retorna boolean y detiene ejecucion. Validacion antes de abrir modales.
+  - Proteccion doble-click en botones de registro (onclick disable/oncomplete enable).
+  - Try-catch en los 4 metodos de registro con mensajes diferenciados por tipo de fallo.
+  - `markRollback()` para manejo limpio de TX ABORT_ONLY en Seam.
+  - `safeClearAll()` en paths de exito para evitar fallos de EJB post-error.
+- **Fix NPE billing API deshabilitada**: `checkBillingMode()` retornaba `null` → NPE por unboxing `Boolean` a `boolean` → `RollbackInterceptor` de Seam marcaba TX como ABORT_ONLY. Ahora retorna `false` (modo offline).
+- **Fix `generateInvoiceOnline()`**: Catch `IOException` cambiado a `Exception` + `markRollback()` como safety net.
+- **Fix `registerCashSale()` inner catch**: Faltaba `return` despues de `markRollback()`, causando cascada al outer catch con mensaje incorrecto.
+- **Mensaje billing sin conexion**: Cambiado de INFO "Facturacion SIN CONEXION, -1" a WARN "Facturacion pendiente, sin conexion".
+- **Secuencia protegida**: Generacion de secuencia movida dentro de `createSaleWithInventory()` como parte de la transaccion atomica.
+
+---
+
+## [6.0.45] - 2026-04-13
+
+### Corregido
 - **Fix concurrencia ventas a credito**: Error `TransactionRequiredException: no transaction is in progress` cuando dos o mas usuarios registraban ventas simultaneamente sobre el mismo producto.
   - **Causa raiz**: La funcion MySQL `getNextSeq()` retenia un row lock en la tabla `_sequence` durante toda la transaccion de Seam (persist pedido + actualizacion inventario + costos). Si la transaccion duraba mas de `innodb_lock_wait_timeout` (50s), MySQL hacia rollback de la segunda transaccion.
   - **Nuevo `SaleSequenceService`**: Generador de secuencias con `@TransactionAttribute(REQUIRES_NEW)` y `@PersistenceContext`. Micro-transaccion independiente que libera el lock en ~1ms. Reemplaza llamada a `getNextSeq()` en ventas.
