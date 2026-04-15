@@ -66,11 +66,23 @@ URL: `/khipus/customers/salesBox?actionMethod=home.xhtml%3AsalesAction.openSale(
 
 ### Prioridad Media (UX y calidad)
 
-#### T04 - Indicador de carga AJAX (spinner/loading)
-- **Estado:** Pendiente
-- **Problema:** No hay `a4j:status` ni spinner visible. El usuario no sabe si la venta se esta procesando, especialmente en ventas con facturacion que toman mas tiempo.
-- **Solucion:** Agregar un `a4j:status` global con un spinner/overlay que se muestre durante las operaciones AJAX.
-- **Archivos:** `salesBox.xhtml`
+#### T04 - Toast notifications y mejoras visuales listado pedidos
+- **Estado:** Completado
+- **Problema:** Los mensajes de Seam (`facesMessages`) se renderizaban como un bloque que empujaba todo el contenido hacia abajo, desplazando la UX de ventas.
+- **Solucion:**
+  - Mensajes globales convertidos a toast flotante (`position:fixed; top:20px; right:20px`) con boton X para cerrar
+  - `a4j:outputPanel ajaxRendered="true"` para auto-renderizar en cada request AJAX sin modificar reRender de botones
+  - Estilos toast: box-shadow, border-radius, colores diferenciados por tipo (error rojo, warn naranja, info verde)
+  - Fix `checkBillingMode()` retornaba `null` → NPE unboxing → TX ABORT_ONLY. Ahora retorna `false` (offline)
+  - Fix `generateInvoiceOnline()` catch `IOException` → `Exception` + `markRollback()`
+  - Fix `registerCashSale()` inner catch sin `return` → cascada a outer catch
+  - Reemplazar `clearAll()/assignCustomerOrderTypeDefault()` por `safeClearAll()` en todos los register methods
+  - Mensaje billing sin conexion: WARN "Facturacion pendiente, sin conexion"
+  - Iconos estado en customerOrderList: `pending.png` (PEN), `file-check.png` (CONTA), `anulado.png` (ANL)
+  - Columna Estado movida a posicion 2 (despues de checkbox)
+  - Icono `warn.png` para ventas al contado sin asiento contable
+  - Icono `pending.png` en columna Estado SIN cuando factura existe pero sin estado
+- **Archivos:** `messages.xhtml`, `theme.css`, `SalesAction.java`, `BillControllerAction.java`, `customerOrderList.xhtml`
 
 #### T05 - Rehabilitar columna Existencia (stock disponible)
 - **Estado:** Pendiente
@@ -120,7 +132,7 @@ URL: `/khipus/customers/salesBox?actionMethod=home.xhtml%3AsalesAction.openSale(
 | T01 | Fix checkMinimumValues() | Alta | **Completado** |
 | T02 | Proteccion doble-click | Alta | **Completado** |
 | T03 | Try-catch en registro + secuencia protegida | Alta | **Completado** |
-| T04 | Spinner/loading AJAX | Media | Pendiente |
+| T04 | Toast notifications + iconos listado | Media | **Completado** |
 | T05 | Columna Existencia | Media | Pendiente |
 | T06 | Logging Seam | Media | Pendiente |
 | T07 | Migrar processBillingSpecial | Media | Pendiente |
