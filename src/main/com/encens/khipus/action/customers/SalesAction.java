@@ -472,10 +472,10 @@ public class SalesAction extends GenericAction {
 
             saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
 
-            clearAll();
-            assignCustomerOrderTypeDefault();
+            safeClearAll();
         } catch (Exception e) {
             e.printStackTrace();
+            markRollback();
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
         }
     }
@@ -491,6 +491,7 @@ public class SalesAction extends GenericAction {
             saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
         } catch (Exception e) {
             e.printStackTrace();
+            markRollback();
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
             return;
         }
@@ -502,8 +503,7 @@ public class SalesAction extends GenericAction {
             generateInvoiceOnline(customerOrder);
             if (customerOrder.getTotalAmount() > 0)
                 generateFileXML(customerOrder);
-            clearAll();
-            assignCustomerOrderTypeDefault();
+            safeClearAll();
         } catch (Exception e) {
             markRollback();
             e.printStackTrace();
@@ -529,6 +529,7 @@ public class SalesAction extends GenericAction {
             saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
         } catch (Exception e) {
             e.printStackTrace();
+            markRollback();
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
             return;
         }
@@ -545,16 +546,17 @@ public class SalesAction extends GenericAction {
             } catch (Exception e) {
                 markRollback();
                 e.printStackTrace();
+                clearAll();
                 facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
-                        "Venta Nro " + customerOrder.getCode() + " registrada y facturada. Asiento contable pendiente.");
+                        "Venta Nro " + customerOrder.getCode() + " registrada. Factura y/o asiento contable pendientes.");
+                return;
             }
 
             saleService.updateCustomerOrder(customerOrder);
             generateInvoiceOnline(customerOrder);
             if (customerOrder.getTotalAmount() > 0)
                 generateFileXML(customerOrder);
-            clearAll();
-            assignCustomerOrderTypeDefault();
+            safeClearAll();
         } catch (Exception e) {
             markRollback();
             e.printStackTrace();
@@ -571,8 +573,9 @@ public class SalesAction extends GenericAction {
                     billControllerAction.createBill(customerOrder);
             }
         } catch (Exception e) {
+            markRollback();
             e.printStackTrace();
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Error en facturacion electronica.");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Venta realizada, Facturacion PENDIENTE");
         }
     }
 
@@ -626,6 +629,7 @@ public class SalesAction extends GenericAction {
             saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
         } catch (Exception e) {
             e.printStackTrace();
+            markRollback();
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
             return;
         }
@@ -636,8 +640,7 @@ public class SalesAction extends GenericAction {
             customerOrder.setAccounted(Boolean.TRUE);
             customerOrder.setState(SaleStatus.CONTABILIZADO);
             saleService.updateCustomerOrder(customerOrder);
-            clearAll();
-            assignCustomerOrderTypeDefault();
+            safeClearAll();
         } catch (Exception e) {
             markRollback();
             e.printStackTrace();
@@ -1170,14 +1173,6 @@ public class SalesAction extends GenericAction {
         if (!customerOrder.getSaleType().equals(SaleTypeEnum.CASH)) return false;
         if (customerOrder.getState().equals(SaleStatus.ANULADO)) return false;
         return customerOrder.getAccounted() == null || !customerOrder.getAccounted();
-    }
-
-    public String getIncompleteMessage(CustomerOrder customerOrder){
-        if (!isIncomplete(customerOrder)) return "";
-        if (customerOrder.getMovement() == null) {
-            return "Factura y asiento contable pendientes";
-        }
-        return "Asiento contable pendiente";
     }
 
     public void assignClient(Client client){
