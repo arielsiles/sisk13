@@ -260,7 +260,7 @@
             <!--rows="#{sessionUser.rowsPerPage50}"-->
             <rich:dataTable id="customerOrderList" value="#{customerOrderDataModel}" var="customerOrder"
                             rows="15"
-                            width="100%" columnsWidth="2%, 5%, 5%, 5%, 25%, 5%, 5%, 10%, 8%, 5%, 10%, 5%, 10%">
+                            width="100%" columnsWidth="2%, 5%, 5%, 5%, 5%, 25%, 5%, 5%, 10%, 8%, 10%, 5%, 10%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -270,6 +270,7 @@
                                                           reRender="customerOrderList, dataScroller"/>
                         </rich:column>
 
+                        <rich:column>#{messages['CustomerOrder.state']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.date']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.saleType']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.code']}</rich:column>
@@ -278,7 +279,6 @@
                         <rich:column>#{messages['CustomerOrder.invoice.emission']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.invoiceStatusSIN']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.total']}</rich:column>
-                        <rich:column>#{messages['CustomerOrder.state']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.type']}</rich:column>
                         <rich:column>#{messages['CustomerOrder.user']}</rich:column>
                         <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
@@ -298,6 +298,27 @@
                                              value="#{customerOrderDataModel.selectedList[customerOrderDataModel.page][customerOrder.id]}">
                         <a4j:support event="onchange" reRender="selectCheckboxItem"/>
                     </h:selectBooleanCheckbox>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:graphicImage value="/img/pending.png"
+                                    rendered="#{customerOrder.state == 'PENDIENTE'}"
+                                    title="Pendiente"
+                                    style="vertical-align:middle;"/>
+                    <h:graphicImage value="/img/file-check.png"
+                                    rendered="#{customerOrder.state == 'CONTABILIZADO'}"
+                                    title="Contabilizado"
+                                    style="vertical-align:middle;"/>
+                    <h:graphicImage value="/img/anulado.png"
+                                    rendered="#{customerOrder.state == 'ANULADO'}"
+                                    title="Anulado"
+                                    style="vertical-align:middle;"/>
+                    <h:outputText value="#{messages[customerOrder.state.status]}"
+                                  rendered="#{customerOrder.state != 'PENDIENTE' and customerOrder.state != 'CONTABILIZADO' and customerOrder.state != 'ANULADO'}"/>
+                    <h:graphicImage value="/img/warn.png"
+                                    rendered="#{salesAction.isIncomplete(customerOrder)}"
+                                    title="Asiento contable pendiente"
+                                    style="margin-left:4px; vertical-align:middle;"/>
                 </rich:column>
 
                 <rich:column styleClass="center">
@@ -328,16 +349,16 @@
 
                 <rich:column styleClass="center">
                     <h:outputText value="#{customerOrder.getInvoiceStatusSIN()}"/>
+                    <h:graphicImage value="/img/pending.png"
+                                    rendered="#{customerOrder.getInvoiceNumber() != null and not empty customerOrder.getInvoiceNumber() and (customerOrder.getInvoiceStatusSIN() == null or empty customerOrder.getInvoiceStatusSIN())}"
+                                    title="Facturacion pendiente"
+                                    style="margin-left:4px; vertical-align:middle;"/>
                 </rich:column>
 
                 <rich:column styleClass="right">
                     <h:outputText value="#{customerOrder.totalAmount}">
                         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
-                </rich:column>
-
-                <rich:column styleClass="center">
-                    <h:outputText value="#{messages[customerOrder.state.status]}"/>
                 </rich:column>
 
                 <rich:column styleClass="center">
@@ -367,7 +388,7 @@
                                       rendered="#{salesAction.showActionsBilling(customerOrder) and s:hasPermission('CANCEL_ORDER_INVOICE_SFE','VIEW')}"
                                       oncomplete="Richfaces.showModalPanel('confirmCancelOrderModalPanel');"
                                       reRender="customerOrderList,confirmCancelOrderModalPanel">
-                        <h:graphicImage value="/img/annul2.png" styleClass="select-image" title="ANULAR FACTURA" />
+                        <h:graphicImage value="/img/anular.png" styleClass="select-image" title="ANULAR FACTURA" />
                     </a4j:commandLink>
 
                     &#160;

@@ -307,7 +307,8 @@
                                rendered="#{s:hasPermission('CREDITSALES', 'VIEW')}"
                                styleClass="button"
                                immediate="true"
-                               oncomplete="Richfaces.showModalPanel('confirmCreditSaleModalPanel');"
+                               data="#{salesAction.validForSale}"
+                               oncomplete="if(data) Richfaces.showModalPanel('confirmCreditSaleModalPanel');"
                                reRender="productDataTable,confirmCreditSaleModalPanel">
             </a4j:commandButton>
 
@@ -318,7 +319,8 @@
                                rendered="#{s:hasPermission('CASHSALES', 'VIEW')}"
                                styleClass="button"
                                immediate="true"
-                               oncomplete="Richfaces.showModalPanel('confirmCashSaleModalPanel');"
+                               data="#{salesAction.validForSale}"
+                               oncomplete="if(data) Richfaces.showModalPanel('confirmCashSaleModalPanel');"
                                reRender="productDataTable,confirmCashSaleModalPanel">
             </a4j:commandButton>
         </s:div>

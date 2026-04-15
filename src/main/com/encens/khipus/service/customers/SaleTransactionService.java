@@ -13,9 +13,11 @@ public interface SaleTransactionService {
 
     /**
      * Crea la venta y actualiza inventario atomicamente.
-     * Si cualquier paso falla, toda la operacion se revierte.
+     * Genera la secuencia de venta dentro de la misma transaccion.
+     * Si cualquier paso falla, toda la operacion (incluyendo secuencia) se revierte.
      *
-     * @param customerOrder pedido ya construido con su lista de articulos
+     * @param customerOrder pedido ya construido con su lista de articulos (sin codigo)
+     * @param sequenceName nombre de la secuencia a usar (ej: SECUENCIAPEDIDO, VENTADIRECTA)
      */
-    void createSaleWithInventory(CustomerOrder customerOrder);
+    void createSaleWithInventory(CustomerOrder customerOrder, String sequenceName);
 }
