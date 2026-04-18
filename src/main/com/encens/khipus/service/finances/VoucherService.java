@@ -56,5 +56,7 @@ public interface VoucherService {
 
     List<VoucherServiceBean.VoucherTransaction>getTransactionMajorAccounting(String start, String end, String cashAccount);
 
+    List<VoucherServiceBean.VoucherTransaction>getTransactionsByAccountCodes(String start, String end, List<String> accountCodes);
+
     List<String> getMinMaxNumber(Date start, Date end, String documentType);
 }

@@ -277,6 +277,37 @@ public class VoucherServiceBean implements VoucherService {
         return  voucherTransactionList;
     }
 
+    public List<VoucherTransaction> getTransactionsByAccountCodes(String start, String end, List<String> accountCodes){
+
+        List<VoucherTransaction> voucherTransactionList = new ArrayList<VoucherTransaction>();
+
+        if (accountCodes == null || accountCodes.isEmpty()) {
+            return voucherTransactionList;
+        }
+
+        List<Object[]> resultList = em.createNativeQuery("select " +
+                "e.fecha, d.cuenta, e.tipo_doc, e.no_doc, e.glosa, d.debe, d.haber " +
+                "from sf_tmpdet d " +
+                "left join sf_tmpenc e on d.id_tmpenc = e.id_tmpenc " +
+                "where e.fecha BETWEEN :start and :end " +
+                "and d.cuenta IN (:codes) " +
+                "and e.estado <> 'ANL' " +
+                "order by d.cuenta, e.fecha")
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .setParameter("codes", accountCodes)
+                .getResultList();
+
+        for (Object[] data : resultList) {
+            voucherTransactionList.add(new VoucherTransaction(
+                    DateUtils.format((Date) data[0], "dd/MM/yyyy"),
+                    (String) data[1], (String) data[2], (String) data[3], (String) data[4],
+                    (BigDecimal) data[5], (BigDecimal) data[6]));
+        }
+
+        return voucherTransactionList;
+    }
+
     public List<String> getMinMaxNumber(Date start, Date end, String documentType){
 
         List<String> resultMinMax = new ArrayList<String>();

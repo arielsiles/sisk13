@@ -498,6 +498,37 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     }
 
 
+    public Map<String, Double> getBalancesByAccountCodes(Date startDate, List<String> accountCodes){
+
+        Map<String, Double> result = new HashMap<String, Double>();
+
+        if (accountCodes == null || accountCodes.isEmpty()) {
+            return result;
+        }
+
+        List<Object[]> rows = em.createQuery(
+                "select voucherDetail.account, sum(voucherDetail.debit), sum(voucherDetail.credit) " +
+                " from VoucherDetail voucherDetail " +
+                " join voucherDetail.voucher voucher " +
+                " where voucher.date < :startdate " +
+                " and voucherDetail.account in (:codes) " +
+                " and voucher.state <> 'ANL' " +
+                " group by voucherDetail.account")
+                .setParameter("startdate", startDate)
+                .setParameter("codes", accountCodes)
+                .getResultList();
+
+        for (Object[] row : rows) {
+            String code = (String) row[0];
+            BigDecimal debit = row[1] != null ? (BigDecimal) row[1] : BigDecimal.ZERO;
+            BigDecimal credit = row[2] != null ? (BigDecimal) row[2] : BigDecimal.ZERO;
+            result.put(code, debit.doubleValue() - credit.doubleValue());
+        }
+
+        return result;
+    }
+
+
     public Double getCustomerBalance(Date startDate, String cashAccountCode, Long clientId){
 
         List<VoucherDetail> voucherDetailList = new ArrayList<VoucherDetail>();

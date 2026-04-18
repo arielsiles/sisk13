@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author
@@ -61,6 +62,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     void pendingVoucher(Voucher voucher);
     public Double getBalance(Date startDate, String cashAccountCode);
+
+    public Map<String, Double> getBalancesByAccountCodes(Date startDate, List<String> accountCodes);
 
     public Double getBalanceProvider(Date startDate, String cashAccountCode, String providerCode);
 

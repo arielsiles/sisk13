@@ -54,7 +54,7 @@
                 <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
                     <app:selectPopUp id="itemAccount"
-                                             required="true"
+                                             required="false"
                                              textValue="#{majorAccountingReportAction.cashAccount.fullName}"
                                              value="#{majorAccountingReportAction.cashAccount}"
                                              clearAction="majorAccountingReportAction.clearAccount()"
@@ -70,15 +70,15 @@
                 <!--<s:decorate><h:outputText value="#{majorAccountingReportAction.cashAccount.fullName}"/></s:decorate>-->
 
                 <s:decorate id="cashAccountTypeField" template="/include/inputField.xhtml" styleClass="formRow"
-                            rendered="#{s:hasPermission('MAJORACCOUNTINGCSV','VIEW')}">
+                            rendered="#{s:hasPermission('MAJOR_ACCOUNTING_GROUPED','VIEW')}">
                     <ui:define name="label">#{messages['Account.accountType']}</ui:define>
                     <h:selectOneMenu id="cashAccountType"
                                      value="#{majorAccountingReportAction.cashAccountType}"
                                      styleClass="input" required="false">
 
-                        <s:selectItems value="#{cashAccountTypeList}" var="cashAccountType"
+                        <s:selectItems value="#{majorAccountingReportAction.allowedCashAccountTypes}" var="cashAccountType"
                                        label="#{messages[cashAccountType.resourceKey]}"
-                                       hideNoSelectionLabel="false"/>
+                                       noSelectionLabel=""/>
                         <s:convertEnum/>
                     </h:selectOneMenu>
                 </s:decorate>
@@ -86,9 +86,22 @@
             </h:panelGrid>
         </rich:panel>
 
-        <app:reportDefaultOptions reportAction="#{majorAccountingReportAction}" showPageFormat="false"
-                                  tabIndex="11"
-                                  showReportTitle="false"/>
+        <rich:panel id="reportDefaultOptionsPanel">
+            <f:facet name="header">
+                #{messages['Reports.options']}
+            </f:facet>
+            <s:decorate id="formatField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Reports.format']}</ui:define>
+                <h:selectOneMenu id="reportFormat"
+                                 value="#{majorAccountingReportAction.reportFormat}"
+                                 styleClass="input"
+                                 tabindex="11">
+                    <f:selectItem itemLabel="PDF" itemValue="#{enumerationUtil.getEnumValue('com.encens.khipus.action.reports.ReportFormat', 'PDF')}"/>
+                    <f:selectItem itemLabel="EXCEL" itemValue="#{enumerationUtil.getEnumValue('com.encens.khipus.action.reports.ReportFormat', 'XLS')}"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </rich:panel>
 
         <div class="buttons">
 
