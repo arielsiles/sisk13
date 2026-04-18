@@ -82,6 +82,10 @@ public class CashAccount implements BaseModel {
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean movementAccount;
 
+    @Column(name = "ind_regulariz")
+    @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
+    private Boolean regulating;
+
     @Column(name = "ind_presup")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
     private Boolean budgetAccount;
@@ -506,6 +510,14 @@ public class CashAccount implements BaseModel {
 
     public void setAccountType(CashAccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public Boolean getRegulating() {
+        return regulating;
+    }
+
+    public void setRegulating(Boolean regulating) {
+        this.regulating = regulating;
     }
 
     public CreditState getState() {

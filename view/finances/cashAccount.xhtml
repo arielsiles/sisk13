@@ -143,6 +143,12 @@
                                          tabindex="2004"/>
             </s:decorate>
 
+            <s:decorate id="regulatingField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CashAccount.regulating']}</ui:define>
+                <h:selectBooleanCheckbox id="regulating" value="#{cashAccount.regulating}"
+                                         tabindex="2005"/>
+            </s:decorate>
+
             <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CashAccount.rootAccount']}:</ui:define>
                 <app:selectPopUp id="productItemAccount"

@@ -131,39 +131,25 @@ public class MajorAccountingReportAction extends GenericReportAction {
             return;
         }
 
-        String cashAccountName = this.cashAccount.getFullName();
-        Double balance = voucherAccoutingService.getBalance(startDate, cashAccount.getAccountCode());
-
-        log.debug("Generating products produced report...................");
-        HashMap<String, Object> reportParameters = new HashMap<String, Object>();
-
-        reportParameters.put("documentTitle", messages.get("MajorAccounting.report.title"));
-        reportParameters.put("companyName", companyConfiguration.getCompanyName());
-        reportParameters.put("systemName", companyConfiguration.getSystemName());
-        reportParameters.put("locationName", companyConfiguration.getLocationName());
-        reportParameters.put("startDate",startDate);
-        reportParameters.put("endDate",endDate);
-        reportParameters.put("cashAccount",cashAccountName);
-        reportParameters.put("balance",balance);
+        List<MajorAccountingRow> rows = buildSingleAccountRows();
 
         try {
             if (getReportFormat() != null && (getReportFormat().name().equals("XLS") || getReportFormat().name().equals("XLSX"))) {
-                exportarExcel(companyConfiguration, cashAccountName, balance);
-                return;
+                exportarExcelAgrupado(rows, companyConfiguration);
+            } else {
+                exportarPDFAgrupado(rows, companyConfiguration);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return;
         }
+    }
 
-        /*setReportFormat(ReportFormat.PDF);*/
-        super.generateReport(
-                "majorAccountingReport",
-                "/accounting/reports/majorAccountingReport.jrxml",
-                PageFormat.LETTER,
-                PageOrientation.PORTRAIT,
-                messages.get("MajorAccounting.report"),
-                reportParameters);
+    private int natureSign(CashAccount ca) {
+        if (ca == null || ca.getAccountType() == null) return +1;
+        CashAccountType t = ca.getAccountType();
+        boolean debtor = (t == CashAccountType.A || t == CashAccountType.E);
+        if (Boolean.TRUE.equals(ca.getRegulating())) debtor = !debtor;
+        return debtor ? +1 : -1;
     }
 
     public void generateGroupedReport(CompanyConfiguration companyConfiguration) {
@@ -214,20 +200,25 @@ public class MajorAccountingReportAction extends GenericReportAction {
         CashAccount currentAccount = null;
         BigDecimal currentInitial = BigDecimal.ZERO;
         BigDecimal running = BigDecimal.ZERO;
+        int currentSign = 1;
 
         for (VoucherServiceBean.VoucherTransaction t : transactions) {
             String code = t.getAccount();
             if (!code.equals(currentCode)) {
                 currentCode = code;
                 currentAccount = accountByCode.get(code);
+                currentSign = natureSign(currentAccount);
                 Double ib = initialBalancesMap.get(code);
-                currentInitial = ib != null ? BigDecimal.valueOf(ib) : BigDecimal.ZERO;
+                BigDecimal rawIb = ib != null ? BigDecimal.valueOf(ib) : BigDecimal.ZERO;
+                currentInitial = currentSign == 1 ? rawIb : rawIb.negate();
                 running = currentInitial;
             }
 
             BigDecimal debit = t.getDebit() != null ? t.getDebit() : BigDecimal.ZERO;
             BigDecimal credit = t.getCredit() != null ? t.getCredit() : BigDecimal.ZERO;
-            running = running.add(debit).subtract(credit);
+            BigDecimal delta = debit.subtract(credit);
+            if (currentSign == -1) delta = delta.negate();
+            running = running.add(delta);
 
             String gloss = t.getGloss() != null ? t.getGloss().replaceAll("[\n\r]", " ") : "";
 
@@ -258,7 +249,9 @@ public class MajorAccountingReportAction extends GenericReportAction {
             Double ib = initialBalancesMap.get(code);
             if (ib == null || ib == 0.0) continue;
 
-            BigDecimal initialBalance = BigDecimal.valueOf(ib);
+            int sign = natureSign(ca);
+            BigDecimal rawIb = BigDecimal.valueOf(ib);
+            BigDecimal initialBalance = sign == 1 ? rawIb : rawIb.negate();
             noMovementRows.add(new MajorAccountingRow(
                     code, ca.getFullName(), initialBalance,
                     "", "", "", "",
@@ -276,6 +269,60 @@ public class MajorAccountingReportAction extends GenericReportAction {
         return rows;
     }
 
+    private List<MajorAccountingRow> buildSingleAccountRows() {
+
+        String start = DateUtils.format(startDate, "yyyy-MM-dd");
+        String end = DateUtils.format(endDate, "yyyy-MM-dd");
+
+        List<MajorAccountingRow> rows = new ArrayList<MajorAccountingRow>();
+
+        int sign = natureSign(cashAccount);
+        Double ib = voucherAccoutingService.getBalance(startDate, cashAccount.getAccountCode());
+        BigDecimal rawIb = ib != null ? BigDecimal.valueOf(ib) : BigDecimal.ZERO;
+        BigDecimal initialBalance = sign == 1 ? rawIb : rawIb.negate();
+
+        List<VoucherServiceBean.VoucherTransaction> transactionList =
+                voucherService.getTransactionMajorAccounting(start, end, cashAccount.getAccountCode());
+
+        BigDecimal running = initialBalance;
+
+        if (transactionList != null) {
+            for (VoucherServiceBean.VoucherTransaction t : transactionList) {
+                BigDecimal debit = t.getDebit() != null ? t.getDebit() : BigDecimal.ZERO;
+                BigDecimal credit = t.getCredit() != null ? t.getCredit() : BigDecimal.ZERO;
+                BigDecimal delta = debit.subtract(credit);
+                if (sign == -1) delta = delta.negate();
+                running = running.add(delta);
+
+                String gloss = t.getGloss() != null ? t.getGloss().replaceAll("[\n\r]", " ") : "";
+
+                rows.add(new MajorAccountingRow(
+                        cashAccount.getAccountCode(),
+                        cashAccount.getFullName(),
+                        initialBalance,
+                        t.getDate(),
+                        t.getDocumentType(),
+                        t.getDocumentNumber(),
+                        gloss,
+                        debit,
+                        credit,
+                        running
+                ));
+            }
+        }
+
+        if (rows.isEmpty()) {
+            rows.add(new MajorAccountingRow(
+                    cashAccount.getAccountCode(),
+                    cashAccount.getFullName(),
+                    initialBalance,
+                    "", "", "", "",
+                    BigDecimal.ZERO, BigDecimal.ZERO, initialBalance));
+        }
+
+        return rows;
+    }
+
     public void exportarPDFAgrupado(List<MajorAccountingRow> rows, CompanyConfiguration companyConfiguration) throws Exception {
 
         HashMap<String, Object> parameters = new HashMap<String, Object>();
@@ -285,7 +332,7 @@ public class MajorAccountingReportAction extends GenericReportAction {
         parameters.put("locationName", companyConfiguration.getLocationName());
         parameters.put("startDate", startDate);
         parameters.put("endDate", endDate);
-        parameters.put("cashAccountType", messages.get(cashAccountType.getResourceKey()));
+        parameters.put("cashAccountType", cashAccountType != null ? messages.get(cashAccountType.getResourceKey()) : "");
 
         File jrxmlFile = new File(JSFUtil.getRealPath("/accounting/reports/majorAccountingGroupedReport.jrxml"));
         String jrxmlContent = new String(java.nio.file.Files.readAllBytes(jrxmlFile.toPath()), "UTF-8");
@@ -341,9 +388,11 @@ public class MajorAccountingReportAction extends GenericReportAction {
         row.createCell(0).setCellValue("Periodo:");
         row.createCell(1).setCellValue(sdf.format(startDate) + " - " + sdf.format(endDate));
 
-        row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue("Tipo:");
-        row.createCell(1).setCellValue(messages.get(cashAccountType.getResourceKey()));
+        if (cashAccountType != null) {
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Tipo:");
+            row.createCell(1).setCellValue(messages.get(cashAccountType.getResourceKey()));
+        }
 
         rowNum++;
 
@@ -444,138 +493,6 @@ public class MajorAccountingReportAction extends GenericReportAction {
         stream.close();
         FacesContext.getCurrentInstance().responseComplete();
     }
-
-    public void exportarExcel(CompanyConfiguration companyConfiguration, String cashAccountName, Double initialBalance) throws IOException {
-
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
-        String start = DateUtils.format(startDate, "yyyy-MM-dd");
-        String end = DateUtils.format(endDate, "yyyy-MM-dd");
-
-        List<VoucherServiceBean.VoucherTransaction> transactionList =
-                voucherService.getTransactionMajorAccounting(start, end, cashAccount.getAccountCode());
-
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet("Mayor");
-
-        HSSFCellStyle headerStyle = workbook.createCellStyle();
-        HSSFFont headerFont = workbook.createFont();
-        headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-        headerStyle.setFont(headerFont);
-
-        HSSFCellStyle numberStyle = workbook.createCellStyle();
-        HSSFDataFormat numFormat = workbook.createDataFormat();
-        numberStyle.setDataFormat(numFormat.getFormat("#,##0.00"));
-
-        HSSFCellStyle numberBoldStyle = workbook.createCellStyle();
-        numberBoldStyle.setDataFormat(numFormat.getFormat("#,##0.00"));
-        numberBoldStyle.setFont(headerFont);
-
-        int rowNum = 0;
-        HSSFRow row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue(companyConfiguration.getCompanyName());
-        row.getCell(0).setCellStyle(headerStyle);
-
-        row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue(companyConfiguration.getLocationName());
-
-        row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue(companyConfiguration.getSystemName());
-
-        row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue(messages.get("MajorAccounting.report.title"));
-        row.getCell(0).setCellStyle(headerStyle);
-
-        row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue("Cuenta:");
-        row.createCell(1).setCellValue(cashAccountName);
-
-        row = sheet.createRow(rowNum++);
-        row.createCell(0).setCellValue("Periodo:");
-        row.createCell(1).setCellValue(sdf.format(startDate) + " - " + sdf.format(endDate));
-
-        rowNum++;
-
-        row = sheet.createRow(rowNum++);
-        String[] headers = {"Fecha", "Doc", "No.", "Glosa", "Debe", "Haber", "Saldo"};
-        for (int i = 0; i < headers.length; i++) {
-            HSSFCell cell = row.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
-        }
-
-        row = sheet.createRow(rowNum++);
-        row.createCell(3).setCellValue("Saldo inicial");
-        row.getCell(3).setCellStyle(headerStyle);
-        HSSFCell initialBalanceCell = row.createCell(6);
-        initialBalanceCell.setCellValue(initialBalance != null ? initialBalance : 0);
-        initialBalanceCell.setCellStyle(numberBoldStyle);
-
-        BigDecimal totalDebit = BigDecimal.ZERO;
-        BigDecimal totalCredit = BigDecimal.ZERO;
-        double balance = initialBalance != null ? initialBalance : 0;
-
-        for (VoucherServiceBean.VoucherTransaction t : transactionList) {
-            BigDecimal debit = t.getDebit() != null ? t.getDebit() : BigDecimal.ZERO;
-            BigDecimal credit = t.getCredit() != null ? t.getCredit() : BigDecimal.ZERO;
-            balance = balance + debit.doubleValue() - credit.doubleValue();
-            totalDebit = totalDebit.add(debit);
-            totalCredit = totalCredit.add(credit);
-
-            String gloss = t.getGloss() != null ? t.getGloss().replaceAll("[\n\r]", " ") : "";
-
-            row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(t.getDate() != null ? t.getDate() : "");
-            row.createCell(1).setCellValue(t.getDocumentType() != null ? t.getDocumentType() : "");
-            row.createCell(2).setCellValue(t.getDocumentNumber() != null ? t.getDocumentNumber() : "");
-            row.createCell(3).setCellValue(gloss);
-
-            HSSFCell debitCell = row.createCell(4);
-            debitCell.setCellValue(debit.doubleValue());
-            debitCell.setCellStyle(numberStyle);
-
-            HSSFCell creditCell = row.createCell(5);
-            creditCell.setCellValue(credit.doubleValue());
-            creditCell.setCellStyle(numberStyle);
-
-            HSSFCell balanceCell = row.createCell(6);
-            balanceCell.setCellValue(balance);
-            balanceCell.setCellStyle(numberStyle);
-        }
-
-        row = sheet.createRow(rowNum++);
-        row.createCell(3).setCellValue("TOTALES");
-        row.getCell(3).setCellStyle(headerStyle);
-
-        HSSFCell totalDebitCell = row.createCell(4);
-        totalDebitCell.setCellValue(totalDebit.doubleValue());
-        totalDebitCell.setCellStyle(numberBoldStyle);
-
-        HSSFCell totalCreditCell = row.createCell(5);
-        totalCreditCell.setCellValue(totalCredit.doubleValue());
-        totalCreditCell.setCellStyle(numberBoldStyle);
-
-        HSSFCell finalBalanceCell = row.createCell(6);
-        finalBalanceCell.setCellValue(balance);
-        finalBalanceCell.setCellStyle(numberBoldStyle);
-
-        sheet.setColumnWidth(0, 90 * 256 / 7);
-        sheet.setColumnWidth(1, 60 * 256 / 7);
-        sheet.setColumnWidth(2, 60 * 256 / 7);
-        sheet.setColumnWidth(3, 480 * 256 / 7);
-        sheet.setColumnWidth(4, 90 * 256 / 7);
-        sheet.setColumnWidth(5, 90 * 256 / 7);
-        sheet.setColumnWidth(6, 90 * 256 / 7);
-
-        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-        response.setContentType("application/vnd.ms-excel");
-        response.addHeader("Content-disposition", "attachment; filename=LibroMayor.xls");
-        ServletOutputStream stream = response.getOutputStream();
-        workbook.write(stream);
-        stream.flush();
-        stream.close();
-        FacesContext.getCurrentInstance().responseComplete();
-    }
-
 
     public void generateCSV(){
         final String fileName = "c:/TMP/Mayor-" + messages.get(this.cashAccountType.getResourceKey()) + ".csv";

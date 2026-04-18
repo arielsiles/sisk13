@@ -187,14 +187,18 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{documentTitle}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="380" y="0" width="55" height="10"/>
+				<reportElement x="380" y="0" width="55" height="10">
+					<printWhenExpression><![CDATA[$P{cashAccountType} != null && $P{cashAccountType}.length() > 0]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tipo:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="438" y="0" width="120" height="10"/>
+				<reportElement x="438" y="0" width="120" height="10">
+					<printWhenExpression><![CDATA[$P{cashAccountType} != null && $P{cashAccountType}.length() > 0]]></printWhenExpression>
+				</reportElement>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="7"/>
 				</textElement>
