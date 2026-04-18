@@ -3,6 +3,13 @@
 Todos los cambios notables de este proyecto se documentan aqui.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.0.0/).
 
+## [6.0.47] - 2026-04-17
+
+### Agregado
+- **Exportacion Excel inventario fisico valorado**: Boton "Generar Excel" en reporte de inventario fisico valorado (`valuedPhysicalInventory.xhtml`). Genera archivo `.xls` plano (Apache POI) con los mismos calculos que el PDF (codigo, articulo, unidad, costo unitario, saldo fisico, saldo valorado). Sin celdas combinadas, datos numericos directos para operar en Excel. Encabezados y totales en negrilla, anchos de columna configurados.
+
+---
+
 ## [6.0.46] - 2026-04-14
 
 ### Agregado

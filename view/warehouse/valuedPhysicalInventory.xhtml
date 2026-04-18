@@ -82,6 +82,11 @@
                                      value="#{messages['Common.generate']}" id="generateButtonId" tabindex="1">
                     </h:commandButton>
 
+                    <h:commandButton action="#{valuedPhysicalInventoryReportAction.generateReportExcel}"
+                                     styleClass="button"
+                                     value="#{messages['Common.generateExcel']}" id="generateExcelButtonId" tabindex="2">
+                    </h:commandButton>
+
                     <h:commandButton id="TransferButtonId" styleClass="button" rendered="#{s:hasPermission('TRANSFER_INVENTORY','VIEW')}"
                                      value="#{messages['ProductInventory.transferNextPeriod']}" tabindex="2">
                         <rich:componentControl for="processConfirmation" event="onclick"  disableDefault="true" operation="show"/>
