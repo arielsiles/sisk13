@@ -3,8 +3,9 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:s="http://jboss.com/products/seam/taglib">
-    <div>
+    <a4j:outputPanel id="toastContainer" ajaxRendered="true" layout="block">
         <rich:messages globalOnly="true" styleClass="message" errorClass="messageError" infoClass="messageInfo"
                        warnClass="messageWarm">
             <f:facet name="errorMarker">
@@ -17,10 +18,28 @@
                 <h:graphicImage value="/img/warnIcon.gif"/>
             </f:facet>
         </rich:messages>
-        <br/>
-    </div>
+        <script type="text/javascript">
+        //<![CDATA[
+            (function(){
+                var t = document.getElementById('toastContainer');
+                if (!t) return;
+                var hasMsg = t.getElementsByTagName('span').length > 0
+                          || t.getElementsByTagName('td').length > 0;
+                if (!hasMsg) { t.style.display = 'none'; return; }
+                t.style.display = 'block';
+                t.style.opacity = '1';
+
+                // Boton cerrar
+                var btn = document.createElement('span');
+                btn.innerHTML = '&#215;';
+                btn.style.cssText = 'position:absolute;top:6px;right:10px;cursor:pointer;font-size:16px;font-weight:bold;color:#999;';
+                btn.onmouseover = function(){ btn.style.color='#333'; };
+                btn.onmouseout = function(){ btn.style.color='#999'; };
+                btn.onclick = function(){ t.style.display='none'; };
+                t.style.position = 'fixed';
+                t.insertBefore(btn, t.firstChild);
+            })();
+        //]]>
+        </script>
+    </a4j:outputPanel>
 </ui:composition>
-
-
-
-

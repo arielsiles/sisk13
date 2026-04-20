@@ -73,12 +73,16 @@
                                action="#{salesAction.registerCashSaleNoInvoice()}"
                                rendered="#{s:hasPermission('CASHSALE_REGISTER','VIEW')}"
                                styleClass="button"
+                               onclick="this.disabled=true;"
+                               oncomplete="this.disabled=false;"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,paymentMethodField,customerCategoryTypeId"/>
 
             <a4j:commandButton id="confirmRegisterButton" value="Aceptar y facturar"
                                action="#{salesAction.registerCashSale()}"
                                rendered="#{s:hasPermission('CASHSALE_INVOICE','VIEW')}"
                                styleClass="button"
+                               onclick="this.disabled=true;"
+                               oncomplete="this.disabled=false;"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,paymentMethodField,customerCategoryTypeId"/>
 
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">

@@ -19,6 +19,7 @@ import com.encens.khipus.service.admin.UserService;
 import com.encens.khipus.service.customers.*;
 import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.finances.FinancesPkGeneratorService;
+import com.encens.khipus.service.finances.SaleSequenceService;
 import com.encens.khipus.service.finances.UserCashBoxService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.warehouse.InventoryService;
@@ -31,6 +32,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
+import org.jboss.seam.transaction.Transaction;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -82,6 +84,7 @@ public class SalesAction extends GenericAction {
     private Boolean validateSale = Boolean.FALSE;
 
     private Boolean isOnline = Boolean.TRUE;
+    private boolean validForSale = false;
 
     private UserCashBox userCashBox;
 
@@ -143,6 +146,12 @@ public class SalesAction extends GenericAction {
 
     @In
     private InventoryService inventoryService;
+
+    @In
+    private SaleSequenceService saleSequenceService;
+
+    @In
+    private SaleTransactionService saleTransactionService;
 
     /*@Create
     public void initialize() {
@@ -362,8 +371,8 @@ public class SalesAction extends GenericAction {
         if (getClient() != null) {
             for (ArticleOrder articleOrder : articleOrderList) {
                 totalAmount = BigDecimalUtil.sum(totalAmount, BigDecimalUtil.toBigDecimal(articleOrder.getAmount()));
-                if (articleOrder.getQuantity() == 0)
-                    setZeroProduct(Boolean.TRUE); /** Verifica productos con cantidad CERO **/
+                if (articleOrder.getQuantity() == null || articleOrder.getQuantity() <= 0)
+                    setZeroProduct(Boolean.TRUE);
             }
 
             BigDecimal discount = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(getClient().getAdditionalDiscount(), BigDecimalUtil.ONE_HUNDRED, 4));
@@ -421,101 +430,152 @@ public class SalesAction extends GenericAction {
         setNameSpecialBill("");
     }
 
-    public void checkMinimumValues(){
+    public boolean checkMinimumValues(){
         if (client == null) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Seleccionar un cliente !");
-            return;
+            return false;
         }
 
         if (articleOrderList.isEmpty()){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Seleccionar al menos un producto !");
-            return;
+            return false;
         }
 
         if (zeroProduct){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Revisar productos con cantidad CERO !");
-            return;
+            return false;
+        }
+        return true;
+    }
+
+    /** Marca la transaccion de Seam para rollback (evita que Seam intente commit de una TX rota) **/
+    private void markRollback(){
+        try { Transaction.instance().setRollbackOnly(); } catch (Exception ignored) {}
+    }
+
+    /** Limpia el formulario sin propagar excepciones (la TX de Seam puede estar en rollback-only) **/
+    private void safeClearAll(){
+        try {
+            clearAll();
+            assignCustomerOrderTypeDefault();
+        } catch (Exception ignored) {
+            clearAll();
         }
     }
 
     /** Venta a credito **/
     public void registerSale(){
-        System.out.println("------------> Registrando venta Total: " + getTotalAmount());
-        System.out.println("------------> Description: " + getObservation());
-        System.out.println("------------> Fecha: " + DateUtils.format(getOrderDate(), "dd/MM/yyyy"));
+        if (!checkMinimumValues()) return;
+        try {
+            CustomerOrder customerOrder = createSale();
+            if (customerOrder == null) return;
 
-        checkMinimumValues();
+            saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
 
-        CustomerOrder customerOrder = createSale();
-
-        inventoryService.updateInventoryForSales(customerOrder);
-
-        clearAll();
-        assignCustomerOrderTypeDefault();
+            safeClearAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            markRollback();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
+        }
     }
 
     /** Venta a credito y factura y asiento **/
     public void registerSaleAndInvoice(){
-        checkMinimumValues();
+        if (!checkMinimumValues()) return;
 
-        CustomerOrder customerOrder = createSale();
+        CustomerOrder customerOrder;
+        try {
+            customerOrder = createSale();
+            if (customerOrder == null) return;
+            saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            markRollback();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
+            return;
+        }
 
-        Movement movement = createInvoice(customerOrder);
-        customerOrder.setMovement(movement);
-        saleService.updateCustomerOrder(customerOrder);
-        inventoryService.updateInventoryForSales(customerOrder);
-
-        generateInvoiceOnline(customerOrder);
-
-        if ( customerOrder.getTotalAmount() > 0)
-            generateFileXML(customerOrder);
-
-        clearAll();
-        assignCustomerOrderTypeDefault();
+        try {
+            Movement movement = createInvoice(customerOrder);
+            customerOrder.setMovement(movement);
+            saleService.updateCustomerOrder(customerOrder);
+            generateInvoiceOnline(customerOrder);
+            if (customerOrder.getTotalAmount() > 0)
+                generateFileXML(customerOrder);
+            safeClearAll();
+        } catch (Exception e) {
+            markRollback();
+            e.printStackTrace();
+            clearAll();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "Venta Nro " + customerOrder.getCode() + " registrada. Error al generar factura, se puede facturar posteriormente.");
+        }
     }
 
 
-    public void registerCashSale() throws IOException {
-        System.out.println("......Registrando Venta al Contado...");
-        checkMinimumValues();
+    public void registerCashSale() {
+        if (!checkMinimumValues()) return;
 
-        if (this.client == null || totalAmount.compareTo(BigDecimal.ZERO) == 0){
+        if (totalAmount.compareTo(BigDecimal.ZERO) == 0){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"No se puede realizar la venta, monto incorrecto.");
             return;
         }
 
-        CustomerOrder customerOrder = createSale();
-        System.out.println("======> customerOrder???? " + customerOrder);
-        if (customerOrder!= null) {
+        CustomerOrder customerOrder;
+        try {
+            customerOrder = createSale();
+            if (customerOrder == null) return;
+            saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            markRollback();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
+            return;
+        }
+
+        try {
             Movement movement = createInvoice(customerOrder);
             customerOrder.setMovement(movement);
-            Voucher voucher = accountingCashSale(customerOrder, movement);
-            customerOrder.setVoucher(voucher);
-            customerOrder.setAccounted(Boolean.TRUE);
+
+            try {
+                Voucher voucher = accountingCashSale(customerOrder, movement);
+                customerOrder.setVoucher(voucher);
+                customerOrder.setAccounted(Boolean.TRUE);
+                customerOrder.setState(SaleStatus.CONTABILIZADO);
+            } catch (Exception e) {
+                markRollback();
+                e.printStackTrace();
+                clearAll();
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                        "Venta Nro " + customerOrder.getCode() + " registrada. Factura y/o asiento contable pendientes.");
+                return;
+            }
+
             saleService.updateCustomerOrder(customerOrder);
-
-            inventoryService.updateInventoryForSales(customerOrder);
-
             generateInvoiceOnline(customerOrder);
-
-            if ( customerOrder.getTotalAmount() > 0)
+            if (customerOrder.getTotalAmount() > 0)
                 generateFileXML(customerOrder);
-
+            safeClearAll();
+        } catch (Exception e) {
+            markRollback();
+            e.printStackTrace();
             clearAll();
-            assignCustomerOrderTypeDefault();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "Venta Nro " + customerOrder.getCode() + " registrada. Error al generar factura, se puede facturar posteriormente.");
         }
     }
 
     public void generateInvoiceOnline(CustomerOrder customerOrder){
         try {
-            System.out.println("--->>> !hasInvoice ???" +  !billControllerAction.hasInvoice(customerOrder));
             if (!billControllerAction.hasInvoice(customerOrder)){
-                /** todo Verifica que no se pueda emitir la factura con monto CERO o menor **/
                 if ( customerOrder.getTotalAmount() > 0)
                     billControllerAction.createBill(customerOrder);
             }
-        } catch (IOException e) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Error en facturacion...");
+        } catch (Exception e) {
+            markRollback();
+            e.printStackTrace();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Venta realizada, Facturacion PENDIENTE");
         }
     }
 
@@ -560,17 +620,34 @@ public class SalesAction extends GenericAction {
     }
 
     public void registerCashSaleNoInvoice(){
-        System.out.println("......Registrando Venta al Contado SF...");
-        CustomerOrder customerOrder = createSale();
-        Voucher voucher = accountingCashSaleNoInvoice(customerOrder);
-        customerOrder.setVoucher(voucher);
-        customerOrder.setAccounted(Boolean.TRUE);
-        saleService.updateCustomerOrder(customerOrder);
+        if (!checkMinimumValues()) return;
 
-        inventoryService.updateInventoryForSales(customerOrder);
+        CustomerOrder customerOrder;
+        try {
+            customerOrder = createSale();
+            if (customerOrder == null) return;
+            saleTransactionService.createSaleWithInventory(customerOrder, saleType.getSequenceName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            markRollback();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Error al registrar la venta, intente nuevamente.");
+            return;
+        }
 
-        clearAll();
-        assignCustomerOrderTypeDefault();
+        try {
+            Voucher voucher = accountingCashSaleNoInvoice(customerOrder);
+            customerOrder.setVoucher(voucher);
+            customerOrder.setAccounted(Boolean.TRUE);
+            customerOrder.setState(SaleStatus.CONTABILIZADO);
+            saleService.updateCustomerOrder(customerOrder);
+            safeClearAll();
+        } catch (Exception e) {
+            markRollback();
+            e.printStackTrace();
+            clearAll();
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "Venta Nro " + customerOrder.getCode() + " registrada. Asiento contable pendiente.");
+        }
     }
 
     public CustomerOrder createSale(){
@@ -595,8 +672,6 @@ public class SalesAction extends GenericAction {
         if (this.invoiceNumberCafc != null)
             customerOrder.setInvoiceNumberCafc(this.invoiceNumberCafc.toString());
 
-        Long saleCode = new Long(financesPkGeneratorService.getNextNoTransByDocumentType(saleType.getSequenceName()));
-        customerOrder.setCode(saleCode);
         customerOrder.setUser(currentUser);
         customerOrder.setOrderDate(orderDate);
         customerOrder.setObservation(observation);
@@ -609,9 +684,6 @@ public class SalesAction extends GenericAction {
         System.out.println("---------> paymentMethodSin: " + paymentMethodSin);
 
         customerOrder.setPaymentMethod(paymentMethodSin);
-
-        if (customerOrder.getSaleType().equals(SaleTypeEnum.CASH))
-            customerOrder.setState(SaleStatus.CONTABILIZADO);
 
         customerOrder.setTotalAmount(totalAmount.doubleValue());
         customerOrder.setAdditionalDiscountValue(this.additionalDiscountAmount);
@@ -662,9 +734,7 @@ public class SalesAction extends GenericAction {
             customerOrder.setObservation(observation);
         }
 
-        if (customerOrder.getTotalAmount() > 0){
-            String outcome = saleService.createSale(customerOrder);
-        }else {
+        if (customerOrder.getTotalAmount() <= 0){
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"Monto total incorrecto para facturar, revise el % descuento.");
             customerOrder = null;
         }
@@ -1098,6 +1168,13 @@ public class SalesAction extends GenericAction {
         return result;
     }
 
+    public boolean isIncomplete(CustomerOrder customerOrder){
+        if (customerOrder.getSaleType() == null) return false;
+        if (!customerOrder.getSaleType().equals(SaleTypeEnum.CASH)) return false;
+        if (customerOrder.getState().equals(SaleStatus.ANULADO)) return false;
+        return customerOrder.getAccounted() == null || !customerOrder.getAccounted();
+    }
+
     public void assignClient(Client client){
         setClient(client);
         assignCustomerOrderTypeDefault();
@@ -1128,7 +1205,7 @@ public class SalesAction extends GenericAction {
     public void initCreditSale(){
         setSaleType(SaleTypeEnum.CREDIT);
         calculateTotalAmount();
-        System.out.println("====>Credit Sale Fecha: " + this.orderDate);
+        validForSale = checkMinimumValues();
     }
 
     public void initSpecialBill(List<CustomerOrder> customerOrderList){
@@ -1145,9 +1222,9 @@ public class SalesAction extends GenericAction {
     }
 
     public void initCashSale(){
-        System.out.println("====>Cash Sale Fecha: " + this.orderDate);
         setSaleType(SaleTypeEnum.CASH);
         setMoneyReceived(calculateTotalAmount());
+        validForSale = checkMinimumValues();
     }
 
     public List<ProductItem> getBestProductList(){
@@ -1706,6 +1783,10 @@ public class SalesAction extends GenericAction {
 
     public void setValidateSale(Boolean validateSale) {
         this.validateSale = validateSale;
+    }
+
+    public boolean isValidForSale() {
+        return validForSale;
     }
 
     public Boolean getOnline() {

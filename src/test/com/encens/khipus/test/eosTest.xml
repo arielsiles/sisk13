@@ -32,4 +32,22 @@
         </classes>
     </test>
 
+    <test name="SaleServiceAnnotationTest">
+        <classes>
+            <class name="com.encens.khipus.test.customers.SaleServiceAnnotationTest"/>
+        </classes>
+    </test>
+
+    <test name="SequenceGeneratorConcurrencyTest">
+        <classes>
+            <class name="com.encens.khipus.test.customers.SequenceGeneratorConcurrencyTest"/>
+        </classes>
+    </test>
+
+    <test name="SaleTransactionConcurrencyTest">
+        <classes>
+            <class name="com.encens.khipus.test.customers.SaleTransactionConcurrencyTest"/>
+        </classes>
+    </test>
+
 </suite>

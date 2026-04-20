@@ -17,6 +17,12 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -137,6 +143,110 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
         return beanCollection;
     }
 
+
+    public void generateReportExcel() {
+
+        log.debug("generating Product Inventory Report EXCEL................................................");
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");}
+
+        Collection<CollectionData> beanCollection = calculateValuedInventory();
+
+        try {
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet = workbook.createSheet("Inventario Valorado");
+
+            // Estilo negrilla
+            HSSFFont boldFont = workbook.createFont();
+            boldFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+            HSSFCellStyle boldStyle = workbook.createCellStyle();
+            boldStyle.setFont(boldFont);
+
+            HSSFCellStyle boldNumberStyle = workbook.createCellStyle();
+            boldNumberStyle.setFont(boldFont);
+            HSSFCellStyle numberStyle = workbook.createCellStyle();
+
+            // Anchos de columna (px * 36 aprox para convertir a unidades POI)
+            sheet.setColumnWidth(0, 75 * 36);   // A: 75px
+            sheet.setColumnWidth(1, 370 * 36);  // B: 370px
+            sheet.setColumnWidth(2, 72 * 36);   // C: 72px
+            sheet.setColumnWidth(3, 115 * 36);  // D: 115px
+            sheet.setColumnWidth(4, 115 * 36);  // E: 115px
+            sheet.setColumnWidth(5, 115 * 36);  // F: 115px
+
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+            int rowNum = 0;
+
+            // Encabezado del reporte
+            HSSFRow row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(companyConfiguration.getCompanyName());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("REPORTE DE INVENTARIO FISICO - VALORADO");
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(this.warehouse.getWarehouseCashAccount().getFullName());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Periodo: " + sdf.format(startDate) + " - " + sdf.format(endDate));
+
+            rowNum++; // fila vacia
+
+            // Encabezados de columna (fila 6 en negrilla)
+            row = sheet.createRow(rowNum++);
+            String[] headers = {"CODIGO", "ARTICULO", "UNIDAD", "COSTO UNIT.", "SALDO FIS.", "SALDO VAL."};
+            for (int i = 0; i < headers.length; i++) {
+                HSSFCell cell = row.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(boldStyle);
+            }
+
+            // Datos
+            BigDecimal totalQuantity = BigDecimal.ZERO;
+            BigDecimal totalAmount = BigDecimal.ZERO;
+
+            for (CollectionData data : beanCollection) {
+                row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(data.getCodeArt());
+                row.createCell(1).setCellValue(data.getName());
+                row.createCell(2).setCellValue(data.getUnit());
+                row.createCell(3).setCellValue(data.getUnitCost().doubleValue());
+                row.createCell(4).setCellValue(data.getQuantity().doubleValue());
+                row.createCell(5).setCellValue(data.getAmount().doubleValue());
+
+                totalQuantity = totalQuantity.add(data.getQuantity());
+                totalAmount = totalAmount.add(data.getAmount());
+            }
+
+            // Fila de totales en negrilla
+            row = sheet.createRow(rowNum);
+            HSSFCell totalLabel = row.createCell(1);
+            totalLabel.setCellValue("TOTALES:");
+            totalLabel.setCellStyle(boldStyle);
+
+            HSSFCell totalQtyCell = row.createCell(4);
+            totalQtyCell.setCellValue(totalQuantity.doubleValue());
+            totalQtyCell.setCellStyle(boldNumberStyle);
+
+            HSSFCell totalAmtCell = row.createCell(5);
+            totalAmtCell.setCellValue(totalAmount.doubleValue());
+            totalAmtCell.setCellStyle(boldNumberStyle);
+
+            // Escribir respuesta
+            HttpServletResponse response = JSFUtil.getHttpServletResponse();
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-Disposition", "attachment; filename=ReporteInventarioValorado.xls");
+            workbook.write(response.getOutputStream());
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+            FacesContext.getCurrentInstance().responseComplete();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void exportarPDF(JasperPrint jasperPrint) throws IOException, JRException {
 

@@ -73,22 +73,6 @@
                 </c:otherwise>
             </c:choose>
 
-            <s:decorate id="productiveZoneField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['RawMaterialPayRoll.productiveZoneName']}</ui:define>
-                <h:inputText id="productiveZone" value="#{rawMaterialPayRoll.fullNameOfProductiveZone}"
-                             styleClass="input"
-                             disabled="true"
-                             maxlength="150" tabindex="1" readonly="#{rawMaterialPayRollAction.readonly}">
-                </h:inputText>
-                <a4j:commandLink id="selectProductiveZone" ajaxSingle="true" immediate="true" tabindex="2"
-                                 title="#{messages['RawMaterialPayRoll.selectProductiveZone']}"
-                                 disabled="true"
-                                 onclick="Richfaces.showModalPanel('productiveZoneModalPanel');"
-                                 rendered="#{!rawMaterialPayRollAction.managed and !rawMaterialPayRollAction.readonly}">
-                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
-                </a4j:commandLink>
-            </s:decorate>
-
             <s:decorate id="gestionField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Gestion.gestion']}</ui:define>
                 <h:selectOneMenu id="gestion"
@@ -250,20 +234,5 @@
 
 <rich:jQuery selector="#name" query="focus()" timing="onload"/>
 
-<s:decorate id="productiveZoneModalPanelContainer" template="/production/searchProductiveZoneModalPanel.xhtml">
-    <ui:param name="listTitle" value="#{messages['RawMaterialPayRoll.searchProductiveZone']}"/>
-    <ui:param name="searchPanelTitle" value="#{messages['RawMaterialPayRoll.searchProductiveZone']}"/>
-    <ui:param name="dialogId" value="productiveZoneModalPanel"/>
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton"
-                           title="#{messages['Common.choose']}"
-                           action="#{rawMaterialPayRollAction.selectProductiveZone(productiveZoneItem)}"
-                           image="/img/active.gif" styleClass="select-image-middle"
-                           ajaxSingle="true" reRender="productiveZoneField,collectedRawMaterialList"
-                           oncomplete="Richfaces.hideModalPanel('productiveZoneModalPanel');"
-                           style="width:0.8em"/>
-
-    </ui:define>
-</s:decorate>
 </ui:define>
 </ui:composition>

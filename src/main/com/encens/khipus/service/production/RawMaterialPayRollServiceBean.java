@@ -20,6 +20,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 import static com.encens.khipus.exception.production.RawMaterialPayRollException.*;
@@ -65,24 +66,13 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void createAll(RawMaterialPayRoll rawMaterialPayRoll) throws EntryDuplicatedException, RawMaterialPayRollException {
         try {
-            //validate(rawMaterialPayRoll);
-            //Object args = preCreate(rawMaterialPayRoll);
-            //processCreate(rawMaterialPayRoll);
-            //postCreate(rawMaterialPayRoll, args);
-            //getEntityManager().merge(rawMaterialPayRoll);
-            //getEntityManager().flush();
-
-            validate(rawMaterialPayRoll);
             Object args = preCreate(rawMaterialPayRoll);
             processCreate(rawMaterialPayRoll);
             postCreate(rawMaterialPayRoll, args);
             getEntityManager().flush();
-
-        } catch (PersistenceException e) { //TODO when hibernate will fix this http://opensource.atlassian.com/projects/hibernate/browse/EJB-382, we have to restore EntityExistsException here.
+        } catch (PersistenceException e) {
             log.debug("Persistence error..", e);
             log.info("PersistenceException caught");
-            //log.error(e);
-            //throw new EntryDuplicatedException(e);
         }
     }
 
@@ -161,21 +151,16 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return result;
     }
 
-    /** @Claude OPT-6: Parametro totalWeightFortnight agregado para evitar recalculo por zona **/
     @Override
-    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException {
+    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, Map<Long, ProducerTax> producerTaxCache, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException {
         Double totalReservaGAB = 0.0;
         if(discountProducer != null && dayFilter != 2) {
-            /** @Claude OPT-6: Usa totalWeightFortnight pre-calculado en vez de recalcular por zona **/
             Double totalWeightFortnightGAB = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), rawMaterialPayRoll.getProductiveZone(), dayFilter);
             Double percentageReserveGAB = ((totalWeightFortnightGAB * 100) / totalWeightFortnight) / 100;
             totalReservaGAB = (RoundUtil.getRoundValue(totalWeightFortnight * discountProducer.getReserve(), 2, RoundUtil.RoundMode.SYMMETRIC) * rawMaterialPayRoll.getUnitPrice()) * percentageReserveGAB;
         }
 
         Map<Date, Double> differences = createMapOfDifferencesWeights(rawMaterialPayRoll, dayFilter);
-
-        /** @Claude OPT-3: Pre-carga batch de ProducerTax para evitar lazy loading N+1 **/
-        Map<Long, ProducerTax> producerTaxCache = preloadProducerTaxes(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
         Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache, dayFilter);
         Double alcoholByGAB = (dayFilter == 2) ? 0.0 : salaryMovementGABService.getAlcoholBayGAB(rawMaterialPayRoll.getProductiveZone(), rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
@@ -250,7 +235,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             discount.setRawMaterialPayRecord(record);
             record.setRawMaterialProducerDiscount(discount);
             record.setDiscountReserve(aux.reserveDiscount);
-            record.setDiscountGA(aux.discountGA);
+            record.setDiscountGA(RoundUtil.getRoundValue(aux.discountGA, 2, RoundUtil.RoundMode.SYMMETRIC));
 
             rawMaterialPayRoll.getRawMaterialPayRecordList().add(record);
             record.setRawMaterialPayRoll(rawMaterialPayRoll);
@@ -986,12 +971,8 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return RoundUtil.getRoundValue(totaldiff, 2, RoundUtil.RoundMode.SYMMETRIC);
     }
 
-    /**
-     * @Claude OPT-3: Pre-carga batch de ProducerTax para evitar lazy loading N+1.
-     * Reemplaza las llamadas individuales a getProducerTaxValid() por productor
-     * con una sola query SQL que trae todos los registros fiscales validos.
-     */
-    private Map<Long, ProducerTax> preloadProducerTaxes(Date startDate, Date endDate) {
+    @Override
+    public Map<Long, ProducerTax> preloadProducerTaxes(Date startDate, Date endDate) {
         List<ProducerTax> taxes = getEntityManager().createQuery(
                 "SELECT pt FROM ProducerTax pt JOIN FETCH pt.gestionTax " +
                 "WHERE pt.gestionTax.startDate <= :startDate " +
@@ -1035,7 +1016,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             aux.procentaje = porcentage;
 
             // Ajuste por diferencia de peso (antes addProrationPorcentaje)
-            Double proration = totalDifference * porcentage;
+            Double proration = RoundUtil.getRoundValue(totalDifference * porcentage, 2, RoundUtil.RoundMode.SYMMETRIC);
             aux.adjustmentAmount = proration;
             aux.earnedMoney += proration;
 
@@ -1330,25 +1311,30 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
 
     @Override
     public void calculateLiquidPayable(RawMaterialPayRoll rawMaterialPayRoll) {
-        Double totalLiquidPay = 0.0;
+        BigDecimal totalLiquidPay = BigDecimal.ZERO;
         for (RawMaterialPayRecord record : rawMaterialPayRoll.getRawMaterialPayRecordList()) {
             RawMaterialProducerDiscount discount = record.getRawMaterialProducerDiscount();
-            double totalDiscount = 0.0;
-            totalDiscount += discount.getAlcohol();
-            totalDiscount += discount.getConcentrated();
-            totalDiscount += discount.getWithholdingTax();
-            totalDiscount += discount.getCans();
-            totalDiscount += discount.getCredit();
-            totalDiscount += discount.getVeterinary();
-            totalDiscount += discount.getYogurt();
-            totalDiscount += discount.getOtherDiscount();
-            totalDiscount += discount.getCommission();
-            double liquidPayable = record.getEarnedMoney() - totalDiscount + discount.getOtherIncoming() - record.getDiscountGA();
-            totalLiquidPay += liquidPayable;
-            record.setLiquidPayable(RoundUtil.getRoundValue(liquidPayable, 2, RoundUtil.RoundMode.SYMMETRIC));
+            BigDecimal totalDiscount = BigDecimal.ZERO;
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getAlcohol()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getConcentrated()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getWithholdingTax()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getCans()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getCredit()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getVeterinary()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getYogurt()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getOtherDiscount()));
+            totalDiscount = totalDiscount.add(BigDecimal.valueOf(discount.getCommission()));
+
+            BigDecimal liquidPayable = BigDecimal.valueOf(record.getEarnedMoney())
+                    .subtract(totalDiscount)
+                    .add(BigDecimal.valueOf(discount.getOtherIncoming()))
+                    .subtract(BigDecimal.valueOf(record.getDiscountGA()));
+
+            record.setLiquidPayable(liquidPayable.setScale(2, RoundingMode.HALF_UP).doubleValue());
+            totalLiquidPay = totalLiquidPay.add(liquidPayable);
         }
 
-        rawMaterialPayRoll.setTotalLiquidByGAB(RoundUtil.getRoundValue(totalLiquidPay, 2, RoundUtil.RoundMode.SYMMETRIC));
+        rawMaterialPayRoll.setTotalLiquidByGAB(totalLiquidPay.setScale(2, RoundingMode.HALF_UP).doubleValue());
     }
 
     public RawMaterialPayRoll getTotalsRawMaterialPayRoll(Date dateIni, Date dateEnd, ProductiveZone productiveZone, MetaProduct metaProduct) {
@@ -1563,6 +1549,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     @Override
     public List<RawMaterialPayRoll> findAll() {
         List<RawMaterialPayRoll> rawMaterialPayRolls = getEntityManager().createNamedQuery("RawMaterialPayRoll.getAllMaterialPayRoll")
+                .setMaxResults(1)
                 .getResultList();
         return rawMaterialPayRolls;
     }

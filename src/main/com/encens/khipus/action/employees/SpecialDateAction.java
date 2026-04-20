@@ -8,6 +8,8 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 
+import java.util.Calendar;
+
 /**
  * SpecialDate action class
  *
@@ -39,7 +41,37 @@ public class SpecialDateAction extends GenericAction<SpecialDate> {
     @End
     @Restrict("#{s:hasPermission('SPECIALDATE','CREATE')}")
     public String create() {
+        normalizeAllDayTimes();
         return super.create();
+    }
+
+    @Override
+    @End
+    @Restrict("#{s:hasPermission('SPECIALDATE','UPDATE')}")
+    public String update() {
+        normalizeAllDayTimes();
+        return super.update();
+    }
+
+    /**
+     * Cuando allDay=true, los campos de hora no se renderizan en el formulario
+     * y pueden quedar con valores invalidos (ej: 24:00:00).
+     * Se normalizan a 00:00:00 - 23:59:59.
+     */
+    private void normalizeAllDayTimes() {
+        if (getInstance().getAllDay() != null && getInstance().getAllDay()) {
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            getInstance().setStartTime(cal.getTime());
+
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            getInstance().setEndTime(cal.getTime());
+        }
     }
 
     @Override

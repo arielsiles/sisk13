@@ -63,12 +63,16 @@
                                action="#{salesAction.registerSaleAndInvoice()}"
                                styleClass="button"
                                rendered="#{s:hasPermission('CREDITSALE_INVOICE','VIEW')}"
+                               onclick="this.disabled=true;"
+                               oncomplete="this.disabled=false;"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,paymentMethodField,customerCategoryTypeId"/>
 
             <a4j:commandButton id="confirmRegisterButton" value="Aceptar"
                                action="#{salesAction.registerSale()}"
                                styleClass="button"
                                rendered="#{s:hasPermission('CREDITSALE_REGISTER','VIEW')}"
+                               onclick="this.disabled=true;"
+                               oncomplete="this.disabled=false;"
                                reRender="clientField,totalAmount,distributorField,productDataTable,customerOrderTypeField,subsidyField,paymentMethodField,customerCategoryTypeId"/>
 
             <h:commandButton value="#{messages['Common.cancel']}" styleClass="button">

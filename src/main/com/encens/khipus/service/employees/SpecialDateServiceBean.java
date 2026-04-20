@@ -96,6 +96,21 @@ public class SpecialDateServiceBean implements SpecialDateService {
         }
     }
 
+    public Map<Date, List<TimeInterval>> getSpecialDateTimeRangeUnpaid(Employee employee, Date initDate, Date endDate) {
+        try {
+            return getDateTimeIntervalRangeList(em.createNamedQuery("SpecialDate.findSpecialDateTimeRangeByEmployee")
+                    .setParameter("specialDateTarget", SpecialDateTarget.EMPLOYEE)
+                    .setParameter("employee", employee)
+                    .setParameter("initDate", initDate)
+                    .setParameter("endDate", endDate)
+                    .setParameter("credit", SpecialDateType.UNPAID)
+                    .setParameter("allDay", false)
+                    .getResultList(), initDate, endDate);
+        } catch (NoResultException e) {
+            return new LinkedHashMap<Date, List<TimeInterval>>();
+        }
+    }
+
     public List<Date> getSpecialDateRange(OrganizationalUnit organizationalUnit, Date initDate, Date endDate) {
         try {
             return getDateRangeList(em.createNamedQuery("SpecialDate.findSpecialDateRangeByOrganizationalUnit")

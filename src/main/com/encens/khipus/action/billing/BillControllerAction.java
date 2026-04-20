@@ -327,7 +327,7 @@ public class BillControllerAction {
         System.out.println("--> Response Json: " + serverResponse.getResponseJson());
 
         if (serverResponse.getResponseCode() == -1){
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Facturacion SIN CONEXION, -1");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,"Facturacion pendiente, sin conexion");
             return;
         }
 
@@ -616,7 +616,7 @@ public class BillControllerAction {
 
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 

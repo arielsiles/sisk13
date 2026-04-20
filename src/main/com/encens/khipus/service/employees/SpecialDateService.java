@@ -46,6 +46,8 @@ public interface SpecialDateService {
 
     Map<Date, List<TimeInterval>> getSpecialDateTimeRange(Employee employee, Date initDate, Date endDate);
 
+    Map<Date, List<TimeInterval>> getSpecialDateTimeRangeUnpaid(Employee employee, Date initDate, Date endDate);
+
     Map<Date, List<TimeInterval>> getSpecialDateTimeRange(OrganizationalUnit organizationalUnit, Date initDate, Date endDate);
 
     Map<Date, List<TimeInterval>> getSpecialDateTimeRange(BusinessUnit businessUnit, Date initDate, Date endDate);
