@@ -2206,7 +2206,16 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             reverseVoucher.setProviderCode(originalVoucher.getProviderCode());
         }
 
-        for (VoucherDetail original : originalVoucher.getDetails()) {
+        // Voucher.getDetails() es @Transient y solo se popula al construir un
+        // voucher nuevo en memoria. Para un voucher ya persistido leemos la
+        // lista real mapeada por @OneToMany("voucher") mediante query directa.
+        @SuppressWarnings("unchecked")
+        List<VoucherDetail> originalDetails = em.createQuery(
+                "select d from VoucherDetail d where d.voucher =:voucher")
+                .setParameter("voucher", originalVoucher)
+                .getResultList();
+
+        for (VoucherDetail original : originalDetails) {
             VoucherDetail reversed = new VoucherDetail();
             reversed.setBusinessUnitCode(original.getBusinessUnitCode());
             reversed.setCostCenterCode(original.getCostCenterCode());
