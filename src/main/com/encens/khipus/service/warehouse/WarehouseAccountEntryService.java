@@ -77,6 +77,33 @@ public interface WarehouseAccountEntryService extends GenericService {
 
     void createAccountEntryForProductTransfer(WarehouseVoucher warehouseVoucherFrom, WarehouseVoucher warehouseVoucherTo, BusinessUnit executorUnit, String costCenterCode, String gloss)  throws CompanyConfigurationNotFoundException;
 
+    /**
+     * Genera un asiento contable reverso (contra-asiento) simetrico al
+     * {@code originalVoucher}: invierte DEBE y HABER linea por linea
+     * manteniendo los montos originales. Enlaza el nuevo asiento al original
+     * via {@code relatedTransactionNumber} y prefija la glosa con
+     * {@link com.encens.khipus.util.Constants#ANNULMENT_PREFIX} + motivo.
+     *
+     * @param sourceWarehouseVoucher vale de origen cuyo asiento se revierte
+     * @param originalVoucher asiento original a revertir
+     * @param reason motivo de la anulacion (se incluye en la glosa)
+     * @return el nuevo Voucher persistido en estado PEN
+     */
+    Voucher createReverseAccountEntry(WarehouseVoucher sourceWarehouseVoucher,
+                                      Voucher originalVoucher,
+                                      String reason);
+
+    /**
+     * Anulacion directa de un asiento: marca {@code state=ANL} y antepone el
+     * motivo entre asteriscos a la glosa/descripcion. No genera contra-asiento
+     * ni afecta inventario. Uso previsto: asientos CP de liquidacion, pagos,
+     * anticipos.
+     *
+     * @param voucher asiento a anular
+     * @param reason motivo a registrar en la glosa
+     */
+    void annulVoucher(Voucher voucher, String reason);
+
     List<WarehouseVoucher> getVouchersWithoutAccounting(Date startDate, Date endDate);
 
     List<WarehouseVoucher> getVouchersFromTransferCustomerOrder(Date startDate, Date endDate);

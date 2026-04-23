@@ -2174,4 +2174,80 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         return customerOrderList;
     }*/
 
+    @Override
+    public Voucher createReverseAccountEntry(WarehouseVoucher sourceWarehouseVoucher,
+                                             Voucher originalVoucher,
+                                             String reason) {
+        String baseGloss = originalVoucher.getGloss() != null ? originalVoucher.getGloss() : "";
+        String reasonFragment = " [" + (reason != null ? reason : "") + "]";
+        String newGloss = Constants.ANNULMENT_PREFIX + baseGloss + reasonFragment;
+
+        Voucher reverseVoucher = VoucherBuilder.newGeneralVoucher(
+                originalVoucher.getForm() != null ? originalVoucher.getForm() : Constants.WAREHOUSE_VOUCHER_FORM,
+                newGloss,
+                originalVoucher.getTransactionNumber());
+
+        // Tipo documento inverso: IA <-> SA; caso contrario se preserva
+        String originalDocType = originalVoucher.getDocumentType();
+        if (Constants.IA_VOUCHER_DOCTYPE.equals(originalDocType)) {
+            reverseVoucher.setDocumentType(Constants.SA_VOUCHER_DOCTYPE);
+        } else if (Constants.SA_VOUCHER_DOCTYPE.equals(originalDocType)) {
+            reverseVoucher.setDocumentType(Constants.IA_VOUCHER_DOCTYPE);
+        } else {
+            reverseVoucher.setDocumentType(originalDocType);
+        }
+
+        if (originalVoucher.getUserNumber() != null) {
+            reverseVoucher.setUserNumber(originalVoucher.getUserNumber());
+        } else {
+            reverseVoucher.setUserNumber(companyConfigurationService.findDefaultAccountancyUserNumber());
+        }
+        if (originalVoucher.getProviderCode() != null) {
+            reverseVoucher.setProviderCode(originalVoucher.getProviderCode());
+        }
+
+        for (VoucherDetail original : originalVoucher.getDetails()) {
+            VoucherDetail reversed = new VoucherDetail();
+            reversed.setBusinessUnitCode(original.getBusinessUnitCode());
+            reversed.setCostCenterCode(original.getCostCenterCode());
+            reversed.setAccount(original.getAccount());
+            // Simetria: DEBE <-> HABER
+            reversed.setDebit(original.getCredit());
+            reversed.setCredit(original.getDebit());
+            reversed.setDebitMe(original.getCreditMe());
+            reversed.setCreditMe(original.getDebitMe());
+            reversed.setCurrency(original.getCurrency());
+            reversed.setExchangeAmount(original.getExchangeAmount());
+            reversed.setProviderCode(original.getProviderCode());
+            reversed.setProductItemCode(original.getProductItemCode());
+            reversed.setQuantityArt(original.getQuantityArt());
+            reverseVoucher.addVoucherDetail(reversed);
+        }
+
+        voucherAccoutingService.saveVoucher(reverseVoucher);
+        return reverseVoucher;
+    }
+
+    @Override
+    public void annulVoucher(Voucher voucher, String reason) {
+        if (voucher == null) {
+            return;
+        }
+        String marker = Constants.ANNULMENT_REASON_OPEN
+                + (reason != null ? reason : "")
+                + Constants.ANNULMENT_REASON_CLOSE;
+
+        String currentGloss = voucher.getGloss() != null ? voucher.getGloss() : "";
+        if (!currentGloss.startsWith(marker)) {
+            voucher.setGloss(marker + currentGloss);
+        }
+        String currentDescription = voucher.getDescription() != null ? voucher.getDescription() : "";
+        if (!currentDescription.startsWith(marker)) {
+            voucher.setDescription(marker + currentDescription);
+        }
+        voucher.setState(VoucherState.ANL.name());
+        em.merge(voucher);
+        em.flush();
+    }
+
 }

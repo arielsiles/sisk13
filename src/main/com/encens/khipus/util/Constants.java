@@ -164,6 +164,12 @@ public final class Constants {
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
     public static final String WAREHOUSEVOUCHER_NUMBER_PARAM = "<WAREHOUSEVOUCHER_NUMBER_PARAM>";
 
+    // Prefijo para glosas de asientos/registros generados por anulacion
+    public static final String ANNULMENT_PREFIX = "ANULACION - ";
+    // Marcador del motivo de anulacion al inicio de una glosa existente (entre asteriscos)
+    public static final String ANNULMENT_REASON_OPEN = "*";
+    public static final String ANNULMENT_REASON_CLOSE = "* ";
+
     // separators
     public static final String DOT_SEPARATOR = ".";
     public static final String HYPHEN_SEPARATOR = "-";
