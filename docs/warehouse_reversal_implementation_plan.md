@@ -290,8 +290,8 @@ public void reversePurchaseOrder(PurchaseOrder purchaseOrder,
    - `purchaseOrder.balanceAmount` restaurado al valor previo (si aplica)
 8. Merge/flush.
 
-### Tarea 3.2 — Localizar flujo de anulación de cheques
-Investigar y documentar cómo se anula un cheque en el módulo de tesorería (revisar `Check`, `CheckService`, `PurchaseOrderPayment.getCheck()`). Definir el punto de entrada exacto que invocará `reversePurchaseOrder` cuando detecte un pago con cheque.
+### Tarea 3.2 — Bloquear anulación cuando hay cheque emitido (decisión ronda 3)
+No existe un flujo de anulación de cheques en el sistema; implementarlo excede el alcance de esta funcionalidad. En consecuencia, Fase 3 **bloqueará** la anulación de una OC si alguno de sus `PurchaseOrderPayment` tiene cheque emitido, pidiendo al usuario que primero anule el cheque manualmente (o mediante contra-asiento aparte). Detectar esto revisando `PurchaseOrderPayment` → tipo CHEQUE / `paymentType` correspondiente. Mensaje i18n específico.
 
 ### Tarea 3.3 — Acción UI `WarehousePurchaseOrderAction.reverse()`
 Nueva acción:
