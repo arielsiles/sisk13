@@ -297,6 +297,18 @@ public class WarehouseVoucher implements BaseModel {
     @Column(name = "updated_by")
     private String updatedBy;
 
+    @Column(name = "fecha_anul")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date nullifyDate;
+
+    @Column(name = "usuario_anul", length = 4)
+    @Length(max = 4)
+    private String nullifyUser;
+
+    @Column(name = "motivo_anul", length = 250)
+    @Length(max = 250)
+    private String nullifyReason;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = new Date();
@@ -874,6 +886,34 @@ public class WarehouseVoucher implements BaseModel {
 
     public boolean isAccounted(){
         return null != getVoucher();
+    }
+
+    public Date getNullifyDate() {
+        return nullifyDate;
+    }
+
+    public void setNullifyDate(Date nullifyDate) {
+        this.nullifyDate = nullifyDate;
+    }
+
+    public String getNullifyUser() {
+        return nullifyUser;
+    }
+
+    public void setNullifyUser(String nullifyUser) {
+        this.nullifyUser = nullifyUser;
+    }
+
+    public String getNullifyReason() {
+        return nullifyReason;
+    }
+
+    public void setNullifyReason(String nullifyReason) {
+        this.nullifyReason = nullifyReason;
+    }
+
+    public boolean isNullified() {
+        return null != state && WarehouseVoucherState.ANL.equals(state);
     }
 
 }
