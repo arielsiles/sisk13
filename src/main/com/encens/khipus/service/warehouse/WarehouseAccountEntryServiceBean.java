@@ -2215,26 +2215,43 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 .setParameter("voucher", originalVoucher)
                 .getResultList();
 
+        // Orden contable del reverso: primero todas las lineas al DEBE
+        // (originales al HABER) y luego las al HABER (originales al DEBE).
         for (VoucherDetail original : originalDetails) {
-            VoucherDetail reversed = new VoucherDetail();
-            reversed.setBusinessUnitCode(original.getBusinessUnitCode());
-            reversed.setCostCenterCode(original.getCostCenterCode());
-            reversed.setAccount(original.getAccount());
-            // Simetria: DEBE <-> HABER
-            reversed.setDebit(original.getCredit());
-            reversed.setCredit(original.getDebit());
-            reversed.setDebitMe(original.getCreditMe());
-            reversed.setCreditMe(original.getDebitMe());
-            reversed.setCurrency(original.getCurrency());
-            reversed.setExchangeAmount(original.getExchangeAmount());
-            reversed.setProviderCode(original.getProviderCode());
-            reversed.setProductItemCode(original.getProductItemCode());
-            reversed.setQuantityArt(original.getQuantityArt());
-            reverseVoucher.addVoucherDetail(reversed);
+            if (isPositive(original.getCredit())) {
+                reverseVoucher.addVoucherDetail(buildReversedDetail(original));
+            }
+        }
+        for (VoucherDetail original : originalDetails) {
+            if (isPositive(original.getDebit())) {
+                reverseVoucher.addVoucherDetail(buildReversedDetail(original));
+            }
         }
 
         voucherAccoutingService.saveVoucher(reverseVoucher);
         return reverseVoucher;
+    }
+
+    private VoucherDetail buildReversedDetail(VoucherDetail original) {
+        VoucherDetail reversed = new VoucherDetail();
+        reversed.setBusinessUnitCode(original.getBusinessUnitCode());
+        reversed.setCostCenterCode(original.getCostCenterCode());
+        reversed.setAccount(original.getAccount());
+        // Simetria: DEBE <-> HABER
+        reversed.setDebit(original.getCredit());
+        reversed.setCredit(original.getDebit());
+        reversed.setDebitMe(original.getCreditMe());
+        reversed.setCreditMe(original.getDebitMe());
+        reversed.setCurrency(original.getCurrency());
+        reversed.setExchangeAmount(original.getExchangeAmount());
+        reversed.setProviderCode(original.getProviderCode());
+        reversed.setProductItemCode(original.getProductItemCode());
+        reversed.setQuantityArt(original.getQuantityArt());
+        return reversed;
+    }
+
+    private boolean isPositive(BigDecimal value) {
+        return value != null && value.compareTo(BigDecimal.ZERO) > 0;
     }
 
     @Override
