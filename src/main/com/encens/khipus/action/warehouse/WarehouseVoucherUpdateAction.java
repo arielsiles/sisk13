@@ -413,16 +413,28 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
 
     /**
      * Indica si el vale actual puede anularse por el flujo independiente.
-     * Usado para renderizar condicionalmente el boton "Anular".
+     * Usado para renderizar condicionalmente el boton "Anular". Blindado
+     * contra cualquier excepcion para no romper el render; en caso de fallo
+     * loguea la causa y oculta el boton.
      */
     public boolean isCanAnnul() {
         if (warehouseVoucher == null) {
+            return false;
+        }
+        if (reverseWarehouseVoucherService == null) {
+            log.warn("isCanAnnul: reverseWarehouseVoucherService is null (bean no inyectado)");
             return false;
         }
         try {
             reverseWarehouseVoucherService.validateReversibility(warehouseVoucher);
             return true;
         } catch (ReverseNotAllowedException e) {
+            log.debug("isCanAnnul: vale #0 no reversible: #1",
+                    warehouseVoucher.getNumber(), e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.warn("isCanAnnul: excepcion inesperada evaluando reversibilidad del vale #0: #1",
+                    warehouseVoucher.getNumber(), e);
             return false;
         }
     }
