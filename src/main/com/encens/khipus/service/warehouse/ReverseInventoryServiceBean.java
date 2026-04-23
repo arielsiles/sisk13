@@ -166,6 +166,13 @@ public class ReverseInventoryServiceBean extends GenericServiceBean implements R
 
     @Override
     public void reverseInventoryHistory(MovementDetail movementDetail) {
+        // El flujo de aprobacion de ENTRADAS no actualiza inv_invmes
+        // (linea 1062 de ApprovalWarehouseVoucherServiceBean comentada),
+        // por lo que revertir una entrada tampoco debe tocar esta tabla.
+        if (MovementDetailType.E.equals(movementDetail.getMovementType())) {
+            return;
+        }
+
         String monthCode = buildMonthCode();
         InventoryHistoryPK pk = new InventoryHistoryPK(
                 movementDetail.getCompanyNumber(),
@@ -178,7 +185,7 @@ public class ReverseInventoryServiceBean extends GenericServiceBean implements R
             inventoryHistory = findById(InventoryHistory.class, pk);
             getEntityManager().refresh(inventoryHistory);
         } catch (EntryNotFoundException e) {
-            // No hay acumulado en el mes actual: nada que revertir en esta tabla.
+            // Salida que no dejo registro en el mes actual: nada que revertir.
             return;
         }
 
@@ -187,20 +194,22 @@ public class ReverseInventoryServiceBean extends GenericServiceBean implements R
         BigDecimal amount = movementDetail.getAmount() != null
                 ? movementDetail.getAmount() : BigDecimal.ZERO;
 
-        if (MovementDetailType.E.equals(movementDetail.getMovementType())) {
-            inventoryHistory.setIncomingQuantity(
-                    BigDecimalUtil.subtract(inventoryHistory.getIncomingQuantity(), quantity));
-            inventoryHistory.setIncomingAmount(
-                    BigDecimalUtil.subtract(inventoryHistory.getIncomingAmount(), amount, 6));
-        } else {
-            inventoryHistory.setOutgoingQuantity(
-                    BigDecimalUtil.subtract(inventoryHistory.getOutgoingQuantity(), quantity));
-            inventoryHistory.setOutgoingAmount(
-                    BigDecimalUtil.subtract(inventoryHistory.getOutgoingAmount(), amount, 6));
-        }
+        // Revertir salidas: se resta sin permitir negativos (si por algun motivo
+        // el acumulado es menor que el movimiento, se deja en cero).
+        inventoryHistory.setOutgoingQuantity(
+                maxZero(BigDecimalUtil.subtract(inventoryHistory.getOutgoingQuantity(), quantity)));
+        inventoryHistory.setOutgoingAmount(
+                maxZero(BigDecimalUtil.subtract(inventoryHistory.getOutgoingAmount(), amount, 6)));
 
         getEntityManager().merge(inventoryHistory);
         getEntityManager().flush();
+    }
+
+    private BigDecimal maxZero(BigDecimal value) {
+        if (value == null) {
+            return BigDecimal.ZERO;
+        }
+        return value.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : value;
     }
 
     private Inventory findInventory(Warehouse warehouse, ProductItem productItem) {
