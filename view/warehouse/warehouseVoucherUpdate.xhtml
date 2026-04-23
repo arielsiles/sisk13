@@ -83,6 +83,15 @@
                                operation="show"/>
     </h:commandButton>
 
+    <h:commandButton value="#{messages['WarehouseVoucher.reverse.button']}"
+                     styleClass="button"
+                     rendered="#{warehouseVoucherUpdateAction.canAnnul and s:hasPermission('WAREHOUSEVOUCHERREVERSE','VIEW')}">
+        <rich:componentControl for="annulConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
     <h:commandButton action="#{warehouseVoucherUpdateAction.cancel}"
                      value="#{messages['Common.cancel']}"
                      styleClass="button"
@@ -888,11 +897,21 @@
                                operation="show"/>
     </h:commandButton>
 
+    <h:commandButton value="#{messages['WarehouseVoucher.reverse.button']}"
+                     styleClass="button"
+                     rendered="#{warehouseVoucherUpdateAction.canAnnul and s:hasPermission('WAREHOUSEVOUCHERREVERSE','VIEW')}"
+                     tabindex="22">
+        <rich:componentControl for="annulConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
     <h:commandButton action="#{warehouseVoucherUpdateAction.cancel}"
                      value="#{messages['Common.cancel']}"
                      styleClass="button"
                      immediate="true"
-                     tabindex="22"/>
+                     tabindex="23"/>
 </div>
 
 <rich:spacer height="15px"/>
@@ -1077,6 +1096,38 @@
                            styleClass="button"/>
     </ui:define>
 </s:decorate>
+
+<rich:modalPanel id="annulConfirmation"
+                 minHeight="160" minWidth="420" autosized="true" zindex="2000"
+                 rendered="#{warehouseVoucherUpdateAction.canAnnul and s:hasPermission('WAREHOUSEVOUCHERREVERSE','VIEW')}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['WarehouseVoucher.reverse.button']}"/>
+    </f:facet>
+    <h:panelGroup>
+        <div align="center">
+            <h:form id="annulVoucherForm">
+                <p>
+                    <h:outputText value="#{messages['WarehouseVoucher.reverse.confirm']}"/>
+                </p>
+                <p>
+                    <h:outputLabel value="#{messages['WarehouseVoucher.reverse.reason']}: " for="nullifyReasonInput"/>
+                    <h:inputTextarea id="nullifyReasonInput"
+                                     value="#{warehouseVoucherUpdateAction.nullifyReason}"
+                                     rows="3" cols="50"
+                                     styleClass="input"/>
+                </p>
+                <h:panelGroup>
+                    <a4j:commandButton action="#{warehouseVoucherUpdateAction.annul}"
+                                       value="#{messages['WarehouseVoucher.reverse.button']}"
+                                       styleClass="button"/>
+                    <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                        <rich:componentControl for="annulConfirmation" event="onclick" disableDefault="true" operation="hide"/>
+                    </h:commandButton>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </h:panelGroup>
+</rich:modalPanel>
 
 <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
     <ui:param name="containerId" value="costCenterListModalPanelContainer"/>

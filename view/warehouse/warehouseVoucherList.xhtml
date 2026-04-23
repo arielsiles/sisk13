@@ -352,7 +352,9 @@
         <h:outputText value="#{warehouseVoucherItem.warehouse.name}"/>
     </rich:column>
     <rich:column>
-        <h:outputText value="#{messages[warehouseVoucherItem.state.resourceKey]}"/>
+        <h:outputText value="#{messages[warehouseVoucherItem.state.resourceKey]}"
+                      title="#{warehouseVoucherItem.nullified ? warehouseVoucherItem.nullifyReason : ''}"
+                      styleClass="#{warehouseVoucherItem.nullified ? 'labelError' : ''}"/>
     </rich:column>
     <rich:column>
         <h:outputText value="#{warehouseVoucherItem.gloss}"/>

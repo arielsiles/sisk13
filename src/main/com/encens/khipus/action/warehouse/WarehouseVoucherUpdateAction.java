@@ -76,7 +76,13 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
     @In
     private WarehouseVoucherService warehouseVoucherService;
 
+    @In
+    private ReverseWarehouseVoucherService reverseWarehouseVoucherService;
+
     private ProductionLine productionLine;
+
+    /** Motivo de anulacion capturado en el modal de confirmacion. */
+    private String nullifyReason;
 
     @Override
     @BusinessUnitRestriction(value = "#{warehouseVoucherUpdateAction.warehouseVoucher}", postValidation = true)
@@ -361,6 +367,72 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         }
 
         return Outcome.SUCCESS;
+    }
+
+    /**
+     * Anula un vale aprobado o parcial revirtiendo inventario, costo promedio
+     * y asiento contable asociado. Invocado desde el modal "annulConfirmation"
+     * en warehouseVoucherUpdate.xhtml. Requiere motivo obligatorio.
+     */
+    @BusinessUnitRestriction(value = "#{warehouseVoucherUpdateAction.warehouseVoucher}")
+    @End
+    @Restrict("#{s:hasPermission('WAREHOUSEVOUCHERREVERSE','VIEW')}")
+    public String annul() {
+        if (nullifyReason == null || nullifyReason.trim().length() == 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "WarehouseVoucher.reverse.reasonRequired");
+            return Outcome.REDISPLAY;
+        }
+        try {
+            reverseWarehouseVoucherService.reverseWarehouseVoucher(
+                    warehouseVoucher.getId(),
+                    nullifyReason.trim(),
+                    null,
+                    false);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "WarehouseVoucher.reverse.success");
+            nullifyReason = null;
+            return Outcome.SUCCESS;
+        } catch (ReverseNotAllowedException e) {
+            facesMessages.add(StatusMessage.Severity.ERROR, e.getMessage());
+            return Outcome.FAIL;
+        } catch (WarehouseVoucherNotFoundException e) {
+            addNotFoundMessage();
+            return Outcome.FAIL;
+        } catch (InventoryUnitaryBalanceException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseVoucher.reverse.insufficientStock",
+                    e.getProductItem() != null ? e.getProductItem().getName() : "");
+            return Outcome.FAIL;
+        } catch (InventoryProductItemNotFoundException e) {
+            addInventoryProductItemNotFoundErrorMessage(
+                    e.getExecutorUnitCode(), e.getProductItem(), e.getWarehouse());
+            return Outcome.FAIL;
+        }
+    }
+
+    /**
+     * Indica si el vale actual puede anularse por el flujo independiente.
+     * Usado para renderizar condicionalmente el boton "Anular".
+     */
+    public boolean isCanAnnul() {
+        if (warehouseVoucher == null) {
+            return false;
+        }
+        try {
+            reverseWarehouseVoucherService.validateReversibility(warehouseVoucher);
+            return true;
+        } catch (ReverseNotAllowedException e) {
+            return false;
+        }
+    }
+
+    public String getNullifyReason() {
+        return nullifyReason;
+    }
+
+    public void setNullifyReason(String nullifyReason) {
+        this.nullifyReason = nullifyReason;
     }
 
     @BusinessUnitRestriction(value = "#{warehouseVoucherUpdateAction.warehouseVoucher}")
