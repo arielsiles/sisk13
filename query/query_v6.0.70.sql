@@ -25,5 +25,9 @@ insert into funcionalidad values (318, 'WAREHOUSEPURCHASEORDERREVERSE', null, 7,
 insert into funcionalidad values (319, 'WAREHOUSEVOUCHERREVERSE',      null, 7, 1, 'menu.warehouse.voucher.reverse',      1);
 
 -- Asignacion por defecto al rol Administrador (idrol=1)
+-- (derechoacceso tiene PK compuesta idfuncionalidad+idrol; no requiere secuencia)
 insert into derechoacceso(idfuncionalidad, idrol, permiso, idcompania) values (318, 1, 7, 1);
 insert into derechoacceso(idfuncionalidad, idrol, permiso, idcompania) values (319, 1, 7, 1);
+
+-- Actualizar secuencia de funcionalidad al ultimo id usado
+update secuencia set valor = 319 where tabla = 'funcionalidad' and valor < 319;
