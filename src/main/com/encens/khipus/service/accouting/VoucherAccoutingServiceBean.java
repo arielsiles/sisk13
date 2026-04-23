@@ -2304,17 +2304,39 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         datas = em.createNativeQuery("" +
                 "SELECT d.cod_art, a.descri, a.cod_med, " +
-                "SUM(d.debe)     AS debe, " +
-                "SUM(d.haber)    AS haber, " +
-                "SUM(IF(d.debe>0, d.cant_art, 0))  AS cant_e, " +
-                "SUM(IF(d.haber>0, d.cant_art, 0)) AS cant_s " +
+                "SUM(COALESCE(d.debe,0))     AS debe, " +
+                "SUM(COALESCE(d.haber,0))    AS haber, " +
+                "SUM(COALESCE(IF(d.debe>0, d.cant_art, 0),0))  AS cant_e, " +
+                "SUM(COALESCE(IF(d.haber>0, d.cant_art, 0),0)) AS cant_s " +
                 "FROM sf_tmpdet d " +
                 "LEFT JOIN sf_tmpenc e ON d.id_tmpenc = e.id_tmpenc " +
                 "LEFT JOIN inv_articulos a ON d.cod_art = a.cod_art " +
                 "WHERE d.cuenta = :cashAccount " +
                 "AND e.fecha BETWEEN :startDate AND :endDate " +
                 "AND e.estado <> 'ANL' " +
+                "AND d.cod_art IS NOT NULL AND d.cod_art <> '' " +
                 "GROUP BY d.cod_art, a.descri, a.cod_med order by a.descri asc")
+        .setParameter("cashAccount", cashAccount.getAccountCode())
+        .setParameter("startDate", startDate)
+        .setParameter("endDate", endDate).getResultList();
+
+        return datas;
+
+    }
+
+    public List<Object[]> getInvalidValuedInventoryEntries(Date startDate, Date endDate, CashAccount cashAccount){
+
+        List<Object[]> datas = new ArrayList<Object[]>();
+
+        datas = em.createNativeQuery("" +
+                "SELECT DISTINCT e.tipo_doc, e.no_doc, e.fecha, e.glosa " +
+                "FROM sf_tmpdet d " +
+                "INNER JOIN sf_tmpenc e ON d.id_tmpenc = e.id_tmpenc " +
+                "WHERE d.cuenta = :cashAccount " +
+                "AND e.fecha BETWEEN :startDate AND :endDate " +
+                "AND e.estado <> 'ANL' " +
+                "AND (d.cod_art IS NULL OR d.cod_art = '') " +
+                "ORDER BY e.fecha, e.tipo_doc, e.no_doc")
         .setParameter("cashAccount", cashAccount.getAccountCode())
         .setParameter("startDate", startDate)
         .setParameter("endDate", endDate).getResultList();

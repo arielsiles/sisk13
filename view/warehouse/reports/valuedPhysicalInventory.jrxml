@@ -10,6 +10,9 @@
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="locationName" class="java.lang.String"/>
 	<parameter name="systemName" class="java.lang.String"/>
+	<parameter name="observations" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
 	<field name="codeArt" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
 	<field name="unit" class="java.lang.String"/>
@@ -136,7 +139,7 @@
 		</groupFooter>
 	</group>
 	<title>
-		<band height="37" splitType="Stretch">
+		<band height="40" splitType="Stretch">
 			<textField>
 				<reportElement x="175" y="22" width="214" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -164,6 +167,13 @@
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{systemName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="389" y="0" width="172" height="40"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="Arial" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{observations}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

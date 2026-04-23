@@ -13,9 +13,11 @@ import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.JSFUtil;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
@@ -31,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -81,6 +84,7 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
         Collection<CollectionData> beanCollection = calculateValuedInventory();
+        String observations = buildObservations();
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("reportTitle", "REPORTE DE INVENTARIO FISICO - VALORADO");
@@ -90,6 +94,7 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
         paramMap.put("startDate", startDate);
         paramMap.put("endDate", endDate);
         paramMap.put("cashAccount", this.warehouse.getWarehouseCashAccount().getFullName());
+        paramMap.put("observations", observations);
         parameters.putAll(paramMap);
 
         System.out.println("|Codigo|Articulo|Unidad|Costo Unit|Saldo Fis|Saldo Val");
@@ -97,12 +102,42 @@ public class ValuedPhysicalInventoryReportAction extends GenericReportAction {
             System.out.println("|"+ data.getCodeArt() +"|"+ data.getName() +"|"+ data.getUnit() +"|"+ data.getUnitCost() +"|"+ data.getQuantity() + "|" + data.getAmount());
         }
         try{
-            File jasper = new File(JSFUtil.getRealPath("/warehouse/reports/valuedPhysicalInventory.jasper"));
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasper.getPath(), parameters, new JRBeanCollectionDataSource(beanCollection));
+            File jrxml = new File(JSFUtil.getRealPath("/warehouse/reports/valuedPhysicalInventory.jrxml"));
+            JasperReport jasperReport = JasperCompileManager.compileReport(jrxml.getPath());
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JRBeanCollectionDataSource(beanCollection));
             exportarPDF(jasperPrint);
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private String buildObservations() {
+        try {
+            List<Object[]> invalid = voucherAccoutingService.getInvalidValuedInventoryEntries(
+                    startDate, endDate, this.warehouse.getWarehouseCashAccount());
+            if (invalid == null || invalid.isEmpty()) {
+                return "";
+            }
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+            StringBuilder sb = new StringBuilder("Obs: asientos sin articulo excluidos (corregir):");
+            int col = 0;
+            for (Object[] row : invalid) {
+                String tipoDoc = row[0] != null ? row[0].toString() : "";
+                String noDoc   = row[1] != null ? row[1].toString() : "";
+                String fecha   = row[2] != null ? df.format((Date) row[2]) : "";
+                String entry   = tipoDoc + "-" + noDoc + " " + fecha;
+                if (col == 0) {
+                    sb.append("\n").append(entry);
+                } else {
+                    sb.append(" | ").append(entry);
+                }
+                col = (col + 1) % 2;
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public Collection<CollectionData> calculateValuedInventory(){
