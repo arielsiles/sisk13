@@ -419,6 +419,7 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
      */
     public boolean isCanAnnul() {
         if (warehouseVoucher == null) {
+            log.info("isCanAnnul: warehouseVoucher is null -> false");
             return false;
         }
         if (reverseWarehouseVoucherService == null) {
@@ -427,9 +428,10 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         }
         try {
             reverseWarehouseVoucherService.validateReversibility(warehouseVoucher);
+            log.info("isCanAnnul: vale #0 -> TRUE", warehouseVoucher.getNumber());
             return true;
         } catch (ReverseNotAllowedException e) {
-            log.debug("isCanAnnul: vale #0 no reversible: #1",
+            log.info("isCanAnnul: vale #0 NO reversible. Motivo: #1",
                     warehouseVoucher.getNumber(), e.getMessage());
             return false;
         } catch (Exception e) {
