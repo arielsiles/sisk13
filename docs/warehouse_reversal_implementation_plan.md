@@ -6,6 +6,36 @@ Basado en [warehouse_order_voucher_flow.md](warehouse_order_voucher_flow.md). Ca
 
 ---
 
+## Estado de implementación
+
+| Fase | Estado | Commits clave |
+|---|---|---|
+| **Fase 0** — Schema, permisos, i18n | ✅ Completa | `834d6942`, `bd36d095`, `8023f958` |
+| **Fase 1** — Servicios base (ReverseInventoryService, createReverseAccountEntry, annulVoucher) | ✅ Completa | `895b9d15`, `52d6f5ee`, `07653c62`, `e473b997`, `b5f208b8` |
+| **Fase 2** — Anulación de Vale independiente (UI + action + listado) | ✅ Completa y validada | `6106402c`, `47d534ff` |
+| **Fase 3** — Anulación de Orden de Compra (APR/FIN/LIQ) | ✅ Completa y validada | `78ca004a`, `c2b974f8` |
+| Fase 4 — Reportes y visibilidad (opcional) | Pendiente | — |
+| Fase 5 — Validación final | Pendiente | — |
+
+### Casos probados en dev (terdemol)
+
+| Escenario | OC/Vale | Resultado |
+|---|---|---|
+| Vale RECEPCION independiente APR → ANL | Vale 2-18060 (art. 197) | ✅ inventario, costo promedio, contra-asiento SA simétrico, auditoría |
+| OC LIQ con stock insuficiente para revertir | OC-INV-2069 | ✅ bloqueada con `InventoryUnitaryBalanceException`; nada quedó modificado |
+| OC LIQ al CRÉDITO con CP separado y factura | OC-INV-2070 (arts. 319, 320) | ✅ IA original intacto (APR), CE del pago anulado con motivo entre asteriscos, contra-asiento SA con líneas DEBE→HABER, payments/factura NULLIFIED, inventario y costo correctos |
+
+### Bugs resueltos durante validación
+
+1. `inv_invmes` quedaba con valores negativos al revertir entradas → `reverseInventoryHistory` no toca historial en entradas (consistente con que la aprobación tampoco lo actualiza).
+2. Contra-asiento sin líneas → `Voucher.getDetails()` es `@Transient`; ahora se cargan vía JPQL contra `voucherDetailList` real.
+3. Orden incorrecto de líneas en contra-asiento → primero DEBE, después HABER (norma contable).
+4. En CONTADO con un solo voucher (IA == voucher del pago), se anulaba el IA además del contra-asiento (doble reversión) → ahora se excluye el voucher IA cuando el payment lo comparte.
+5. `isCanAnnul`/`isCanReverse` blindados contra excepciones para no romper el render.
+6. Permisos nuevos quedaban con `idmodulo=NULL` rompiendo `AccessRight.findByUser` → migración corregida con `idmodulo=5` (finances) y `permiso=1` (VIEW).
+
+---
+
 ## Alcance
 
 **Dos flujos de anulación**:
