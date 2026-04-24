@@ -98,6 +98,15 @@
                      styleClass="button"
                      rendered="#{warehousePurchaseOrderAction.managed and (isPurchaseOrderPending or isPurchaseOrderApproved) and s:hasPermission('WAREHOUSEPURCHASEORDERANNUL','VIEW')}"/>
 
+    <h:commandButton value="#{messages['WarehousePurchaseOrder.reverse.button']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.canReverse and s:hasPermission('WAREHOUSEPURCHASEORDERREVERSE','VIEW')}">
+        <rich:componentControl for="purchaseOrderAnnulConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
+
     <h:commandButton id="updateButtonId"
                      action="#{warehousePurchaseOrderAction.update}"
                      value="#{messages['Common.save']}"
@@ -225,6 +234,16 @@
                      styleClass="button"
                      rendered="#{warehousePurchaseOrderAction.managed and (isPurchaseOrderPending or isPurchaseOrderApproved) and s:hasPermission('WAREHOUSEPURCHASEORDERANNUL','VIEW')}"
                      tabindex="36"/>
+
+    <h:commandButton value="#{messages['WarehousePurchaseOrder.reverse.button']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.canReverse and s:hasPermission('WAREHOUSEPURCHASEORDERREVERSE','VIEW')}"
+                     tabindex="37">
+        <rich:componentControl for="purchaseOrderAnnulConfirmation"
+                               event="onclick"
+                               disableDefault="true"
+                               operation="show"/>
+    </h:commandButton>
 
     <h:commandButton action="#{warehousePurchaseOrderAction.update}"
                      value="#{messages['Common.save']}"
@@ -517,6 +536,42 @@
                            styleClass="button"/>
     </ui:define>
 </s:decorate>
+
+<rich:modalPanel id="purchaseOrderAnnulConfirmation"
+                 minHeight="200" minWidth="480" autosized="true" zindex="2000"
+                 rendered="#{warehousePurchaseOrderAction.canReverse and s:hasPermission('WAREHOUSEPURCHASEORDERREVERSE','VIEW')}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['WarehousePurchaseOrder.reverse.button']}"/>
+    </f:facet>
+    <h:panelGroup>
+        <div align="center">
+            <h:form id="annulPurchaseOrderForm">
+                <p>
+                    <h:outputText value="#{messages['WarehousePurchaseOrder.reverse.confirm']}"/>
+                </p>
+                <p>
+                    <h:outputLabel value="#{messages['WarehousePurchaseOrder.reverse.reason']}: "
+                                   for="poNullifyReasonInput"/>
+                    <h:inputTextarea id="poNullifyReasonInput"
+                                     value="#{warehousePurchaseOrderAction.nullifyReason}"
+                                     rows="3" cols="60"
+                                     styleClass="input"/>
+                </p>
+                <h:panelGroup>
+                    <a4j:commandButton action="#{warehousePurchaseOrderAction.reverseWarehousePurchaseOrder}"
+                                       value="#{messages['WarehousePurchaseOrder.reverse.button']}"
+                                       styleClass="button"/>
+                    <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                        <rich:componentControl for="purchaseOrderAnnulConfirmation"
+                                               event="onclick"
+                                               disableDefault="true"
+                                               operation="hide"/>
+                    </h:commandButton>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </h:panelGroup>
+</rich:modalPanel>
 
 <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
     <ui:param name="containerId" value="warehouseListModalPanelContainer"/>

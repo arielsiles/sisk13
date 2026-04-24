@@ -130,6 +130,12 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
     @In
     private WarehouseVoucherService warehouseVoucherService;
 
+    @In
+    private com.encens.khipus.service.warehouse.ReversePurchaseOrderService reversePurchaseOrderService;
+
+    /** Motivo de anulacion capturado en el modal de confirmacion. */
+    private String nullifyReason;
+
     @Factory(value = "warehousePurchaseOrder", scope = ScopeType.STATELESS)
     @Restrict("#{s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW')}")
     public PurchaseOrder initPurchaseOrder() {
@@ -370,6 +376,73 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
             addPurchaseOrderLiquidatedErrorMessage();
             return LIQUIDATED_OUTCOME;
         }
+    }
+
+    /**
+     * Anula/revierte una orden de compra en estado APR, FIN o LIQ revirtiendo
+     * inventario, asiento IA (contra-asiento simetrico), marcando asientos CP
+     * como ANL con motivo en glosa y anulando pagos, anticipos y facturas.
+     * Requiere permiso WAREHOUSEPURCHASEORDERREVERSE y motivo obligatorio.
+     */
+    @BusinessUnitRestriction(value = "#{warehousePurchaseOrderAction.instance}")
+    @End
+    @Restrict("#{s:hasPermission('WAREHOUSEPURCHASEORDERREVERSE','VIEW')}")
+    public String reverseWarehousePurchaseOrder() {
+        if (nullifyReason == null || nullifyReason.trim().length() == 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "WarehousePurchaseOrder.reverse.reasonRequired");
+            return Outcome.REDISPLAY;
+        }
+        try {
+            reversePurchaseOrderService.reversePurchaseOrder(
+                    getInstance(), nullifyReason.trim(), null);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "WarehousePurchaseOrder.reverse.success");
+            nullifyReason = null;
+            return Outcome.SUCCESS;
+        } catch (com.encens.khipus.exception.warehouse.ReverseNotAllowedException e) {
+            facesMessages.add(StatusMessage.Severity.ERROR, e.getMessage());
+            return Outcome.FAIL;
+        } catch (com.encens.khipus.exception.warehouse.InventoryUnitaryBalanceException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehousePurchaseOrder.reverse.insufficientStock");
+            return Outcome.FAIL;
+        } catch (com.encens.khipus.exception.warehouse.InventoryProductItemNotFoundException e) {
+            facesMessages.add(StatusMessage.Severity.ERROR,
+                    MessageUtils.getMessage("WarehousePurchaseOrder.reverse.notAllowed"));
+            return Outcome.FAIL;
+        }
+    }
+
+    /**
+     * Indica si la OC actual puede anularse via el flujo de reversion.
+     * Usado para renderizar el boton Anular/Revertir en la UI.
+     */
+    public boolean isCanReverse() {
+        if (getInstance() == null) {
+            return false;
+        }
+        if (reversePurchaseOrderService == null) {
+            return false;
+        }
+        try {
+            reversePurchaseOrderService.validateReversibility(getInstance());
+            return true;
+        } catch (com.encens.khipus.exception.warehouse.ReverseNotAllowedException e) {
+            return false;
+        } catch (Exception e) {
+            log.warn("isCanReverse: excepcion evaluando reversibilidad de la OC #0: #1",
+                    getInstance().getOrderNumber(), e);
+            return false;
+        }
+    }
+
+    public String getNullifyReason() {
+        return nullifyReason;
+    }
+
+    public void setNullifyReason(String nullifyReason) {
+        this.nullifyReason = nullifyReason;
     }
 
     @BusinessUnitRestriction(value = "#{warehousePurchaseOrderAction.instance}")

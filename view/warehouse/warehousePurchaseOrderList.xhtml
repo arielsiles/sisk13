@@ -310,7 +310,9 @@
         <h:outputText value="#{purchaseOrderItem.warehouse.fullName}"/>
     </rich:column>
     <rich:column styleClass="#{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
-        <h:outputText value="#{messages[purchaseOrderItem.state.resourceKey]}"/>
+        <h:outputText value="#{messages[purchaseOrderItem.state.resourceKey]}"
+                      title="#{purchaseOrderItem.isPurchaseOrderNullified() ? purchaseOrderItem.nullifyReason : ''}"
+                      styleClass="#{purchaseOrderItem.isPurchaseOrderNullified() ? 'labelError' : ''}"/>
     </rich:column>
 
     <rich:column styleClass="left #{purchaseOrderItem.isPurchaseDocumentRegisterPending()?'labelInfo':''}">
