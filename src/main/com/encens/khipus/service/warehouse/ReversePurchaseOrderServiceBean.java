@@ -61,6 +61,7 @@ public class ReversePurchaseOrderServiceBean extends GenericServiceBean implemen
 
         PurchaseOrderState originalState = purchaseOrder.getState();
         String effectiveUser = userCode != null ? userCode : financesUserService.getFinancesUserCode();
+        Long iaVoucherId = null;
 
         // --- FIN o LIQ: revertir vale de recepcion (inventario + contra-asiento IA)
         if (PurchaseOrderState.FIN.equals(originalState)
@@ -68,6 +69,9 @@ public class ReversePurchaseOrderServiceBean extends GenericServiceBean implemen
             WarehouseVoucher warehouseVoucher =
                     warehouseVoucherService.findWarehouseVoucherByPurchaseOrder(purchaseOrder);
             if (warehouseVoucher != null) {
+                if (warehouseVoucher.getVoucher() != null) {
+                    iaVoucherId = warehouseVoucher.getVoucher().getId();
+                }
                 try {
                     reverseWarehouseVoucherService.reverseWarehouseVoucher(
                             warehouseVoucher.getId(), reason, effectiveUser, true);
@@ -79,9 +83,14 @@ public class ReversePurchaseOrderServiceBean extends GenericServiceBean implemen
             }
         }
 
-        // --- LIQ: anular asientos CP, pagos, anticipos y facturas
+        // --- LIQ: anular pagos (state=NULLIFIED) y sus vouchers CP separados.
+        // Si el voucher de un pago es el MISMO que el IA del vale (caso tipico
+        // de compras al CONTADO donde IA y pago se registran en un unico
+        // asiento), NO se vuelve a anular ese voucher: el contra-asiento
+        // simetrico generado por reverseWarehouseVoucher ya lo cubre y anular
+        // el IA encima seria redundante (doble reversion del mismo asiento).
         if (PurchaseOrderState.LIQ.equals(originalState)) {
-            annulPaymentsAndTheirVouchers(purchaseOrder, reason);
+            annulPaymentsAndTheirVouchers(purchaseOrder, reason, iaVoucherId);
             nullifyPurchaseDocuments(purchaseOrder);
         }
 
@@ -115,7 +124,9 @@ public class ReversePurchaseOrderServiceBean extends GenericServiceBean implemen
     }
 
     @SuppressWarnings("unchecked")
-    private void annulPaymentsAndTheirVouchers(PurchaseOrder purchaseOrder, String reason) {
+    private void annulPaymentsAndTheirVouchers(PurchaseOrder purchaseOrder,
+                                               String reason,
+                                               Long iaVoucherIdToSkip) {
         List<PurchaseOrderPayment> payments = getEntityManager()
                 .createNamedQuery("PurchaseOrderPayment.findByPurchaseOrder")
                 .setParameter("purchaseOrder", purchaseOrder)
@@ -126,7 +137,9 @@ public class ReversePurchaseOrderServiceBean extends GenericServiceBean implemen
                 continue;
             }
             Voucher paymentVoucher = payment.getVoucher();
-            if (paymentVoucher != null) {
+            if (paymentVoucher != null
+                    && (iaVoucherIdToSkip == null
+                        || !iaVoucherIdToSkip.equals(paymentVoucher.getId()))) {
                 warehouseAccountEntryService.annulVoucher(paymentVoucher, reason);
             }
             payment.setState(PurchaseOrderPaymentState.NULLIFIED);
