@@ -32,15 +32,11 @@
                                      alias="warehouse"
                                      reRender="warehouseField"
                                      tabindex="3">
-                        <!--<ui:define name="restrictions">
-                            <app:restriction
-                                    condition="warehouse.executorUnit = #{productItemCostUnitReportAction.executorUnit}"/>
-                        </ui:define>-->
                     </app:quickSearch>
                     <app:selectPopUp id="warehouse"
                                      textValue="#{productInventoryReportAction.warehouse.name}"
                                      value="#{productInventoryReportAction.warehouse}"
-                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(productItemCostUnitReportAction.executorUnit)"
+                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(null)"
                                      clearAction="ProductInventoryReportAction.cleanWarehouseField()"
                                      searchModalPanel="warehouseModalPanel"
                                      dataModel="#{warehouseSearchDataModel}"

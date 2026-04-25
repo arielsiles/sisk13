@@ -174,7 +174,6 @@
     <factory name="subGroupList2" value="#{subGroupQuery2}"/>
     <framework:entity-query name="subGroupQuery2" ejbql="select s from SubGroup s">
         <framework:restrictions>
-            <value>s.group = #{productItemCostUnitReportAction.group}</value>
             <value>s.state !=
                 #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.SubGroupState', 'BLO')}
             </value>

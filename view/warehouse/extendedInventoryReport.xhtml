@@ -36,7 +36,7 @@
                     <app:selectPopUp id="warehouse"
                                      textValue="#{extendedInventoryReportAction.warehouse.name}"
                                      value="#{extendedInventoryReportAction.warehouse}"
-                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(productItemCostUnitReportAction.executorUnit)"
+                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(null)"
                                      clearAction="#{extendedInventoryReportAction.cleanWarehouseField()}"
                                      searchModalPanel="warehouseModalPanel"
                                      dataModel="#{warehouseSearchDataModel}"

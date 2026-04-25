@@ -26,7 +26,6 @@ public class SubGroupSearchDataModel extends QueryDataModel<SubGroupPK, SubGroup
             "lower(subGroup.group.groupCode) like concat(lower(#{subGroupSearchDataModel.groupCode}), '%')",
             "lower(subGroup.name) like concat('%',concat(lower(#{subGroupSearchDataModel.criteria.name}), '%'))",
             "lower(subGroup.subGroupCode) like concat(lower(#{subGroupSearchDataModel.criteria.subGroupCode}), '%')",
-            "subGroup.group =#{productItemCostUnitReportAction.group}",
             "subGroup.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.SubGroupState', 'VIG')}"
     };
 
