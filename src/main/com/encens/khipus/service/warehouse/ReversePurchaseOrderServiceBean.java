@@ -91,8 +91,12 @@ public class ReversePurchaseOrderServiceBean extends GenericServiceBean implemen
         // el IA encima seria redundante (doble reversion del mismo asiento).
         if (PurchaseOrderState.LIQ.equals(originalState)) {
             annulPaymentsAndTheirVouchers(purchaseOrder, reason, iaVoucherId);
-            nullifyPurchaseDocuments(purchaseOrder);
         }
+
+        // --- Facturas asociadas: marcar como NULLIFIED en TODOS los estados
+        // (paridad con el flujo previo nullifyInvoicesPurchaseOrder aplicado
+        // en PEN/APR por WarehousePurchaseOrderAction.nullifyWarehousePurchaseOrder).
+        nullifyPurchaseDocuments(purchaseOrder);
 
         // --- Auditoria y cambio de estado
         purchaseOrder.setState(PurchaseOrderState.ANL);
@@ -115,7 +119,8 @@ public class ReversePurchaseOrderServiceBean extends GenericServiceBean implemen
                     MessageUtils.getMessage("WarehousePurchaseOrder.reverse.alreadyNullified"));
         }
         PurchaseOrderState state = purchaseOrder.getState();
-        if (!PurchaseOrderState.APR.equals(state)
+        if (!PurchaseOrderState.PEN.equals(state)
+                && !PurchaseOrderState.APR.equals(state)
                 && !PurchaseOrderState.FIN.equals(state)
                 && !PurchaseOrderState.LIQ.equals(state)) {
             throw new ReverseNotAllowedException(

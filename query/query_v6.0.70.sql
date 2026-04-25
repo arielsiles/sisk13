@@ -36,4 +36,4 @@ insert into derechoacceso(idfuncionalidad, idrol, permiso, idcompania, idmodulo)
 insert into derechoacceso(idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (319, 1, 1, 1, 5);
 
 -- Actualizar secuencia de funcionalidad al ultimo id usado
-update secuencia set valor = 319 where tabla = 'funcionalidad' and valor < 319;
+update secuencia set valor=(select max(e.idfuncionalidad)+1 from funcionalidad e) where tabla='funcionalidad';

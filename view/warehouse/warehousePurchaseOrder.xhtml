@@ -93,11 +93,6 @@
                      styleClass="button"
                      rendered="#{warehousePurchaseOrderAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERAPPROVE','VIEW')}"/>
 
-    <h:commandButton action="#{warehousePurchaseOrderAction.nullifyWarehousePurchaseOrder}"
-                     value="#{messages['PurchaseOrder.nullify']}"
-                     styleClass="button"
-                     rendered="#{warehousePurchaseOrderAction.managed and (isPurchaseOrderPending or isPurchaseOrderApproved) and s:hasPermission('WAREHOUSEPURCHASEORDERANNUL','VIEW')}"/>
-
     <h:commandButton value="#{messages['WarehousePurchaseOrder.reverse.button']}"
                      styleClass="button"
                      rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.canReverse and s:hasPermission('WAREHOUSEPURCHASEORDERREVERSE','VIEW')}">
@@ -229,16 +224,10 @@
                      rendered="#{warehousePurchaseOrderAction.managed and isPurchaseOrderPending and s:hasPermission('WAREHOUSEPURCHASEORDERAPPROVE','VIEW')}"
                      tabindex="35"/>
 
-    <h:commandButton action="#{warehousePurchaseOrderAction.nullifyWarehousePurchaseOrder}"
-                     value="#{messages['PurchaseOrder.nullify']}"
-                     styleClass="button"
-                     rendered="#{warehousePurchaseOrderAction.managed and (isPurchaseOrderPending or isPurchaseOrderApproved) and s:hasPermission('WAREHOUSEPURCHASEORDERANNUL','VIEW')}"
-                     tabindex="36"/>
-
     <h:commandButton value="#{messages['WarehousePurchaseOrder.reverse.button']}"
                      styleClass="button"
                      rendered="#{warehousePurchaseOrderAction.managed and warehousePurchaseOrderAction.canReverse and s:hasPermission('WAREHOUSEPURCHASEORDERREVERSE','VIEW')}"
-                     tabindex="37">
+                     tabindex="36">
         <rich:componentControl for="purchaseOrderAnnulConfirmation"
                                event="onclick"
                                disableDefault="true"
