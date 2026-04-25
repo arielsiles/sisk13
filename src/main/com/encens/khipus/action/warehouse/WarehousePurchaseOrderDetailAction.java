@@ -355,7 +355,9 @@ public class WarehousePurchaseOrderDetailAction extends GenericAction<PurchaseOr
         ProductItem productItem = productItemService.findProductItemByCode(getInstance().getProductItem().getProductItemCode());
 
         getInstance().setPurchaseMeasureUnit(productItem.getUsageMeasureUnit());
-        getInstance().setUnitCost(productItem.getCu());
+        // Sin proveedor no hay historial de precios: arranca con el costo
+        // promedio actual del articulo (unitCost). El usuario puede editarlo.
+        getInstance().setUnitCost(productItem.getUnitCost());
         getInstance().setTotalAmount(getInstance().getRequestedQuantity() != null ? BigDecimalUtil.multiply(getInstance().getRequestedQuantity(), getInstance().getUnitCost(), 6) : BigDecimal.ZERO);
     }
 

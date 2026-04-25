@@ -91,7 +91,9 @@ public class WarehousePurchaseOrderDetailListCreateAction implements Serializabl
             detail.setPurchaseOrder(warehousePurchaseOrderAction.getPurchaseOrder());
 
             detail.setPurchaseMeasureUnit(productItem.getUsageMeasureUnit());
-            detail.setUnitCost(productItem.getCu());
+            // Sugerencia inicial del costo unitario basado en el costo promedio
+            // actual del articulo; el usuario puede editarlo al confirmar precio.
+            detail.setUnitCost(productItem.getUnitCost());
             updateTotalAmount(detail);
 
             instances.add(detail);

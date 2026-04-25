@@ -170,8 +170,7 @@
                 <h:outputText value="#{inventoryDetailItem.productItem.fullName}"/>
             </rich:column>
             <rich:column>
-                <!--<h:outputText value="#{inventoryDetailItem.costCenter.fullName}"/>-->
-                <h:outputText value="#{inventoryDetailItem.productItem.cu}">
+                <h:outputText value="#{inventoryDetailItem.productItem.unitCost}">
                     <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
                 </h:outputText>
             </rich:column>

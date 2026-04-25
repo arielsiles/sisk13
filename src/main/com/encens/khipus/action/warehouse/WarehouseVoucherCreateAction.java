@@ -157,8 +157,10 @@ public class WarehouseVoucherCreateAction extends WarehouseVoucherGeneralAction 
         movementDetail.setWarehouse(warehouseVoucher.getWarehouse());
         movementDetail.setUnitCost(productItemFrom.getUnitCost());
         movementDetail.setAmount(BigDecimalUtil.multiply(quantity, productItemFrom.getUnitCost(), 6));
-        movementDetail.setUnitPurchasePrice(productItemFrom.getCu());
-        movementDetail.setPurchasePrice(BigDecimalUtil.multiply(quantity, productItemFrom.getCu(), 6));
+        // En transferencias no hay compra nueva: el "precio de compra" se
+        // toma del costo promedio actual del articulo (unitCost).
+        movementDetail.setUnitPurchasePrice(productItemFrom.getUnitCost());
+        movementDetail.setPurchasePrice(BigDecimalUtil.multiply(quantity, productItemFrom.getUnitCost(), 6));
         movementDetail.setMovementType(MovementDetailType.S);
         movementDetail.setCashAccount(productItemFrom.getCashAccount());
 
