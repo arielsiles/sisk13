@@ -113,12 +113,6 @@ public class ProductItem implements BaseModel {
     @Column(name = "precio_venta", precision = 10, scale = 2, nullable = true)
     private BigDecimal  salePrice;
 
-    @Column(name = "cu", precision = 16, scale = 6, nullable = true)
-    private BigDecimal cu;
-
-    @Column(name = "ct", precision = 20, scale = 6, nullable = true)
-    private BigDecimal ct;
-
     @Column(name = "cod_gru", nullable = false, updatable = true, insertable = true, length = 3)
     @Length(max = 3)
     private String groupCode;
@@ -440,22 +434,6 @@ public class ProductItem implements BaseModel {
 
     public void setOrderMaterials(List<OrderMaterial> orderMaterials) {
         this.orderMaterials = orderMaterials;
-    }
-
-    public BigDecimal getCu() {
-        return cu;
-    }
-
-    public void setCu(BigDecimal cu) {
-        this.cu = cu;
-    }
-
-    public BigDecimal getCt() {
-        return ct;
-    }
-
-    public void setCt(BigDecimal ct) {
-        this.ct = ct;
     }
 
     public String getWarehouseCode() {
