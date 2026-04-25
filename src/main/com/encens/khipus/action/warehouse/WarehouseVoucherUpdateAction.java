@@ -394,7 +394,7 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
             nullifyReason = null;
             return Outcome.SUCCESS;
         } catch (ReverseNotAllowedException e) {
-            facesMessages.add(StatusMessage.Severity.ERROR, e.getMessage());
+            addMultilineErrorMessage(e.getMessage());
             return Outcome.FAIL;
         } catch (WarehouseVoucherNotFoundException e) {
             addNotFoundMessage();
@@ -408,6 +408,26 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
             addInventoryProductItemNotFoundErrorMessage(
                     e.getExecutorUnitCode(), e.getProductItem(), e.getWarehouse());
             return Outcome.FAIL;
+        }
+    }
+
+    /**
+     * Emite un mensaje de error potencialmente multilinea como varios
+     * facesMessages separados (uno por linea) para que JSF los renderice
+     * apilados. Un solo mensaje con '\n' internos es colapsado en la UI.
+     */
+    private void addMultilineErrorMessage(String message) {
+        if (message == null) {
+            return;
+        }
+        if (message.contains("\n")) {
+            for (String line : message.split("\n")) {
+                if (line.trim().length() > 0) {
+                    facesMessages.add(StatusMessage.Severity.ERROR, line);
+                }
+            }
+        } else {
+            facesMessages.add(StatusMessage.Severity.ERROR, message);
         }
     }
 

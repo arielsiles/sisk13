@@ -401,7 +401,7 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
             nullifyReason = null;
             return Outcome.SUCCESS;
         } catch (com.encens.khipus.exception.warehouse.ReverseNotAllowedException e) {
-            facesMessages.add(StatusMessage.Severity.ERROR, e.getMessage());
+            addMultilineErrorMessage(e.getMessage());
             return Outcome.FAIL;
         } catch (com.encens.khipus.exception.warehouse.InventoryUnitaryBalanceException e) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
@@ -411,6 +411,26 @@ public class WarehousePurchaseOrderAction extends GenericAction<PurchaseOrder> {
             facesMessages.add(StatusMessage.Severity.ERROR,
                     MessageUtils.getMessage("WarehousePurchaseOrder.reverse.notAllowed"));
             return Outcome.FAIL;
+        }
+    }
+
+    /**
+     * Emite un mensaje de error potencialmente multilinea como varios
+     * facesMessages separados, porque JSF renderiza cada uno en linea propia
+     * y los '\n' dentro de un solo mensaje son colapsados.
+     */
+    private void addMultilineErrorMessage(String message) {
+        if (message == null) {
+            return;
+        }
+        if (message.contains("\n")) {
+            for (String line : message.split("\n")) {
+                if (line.trim().length() > 0) {
+                    facesMessages.add(StatusMessage.Severity.ERROR, line);
+                }
+            }
+        } else {
+            facesMessages.add(StatusMessage.Severity.ERROR, message);
         }
     }
 

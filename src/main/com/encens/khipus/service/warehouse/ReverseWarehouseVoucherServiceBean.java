@@ -89,6 +89,11 @@ public class ReverseWarehouseVoucherServiceBean extends GenericServiceBean imple
                 ? movementDetailService.findDetailListByVoucher(warehouseVoucher)
                 : java.util.Collections.<MovementDetail>emptyList();
 
+        // 1.a) Pre-check de stock: identificar TODOS los articulos con stock
+        // insuficiente de una sola pasada, para dar un mensaje de error completo
+        // en lugar de fallar con el primer articulo problematico.
+        validateSufficientStockForReversal(warehouseVoucher, details);
+
         for (MovementDetail detail : details) {
             Warehouse warehouseForDetail = resolveWarehouseForDetail(warehouseVoucher, detail);
             reverseInventoryService.reverseInventory(warehouseVoucher, warehouseForDetail, detail);
@@ -205,5 +210,48 @@ public class ReverseWarehouseVoucherServiceBean extends GenericServiceBean imple
             return wv.getTargetWarehouse();
         }
         return wv.getWarehouse();
+    }
+
+    /**
+     * Pre-check de stock: para cada MovementDetail de tipo entrada (E),
+     * verifica que el inventario del almacen tenga al menos la cantidad
+     * requerida para la reversion. Acumula TODOS los articulos problematicos
+     * en un unico mensaje (uno por linea) y lanza ReverseNotAllowedException
+     * si encuentra al menos uno.
+     */
+    private void validateSufficientStockForReversal(WarehouseVoucher warehouseVoucher,
+                                                    List<MovementDetail> details)
+            throws ReverseNotAllowedException {
+        StringBuilder report = new StringBuilder();
+        for (MovementDetail detail : details) {
+            if (!MovementDetailType.E.equals(detail.getMovementType())) {
+                continue; // salidas no requieren pre-check de stock
+            }
+            Warehouse warehouse = resolveWarehouseForDetail(warehouseVoucher, detail);
+            InventoryPK pk = new InventoryPK(
+                    warehouse.getId().getCompanyNumber(),
+                    warehouse.getId().getWarehouseCode(),
+                    detail.getProductItem().getId().getProductItemCode());
+            Inventory inventory = getEntityManager().find(Inventory.class, pk);
+            java.math.BigDecimal available = (inventory != null && inventory.getUnitaryBalance() != null)
+                    ? inventory.getUnitaryBalance() : java.math.BigDecimal.ZERO;
+            java.math.BigDecimal required = detail.getQuantity() != null
+                    ? detail.getQuantity() : java.math.BigDecimal.ZERO;
+            if (available.compareTo(required) < 0) {
+                ProductItem pi = detail.getProductItem();
+                report.append("\n• ")
+                      .append(pi.getProductItemCode())
+                      .append(" - ")
+                      .append(pi.getName() != null ? pi.getName() : "")
+                      .append(" (requerido: ").append(required.toPlainString())
+                      .append(", disponible: ").append(available.toPlainString())
+                      .append(")");
+            }
+        }
+        if (report.length() > 0) {
+            throw new ReverseNotAllowedException(
+                    MessageUtils.getMessage("WarehouseVoucher.reverse.insufficientStock.list")
+                            + report.toString());
+        }
     }
 }
