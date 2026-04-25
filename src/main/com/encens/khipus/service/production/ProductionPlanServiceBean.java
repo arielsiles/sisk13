@@ -113,11 +113,6 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
 
         ProductItem productItem = em.find(ProductItem.class, product.getProductItem().getId());
 
-        /** Actualiza CT **/
-        BigDecimal total = BigDecimalUtil.multiply(productItem.getCu(), BigDecimalUtil.toBigDecimal(product.getQuantity()), 6);
-        BigDecimal newTotalCost = BigDecimalUtil.sum(productItem.getCt(), total, 6);
-        productItem.setCt(newTotalCost);
-
         /** Actualiza Saldo_Mon **/
         BigDecimal totalCost = BigDecimalUtil.multiply(productItem.getUnitCost(), BigDecimalUtil.toBigDecimal(product.getQuantity()));
         BigDecimal newInvestmentAmount = BigDecimalUtil.sum(productItem.getInvestmentAmount(), totalCost, 6);
@@ -132,11 +127,6 @@ public class ProductionPlanServiceBean implements ProductionPlanService {
     public void updateProductItemRemoveFromProduction(ProductionProduct product) {
 
         ProductItem productItem = em.find(ProductItem.class, product.getProductItem().getId());
-
-        /** Actualiza CT **/
-        BigDecimal total = BigDecimalUtil.multiply(productItem.getCu(), BigDecimalUtil.toBigDecimal(product.getQuantity()), 6);
-        BigDecimal newTotalCost = BigDecimalUtil.subtract(productItem.getCt(), total, 6);
-        productItem.setCt(newTotalCost);
 
         /** Actualiza Saldo_Mon **/
         BigDecimal totalCost = BigDecimalUtil.multiply(productItem.getUnitCost(), BigDecimalUtil.toBigDecimal(product.getQuantity()));

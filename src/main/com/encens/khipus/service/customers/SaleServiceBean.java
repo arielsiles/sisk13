@@ -81,11 +81,6 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
 
         /** todo Controlar negativos, si cuando se requiera **/
 
-        /** Actualiza CT **/
-        BigDecimal total = BigDecimalUtil.multiply(productItem.getCu(), BigDecimalUtil.toBigDecimal(articleOrder.getTotal()), 6);
-        BigDecimal newTotalCost = BigDecimalUtil.subtract(productItem.getCt(), total, 6);
-        productItem.setCt(newTotalCost);
-
         /** Actualiza Saldo_Mon **/
         BigDecimal totalCost = BigDecimalUtil.multiply(productItem.getUnitCost(), BigDecimalUtil.toBigDecimal(articleOrder.getTotal()));
         BigDecimal newInvestmentAmount = BigDecimalUtil.subtract(productItem.getInvestmentAmount(), totalCost, 6);
@@ -102,11 +97,6 @@ public class SaleServiceBean extends GenericServiceBean implements SaleService {
         ProductItem productItem = getEntityManager().find(ProductItem.class, articleOrder.getProductItem().getId());
 
         /** todo Controlar negativos, si cuando se requiera **/
-
-        /** Actualiza CT **/
-        BigDecimal total = BigDecimalUtil.multiply(productItem.getCu(), BigDecimalUtil.toBigDecimal(articleOrder.getTotal()), 6);
-        BigDecimal newTotalCost = BigDecimalUtil.sum(productItem.getCt(), total, 6);
-        productItem.setCt(newTotalCost);
 
         /** Actualiza Saldo_Mon **/
         BigDecimal totalCost = BigDecimalUtil.multiply(productItem.getUnitCost(), BigDecimalUtil.toBigDecimal(articleOrder.getTotal()));

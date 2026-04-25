@@ -1101,39 +1101,14 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         if ((warehouseVoucher.isReception() || warehouseVoucher.isInput()) && productItem.getControlValued()) {
             //                                                                     SALDO_MON                        MONTO (BS)
             BigDecimal newInvestmentAmount = BigDecimalUtil.sum(productItem.getInvestmentAmount(), movementDetail.getAmount(), 6);
-            BigDecimal newCTAmount         = BigDecimalUtil.sum(productItem.getCt(), movementDetail.getPurchasePrice(), 6);
 
-            System.out.println("======> newInvestmentAmount = " + productItem.getInvestmentAmount() + " + " + movementDetail.getAmount() + " : " + newInvestmentAmount);
-            System.out.println("======> DIVISOR: " + productItem.getFullName() + " : " + sumUnitaryBalances);
-
-            BigDecimal newUnitCost = BigDecimal.ZERO;
-            BigDecimal newCU = BigDecimal.ZERO;
-
-
-            if(sumUnitaryBalances.doubleValue() > 0){
-                newUnitCost = BigDecimalUtil.divide(newInvestmentAmount, sumUnitaryBalances, 6);
-                newCU = BigDecimalUtil.divide(newCTAmount, sumUnitaryBalances, 6);
-
+            if (sumUnitaryBalances.doubleValue() > 0) {
+                BigDecimal newUnitCost = BigDecimalUtil.divide(newInvestmentAmount, sumUnitaryBalances, 6);
                 productItem.setUnitCost(newUnitCost);
-                productItem.setCu(newCU);
                 productItem.setInvestmentAmount(newInvestmentAmount);
-                productItem.setCt(newCTAmount);
-
-            }else {
+            } else {
                 productItem.setInvestmentAmount(BigDecimal.ZERO);
-                productItem.setCt(BigDecimal.ZERO);
             }
-
-
-            System.out.println("----FIJANDO VALORES A PRODUCT ITEM----");
-            System.out.println("----> newInvestmentAmount: " + newInvestmentAmount);
-            System.out.println("----> newCTAmount: " + newCTAmount);
-            System.out.println("----> newUnitCost: " + newUnitCost);
-            System.out.println("----> newCU: " + newCU);
-            System.out.println("--------------------------------------");
-
-
-
         }
 
         getEntityManager().merge(productItem);
@@ -1152,10 +1127,6 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         if (warehouseVoucher.isConsumption() && productItem.getControlValued()) {
             BigDecimal newInvestmentAmount = BigDecimalUtil.multiply(sumUnitaryBalances, productItem.getUnitCost(), 6);
             productItem.setInvestmentAmount(newInvestmentAmount);
-            /** Actualiza CT **/
-            BigDecimal newTotalCost = BigDecimalUtil.subtract(productItem.getCt(), movementDetail.getPurchasePrice());
-            productItem.setCt(newTotalCost);
-            System.out.println("....CONSUMO...isConsumption...");
         }
 
         if (warehouseVoucher.isOutput() && productItem.getControlValued()) {

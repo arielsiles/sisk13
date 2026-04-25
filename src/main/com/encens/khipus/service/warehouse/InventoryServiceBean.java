@@ -142,11 +142,6 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
     @Override
     public void increaseProductItemAmount(ProductItem productItem, BigDecimal newQuantityInventory, BigDecimal amountToAdd, BigDecimal amountCTAdd) {
 
-        /** Actualiza CT **/
-        BigDecimal newTotalCost = BigDecimalUtil.sum(productItem.getCt(), amountCTAdd, 6);
-        productItem.setCt(newTotalCost);
-        productItem.setCu( BigDecimalUtil.divide(newTotalCost, newQuantityInventory, 6) );
-
         /** Actualiza Saldo_Mon **/
         BigDecimal newInvestmentAmount = BigDecimalUtil.sum(productItem.getInvestmentAmount(), amountToAdd, 6);
         productItem.setInvestmentAmount(newInvestmentAmount);

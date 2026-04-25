@@ -59,9 +59,7 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
                 productItem.setEquivalentQuantity(null);
             }
             productItem.setUnitCost(BigDecimal.ZERO);
-            productItem.setCu(BigDecimal.ZERO);
             productItem.setInvestmentAmount(BigDecimal.ZERO);
-            productItem.setCt(BigDecimal.ZERO);
             productItem.getId().setProductItemCode(String.valueOf(sequenceGeneratorService.nextValue(Constants.WAREHOUSE_PRODUCT_ITEM_SEQUENCE)));
             getEntityManager().persist(productItem);
             getEntityManager().flush();

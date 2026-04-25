@@ -133,31 +133,23 @@ public class ReverseInventoryServiceBean extends GenericServiceBean implements R
 
         BigDecimal amount = movementDetail.getAmount() != null
                 ? movementDetail.getAmount() : BigDecimal.ZERO;
-        BigDecimal purchasePrice = movementDetail.getPurchasePrice() != null
-                ? movementDetail.getPurchasePrice() : BigDecimal.ZERO;
 
         BigDecimal newInvestmentAmount;
-        BigDecimal newCTAmount;
 
         if (MovementDetailType.E.equals(movementDetail.getMovementType())) {
             // Revertir entrada: descontar el monto que se habia sumado al aprobar
             newInvestmentAmount = BigDecimalUtil.subtract(productItem.getInvestmentAmount(), amount, 6);
-            newCTAmount         = BigDecimalUtil.subtract(productItem.getCt(), purchasePrice, 6);
         } else {
             // Revertir salida: volver a sumar el monto al saldo monetario
             newInvestmentAmount = BigDecimalUtil.sum(productItem.getInvestmentAmount(), amount, 6);
-            newCTAmount         = BigDecimalUtil.sum(productItem.getCt(), purchasePrice, 6);
         }
 
         if (sumUnitaryBalances.doubleValue() > 0) {
             productItem.setUnitCost(BigDecimalUtil.divide(newInvestmentAmount, sumUnitaryBalances, 6));
-            productItem.setCu(BigDecimalUtil.divide(newCTAmount, sumUnitaryBalances, 6));
             productItem.setInvestmentAmount(newInvestmentAmount);
-            productItem.setCt(newCTAmount);
         } else {
-            // Sin stock remanente: saldos monetarios a cero; se preserva ultimo unitCost
+            // Sin stock remanente: saldo monetario a cero; se preserva ultimo unitCost
             productItem.setInvestmentAmount(BigDecimal.ZERO);
-            productItem.setCt(BigDecimal.ZERO);
         }
 
         getEntityManager().merge(productItem);
