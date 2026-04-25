@@ -536,6 +536,9 @@
         <div align="center">
             <h:form id="annulPurchaseOrderForm">
                 <p>
+                    <strong><h:outputText value="#{messages['WarehousePurchaseOrder.reverse.confirm.title']}"/></strong>
+                </p>
+                <p>
                     <h:outputText value="#{messages['WarehousePurchaseOrder.reverse.confirm.simple']}"
                                   rendered="#{isPurchaseOrderPending or isPurchaseOrderApproved}"/>
                     <h:outputText value="#{messages['WarehousePurchaseOrder.reverse.confirm']}"
