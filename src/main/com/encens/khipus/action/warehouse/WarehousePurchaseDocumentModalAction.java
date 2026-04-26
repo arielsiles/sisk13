@@ -21,7 +21,6 @@ import com.encens.khipus.service.finances.FinancesExchangeRateService;
 import com.encens.khipus.service.purchases.PurchaseDocumentService;
 import com.encens.khipus.util.MessageUtils;
 import com.encens.khipus.util.ValidatorUtil;
-import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
@@ -31,9 +30,12 @@ import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.log.Log;
 
 import javax.faces.context.FacesContext;
+import javax.persistence.EntityManager;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -71,6 +73,10 @@ public class WarehousePurchaseDocumentModalAction implements Serializable {
 
     @In
     protected FacesMessages facesMessages;
+
+    /** EM de la conversation para queries directas (no cacheadas) de la grilla. */
+    @In(value = "#{entityManager}")
+    private EntityManager entityManager;
 
     /** Documento sobre el que opera el modal (nuevo o existente). */
     private PurchaseDocument instance;
@@ -117,20 +123,17 @@ public class WarehousePurchaseDocumentModalAction implements Serializable {
                     "Common.error.notFound", "");
             return Outcome.FAIL;
         }
-        try {
-            instance = purchaseDocumentService.readDocument(purchaseDocument.getId());
-            creatingNew = false;
-            // Si el documento existente vino sin NIT/Nombre (por ejemplo,
-            // creado en una version anterior o por un flujo legacy), los
-            // recuperamos del proveedor asociado a la OC para que el usuario
-            // pueda aprobarlo sin tener que reabrirlo desde el flujo de pagina.
-            recoverFinancesEntityFromProvider();
-            return null;
-        } catch (PurchaseDocumentNotFoundException e) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
-                    "Common.error.notFound", purchaseDocument.getNumber());
-            return Outcome.FAIL;
-        }
+        // CRITICO: usar la instancia que viene del dataTable directamente,
+        // NO recargarla via service.readDocument(id). Razon: el dataTable
+        // tiene esta misma entidad en wrappedData (cache PAGE-scoped). Si
+        // recargamos, terminamos operando sobre una copia distinta y las
+        // mutaciones (setState en approve/nullify) no se reflejan en la
+        // entidad cacheada que el grid muestra. Mismo patron que sigue
+        // CustomerOrderAction.cancelOrderInvoice(customerOrder).
+        instance = purchaseDocument;
+        creatingNew = false;
+        recoverFinancesEntityFromProvider();
+        return null;
     }
 
     public void closeModal() {
@@ -243,11 +246,15 @@ public class WarehousePurchaseDocumentModalAction implements Serializable {
         }
     }
 
-    /** Anula un documento PENDING. */
+    /**
+     * Anula un documento PENDING o APPROVED. Bloqueado si la OC esta
+     * FINALIZED o LIQUIDATED (en esos estados los documentos quedan
+     * congelados y solo pueden moverse via reversion completa de la OC).
+     */
     @Restrict("#{s:hasPermission('PURCHASEDOCUMENTMODAL_NULLIFY','VIEW')}")
     public String nullify() {
         lastOperationSucceeded = false;
-        if (instance == null || !isInstancePending()) {
+        if (!isCanNullify()) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
                     "PurchaseDocument.modal.error.notAllowed");
             return Outcome.FAIL;
@@ -306,6 +313,26 @@ public class WarehousePurchaseDocumentModalAction implements Serializable {
         return isEditingExisting() && (isInstanceApproved() || isInstanceNullified());
     }
 
+    /**
+     * Indica si el boton "Anular" del modal debe estar habilitado.
+     * Reglas:
+     *  - El documento debe ser existente (no creando uno nuevo).
+     *  - Estado del documento: PENDING o APPROVED (NULLIFIED ya esta anulado).
+     *  - La OC NO debe estar FINALIZED ni LIQUIDATED (en esos estados los
+     *    documentos quedan congelados; revertirlos requiere reversion completa
+     *    de la OC desde el flujo dedicado).
+     */
+    public boolean isCanNullify() {
+        if (!isEditingExisting()) return false;
+        if (!isInstancePending() && !isInstanceApproved()) return false;
+        if (warehousePurchaseOrderAction == null
+                || warehousePurchaseOrderAction.getInstance() == null) {
+            return false;
+        }
+        return !warehousePurchaseOrderAction.getInstance().isPurchaseOrderFinalized()
+                && !warehousePurchaseOrderAction.getInstance().isPurchaseOrderLiquidated();
+    }
+
     /** True para rendering del titulo "Nuevo documento" vs "Documento de compra". */
     public boolean isCreatingNew() {
         return creatingNew;
@@ -341,6 +368,37 @@ public class WarehousePurchaseDocumentModalAction implements Serializable {
 
     public void setInstance(PurchaseDocument instance) {
         this.instance = instance;
+    }
+
+    /**
+     * Lista de documentos de compra de la OC actual, consultada directamente
+     * a la DB en cada acceso (sin cache). Mismo patron que utiliza
+     * salesAction.articleOrderList en salesBox.xhtml: el dataTable se bindea
+     * a un getter del action y JSF re-evalua en cada render, asi que tras
+     * cualquier mutacion (save/approve/nullify) el siguiente reRender muestra
+     * el estado actual sin necesidad de gestionar caches de QueryDataModel.
+     *
+     * Se prefiere este patron sobre warehousePurchaseDocumentDataModel
+     * (PAGE-scoped, con wrappedKeys/wrappedData/detached cacheados) que en
+     * la grilla del modal mostraba estados viejos tras approve/nullify por
+     * mas que se reRender el dataTable o se forzaran update/search/eviction.
+     *
+     * El refresco automatico tras refreshFromConversationContext o un commit
+     * en la DB queda garantizado: cada render = nueva query.
+     */
+    @SuppressWarnings("unchecked")
+    public List<PurchaseDocument> getDocumentList() {
+        if (warehousePurchaseOrderAction == null
+                || warehousePurchaseOrderAction.getInstance() == null
+                || warehousePurchaseOrderAction.getInstance().getId() == null) {
+            return Collections.emptyList();
+        }
+        return (List<PurchaseDocument>) entityManager.createQuery(
+                "select pd from PurchaseDocument pd"
+                        + " where pd.purchaseOrder.id = :ocId"
+                        + " order by pd.date desc, pd.id desc")
+                .setParameter("ocId", warehousePurchaseOrderAction.getInstance().getId())
+                .getResultList();
     }
 
     public List<CollectionDocumentType> getPurchaseDocumentTypeList() {
@@ -433,64 +491,42 @@ public class WarehousePurchaseDocumentModalAction implements Serializable {
     }
 
     /**
-     * Tras cada operacion del modal, los servicios corren con TX REQUIRES_NEW,
-     * lo que detacha de la sesion Hibernate todas las entidades cargadas en
-     * pedidos previos: la OC misma, sus PurchaseOrderDetail y los proxies LAZY
-     * (productItem, purchaseMeasureUnit, etc). Si el usuario cambia de pestania
-     * tras cerrar el modal, el render intenta inicializar esos proxies y
-     * dispara LazyInitializationException, que pone la transaccion en
-     * ABORT_ONLY y a partir de alli todo falla con "Cannot open connection".
+     * Refresca las grillas PAGE-scoped tras una operacion del modal
+     * (save/approve/nullify). Estrategia: evictar los componentes PAGE
+     * de TODOS los lugares donde Seam y JSF los puedan cachear:
      *
-     * Solucion: evictar del PAGE context todos los QueryDataModel afectados.
-     * Asi Seam recrea instancias frescas en el proximo render, ejecutan una
-     * nueva consulta contra la DB y todos los proxies quedan reattachados al
-     * listEntityManager del request actual.
+     *   1. Contexts.getPageContext() — el page context "logico" de Seam.
+     *   2. UIViewRoot.getAttributes() — donde Seam materialmente persiste
+     *      los componentes PAGE entre requests via JSF view state.
+     *
+     * Tras evictar, en el siguiente render el dataTable evalua su EL,
+     * Seam no encuentra la instancia, ejecuta el factory y crea una nueva
+     * con detached=false / wrappedKeys=null. walk() arranca limpio y
+     * ejecuta SELECT contra DB, mostrando el estado actual.
+     *
+     * Esto es clave para approve/nullify: el row con MISMO ID cambia de
+     * PENDING a APPROVED/NULLIFIED. Sin re-query, walk reusa el entity
+     * cacheado en wrappedData con el estado viejo.
      */
     private void refreshPurchaseOrderInstance() {
-        evictPageScopedDataModel("warehousePurchaseDocumentDataModel");
-        evictPageScopedDataModel("warehousePurchaseOrderDetailDataModel");
-        // Tras evictar, forzamos updateAndSearch sobre la instancia que
-        // Seam recree. update() resetea detached/rowCount/wrappedKeys flags
-        // internos; search() limpia el resultList del EntityQuery. Esto
-        // asegura que el siguiente walk() ejecute un nuevo SELECT y popule
-        // wrappedData con entidades attacheadas al listEntityManager del
-        // request actual, evitando proxies LAZY huerfanos en requests futuros.
-        forceDataModelRefresh("warehousePurchaseDocumentDataModel");
+        evictFromAllScopes("warehousePurchaseDocumentDataModel");
+        evictFromAllScopes("warehousePurchaseOrderDetailDataModel");
     }
 
-    private void forceDataModelRefresh(String name) {
+    private void evictFromAllScopes(String name) {
         try {
-            Object dataModel = Component.getInstance(name, true);
-            if (dataModel instanceof PurchaseDocumentDataModel) {
-                ((PurchaseDocumentDataModel) dataModel).updateAndSearch();
+            if (Contexts.isPageContextActive()) {
+                Contexts.getPageContext().remove(name);
             }
-        } catch (RuntimeException e) {
-            log.warn("No se pudo forzar refresh del data model #0: #1",
-                    name, e.getMessage());
+        } catch (RuntimeException ignored) {
+            // page context puede no estar activo en algunos paths
         }
-    }
-
-    private void evictPageScopedDataModel(String name) {
-        // Seam guarda los componentes PAGE en el atributo del UIViewRoot.
-        // Quitarlos ahi mismo es la via mas directa y funciona durante
-        // INVOKE_APPLICATION (a diferencia de Contexts.getPageContext() que
-        // puede devolver un contexto distinto segun el momento del lifecycle).
         try {
             FacesContext fc = FacesContext.getCurrentInstance();
             if (fc != null && fc.getViewRoot() != null) {
                 fc.getViewRoot().getAttributes().remove(name);
             }
-        } catch (RuntimeException e) {
-            log.warn("No se pudo evictar (viewRoot) el data model #0: #1",
-                    name, e.getMessage());
-        }
-        try {
-            if (Contexts.isPageContextActive()) {
-                Contexts.getPageContext().remove(name);
-            }
-        } catch (RuntimeException e) {
-            log.warn("No se pudo evictar (pageContext) el data model #0: #1",
-                    name, e.getMessage());
+        } catch (RuntimeException ignored) {
         }
     }
 

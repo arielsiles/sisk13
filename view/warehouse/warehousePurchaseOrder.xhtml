@@ -69,16 +69,15 @@
                      rendered="#{warehousePurchaseOrderAction.managed and !isPurchaseOrderNullified and s:hasPermission('PURCHASEDOCUMENT','CREATE')}"
                      immediate="true"/>
 
-    <h:commandButton value="#{messages['PurchaseDocument.modal.register']}"
-                     styleClass="button"
-                     rendered="#{warehousePurchaseDocumentModalAction.canRegister and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}">
-        <a4j:support event="onclick"
-                     action="#{warehousePurchaseDocumentModalAction.openForCreate}"
-                     reRender="purchaseDocumentModalForm"
-                     ajaxSingle="true"
-                     immediate="true"
-                     oncomplete="Richfaces.showModalPanel('purchaseDocumentModalPanel');"/>
-    </h:commandButton>
+    <a4j:commandButton id="modalRegisterPurchaseDocumentButtonTop"
+                       action="#{warehousePurchaseDocumentModalAction.openForCreate}"
+                       value="#{messages['PurchaseDocument.modal.register']}"
+                       styleClass="button"
+                       rendered="#{warehousePurchaseDocumentModalAction.canRegister and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}"
+                       reRender="purchaseDocumentModalForm"
+                       ajaxSingle="true"
+                       immediate="true"
+                       oncomplete="Richfaces.showModalPanel('purchaseDocumentModalPanel');"/>
 
     <h:commandButton id="createButtonId"
                      action="#{warehousePurchaseOrderAction.create}"
@@ -217,7 +216,9 @@
                        value="#{messages['PurchaseDocument.modal.register']}"
                        styleClass="button"
                        rendered="#{warehousePurchaseDocumentModalAction.canRegister and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}"
-                       reRender="modalFormPanel"
+                       reRender="purchaseDocumentModalForm"
+                       ajaxSingle="true"
+                       immediate="true"
                        oncomplete="Richfaces.showModalPanel('purchaseDocumentModalPanel');"
                        tabindex="34"/>
 
@@ -442,7 +443,7 @@
           ajaxSingle="true"
           rendered="#{s:hasPermission('PURCHASEDOCUMENT','VIEW')}">
     <rich:dataTable id="purchaseDocumentListId"
-                    value="#{warehousePurchaseDocumentDataModel}"
+                    value="#{warehousePurchaseDocumentModalAction.documentList}"
                     var="purchaseDocumentItem"
                     rows="#{sessionUser.rowsPerPage}"
                     width="100%"
@@ -522,9 +523,9 @@
             </a4j:commandLink>
         </rich:column>
     </rich:dataTable>
-    <app:dataScroller id="purchaseDocumentListDataScrollerId"
-                      for="purchaseDocumentListId"
-                      dataModel="#{warehousePurchaseDocumentDataModel}"/>
+    <rich:datascroller id="purchaseDocumentListDataScrollerId"
+                       for="purchaseDocumentListId"
+                       align="right" maxPages="10" renderIfSinglePage="false"/>
 </rich:tab>
 <rich:tab name="discountCommentTab"
           rendered="#{s:hasPermission('DISCOUNTCOMMENT','VIEW')}"

@@ -398,7 +398,7 @@
                            value="#{messages['Common.save']}"
                            styleClass="button"
                            rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}"
-                           reRender=":warehousePurchaseOrderForm:purchaseDocumentListId, :warehousePurchaseOrderForm:purchaseDocumentListDataScrollerId, :warehousePurchaseOrderForm:warehousePurchaseOrderDetailList, purchaseDocumentModalForm"
+                           reRender=":warehousePurchaseOrderForm, purchaseDocumentModalForm"
                            data="#{warehousePurchaseDocumentModalAction.lastOperationSucceeded}"
                            oncomplete="if (data === true) { Richfaces.hideModalPanel('purchaseDocumentModalPanel'); }"/>
 
@@ -408,17 +408,19 @@
                            value="#{messages['PurchaseDocument.button.approve']}"
                            styleClass="button"
                            rendered="#{warehousePurchaseDocumentModalAction.editingExisting and warehousePurchaseDocumentModalAction.instancePending and s:hasPermission('PURCHASEDOCUMENTMODAL_APPROVE','VIEW')}"
-                           reRender=":warehousePurchaseOrderForm:purchaseDocumentListId, :warehousePurchaseOrderForm:purchaseDocumentListDataScrollerId, :warehousePurchaseOrderForm:warehousePurchaseOrderDetailList, purchaseDocumentModalForm"
+                           reRender=":warehousePurchaseOrderForm, purchaseDocumentModalForm"
                            data="#{warehousePurchaseDocumentModalAction.lastOperationSucceeded}"
                            oncomplete="if (data === true) { Richfaces.hideModalPanel('purchaseDocumentModalPanel'); }"/>
 
-        <!-- Anular (solo si PENDING y existe) -->
+        <!-- Anular: visible para PENDING o APPROVED. Bloqueado si la OC esta
+             FINALIZED o LIQUIDATED (en esos estados los docs solo se mueven
+             via reversion completa de la OC). -->
         <a4j:commandButton id="modalNullifyButton"
                            action="#{warehousePurchaseDocumentModalAction.nullify}"
                            value="#{messages['PurchaseDocument.button.nullify']}"
                            styleClass="button"
-                           rendered="#{warehousePurchaseDocumentModalAction.editingExisting and warehousePurchaseDocumentModalAction.instancePending and s:hasPermission('PURCHASEDOCUMENTMODAL_NULLIFY','VIEW')}"
-                           reRender=":warehousePurchaseOrderForm:purchaseDocumentListId, :warehousePurchaseOrderForm:purchaseDocumentListDataScrollerId, :warehousePurchaseOrderForm:warehousePurchaseOrderDetailList, purchaseDocumentModalForm"
+                           rendered="#{warehousePurchaseDocumentModalAction.canNullify and s:hasPermission('PURCHASEDOCUMENTMODAL_NULLIFY','VIEW')}"
+                           reRender=":warehousePurchaseOrderForm, purchaseDocumentModalForm"
                            data="#{warehousePurchaseDocumentModalAction.lastOperationSucceeded}"
                            oncomplete="if (data === true) { Richfaces.hideModalPanel('purchaseDocumentModalPanel'); }"/>
 

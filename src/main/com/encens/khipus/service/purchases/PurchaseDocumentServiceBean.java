@@ -217,11 +217,21 @@ public class PurchaseDocumentServiceBean extends GenericServiceBean implements P
 
     public void nullifyDocument(PurchaseDocument document) throws PurchaseDocumentNotFoundException,
             PurchaseDocumentStateException {
-        if (null == getPurchaseDocumentFromDatabase(document.getId())) {
+        PurchaseDocument dbDocument = getPurchaseDocumentFromDatabase(document.getId());
+        if (null == dbDocument) {
             throw new PurchaseDocumentNotFoundException();
         }
 
-        validatePurchaseDocumentState(document);
+        // Validacion local: solo se rechaza si ya esta NULLIFIED (idempotencia).
+        // PENDING y APPROVED son ambos anulables. Esto coincide con lo que ya hace
+        // ReversePurchaseOrderServiceBean.nullifyPurchaseDocuments() en bulk
+        // cuando se reversa la OC, donde tambien marca como NULLIFIED documentos
+        // que estaban APPROVED. La proteccion contra anulacion fuera de tiempo
+        // (OC ya FIN/LIQ) se hace al nivel UI/action donde se conoce el contexto
+        // de la OC.
+        if (dbDocument.isNullified()) {
+            throw new PurchaseDocumentStateException(dbDocument.getState());
+        }
 
         document.setState(PurchaseDocumentState.NULLIFIED);
 
