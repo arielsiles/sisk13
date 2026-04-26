@@ -1,0 +1,446 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+<!--
+  Modal de Documento de Compra para abrirse desde la pantalla de OC.
+  Convive con el flujo de pagina completa (warehousePurchaseDocument.xhtml)
+  sin compartir form ni action: usa warehousePurchaseDocumentModalAction
+  y sus propios permisos PURCHASEDOCUMENTMODAL_*.
+
+  Requiere que los modales hijos (financesEntityListModalPanel,
+  cashAccountAdjustmentListModalPanel) esten declarados al nivel raiz de
+  la pagina de OC para evitar el problema de modales anidados de
+  RichFaces 3.x.
+-->
+
+<rich:modalPanel id="purchaseDocumentModalPanel"
+                 width="640"
+                 autosized="true"
+                 resizeable="false"
+                 zindex="2000">
+    <!-- El facet header se renderiza una sola vez con la pagina (fuera del
+         h:form), asi que no podemos usar EL dependiente del estado del bean.
+         Usamos un titulo estable para que la barra de ventana muestre siempre
+         texto, evitando una barra "vacia" con solo la X. -->
+    <f:facet name="header">
+        <h:outputText value="#{messages['PurchaseDocument.modal.title.edit']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" styleClass="select-image" id="modalCloseIcon"/>
+    </f:facet>
+
+    <h:form id="purchaseDocumentModalForm">
+
+    <rich:panel id="modalFormPanel">
+
+    <!-- ============== Datos generales ============== -->
+    <app:fieldset id="modalGeneralFieldset"
+                  title="#{messages['PurchaseDocument.modal.section.general']}">
+
+        <s:decorate id="modalFinancesEntityField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.provider']}</ui:define>
+            <app:selectPopUp id="modalFinancesEntitySelectPopup"
+                             required="true"
+                             textValue="#{warehousePurchaseDocumentModalAction.instance.financesEntity.acronym}"
+                             value="#{warehousePurchaseDocumentModalAction.instance.financesEntity}"
+                             clearAction="#{warehousePurchaseDocumentModalAction.clearFinancesEntity()}"
+                             searchModalPanel="financesEntityListModalPanel"
+                             dataModel="#{financesEntityDataModel}"
+                             reRender="modalFinancesEntityField, modalNitField"
+                             readOnly="#{warehousePurchaseDocumentModalAction.instanceReadOnly}"
+                             hotKeySelect="alt+1"/>
+        </s:decorate>
+
+        <s:decorate id="modalDocumentTypeField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.documentType']}</ui:define>
+            <h:selectOneMenu id="modalPurchaseDocumentType"
+                             value="#{warehousePurchaseDocumentModalAction.instance.type}"
+                             styleClass="input"
+                             rendered="#{warehousePurchaseDocumentModalAction.instancePending}"
+                             required="true"
+                             tabindex="1">
+                <s:selectItems value="#{warehousePurchaseDocumentModalAction.purchaseDocumentTypeList}"
+                               var="element"
+                               label="#{messages[element.resourceKey]}"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             action="#{warehousePurchaseDocumentModalAction.updateDocumentType}"
+                             reRender="modalFormPanel"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+            <h:outputText value="#{messages[warehousePurchaseDocumentModalAction.instance.type.resourceKey]}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}"/>
+        </s:decorate>
+
+        <!-- Numero asignado para Ajuste (solo lectura cuando ya esta) -->
+        <s:decorate template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{warehousePurchaseDocumentModalAction.editingExisting and warehousePurchaseDocumentModalAction.instance.adjustmentDocument}">
+            <ui:define name="label">#{messages['PurchaseDocument.number']}</ui:define>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.number}"/>
+        </s:decorate>
+
+        <s:decorate id="modalCashAccountAdjustmentField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{warehousePurchaseDocumentModalAction.instance.adjustmentDocument}">
+            <ui:define name="label">#{messages['PurchaseDocument.adjustmentAccount']}</ui:define>
+            <app:selectPopUp id="modalCashAccountAdjustment"
+                             required="true"
+                             textValue="#{warehousePurchaseDocumentModalAction.instance.cashAccountAdjustment.fullName}"
+                             value="#{warehousePurchaseDocumentModalAction.instance.cashAccountAdjustment}"
+                             dataModel="#{cashAccountDataModel}"
+                             clearAction="warehousePurchaseDocumentModalAction.clearCashAccountAdjustment()"
+                             selectAction="cashAccountDataModel.searchByCurrency('P')"
+                             searchModalPanel="cashAccountAdjustmentListModalPanel"
+                             reRender="modalFormPanel"
+                             rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly}"
+                             hotKeySelect="alt+1"
+                             tabindex="2"/>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.cashAccountAdjustment.fullName}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}"/>
+        </s:decorate>
+
+        <s:decorate id="modalNumberField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{not warehousePurchaseDocumentModalAction.instance.adjustmentDocument}">
+            <ui:define name="label">#{messages['PurchaseDocument.number']}</ui:define>
+            <h:inputText id="modalNumber"
+                         value="#{warehousePurchaseDocumentModalAction.instance.number}"
+                         rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="2"/>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.number}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}"/>
+        </s:decorate>
+
+        <s:decorate id="modalNameField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow"
+                    rendered="#{not warehousePurchaseDocumentModalAction.instance.adjustmentDocument}">
+            <ui:define name="label">#{messages['PurchaseDocument.name']}</ui:define>
+            <h:inputText id="modalName"
+                         value="#{warehousePurchaseDocumentModalAction.instance.name}"
+                         rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly}"
+                         required="true"
+                         styleClass="input"
+                         tabindex="3"/>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.name}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}"/>
+        </s:decorate>
+
+        <s:decorate id="modalNitField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.nit']}</ui:define>
+            <h:inputText id="modalNit"
+                         value="#{warehousePurchaseDocumentModalAction.instance.nit}"
+                         rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly}"
+                         required="true"
+                         styleClass="input"
+                         tabindex="9"/>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.nit}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}"/>
+        </s:decorate>
+
+        <s:decorate id="modalDocumentDateField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.date']}</ui:define>
+            <rich:calendar id="modalPurchaseDocumentDate"
+                           value="#{warehousePurchaseDocumentModalAction.instance.date}"
+                           rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly}"
+                           styleClass="input"
+                           datePattern="#{messages['patterns.date']}"
+                           enableManualInput="true"
+                           required="true"
+                           tabindex="4">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </rich:calendar>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.date}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}"
+                                   type="date"/>
+            </h:outputText>
+        </s:decorate>
+
+        <s:decorate id="modalAmountField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.totalAmount']}</ui:define>
+            <h:inputText id="modalAmountInputText"
+                         value="#{warehousePurchaseDocumentModalAction.instance.amount}"
+                         rendered="#{warehousePurchaseDocumentModalAction.instancePending}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="5">
+                <app:realNumberConverter minimum="0"
+                                         pattern="#{messages['patterns.decimalNumber']}"
+                                         forId="modalAmountInputText"/>
+                <a4j:support event="onchange"
+                             reRender="modalAmountField"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.amount}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+
+    </app:fieldset>
+
+    <!-- ============== Columna derecha: panel segun tipo ============== -->
+    <app:fieldset id="modalReceiptFieldset"
+                  title="#{messages['PurchaseDocument.modal.section.payment']}"
+                  rendered="#{warehousePurchaseDocumentModalAction.instance.receiptDocument or warehousePurchaseDocumentModalAction.instance.adjustmentDocument}">
+        <s:decorate id="modalCurrencyField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.currency']}</ui:define>
+            <h:selectOneMenu id="modalCurrencySelectOne"
+                             value="#{warehousePurchaseDocumentModalAction.instance.currency}"
+                             styleClass="input"
+                             required="true"
+                             rendered="#{warehousePurchaseDocumentModalAction.instancePending and not warehousePurchaseDocumentModalAction.instance.adjustmentDocument}"
+                             tabindex="7">
+                <s:selectItems value="#{purchaseDocumentCurrencies}"
+                               var="element"
+                               label="#{messages[element.resourceKey]} (#{messages[element.symbolResourceKey]})"
+                               noSelectionLabel=""
+                               hideNoSelectionLabel="false"/>
+                <a4j:support event="onchange"
+                             action="#{warehousePurchaseDocumentModalAction.updateExchangeRate}"
+                             reRender="modalCurrencyField, modalExchangeRateField"
+                             ajaxSingle="true"/>
+            </h:selectOneMenu>
+            <h:outputText
+                    value="#{messages[warehousePurchaseDocumentModalAction.instance.currency.resourceKey]} (#{messages[warehousePurchaseDocumentModalAction.instance.currency.symbolResourceKey]})"
+                    rendered="#{not empty warehousePurchaseDocumentModalAction.instance.currency and (not warehousePurchaseDocumentModalAction.instancePending or warehousePurchaseDocumentModalAction.instance.adjustmentDocument)}"/>
+        </s:decorate>
+        <h:panelGroup id="modalExchangeRateField">
+            <s:decorate template="/include/inputField.xhtml"
+                        rendered="#{empty warehousePurchaseDocumentModalAction.instance.currency or not warehousePurchaseDocumentModalAction.instance.isLocalCurrencyUsed()}"
+                        styleClass="formRow">
+                <ui:define name="label">#{messages['PurchaseDocument.exchangeRate']}</ui:define>
+                <h:inputText id="modalExchangeRate"
+                             value="#{warehousePurchaseDocumentModalAction.instance.exchangeRate}"
+                             styleClass="input right"
+                             rendered="#{warehousePurchaseDocumentModalAction.instancePending}"
+                             required="true"
+                             tabindex="8">
+                    <app:realNumberConverter minimum="0.000001"
+                                             pattern="#{messages['patterns.decimal6FNumber']}"
+                                             forId="modalExchangeRate"/>
+                </h:inputText>
+                <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.exchangeRate}"
+                              rendered="#{not warehousePurchaseDocumentModalAction.instancePending}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                </h:outputText>
+            </s:decorate>
+        </h:panelGroup>
+    </app:fieldset>
+
+    <app:fieldset id="modalInvoiceFieldset"
+                  title="#{messages['PurchaseDocument.modal.section.invoice']}"
+                  rendered="#{warehousePurchaseDocumentModalAction.instance.invoiceDocument}">
+        <s:decorate id="modalAuthorizationNumberField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.authorizationCode']}</ui:define>
+            <h:inputText id="modalAuthorizationNumber"
+                         value="#{warehousePurchaseDocumentModalAction.instance.authorizationNumber}"
+                         rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="10"/>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.authorizationNumber}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}"/>
+        </s:decorate>
+        <s:decorate id="modalControlCodeField"
+                    template="/include/inputField.xhtml"
+                    styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.controlCode']}</ui:define>
+            <h:inputText id="modalControlCode"
+                         value="#{warehousePurchaseDocumentModalAction.instance.controlCode}"
+                         rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly}"
+                         styleClass="input right"
+                         tabindex="11"/>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.controlCode}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}"/>
+        </s:decorate>
+        <s:decorate id="modalExemptField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.exempt']}</ui:define>
+            <h:inputText id="modalExempt"
+                         value="#{warehousePurchaseDocumentModalAction.instance.exempt}"
+                         rendered="#{warehousePurchaseDocumentModalAction.instancePending}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="12">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         minimum="0"
+                                         forId="modalExempt"/>
+                <a4j:support event="onchange"
+                             reRender="modalExemptField"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.exempt}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="modalIceField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.ice']}</ui:define>
+            <h:inputText id="modalIce"
+                         value="#{warehousePurchaseDocumentModalAction.instance.ice}"
+                         rendered="#{warehousePurchaseDocumentModalAction.instancePending}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="13">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         minimum="0"
+                                         forId="modalIce"/>
+                <a4j:support event="onchange"
+                             reRender="modalIceField"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.ice}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="modalRatesField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.rates']}</ui:define>
+            <h:inputText id="modalRates"
+                         value="#{warehousePurchaseDocumentModalAction.instance.rates}"
+                         rendered="#{warehousePurchaseDocumentModalAction.instancePending}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="14">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         minimum="0"
+                                         forId="modalRates"/>
+                <a4j:support event="onchange"
+                             reRender="modalRatesField"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.rates}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="modalNoTaxCreditField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.noTaxCredit']}</ui:define>
+            <h:inputText id="modalNoTaxCredit"
+                         value="#{warehousePurchaseDocumentModalAction.instance.noTaxCredit}"
+                         rendered="#{warehousePurchaseDocumentModalAction.instancePending}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="15">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         minimum="0"
+                                         forId="modalNoTaxCredit"/>
+                <a4j:support event="onchange"
+                             reRender="modalNoTaxCreditField"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.noTaxCredit}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+        <s:decorate id="modalDiscountsField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['PurchaseDocument.discounts']}</ui:define>
+            <h:inputText id="modalDiscounts"
+                         value="#{warehousePurchaseDocumentModalAction.instance.discounts}"
+                         rendered="#{warehousePurchaseDocumentModalAction.instancePending}"
+                         required="true"
+                         styleClass="input right"
+                         tabindex="16">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                         minimum="0"
+                                         forId="modalDiscounts"/>
+                <a4j:support event="onchange"
+                             reRender="modalDiscountsField"
+                             ajaxSingle="true"/>
+            </h:inputText>
+            <h:outputText value="#{warehousePurchaseDocumentModalAction.instance.discounts}"
+                          rendered="#{warehousePurchaseDocumentModalAction.instanceReadOnly}">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </s:decorate>
+    </app:fieldset>
+    </rich:panel>
+
+    <!-- ============== Botones del modal ============== -->
+    <div class="buttonsRight">
+
+        <!-- Guardar (crea o actualiza). Visible siempre que el documento
+             sea editable (nuevo o existente en estado PENDING) y el usuario
+             tenga permiso. Equivale a "no es readOnly" del cuerpo del modal. -->
+        <a4j:commandButton id="modalSaveButton"
+                           action="#{warehousePurchaseDocumentModalAction.save}"
+                           value="#{messages['Common.save']}"
+                           styleClass="button"
+                           rendered="#{not warehousePurchaseDocumentModalAction.instanceReadOnly and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}"
+                           reRender=":warehousePurchaseOrderForm:purchaseDocumentListId, :warehousePurchaseOrderForm:purchaseDocumentListDataScrollerId, :warehousePurchaseOrderForm:warehousePurchaseOrderDetailList, purchaseDocumentModalForm"
+                           data="#{warehousePurchaseDocumentModalAction.lastOperationSucceeded}"
+                           oncomplete="if (data === true) { Richfaces.hideModalPanel('purchaseDocumentModalPanel'); }"/>
+
+        <!-- Aprobar (solo si PENDING y existe) -->
+        <a4j:commandButton id="modalApproveButton"
+                           action="#{warehousePurchaseDocumentModalAction.approve}"
+                           value="#{messages['PurchaseDocument.button.approve']}"
+                           styleClass="button"
+                           rendered="#{warehousePurchaseDocumentModalAction.editingExisting and warehousePurchaseDocumentModalAction.instancePending and s:hasPermission('PURCHASEDOCUMENTMODAL_APPROVE','VIEW')}"
+                           reRender=":warehousePurchaseOrderForm:purchaseDocumentListId, :warehousePurchaseOrderForm:purchaseDocumentListDataScrollerId, :warehousePurchaseOrderForm:warehousePurchaseOrderDetailList, purchaseDocumentModalForm"
+                           data="#{warehousePurchaseDocumentModalAction.lastOperationSucceeded}"
+                           oncomplete="if (data === true) { Richfaces.hideModalPanel('purchaseDocumentModalPanel'); }"/>
+
+        <!-- Anular (solo si PENDING y existe) -->
+        <a4j:commandButton id="modalNullifyButton"
+                           action="#{warehousePurchaseDocumentModalAction.nullify}"
+                           value="#{messages['PurchaseDocument.button.nullify']}"
+                           styleClass="button"
+                           rendered="#{warehousePurchaseDocumentModalAction.editingExisting and warehousePurchaseDocumentModalAction.instancePending and s:hasPermission('PURCHASEDOCUMENTMODAL_NULLIFY','VIEW')}"
+                           reRender=":warehousePurchaseOrderForm:purchaseDocumentListId, :warehousePurchaseOrderForm:purchaseDocumentListDataScrollerId, :warehousePurchaseOrderForm:warehousePurchaseOrderDetailList, purchaseDocumentModalForm"
+                           data="#{warehousePurchaseDocumentModalAction.lastOperationSucceeded}"
+                           oncomplete="if (data === true) { Richfaces.hideModalPanel('purchaseDocumentModalPanel'); }"/>
+
+        <!-- Cerrar (solo cierra el modal sin tocar nada) -->
+        <h:commandButton id="modalCloseButton"
+                         value="#{messages['Common.cancel']}"
+                         styleClass="button"
+                         immediate="true">
+            <rich:componentControl for="purchaseDocumentModalPanel"
+                                   event="onclick"
+                                   disableDefault="true"
+                                   operation="hide"/>
+        </h:commandButton>
+
+    </div>
+
+    <rich:componentControl for="purchaseDocumentModalPanel"
+                           attachTo="modalCloseIcon"
+                           event="onclick"
+                           operation="hide"/>
+
+    </h:form>
+</rich:modalPanel>
+
+</ui:composition>

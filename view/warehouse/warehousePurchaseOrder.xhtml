@@ -69,6 +69,17 @@
                      rendered="#{warehousePurchaseOrderAction.managed and !isPurchaseOrderNullified and s:hasPermission('PURCHASEDOCUMENT','CREATE')}"
                      immediate="true"/>
 
+    <h:commandButton value="#{messages['PurchaseDocument.modal.register']}"
+                     styleClass="button"
+                     rendered="#{warehousePurchaseDocumentModalAction.canRegister and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}">
+        <a4j:support event="onclick"
+                     action="#{warehousePurchaseDocumentModalAction.openForCreate}"
+                     reRender="purchaseDocumentModalForm"
+                     ajaxSingle="true"
+                     immediate="true"
+                     oncomplete="Richfaces.showModalPanel('purchaseDocumentModalPanel');"/>
+    </h:commandButton>
+
     <h:commandButton id="createButtonId"
                      action="#{warehousePurchaseOrderAction.create}"
                      value="#{messages['Common.save']}"
@@ -200,6 +211,15 @@
                      rendered="#{warehousePurchaseOrderAction.managed and !isPurchaseOrderNullified and s:hasPermission('PURCHASEDOCUMENT','CREATE')}"
                      tabindex="34"
                      immediate="true"/>
+
+    <a4j:commandButton id="modalRegisterPurchaseDocumentButtonBottom"
+                       action="#{warehousePurchaseDocumentModalAction.openForCreate}"
+                       value="#{messages['PurchaseDocument.modal.register']}"
+                       styleClass="button"
+                       rendered="#{warehousePurchaseDocumentModalAction.canRegister and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}"
+                       reRender="modalFormPanel"
+                       oncomplete="Richfaces.showModalPanel('purchaseDocumentModalPanel');"
+                       tabindex="34"/>
 
     <h:commandButton action="#{warehousePurchaseOrderAction.create}"
                      value="#{messages['Common.save']}"
@@ -489,6 +509,17 @@
                            immediate="true"
                            rendered="#{s:hasPermission('PURCHASEDOCUMENT','VIEW')}"
                            action="#{warehousePurchaseDocumentAction.select(purchaseDocumentItem)}"/>
+            &#160;
+            <a4j:commandLink action="#{warehousePurchaseDocumentModalAction.openForReview(purchaseDocumentItem)}"
+                             rendered="#{s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}"
+                             reRender="purchaseDocumentModalForm"
+                             ajaxSingle="true"
+                             immediate="true"
+                             oncomplete="Richfaces.showModalPanel('purchaseDocumentModalPanel');">
+                <h:graphicImage value="/img/ver16.png"
+                                styleClass="select-image-middle"
+                                title="#{messages['PurchaseDocument.modal.openExisting.tooltip']}"/>
+            </a4j:commandLink>
         </rich:column>
     </rich:dataTable>
     <app:dataScroller id="purchaseDocumentListDataScrollerId"
@@ -741,6 +772,56 @@
                            oncomplete="Richfaces.hideModalPanel('providerAuxListModalPanel');"/>
     </ui:define>
 </s:decorate>
+
+<!--
+  ============================================================================
+  Modales auxiliares para el flujo del modal de Documento de Compra
+  (warehousePurchaseDocumentModalAction). Se declaran al nivel raiz de la
+  pagina, fuera del form principal y fuera del rich:modalPanel del modal de
+  documento, para evitar el problema de modales anidados en RichFaces 3.x.
+  ============================================================================
+-->
+<s:decorate id="financesEntityListModalPanelContainerForDocModal"
+            template="/finances/financesEntityListModalPanel.xhtml"
+            rendered="#{warehousePurchaseOrderAction.managed and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}">
+    <ui:param name="containerId" value="financesEntityListModalPanelContainerForDocModal"/>
+    <ui:param name="dialogId" value="financesEntityListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignFinancesEntityFromModalDoc"
+                           title="#{messages['Common.choose']}"
+                           action="#{warehousePurchaseDocumentModalAction.assignFinancesEntity(instance)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="modalFinancesEntityField, modalNitField"
+                           oncomplete="Richfaces.hideModalPanel('financesEntityListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate id="cashAccountAdjustmentListModalPanelContainerForDocModal"
+            template="/finances/cashAccountListModalPanel.xhtml"
+            rendered="#{warehousePurchaseOrderAction.managed and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}">
+    <ui:param name="containerId" value="cashAccountAdjustmentListModalPanelContainerForDocModal"/>
+    <ui:param name="dialogId" value="cashAccountAdjustmentListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignCashAccountAdjustmentFromModalDoc"
+                           action="#{warehousePurchaseDocumentModalAction.assignCashAccountAdjustment(cashAccountItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image-middle"
+                           immediate="true"
+                           reRender="modalFormPanel"
+                           oncomplete="Richfaces.hideModalPanel('cashAccountAdjustmentListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+
+<!--
+  Modal de Documento de Compra (vista rapida, alternativa al flujo de
+  pagina completa que sigue activo). c:if es de build-time, controla
+  si el modal se incluye en el arbol JSF.
+-->
+<c:if test="#{warehousePurchaseOrderAction.managed and s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}">
+    <ui:include src="/warehouse/purchaseDocumentModal.xhtml"/>
+</c:if>
 
 <c:if test="#{not functionAction.hasSeverityErrorMessages and not warehousePurchaseOrderAction.managed}">
     <script type="text/javascript">
