@@ -441,7 +441,7 @@
 <rich:tab name="purchaseDocumentTab"
           label="#{messages['PurchaseDocument.tab.title']}"
           ajaxSingle="true"
-          rendered="#{s:hasPermission('PURCHASEDOCUMENT','VIEW')}">
+          rendered="#{s:hasPermission('PURCHASEDOCUMENT','VIEW') or s:hasPermission('PURCHASEDOCUMENTMODAL_REGISTER','VIEW')}">
     <rich:dataTable id="purchaseDocumentListId"
                     value="#{warehousePurchaseDocumentModalAction.documentList}"
                     var="purchaseDocumentItem"
@@ -517,7 +517,7 @@
                              ajaxSingle="true"
                              immediate="true"
                              oncomplete="Richfaces.showModalPanel('purchaseDocumentModalPanel');">
-                <h:graphicImage value="/img/ver16.png"
+                <h:graphicImage value="/img/edit.gif"
                                 styleClass="select-image-middle"
                                 title="#{messages['PurchaseDocument.modal.openExisting.tooltip']}"/>
             </a4j:commandLink>
@@ -526,6 +526,13 @@
     <rich:datascroller id="purchaseDocumentListDataScrollerId"
                        for="purchaseDocumentListId"
                        align="right" maxPages="10" renderIfSinglePage="false"/>
+
+    <!-- Rollover de filas: igual al patron que aplica app:dataScroller en
+         la grilla de Detalles (selector ##{for} tr + active-row CSS class). -->
+    <rich:jQuery selector="#purchaseDocumentListId tr"
+                 query="mouseover(function(){jQuery(this).addClass('active-row')})"/>
+    <rich:jQuery selector="#purchaseDocumentListId tr"
+                 query="mouseout(function(){jQuery(this).removeClass('active-row')})"/>
 </rich:tab>
 <rich:tab name="discountCommentTab"
           rendered="#{s:hasPermission('DISCOUNTCOMMENT','VIEW')}"
