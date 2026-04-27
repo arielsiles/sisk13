@@ -11,6 +11,7 @@ public interface CollectMaterialService {
     List<CollectMaterial> findCollectMaterialNoAccounting(Date startDate, Date endDate);
 
     List<CollectMaterial> findApprovedCollectMaterial(Date startDate, Date endDate);
+    List<CollectMaterial> findApprovedCollectMaterial(Date startDate, Date endDate, String warehouseCode);
     List<CollectMaterial> findApprovedCollectMaterialByCode(String productItemCode, Date startDate, Date endDate);
 
     String createCollectMaterialListAccounting(List<CollectMaterial> collectMaterialList,Date starDate,Date endDate);

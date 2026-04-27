@@ -80,4 +80,36 @@ public class ArticleOrderServiceBean extends GenericServiceBean implements Artic
                 .getResultList();
     }
 
+    /** Variantes con filtro de almacen: usan join a productItem para que SQL filtre por warehouseCode
+     * y no se traigan ventas/pedidos de otros almacenes. **/
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ArticleOrder> findCashSaleDetailList(Date startDate, Date endDate, String warehouseCode){
+        return em.createQuery(
+                "select articleOrder from ArticleOrder articleOrder " +
+                "join articleOrder.productItem pi " +
+                "where articleOrder.ventaDirecta.estado <> 'ANULADO' " +
+                "and articleOrder.ventaDirecta.fechaPedido between :startDate and :endDate " +
+                "and pi.warehouseCode = :warehouseCode")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("warehouseCode", warehouseCode)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ArticleOrder> findCustomerOrderDetailList(Date startDate, Date endDate, String warehouseCode){
+        return em.createQuery(
+                "select articleOrder from ArticleOrder articleOrder " +
+                "join articleOrder.productItem pi " +
+                "where articleOrder.customerOrder.state <> :annulledState " +
+                "and articleOrder.customerOrder.orderDate between :startDate and :endDate " +
+                "and pi.warehouseCode = :warehouseCode")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("annulledState", SaleStatus.ANULADO)
+                .setParameter("warehouseCode", warehouseCode)
+                .getResultList();
+    }
+
 }

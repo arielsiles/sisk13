@@ -30,8 +30,14 @@ public interface ProductionOrderService{
     public List<ProductionOrder> findProductionOrders(Date startDate, Date endDate);
     public List<BaseProduct> findBaseProductByDate(Date startDate, Date endDate);
 
+    /** Variantes con filtro de almacen (push-down de productItem.warehouseCode) **/
+    List<ProductionProduct> findProductionByDate(Date startDate, Date endDate, String warehouseCode);
+    List<ProductionOrder> findProductionOrders(Date startDate, Date endDate, String warehouseCode);
+    List<BaseProduct> findBaseProductByDate(Date startDate, Date endDate, String warehouseCode);
+
     /** xproduction... **/
     List<XProductionProduct> findXProductionByDate(Date startDate, Date endDate);
+    List<XProductionProduct> findXProductionByDate(Date startDate, Date endDate, String warehouseCode);
 
     List<XProductionProduct> findXProductionByProductItem(String productItemCode, Date startDate, Date endDate);
 

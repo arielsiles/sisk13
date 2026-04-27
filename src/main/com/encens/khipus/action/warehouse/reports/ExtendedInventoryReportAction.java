@@ -153,13 +153,16 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         else
             movementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, null);
 
-        List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(startDate, endDate);
-        List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByDate(startDate, endDate);
-        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(startDate, endDate);
-        List<BaseProduct> baseProductList = productionOrderService.findBaseProductByDate(startDate, endDate);
-        List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(startDate, endDate);
-        List<ArticleOrder> cashSaleDetailList = articleOrderService.findCashSaleDetailList(startDate, endDate);
-        List<ArticleOrder> orderDetailList = articleOrderService.findCustomerOrderDetailList(startDate, endDate);
+        // Push-down de warehouseCode a SQL: las queries debajo ya filtran por almacen,
+        // evitando traer produccion/ventas/acopio de otros almacenes para luego descartarlos.
+        String wcode = warehouse.getWarehouseCode();
+        List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(startDate, endDate, wcode);
+        List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByDate(startDate, endDate, wcode);
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(startDate, endDate, wcode);
+        List<BaseProduct> baseProductList = productionOrderService.findBaseProductByDate(startDate, endDate, wcode);
+        List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(startDate, endDate, wcode);
+        List<ArticleOrder> cashSaleDetailList = articleOrderService.findCashSaleDetailList(startDate, endDate, wcode);
+        List<ArticleOrder> orderDetailList = articleOrderService.findCustomerOrderDetailList(startDate, endDate, wcode);
 
         // Materia prima en XProduccion
         List<XSupply> supplyList = new ArrayList<XSupply>();
@@ -400,8 +403,9 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
             balanceMap.put(code, current);
         }
 
+        // Push-down de warehouseCode a SQL para todas las queries de saldo inicial.
         // Ordenes de produccion
-        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(firstDate, endInitDate);
+        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(firstDate, endInitDate, warehouseCode);
         for (ProductionOrder po : productionOrderList) {
             String code = po.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode();
             if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
@@ -410,7 +414,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         }
 
         // Reprocesos
-        List<BaseProduct> baseProductList = productionOrderService.findBaseProductByDate(firstDate, endInitDate);
+        List<BaseProduct> baseProductList = productionOrderService.findBaseProductByDate(firstDate, endInitDate, warehouseCode);
         for (BaseProduct bp : baseProductList) {
             for (SingleProduct sp : bp.getSingleProducts()) {
                 String code = sp.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode();
@@ -421,7 +425,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         }
 
         // Produccion
-        List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(firstDate, endInitDate);
+        List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(firstDate, endInitDate, warehouseCode);
         for (ProductionProduct product : productionProductList) {
             String code = product.getProductItemCode();
             if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
@@ -430,7 +434,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         }
 
         // XProduccion (entrada)
-        List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByDate(firstDate, endInitDate);
+        List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByDate(firstDate, endInitDate, warehouseCode);
         for (XProductionProduct product : xproductionProductList) {
             String code = product.getProductItemCode();
             if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
@@ -439,7 +443,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         }
 
         // Acopio MP (entrada)
-        List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(firstDate, endInitDate);
+        List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(firstDate, endInitDate, warehouseCode);
         for (CollectMaterial cm : collectMaterialList) {
             String code = cm.getMetaProduct().getProductItemCode();
             if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;

@@ -32,4 +32,8 @@ public interface ArticleOrderService extends GenericService {
     public List findCustomerOrderDetailListGroupBy(Date startDate, Date endDate);
     public List<ArticleOrder> findCashSaleDetailList(Date startDate, Date endDate);
     public List<ArticleOrder> findCustomerOrderDetailList(Date startDate, Date endDate);
+
+    /** Variantes con filtro de almacen (push-down a productItem.warehouseCode) **/
+    public List<ArticleOrder> findCashSaleDetailList(Date startDate, Date endDate, String warehouseCode);
+    public List<ArticleOrder> findCustomerOrderDetailList(Date startDate, Date endDate, String warehouseCode);
 }

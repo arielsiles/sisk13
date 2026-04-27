@@ -68,6 +68,24 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
     }
 
     @Override
+    @SuppressWarnings(value = "unchecked")
+    public List<CollectMaterial> findApprovedCollectMaterial(Date startDate, Date endDate, String warehouseCode) {
+        return em.createQuery(
+                "select c from CollectMaterial c " +
+                "join c.metaProduct mp " +
+                "join mp.productItem pi " +
+                "where c.date between :startDate and :endDate " +
+                "and c.state in (:stateApr, :stateConta) " +
+                "and pi.warehouseCode = :warehouseCode")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("stateApr", CollectMaterialState.APR)
+                .setParameter("stateConta", CollectMaterialState.CONTA)
+                .setParameter("warehouseCode", warehouseCode)
+                .getResultList();
+    }
+
+    @Override
     public List<CollectMaterial> findApprovedCollectMaterialByCode(String productItemCode, Date startDate, Date endDate) {
 
         List<CollectMaterial> resultList = em.createQuery("select c from CollectMaterial c " +

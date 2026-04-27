@@ -104,4 +104,68 @@ public class ProductionOrderServiceBean extends GenericServiceBean implements Pr
                 .getResultList();
     }
 
+    /** Variantes con filtro de almacen: agregan join a productItem y filtran por warehouseCode en SQL,
+     * para que el reporte no traiga produccion/ventas/acopio de otros almacenes y luego los descarte. **/
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ProductionProduct> findProductionByDate(Date startDate, Date endDate, String warehouseCode){
+        return em.createQuery(
+                "select pp from ProductionProduct pp " +
+                "left join pp.productionPlan plan " +
+                "join pp.productItem pi " +
+                "where plan.date between :startDate and :endDate " +
+                "and pi.warehouseCode = :warehouseCode")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("warehouseCode", warehouseCode)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<XProductionProduct> findXProductionByDate(Date startDate, Date endDate, String warehouseCode){
+        return em.createQuery(
+                "select pp from XProductionProduct pp " +
+                "left join pp.productionPlan plan " +
+                "join pp.productItem pi " +
+                "where plan.date between :startDate and :endDate " +
+                "and pi.warehouseCode = :warehouseCode")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("warehouseCode", warehouseCode)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<ProductionOrder> findProductionOrders(Date startDate, Date endDate, String warehouseCode){
+        return em.createQuery(
+                "select po from ProductionOrder po " +
+                "left join po.productionPlanning plan " +
+                "join po.productComposition pc " +
+                "join pc.processedProduct proc " +
+                "join proc.productItem pi " +
+                "where plan.date between :startDate and :endDate " +
+                "and pi.warehouseCode = :warehouseCode")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("warehouseCode", warehouseCode)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<BaseProduct> findBaseProductByDate(Date startDate, Date endDate, String warehouseCode){
+        return em.createQuery(
+                "select distinct bp from BaseProduct bp " +
+                "left join bp.productionPlanningBase ppb " +
+                "join bp.singleProducts sp " +
+                "join sp.productProcessingSingle pps " +
+                "join pps.metaProduct mp " +
+                "join mp.productItem pi " +
+                "where ppb.date between :startDate and :endDate " +
+                "and pi.warehouseCode = :warehouseCode")
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("warehouseCode", warehouseCode)
+                .getResultList();
+    }
+
 }
