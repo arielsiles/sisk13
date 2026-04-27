@@ -150,6 +150,44 @@ Si el SQL está sobre varios segundos → falta índice o el plan es subóptimo 
 
 Las named queries en entidades suelen ser usadas por varios reportes. Modificar la JPQL original = riesgo de romper otros flujos. **Patrón correcto**: agregar un nuevo método en el service con sufijo descriptivo (`...ByWarehouse`, `...Fetch`, etc.) y dejar la original intacta.
 
+#### ¿Qué es un *overload*?
+
+En Java, **dos o más métodos pueden tener el mismo nombre** mientras tengan **firma diferente** (distinta cantidad o tipo de parámetros). Eso es un *overload* / sobrecarga. El compilador decide cuál ejecutar según los parámetros que se le pasan al llamarla.
+
+Ejemplo del proyecto — en [`ProductionOrderService`](../src/main/com/encens/khipus/service/production/ProductionOrderService.java) ahora coexisten:
+
+```java
+// Original — sin filtro de almacen (usada por ProductInventoryReportAction y KardexProductMovementAction)
+List<ProductionProduct> findProductionByDate(Date startDate, Date endDate);
+
+// Overload nuevo — agrega un parametro warehouseCode
+List<ProductionProduct> findProductionByDate(Date startDate, Date endDate, String warehouseCode);
+```
+
+Llamadas:
+
+```java
+productionOrderService.findProductionByDate(start, end);          // version vieja: 2 parametros
+productionOrderService.findProductionByDate(start, end, "2");     // version nueva: 3 parametros
+```
+
+#### ¿Por qué overloads en vez de modificar la original?
+
+| Opción | Riesgo | Impacto |
+|---|---|---|
+| Modificar la original y agregar `warehouseCode` como parámetro obligatorio | Hay que tocar TODOS los callers — varios archivos extra, más testing | Alto riesgo de romper otros reportes |
+| **Agregar un overload nuevo** y dejar la original intacta | El método nuevo sólo se usa donde lo necesito | Cero riesgo para los demás callers |
+
+#### Aclaración sobre el sufijo `Fetch`
+
+En [`MovementDetailService`](../src/main/com/encens/khipus/service/warehouse/MovementDetailService.java) usé otro patrón: en vez de overload (mismo nombre, distinta firma) creé un método con **nombre distinto** (`findListMovementByWarehouseAndTypeFetch`).
+
+**Estrictamente no es un overload de Java** porque cambió el nombre. Es la misma idea conceptual ("método paralelo, alternativa de la original") pero con sufijo descriptivo (`Fetch`) para que al leer el código quede claro que esa variante hace algo extra (`JOIN FETCH` de asociaciones). Cuando la diferencia entre las dos variantes no es de parámetros sino de **comportamiento interno**, conviene un nombre distinto antes que un overload — el lector del código no debería tener que mirar la firma para entender la diferencia.
+
+**Regla práctica**:
+- ¿La diferencia es agregar/quitar un parámetro de filtro? → **overload** (mismo nombre).
+- ¿La diferencia es estrategia interna (fetch eager, projection, paginación)? → **nombre distinto con sufijo descriptivo**.
+
 ### Lección 5 — Verificar índices al diseñar consultas con joins por fecha + dimensión
 
 Toda tabla del kardex/movimientos debe tener al menos:
