@@ -146,12 +146,14 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         /** 2.- Calcular saldo inicial por articulo (desde inicio gestion hasta startDate-1) **/
         Map<String, BigDecimal> initialBalanceMap = calculateInitialBalanceMap(warehouse.getWarehouseCode(), startDate, productItemCodesFilter);
 
-        /** 3.- Cargar todos los movimientos del periodo en listas **/
+        /** 3.- Cargar todos los movimientos del periodo en listas.
+         * Variante con JOIN FETCH: evita el N+1 al acceder despues a md.inventoryMovement.warehouseVoucher.date
+         * y md.inventoryMovement.description en el bucle de "Vales de movimiento". **/
         List<MovementDetail> movementDetailList;
         if (warehouse.getWarehouseCode().equals(WarehouseType.DAIRY))
-            movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeNull(warehouse.getWarehouseCode(), startDate, endDate, null);
+            movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeNullFetch(warehouse.getWarehouseCode(), startDate, endDate, null);
         else
-            movementDetailList = movementDetailService.findListMovementByWarehouseAndType(warehouse.getWarehouseCode(), startDate, endDate, null);
+            movementDetailList = movementDetailService.findListMovementByWarehouseAndTypeFetch(warehouse.getWarehouseCode(), startDate, endDate, null);
 
         // Push-down de warehouseCode a SQL: las queries debajo ya filtran por almacen,
         // evitando traer produccion/ventas/acopio de otros almacenes para luego descartarlos.

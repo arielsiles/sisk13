@@ -440,6 +440,44 @@ public class MovementDetailServiceBean implements MovementDetailService {
                 .getResultList();
     }
 
+    /** Variantes con JOIN FETCH para evitar el N+1 al acceder despues a
+     * md.inventoryMovement.warehouseVoucher.date y md.inventoryMovement.description.
+     * El distinct evita duplicados que pueden aparecer al joinear el to-one wv. **/
+
+    @SuppressWarnings(value = "unchecked")
+    public List<MovementDetail> findListMovementByWarehouseAndTypeFetch(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType){
+        return em.createQuery(
+                "select distinct movementDetail from MovementDetail movementDetail " +
+                "left join fetch movementDetail.inventoryMovement im " +
+                "left join fetch im.warehouseVoucher wv " +
+                "where movementDetail.warehouseCode = :warehouseCode " +
+                "and wv.date between :startDate and :endDate " +
+                "and wv.state = :state")
+                .setParameter("warehouseCode", warehouseCode)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("state", WarehouseVoucherState.APR)
+                .getResultList();
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public List<MovementDetail> findListMovementByWarehouseAndTypeNullFetch(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType){
+        return em.createQuery(
+                "select distinct movementDetail from MovementDetail movementDetail " +
+                "left join fetch movementDetail.inventoryMovement im " +
+                "left join fetch im.warehouseVoucher wv " +
+                "where movementDetail.warehouseCode = :warehouseCode " +
+                "and wv.date between :startDate and :endDate " +
+                "and wv.state = :state " +
+                "and wv.productionOrder is null " +
+                "and wv.baseProduct is null")
+                .setParameter("warehouseCode", warehouseCode)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
+                .setParameter("state", WarehouseVoucherState.APR)
+                .getResultList();
+    }
+
     /** Solo cuando el vale tiene 1 articulo **/
     public String getCodeByNoTrans(String no_trans){
 

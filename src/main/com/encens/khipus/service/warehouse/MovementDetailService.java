@@ -65,6 +65,13 @@ public interface MovementDetailService {
 
     public List<MovementDetail> findListMovementByWarehouseAndTypeNull(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType);
 
+    /** Variantes con JOIN FETCH de inventoryMovement y warehouseVoucher: una sola query
+     * en vez de N+1 lazy loads cuando luego se accede a md.inventoryMovement.warehouseVoucher.date
+     * y md.inventoryMovement.description (caso del Reporte de Inventario Extendido). **/
+    public List<MovementDetail> findListMovementByWarehouseAndTypeFetch(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType);
+
+    public List<MovementDetail> findListMovementByWarehouseAndTypeNullFetch(String warehouseCode, Date startDate, Date endDate, MovementDetailType movementDetailType);
+
     public String getCodeByNoTrans(String no_trans);
 
     public BigDecimal getCantByNoTrans(String no_trans);
