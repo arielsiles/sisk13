@@ -91,39 +91,12 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "CompanyConfiguration.notFound");
         }
 
-        List<ArticleReportData> reportData = calculateExtendedData();
+        // Resolver filtro de articulos antes de calcular: si hay grupo/subgrupo seleccionado,
+        // se construye el set de productItemCodes y se descartan los demas dentro de cada bucle,
+        // evitando procesar todo el almacen para luego descartar 80-90% del resultado.
+        Set<String> productItemCodesFilter = resolveProductItemCodesFilter();
 
-        // Filtrar por grupo si se selecciono
-        if (group != null) {
-            List<ProductItem> groupItems = productItemService.findByGroupCode(group.getGroupCode());
-            Set<String> groupCodes = new HashSet<String>();
-            for (ProductItem item : groupItems) {
-                groupCodes.add(item.getProductItemCode());
-            }
-            List<ArticleReportData> filtered = new ArrayList<ArticleReportData>();
-            for (ArticleReportData ard : reportData) {
-                if (groupCodes.contains(ard.getArticleCode())) {
-                    filtered.add(ard);
-                }
-            }
-            reportData = filtered;
-        }
-
-        // Filtrar por subgrupo si se selecciono
-        if (subGroup != null) {
-            List<ProductItem> subGroupItems = productItemService.findBySubGroupCode(subGroup.getGroupCode(), subGroup.getSubGroupCode());
-            Set<String> subGroupCodes = new HashSet<String>();
-            for (ProductItem item : subGroupItems) {
-                subGroupCodes.add(item.getProductItemCode());
-            }
-            List<ArticleReportData> filtered = new ArrayList<ArticleReportData>();
-            for (ArticleReportData ard : reportData) {
-                if (subGroupCodes.contains(ard.getArticleCode())) {
-                    filtered.add(ard);
-                }
-            }
-            reportData = filtered;
-        }
+        List<ArticleReportData> reportData = calculateExtendedData(productItemCodesFilter);
 
         try {
             if (reportFormat != null && (reportFormat.name().equals("XLS") || reportFormat.name().equals("XLSX"))) {
@@ -136,11 +109,33 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         }
     }
 
+    private Set<String> resolveProductItemCodesFilter() {
+        if (subGroup != null) {
+            List<ProductItem> items = productItemService.findBySubGroupCode(subGroup.getGroupCode(), subGroup.getSubGroupCode());
+            Set<String> codes = new HashSet<String>(items.size() * 2);
+            for (ProductItem item : items) {
+                codes.add(item.getProductItemCode());
+            }
+            return codes;
+        }
+        if (group != null) {
+            List<ProductItem> items = productItemService.findByGroupCode(group.getGroupCode());
+            Set<String> codes = new HashSet<String>(items.size() * 2);
+            for (ProductItem item : items) {
+                codes.add(item.getProductItemCode());
+            }
+            return codes;
+        }
+        return null;
+    }
+
     /**
      * Calcula datos extendidos: para cada articulo del almacen,
      * genera la lista de movimientos individuales con fecha, entrada, salida, saldo acumulado y glosa.
+     *
+     * @param productItemCodesFilter null = todo el almacen; set poblado = solo esos productItemCodes.
      */
-    public List<ArticleReportData> calculateExtendedData() {
+    public List<ArticleReportData> calculateExtendedData(Set<String> productItemCodesFilter) {
 
         List<ArticleReportData> result = new ArrayList<ArticleReportData>();
 
@@ -149,7 +144,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
                 warehouse.getWarehouseCode(), DateUtils.getCurrentYear(startDate).toString());
 
         /** 2.- Calcular saldo inicial por articulo (desde inicio gestion hasta startDate-1) **/
-        Map<String, BigDecimal> initialBalanceMap = calculateInitialBalanceMap(warehouse.getWarehouseCode(), startDate);
+        Map<String, BigDecimal> initialBalanceMap = calculateInitialBalanceMap(warehouse.getWarehouseCode(), startDate, productItemCodesFilter);
 
         /** 3.- Cargar todos los movimientos del periodo en listas **/
         List<MovementDetail> movementDetailList;
@@ -172,12 +167,15 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
             supplyList = xproductionService.getAllRawMaterialInProduction(startDate, endDate);
         }
 
-        /** 4.- Indexar movimientos por productItemCode usando HashMap<String, List<MovementRow>> **/
-        Map<String, List<MovementRow>> movementsByArticle = new HashMap<String, List<MovementRow>>();
+        /** 4.- Indexar movimientos por productItemCode usando HashMap<String, List<MovementRow>>.
+         * Si productItemCodesFilter != null, descartar codes fuera del set: ahorra ademas la lazy-load
+         * de las cadenas anidadas (productComposition.processedProduct.productItem) en filas descartadas. **/
 
         // Acopio MP
+        Map<String, List<MovementRow>> movementsByArticle = new HashMap<String, List<MovementRow>>();
         for (CollectMaterial cm : collectMaterialList) {
             String code = cm.getMetaProduct().getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             addMovement(movementsByArticle, code, new MovementRow(
                     cm.getDate(), cm.getBalanceWeight(), BigDecimal.ZERO,
                     "ACOPIO DE MATERIA PRIMA EN FECHA " + DateUtils.format(cm.getDate(), "dd/MM/yyyy")));
@@ -185,14 +183,18 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
 
         // Produccion
         for (ProductionProduct product : productionProductList) {
-            addMovement(movementsByArticle, product.getProductItemCode(), new MovementRow(
+            String code = product.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
+            addMovement(movementsByArticle, code, new MovementRow(
                     product.getProductionPlan().getDate(), product.getQuantity(), BigDecimal.ZERO,
                     "ORDEN DE PRODUCCION FECHA " + DateUtils.format(product.getProductionPlan().getDate(), "dd/MM/yyyy")));
         }
 
         // XProduccion
         for (XProductionProduct product : xproductionProductList) {
-            addMovement(movementsByArticle, product.getProductItemCode(), new MovementRow(
+            String code = product.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
+            addMovement(movementsByArticle, code, new MovementRow(
                     product.getProductionPlan().getDate(), product.getQuantity(), BigDecimal.ZERO,
                     "ORDEN DE PRODUCCION FECHA " + DateUtils.format(product.getProductionPlan().getDate(), "dd/MM/yyyy")));
         }
@@ -200,6 +202,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         // Ordenes de produccion
         for (ProductionOrder po : productionOrderList) {
             String code = po.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             addMovement(movementsByArticle, code, new MovementRow(
                     po.getProductionPlanning().getDate(),
                     BigDecimalUtil.toBigDecimal(po.getProducedAmount()), BigDecimal.ZERO,
@@ -210,6 +213,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         for (BaseProduct baseProduct : baseProductList) {
             for (SingleProduct sp : baseProduct.getSingleProducts()) {
                 String code = sp.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode();
+                if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
                 addMovement(movementsByArticle, code, new MovementRow(
                         baseProduct.getProductionPlanningBase().getDate(),
                         BigDecimalUtil.toBigDecimal(sp.getAmount()), BigDecimal.ZERO,
@@ -219,9 +223,11 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
 
         // Vales de movimiento
         for (MovementDetail md : movementDetailList) {
+            String code = md.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             BigDecimal entry = md.getMovementType().equals(MovementDetailType.E) ? md.getQuantity() : BigDecimal.ZERO;
             BigDecimal output = md.getMovementType().equals(MovementDetailType.S) ? md.getQuantity() : BigDecimal.ZERO;
-            addMovement(movementsByArticle, md.getProductItemCode(), new MovementRow(
+            addMovement(movementsByArticle, code, new MovementRow(
                     md.getInventoryMovement().getWarehouseVoucher().getDate(),
                     entry, output,
                     md.getInventoryMovement().getDescription()));
@@ -230,6 +236,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         // XProduccion - materia prima (salida)
         for (XSupply supply : supplyList) {
             String code = supply.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             String dateString = DateUtils.format(supply.getProduction().getProductionPlan().getDate(), "dd/MM/yyyy");
             addMovement(movementsByArticle, code, new MovementRow(
                     supply.getProduction().getProductionPlan().getDate(),
@@ -240,6 +247,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         // Ventas al contado
         for (ArticleOrder ao : cashSaleDetailList) {
             String code = ao.getCodArt();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             String invoiceLabel = "";
             if (ao.getVentaDirecta().getMovement() != null) {
                 invoiceLabel = "F-" + ao.getVentaDirecta().getMovement().getNumber().toString() + " ";
@@ -253,6 +261,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         // Pedidos
         for (ArticleOrder ao : orderDetailList) {
             String code = ao.getCodArt();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             String invoiceLabel = "";
             if (ao.getCustomerOrder().getMovement() != null) {
                 invoiceLabel = "F-" + ao.getCustomerOrder().getMovement().getNumber().toString() + " ";
@@ -268,9 +277,14 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
                     invoiceLabel + typeLabel + ao.getCustomerOrder().getCode() + " " + ao.getCustomerOrder().getClient().getFullName()));
         }
 
+        /** 4.5.- Cache de nombres de subgrupo (1 query) para evitar N+1 al acceder a productItem.subGroup.name **/
+        Map<String, String> subgroupNameByKey = loadSubgroupNameMap();
+
         /** 5.- Armar resultado: por cada articulo, ordenar movimientos y calcular saldo acumulado **/
         for (InventoryPeriod ip : inventoryPeriodList) {
             String code = ip.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
+
             BigDecimal initialBalance = initialBalanceMap.containsKey(code) ? initialBalanceMap.get(code) : BigDecimal.ZERO;
 
             List<MovementRow> movements = movementsByArticle.get(code);
@@ -280,11 +294,19 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
                 continue;
             }
 
+            ProductItem productItem = ip.getProductItem();
+            String subgroupName = "";
+            if (productItem != null && productItem.getGroupCode() != null && productItem.getSubGroupCode() != null) {
+                String key = productItem.getGroupCode() + "|" + productItem.getSubGroupCode();
+                String n = subgroupNameByKey.get(key);
+                if (n != null) subgroupName = n;
+            }
+
             ArticleReportData articleData = new ArticleReportData(
                     code,
-                    ip.getProductItem().getName(),
-                    ip.getProductItem().getUsageMeasureCode(),
-                    ip.getProductItem().getSubGroup() != null ? ip.getProductItem().getSubGroup().getName() : "",
+                    productItem != null ? productItem.getName() : "",
+                    productItem != null ? productItem.getUsageMeasureCode() : "",
+                    subgroupName,
                     initialBalance
             );
 
@@ -322,10 +344,27 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
     }
 
     /**
+     * Carga todos los SubGroup en una sola query y devuelve un Map keyado por "groupCode|subGroupCode" -> nombre.
+     * Reemplaza el N+1 que generaba el lazy-load productItem.subGroup en el bucle final del reporte.
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, String> loadSubgroupNameMap() {
+        Map<String, String> map = new HashMap<String, String>();
+        List<SubGroup> all = (List<SubGroup>) em.createQuery("select sg from SubGroup sg").getResultList();
+        for (SubGroup sg : all) {
+            String key = sg.getGroupCode() + "|" + sg.getSubGroupCode();
+            map.put(key, sg.getName() != null ? sg.getName() : "");
+        }
+        return map;
+    }
+
+    /**
      * Calcula saldo inicial por articulo desde inicio de gestion hasta (startDate - 1 dia).
      * Reutiliza la logica optimizada con HashMaps.
+     *
+     * @param productItemCodesFilter null = todo el almacen; set poblado = solo esos productItemCodes.
      */
-    private Map<String, BigDecimal> calculateInitialBalanceMap(String warehouseCode, Date initDate) {
+    private Map<String, BigDecimal> calculateInitialBalanceMap(String warehouseCode, Date initDate, Set<String> productItemCodesFilter) {
 
         Calendar calendar = Calendar.getInstance();
         Date firstDate = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(initDate));
@@ -338,7 +377,9 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         // Inventario inicio gestion
         List<InitialInventory> initialInventoryList = productInventoryService.findInitialInventory(warehouseCode, DateUtils.getCurrentYear(startDate).toString());
         for (InitialInventory inv : initialInventoryList) {
-            balanceMap.put(inv.getProductItemCode(), inv.getQuantity());
+            String code = inv.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
+            balanceMap.put(code, inv.getQuantity());
         }
 
         // Vales de movimiento
@@ -350,6 +391,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
 
         for (MovementDetail detail : movementDetailList) {
             String code = detail.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
             if (detail.getMovementType().equals(MovementDetailType.E))
                 current = BigDecimalUtil.sum(current, detail.getQuantity(), 2);
@@ -362,6 +404,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrders(firstDate, endInitDate);
         for (ProductionOrder po : productionOrderList) {
             String code = po.getProductComposition().getProcessedProduct().getProductItem().getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
             balanceMap.put(code, BigDecimalUtil.sum(current, BigDecimalUtil.toBigDecimal(po.getProducedAmount()), 2));
         }
@@ -371,6 +414,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         for (BaseProduct bp : baseProductList) {
             for (SingleProduct sp : bp.getSingleProducts()) {
                 String code = sp.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode();
+                if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
                 BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
                 balanceMap.put(code, BigDecimalUtil.sum(current, BigDecimalUtil.toBigDecimal(sp.getAmount()), 2));
             }
@@ -380,6 +424,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(firstDate, endInitDate);
         for (ProductionProduct product : productionProductList) {
             String code = product.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
             balanceMap.put(code, BigDecimalUtil.sum(current, product.getQuantity(), 2));
         }
@@ -388,6 +433,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByDate(firstDate, endInitDate);
         for (XProductionProduct product : xproductionProductList) {
             String code = product.getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
             balanceMap.put(code, BigDecimalUtil.sum(current, product.getQuantity(), 2));
         }
@@ -396,6 +442,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterial(firstDate, endInitDate);
         for (CollectMaterial cm : collectMaterialList) {
             String code = cm.getMetaProduct().getProductItemCode();
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
             balanceMap.put(code, BigDecimalUtil.sum(current, cm.getBalanceWeight(), 2));
         }
@@ -406,6 +453,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
             for (int i = 0; i < rawMaterialList.size(); i++) {
                 Object[] row = (Object[]) rawMaterialList.get(i);
                 String code = (String) row[0];
+                if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
                 BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
                 balanceMap.put(code, BigDecimalUtil.subtract(current, (BigDecimal) row[1], 2));
             }
@@ -416,6 +464,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         for (int i = 0; i < cashSaleDetailList.size(); i++) {
             Object[] row = (Object[]) cashSaleDetailList.get(i);
             String code = (String) row[0];
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
             balanceMap.put(code, BigDecimalUtil.subtract(current, BigDecimalUtil.toBigDecimal((Long) row[1]), 2));
         }
@@ -425,6 +474,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         for (int i = 0; i < orderDetailList.size(); i++) {
             Object[] row = (Object[]) orderDetailList.get(i);
             String code = (String) row[0];
+            if (productItemCodesFilter != null && !productItemCodesFilter.contains(code)) continue;
             BigDecimal current = balanceMap.containsKey(code) ? balanceMap.get(code) : BigDecimal.ZERO;
             balanceMap.put(code, BigDecimalUtil.subtract(current, BigDecimalUtil.toBigDecimal((Long) row[1]), 2));
         }
