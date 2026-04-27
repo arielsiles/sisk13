@@ -511,6 +511,63 @@ public class WarehousePurchaseDocumentModalAction implements Serializable {
     private void refreshPurchaseOrderInstance() {
         evictFromAllScopes("warehousePurchaseDocumentDataModel");
         evictFromAllScopes("warehousePurchaseOrderDetailDataModel");
+        recomputePurchaseOrderInvoiceNumber();
+    }
+
+    /**
+     * Tras cada operacion (save/approve/nullify), re-calcula el campo
+     * PurchaseOrder.invoiceNumber (label "Nro Doc" en la pantalla) como la
+     * concatenacion de los numeros de los documentos NO anulados de la OC,
+     * en orden date desc, id desc (igual al orden de la grilla).
+     *
+     * Persiste via UPDATE SQL directo (no engancha cascadas ni validaciones
+     * de la OC) y tambien setea el campo en memoria para que el reRender
+     * del form muestre el valor sin que el usuario tenga que apretar
+     * "Guardar" en la OC.
+     *
+     * Riesgo conocido: si el usuario tipeo manualmente algo en "Nro Doc" y
+     * luego registra/aprueba/anula un documento, su texto manual se
+     * sobreescribe. Es por diseno - el campo paso a ser auto-poblado.
+     */
+    private void recomputePurchaseOrderInvoiceNumber() {
+        if (warehousePurchaseOrderAction == null
+                || warehousePurchaseOrderAction.getInstance() == null
+                || warehousePurchaseOrderAction.getInstance().getId() == null) {
+            return;
+        }
+        Long ocId = warehousePurchaseOrderAction.getInstance().getId();
+        try {
+            @SuppressWarnings("unchecked")
+            List<String> numbers = (List<String>) entityManager.createQuery(
+                    "select pd.number from PurchaseDocument pd"
+                            + " where pd.purchaseOrder.id = :ocId"
+                            + " and pd.state <> :nullState"
+                            + " order by pd.date desc, pd.id desc")
+                    .setParameter("ocId", ocId)
+                    .setParameter("nullState", PurchaseDocumentState.NULLIFIED)
+                    .getResultList();
+            StringBuilder sb = new StringBuilder();
+            for (String n : numbers) {
+                if (n == null || n.trim().length() == 0) continue;
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(n.trim());
+            }
+            String concatenated = sb.length() > 150
+                    ? sb.substring(0, 150)
+                    : sb.toString();
+            // Persistir via UPDATE SQL para no disparar lifecycle de la OC.
+            entityManager.createQuery(
+                    "update PurchaseOrder po set po.invoiceNumber = :inv"
+                            + " where po.id = :id")
+                    .setParameter("inv", concatenated)
+                    .setParameter("id", ocId)
+                    .executeUpdate();
+            // Reflejar en memoria para que el reRender del form muestre el valor.
+            warehousePurchaseOrderAction.getInstance().setInvoiceNumber(concatenated);
+        } catch (RuntimeException e) {
+            log.warn("No se pudo recalcular invoiceNumber de la OC: #0",
+                    e.getMessage());
+        }
     }
 
     private void evictFromAllScopes(String name) {

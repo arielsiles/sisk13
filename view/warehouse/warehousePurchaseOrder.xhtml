@@ -456,8 +456,8 @@
                 <rich:column>
                     <h:outputText value="#{messages['PurchaseDocument.documentType']}"/>
                 </rich:column>
-                <rich:column>
-                    <h:outputText value="#{messages['PurchaseDocument.invoiceNumber']}"/>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages['PurchaseDocument.documentNumber']}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{messages['PurchaseDocument.name']}"/>
@@ -484,7 +484,7 @@
         <rich:column>
             <h:outputText value="#{messages[purchaseDocumentItem.type.resourceKey]}"/>
         </rich:column>
-        <rich:column>
+        <rich:column styleClass="center">
             <h:outputText value="#{purchaseDocumentItem.number}"/>
         </rich:column>
         <rich:column>
