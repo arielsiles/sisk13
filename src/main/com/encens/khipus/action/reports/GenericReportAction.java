@@ -16,7 +16,10 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.log.Log;
 
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -619,6 +622,39 @@ public class GenericReportAction implements Serializable {
 
     public void setReportTitle(String reportTitle) {
         this.reportTitle = reportTitle;
+    }
+
+    /** Token enviado por el form (hidden input) para emparejar la cookie de "reporte listo"
+     * que dispara el cierre del progressModalPanel en el cliente. **/
+    private String reportToken;
+
+    public String getReportToken() {
+        return reportToken;
+    }
+
+    public void setReportToken(String reportToken) {
+        this.reportToken = reportToken;
+    }
+
+    /**
+     * Reusable: marca el reporte como listo agregando una cookie reportReady_&lt;token&gt;=1
+     * justo antes de cerrar el ServletOutputStream. El cliente sondea esa cookie y al verla
+     * cierra el progressModalPanel automaticamente. Llamar desde cualquier export (PDF, Excel, CSV)
+     * justo antes del flush/close.
+     */
+    protected void markReportReady() {
+        if (reportToken == null || reportToken.length() == 0) return;
+        try {
+            HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance()
+                    .getExternalContext().getResponse();
+            Cookie cookie = new Cookie("reportReady_" + reportToken, "1");
+            cookie.setPath("/");
+            cookie.setMaxAge(60); // suficiente para que el cliente la detecte
+            response.addCookie(cookie);
+        } catch (Exception e) {
+            // No queremos que un fallo aqui rompa la generacion del reporte; solo se pierde la senal de cierre.
+            if (log != null) log.warn("markReportReady: no se pudo agregar la cookie", e);
+        }
     }
 
 }

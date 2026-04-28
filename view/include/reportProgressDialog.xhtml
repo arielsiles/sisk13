@@ -1,0 +1,96 @@
+<!--
+  Reusable: progress modal panel para reportes que descargan archivo (PDF/Excel/CSV).
+
+  Uso (caller):
+  =============
+  1) Dentro del <h:form> del reporte agregar el hidden con id "reportToken":
+
+         <h:inputHidden id="reportToken" value="#{xxxReportAction.reportToken}"/>
+
+  2) En el boton "Generar" agregar onclick que llama a startReportProgress:
+
+         <h:commandButton action="#{xxxReportAction.generateReport}" ...
+                          onclick="return startReportProgress(this.form.id, 'progressModalPanel');"/>
+
+  3) Fuera del form (al final del body) incluir este template:
+
+         <ui:include src="/include/reportProgressDialog.xhtml">
+             <ui:param name="dialogId" value="progressModalPanel"/>
+         </ui:include>
+
+  4) El action debe extender GenericReportAction (que ya tiene reportToken + markReportReady)
+     y llamar markReportReady() en el export, justo antes de stream.flush():
+
+         markReportReady();
+         stream.flush();
+         stream.close();
+         FacesContext.getCurrentInstance().responseComplete();
+
+  Parametros opcionales del include (con defaults sensibles):
+    dialogId       — id del modal (default "progressModalPanel")
+    dialogTitle    — titulo (default messages['Common.processing'])
+    progressTitle  — texto sobre la barra (default messages['Common.processing'])
+    dialogContent  — descripcion debajo (default messages['ProductInventory.processMessage'])
+-->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html">
+
+    <ui:param name="dialogId" value="#{empty dialogId ? 'progressModalPanel' : dialogId}"/>
+    <ui:param name="dialogTitle" value="#{empty dialogTitle ? messages['Common.processing'] : dialogTitle}"/>
+    <ui:param name="progressTitle" value="#{empty progressTitle ? messages['Common.processing'] : progressTitle}"/>
+    <ui:param name="dialogContent" value="#{empty dialogContent ? messages['ProductInventory.processMessage'] : dialogContent}"/>
+
+    <s:decorate template="/include/progressDialog.xhtml">
+        <ui:param name="dialogId" value="#{dialogId}"/>
+        <ui:define name="dialogTitle">#{dialogTitle}</ui:define>
+        <ui:define name="progressTitle">#{progressTitle}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{dialogContent}"/>
+            </p>
+        </ui:define>
+    </s:decorate>
+
+    <script type="text/javascript">
+        // Reusable: muestra el modal, genera un token unico, lo deja en el hidden "reportToken"
+        // del form y arranca el polling de la cookie reportReady_&lt;token&gt;.
+        // El servidor (GenericReportAction.markReportReady) setea esa cookie justo antes
+        // de flushear el archivo, lo que dispara el cierre automatico del modal.
+        // Devuelve true para no cancelar el submit.
+        if (typeof window.startReportProgress !== 'function') {
+            window.startReportProgress = function(formClientId, modalId) {
+                try {
+                    var token = String(new Date().getTime()) + '_' + Math.floor(Math.random() * 1000000);
+                    var input = document.getElementById(formClientId + ':reportToken');
+                    if (input) { input.value = token; }
+                    if (typeof Richfaces !== 'undefined' &amp;&amp; Richfaces.showModalPanel) {
+                        Richfaces.showModalPanel(modalId);
+                    }
+                    var cookieName = 'reportReady_' + token;
+                    var deadline = new Date().getTime() + 600000; // 10 min de seguridad
+                    var pollInterval = setInterval(function() {
+                        var ready = document.cookie.indexOf(cookieName + '=1') !== -1;
+                        var expired = new Date().getTime() > deadline;
+                        if (ready || expired) {
+                            clearInterval(pollInterval);
+                            // Limpiar cookie para no acumular
+                            document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+                            if (typeof Richfaces !== 'undefined' &amp;&amp; Richfaces.hideModalPanel) {
+                                Richfaces.hideModalPanel(modalId);
+                            }
+                        }
+                    }, 500);
+                } catch (e) {
+                    // No bloquear el submit por error de UI
+                    if (typeof console !== 'undefined' &amp;&amp; console.warn) {
+                        console.warn('startReportProgress error:', e);
+                    }
+                }
+                return true;
+            };
+        }
+    </script>
+
+</ui:composition>

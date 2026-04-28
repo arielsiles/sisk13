@@ -127,15 +127,23 @@
                 </s:decorate>
             </rich:panel>
 
+            <h:inputHidden id="reportToken" value="#{extendedInventoryReportAction.reportToken}"/>
+
             <div class="buttons">
                 <h:commandButton action="#{extendedInventoryReportAction.generateReport}"
                                  styleClass="button"
-                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4"
+                                 onclick="return startReportProgress(this.form.id, 'progressModalPanel');">
                     <s:defaultAction/>
                 </h:commandButton>
             </div>
 
         </h:form>
+
+        <ui:include src="/include/reportProgressDialog.xhtml">
+            <ui:param name="dialogId" value="progressModalPanel"/>
+            <ui:param name="progressTitle" value="#{messages['Reports.kardex.extendedInventoryReport.titleReport']}"/>
+        </ui:include>
 
         <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
             <ui:param name="containerId" value="warehouseListModalPanelContainer"/>

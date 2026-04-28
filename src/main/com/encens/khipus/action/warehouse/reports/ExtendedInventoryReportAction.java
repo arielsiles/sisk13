@@ -554,6 +554,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
         response.addHeader("Content-disposition", "attachment; filename=ReporteInventarioExtendido.pdf");
+        markReportReady();
         ServletOutputStream stream = response.getOutputStream();
         JasperExportManager.exportReportToPdfStream(jasperPrint, stream);
         stream.flush();
@@ -745,6 +746,7 @@ public class ExtendedInventoryReportAction extends GenericReportAction {
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
         response.setContentType("application/vnd.ms-excel");
         response.addHeader("Content-disposition", "attachment; filename=ReporteInventarioExtendido.xls");
+        markReportReady();
         ServletOutputStream stream = response.getOutputStream();
         workbook.write(stream);
         stream.flush();
