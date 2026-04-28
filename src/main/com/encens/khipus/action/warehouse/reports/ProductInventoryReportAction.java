@@ -1388,6 +1388,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
         response.setContentType("application/vnd.ms-excel");
         response.addHeader("Content-disposition", "attachment; filename=ReporteInventarioAgrupado.xls");
+        markReportReady();
         ServletOutputStream stream = response.getOutputStream();
         workbook.write(stream);
         stream.flush();
@@ -1399,6 +1400,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
 
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
         response.addHeader("Content-disposition", "attachment; filename=ReporteGeneralInv.pdf");
+        markReportReady();
         ServletOutputStream stream = response.getOutputStream();
         JasperExportManager.exportReportToPdfStream(jasperPrint, stream);
         stream.flush();
