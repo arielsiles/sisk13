@@ -1190,6 +1190,7 @@ public class ProductInventoryReportAction extends GenericReportAction {
         HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
         response.setContentType("application/vnd.ms-excel");
         response.addHeader("Content-disposition", "attachment; filename=ReporteGeneralInv.xls");
+        markReportReady();
         ServletOutputStream stream = response.getOutputStream();
         workbook.write(stream);
         stream.flush();

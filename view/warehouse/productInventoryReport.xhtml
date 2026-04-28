@@ -123,10 +123,13 @@
                 </s:decorate>
             </rich:panel>
 
+            <h:inputHidden id="reportToken" value="#{productInventoryReportAction.reportToken}"/>
+
             <div class="buttons">
                 <h:commandButton action="#{productInventoryReportAction.generateReport}"
                                  styleClass="button"
-                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
+                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4"
+                                 onclick="return startReportProgress(this.form.id, 'progressModalPanel');">
                     <s:defaultAction/>
                 </h:commandButton>
 
@@ -167,17 +170,11 @@
             </ui:define>
         </s:decorate>
 
-        <!--<s:decorate id="progressDialog" template="/include/progressDialog.xhtml" rendered="#{s:hasPermission('ACCOUNTINGRECORD','CREATE')}">-->
-        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
+        <ui:include src="/include/reportProgressDialog.xhtml">
             <ui:param name="dialogId" value="progressModalPanel"/>
-            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
-            <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
-            <ui:define name="dialogContent">
-                <p>
-                    <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
-                </p>
-            </ui:define>
-        </s:decorate>
+            <ui:param name="progressTitle" value="#{messages['ProductInventory.processTitle']}"/>
+            <ui:param name="dialogContent" value="#{messages['ProductInventory.processMessage']}"/>
+        </ui:include>
 
 
 
