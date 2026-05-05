@@ -1,0 +1,216 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <rich:modalPanel id="detailModalPanel"
+                     width="980"
+                     height="780"
+                     autosized="false"
+                     domElementAttachment="parent"
+                     resizeable="true">
+
+        <f:facet name="header">
+            <h:outputText value="#{messages['InventoryReconciliation.detail.title']}"/>
+        </f:facet>
+        <f:facet name="controls">
+            <h:graphicImage value="/img/close.png" id="hidelink" style="cursor:pointer"
+                            onclick="Richfaces.hideModalPanel('detailModalPanel');"/>
+        </f:facet>
+
+        <a4j:outputPanel id="detailPanel" ajaxRendered="true">
+            <h:form id="detailForm" rendered="#{not empty inventoryReconciliationAction.detail}">
+
+                <rich:panel>
+                    <f:facet name="header">
+                        #{inventoryReconciliationAction.detail.productItemCode} -
+                        #{inventoryReconciliationAction.detail.productItemName}
+                        &#160;|&#160;
+                        #{messages['InventoryReconciliation.detail.warehouse']}:
+                        #{inventoryReconciliationAction.detail.warehouseCode} -
+                        #{inventoryReconciliationAction.detail.warehouseName}
+                    </f:facet>
+
+                    <!-- ===== Trace cronologico ===== -->
+                    <h4>#{messages['InventoryReconciliation.detail.trace']}</h4>
+                    <div style="max-height:200px; overflow-y:auto; border:1px solid #ccc;">
+                    <rich:dataTable id="traceTable"
+                                    value="#{inventoryReconciliationAction.detail.trace}"
+                                    var="step"
+                                    rowClasses="row1,row2"
+                                    styleClass="dr-table">
+                        <rich:column>
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.date']}</f:facet>
+                            <h:outputText value="#{step.date}">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column>
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.ref']}</f:facet>
+                            #{step.reference}
+                        </rich:column>
+                        <rich:column>
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.type']}</f:facet>
+                            #{step.typeLabel}
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.qty']}</f:facet>
+                            <h:outputText value="#{step.quantity}">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.movCost']}</f:facet>
+                            <h:outputText value="#{step.movementUnitCost}"
+                                          rendered="#{step.type ne 'SALIDA'}">
+                                <f:convertNumber pattern="#,##0.0000"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.runQty']}</f:facet>
+                            <h:outputText value="#{step.runningQuantity}"
+                                          style="#{step.negativeFlag ? 'color:#b00;font-weight:bold;' : ''}">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.runCost']}</f:facet>
+                            <h:outputText value="#{step.runningUnitCost}">
+                                <f:convertNumber pattern="#,##0.0000"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.runValue']}</f:facet>
+                            <h:outputText value="#{step.runningTotalValue}">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.detail.col.accounting']}</f:facet>
+                            <h:outputText value="#{step.accountingAmount}"
+                                          rendered="#{step.type ne 'INV_INICIO'}">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </rich:column>
+                    </rich:dataTable>
+                    </div>
+
+                    <!-- ===== Resumen reconstruido ===== -->
+                    <h4>#{messages['InventoryReconciliation.detail.summary']}</h4>
+                    <h:panelGrid columns="2" cellpadding="3">
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.reconQty']}:"/>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.reconstructedQuantity}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.reportQty']}:"/>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.reportQuantity}"
+                                      style="#{inventoryReconciliationAction.detail.reportMismatch ? 'color:#b00;' : ''}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.reconCost']}:"/>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.reconstructedUnitCost}">
+                            <f:convertNumber pattern="#,##0.0000"/>
+                        </h:outputText>
+
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.reconMon']}:"/>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.reconstructedMonetaryBalance}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </h:panelGrid>
+
+                    <!-- ===== Comparacion antes/despues ===== -->
+                    <h4>#{messages['InventoryReconciliation.detail.compare']}</h4>
+                    <h:panelGrid columns="4" cellpadding="6" cellspacing="0"
+                                 styleClass="dr-table"
+                                 columnClasses="text-left,text-right,text-right,text-right"
+                                 headerClass="dr-table-headercell">
+                        <f:facet name="header">
+                            <h:outputText value=""/>
+                        </f:facet>
+
+                        <!-- Encabezados de columna -->
+                        <h:outputText value=""/>
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.col.before']}"
+                                      style="font-weight:bold;"/>
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.col.after']}"
+                                      style="font-weight:bold;"/>
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.col.delta']}"
+                                      style="font-weight:bold;"/>
+
+                        <!-- Fila: cantidad -->
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.row.qty']}"/>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.currentQuantity}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.reconstructedQuantity}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.quantityDiff}"
+                                      style="font-weight:bold;color:#06c;">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+
+                        <!-- Fila: costo unitario -->
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.row.cost']}"/>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.currentUnitCost}">
+                            <f:convertNumber pattern="#,##0.0000"/>
+                        </h:outputText>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.reconstructedUnitCost}">
+                            <f:convertNumber pattern="#,##0.0000"/>
+                        </h:outputText>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.unitCostDiff}"
+                                      style="font-weight:bold;color:#06c;">
+                            <f:convertNumber pattern="#,##0.0000"/>
+                        </h:outputText>
+
+                        <!-- Fila: saldo monetario -->
+                        <h:outputText value="#{messages['InventoryReconciliation.detail.row.mon']}"/>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.currentMonetaryBalance}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.reconstructedMonetaryBalance}">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                        <h:outputText value="#{inventoryReconciliationAction.detail.monetaryDiff}"
+                                      style="font-weight:bold;color:#06c;">
+                            <f:convertNumber pattern="#,##0.00"/>
+                        </h:outputText>
+                    </h:panelGrid>
+
+                    <!-- ===== Motivo y botones ===== -->
+                    <h:panelGrid columns="2" cellpadding="3" style="margin-top:10px;">
+                        <h:outputLabel for="reasonTxt"
+                                       value="#{messages['InventoryReconciliation.detail.reason']}:"/>
+                        <h:inputTextarea id="reasonTxt"
+                                         value="#{inventoryReconciliationAction.reason}"
+                                         rows="2" cols="80"
+                                         disabled="#{inventoryReconciliationAction.detail.blockedByNegativeFinal}"/>
+                    </h:panelGrid>
+
+                    <div class="buttons" style="margin-top:10px;">
+                        <a4j:commandButton value="#{messages['InventoryReconciliation.detail.cancel']}"
+                                           styleClass="button"
+                                           action="#{inventoryReconciliationAction.cancelDetail}"
+                                           reRender="detailPanel"
+                                           oncomplete="Richfaces.hideModalPanel('detailModalPanel');"
+                                           immediate="true"/>
+                        <a4j:commandButton value="#{messages['InventoryReconciliation.detail.apply']}"
+                                           styleClass="button"
+                                           action="#{inventoryReconciliationAction.confirmAdjustment}"
+                                           reRender="detailPanel,diffsPanel"
+                                           disabled="#{inventoryReconciliationAction.detail.blockedByNegativeFinal}"
+                                           onclick="if (!confirm('#{messages['InventoryReconciliation.detail.confirmJs']}')) return false;"
+                                           oncomplete="if (!#{inventoryReconciliationAction.showDetail}) Richfaces.hideModalPanel('detailModalPanel');"/>
+                    </div>
+
+                </rich:panel>
+            </h:form>
+        </a4j:outputPanel>
+
+    </rich:modalPanel>
+</ui:composition>
