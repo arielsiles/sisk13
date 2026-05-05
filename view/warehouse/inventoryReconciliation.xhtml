@@ -1,0 +1,158 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['InventoryReconciliation.titleReport']}</ui:define>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+
+    <ui:define name="body">
+
+        <h:form id="reconciliationForm">
+
+            <rich:panel>
+                <f:facet name="header">
+                    #{messages['InventoryReconciliation.titleReport']}
+                </f:facet>
+
+                <s:decorate id="warehouseField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryReconciliation.warehouse']}</ui:define>
+                    <app:quickSearch id="quickSearchWarehouse"
+                                     textValue="inventoryReconciliationAction.warehouse.warehouseCode"
+                                     value="#{inventoryReconciliationAction.warehouse}"
+                                     searchField="warehouseCode"
+                                     alias="warehouse"
+                                     reRender="warehouseField"
+                                     tabindex="1"/>
+                    <app:selectPopUp id="warehouse"
+                                     textValue="#{inventoryReconciliationAction.warehouse.name}"
+                                     value="#{inventoryReconciliationAction.warehouse}"
+                                     selectAction="warehouseSearchDataModel.filterByExecutorUnitCode(null)"
+                                     clearAction="inventoryReconciliationAction.cleanWarehouse()"
+                                     searchModalPanel="warehouseModalPanel"
+                                     dataModel="#{warehouseSearchDataModel}"
+                                     reRender="warehouseField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryReconciliation.startDate']}</ui:define>
+                    <rich:calendar id="startDate"
+                                   value="#{inventoryReconciliationAction.startDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryReconciliation.endDate']}</ui:define>
+                    <rich:calendar id="endDate"
+                                   value="#{inventoryReconciliationAction.endDate}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="3">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                        <app:dateRangeValidator forId="startDate"
+                                                forLabel="#{messages['InventoryReconciliation.startDate']}"
+                                                type="greater"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <div class="buttons">
+                    <h:commandButton action="#{inventoryReconciliationAction.search}"
+                                     styleClass="button"
+                                     value="#{messages['InventoryReconciliation.search.button']}"
+                                     id="searchButtonId"
+                                     tabindex="4">
+                        <s:defaultAction/>
+                    </h:commandButton>
+                </div>
+            </rich:panel>
+
+            <a4j:outputPanel id="diffsPanel" ajaxRendered="true">
+                <rich:panel rendered="#{inventoryReconciliationAction.searched and not empty inventoryReconciliationAction.diffs}">
+                    <f:facet name="header">
+                        #{messages['InventoryReconciliation.titleReport']} - #{fn:length(inventoryReconciliationAction.diffs)}
+                    </f:facet>
+
+                    <rich:dataTable id="diffsTable"
+                                    value="#{inventoryReconciliationAction.diffs}"
+                                    var="diff"
+                                    rowClasses="row1,row2"
+                                    styleClass="dr-table">
+                        <rich:column>
+                            <f:facet name="header">#{messages['InventoryReconciliation.list.code']}</f:facet>
+                            #{diff.productItemCode}
+                        </rich:column>
+                        <rich:column>
+                            <f:facet name="header">#{messages['InventoryReconciliation.list.name']}</f:facet>
+                            #{diff.productItemName}
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.list.calculated']}</f:facet>
+                            <h:outputText value="#{diff.calculatedQuantity}">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.list.current']}</f:facet>
+                            <h:outputText value="#{diff.currentQuantity}">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="text-right">
+                            <f:facet name="header">#{messages['InventoryReconciliation.list.diff']}</f:facet>
+                            <h:outputText value="#{diff.difference}" style="font-weight:bold;color:#b00;">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column>
+                            <a4j:commandLink value="#{messages['InventoryReconciliation.list.viewDetail']}"
+                                             action="#{inventoryReconciliationAction.selectArticle(diff)}"
+                                             reRender="detailPanel,diffsPanel"
+                                             oncomplete="if (#{inventoryReconciliationAction.showDetail}) Richfaces.showModalPanel('detailModalPanel');"/>
+                        </rich:column>
+                    </rich:dataTable>
+                </rich:panel>
+            </a4j:outputPanel>
+
+        </h:form>
+
+        <!-- ===== Modal de Warehouse popup (reutiliza el componente) ===== -->
+        <s:decorate id="warehouseListModalPanelContainer" template="/warehouse/warehouseListModalPanel.xhtml">
+            <ui:param name="containerId" value="warehouseListModalPanelContainer"/>
+            <ui:param name="dialogId" value="warehouseModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{inventoryReconciliationAction.setWarehouse(warehouseItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image"
+                                   reRender="warehouseField"
+                                   oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <!-- ===== Modal de Detalle ===== -->
+        <ui:include src="/warehouse/inventoryReconciliationDetail.xhtml"/>
+
+    </ui:define>
+</ui:composition>
