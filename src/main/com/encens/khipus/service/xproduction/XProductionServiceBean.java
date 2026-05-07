@@ -75,7 +75,12 @@ public class XProductionServiceBean implements XProductionService {
         }
 
         for (XProductionProduct product : production.getProductionProductList()){
-            em.merge(product);
+            if (product.getId() == null) {
+                product.setProduction(production);
+                em.persist(product);
+            } else {
+                em.merge(product);
+            }
             em.flush();
         }
 
@@ -105,6 +110,17 @@ public class XProductionServiceBean implements XProductionService {
         }
 
         em.remove(production);
+        em.flush();
+    }
+
+    @Override
+    public void addFinishedProductDirect(XProduction production, XProductionProduct product) {
+        if (product == null || product.getId() != null) return;
+        product.setProduction(production);
+        if (product.getProductionPlan() == null && production.getProductionPlan() != null) {
+            product.setProductionPlan(production.getProductionPlan());
+        }
+        em.persist(product);
         em.flush();
     }
 
@@ -151,9 +167,11 @@ public class XProductionServiceBean implements XProductionService {
     }
 
     public void removeProductionProduct(XProductionProduct product, XProduction production){
-        product.setProduction(null);
-        em.merge(product);
+        if (product == null || product.getId() == null) return;
+        XProductionProduct managed = em.contains(product) ? product : em.merge(product);
+        em.remove(managed);
         em.flush();
+        production.getProductionProductList().remove(product);
         em.refresh(production);
         em.flush();
     }
