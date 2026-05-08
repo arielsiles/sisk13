@@ -116,7 +116,7 @@ Snapshots (`ulex_disponible_snap`, `consumo_mp_calc_snap`) se persisten al aprob
 
 ### 4.2.1 Snapshots completos (v6.0.77)
 
-Al aprobar la orden se snapshotea **todos** los valores calculados para inmutabilidad histórica. Migración SQL en `query/query_v6.0.77.sql`:
+Al aprobar la orden se snapshotea **todos** los valores calculados para inmutabilidad histórica. Migración SQL en `query/query_v6.0.77_terdemol.sql`:
 
 ```sql
 ALTER TABLE xpr_produccion_ulexita
@@ -547,8 +547,8 @@ Este apartado documenta todo lo implementado, los problemas encontrados, las dec
 
 | Capa | Archivo | Propósito |
 |------|---------|-----------|
-| Migración SQL | [query/query_v6.0.76.sql](../query/query_v6.0.76.sql) | ALTER `xpr_linea` (7 cols) + CREATE `xpr_produccion_ulexita` + permisos `PRODUCTION_LAB_DATA`, `PRODUCTION_LABOR` |
-| Migración SQL | [query/query_v6.0.77.sql](../query/query_v6.0.77.sql) | ALTER `xpr_produccion_ulexita` con 15 columnas snapshot |
+| Migración SQL | [query/query_v6.0.76_terdemol.sql](../query/query_v6.0.76_terdemol.sql) | ALTER `xpr_linea` (7 cols) + CREATE `xpr_produccion_ulexita` + permisos `PRODUCTION_LAB_DATA`, `PRODUCTION_LABOR` |
+| Migración SQL | [query/query_v6.0.77_terdemol.sql](../query/query_v6.0.77_terdemol.sql) | ALTER `xpr_produccion_ulexita` con 15 columnas snapshot |
 | Entidad | [src/main/com/encens/khipus/model/xproduction/ProductionLine.java](../src/main/com/encens/khipus/model/xproduction/ProductionLine.java) | Campos de configuración por línea + helper `isUlexitaTemplate()` |
 | Entidad | [src/main/com/encens/khipus/model/xproduction/XProductionUlexita.java](../src/main/com/encens/khipus/model/xproduction/XProductionUlexita.java) | Datos de proceso/laboratorio + 15 snapshots + `hasSnapshots()` |
 | Servicio | [src/main/com/encens/khipus/service/xproduction/XProductionUlexitaService.java](../src/main/com/encens/khipus/service/xproduction/XProductionUlexitaService.java) | API: `findByProduction`, `save`, `findProductionsByLineAndMonth`, `persistSnapshots` |
@@ -566,8 +566,8 @@ Este apartado documenta todo lo implementado, los problemas encontrados, las dec
 
 ```bash
 # Ejecutar en orden, después de mergear la rama
-mysql -u root -p khipus < query/query_v6.0.76.sql
-mysql -u root -p khipus < query/query_v6.0.77.sql
+mysql -u root -p khipus < query/query_v6.0.76_terdemol.sql
+mysql -u root -p khipus < query/query_v6.0.77_terdemol.sql
 ```
 
 `v6.0.76` debe correr ANTES de `v6.0.77` porque éste último depende de la tabla creada en aquél.

@@ -571,11 +571,25 @@ public class XProductionAction extends GenericAction<XProduction> {
     }
 
     public void removeSupply(XSupply supply){
+        if (supply == null) return;
         xproductionService.removeSupply(supply);
-        if (supply.getType().equals(SupplyType.INGREDIENT))
-            ingredientSupplyList.remove(supply);
-        if (supply.getType().equals(SupplyType.MATERIAL))
-            materialSupplyList.remove(supply);
+        if (SupplyType.INGREDIENT.equals(supply.getType())) {
+            removeSupplyById(ingredientSupplyList, supply.getId());
+        }
+        if (SupplyType.MATERIAL.equals(supply.getType())) {
+            removeSupplyById(materialSupplyList, supply.getId());
+        }
+    }
+
+    private void removeSupplyById(List<XSupply> list, Long id) {
+        if (list == null || id == null) return;
+        java.util.Iterator<XSupply> it = list.iterator();
+        while (it.hasNext()) {
+            XSupply s = it.next();
+            if (id.equals(s.getId())) {
+                it.remove();
+            }
+        }
     }
 
     public void removeProductionProduct(XProductionProduct product){
@@ -848,6 +862,18 @@ public class XProductionAction extends GenericAction<XProduction> {
     }
 
     public XProductionUlexita getUlexitaData() {
+        if (ulexitaData == null && isUlexitaTemplate()) {
+            if (getInstance() != null && getInstance().getId() != null) {
+                ulexitaData = xproductionUlexitaService.findByProduction(getInstance());
+            }
+            if (ulexitaData == null) {
+                ulexitaData = new XProductionUlexita();
+                ulexitaData.setProduction(getInstance());
+            }
+        }
+        if (ulexitaData != null && ulexitaData.getUlexDisponibleSnap() == null) {
+            ulexitaData.setUlexDisponibleSnap(BigDecimal.ZERO);
+        }
         return ulexitaData;
     }
 

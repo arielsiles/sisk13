@@ -108,7 +108,7 @@ public class XProductionUlexitaCalc {
      */
     public BigDecimal getDiluyenteTotal() {
         if (useSnapshots()) return ulexita.getDiluyenteTotalSnap();
-        if (ulexita != null && isPositive(ulexita.getDiluyenteTotalTn())) {
+        if (ulexita != null && ulexita.getDiluyenteTotalTn() != null) {
             return ulexita.getDiluyenteTotalTn();
         }
         if (line == null) return null;

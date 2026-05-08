@@ -338,45 +338,45 @@
 
                             <h:outputText value="#{messages['XProduction.ulexita.consumoMpCalc']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.consumoMpCalc}" title="MERMA + Kpa * PT" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
                             <h:outputText value="#{messages['XProduction.ulexita.kpmBent']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.kpmBentonita}" title="Ley_PT / Ley_MP_con_bentonita" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
 
                             <h:outputText value="#{messages['XProduction.ulexita.kaolinPct']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.caolinPct}" title="100 - bentonita%" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
                             <h:outputText value="#{messages['XProduction.ulexita.kpmMerma']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.kpmMerma}" title="(Kpm_bent - 1) - Diluyente / (PT*mermaFactor*Kpa) + 1" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
 
                             <h:outputText value="#{messages['XProduction.ulexita.leyMpRecalc']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.leyMpRecalc}" title="Ley_PT / Kpm_bentonita" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
                             <h:outputText value="#{messages['XProduction.ulexita.kpa']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.kpa}" title="GRANULADO / PT_TOTAL_BUENO" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
 
                             <h:outputText value="#{messages['XProduction.ulexita.ptTotalGood']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.ptTotalBueno}" title="A + B" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
                             <h:outputText value="#{messages['XProduction.ulexita.merma']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.merma}" title="(Kpm_merma - 1) * mermaFactor * Kpa * PT" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
 
                             <h:outputText value=""/>
                             <h:outputText value=""/>
                             <h:outputText value="#{messages['XProduction.ulexita.mermaPct']}"/>
                             <h:outputText value="#{xproductionAction.ulexitaCalc.mermaPct}" title="MERMA / (MERMA + GRANULADO)" styleClass="right">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>
+                                <f:convertNumber type="percent" minFractionDigits="2" maxFractionDigits="2"/>
                             </h:outputText>
 
                         </h:panelGrid>
@@ -659,10 +659,9 @@
                         <s:decorate id="ulexAvailableField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['XProduction.ulexita.ulexAvailable']}</ui:define>
                             <h:inputText id="ulexAvailable" value="#{xproductionAction.ulexitaData.ulexDisponibleSnap}"
-                                         styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
+                                         styleClass="inputSmall right" disabled="true">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="ulexAvailable"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
                             </h:inputText>
                         </s:decorate>
 
