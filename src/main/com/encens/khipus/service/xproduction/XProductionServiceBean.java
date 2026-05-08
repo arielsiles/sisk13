@@ -56,7 +56,7 @@ public class XProductionServiceBean implements XProductionService {
                 supply.setType(SupplyType.INGREDIENT);
                 em.persist(supply);
                 em.flush();
-            }else {
+            }else if (em.find(XSupply.class, supply.getId()) != null) {
                 em.merge(supply);
                 em.flush();
             }
@@ -68,19 +68,27 @@ public class XProductionServiceBean implements XProductionService {
                 supply.setType(SupplyType.MATERIAL);
                 em.persist(supply);
                 em.flush();
-            }else {
+            }else if (em.find(XSupply.class, supply.getId()) != null) {
                 em.merge(supply);
                 em.flush();
             }
         }
 
         for (XProductionProduct product : production.getProductionProductList()){
-            em.merge(product);
+            if (product.getId() == null) {
+                product.setProduction(production);
+                em.persist(product);
+            } else if (em.find(XProductionProduct.class, product.getId()) != null) {
+                em.merge(product);
+            } else {
+                continue;
+            }
             em.flush();
         }
 
 
         for (XProductionLabor labor : laborList){
+            if (labor.getId() != null && em.find(XProductionLabor.class, labor.getId()) == null) continue;
             em.merge(labor);
             em.flush();
         }
@@ -93,18 +101,35 @@ public class XProductionServiceBean implements XProductionService {
     @Override
     public void deleteProduction(XProduction production) {
 
-        for (XProductionProduct product : production.getProductionProductList()){
-            product.setProduction(null);
-            em.merge(product);
-            em.flush();
-        }
+        Long pid = production.getId();
 
-        for (XSupply supply : production.getSupplyList()){
-            em.remove(supply);
-            em.flush();
-        }
+        em.createQuery("delete from XProductionProduct p where p.production.id = :pid")
+                .setParameter("pid", pid)
+                .executeUpdate();
+        em.createQuery("delete from XSupply s where s.production.id = :pid")
+                .setParameter("pid", pid)
+                .executeUpdate();
+        em.createQuery("delete from XProductionLabor l where l.production.id = :pid")
+                .setParameter("pid", pid)
+                .executeUpdate();
+        em.createQuery("delete from XProductionUlexita u where u.production.id = :pid")
+                .setParameter("pid", pid)
+                .executeUpdate();
+        em.flush();
 
-        em.remove(production);
+        XProduction managed = em.contains(production) ? production : em.merge(production);
+        em.remove(managed);
+        em.flush();
+    }
+
+    @Override
+    public void addFinishedProductDirect(XProduction production, XProductionProduct product) {
+        if (product == null || product.getId() != null) return;
+        product.setProduction(production);
+        if (product.getProductionPlan() == null && production.getProductionPlan() != null) {
+            product.setProductionPlan(production.getProductionPlan());
+        }
+        em.persist(product);
         em.flush();
     }
 
@@ -151,17 +176,20 @@ public class XProductionServiceBean implements XProductionService {
     }
 
     public void removeProductionProduct(XProductionProduct product, XProduction production){
-        product.setProduction(null);
-        em.merge(product);
+        if (product == null || product.getId() == null) return;
+        XProductionProduct managed = em.contains(product) ? product : em.merge(product);
+        em.remove(managed);
         em.flush();
+        production.getProductionProductList().remove(product);
         em.refresh(production);
         em.flush();
     }
 
     public void removeSupply(XSupply supply){
-
-        if (em.contains(supply)){
-            em.remove(supply);
+        if (supply == null || supply.getId() == null) return;
+        XSupply managed = em.find(XSupply.class, supply.getId());
+        if (managed != null) {
+            em.remove(managed);
             em.flush();
         }
     }

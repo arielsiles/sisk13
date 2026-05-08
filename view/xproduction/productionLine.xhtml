@@ -4,7 +4,9 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">
         <c:choose>
@@ -74,6 +76,62 @@
                                  maxlength="255" tabindex="1"/>
                 </s:decorate>
 
+                <s:decorate id="reportTemplateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductionLine.reportTemplateCode']}</ui:define>
+                    <h:selectOneMenu id="reportTemplateCode"
+                                     value="#{productionLine.reportTemplateCode}"
+                                     styleClass="input250"
+                                     tabindex="3">
+                        <f:selectItem itemLabel="" itemValue="#{null}"/>
+                        <f:selectItem itemLabel="ULEXITA" itemValue="ULEXITA"/>
+                        <a4j:support event="onchange" reRender="ulexitaConfigPanel" ajaxSingle="true"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:div id="ulexitaConfigPanel">
+                    <c:if test="#{productionLine.reportTemplateCode == 'ULEXITA'}">
+
+                        <s:decorate id="codArtMpPrincipalField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.codArtMpPrincipal']}</ui:define>
+                            <h:inputText id="codArtMpPrincipal" value="#{productionLine.codArtMpPrincipal}"
+                                         styleClass="inputSmall" maxlength="20" tabindex="4"/>
+                        </s:decorate>
+
+                        <s:decorate id="codArtPtAField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.codArtPtA']}</ui:define>
+                            <h:inputText id="codArtPtA" value="#{productionLine.codArtPtA}"
+                                         styleClass="inputSmall" maxlength="20" tabindex="5"/>
+                        </s:decorate>
+
+                        <s:decorate id="codArtPtBField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.codArtPtB']}</ui:define>
+                            <h:inputText id="codArtPtB" value="#{productionLine.codArtPtB}"
+                                         styleClass="inputSmall" maxlength="20" tabindex="6"/>
+                        </s:decorate>
+
+                        <s:decorate id="codArtDiluyBentField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.codArtDiluyBent']}</ui:define>
+                            <h:inputText id="codArtDiluyBent" value="#{productionLine.codArtDiluyBent}"
+                                         styleClass="inputSmall" maxlength="20" tabindex="7"/>
+                        </s:decorate>
+
+                        <s:decorate id="codArtDiluyCaolinField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.codArtDiluyCaolin']}</ui:define>
+                            <h:inputText id="codArtDiluyCaolin" value="#{productionLine.codArtDiluyCaolin}"
+                                         styleClass="inputSmall" maxlength="20" tabindex="8"/>
+                        </s:decorate>
+
+                        <s:decorate id="mermaFactorField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.mermaFactor']}</ui:define>
+                            <h:inputText id="mermaFactor" value="#{productionLine.mermaFactor}"
+                                         styleClass="inputSmall right" tabindex="9">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"
+                                                         forId="mermaFactor"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                    </c:if>
+                </s:div>
 
             </rich:panel>
         </h:form>

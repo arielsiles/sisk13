@@ -23,6 +23,13 @@ public interface XProductionService {
     void assignProduct(XProduction production, XProductionProduct product);
     void removeProductionProduct(XProductionProduct product, XProduction production);
 
+    /**
+     * Persiste un nuevo producto terminado (id == null) inmediatamente, enlazandolo
+     * a la produccion. Usado por "+ Producto Terminado". Las ediciones posteriores de
+     * cantidad se persisten en el ciclo normal updateProduction via em.merge.
+     */
+    void addFinishedProductDirect(XProduction production, XProductionProduct product);
+
     List<XMaterialInput> getMaterialInput(String productItemCode);
     List<XMaterialInput> getIngredientOrMaterialInput(String productItemCode, SupplyType type);
 

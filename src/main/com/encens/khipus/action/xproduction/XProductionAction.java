@@ -3,6 +3,7 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.admin.User;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.production.MeasurementUnit;
@@ -14,6 +15,8 @@ import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.service.xproduction.XProductionPlanService;
 import com.encens.khipus.service.xproduction.XProductionService;
+import com.encens.khipus.service.xproduction.XProductionUlexitaCalc;
+import com.encens.khipus.service.xproduction.XProductionUlexitaService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
@@ -48,6 +51,8 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XSupply supplyAssign;
     private String activeTabName = "productsTab";
 
+    private XProductionUlexita ulexitaData;
+
     @In
     private XProductionPlanAction xproductionPlanAction;
 
@@ -59,6 +64,10 @@ public class XProductionAction extends GenericAction<XProduction> {
     private SequenceService sequenceService;
     @In
     private JobContractService jobContractService;
+    @In
+    private XProductionUlexitaService xproductionUlexitaService;
+    @In(required = false)
+    private User currentUser;
 
     @Factory(value = "xproduction", scope = ScopeType.STATELESS)
     public XProduction initProduction() {
@@ -82,7 +91,47 @@ public class XProductionAction extends GenericAction<XProduction> {
         setMaterialSupplyList(xproductionService.getSupplyList(getInstance(), SupplyType.MATERIAL));
         setLaborList(xproductionService.getLaborList(getInstance()));
 
+        // Default initDate = fecha del plan a las 00:00 si no esta seteada
+        if (getInstance().getInitDate() == null && getInstance().getProductionPlan() != null
+                && getInstance().getProductionPlan().getDate() != null) {
+            java.util.Calendar c = java.util.Calendar.getInstance();
+            c.setTime(getInstance().getProductionPlan().getDate());
+            c.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            c.set(java.util.Calendar.MINUTE, 0);
+            c.set(java.util.Calendar.SECOND, 0);
+            c.set(java.util.Calendar.MILLISECOND, 0);
+            getInstance().setInitDate(c.getTime());
+        }
+
+        loadUlexitaData();
+
         return outCome;
+    }
+
+    /**
+     * Carga los datos especificos de ULEXITA si la linea aplica. Si la linea es
+     * ULEXITA y aun no existe registro satelite, instancia uno vacio en memoria
+     * para que la pestaña Datos del Proceso pueda enlazar campos sin NPE.
+     */
+    private void loadUlexitaData() {
+        ulexitaData = null;
+        if (getInstance() == null || getInstance().getId() == null) return;
+        if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isUlexitaTemplate()) return;
+        ulexitaData = xproductionUlexitaService.findByProduction(getInstance());
+        if (ulexitaData == null) {
+            ulexitaData = new XProductionUlexita();
+            ulexitaData.setProduction(getInstance());
+        }
+    }
+
+    private void persistUlexitaData() {
+        if (ulexitaData == null) return;
+        if (getInstance() == null || getInstance().getId() == null) return;
+        if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isUlexitaTemplate()) return;
+        if (ulexitaData.getProduction() == null) {
+            ulexitaData.setProduction(getInstance());
+        }
+        xproductionUlexitaService.save(ulexitaData);
     }
 
     @Override
@@ -120,6 +169,18 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setTotalCost(calculateTotalCost());
         production.setTotalRawMaterial(calculateRawMaterial());
         xproductionService.updateProduction(production, ingredientSupplyList, materialSupplyList, laborList);
+        persistUlexitaData();
+
+        // Re-snapshot si la orden ya esta aprobada (caso edicion de lab data
+        // con permiso PRODUCTION_LAB_DATA:UPDATE). Asi los snapshots reflejan
+        // el ultimo estado autorizado.
+        if (production.isApproved()
+                && production.getProductionLine() != null
+                && production.getProductionLine().isUlexitaTemplate()) {
+            xproductionUlexitaService.persistSnapshots(production,
+                    ulexitaData != null ? ulexitaData.getUlexDisponibleSnap() : null,
+                    currentUserCode());
+        }
 
         return Outcome.SUCCESS;
     }
@@ -233,7 +294,24 @@ public class XProductionAction extends GenericAction<XProduction> {
         xproductionPlanAction.changePlanStatus(getInstance().getProductionPlan());
 
         xproductionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList, laborList);
+        persistUlexitaData();
+
+        if (getInstance().getProductionLine() != null && getInstance().getProductionLine().isUlexitaTemplate()) {
+            xproductionUlexitaService.persistSnapshots(getInstance(),
+                    ulexitaData != null ? ulexitaData.getUlexDisponibleSnap() : null,
+                    currentUserCode());
+        }
+
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
+    }
+
+    /**
+     * Codigo del usuario actual para auditoria de snapshots (financesCode 4-char).
+     * Si no hay usuario o no tiene financesCode, retorna null.
+     */
+    private String currentUserCode() {
+        if (currentUser == null) return null;
+        return currentUser.getFinancesCode();
     }
 
     /** Calcula el VOLUMEN TOTAL de una produccion **/
@@ -287,6 +365,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
         setIngredientSupplyList(new ArrayList<XSupply>());
         setMaterialSupplyList(new ArrayList<XSupply>());
+        ulexitaData = null;
     }
 
     public void loadSupplies(){
@@ -316,6 +395,45 @@ public class XProductionAction extends GenericAction<XProduction> {
             //supply.setUnitCost(productItem.getUnitCost());
             materialSupplyList.add(supply);
         }
+    }
+
+    /**
+     * Agrega productos terminados directamente a la orden (sin pasar por el plan).
+     * Multi-seleccion. La cantidad inicia en 0 y se edita en la tabla "Productos Terminados".
+     * La persistencia es diferida: los nuevos XProductionProduct se guardan al hacer "Guardar".
+     * El idplan se enlaza al plan de la orden si existe (para mantener trazabilidad).
+     */
+    public void addFinishedProductsDirect(List<ProductItem> productItems) {
+        enableProductsTab();
+        if (productItems == null || productItems.isEmpty()) return;
+        for (ProductItem productItem : productItems) {
+            if (containsFinishedProduct(productItem.getProductItemCode())) continue;
+
+            XProductionProduct product = new XProductionProduct();
+            product.setProductItemCode(productItem.getProductItemCode());
+            product.setProductItem(productItem);
+            product.setQuantity(BigDecimal.ZERO);
+            product.setCost(BigDecimal.ZERO);
+            product.setUnitCost(BigDecimal.ZERO);
+            product.setCostA(BigDecimal.ZERO);
+            product.setCostB(BigDecimal.ZERO);
+            product.setCostC(BigDecimal.ZERO);
+            product.setCostMo(BigDecimal.ZERO);
+            product.setProductionPlan(getInstance().getProductionPlan());
+
+            // Persistencia inmediata del PT con cantidad 0. La cantidad real se
+            // edita inline y se guarda al hacer Guardar via updateProduction (em.merge).
+            xproductionService.addFinishedProductDirect(getInstance(), product);
+            getInstance().getProductionProductList().add(product);
+        }
+    }
+
+    private boolean containsFinishedProduct(String codArt) {
+        if (codArt == null || getInstance() == null) return false;
+        for (XProductionProduct p : getInstance().getProductionProductList()) {
+            if (codArt.equals(p.getProductItemCode())) return true;
+        }
+        return false;
     }
 
     public void addIngredientItems(List<ProductItem> productItems) {
@@ -453,11 +571,25 @@ public class XProductionAction extends GenericAction<XProduction> {
     }
 
     public void removeSupply(XSupply supply){
+        if (supply == null) return;
         xproductionService.removeSupply(supply);
-        if (supply.getType().equals(SupplyType.INGREDIENT))
-            ingredientSupplyList.remove(supply);
-        if (supply.getType().equals(SupplyType.MATERIAL))
-            materialSupplyList.remove(supply);
+        if (SupplyType.INGREDIENT.equals(supply.getType())) {
+            removeSupplyById(ingredientSupplyList, supply.getId());
+        }
+        if (SupplyType.MATERIAL.equals(supply.getType())) {
+            removeSupplyById(materialSupplyList, supply.getId());
+        }
+    }
+
+    private void removeSupplyById(List<XSupply> list, Long id) {
+        if (list == null || id == null) return;
+        java.util.Iterator<XSupply> it = list.iterator();
+        while (it.hasNext()) {
+            XSupply s = it.next();
+            if (id.equals(s.getId())) {
+                it.remove();
+            }
+        }
     }
 
     public void removeProductionProduct(XProductionProduct product){
@@ -727,6 +859,43 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void setProductionShiftType(ProductionShiftType productionShiftType) {
         this.productionShiftType = productionShiftType;
+    }
+
+    public XProductionUlexita getUlexitaData() {
+        if (ulexitaData == null && isUlexitaTemplate()) {
+            if (getInstance() != null && getInstance().getId() != null) {
+                ulexitaData = xproductionUlexitaService.findByProduction(getInstance());
+            }
+            if (ulexitaData == null) {
+                ulexitaData = new XProductionUlexita();
+                ulexitaData.setProduction(getInstance());
+            }
+        }
+        if (ulexitaData != null && ulexitaData.getUlexDisponibleSnap() == null) {
+            ulexitaData.setUlexDisponibleSnap(BigDecimal.ZERO);
+        }
+        return ulexitaData;
+    }
+
+    public void setUlexitaData(XProductionUlexita ulexitaData) {
+        this.ulexitaData = ulexitaData;
+    }
+
+    public boolean isUlexitaTemplate() {
+        return getInstance() != null
+                && getInstance().getProductionLine() != null
+                && getInstance().getProductionLine().isUlexitaTemplate();
+    }
+
+    /**
+     * Calc en vivo para la pestaña Datos del Proceso. Re-instancia en cada
+     * llamada para reflejar cambios de inputs sin necesidad de persistir.
+     */
+    public XProductionUlexitaCalc getUlexitaCalc() {
+        if (!isUlexitaTemplate()) return null;
+        return new XProductionUlexitaCalc(
+                getInstance(), ulexitaData, getInstance().getProductionLine(),
+                ingredientSupplyList, getInstance().getProductionProductList());
     }
 
     /*public BigDecimal getTotalCost() {

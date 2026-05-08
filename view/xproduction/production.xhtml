@@ -72,9 +72,22 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('generalEmployeeListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE') and s:hasPermission('PRODUCTION_LABOR','UPDATE')}"
                            reRender="generalEmployeeListModalPanel">
             <f:attribute name="dataModelObject" value="#{generalEmployeeDataModel}"/>
+        </a4j:commandButton>
+
+        <a4j:commandButton id="addFinishedProductButton"
+                           action="#{productionProductsDataModel.reset()}"
+                           value="#{messages['Production.addFinishedProduct']}"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('addFinishedProductModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           reRender="addFinishedProductModalPanel">
+            <f:attribute name="entityManagerName" value=""/>
+            <f:attribute name="dataModelObject" value="#{productionProductsDataModel}"/>
         </a4j:commandButton>
 
         <h:commandButton action="#{xproductionAction.update}" value="#{messages['Common.update']}"
@@ -130,7 +143,7 @@
             </c:choose>
         </f:facet>
 
-        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width60percent,width40percent">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width55percent,width45percent">
 
             <s:div>
                 <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -228,6 +241,7 @@
                                      value="#{xproductionAction.productionGroup}"
                                      styleClass="inputMedium"
                                      required="true"
+                                     disabled="#{xproductionAction.approved}"
                                      tabindex="7">
                         <s:selectItems value="#{productionGroupList}"
                                        var="productionGroup"
@@ -244,16 +258,13 @@
                                      value="#{xproductionAction.productionShiftType}"
                                      styleClass="inputMedium"
                                      required="true"
+                                     disabled="#{xproductionAction.approved}"
                                      tabindex="1000">
                         <s:selectItems value="#{productionShiftTypesEnum}"
                                        var="element"
                                        label="#{messages[element.resourceKey]}"
                                        noSelectionLabel=""
                                        hideNoSelectionLabel="false"/>
-                        <!--<a4j:support event="onchange"
-                                     action="#{rawMaterialPaymentAction.paymentTypeChanged()}"
-                                     reRender="cashBoxCashAccountDiv, bankDiv"
-                                     ajaxSingle="true"/>-->
                         <s:convertEnum/>
                     </h:selectOneMenu>
                 </s:decorate>
@@ -274,66 +285,133 @@
                     <h:outputText value="#{messages['MeasureUnit.KG']}" />
                 </s:decorate>
 
+                <c:if test="#{xproductionAction.managed}">
+                    <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['XProduction.initDate']}</ui:define>
+                        <rich:calendar id="initDate"
+                                       value="#{xproduction.initDate}"
+                                       popup="true"
+                                       datePattern="#{messages['patterns.dateTime']}"
+                                       inputClass="inputMedium"
+                                       enableManualInput="true"
+                                       required="true"
+                                       disabled="#{xproductionAction.approved}"
+                                       readonly="#{xproductionAction.approved}"
+                                       tabindex="3">
+                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="both"/>
+                        </rich:calendar>
+                    </s:decorate>
+
+                    <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['XProduction.endDate']}</ui:define>
+                        <rich:calendar id="endDate"
+                                       value="#{xproduction.endDate}"
+                                       popup="true"
+                                       datePattern="#{messages['patterns.dateTime']}"
+                                       inputClass="inputMedium"
+                                       enableManualInput="true"
+                                       required="true"
+                                       disabled="#{xproductionAction.approved}"
+                                       readonly="#{xproductionAction.approved}"
+                                       tabindex="4">
+                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="both"/>
+                        </rich:calendar>
+                    </s:decorate>
+                </c:if>
+
             </s:div>
 
 
             <s:div id="assignProductionProduct">
 
-                <s:div>
-                    <c:if test="#{xproductionAction.managed}">
+                <s:div id="ulexitaCalcPanel">
+                <c:if test="#{xproductionAction.ulexitaTemplate}">
+                    <rich:panel styleClass="ulexCalcHeaderPanel">
+                        <f:facet name="header">#{messages['XProduction.ulexita.section.calc']}</f:facet>
+                        <h:panelGrid columns="4" width="100%" cellpadding="3" cellspacing="0" border="0"
+                                     style="background-color:#f0f0f0;"
+                                     columnClasses="ulexCalcLabel,ulexCalcVal,ulexCalcLabel,ulexCalcVal">
 
-                        <h:panelGrid columns="4" width="100%" >
+                            <h:outputText value="#{messages['XProduction.ulexita.consumoMpCalc']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.consumoMpCalc}" title="MERMA + Kpa * PT" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                            <h:outputText value="#{messages['XProduction.ulexita.kpmBent']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.kpmBentonita}" title="Ley_PT / Ley_MP_con_bentonita" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
 
-                            <h:outputText value="Inicio"/>
-                            <s:decorate id="initDateField" template="/include/validateField.xhtml" styleClass="formRow">
-                                <rich:calendar id="initDate"
-                                               value="#{xproduction.initDate}"
-                                               popup="true"
-                                               datePattern="#{messages['patterns.dateTime']}"
-                                               inputClass="inputMedium"
-                                               enableManualInput="true"
-                                               required="false"
-                                               tabindex="3">
-                                    <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
-                                                       timeZone="#{sessionUser.timeZone}"
-                                                       type="both"/>
-                                </rich:calendar>
-                            </s:decorate>
+                            <h:outputText value="#{messages['XProduction.ulexita.kaolinPct']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.caolinPct}" title="100 - bentonita%" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                            <h:outputText value="#{messages['XProduction.ulexita.kpmMerma']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.kpmMerma}" title="(Kpm_bent - 1) - Diluyente / (PT*mermaFactor*Kpa) + 1" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
 
-                            <h:outputText value="Fin"/>
-                            <s:decorate id="endDateField" template="/include/validateField.xhtml" styleClass="formRow">
-                                <!--<ui:define name="label">Fin</ui:define>-->
-                                <rich:calendar id="endDate"
-                                               value="#{xproduction.endDate}"
-                                               popup="true"
-                                               datePattern="#{messages['patterns.dateTime']}"
-                                               inputClass="inputMedium"
-                                               enableManualInput="true"
-                                               required="false"
-                                               tabindex="4">
-                                    <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
-                                                       timeZone="#{sessionUser.timeZone}"
-                                                       type="both"/>
-                                </rich:calendar>
-                            </s:decorate>
+                            <h:outputText value="#{messages['XProduction.ulexita.leyMpRecalc']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.leyMpRecalc}" title="Ley_PT / Kpm_bentonita" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                            <h:outputText value="#{messages['XProduction.ulexita.kpa']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.kpa}" title="GRANULADO / PT_TOTAL_BUENO" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+
+                            <h:outputText value="#{messages['XProduction.ulexita.ptTotalGood']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.ptTotalBueno}" title="A + B" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                            <h:outputText value="#{messages['XProduction.ulexita.merma']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.merma}" title="(Kpm_merma - 1) * mermaFactor * Kpa * PT" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+
+                            <h:outputText value=""/>
+                            <h:outputText value=""/>
+                            <h:outputText value="#{messages['XProduction.ulexita.mermaPct']}"/>
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.mermaPct}" title="MERMA / (MERMA + GRANULADO)" styleClass="right">
+                                <f:convertNumber type="percent" minFractionDigits="2" maxFractionDigits="2"/>
+                            </h:outputText>
+
                         </h:panelGrid>
+                    </rich:panel>
 
-                        <s:div>
-                            <h:inputTextarea  id="observation"
-                                              value="#{xproduction.observation}"
-                                              required="false"
-                                              style="width: 98%; height: 27px;"
-                                              rows="3"
-                                              tabindex="3">
-                                <f:validateLength maximum="500"/>
-                            </h:inputTextarea>
-                        </s:div>
-
+                    <c:if test="#{xproductionAction.managed}">
+                        <rich:spacer height="6"/>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td valign="top" style="width:110px; padding-top:6px; text-align:right; padding-right:8px;">
+                                    <h:outputText value="#{messages['XProduction.observation']}"/>
+                                </td>
+                                <td valign="top">
+                                    <h:inputTextarea id="observation"
+                                                     value="#{xproduction.observation}"
+                                                     required="false"
+                                                     readonly="#{xproductionAction.approved}"
+                                                     style="width:100%; height:48px; box-sizing:border-box; line-height:18px;"
+                                                     rows="2"
+                                                     tabindex="5">
+                                        <f:validateLength maximum="500"/>
+                                    </h:inputTextarea>
+                                </td>
+                            </tr>
+                        </table>
                     </c:if>
+                </c:if>
                 </s:div>
 
                 <rich:spacer height="10" />
 
+                <!--
+                    Panel "Asignar Producto Terminado" desactivado.
+                    Reemplazado por el boton "+ Producto Terminado" que agrega PT directamente
+                    en la orden via modal (ver addFinishedProductModalPanel al final del archivo).
                 <c:if test="#{xproductionAction.managed}">
                 <rich:dataTable value="#{xproductionAction.productionProductList}"
                                 var="productionProduct"
@@ -362,6 +440,7 @@
                     </rich:column>
                 </rich:dataTable>
                 </c:if>
+                -->
             </s:div>
         </h:panelGrid>
 
@@ -400,7 +479,7 @@
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimal4FNumber']}"
                                                              forId="#{quantityInputFieldId}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="ingredientPanel, totalCostField, totalRawMaterialField" />
+                                    <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ingredientPanel, totalCostField, totalRawMaterialField" />
                                 </h:inputText>
                                 <h:message for="#{quantityInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
                             </td>
@@ -485,7 +564,7 @@
                                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{quantityMaterialInputFieldId}"/>
 
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="materialPanel" />
+                                    <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="materialPanel" />
                                 </h:inputText>
                             </td>
 
@@ -532,16 +611,171 @@
 
     <rich:spacer height="10" />
 
+    <c:if test="#{xproductionAction.ulexitaTemplate}">
+    <rich:tabPanel selectedTab="ulexitaDataTab">
+        <rich:tab name="ulexitaDataTab" label="#{messages['XProduction.tab.ulexitaData']}">
+            <style type="text/css">
+                .ulexitaPanel .entry {
+                    display: block !important;
+                    overflow: hidden;
+                    width: 70% !important;
+                    margin: 0 0 4px 0 !important;
+                }
+                .ulexitaPanel .entry .label {
+                    float: left !important;
+                    width: 50% !important;
+                    text-align: right !important;
+                    padding-right: 10px !important;
+                    box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                }
+                .ulexitaPanel .entry .data {
+                    float: left !important;
+                    width: 50% !important;
+                    text-align: left;
+                    box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                }
+                .ulexitaPanel .entry .data input {
+                    width: 45% !important;
+                    box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                }
+                .ulexitaPanel .entry .data textarea {
+                    width: 90% !important;
+                    box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                }
+            </style>
+            <s:div id="ulexitaPanel" styleClass="ulexitaPanel" style="padding:8px;">
+
+                <h:panelGrid columns="2" width="100%" cellpadding="4" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <!-- Seccion 1: Datos de Produccion (orden columnas Excel D,H,I,K,O,V) -->
+                    <rich:simpleTogglePanel switchType="client" opened="true"
+                                            label="#{messages['XProduction.ulexita.section.production']}">
+
+                        <s:decorate id="ulexAvailableField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.ulexAvailable']}</ui:define>
+                            <h:inputText id="ulexAvailable" value="#{xproductionAction.ulexitaData.ulexDisponibleSnap}"
+                                         styleClass="inputSmall right" disabled="true">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         forId="ulexAvailable"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="diluentTotalField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.diluentTotal']}</ui:define>
+                            <h:inputText id="diluentTotal" value="#{xproductionAction.ulexitaData.diluyenteTotalTn}"
+                                         styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         forId="diluentTotal" minimum="0"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="bentonitePctField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.bentonitePct']}</ui:define>
+                            <h:inputText id="bentonitePct" value="#{xproductionAction.ulexitaData.bentonitaPct}"
+                                         styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         forId="bentonitePct" minimum="0" maximum="100"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="reprocessInField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.reprocessIn']}</ui:define>
+                            <h:inputText id="reprocessIn" value="#{xproductionAction.ulexitaData.consumoReprocesoTn}"
+                                         styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         forId="reprocessIn" minimum="0"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="granuladoField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.granulated']}</ui:define>
+                            <h:inputText id="granulado" value="#{xproductionAction.ulexitaData.productoGranuladoTn}"
+                                         styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         forId="granulado" minimum="0"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="reprocessOutField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.reprocessOut']}</ui:define>
+                            <h:inputText id="reprocessOut" value="#{xproductionAction.ulexitaData.reprocesoFinalTn}"
+                                         styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         forId="reprocessOut" minimum="0"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                    </rich:simpleTogglePanel>
+
+                    <!-- Seccion 2: Datos de Laboratorio -->
+                    <rich:simpleTogglePanel switchType="client" opened="true"
+                                            label="#{messages['XProduction.ulexita.section.lab']}">
+
+                        <s:decorate id="leyMpBentField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.leyMpBent']}</ui:define>
+                            <h:inputText id="leyMpBent" value="#{xproductionAction.ulexitaData.leyMpBentonita}"
+                                         styleClass="inputSmall right"
+                                         readonly="#{xproductionAction.approved and !s:hasPermission('PRODUCTION_LAB_DATA','UPDATE')}"
+                                         style="background-color:#fffbcc;">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         forId="leyMpBent" minimum="0"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="leyPtField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.leyPt']}</ui:define>
+                            <h:inputText id="leyPt" value="#{xproductionAction.ulexitaData.leyPt}"
+                                         styleClass="inputSmall right"
+                                         readonly="#{xproductionAction.approved and !s:hasPermission('PRODUCTION_LAB_DATA','UPDATE')}"
+                                         style="background-color:#fffbcc;">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                         forId="leyPt" minimum="0"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                            </h:inputText>
+                        </s:decorate>
+
+                        <s:decorate id="observacionLabField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['XProduction.ulexita.observacionLab']}</ui:define>
+                            <h:inputTextarea id="observacionLab" value="#{xproductionAction.ulexitaData.observacionLab}"
+                                             readonly="#{xproductionAction.approved and !s:hasPermission('PRODUCTION_LAB_DATA','UPDATE')}"
+                                             style="width:98%; height:50px; background-color:#fffbcc;" rows="3">
+                                <f:validateLength maximum="500"/>
+                            </h:inputTextarea>
+                        </s:decorate>
+
+                    </rich:simpleTogglePanel>
+
+                </h:panelGrid>
+
+            </s:div>
+        </rich:tab>
+    </rich:tabPanel>
+
+    <rich:spacer height="10" />
+    </c:if>
+
     <rich:tabPanel id="finalProductPanel" switchType="ajax" selectedTab="#{xproductionAction.activeTabName}">
         <rich:tab name="productsTab" label="#{messages['Production.products']}" action="#{xproductionAction.enableProductsTab}" ajaxSingle="true" immediate="true">
             <s:div id="finalProductList">
                 <rich:dataTable id="productList"
                                 value="#{xproduction.productionProductList}"
                                 var="product"
-                                width="100%" columnsWidth="50%, 15%, 15%, 15%, 5%">
+                                width="100%" columnsWidth="45%, 10%, 15%, 15%, 10%, 5%">
                     <f:facet name="header">
                         <rich:columnGroup>
                             <rich:column>#{messages['ProductionPlan.product.name']}</rich:column>
+                            <rich:column>#{messages['Supply.unity']}</rich:column>
                             <rich:column>#{messages['ProductionPlan.product.quantity']}</rich:column>
                             <rich:column>#{messages['Production.totalCost']}</rich:column>
                             <rich:column>#{messages['Production.unitCost']}</rich:column>
@@ -552,8 +786,20 @@
                     <rich:column>
                         <h:outputText value="#{product.productItem.fullName}" />
                     </rich:column>
+                    <rich:column styleClass="center">
+                        <h:outputText value="#{product.productItem.usageMeasureCode}" />
+                    </rich:column>
                     <rich:column styleClass="right">
-                        <h:outputText value="#{product.quantity}">
+                        <h:inputText id="qtyInput"
+                                     value="#{product.quantity}"
+                                     styleClass="inputSmall right"
+                                     readonly="#{xproductionAction.approved}"
+                                     rendered="#{xproductionAction.pending}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                     minimum="0" forId="qtyInput"/>
+                            <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="finalProductList"/>
+                        </h:inputText>
+                        <h:outputText value="#{product.quantity}" rendered="#{xproductionAction.approved}">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                         </h:outputText>
                     </rich:column>
@@ -584,7 +830,7 @@
             </s:div>
         </rich:tab>
 
-        <rich:tab name="laborTab" label="#{messages['Production.productionLabor']}" action="#{xproductionAction.enableLaborTab}" ajaxSingle="true" immediate="true">
+        <rich:tab name="laborTab" label="#{messages['Production.productionLabor']}" action="#{xproductionAction.enableLaborTab}" ajaxSingle="true" immediate="true" rendered="#{s:hasPermission('PRODUCTION_LABOR','VIEW')}">
             <s:div id="laborPanel">
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
@@ -612,7 +858,7 @@
                                              styleClass="inputSmall right">
                                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="#{hoursWorkedInputFieldId}"/>
 
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="laborPanel" />
+                                    <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="laborPanel" />
                                 </h:inputText>
                             </td>
 
@@ -701,6 +947,21 @@
                                reRender="ingredientPanel"
                                styleClass="button"
                                oncomplete="Richfaces.hideModalPanel('ingredientItemsByWarehouseListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate id="addFinishedProductModalPanelContainer" template="/warehouse/productionProductListModalPanel.xhtml">
+        <ui:param name="containerId" value="addFinishedProductModalPanelContainer"/>
+        <ui:param name="dialogId" value="addFinishedProductModalPanel"/>
+        <ui:define name="addButton">
+            <a4j:commandButton id="addButton"
+                               immediate="true"
+                               ajaxSingle="true"
+                               action="#{xproductionAction.addFinishedProductsDirect(productionProductsDataModel.selectedProductItems)}"
+                               value="#{messages['Common.add']}"
+                               reRender="finalProductList, finalProductPanel"
+                               styleClass="button"
+                               oncomplete="Richfaces.hideModalPanel('addFinishedProductModalPanel');"/>
         </ui:define>
     </s:decorate>
 

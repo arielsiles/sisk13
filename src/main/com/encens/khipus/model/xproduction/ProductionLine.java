@@ -8,6 +8,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @TableGenerator(schema = Constants.KHIPUS_SCHEMA, name = "ProductionLine.tableGenerator",
         table = Constants.SEQUENCE_TABLE_NAME,
@@ -31,6 +32,27 @@ public class ProductionLine implements BaseModel {
 
     @Column(name = "nombre", nullable = false, length = 255)
     private String name;
+
+    @Column(name = "report_template_code", length = 20)
+    private String reportTemplateCode;
+
+    @Column(name = "cod_art_mp_principal", length = 20)
+    private String codArtMpPrincipal;
+
+    @Column(name = "cod_art_pt_a", length = 20)
+    private String codArtPtA;
+
+    @Column(name = "cod_art_pt_b", length = 20)
+    private String codArtPtB;
+
+    @Column(name = "cod_art_diluy_bent", length = 20)
+    private String codArtDiluyBent;
+
+    @Column(name = "cod_art_diluy_caolin", length = 20)
+    private String codArtDiluyCaolin;
+
+    @Column(name = "merma_factor")
+    private BigDecimal mermaFactor;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -80,5 +102,65 @@ public class ProductionLine implements BaseModel {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getReportTemplateCode() {
+        return reportTemplateCode;
+    }
+
+    public void setReportTemplateCode(String reportTemplateCode) {
+        this.reportTemplateCode = reportTemplateCode;
+    }
+
+    public String getCodArtMpPrincipal() {
+        return codArtMpPrincipal;
+    }
+
+    public void setCodArtMpPrincipal(String codArtMpPrincipal) {
+        this.codArtMpPrincipal = codArtMpPrincipal;
+    }
+
+    public String getCodArtPtA() {
+        return codArtPtA;
+    }
+
+    public void setCodArtPtA(String codArtPtA) {
+        this.codArtPtA = codArtPtA;
+    }
+
+    public String getCodArtPtB() {
+        return codArtPtB;
+    }
+
+    public void setCodArtPtB(String codArtPtB) {
+        this.codArtPtB = codArtPtB;
+    }
+
+    public String getCodArtDiluyBent() {
+        return codArtDiluyBent;
+    }
+
+    public void setCodArtDiluyBent(String codArtDiluyBent) {
+        this.codArtDiluyBent = codArtDiluyBent;
+    }
+
+    public String getCodArtDiluyCaolin() {
+        return codArtDiluyCaolin;
+    }
+
+    public void setCodArtDiluyCaolin(String codArtDiluyCaolin) {
+        this.codArtDiluyCaolin = codArtDiluyCaolin;
+    }
+
+    public BigDecimal getMermaFactor() {
+        return mermaFactor;
+    }
+
+    public void setMermaFactor(BigDecimal mermaFactor) {
+        this.mermaFactor = mermaFactor;
+    }
+
+    public boolean isUlexitaTemplate() {
+        return "ULEXITA".equals(reportTemplateCode);
     }
 }
