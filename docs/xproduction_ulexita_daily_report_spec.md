@@ -256,119 +256,61 @@ Visibilidad condicional: los campos específicos aparecen cuando `Template de re
 
 ### 8.1 Tecnología
 
-**Apache POI (HSSF) cargando una plantilla `.xls` precargada**. Misma librería que ya usa `ProductInventoryReportAction.exportarExcel()` (`HSSFWorkbook`/`HSSFSheet`/`HSSFCellStyle`). El JAR `poi-3.5-FINAL-20090928.jar` ya está en `lib/`; no se introducen dependencias nuevas.
+**Apache POI (HSSF) — generación 100% programática, sin plantilla externa**.
 
-Patrón de **plantilla** en lugar de construir todo en código: el `.xls` se carga desde disco con cabecera, colores, merges y fórmulas ya definidos en Excel; el código solo escribe las filas de datos reusando los `HSSFCellStyle` capturados de una fila modelo.
+Misma librería que ya usa `ProductInventoryReportAction.exportarExcel()` (`HSSFWorkbook` / `HSSFSheet` / `HSSFCellStyle`). El JAR `poi-3.5-FINAL-20090928.jar` ya está en `lib/`; no se introducen dependencias nuevas. El reporte se construye en código (cabecera, colores, merges, fórmulas) — sin archivo `.xls` versionado.
 
-La plantilla original del usuario (`.xlsx`) se guarda como `.xls` desde Excel — formato binario clásico que preserva todo el styling visual (colores, merges, fórmulas, anchos, fuentes). Para 31 filas/mes está muy por debajo del límite HSSF (65 535 filas).
+**Razón del cambio respecto a iteraciones previas del spec**: una plantilla `.xls` versionada en disco es frágil ante cambios — si las columnas o filas se modifican fuera del código (alguien edita el archivo), los índices del código quedan desfasados y el reporte se rompe silenciosamente. Construir todo en código mantiene una sola fuente de verdad: el código. Coherente con el patrón ya establecido en otros reportes Excel del sistema (`productInventoryReport.xhtml`).
 
-**Único formato soportado**: XLS. No se ofrece PDF (decisión confirmada por el usuario). Si en el futuro se requiere XLSX nativo, se agrega `poi-ooxml` + `xmlbeans` y se cambia `HSSFWorkbook` por `HSSFWorkbook` (el resto del código se mantiene).
+**Único formato soportado**: XLS. No se ofrece PDF (decisión confirmada por el usuario). Si en el futuro se requiere XLSX nativo, se agrega `poi-ooxml` + `xmlbeans` y se cambia `HSSFWorkbook` por `XSSFWorkbook`.
 
-### 8.2 Plantilla
+### 8.2 Diferencias respecto al Excel manual original
 
-Archivo `view/xproduction/reports/dailyProductionUlexita.xls`, versionado en git. Es una copia del Excel original "REPORTE DIARIO DE PRODUCCION ULEXITA" guardada en formato `.xls` con:
+El reporte generado es **más compacto** que la planilla manual:
 
-- Cabecera multinivel (filas 1-7) intacta: títulos, "Insumo / insumos", "Cálculo", "Ingreso producción", "Dato laboratorio", "GRUPO D/N", "PRODUCTO TN A/B".
-- Colores por tipo de columna: azul claro = calculados, amarillo claro = dato laboratorio, naranja = ULEX disponible y MERMA, etc.
-- Merged cells respetadas.
-- Anchos de columna y altura de filas.
-- Fila modelo (fila 9) con todos los `CellStyle` aplicados a cada columna del cuerpo (formato numérico con decimales, alineación, bordes). Esta fila se usa como template de estilo.
-- Fila SALDO ANTERIOR (fila 8) opcional según diseño final.
-- Fila TOTAL MES al final con fórmulas `=SUM(...)` que el código reescribe al rango real generado.
+| Excel manual (original) | Reporte generado | Razón |
+|-------------------------|-------------------|-------|
+| Filas 4-5 con leyendas ("Insumo", "insumos", "Cálculo", "Ingreso producción", "Dato laboratorio") | Eliminadas | Solo informativas; los nombres de columna en la fila siguiente ya describen la naturaleza del dato |
+| Fila "SALDO ANTERIOR" | Eliminada | Decisión: no agrega valor en reporte automatizado |
+| Columnas vacías S, T, U (separadores visuales) | Eliminadas | Sin propósito funcional; se eliminaron del layout |
+| Cabeceras agrupadas ("GRUPO" sobre D/N, "PRODUCTO (TN)" sobre A/B con merged cells) | Cabecera única por columna ("GRUPO D", "GRUPO N", "PRODUCTO A (TN)", "PRODUCTO B (TN)") | Más simple, no requiere merges, columnas auto-descriptivas |
 
-El usuario funcional puede abrir esta plantilla en Excel y modificar colores, anchos, agregar columnas, sin tocar código Java. Solo se requiere mantener la posición de columnas cuyos índices están referenciados en el código.
+El resto del contenido (colores diferenciados por tipo de columna, formato numérico con decimales, fila TOTAL MES) se preserva.
 
-### 8.3 Acción y pantalla
+### 8.3 Layout final del Excel generado
 
-- Pantalla nueva `view/xproduction/dailyProductionReport.xhtml` con filtros: año, mes, línea de producción, opción "Mostrar días sin producción".
-- Acción `UlexitaDailyReportAction` (Seam, scope PAGE) con método `generateReport()`.
-- Botón "Exportar Excel".
-
-### 8.4 Algoritmo de generación
-
-```java
-public void generateReport() {
-    // 1. Cargar producciones del mes
-    List<XProduction> producciones = xproductionService.findByMonth(productionLine, year, month);
-
-    // 2. Construir filas de datos
-    List<UlexitaReportRow> rows = new ArrayList<UlexitaReportRow>();
-    for (XProduction p : producciones) {
-        XProductionUlexita u = xproductionUlexitaService.findByProduction(p);
-        XProductionUlexitaCalc calc = new XProductionUlexitaCalc(p, u, productionLine,
-                                          p.getSupplyList(), p.getProductionProductList());
-        rows.add(buildRow(p, u, calc));
-    }
-    if (showEmptyDays) {
-        rows = padWithEmptyDays(rows, year, month);
-    }
-
-    // 3. Cargar plantilla
-    InputStream is = new FileInputStream(JSFUtil.getRealPath(
-        "/xproduction/reports/dailyProductionUlexita.xls"));
-    HSSFWorkbook wb = new HSSFWorkbook(is);
-    HSSFSheet sheet = wb.getSheetAt(0);
-
-    // 4. Capturar estilos de la fila modelo (fila 9 en la plantilla)
-    HSSFRow templateRow = sheet.getRow(TEMPLATE_ROW_INDEX);
-    Map<Integer, HSSFCellStyle> styles = captureStyles(templateRow);
-
-    // 5. Escribir N filas reales reusando estilos
-    int rowIdx = DATA_START_ROW;
-    for (UlexitaReportRow r : rows) {
-        HSSFRow row = sheet.createRow(rowIdx++);
-        writeCell(row, COL_FECHA, r.getFecha(), styles.get(COL_FECHA));
-        writeCell(row, COL_DIA, r.getDia(), styles.get(COL_DIA));
-        writeCell(row, COL_ULEX_DISP, r.getUlexDisp(), styles.get(COL_ULEX_DISP));
-        writeCell(row, COL_CONSUMO_CALC, r.getConsumoMpCalc(), styles.get(COL_CONSUMO_CALC));
-        // ... resto de columnas
-    }
-
-    // 6. Escribir fila TOTAL MES con fórmulas SUM
-    HSSFRow totalRow = sheet.createRow(rowIdx);
-    writeFormulaCell(totalRow, COL_ULEX_DISP, "SUM(D9:D" + rowIdx + ")");
-    writeFormulaCell(totalRow, COL_CONSUMO_CALC, "SUM(E9:E" + rowIdx + ")");
-    // ... resto de columnas físicas (H, K, O, P, Q, R, V, Z)
-    // Columnas calculadas (Kpa, Kpm bent/merma, %MERMA, Leyes, Caolín%) → en blanco
-
-    // 7. Forzar recálculo de fórmulas al abrir
-    wb.setForceFormulaRecalculation(true);
-
-    // 8. Stream al response
-    HttpServletResponse resp = (HttpServletResponse) FacesContext.getCurrentInstance()
-        .getExternalContext().getResponse();
-    resp.setContentType("application/vnd.ms-excel");
-    resp.setHeader("Content-Disposition",
-        "attachment; filename=\"reporte_diario_ulexita_" + year + "_" + month + ".xls\"");
-    wb.write(resp.getOutputStream());
-    FacesContext.getCurrentInstance().responseComplete();
-}
+```
+Fila 1  │      ┌── REPORTE DIARIO DE PRODUCCION "ULEXITA" ──┐ (mergeado B:Y, bold)
+Fila 2  │ Periodo: <Mes> <Año>
+Fila 3  │ (en blanco — espacio visual)
+Fila 4  │ FECHA │ DIA │ ULEX DISP │ CONSUMO MP (TN) │ GRUPO        │ Diluyente │ ...
+Fila 5  │ (mergeada vertical con fila 4 excepto F-G y P-Q) │ D │ N │ ...
+Fila 6  │ SALDO │     │           │                 │      │      │           │ ...
+Fila 7+ │ <datos de cada produccion del mes>
+Fila N  │ TOTAL MES: │ ... (sumas en columnas físicas; calculadas en blanco) ...
 ```
 
-### 8.5 Reglas de escritura de celdas
+**Sin colores de fondo**: todas las celdas en blanco. Distinción visual mediante bold (cabecera y totales) y bordes finos en todas las celdas.
 
-- `BigDecimal` no nulo → `cell.setCellValue(value.doubleValue())` con estilo numérico.
-- `BigDecimal` nulo o calculado con división por cero → celda en blanco (sin `setCellValue`).
-- Strings → `setCellValue(string)`.
-- Fechas → `setCellValue(date)` con estilo de fecha (`dd-MMM`).
-- GRUPO (D/N) → escribir "X" en columna D si turno=DIA, "X" en columna N si NOCHE; la otra queda vacía.
+**Merges en cabecera**:
+- Filas 4-5 mergeadas verticalmente para cada columna individual EXCEPTO F-G y P-Q.
+- F-G: row 4 con texto "GRUPO" mergeado horizontal F4:G4; row 5 con celdas separadas "D" en F5 y "N" en G5.
+- P-Q: row 4 con texto "PRODUCTO (TN)" mergeado horizontal P4:Q4; row 5 con celdas separadas "A" en P5 y "B" en Q5.
 
-### 8.6 Snapshots vs. live
+**Fila SALDO** (fila 6): etiqueta "SALDO" en col B, resto vacío pero con borde en toda la fila.
 
-- ULEX DISPONIBLE (col D) y CONSUMO MP CALC (col E): si la producción está aprobada, se usan los valores guardados en `XProductionUlexita.ulexDisponibleSnap` y `consumoMpCalcSnap`. Para producciones pendientes el reporte recalcula en vivo.
-- Esto garantiza que un reporte histórico no cambie aunque se modifique el inventario o las leyes después.
+**Fila TOTAL MES** (al final): etiqueta `"TOTAL MES:"` mergeada en B-C; sumas de columnas físicas; calculadas en blanco; borde continuo en toda la fila.
 
-### 8.7 Constantes de columnas
-
-Definidas como constantes en `UlexitaDailyReportAction` (deben coincidir con los índices reales de la plantilla):
+### 8.4 Constantes de columnas y filas
 
 ```java
-private static final int TEMPLATE_ROW_INDEX = 8;   // fila 9 en Excel (modelo de estilos)
-private static final int DATA_START_ROW     = 8;   // empieza a escribir aquí
+// Columnas (0-based). Sin huecos: cada índice es una columna usada.
+// Las columnas S/T/U del Excel manual original eran solo separadores
+// visuales; aquí se eliminan para compactar el reporte.
 private static final int COL_FECHA          = 1;   // B
 private static final int COL_DIA            = 2;   // C
 private static final int COL_ULEX_DISP      = 3;   // D
-private static final int COL_CONSUMO_CALC   = 4;   // E
+private static final int COL_CONSUMO        = 4;   // E
 private static final int COL_GRUPO_D        = 5;   // F
 private static final int COL_GRUPO_N        = 6;   // G
 private static final int COL_DILUYENTE      = 7;   // H
@@ -382,14 +324,128 @@ private static final int COL_GRANULADO      = 14;  // O
 private static final int COL_PT_A           = 15;  // P
 private static final int COL_PT_B           = 16;  // Q
 private static final int COL_PT_BUENO       = 17;  // R
-private static final int COL_REPROC_OUT     = 21;  // V (hay columnas vacías de separación visual)
-private static final int COL_KPM_BENT       = 22;  // W
-private static final int COL_KPM_MERMA      = 23;  // X
-private static final int COL_KPA            = 24;  // Y
-private static final int COL_MERMA          = 25;  // Z
-private static final int COL_MERMA_PCT      = 26;  // AA
-private static final int COL_OBS            = 27;  // AB
+private static final int COL_REPROC_OUT     = 18;  // S
+private static final int COL_KPM_BENT       = 19;  // T
+private static final int COL_KPM_MERMA      = 20;  // U
+private static final int COL_KPA            = 21;  // V
+private static final int COL_MERMA          = 22;  // W
+private static final int COL_MERMA_PCT      = 23;  // X
+private static final int COL_OBS            = 24;  // Y
+private static final int LAST_COL           = 24;
+
+// Filas (0-based)
+private static final int HEADER_ROW1        = 3;  // Excel fila 4
+private static final int HEADER_ROW2        = 4;  // Excel fila 5
+private static final int SALDO_ROW          = 5;  // Excel fila 6
+private static final int DATA_START_ROW     = 6;  // Excel fila 7+
 ```
+
+### 8.4.1 Anchos de columna (px → POI units)
+
+POI usa unidades de 1/256 de char-width. Conversión empírica:
+`poiUnits ≈ (pixels − 5) × 256 / 7`.
+
+| Col | Contenido | Px | POI units |
+|-----|-----------|----|----------:|
+| A | margen visual | 25 | 915 |
+| B (FECHA) | dd-MMM | — | 2400 |
+| C (DIA) | letra día | — | 1200 |
+| D, E | ULEX DISP, CONSUMO MP | 96 | 3328 |
+| F, G | GRUPO D, GRUPO N | 30 | 1100 |
+| H, I, J, K, L, M | diluyente, %bent, %caol, reproc, leyes | 96 | 3328 |
+| N (Ley PT) | dato lab | 75 | 2560 |
+| O (PT GRANULADO) | dato | — | 3600 (default) |
+| P, Q (PRODUCTO A/B TN) | dato | 75 | 2560 |
+| R, S | PT BUENO, REPROC FINAL | — | 3600 (default) |
+| T, U, V, W, X | Kpm bent/merma, Kpa, MERMA, %MERMA | 75 | 2560 |
+| Y (OBSERVACIONES) | texto largo | — | 8000 |
+
+### 8.4.2 Alturas de fila
+
+- Filas 4 y 5 (cabecera de dos filas): **`setHeightInPoints(28f)`** = 28 puntos = ~37 px (igual al Excel manual original).
+- Resto de filas: altura por defecto.
+
+### 8.4.3 Formato numérico
+
+- **Body numérico** (cantidades, leyes, MERMA, Kpa, etc.): formato `#,##0.00` (locale español: separador miles `.`, decimal `,`, **2 decimales**).
+- **Body porcentaje** (% MERMA): formato `0.00%`.
+- **Totales** (fila TOTAL MES): mismo formato `#,##0.00`, en bold.
+- Locale del converter en la entrada al sistema usa coma como separador decimal; el reporte respeta esa convención.
+
+### 8.5 Acción y pantalla
+
+- Pantalla `view/xproduction/dailyProductionReportUlexita.xhtml` con filtros: año, mes, línea de producción, opción "Mostrar días sin producción".
+- Acción `UlexitaDailyReportAction` (Seam, scope PAGE) con método `generateReport()`.
+- Botón "Generar Excel".
+
+### 8.6 Algoritmo de generación
+
+```java
+public void generateReport() {
+    // 1. Cargar producciones del mes ordenadas por initDate, id
+    List<XProduction> producciones =
+            xproductionUlexitaService.findProductionsByLineAndMonth(productionLine, year, month);
+
+    // 2. Crear workbook y sheet (en memoria, sin plantilla)
+    HSSFWorkbook wb = new HSSFWorkbook();
+    HSSFSheet sheet = wb.createSheet("ULEXITA " + month + "-" + year);
+    sheet.setDisplayGridlines(false);
+
+    // 3. Crear estilos (titulo, header, body con colores, totales)
+    Styles styles = buildStyles(wb);
+
+    // 4. Escribir cabecera (titulo, periodo, columnas)
+    buildHeader(sheet, styles, companyConfig);
+
+    // 5. Escribir filas de datos (una por orden)
+    int rowIdx = DATA_START_ROW;
+    BigDecimal[] totals = new BigDecimal[LAST_COL + 1];
+    for (XProduction p : producciones) {
+        XProductionUlexita u = xproductionUlexitaService.findByProduction(p);
+        XProductionUlexitaCalc calc = new XProductionUlexitaCalc(
+                p, u, p.getProductionLine(), p.getSupplyList(), p.getProductionProductList());
+        writeDataRow(sheet, rowIdx++, p, u, calc, styles);
+        accumulate(totals, p, u, calc);
+    }
+
+    // 6. Fila TOTAL MES (sumas de columnas fisicas; calculadas en blanco)
+    writeTotalsRow(sheet, rowIdx, totals, styles);
+
+    // 7. Anchos de columna
+    for (int i = 0; i <= LAST_COL; i++) {
+        sheet.setColumnWidth(i, columnWidthFor(i));
+    }
+
+    // 8. Stream al response (mismo patron que ProductInventoryReportAction)
+    HttpServletResponse resp = ...;
+    resp.setContentType("application/vnd.ms-excel");
+    resp.addHeader("Content-disposition", "attachment; filename=" + fileName);
+    wb.write(resp.getOutputStream());
+    FacesContext.getCurrentInstance().responseComplete();
+}
+```
+
+### 8.7 Reglas de escritura de celdas
+
+- `BigDecimal` no nulo → `cell.setCellValue(value.doubleValue())` con estilo numérico.
+- `BigDecimal` nulo (incluye divisiones por cero) → celda en blanco (sin `setCellValue`).
+- Strings → `setCellValue(string)`.
+- GRUPO (D/N) → escribir "X" en columna D si turno=`D`, "X" en columna N si turno=`N`; la otra queda vacía.
+- Fila TOTAL MES: solo suma columnas físicas (D, E, H, K, O, P, Q, R, S, W). Calculadas (Kpm bent, Kpm merma, Kpa, %MERMA, Leyes, Caolín%) se dejan en blanco — no tiene sentido sumar coeficientes/promedios sin ponderación.
+
+### 8.8 Snapshots vs. live
+
+- Si la producción está aprobada y tiene snapshots persistidos (`snap_at != null`), `XProductionUlexitaCalc` retorna automáticamente los valores `*_snap`. El reporte mensual no necesita lógica adicional para esto — basta con instanciar el calc.
+- Si la producción está pendiente, el calc compute en vivo desde inputs y configuración actual.
+- Esto garantiza que un reporte histórico no cambie aunque se modifique el inventario, las leyes, el `merma_factor` o cualquier otro parámetro después de aprobar.
+
+### 8.9 Robustez frente a cambios del Excel manual original
+
+Si el operario decide cambiar el Excel manual (agregar columna, cambiar orden, etc.):
+1. **El reporte generado por el sistema NO se rompe** — sigue produciendo su layout fijo, definido en código.
+2. Para alinear el reporte sistemático al nuevo Excel manual, se modifican las constantes `COL_*` en `UlexitaDailyReportAction` y/o se agregan campos a `XProductionUlexita`.
+3. Migración de datos no requerida si solo se agregan columnas calculadas (se derivan al vuelo o se leen de snapshots existentes).
+4. Para columnas que necesiten persistencia y snapshot, agregar campos `*_snap` a la tabla y a `persistSnapshots()`.
 
 ## 9. Pantalla de configuración de inventario
 
