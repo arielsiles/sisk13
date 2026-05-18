@@ -47,7 +47,9 @@ CREATE TABLE inv_valedespacho (
     codigo_lote_venta    VARCHAR(80)   NOT NULL,
     cantidad_bolsas      INT           NOT NULL,
     numero_factura       VARCHAR(50)   NULL,
-    idtransportadora     BIGINT        NULL,    -- cxp_proveedores.idproveedor
+    -- Transportadora: cxp_proveedores PK es compuesta (no_cia, cod_prov).
+    --   no_cia se comparte con la fila (mas abajo), aqui solo se almacena cod_prov.
+    cod_prov             VARCHAR(6)    NULL,
     idcliente            BIGINT        NULL,    -- personacliente.idpersonacliente
     idturno              BIGINT        NULL,    -- xpr_grupo.idgrupo
     idlugar_origen       BIGINT        NULL,
@@ -109,10 +111,13 @@ CREATE TABLE inv_valedespacho (
     KEY ix_valedespacho_orden  (idcompania, no_orden_entrega),
     KEY ix_valedespacho_alm    (no_cia, cod_alm),
     KEY ix_valedespacho_vale   (no_cia_vale, no_trans_vale),
+    KEY ix_valedespacho_prov   (no_cia, cod_prov),
     CONSTRAINT fk_valedespacho_compania
         FOREIGN KEY (idcompania) REFERENCES compania (idcompania),
     CONSTRAINT fk_valedespacho_almacen
         FOREIGN KEY (no_cia, cod_alm) REFERENCES inv_almacenes (no_cia, cod_alm),
+    CONSTRAINT fk_valedespacho_proveedor
+        FOREIGN KEY (no_cia, cod_prov) REFERENCES cxp_proveedores (no_cia, cod_prov),
     CONSTRAINT fk_valedespacho_lugarorigen
         FOREIGN KEY (idlugar_origen) REFERENCES inv_lugardespacho (idlugardespacho),
     CONSTRAINT fk_valedespacho_lugardestino
@@ -131,7 +136,7 @@ CREATE TABLE inv_valedespacho_det (
     idvaledespacho       BIGINT        NOT NULL,
     no_cia_art           VARCHAR(2)    NOT NULL,
     cod_art              VARCHAR(6)    NOT NULL,
-    cod_uso              VARCHAR(10)   NOT NULL,    -- MeasureUnit code
+    cod_med              VARCHAR(6)    NOT NULL,    -- MeasureUnit code (FK: no_cia_art + cod_med)
     cantidad             DECIMAL(14,6) NOT NULL,
     costo_unitario       DECIMAL(14,6) NOT NULL DEFAULT 0,
     monto                DECIMAL(14,6) NOT NULL DEFAULT 0,
