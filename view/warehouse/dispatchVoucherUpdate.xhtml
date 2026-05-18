@@ -17,6 +17,7 @@
 <ui:define name="body">
 
 <c:set var="isDraft" value="#{dispatchVoucherAction.draft}"/>
+<c:set var="isApproved" value="#{dispatchVoucherAction.approved}"/>
 <c:set var="readOnly" value="#{not isDraft}"/>
 <c:set var="warehouseSelected" value="#{not empty dispatchVoucher.warehouse}"/>
 
@@ -38,6 +39,14 @@
                        rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCHAPPROVAL','VIEW')}"
                        reRender="approveStep1Panel, messagesPanel"
                        oncomplete="Richfaces.showModalPanel('approveStep1Modal');"/>
+
+    <a4j:commandButton id="annulButtonId"
+                       action="#{dispatchVoucherAction.prepareAnnul}"
+                       value="#{messages['WarehouseDispatch.button.annul']}"
+                       styleClass="button"
+                       rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHREVERSE','VIEW')}"
+                       reRender="annulPanel"
+                       oncomplete="Richfaces.showModalPanel('annulModal');"/>
 
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
@@ -557,6 +566,13 @@
                        reRender="approveStep1Panel, messagesPanel"
                        oncomplete="Richfaces.showModalPanel('approveStep1Modal');"
                        tabindex="41"/>
+    <a4j:commandButton action="#{dispatchVoucherAction.prepareAnnul}"
+                       value="#{messages['WarehouseDispatch.button.annul']}"
+                       styleClass="button"
+                       rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHREVERSE','VIEW')}"
+                       reRender="annulPanel"
+                       oncomplete="Richfaces.showModalPanel('annulModal');"
+                       tabindex="42"/>
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}"
@@ -769,6 +785,48 @@
                                styleClass="button"
                                reRender="approveStep2Panel, messagesPanel"
                                oncomplete="Richfaces.hideModalPanel('approveStep1Modal'); Richfaces.showModalPanel('approveStep2Modal');"/>
+        </div>
+    </h:form>
+    </a4j:outputPanel>
+</rich:modalPanel>
+
+<!-- ============================================================
+     Modal Anular Despacho (APROBADO -> ANULADO)
+     ============================================================ -->
+<rich:modalPanel id="annulModal" width="600" height="320"
+                 autosized="false" zindex="2000" resizeable="false"
+                 rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHREVERSE','VIEW')}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['WarehouseDispatch.annul.confirm.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer"
+                        onclick="Richfaces.hideModalPanel('annulModal');"/>
+    </f:facet>
+
+    <a4j:outputPanel id="annulPanel" ajaxRendered="true">
+    <h:form id="annulForm">
+        <p>#{messages['WarehouseDispatch.annul.confirm.message']}</p>
+        <rich:spacer height="15"/>
+
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseDispatch.annul.reason']}</ui:define>
+            <h:inputTextarea id="annulReason" value="#{dispatchVoucherAction.annulReason}"
+                             required="true" styleClass="input textarea" cols="60" rows="4">
+                <f:validateLength maximum="250"/>
+            </h:inputTextarea>
+        </s:decorate>
+
+        <rich:spacer height="15"/>
+        <div class="buttons" style="text-align:right;">
+            <a4j:commandButton value="#{messages['WarehouseDispatch.approve.confirm.back']}"
+                               immediate="true"
+                               styleClass="button"
+                               onclick="Richfaces.hideModalPanel('annulModal'); return false;"/>
+            <h:commandButton value="#{messages['WarehouseDispatch.button.annul']}"
+                             action="#{dispatchVoucherAction.confirmAnnul}"
+                             styleClass="button"
+                             onclick="Richfaces.hideModalPanel('annulModal');"/>
         </div>
     </h:form>
     </a4j:outputPanel>

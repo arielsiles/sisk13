@@ -10,10 +10,12 @@ import com.encens.khipus.exception.warehouse.InventoryProductItemNotFoundExcepti
 import com.encens.khipus.exception.warehouse.InventoryUnitaryBalanceException;
 import com.encens.khipus.exception.warehouse.ProductItemAmountException;
 import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
+import com.encens.khipus.exception.warehouse.ReverseNotAllowedException;
 import com.encens.khipus.exception.warehouse.WarehouseAccountCashNotFoundException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherApprovedException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherEmptyException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherNotFoundException;
+import com.encens.khipus.util.ValidatorUtil;
 import com.encens.khipus.model.warehouse.DispatchState;
 import com.encens.khipus.model.warehouse.DispatchStockImpact;
 import com.encens.khipus.model.warehouse.DocumentTypePK;
@@ -73,6 +75,9 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
 
     @In
     private ApprovalWarehouseVoucherService approvalWarehouseVoucherService;
+
+    @In
+    private ReverseWarehouseVoucherService reverseWarehouseVoucherService;
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -318,5 +323,58 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
                 clientName,
                 d.getSalesLotCode());
         return new String[]{ message };
+    }
+
+    /* =============================================================
+     * Anulacion del despacho aprobado
+     * ============================================================= */
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public WarehouseVoucherDispatch annul(WarehouseVoucherDispatch dispatch, String reason)
+            throws ReverseNotAllowedException,
+                   WarehouseVoucherNotFoundException,
+                   InventoryUnitaryBalanceException,
+                   InventoryProductItemNotFoundException {
+
+        if (dispatch.getState() != DispatchState.APROBADO) {
+            throw new IllegalStateException(
+                    "Solo se puede anular un despacho APROBADO (actual: "
+                            + dispatch.getState() + ")");
+        }
+        if (dispatch.getWarehouseVoucher() == null
+                || dispatch.getWarehouseVoucher().getId() == null) {
+            throw new IllegalStateException(
+                    "El despacho no tiene un WarehouseVoucher enlazado; no se puede anular.");
+        }
+        if (ValidatorUtil.isBlankOrNull(reason)) {
+            throw new IllegalArgumentException(
+                    "El motivo de anulacion es obligatorio.");
+        }
+
+        String userCode = financesUserService.getFinancesUserCode();
+
+        // Delegar la reversion al servicio existente. skipValidation=true
+        // porque la validacion de elegibilidad ya la hicimos aqui (estado
+        // APROBADO + vale enlazado); ademas el vale fue generado desde este
+        // flujo y no pertenece al flujo independiente de vales.
+        reverseWarehouseVoucherService.reverseWarehouseVoucher(
+                dispatch.getWarehouseVoucher().getId(),
+                reason,
+                userCode,
+                true);
+
+        // Auditoria de anulacion en el despacho + cambio de estado
+        Date now = new Date();
+        dispatch.setState(DispatchState.ANULADO);
+        dispatch.setAnnulReason(reason.trim());
+        dispatch.setAnnulUser(userCode);
+        dispatch.setAnnulDate(now);
+        dispatch.setUpdatedBy(userCode);
+        dispatch.setUpdatedDate(now);
+
+        WarehouseVoucherDispatch merged = em.merge(dispatch);
+        em.flush();
+        return merged;
     }
 }

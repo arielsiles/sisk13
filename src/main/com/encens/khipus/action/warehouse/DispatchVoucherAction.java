@@ -65,6 +65,9 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     private boolean approvalStep2Visible = false;
     private List<DispatchStockImpact> approvalImpact = new ArrayList<DispatchStockImpact>();
 
+    // Motivo de anulacion (capturado en el modal de Anular)
+    private String annulReason;
+
     /* =========================================================
      * Factories
      * ========================================================= */
@@ -496,6 +499,43 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
             }
         }
         return true;
+    }
+
+    /* =========================================================
+     * Anulacion del despacho aprobado
+     * ========================================================= */
+
+    public void prepareAnnul() {
+        annulReason = null;
+    }
+
+    public String confirmAnnul() {
+        if (annulReason == null || annulReason.trim().isEmpty()) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.annul.reason.required");
+            return Outcome.REDISPLAY;
+        }
+        try {
+            WarehouseVoucherDispatch annulled =
+                    dispatchVoucherService.annul(getInstance(), annulReason);
+            setInstance(annulled);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "WarehouseDispatch.annul.success");
+            return Outcome.SUCCESS;
+        } catch (Exception e) {
+            log.error("Error anulando despacho", e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.annul.error");
+            return Outcome.REDISPLAY;
+        }
+    }
+
+    public String getAnnulReason() {
+        return annulReason;
+    }
+
+    public void setAnnulReason(String annulReason) {
+        this.annulReason = annulReason;
     }
 
     /* =========================================================

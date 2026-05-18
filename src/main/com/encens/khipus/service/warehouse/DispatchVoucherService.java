@@ -8,6 +8,7 @@ import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundExceptio
 import com.encens.khipus.exception.warehouse.*;
 import com.encens.khipus.model.warehouse.DispatchStockImpact;
 import com.encens.khipus.model.warehouse.WarehouseVoucherDispatch;
+import com.encens.khipus.util.ValidatorUtil;
 
 import javax.ejb.Local;
 import java.util.List;
@@ -83,4 +84,21 @@ public interface DispatchVoucherService {
                    ReferentialIntegrityException,
                    ProductItemNotFoundException,
                    WarehouseAccountCashNotFoundException;
+
+    /**
+     * Anula un Despacho aprobado:
+     *   1. Re-valida estado APROBADO y existencia del WarehouseVoucher
+     *      enlazado.
+     *   2. Delega en ReverseWarehouseVoucherService.reverseWarehouseVoucher
+     *      (con skipValidation=true porque la anulacion es manejada por
+     *      este flujo y no por el flujo independiente de vale): revierte
+     *      inventario, costo promedio, historial y genera contra-asiento.
+     *   3. Marca el Despacho como ANULADO con auditoria (annulDate,
+     *      annulUser, annulReason).
+     */
+    WarehouseVoucherDispatch annul(WarehouseVoucherDispatch dispatch, String reason)
+            throws ReverseNotAllowedException,
+                   WarehouseVoucherNotFoundException,
+                   InventoryUnitaryBalanceException,
+                   InventoryProductItemNotFoundException;
 }
