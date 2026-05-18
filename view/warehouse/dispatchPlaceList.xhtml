@@ -1,0 +1,119 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['DispatchPlace.titlePlural']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="dispatchPlaceSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+                <s:decorate id="codeFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.code']}</ui:define>
+                    <h:inputText id="code" value="#{dispatchPlaceDataModel.criteria.code}"
+                                 maxlength="20" tabindex="1" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="descriptionFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.description']}</ui:define>
+                    <h:inputText id="description" value="#{dispatchPlaceDataModel.criteria.description}"
+                                 maxlength="150" tabindex="2" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="kindFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.kind']}</ui:define>
+                    <h:selectOneMenu id="kind" value="#{dispatchPlaceDataModel.criteria.kind}"
+                                     styleClass="input" tabindex="3">
+                        <s:selectItems value="#{dispatchPlaceKindList}" var="k"
+                                       label="#{messages[k.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{dispatchPlaceDataModel.active}" tabindex="4"/>
+                </s:decorate>
+
+                <div class="buttons">
+                    <a4j:commandButton action="#{dispatchPlaceDataModel.search}"
+                                       reRender="dispatchPlaceList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="5">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+
+                <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/dispatchPlace.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEDISPATCHPLACE','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{dispatchPlaceDataModel}" var="dispatchPlaceItem" id="dispatchPlaceList"
+                            rows="#{sessionUser.rowsPerPage15}"
+                            width="100%" columnsWidth="15%, 40%, 25%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="dispatchPlace.code"
+                                                   dataModel="#{dispatchPlaceDataModel}"
+                                                   reRender="dispatchPlaceList, dataScroller">
+                                #{messages['DispatchPlace.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="dispatchPlace.description"
+                                                   dataModel="#{dispatchPlaceDataModel}"
+                                                   reRender="dispatchPlaceList, dataScroller">
+                                #{messages['DispatchPlace.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['DispatchPlace.address']}</rich:column>
+                        <rich:column>#{messages['DispatchPlace.kind']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{dispatchPlaceItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{dispatchPlaceItem.description}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{dispatchPlaceItem.address}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[dispatchPlaceItem.kind.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WAREHOUSEDISPATCHPLACE','VIEW')}"
+                                   action="#{dispatchPlaceAction.select(dispatchPlaceItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="dispatchPlaceList" dataModel="#{dispatchPlaceDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/dispatchPlace.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEDISPATCHPLACE','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

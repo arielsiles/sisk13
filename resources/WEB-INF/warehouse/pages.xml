@@ -716,4 +716,30 @@
         </navigation>
     </page>
 
+    <!-- Catalogo Lugares de Despacho/Entrega -->
+    <page view-id="/warehouse/dispatchPlaceList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCHPLACE','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{dispatchPlaceAction.select(dispatchPlaceItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchPlace.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/dispatchPlace.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/dispatchPlaceList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCHPLACE','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchPlaceList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/dispatchPlaceList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>        

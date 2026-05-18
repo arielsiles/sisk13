@@ -1,0 +1,150 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{dispatchPlaceAction.managed}">
+                #{messages['DispatchPlace.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['DispatchPlace.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="dispatchPlaceForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{dispatchPlaceAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!dispatchPlaceAction.managed and s:hasPermission('WAREHOUSEDISPATCHPLACE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{dispatchPlaceAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchPlaceAction.managed and s:hasPermission('WAREHOUSEDISPATCHPLACE','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchPlaceAction.managed and s:hasPermission('WAREHOUSEDISPATCHPLACE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{dispatchPlaceAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{dispatchPlaceAction.managed}">
+                            #{messages['DispatchPlace.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['DispatchPlace.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.code']}</ui:define>
+                    <h:inputText id="code" value="#{dispatchPlace.code}" styleClass="input"
+                                 required="true" maxlength="20" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.description']}</ui:define>
+                    <h:inputText id="description" value="#{dispatchPlace.description}" styleClass="input"
+                                 required="true" maxlength="150" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="addressField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.address']}</ui:define>
+                    <h:inputTextarea id="address" value="#{dispatchPlace.address}"
+                                     styleClass="input textarea" tabindex="3">
+                        <f:validateLength maximum="250"/>
+                    </h:inputTextarea>
+                </s:decorate>
+
+                <s:decorate id="kindField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.kind']}</ui:define>
+                    <h:selectOneMenu id="kind" value="#{dispatchPlace.kind}"
+                                     styleClass="input" required="true" tabindex="4">
+                        <s:selectItems value="#{dispatchPlaceKindList}" var="k"
+                                       label="#{messages[k.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchPlace.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{dispatchPlace.active}" tabindex="5"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{dispatchPlaceAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!dispatchPlaceAction.managed and s:hasPermission('WAREHOUSEDISPATCHPLACE','CREATE')}"
+                                 tabindex="6"/>
+
+                <h:commandButton action="#{dispatchPlaceAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchPlaceAction.managed and s:hasPermission('WAREHOUSEDISPATCHPLACE','UPDATE')}"
+                                 tabindex="7"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchPlaceAction.managed and s:hasPermission('WAREHOUSEDISPATCHPLACE','DELETE')}"
+                                 tabindex="8">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{dispatchPlaceAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="9"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{dispatchPlaceAction.managed and s:hasPermission('WAREHOUSEDISPATCHPLACE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DispatchPlace.delete.confirmation']}">
+                        <f:param value="#{dispatchPlace.description}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{dispatchPlaceAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{dispatchPlaceAction.managed and s:hasPermission('WAREHOUSEDISPATCHPLACE','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

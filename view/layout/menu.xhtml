@@ -480,6 +480,14 @@
                             value="#{messages['menu.warehouse.configuration.inventoryReconciliation']}"
                             propagation="none"/>
                 </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WAREHOUSEDISPATCHPLACE','VIEW')}">
+                    <s:link view="/warehouse/dispatchPlaceList.xhtml"
+                            value="#{messages['menu.warehouse.dispatch.place']}"
+                            propagation="none"/>
+                </rich:menuItem>
             </rich:dropDownMenu>
 
         </h:panelGrid>
