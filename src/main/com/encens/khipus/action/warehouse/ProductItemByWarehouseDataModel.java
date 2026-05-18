@@ -28,6 +28,7 @@ public class ProductItemByWarehouseDataModel extends QueryDataModel<InventoryPK,
             {
                     "inventory.warehouse = #{warehouseVoucherCreateAction.warehouseVoucher.warehouse}",
                     "inventory.warehouse = #{warehouseVoucherUpdateAction.warehouseVoucher.warehouse}",
+                    "inventory.warehouse = #{dispatchVoucher.warehouse}",
                     "lower(inventory.productItem.id.productItemCode) like concat(lower(#{productItemByWarehouseDataModel.productItemCode}), '%')",
                     "lower(inventory.productItem.name) like concat('%',concat(lower(#{productItemByWarehouseDataModel.productItemName}), '%'))",
                     "inventory.productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"

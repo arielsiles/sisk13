@@ -29,6 +29,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.international.StatusMessage;
 
+import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,6 +52,9 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     @In
     private WarehouseCatalogService warehouseCatalogService;
 
+    @In(value = "#{entityManager}")
+    private EntityManager em;
+
     // Conjunto de IDs de productos ya agregados, para evitar duplicados al
     // agregar desde el popup.
     private Set<ProductItemPK> selectedProductItemIds = new HashSet<ProductItemPK>();
@@ -69,6 +73,32 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
             d.setState(DispatchState.BORRADOR);
         }
         return d;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Factory(value = "dispatchOriginPlaceList", scope = ScopeType.STATELESS)
+    public List<DispatchPlace> getOriginPlaces() {
+        return em.createNamedQuery("DispatchPlace.findByKind")
+                .setParameter("kind",
+                        com.encens.khipus.model.warehouse.DispatchPlaceKind.ORIGEN)
+                .getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Factory(value = "dispatchDestinationPlaceList", scope = ScopeType.STATELESS)
+    public List<DispatchPlace> getDestinationPlaces() {
+        return em.createNamedQuery("DispatchPlace.findByKind")
+                .setParameter("kind",
+                        com.encens.khipus.model.warehouse.DispatchPlaceKind.DESTINO)
+                .getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Factory(value = "dispatchProductionGroupList", scope = ScopeType.STATELESS)
+    public List<ProductionGroup> getProductionGroups() {
+        return em.createQuery(
+                "select g from ProductionGroup g order by g.code")
+                .getResultList();
     }
 
     /* =========================================================

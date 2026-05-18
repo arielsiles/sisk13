@@ -742,4 +742,44 @@
         </navigation>
     </page>
 
+    <!-- Vales de Despacho de Productos Terminados -->
+    <page view-id="/warehouse/dispatchVoucherList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCH','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{dispatchVoucherAction.select(dispatchItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchVoucherUpdate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/dispatchVoucherCreate.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/dispatchVoucherList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCH','CREATE')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchVoucherList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/dispatchVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/dispatchVoucherUpdate.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/dispatchVoucherList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCH','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchVoucherList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/dispatchVoucherList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
 </pages>        
