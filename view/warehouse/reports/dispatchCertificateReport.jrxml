@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="DispatchCertificateReport"
+              pageWidth="612" pageHeight="792"
+              whenNoDataType="AllSectionsNoDetail"
+              columnWidth="562"
+              leftMargin="25" rightMargin="25" topMargin="20" bottomMargin="20">
+
+    <parameter name="companyName" class="java.lang.String"/>
+    <parameter name="locationName" class="java.lang.String"/>
+    <parameter name="deliveryOrderNumber" class="java.lang.Long"/>
+    <parameter name="dispatchDate" class="java.util.Date"/>
+    <parameter name="dispatchTime" class="java.util.Date"/>
+    <parameter name="sellerName" class="java.lang.String"/>
+    <parameter name="sellerCi" class="java.lang.String"/>
+    <parameter name="sellerCharge" class="java.lang.String"/>
+    <parameter name="sellerPhone" class="java.lang.String"/>
+    <parameter name="salesLotCode" class="java.lang.String"/>
+    <parameter name="bagCount" class="java.lang.Integer"/>
+    <parameter name="invoiceNumber" class="java.lang.String"/>
+    <parameter name="clientName" class="java.lang.String"/>
+    <parameter name="clientCode" class="java.lang.String"/>
+    <parameter name="transportCompany" class="java.lang.String"/>
+    <parameter name="driverName" class="java.lang.String"/>
+    <parameter name="driverLicense" class="java.lang.String"/>
+    <parameter name="driverPhone" class="java.lang.String"/>
+    <parameter name="vehiclePlate" class="java.lang.String"/>
+    <parameter name="vehicleBrand" class="java.lang.String"/>
+    <parameter name="vehicleColor" class="java.lang.String"/>
+    <parameter name="loadingStart" class="java.lang.String"/>
+    <parameter name="loadingEnd" class="java.lang.String"/>
+    <parameter name="truckDispatchNumber" class="java.lang.Integer"/>
+    <parameter name="weighingTicket" class="java.lang.String"/>
+    <parameter name="tareWeight" class="java.math.BigDecimal"/>
+    <parameter name="grossWeight" class="java.math.BigDecimal"/>
+    <parameter name="netWeight" class="java.math.BigDecimal"/>
+    <parameter name="netWeightTons" class="java.math.BigDecimal"/>
+    <parameter name="bagsFromNumber" class="java.lang.Integer"/>
+    <parameter name="bagsToNumber" class="java.lang.Integer"/>
+    <parameter name="originPlace" class="java.lang.String"/>
+    <parameter name="destinationPlace" class="java.lang.String"/>
+    <parameter name="warehouseResponsible" class="java.lang.String"/>
+    <parameter name="warehouseResponsibleCi" class="java.lang.String"/>
+    <parameter name="productionTurn" class="java.lang.String"/>
+    <parameter name="productListDescription" class="java.lang.String"/>
+    <parameter name="state" class="java.lang.String"/>
+    <parameter name="annulled" class="java.lang.Boolean"/>
+    <parameter name="DETAILSUBREPORT" class="net.sf.jasperreports.engine.JasperReport"/>
+    <parameter name="DETAILSUBREPORT_DATASOURCE" class="net.sf.jasperreports.engine.JRDataSource"/>
+
+    <title>
+        <band height="370">
+            <!-- Watermark ANULADO -->
+            <textField isBlankWhenNull="true">
+                <reportElement x="100" y="200" width="360" height="80" forecolor="#FF0000"
+                               printWhenExpression="$P{annulled}"/>
+                <textElement textAlignment="Center" rotation="None">
+                    <font fontName="Arial" size="60" isBold="true"/>
+                </textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["ANULADO"]]></textFieldExpression>
+            </textField>
+
+            <!-- Cabecera empresa -->
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="0" y="0" width="380" height="14"/>
+                <textElement><font fontName="Arial" size="10" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="0" y="14" width="380" height="12"/>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{locationName}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="32" width="562" height="18"/>
+                <textElement textAlignment="Center"><font fontName="Arial" size="13" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["CERTIFICADO DE RECEPCION DE CARGUIO"]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="380" y="14" width="182" height="14" backcolor="#EEEEEE" mode="Opaque"/>
+                <box padding="2"><pen lineWidth="0.5"/></box>
+                <textElement textAlignment="Center"><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["ORDEN DE ENTREGA N°: " + ($P{deliveryOrderNumber} != null ? String.format("%06d", $P{deliveryOrderNumber}) : "-")]]></textFieldExpression>
+            </textField>
+
+            <!-- Tabla 1: Vendedor -->
+            <textField>
+                <reportElement x="0" y="56" width="562" height="14" backcolor="#DDDDDD" mode="Opaque"/>
+                <box padding="2"><pen lineWidth="0.5"/></box>
+                <textElement><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["DATOS DE VENDEDOR DE ENTREGA"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="70" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Nombre:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="120" y="70" width="442" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{sellerName}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="83" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["C.I.:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="120" y="83" width="161" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{sellerCi}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="281" y="83" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Celular:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="401" y="83" width="161" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{sellerPhone}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="96" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Cargo:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="120" y="96" width="442" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{sellerCharge}]]></textFieldExpression>
+            </textField>
+
+            <!-- Tabla 2: Datos del despacho -->
+            <textField>
+                <reportElement x="0" y="118" width="562" height="14" backcolor="#DDDDDD" mode="Opaque"/>
+                <box padding="2"><pen lineWidth="0.5"/></box>
+                <textElement><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["DATOS DEL DESPACHO"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="132" width="140" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["PLANTA DE DESPACHO:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="140" y="132" width="281" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{originPlace}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="421" y="132" width="80" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["FECHA:"]]></textFieldExpression>
+            </textField>
+            <textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                <reportElement x="501" y="132" width="61" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.util.Date"><![CDATA[$P{dispatchDate}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="145" width="140" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["DESTINO:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="140" y="145" width="281" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{destinationPlace}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="421" y="145" width="80" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["HORA ENTREGA:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="501" y="145" width="61" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{loadingEnd}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="158" width="140" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["CLIENTE / TRANSBORDO:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="140" y="158" width="281" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{clientName}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="421" y="158" width="80" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["N° LOTE:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="501" y="158" width="61" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{salesLotCode}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="171" width="140" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["NOMBRE CONDUCTOR:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="140" y="171" width="281" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{driverName}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="421" y="171" width="80" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["PLACA CAMION:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="501" y="171" width="61" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{vehiclePlate}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="184" width="140" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["CEDULA DE IDENTIDAD:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="140" y="184" width="281" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{driverLicense}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="421" y="184" width="80" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["COLOR CAMION:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="501" y="184" width="61" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{vehicleColor}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="197" width="140" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["EMPRESA TRANSPORTE:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="140" y="197" width="281" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{transportCompany}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="421" y="197" width="80" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["MARCA CAMION:"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="501" y="197" width="61" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{vehicleBrand}]]></textFieldExpression>
+            </textField>
+
+            <!-- Subreport: detalle de productos -->
+            <subreport runToBottom="false">
+                <reportElement x="0" y="218" width="562" height="50" positionType="Float"/>
+                <subreportParameter name="REPORT_RESOURCE_BUNDLE">
+                    <subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+                </subreportParameter>
+                <dataSourceExpression><![CDATA[$P{DETAILSUBREPORT_DATASOURCE}]]></dataSourceExpression>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{DETAILSUBREPORT}]]></subreportExpression>
+            </subreport>
+
+            <!-- Bloque MEDIDOR DE PESO -->
+            <textField positionType="Float">
+                <reportElement x="0" y="280" width="562" height="14" backcolor="#DDDDDD" mode="Opaque"/>
+                <box padding="2"><pen lineWidth="0.5"/></box>
+                <textElement><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["MEDIDOR DE PESO"]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float">
+                <reportElement x="0" y="294" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["TARA"]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float" pattern="#,##0.###" isBlankWhenNull="true">
+                <reportElement x="120" y="294" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement textAlignment="Right"><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{tareWeight}]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float">
+                <reportElement x="240" y="294" width="60" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Kilogramos"]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float">
+                <reportElement x="300" y="294" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["N° DE BOLETA PESAJE:"]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float" isBlankWhenNull="true">
+                <reportElement x="420" y="294" width="142" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{weighingTicket}]]></textFieldExpression>
+            </textField>
+
+            <textField positionType="Float">
+                <reportElement x="0" y="307" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["BRUTO"]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float" pattern="#,##0.###" isBlankWhenNull="true">
+                <reportElement x="120" y="307" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement textAlignment="Right"><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{grossWeight}]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float">
+                <reportElement x="240" y="307" width="60" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Kilogramos"]]></textFieldExpression>
+            </textField>
+
+            <textField positionType="Float">
+                <reportElement x="0" y="320" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["NETO"]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float" pattern="#,##0.###" isBlankWhenNull="true">
+                <reportElement x="120" y="320" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement textAlignment="Right"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{netWeight}]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float">
+                <reportElement x="240" y="320" width="60" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Kilogramos"]]></textFieldExpression>
+            </textField>
+
+            <textField positionType="Float">
+                <reportElement x="300" y="307" width="120" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["PESO NETO CARGA:"]]></textFieldExpression>
+            </textField>
+            <textField positionType="Float" pattern="#,##0.000" isBlankWhenNull="true">
+                <reportElement x="420" y="307" width="142" height="13"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[($P{netWeightTons} != null ? $P{netWeightTons}.toString() : "0") + " Toneladas"]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <summary>
+        <band height="220">
+            <!-- Datos del Recepcionista -->
+            <textField>
+                <reportElement x="0" y="0" width="562" height="14" backcolor="#DDDDDD" mode="Opaque"/>
+                <box padding="2"><pen lineWidth="0.5"/></box>
+                <textElement><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["DATOS DEL RECEPCIONISTA DE LA ORDEN"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="14" width="281" height="14" backcolor="#EEEEEE" mode="Opaque"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement textAlignment="Center"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["ENTREGUE CONFORME"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="281" y="14" width="281" height="14" backcolor="#EEEEEE" mode="Opaque"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement textAlignment="Center"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["RECIBI CONFORME"]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="60" width="281" height="13"/>
+                <textElement textAlignment="Center"><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["RESPONSABLE DE ALMACEN Y COMPRAS"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="73" width="281" height="13"/>
+                <textElement textAlignment="Center"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{warehouseResponsible}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="86" width="281" height="13"/>
+                <textElement textAlignment="Center"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{warehouseResponsibleCi}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="281" y="60" width="281" height="13"/>
+                <textElement textAlignment="Center"><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{driverName}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="281" y="73" width="281" height="13"/>
+                <textElement textAlignment="Center"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["C.I.: " + ($P{driverLicense} != null ? $P{driverLicense} : "")]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="40" y="100" width="200" height="1"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+            <line>
+                <reportElement x="321" y="100" width="200" height="1"/>
+                <graphicElement><pen lineWidth="0.5"/></graphicElement>
+            </line>
+
+            <!-- Disclaimer -->
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="115" width="562" height="80"/>
+                <box padding="2"><pen lineWidth="0.25"/></box>
+                <textElement><font fontName="Arial" size="7" isBold="false"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["IMPORTANTE: Senor transportista, usted se responsabiliza del transporte de la totalidad de los sacos con productos para llevarlos al destino final, comprometiendose a llegar en un plazo no mayor de 3 DIAS al lugar para la entrega de la mercancia. EL TRANSPORTISTA respondera ante las instancias correspondientes por cualquier problema que se presente en la carga, como sustitucion de la misma, agio, violacion de precintos, entre otros. EL TRANSPORTISTA sera responsable de la mercancia desde que inicie el carguio en su vehiculo durante el viaje, hasta la recepcion de la mercaderia por parte del destinatario sin reclamacion, conforme al articulo 956 del codigo de transporte."]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+
+    <pageFooter>
+        <band height="14">
+            <textField>
+                <reportElement x="0" y="0" width="280" height="12"/>
+                <textElement><font fontName="Arial" size="7"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Estado: " + ($P{state} != null ? $P{state} : "")]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="280" y="0" width="282" height="12"/>
+                <textElement textAlignment="Right"><font fontName="Arial" size="7"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Pagina " + $V{PAGE_NUMBER} + " de " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>

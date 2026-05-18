@@ -48,6 +48,12 @@
                        reRender="annulPanel"
                        oncomplete="Richfaces.showModalPanel('annulModal');"/>
 
+    <h:commandButton action="#{dispatchCertificateReportAction.generateCertificate(dispatchVoucher)}"
+                     value="#{messages['WarehouseDispatch.button.print']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{(isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
+
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}">
@@ -573,10 +579,16 @@
                        reRender="annulPanel"
                        oncomplete="Richfaces.showModalPanel('annulModal');"
                        tabindex="42"/>
+    <h:commandButton action="#{dispatchCertificateReportAction.generateCertificate(dispatchVoucher)}"
+                     value="#{messages['WarehouseDispatch.button.print']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{(isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"
+                     tabindex="43"/>
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}"
-                     tabindex="42">
+                     tabindex="44">
         <rich:componentControl for="deleteConfirmation" event="onclick"
                                disableDefault="true" operation="show"/>
     </h:commandButton>
