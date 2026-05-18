@@ -56,17 +56,17 @@
 
 ### Estado
 
-| Fase | Estado |
-|---|---|
-| Fase 0 — Schema, sequence, permisos, i18n | Pendiente |
-| Fase 1 — Modelo (entidades + enums) | Pendiente |
-| Fase 2 — Catálogo DispatchPlace (CRUD) | Pendiente |
-| Fase 3 — Servicio + Action de creación/edición | Pendiente |
-| Fase 4 — Vistas BORRADOR (create + update + list) | Pendiente |
-| Fase 5 — Aprobación con doble confirmación | Pendiente |
-| Fase 6 — Anulación / reversión | Pendiente |
-| Fase 7 — Reporte Jasper (Certificado) | Pendiente |
-| Fase 8 — Pruebas integradas y QA | Pendiente |
+| Fase | Estado | Commit |
+|---|---|---|
+| Fase 0 — Schema, sequence, permisos, i18n | ✅ Completa | `cdee03d6` |
+| Fase 1 — Modelo (entidades + enums) | ✅ Completa | `32fa760c` |
+| Fase 2 — Catálogo DispatchPlace (CRUD) | ✅ Completa | `7ef80aab` |
+| Fase 3 — Servicio + Action de creación/edición | ✅ Completa | `fd406275` |
+| Fase 4 — Vistas BORRADOR (create + update + list) | ✅ Completa | `462ac27e` |
+| Fase 5 — Aprobación con doble confirmación | ✅ Completa | `0cb1a9d8` |
+| Fase 6 — Anulación / reversión | ✅ Completa | `1ef2800b` |
+| Fase 7 — Reporte Jasper (Certificado) | ✅ Completa | `56a3e197` |
+| Fase 8 — Pruebas integradas y QA | Pendiente (manual en dev) | — |
 
 Cada fase produce un commit (o pequeña serie) revisable. Las dependencias son lineales salvo las indicadas.
 
