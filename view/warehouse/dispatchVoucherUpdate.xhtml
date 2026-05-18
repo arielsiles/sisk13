@@ -31,6 +31,14 @@
         <s:defaultAction/>
     </h:commandButton>
 
+    <a4j:commandButton id="approveButtonId"
+                       action="#{dispatchVoucherAction.prepareApprove}"
+                       value="#{messages['WarehouseDispatch.button.approve']}"
+                       styleClass="button"
+                       rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCHAPPROVAL','VIEW')}"
+                       reRender="approveStep1Panel, messagesPanel"
+                       oncomplete="Richfaces.showModalPanel('approveStep1Modal');"/>
+
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}">
@@ -42,6 +50,10 @@
                      value="#{messages['WarehouseDispatch.button.cancel']}"
                      styleClass="button" immediate="true"/>
 </div>
+
+<a4j:outputPanel id="messagesPanel" ajaxRendered="true">
+    <rich:messages style="color:#a00;"/>
+</a4j:outputPanel>
 
 <rich:panel id="headerPanel">
 <f:facet name="header">#{messages['WarehouseDispatch.edit']}</f:facet>
@@ -538,16 +550,23 @@
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','UPDATE')}"
                      tabindex="40"/>
+    <a4j:commandButton action="#{dispatchVoucherAction.prepareApprove}"
+                       value="#{messages['WarehouseDispatch.button.approve']}"
+                       styleClass="button"
+                       rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCHAPPROVAL','VIEW')}"
+                       reRender="approveStep1Panel, messagesPanel"
+                       oncomplete="Richfaces.showModalPanel('approveStep1Modal');"
+                       tabindex="41"/>
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}"
-                     tabindex="41">
+                     tabindex="42">
         <rich:componentControl for="deleteConfirmation" event="onclick"
                                disableDefault="true" operation="show"/>
     </h:commandButton>
     <h:commandButton action="#{dispatchVoucherAction.cancel}"
                      value="#{messages['WarehouseDispatch.button.cancel']}"
-                     styleClass="button" immediate="true" tabindex="42"/>
+                     styleClass="button" immediate="true" tabindex="43"/>
 </div>
 
 </h:form>
@@ -648,6 +667,193 @@
                            oncomplete="Richfaces.hideModalPanel('productItemsByWarehouseListModalPanel');"/>
     </ui:define>
 </s:decorate>
+
+<!-- ============================================================
+     Modal Step 1 - Revision de datos del despacho
+     ============================================================ -->
+<rich:modalPanel id="approveStep1Modal" width="780" height="560"
+                 autosized="false" zindex="2000" resizeable="false"
+                 rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCHAPPROVAL','VIEW')}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['WarehouseDispatch.approve.confirm1.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer"
+                        onclick="Richfaces.hideModalPanel('approveStep1Modal');"/>
+    </f:facet>
+
+    <a4j:outputPanel id="approveStep1Panel" ajaxRendered="true">
+    <h:form id="approveStep1Form">
+        <p>#{messages['WarehouseDispatch.approve.confirm1.message']}</p>
+        <rich:spacer height="10"/>
+
+        <table cellpadding="4" cellspacing="0" width="100%" class="rich-table">
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.dispatchDate']}</td>
+                <td class="rich-table-cell">
+                    <h:outputText value="#{dispatchVoucher.dispatchDate}">
+                        <s:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </td>
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.salesLotCode']}</td>
+                <td class="rich-table-cell">#{dispatchVoucher.salesLotCode}</td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.client']}</td>
+                <td class="rich-table-cell" colspan="3">#{dispatchVoucher.client.fullName}</td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.transportCompany']}</td>
+                <td class="rich-table-cell" colspan="3">#{dispatchVoucher.transportCompany.entity.fullName}</td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.driver.name']}</td>
+                <td class="rich-table-cell">#{dispatchVoucher.driverName}</td>
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.driver.license']}</td>
+                <td class="rich-table-cell">#{dispatchVoucher.driverLicense}</td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.vehicle.plate']}</td>
+                <td class="rich-table-cell">#{dispatchVoucher.vehiclePlate}</td>
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.vehicle.brand']}</td>
+                <td class="rich-table-cell">#{dispatchVoucher.vehicleBrand}</td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.weight.tare']}</td>
+                <td class="rich-table-cell right">
+                    <h:outputText value="#{dispatchVoucher.tareWeightKg}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                    </h:outputText>
+                </td>
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.weight.gross']}</td>
+                <td class="rich-table-cell right">
+                    <h:outputText value="#{dispatchVoucher.grossWeightKg}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                    </h:outputText>
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.weight.net']}</td>
+                <td class="rich-table-cell right bold">
+                    <h:outputText value="#{dispatchVoucher.netWeightKg}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                    </h:outputText>
+                </td>
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.bagCount']}</td>
+                <td class="rich-table-cell right">
+                    #{dispatchVoucher.bagCount}
+                    (#{dispatchVoucher.bagsFromNumber} - #{dispatchVoucher.bagsToNumber})
+                </td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.originPlace']}</td>
+                <td class="rich-table-cell">#{dispatchVoucher.originPlace.description}</td>
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.destinationPlace']}</td>
+                <td class="rich-table-cell">#{dispatchVoucher.destinationPlace.description}</td>
+            </tr>
+            <tr class="rich-table-row">
+                <td class="rich-table-cell bold">#{messages['WarehouseDispatch.warehouse']}</td>
+                <td class="rich-table-cell" colspan="3">#{dispatchVoucher.warehouse.fullName}</td>
+            </tr>
+        </table>
+
+        <rich:spacer height="15"/>
+        <div class="buttons" style="text-align:right;">
+            <a4j:commandButton value="#{messages['WarehouseDispatch.approve.confirm.back']}"
+                               immediate="true"
+                               styleClass="button"
+                               onclick="Richfaces.hideModalPanel('approveStep1Modal'); return false;"/>
+            <a4j:commandButton value="#{messages['WarehouseDispatch.approve.confirm1.continue']}"
+                               action="#{dispatchVoucherAction.confirmApprovalStep1}"
+                               styleClass="button"
+                               reRender="approveStep2Panel, messagesPanel"
+                               oncomplete="Richfaces.hideModalPanel('approveStep1Modal'); Richfaces.showModalPanel('approveStep2Modal');"/>
+        </div>
+    </h:form>
+    </a4j:outputPanel>
+</rich:modalPanel>
+
+<!-- ============================================================
+     Modal Step 2 - Confirmacion del impacto en inventario
+     ============================================================ -->
+<rich:modalPanel id="approveStep2Modal" width="820" height="540"
+                 autosized="false" zindex="2000" resizeable="false"
+                 rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCHAPPROVAL','VIEW')}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['WarehouseDispatch.approve.confirm2.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer"
+                        onclick="Richfaces.hideModalPanel('approveStep2Modal');"/>
+    </f:facet>
+
+    <a4j:outputPanel id="approveStep2Panel" ajaxRendered="true">
+    <h:form id="approveStep2Form">
+        <p>
+            <h:outputFormat value="#{messages['WarehouseDispatch.approve.confirm2.message']}">
+                <f:param value="#{dispatchVoucher.warehouse.fullName}"/>
+            </h:outputFormat>
+        </p>
+        <rich:spacer height="10"/>
+
+        <rich:dataTable value="#{dispatchVoucherAction.approvalImpact}" var="impact"
+                        width="100%"
+                        columnsWidth="40%, 10%, 12%, 12%, 12%, 14%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>#{messages['WarehouseDispatch.detail.productItem']}</rich:column>
+                    <rich:column>#{messages['WarehouseDispatch.detail.measureUnit']}</rich:column>
+                    <rich:column styleClass="right">#{messages['WarehouseDispatch.approve.preview.current']}</rich:column>
+                    <rich:column styleClass="right">#{messages['WarehouseDispatch.detail.quantity']}</rich:column>
+                    <rich:column styleClass="right">#{messages['WarehouseDispatch.approve.preview.after']}</rich:column>
+                    <rich:column styleClass="right">#{messages['WarehouseDispatch.detail.amount']}</rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{impact.productItem.fullName}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{impact.measureUnit.name}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{impact.currentStock}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{impact.requiredQuantity}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{impact.resultStock}"
+                              style="#{impact.sufficient ? '' : 'color:#a00; font-weight:bold;'}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{impact.amount}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                </h:outputText>
+            </rich:column>
+        </rich:dataTable>
+
+        <rich:spacer height="15"/>
+        <div class="buttons" style="text-align:right;">
+            <a4j:commandButton value="#{messages['WarehouseDispatch.approve.confirm.back']}"
+                               immediate="true"
+                               styleClass="button"
+                               onclick="Richfaces.hideModalPanel('approveStep2Modal'); Richfaces.showModalPanel('approveStep1Modal'); return false;"/>
+            <h:commandButton value="#{messages['WarehouseDispatch.approve.confirm2.confirm']}"
+                             action="#{dispatchVoucherAction.confirmApprovalStep2}"
+                             styleClass="button"
+                             disabled="#{not dispatchVoucherAction.approvalImpactSufficient}"
+                             onclick="Richfaces.hideModalPanel('approveStep2Modal');"/>
+        </div>
+    </h:form>
+    </a4j:outputPanel>
+</rich:modalPanel>
 
 </ui:define>
 </ui:composition>

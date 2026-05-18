@@ -12,6 +12,7 @@ import com.encens.khipus.model.finances.MeasureUnitPk;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.warehouse.DispatchPlace;
 import com.encens.khipus.model.warehouse.DispatchState;
+import com.encens.khipus.model.warehouse.DispatchStockImpact;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.ProductItemPK;
 import com.encens.khipus.model.warehouse.Warehouse;
@@ -58,6 +59,11 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     // Conjunto de IDs de productos ya agregados, para evitar duplicados al
     // agregar desde el popup.
     private Set<ProductItemPK> selectedProductItemIds = new HashSet<ProductItemPK>();
+
+    // Estado del flujo de aprobacion en doble confirmacion.
+    private boolean approvalStep1Visible = false;
+    private boolean approvalStep2Visible = false;
+    private List<DispatchStockImpact> approvalImpact = new ArrayList<DispatchStockImpact>();
 
     /* =========================================================
      * Factories
@@ -388,6 +394,108 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
 
     public void clearResponsible() {
         getInstance().setResponsible(null);
+    }
+
+    /* =========================================================
+     * Aprobacion con doble confirmacion
+     * ========================================================= */
+
+    /**
+     * Paso 0: el usuario hace click en "Aprobar Despacho".
+     * Re-valida el borrador y abre el modal del Paso 1.
+     */
+    public void prepareApprove() {
+        approvalStep1Visible = false;
+        approvalStep2Visible = false;
+        if (!validateDraft()) {
+            return;
+        }
+        approvalStep1Visible = true;
+    }
+
+    /**
+     * Paso 1 -> Paso 2: el usuario confirmo los datos en el modal de revision.
+     * Cierra el modal 1, calcula el impacto en inventario y abre el modal 2.
+     */
+    public void confirmApprovalStep1() {
+        approvalStep1Visible = false;
+        approvalImpact = dispatchVoucherService.calculateInventoryImpact(getInstance());
+        // Si alguna linea no tiene stock suficiente, mostrar advertencia
+        for (DispatchStockImpact i : approvalImpact) {
+            if (!i.isSufficient()) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                        "WarehouseDispatch.error.insufficientStock",
+                        i.getProductItem().getFullName(),
+                        i.getCurrentStock(),
+                        i.getRequiredQuantity());
+            }
+        }
+        approvalStep2Visible = true;
+    }
+
+    /**
+     * Paso 2 (confirmacion definitiva): invoca el servicio approve(),
+     * que descuenta inventario y genera el asiento contable.
+     * Retorna a la lista o redisplay segun el resultado.
+     */
+    public String confirmApprovalStep2() {
+        approvalStep1Visible = false;
+        approvalStep2Visible = false;
+        try {
+            WarehouseVoucherDispatch approved =
+                    dispatchVoucherService.approve(getInstance());
+            setInstance(approved);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "WarehouseDispatch.approve.success",
+                    approved.getDeliveryOrderNumber());
+            return Outcome.SUCCESS;
+        } catch (Exception e) {
+            log.error("Error aprobando despacho", e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.approve.error");
+            return Outcome.REDISPLAY;
+        }
+    }
+
+    /**
+     * Cancela el modal de aprobacion en cualquiera de sus pasos.
+     */
+    public void cancelApproval() {
+        approvalStep1Visible = false;
+        approvalStep2Visible = false;
+        approvalImpact = new ArrayList<DispatchStockImpact>();
+    }
+
+    /**
+     * Retroceder desde el Paso 2 al Paso 1.
+     */
+    public void backToApprovalStep1() {
+        approvalStep2Visible = false;
+        approvalStep1Visible = true;
+    }
+
+    public boolean isApprovalStep1Visible() {
+        return approvalStep1Visible;
+    }
+
+    public boolean isApprovalStep2Visible() {
+        return approvalStep2Visible;
+    }
+
+    public List<DispatchStockImpact> getApprovalImpact() {
+        return approvalImpact;
+    }
+
+    public boolean isApprovalImpactSufficient() {
+        if (approvalImpact == null) {
+            return false;
+        }
+        for (DispatchStockImpact i : approvalImpact) {
+            if (!i.isSufficient()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /* =========================================================
