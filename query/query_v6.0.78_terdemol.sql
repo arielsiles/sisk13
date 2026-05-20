@@ -126,8 +126,10 @@ CREATE TABLE inv_valedespacho (
         FOREIGN KEY (idcompania) REFERENCES compania (idcompania),
     CONSTRAINT fk_valedespacho_almacen
         FOREIGN KEY (no_cia, cod_alm) REFERENCES inv_almacenes (no_cia, cod_alm),
-    CONSTRAINT fk_valedespacho_proveedor
-        FOREIGN KEY (no_cia, cod_prov) REFERENCES cxp_proveedores (no_cia, cod_prov),
+    -- NOTA: cxp_proveedores no tiene PRIMARY KEY / UNIQUE en (no_cia, cod_prov)
+    --   en el esquema legacy, por lo que MySQL no permite definir un FK contra
+    --   ella (error 1822). La integridad de Provider se valida a nivel JPA al
+    --   asignar transportCompany al despacho. Solo dejamos el indice de busqueda.
     CONSTRAINT fk_valedespacho_lugarorigen
         FOREIGN KEY (idlugar_origen) REFERENCES inv_lugardespacho (idlugardespacho),
     CONSTRAINT fk_valedespacho_lugardestino
