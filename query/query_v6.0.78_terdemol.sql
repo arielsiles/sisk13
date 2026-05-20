@@ -6,6 +6,16 @@
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
+-- 0.0 Charset / collation
+-- ----------------------------------------------------------------------------
+--   Las columnas que apuntan via FK compuesta a tablas legacy (inv_almacenes,
+--   cxp_proveedores, unidadmedida, inv_articulos, inv_vales) tienen su PK en
+--   CHARACTER SET utf8 COLLATE utf8_bin, por lo que los columnos FK locales
+--   se declaran con el mismo charset/collation para evitar el error MySQL
+--   3780 "Referencing column and referenced column ... are incompatible".
+-- ----------------------------------------------------------------------------
+
+-- ----------------------------------------------------------------------------
 -- 0.1 Catalogo Lugar de Despacho/Entrega (origen/destino)
 -- ----------------------------------------------------------------------------
 CREATE TABLE inv_lugardespacho (
@@ -22,7 +32,7 @@ CREATE TABLE inv_lugardespacho (
     KEY ix_lugardespacho_tipo (idcompania, tipo, activo),
     CONSTRAINT fk_lugardespacho_compania
         FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------------------------------------------------------
@@ -49,7 +59,7 @@ CREATE TABLE inv_valedespacho (
     numero_factura       VARCHAR(50)   NULL,
     -- Transportadora: cxp_proveedores PK es compuesta (no_cia, cod_prov).
     --   no_cia se comparte con la fila (mas abajo), aqui solo se almacena cod_prov.
-    cod_prov             VARCHAR(6)    NULL,
+    cod_prov             VARCHAR(6)    CHARACTER SET utf8 COLLATE utf8_bin NULL,
     idcliente            BIGINT        NULL,    -- personacliente.idpersonacliente
     idturno              BIGINT        NULL,    -- xpr_grupo.idgrupo
     idlugar_origen       BIGINT        NULL,
@@ -81,15 +91,15 @@ CREATE TABLE inv_valedespacho (
     -- Almacen origen / responsable / unidad / centro de costo
     -- Warehouse PK es compuesta (no_cia, cod_alm); CostCenter PK es compuesta
     -- (no_cia, cod_cc). Se replica el patron usado en inv_vales.
-    no_cia               VARCHAR(2)    NULL,
-    cod_alm              VARCHAR(6)    NULL,
-    cod_cc               VARCHAR(8)    NULL,
+    no_cia               VARCHAR(2)    CHARACTER SET utf8 COLLATE utf8_bin NULL,
+    cod_alm              VARCHAR(6)    CHARACTER SET utf8 COLLATE utf8_bin NULL,
+    cod_cc               VARCHAR(8)    CHARACTER SET utf8 COLLATE utf8_bin NULL,
     idresponsable        BIGINT        NULL,
     idunidadnegocio      BIGINT        NULL,
 
     -- Enlace al WarehouseVoucher generado al aprobar
-    no_trans_vale        VARCHAR(10)   NULL,
-    no_cia_vale          VARCHAR(2)    NULL,
+    no_trans_vale        VARCHAR(10)   CHARACTER SET utf8 COLLATE utf8_bin NULL,
+    no_cia_vale          VARCHAR(2)    CHARACTER SET utf8 COLLATE utf8_bin NULL,
 
     -- Datos varios
     observacion          VARCHAR(500)  NULL,
@@ -122,7 +132,7 @@ CREATE TABLE inv_valedespacho (
         FOREIGN KEY (idlugar_origen) REFERENCES inv_lugardespacho (idlugardespacho),
     CONSTRAINT fk_valedespacho_lugardestino
         FOREIGN KEY (idlugar_destino) REFERENCES inv_lugardespacho (idlugardespacho)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------------------------------------------------------
@@ -134,9 +144,9 @@ CREATE TABLE inv_valedespacho (
 CREATE TABLE inv_valedespacho_det (
     iddetalledespacho    BIGINT        NOT NULL AUTO_INCREMENT,
     idvaledespacho       BIGINT        NOT NULL,
-    no_cia_art           VARCHAR(2)    NOT NULL,
-    cod_art              VARCHAR(6)    NOT NULL,
-    cod_med              VARCHAR(6)    NOT NULL,    -- MeasureUnit code (FK: no_cia_art + cod_med)
+    no_cia_art           VARCHAR(2)    CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+    cod_art              VARCHAR(6)    CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+    cod_med              VARCHAR(6)    CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
     cantidad             DECIMAL(14,6) NOT NULL,
     costo_unitario       DECIMAL(14,6) NOT NULL DEFAULT 0,
     monto                DECIMAL(14,6) NOT NULL DEFAULT 0,
@@ -152,7 +162,7 @@ CREATE TABLE inv_valedespacho_det (
         ON DELETE CASCADE,
     CONSTRAINT fk_detdespacho_compania
         FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------------------------------------------------------
