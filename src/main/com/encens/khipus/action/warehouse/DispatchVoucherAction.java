@@ -304,39 +304,52 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
      * ========================================================= */
 
     public void assignWarehouse(Warehouse warehouse) {
-        WarehouseVoucherDispatch d = getInstance();
-        d.setWarehouse(warehouse);
-        if (warehouse != null) {
-            // warehouse.getExecutorUnit() devuelve un proxy Hibernate lazy
-            // que falla al renderizar si la sesion se cierra. Recuperamos
-            // la BusinessUnit completa por id para tener una entidad
-            // detachada utilizable en la vista.
-            BusinessUnit executorUnit = null;
-            if (warehouse.getExecutorUnit() != null
-                    && warehouse.getExecutorUnit().getId() != null) {
-                try {
-                    executorUnit = warehouseCatalogService.findWarehouseCatalog(
-                            BusinessUnit.class, warehouse.getExecutorUnit().getId());
-                } catch (Exception ignored) {
-                    // si no se encuentra, queda null
-                }
-            }
-            d.setExecutorUnit(executorUnit);
-
-            if (warehouse.getResponsibleId() != null) {
-                try {
-                    Employee responsible = warehouseCatalogService
-                            .findWarehouseCatalog(Employee.class, warehouse.getResponsibleId());
-                    d.setResponsible(responsible);
-                } catch (Exception ignored) {
-                    // si no se encuentra el responsable, queda null
-                }
-            }
-            // Al cambiar de almacen se limpia el detalle (los productos
-            // dependen del almacen).
-            d.setDetails(new ArrayList<WarehouseVoucherDispatchDetail>());
-            selectedProductItemIds.clear();
+        if (warehouse == null || warehouse.getId() == null) {
+            return;
         }
+        WarehouseVoucherDispatch d = getInstance();
+
+        // El warehouse que llega del popup/dataModel viene de un EM ya
+        // cerrado. Re-fetch en MI EM para tener una entidad managed con
+        // sesion activa y poder resolver lazy associations sin
+        // LazyInitializationException.
+        Warehouse fresh = em.find(Warehouse.class, warehouse.getId());
+        if (fresh == null) {
+            return;
+        }
+        d.setWarehouse(fresh);
+
+        // Recuperamos la BusinessUnit completa: como fresh.executorUnit es
+        // un proxy ligado a MI EM (sesion abierta), getId() funciona y
+        // podemos re-fetch para tener una entidad totalmente cargada.
+        BusinessUnit executorUnit = null;
+        if (fresh.getExecutorUnit() != null) {
+            try {
+                Long buId = fresh.getExecutorUnit().getId();
+                if (buId != null) {
+                    executorUnit = warehouseCatalogService.findWarehouseCatalog(
+                            BusinessUnit.class, buId);
+                }
+            } catch (Exception ignored) {
+                // si no se encuentra, queda null
+            }
+        }
+        d.setExecutorUnit(executorUnit);
+
+        if (fresh.getResponsibleId() != null) {
+            try {
+                Employee responsible = warehouseCatalogService
+                        .findWarehouseCatalog(Employee.class, fresh.getResponsibleId());
+                d.setResponsible(responsible);
+            } catch (Exception ignored) {
+                // si no se encuentra el responsable, queda null
+            }
+        }
+
+        // Al cambiar de almacen se limpia el detalle (los productos
+        // dependen del almacen).
+        d.setDetails(new ArrayList<WarehouseVoucherDispatchDetail>());
+        selectedProductItemIds.clear();
     }
 
     public void clearWarehouse() {

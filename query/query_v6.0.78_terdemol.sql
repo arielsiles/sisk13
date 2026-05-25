@@ -179,17 +179,17 @@ CREATE TABLE inv_valedespacho_det (
 --   Columnas funcionalidad: (idfuncionalidad, codigo, descripcion, idmodulo,
 --                            permiso, nombrerecurso, idcompania).
 -- ----------------------------------------------------------------------------
-insert into funcionalidad values (453, 'WAREHOUSEDISPATCH',         'Despacho de Productos Terminados',          5, 15, 'menu.warehouse.dispatch',         1);
-insert into funcionalidad values (454, 'WAREHOUSEDISPATCHAPPROVAL', 'Aprobacion de Despacho',                    5,  1, 'menu.warehouse.dispatch.approve', 1);
-insert into funcionalidad values (455, 'WAREHOUSEDISPATCHREVERSE',  'Anulacion / Reversion de Despacho',         5,  1, 'menu.warehouse.dispatch.reverse', 1);
-insert into funcionalidad values (456, 'WAREHOUSEDISPATCHPLACE',    'Catalogo Lugares de Despacho/Entrega',      5, 15, 'menu.warehouse.dispatch.place',   1);
+insert into funcionalidad values (455, 'WAREHOUSEDISPATCH',         'Despacho de Productos Terminados',          5, 15, 'menu.warehouse.dispatch',         1);
+insert into funcionalidad values (456, 'WAREHOUSEDISPATCHAPPROVAL', 'Aprobacion de Despacho',                    5,  1, 'menu.warehouse.dispatch.approve', 1);
+insert into funcionalidad values (457, 'WAREHOUSEDISPATCHREVERSE',  'Anulacion / Reversion de Despacho',         5,  1, 'menu.warehouse.dispatch.reverse', 1);
+insert into funcionalidad values (458, 'WAREHOUSEDISPATCHPLACE',    'Catalogo Lugares de Despacho/Entrega',      5, 15, 'menu.warehouse.dispatch.place',   1);
 
 -- Asignacion por defecto al rol Administrador (idrol=1). Mismo idmodulo que
 -- en funcionalidad (requisito de AccessRight.findByUser).
-insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (453, 1, 15, 1, 5);
-insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (454, 1,  1, 1, 5);
-insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (455, 1,  1, 1, 5);
-insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (456, 1, 15, 1, 5);
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (453, 1, 15, 1, 5);
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (454, 1,  1, 1, 5);
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (455, 1,  1, 1, 5);
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (456, 1, 15, 1, 5);
 
 -- Actualizar secuencia interna de funcionalidad
 update secuencia set valor = (select max(e.idfuncionalidad)+1 from funcionalidad e) where tabla = 'funcionalidad';
