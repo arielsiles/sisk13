@@ -322,7 +322,16 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
                 d.getDeliveryOrderNumber(),
                 clientName,
                 d.getSalesLotCode());
-        return new String[]{ message };
+        // El servicio existente approveWarehouseVoucher accede a gloss[1]
+        // internamente al armar lineas del asiento (gloss[0]=outgoing,
+        // gloss[1]=incoming en flujos de transferencia; para salida simple
+        // ambos slots se rellenan con el mismo mensaje para evitar
+        // ArrayIndexOutOfBoundsException). Mismo patron que
+        // WarehouseVoucherUpdateAction.getGlossMessage().
+        String[] gloss = new String[2];
+        gloss[0] = message;
+        gloss[1] = message;
+        return gloss;
     }
 
     /* =============================================================
