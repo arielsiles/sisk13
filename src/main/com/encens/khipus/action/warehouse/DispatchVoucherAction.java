@@ -307,7 +307,22 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
         WarehouseVoucherDispatch d = getInstance();
         d.setWarehouse(warehouse);
         if (warehouse != null) {
-            d.setExecutorUnit(warehouse.getExecutorUnit());
+            // warehouse.getExecutorUnit() devuelve un proxy Hibernate lazy
+            // que falla al renderizar si la sesion se cierra. Recuperamos
+            // la BusinessUnit completa por id para tener una entidad
+            // detachada utilizable en la vista.
+            BusinessUnit executorUnit = null;
+            if (warehouse.getExecutorUnit() != null
+                    && warehouse.getExecutorUnit().getId() != null) {
+                try {
+                    executorUnit = warehouseCatalogService.findWarehouseCatalog(
+                            BusinessUnit.class, warehouse.getExecutorUnit().getId());
+                } catch (Exception ignored) {
+                    // si no se encuentra, queda null
+                }
+            }
+            d.setExecutorUnit(executorUnit);
+
             if (warehouse.getResponsibleId() != null) {
                 try {
                     Employee responsible = warehouseCatalogService
