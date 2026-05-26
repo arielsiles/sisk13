@@ -110,6 +110,9 @@ public class Client implements BaseModel {
     @Column(name = "codigocliente")
     private String codigo;
 
+    @Column(name = "codigo_transbordo", length = 30)
+    private String transbordoCode;
+
     @Column(name = "tipo_persona")
     private String personType;
 
@@ -288,6 +291,26 @@ public class Client implements BaseModel {
 
     public String getCodigo() {
         return codigo;
+    }
+
+    public String getTransbordoCode() {
+        return transbordoCode;
+    }
+
+    public void setTransbordoCode(String transbordoCode) {
+        this.transbordoCode = transbordoCode;
+    }
+
+    /**
+     * Devuelve "CODIGO - Nombre Completo" si hay codigo de transbordo,
+     * o solo el nombre completo si no lo hay. Usado en el selectPopUp del
+     * formulario de Despacho para identificar al cliente.
+     */
+    public String getCodeAndFullName() {
+        if (transbordoCode != null && !transbordoCode.trim().isEmpty()) {
+            return transbordoCode + " - " + getFullName();
+        }
+        return getFullName();
     }
 
     public void setCodigo(String codigo) {

@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['Driver.titlePlural']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="driverSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+                <s:decorate id="nameFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.name']}</ui:define>
+                    <h:inputText id="name" value="#{driverDataModel.criteria.name}"
+                                 maxlength="120" tabindex="1" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="licenseFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.license']}</ui:define>
+                    <h:inputText id="license" value="#{driverDataModel.criteria.license}"
+                                 maxlength="30" tabindex="2" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="stateFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.state']}</ui:define>
+                    <h:selectOneMenu id="state" value="#{driverDataModel.state}"
+                                     styleClass="input" tabindex="3">
+                        <s:selectItems value="#{driverStateList}" var="st"
+                                       label="#{messages[st.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <div class="buttons">
+                    <a4j:commandButton action="#{driverDataModel.search}"
+                                       reRender="driverList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/driver.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEDRIVER','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{driverDataModel}" var="driverItem" id="driverList"
+                            rows="#{sessionUser.rowsPerPage15}"
+                            width="100%" columnsWidth="30%, 25%, 20%, 15%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="driver.name"
+                                                   dataModel="#{driverDataModel}"
+                                                   reRender="driverList, dataScroller">
+                                #{messages['Driver.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="driver.license"
+                                                   dataModel="#{driverDataModel}"
+                                                   reRender="driverList, dataScroller">
+                                #{messages['Driver.license']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['Driver.phone']}</rich:column>
+                        <rich:column>#{messages['Driver.state']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{driverItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{driverItem.license}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{driverItem.phone}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[driverItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WAREHOUSEDRIVER','VIEW')}"
+                                   action="#{driverAction.select(driverItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="driverList" dataModel="#{driverDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/driver.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEDRIVER','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

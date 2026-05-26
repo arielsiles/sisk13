@@ -1,0 +1,208 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{driverAction.managed}">
+                #{messages['Driver.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Driver.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="driverForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{driverAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!driverAction.managed and s:hasPermission('WAREHOUSEDRIVER','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{driverAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{driverAction.managed and s:hasPermission('WAREHOUSEDRIVER','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{driverAction.managed and s:hasPermission('WAREHOUSEDRIVER','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{driverAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{driverAction.managed}">
+                            #{messages['Driver.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Driver.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.name']}</ui:define>
+                    <h:inputText id="name" value="#{driver.name}" styleClass="input"
+                                 required="true" maxlength="120" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="licenseField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.license']}</ui:define>
+                    <h:inputText id="license" value="#{driver.license}" styleClass="input"
+                                 required="true" maxlength="30" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.phone']}</ui:define>
+                    <h:inputText id="phone" value="#{driver.phone}" styleClass="input"
+                                 maxlength="30" tabindex="3"/>
+                </s:decorate>
+
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.state']}</ui:define>
+                    <h:selectOneMenu id="state" value="#{driver.state}"
+                                     styleClass="input" required="true" tabindex="4">
+                        <s:selectItems value="#{driverStateList}" var="st"
+                                       label="#{messages[st.resourceKey]}"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </rich:panel>
+
+            <rich:spacer height="10"/>
+
+            <!-- Panel de Vehiculos asociados (M:N) -->
+            <rich:panel id="vehiclesPanel" rendered="#{driverAction.managed}">
+                <f:facet name="header">#{messages['Driver.vehicles']}</f:facet>
+
+                <div class="buttons">
+                    <a4j:commandButton value="#{messages['Driver.vehicles.add']}"
+                                       styleClass="button"
+                                       rendered="#{s:hasPermission('WAREHOUSEDRIVER','UPDATE')}"
+                                       oncomplete="Richfaces.showModalPanel('vehicleListModalPanel')"/>
+                </div>
+
+                <rich:dataTable value="#{driver.vehicles}" var="vehItem" id="vehiclesTable"
+                                width="100%" columnsWidth="20%, 30%, 20%, 15%, 15%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>#{messages['Vehicle.plate']}</rich:column>
+                            <rich:column>#{messages['Vehicle.brand']}</rich:column>
+                            <rich:column>#{messages['Vehicle.color']}</rich:column>
+                            <rich:column>#{messages['Vehicle.state']}</rich:column>
+                            <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:column>
+                        <h:outputText value="#{vehItem.plate}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{vehItem.brand}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{vehItem.color}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{messages[vehItem.state.resourceKey]}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <a4j:commandLink immediate="true"
+                                         title="#{messages['Driver.vehicles.remove']}"
+                                         action="#{driverAction.disassociateVehicle(vehItem)}"
+                                         ajaxSingle="true"
+                                         rendered="#{s:hasPermission('WAREHOUSEDRIVER','UPDATE')}"
+                                         reRender="vehiclesPanel">
+                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </rich:column>
+                </rich:dataTable>
+
+                <h:outputText value="#{messages['Common.searchNoResults']}"
+                              rendered="#{empty driver.vehicles}"/>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{driverAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!driverAction.managed and s:hasPermission('WAREHOUSEDRIVER','CREATE')}"
+                                 tabindex="5"/>
+
+                <h:commandButton action="#{driverAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{driverAction.managed and s:hasPermission('WAREHOUSEDRIVER','UPDATE')}"
+                                 tabindex="6"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{driverAction.managed and s:hasPermission('WAREHOUSEDRIVER','DELETE')}"
+                                 tabindex="7">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{driverAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="8"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{driverAction.managed and s:hasPermission('WAREHOUSEDRIVER','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Driver.delete.confirmation']}">
+                        <f:param value="#{driver.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{driverAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{driverAction.managed and s:hasPermission('WAREHOUSEDRIVER','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <!-- Modal de seleccion de vehiculos para asociar -->
+        <s:decorate id="vehicleListModalPanelContainer" template="/warehouse/vehicleListModalPanel.xhtml"
+                    rendered="#{driverAction.managed}">
+            <ui:param name="containerId" value="vehicleListModalPanelContainer"/>
+            <ui:param name="dialogId" value="vehicleListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{driverAction.associateVehicle(vehicleItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="vehiclesPanel"
+                                   oncomplete="Richfaces.hideModalPanel('vehicleListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

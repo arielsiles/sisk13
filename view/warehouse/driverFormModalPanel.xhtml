@@ -1,0 +1,68 @@
+<rich:modalPanel height="280" width="520" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 id="#{dialogId}"
+                 onshow="#{dialogId}focusFirstElement();">
+    <f:facet name="header">
+        <h:outputText>#{messages['Driver.new']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage id="closeLink" value="/img/close.png" styleClass="select-image"/>
+    </f:facet>
+    <h:form id="driverAjaxForm">
+        <ui:include src="/include/messages.xhtml"/>
+
+        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Driver.name']}</ui:define>
+            <h:inputText id="nameInputField" value="#{driver.name}" styleClass="input"
+                         required="true" immediate="true" maxlength="120"/>
+        </s:decorate>
+
+        <s:decorate id="licenseField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Driver.license']}</ui:define>
+            <h:inputText id="licenseInputField" value="#{driver.license}" styleClass="input"
+                         required="true" immediate="true" maxlength="30"/>
+        </s:decorate>
+
+        <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Driver.phone']}</ui:define>
+            <h:inputText id="phoneInputField" value="#{driver.phone}" styleClass="input"
+                         immediate="true" maxlength="30"/>
+        </s:decorate>
+
+        <div class="buttons">
+            <a4j:commandButton action="#{driverAction.createInline()}"
+                               value="#{messages['Common.save']}"
+                               oncomplete="if(#{not functionAction.hasSeverityErrorMessages}) #{rich:component(dialogId)}.hide();"
+                               reRender="#{reRender}#{not empty reRender?',':''}driverAjaxForm"
+                               styleClass="button">
+                <f:setPropertyActionListener value="#{postCreateAction}"
+                                             target="#{driverAction.postCreateAction}"/>
+            </a4j:commandButton>
+            <a4j:commandButton value="#{messages['Common.cancel']}"
+                               styleClass="button"
+                               action="#{driverAction.cancel}"
+                               immediate="true"
+                               ajaxSingle="true"
+                               oncomplete="Richfaces.hideModalPanel('#{dialogId}');"/>
+        </div>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink"
+                               operation="hide"
+                               event="onclick"/>
+
+        <script type="text/javascript">
+            function #{dialogId}focusFirstElement() {
+                var el = document.getElementById('#{rich:clientId('nameInputField')}');
+                if (el) el.focus();
+            }
+        </script>
+    </h:form>
+</rich:modalPanel>

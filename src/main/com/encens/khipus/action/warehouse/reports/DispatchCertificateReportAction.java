@@ -44,12 +44,16 @@ public class DispatchCertificateReportAction extends GenericReportAction {
     public void generateCertificate(WarehouseVoucherDispatch dispatch) {
         log.debug("Generating dispatch certificate for id=" + dispatch.getId());
 
+        // setReportFormat DEBE invocarse antes de addDetailSubReport, porque
+        // generateSubReport lee getReportFormat().getFormat() y de lo contrario
+        // lanza NullPointerException.
+        setReportFormat(ReportFormat.PDF);
+
         Map<String, Object> params = new HashMap<String, Object>();
         params.putAll(buildDispatchParams(dispatch));
         params.putAll(buildCompanyParams());
         addDetailSubReport(params, dispatch.getDetails());
 
-        setReportFormat(ReportFormat.PDF);
         String fileName = "Despacho_" +
                 (dispatch.getDeliveryOrderNumber() != null
                         ? String.format("%06d", dispatch.getDeliveryOrderNumber())
@@ -73,7 +77,9 @@ public class DispatchCertificateReportAction extends GenericReportAction {
         p.put("bagCount", d.getBagCount());
         p.put("invoiceNumber", paramAsString(d.getInvoiceNumber()));
         p.put("clientName", d.getClient() != null ? d.getClient().getFullName() : "");
-        p.put("clientCode", d.getClient() != null ? paramAsString(d.getClient().getIdNumber()) : "");
+        // clientCode = codigo de transbordo del cliente (campo nuevo en personacliente).
+        // Va impreso en la celda "CLIENTE / TRANSBORDO" del certificado (Sec. 13 del plan).
+        p.put("clientCode", d.getClient() != null ? paramAsString(d.getClient().getTransbordoCode()) : "");
 
         // Vendedor (JobContract -> Contract -> Employee)
         if (d.getDeliverySeller() != null
@@ -97,12 +103,12 @@ public class DispatchCertificateReportAction extends GenericReportAction {
         // Transportadora / conductor / vehiculo
         p.put("transportCompany", d.getTransportCompany() != null && d.getTransportCompany().getEntity() != null
                 ? d.getTransportCompany().getEntity().getFullName() : "");
-        p.put("driverName", paramAsString(d.getDriverName()));
-        p.put("driverLicense", paramAsString(d.getDriverLicense()));
-        p.put("driverPhone", paramAsString(d.getDriverPhone()));
-        p.put("vehiclePlate", paramAsString(d.getVehiclePlate()));
-        p.put("vehicleBrand", paramAsString(d.getVehicleBrand()));
-        p.put("vehicleColor", paramAsString(d.getVehicleColor()));
+        p.put("driverName", d.getDriver() != null ? paramAsString(d.getDriver().getName()) : "");
+        p.put("driverLicense", d.getDriver() != null ? paramAsString(d.getDriver().getLicense()) : "");
+        p.put("driverPhone", d.getDriver() != null ? paramAsString(d.getDriver().getPhone()) : "");
+        p.put("vehiclePlate", d.getVehicle() != null ? paramAsString(d.getVehicle().getPlate()) : "");
+        p.put("vehicleBrand", d.getVehicle() != null ? paramAsString(d.getVehicle().getBrand()) : "");
+        p.put("vehicleColor", d.getVehicle() != null ? paramAsString(d.getVehicle().getColor()) : "");
 
         // Carguio
         SimpleDateFormat hhmm = new SimpleDateFormat("HH:mm");

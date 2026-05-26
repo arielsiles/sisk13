@@ -36,7 +36,7 @@
 
                     <s:decorate id="plateFilter" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['WarehouseDispatch.vehicle.plate']}</ui:define>
-                        <h:inputText id="plate" value="#{dispatchVoucherDataModel.criteria.vehiclePlate}"
+                        <h:inputText id="plate" value="#{dispatchVoucherDataModel.plateFilter}"
                                      maxlength="20" tabindex="3" styleClass="input"/>
                     </s:decorate>
 
@@ -130,7 +130,7 @@
                     <h:outputText value="#{dispatchItem.transportCompany.entity.fullName}"/>
                 </rich:column>
                 <rich:column>
-                    <h:outputText value="#{dispatchItem.vehiclePlate}"/>
+                    <h:outputText value="#{dispatchItem.vehicle.plate}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{dispatchItem.salesLotCode}"/>

@@ -26,9 +26,10 @@ import java.util.List;
  * Tabla: inv_valedespacho.
  * <p>
  * Cada despacho captura los datos comerciales (cliente, transportadora,
- * vendedor), logisticos (conductor, vehiculo, lugares), de pesaje
- * (tara/bruto/neto, boleta balanza), de carguio (numero de bolsas, horario)
- * y de inventario (almacen de productos terminados, productos a egresar).
+ * vendedor), logisticos (conductor y vehiculo via catalogo, lugares),
+ * de pesaje (tara/bruto/neto, boleta balanza), de carguio (numero de bolsas,
+ * horario) y de inventario (almacen de productos terminados, productos a
+ * egresar).
  * <p>
  * Al aprobarse (estado APROBADO), se genera un {@link WarehouseVoucher} de
  * egreso vinculado por (no_cia_vale, no_trans_vale) que dispara el descuento
@@ -118,34 +119,15 @@ public class WarehouseVoucherDispatch implements BaseModel {
     @JoinColumn(name = "idlugar_destino")
     private DispatchPlace destinationPlace;
 
-    /* -------- Conductor / vehiculo (texto libre por despacho) -------- */
+    /* -------- Conductor / vehiculo (FK a catalogos inv_conductor / inv_vehiculo) -------- */
 
-    @Column(name = "conductor_nombre", nullable = false, length = 120)
-    @NotNull
-    @Length(max = 120)
-    private String driverName;
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idconductor")
+    private Driver driver;
 
-    @Column(name = "conductor_licencia", nullable = false, length = 30)
-    @NotNull
-    @Length(max = 30)
-    private String driverLicense;
-
-    @Column(name = "conductor_celular", length = 30)
-    @Length(max = 30)
-    private String driverPhone;
-
-    @Column(name = "vehiculo_placa", nullable = false, length = 20)
-    @NotNull
-    @Length(max = 20)
-    private String vehiclePlate;
-
-    @Column(name = "vehiculo_marca", length = 50)
-    @Length(max = 50)
-    private String vehicleBrand;
-
-    @Column(name = "vehiculo_color", length = 30)
-    @Length(max = 30)
-    private String vehicleColor;
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idvehiculo")
+    private Vehicle vehicle;
 
     /* -------- Carguio -------- */
 
@@ -253,8 +235,8 @@ public class WarehouseVoucherDispatch implements BaseModel {
 
     /* -------- Observacion / auditoria -------- */
 
-    @Column(name = "observacion", length = 500)
-    @Length(max = 500)
+    @Column(name = "observacion", length = 1000)
+    @Length(max = 1000)
     private String observation;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -420,52 +402,20 @@ public class WarehouseVoucherDispatch implements BaseModel {
         this.destinationPlace = destinationPlace;
     }
 
-    public String getDriverName() {
-        return driverName;
+    public Driver getDriver() {
+        return driver;
     }
 
-    public void setDriverName(String driverName) {
-        this.driverName = driverName;
+    public void setDriver(Driver driver) {
+        this.driver = driver;
     }
 
-    public String getDriverLicense() {
-        return driverLicense;
+    public Vehicle getVehicle() {
+        return vehicle;
     }
 
-    public void setDriverLicense(String driverLicense) {
-        this.driverLicense = driverLicense;
-    }
-
-    public String getDriverPhone() {
-        return driverPhone;
-    }
-
-    public void setDriverPhone(String driverPhone) {
-        this.driverPhone = driverPhone;
-    }
-
-    public String getVehiclePlate() {
-        return vehiclePlate;
-    }
-
-    public void setVehiclePlate(String vehiclePlate) {
-        this.vehiclePlate = vehiclePlate;
-    }
-
-    public String getVehicleBrand() {
-        return vehicleBrand;
-    }
-
-    public void setVehicleBrand(String vehicleBrand) {
-        this.vehicleBrand = vehicleBrand;
-    }
-
-    public String getVehicleColor() {
-        return vehicleColor;
-    }
-
-    public void setVehicleColor(String vehicleColor) {
-        this.vehicleColor = vehicleColor;
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 
     public Date getLoadingStartTime() {

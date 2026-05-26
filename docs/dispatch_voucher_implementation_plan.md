@@ -67,6 +67,10 @@
 | Fase 6 — Anulación / reversión | ✅ Completa | `1ef2800b` |
 | Fase 7 — Reporte Jasper (Certificado) | ✅ Completa | `56a3e197` |
 | Fase 8 — Pruebas integradas y QA | Pendiente (manual en dev) | — |
+| Fase 9.A — Catálogo Conductor/Vehículo: DDL, entidades, refactor cabecera | En curso | — |
+| Fase 9.B — CRUD Conductor | Pendiente | — |
+| Fase 9.C — CRUD Vehículo + asociación M:N | Pendiente | — |
+| Fase 9.D — Integración modales inline en formulario Despacho | Pendiente | — |
 
 Cada fase produce un commit (o pequeña serie) revisable. Las dependencias son lineales salvo las indicadas.
 
@@ -634,7 +638,79 @@ Test plan manual sobre dev (terdemol):
 
 ---
 
-## 14. Referencias
+## 14. Fase 9 — Catálogo Conductor/Vehículo (extensión)
+
+### 14.1 Motivación
+
+En la versión inicial (Fase 4) los datos del conductor y del vehículo se capturaban como **texto libre** en 6 columnas de `inv_valedespacho` (`conductor_nombre`, `conductor_licencia`, `conductor_celular`, `vehiculo_placa`, `vehiculo_marca`, `vehiculo_color`). Esto generaba duplicación al despachar repetidamente con el mismo conductor/vehículo y no permitía reutilizar datos ya registrados.
+
+Esta fase introduce dos catálogos nuevos (`Driver`, `Vehicle`) con relación **muchos-a-muchos** entre ellos (un conductor opera varios vehículos; un vehículo puede ser operado por varios conductores), y reemplaza las 6 columnas string del despacho por **dos FKs** (`idconductor`, `idvehiculo`).
+
+### 14.2 Sub-fases
+
+| Sub-fase | Alcance | Commit |
+|---|---|---|
+| 9.A | DDL `v6.0.80`, entidades JPA Driver/Vehicle, refactor `WarehouseVoucherDispatch`, refactor data model + reporte, mensajes, build OK | — |
+| 9.B | CRUD Conductor (service + action + 3 .xhtml + menú + permisos) | — |
+| 9.C | CRUD Vehículo + panel de asociación M:N en pantalla de Conductor | — |
+| 9.D | Reemplazo de selectOneMenu temporales por `app:selectPopUp` con `searchModalPanel` + `newModalPanel` inline (patrón de [voucherCreate.xhtml](../view/accounting/voucherCreate.xhtml)). Filtrado de vehículos por conductor | — |
+
+### 14.3 Modelo
+
+```
+┌─────────────┐    ┌────────────────────────┐    ┌─────────────┐
+│   Driver    │──N─│ inv_conductor_vehiculo │──N─│   Vehicle   │
+│ - name      │    │ - idconductor (PK,FK)  │    │ - plate     │
+│ - license   │    │ - idvehiculo  (PK,FK)  │    │ - brand     │
+│ - phone     │    └────────────────────────┘    │ - color     │
+│ - state VIG │                                  │ - state VIG │
+└──────┬──────┘                                  └──────┬──────┘
+       │                                                │
+       │            ┌──────────────────────────┐        │
+       └────────────│ WarehouseVoucherDispatch │────────┘
+                    │  - idconductor FK        │
+                    │  - idvehiculo  FK        │
+                    └──────────────────────────┘
+```
+
+### 14.4 Decisiones
+
+- **Estado VIG/ANL** (no Boolean `active` como en `DispatchPlace`). Permite filtrar `WHERE estado = 'VIG'` en los selectores sin borrado físico que rompa la integridad referencial.
+- **Sin `no_cia`**: el catálogo es 100% multi-empresa por `idcompania` (sin compound PK al estilo legacy).
+- **Unicidad**: `licencia` única por `idcompania` (Driver), `placa` única por `idcompania` (Vehicle).
+- **Limpieza datos de prueba**: la Fase 9.A ejecuta `DELETE FROM inv_valedespacho_det; DELETE FROM inv_valedespacho;` antes de eliminar las columnas string, dado que estamos en pruebas.
+
+### 14.5 Datos snapshot vs FK
+
+La opción "FK + snapshot histórico" (mantener `driver_name` etc. al momento del despacho) fue descartada en favor de **solo FK**. Si en el futuro un nombre de conductor o placa cambia, los despachos viejos mostrarán los datos actualizados; si esto se vuelve un problema, se puede agregar snapshot en una fase posterior sin tocar el modelo principal.
+
+---
+
+## 15. Generación del asiento contable al aprobar — opciones pendientes
+
+**Problema observado:** al aprobar un despacho, el `WarehouseVoucher` de egreso se genera correctamente y el stock se descuenta, pero **no se genera el asiento contable**. La causa raíz está en `ApprovalWarehouseVoucherServiceBean.approveWarehouseVoucher`:
+
+```java
+if (warehouse.getDefaultOutputWarehouse() || lowFlag) {
+    createAccountEntryForOutputs(...);
+}
+```
+
+El almacén seleccionado para despachos no tiene `inv_egr = 1` (`defaultOutputWarehouse`) y el flag `lowFlag` (calculado a partir del tipo de documento configurado con `CONTRA_ACCOUNT_DEFINED_BY_DEFAULT`) tampoco se activa para `cod_doc='DSP'`.
+
+### Opciones evaluadas
+
+| Opción | Descripción | Pros | Contras |
+|---|---|---|---|
+| **A** | Marcar el almacén de productos terminados con `inv_egr = 1` (`defaultOutputWarehouse`) | Cambio mínimo (un UPDATE en BD); usa la rama ya implementada del servicio | Aplica a **todos** los egresos del almacén, no solo a despachos. Si hay otros vales sobre el mismo almacén, también empiezan a generar asiento — podría ser deseado o no |
+| **B** *(recomendado)* | Configurar el `DocumentType` `DSP` con `CONTRA_ACCOUNT_DEFINED_BY_DEFAULT` y especificar una cuenta de contrapartida fija | Activa la rama vía `lowFlag` específicamente para despachos. Granularidad por tipo de documento, no por almacén | Requiere decidir **qué cuenta contable** sirve como contrapartida (sugerencia: una cuenta de "Costo de Mercadería Vendida" o similar). Necesita un UPDATE/INSERT en la configuración de tipos |
+| **C** | Llamada directa a `createAccountEntryForOutputs(...)` desde `DispatchVoucherServiceBean.approve()` tras `approveWarehouseVoucher` | Control total dentro del flujo del despacho | Acopla el módulo de despacho al servicio de aprobación de vales; duplica lógica que ya existe; requiere acceso a las cuentas e historial |
+
+**Decisión:** **pendiente de definición del usuario** (qué cuenta contable usar para la opción B, o si prefiere A para simplicidad). Hasta entonces los despachos aprobados quedan sin asiento contable (esto puede regularizarse después porque el vale de egreso está correctamente creado).
+
+---
+
+## 16. Referencias
 
 - Requerimientos detallados: [dispatch_voucher_requirements.md](dispatch_voucher_requirements.md).
 - Flujo actual de vales: [warehouse_order_voucher_flow.md](warehouse_order_voucher_flow.md).

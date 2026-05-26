@@ -1,0 +1,68 @@
+<rich:modalPanel height="260" width="520" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 id="#{dialogId}"
+                 onshow="#{dialogId}focusFirstElement();">
+    <f:facet name="header">
+        <h:outputText>#{messages['Vehicle.new']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage id="closeLink" value="/img/close.png" styleClass="select-image"/>
+    </f:facet>
+    <h:form id="vehicleAjaxForm">
+        <ui:include src="/include/messages.xhtml"/>
+
+        <s:decorate id="plateField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Vehicle.plate']}</ui:define>
+            <h:inputText id="plateInputField" value="#{vehicle.plate}" styleClass="input"
+                         required="true" immediate="true" maxlength="20"/>
+        </s:decorate>
+
+        <s:decorate id="brandField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Vehicle.brand']}</ui:define>
+            <h:inputText id="brandInputField" value="#{vehicle.brand}" styleClass="input"
+                         immediate="true" maxlength="50"/>
+        </s:decorate>
+
+        <s:decorate id="colorField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Vehicle.color']}</ui:define>
+            <h:inputText id="colorInputField" value="#{vehicle.color}" styleClass="input"
+                         immediate="true" maxlength="30"/>
+        </s:decorate>
+
+        <div class="buttons">
+            <a4j:commandButton action="#{vehicleAction.createInline()}"
+                               value="#{messages['Common.save']}"
+                               oncomplete="if(#{not functionAction.hasSeverityErrorMessages}) #{rich:component(dialogId)}.hide();"
+                               reRender="#{reRender}#{not empty reRender?',':''}vehicleAjaxForm"
+                               styleClass="button">
+                <f:setPropertyActionListener value="#{postCreateAction}"
+                                             target="#{vehicleAction.postCreateAction}"/>
+            </a4j:commandButton>
+            <a4j:commandButton value="#{messages['Common.cancel']}"
+                               styleClass="button"
+                               action="#{vehicleAction.cancel}"
+                               immediate="true"
+                               ajaxSingle="true"
+                               oncomplete="Richfaces.hideModalPanel('#{dialogId}');"/>
+        </div>
+
+        <rich:componentControl for="#{dialogId}"
+                               attachTo="closeLink"
+                               operation="hide"
+                               event="onclick"/>
+
+        <script type="text/javascript">
+            function #{dialogId}focusFirstElement() {
+                var el = document.getElementById('#{rich:clientId('plateInputField')}');
+                if (el) el.focus();
+            }
+        </script>
+    </h:form>
+</rich:modalPanel>

@@ -1,0 +1,88 @@
+<rich:modalPanel height="500" width="800" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}">
+
+    <c:if test="#{empty dataModel}">
+        <c:set var="dataModel" value="#{driverDataModel}"/>
+    </c:if>
+
+    <f:facet name="header">
+        <h:outputText>#{messages['Driver.list']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="driverListForm#{dialogId}">
+        <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:decorate id="nameField#{dialogId}" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.name']}</ui:define>
+                    <h:inputText id="name" value="#{dataModel.criteria.name}" maxlength="120"
+                                 styleClass="input" tabindex="2001"/>
+                </s:decorate>
+
+                <s:decorate id="licenseField#{dialogId}" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Driver.license']}</ui:define>
+                    <h:inputText id="license" value="#{dataModel.criteria.license}" maxlength="30"
+                                 styleClass="input" tabindex="2002"/>
+                    <a4j:commandButton action="#{dataModel.search}"
+                                       reRender="driverList#{dialogId}, dataScroller#{dialogId}"
+                                       styleClass="button" value="#{messages['Common.search']}"
+                                       tabindex="2003">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+        <br/>
+        <rich:dataTable value="#{dataModel}" var="driverItem" id="driverList#{dialogId}"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="35%, 25%, 25%, 15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="driver.name"
+                                               dataModel="#{dataModel}"
+                                               reRender="driverList#{dialogId}, dataScroller#{dialogId}">
+                            #{messages['Driver.name']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="driver.license"
+                                               dataModel="#{dataModel}"
+                                               reRender="driverList#{dialogId}, dataScroller#{dialogId}">
+                            #{messages['Driver.license']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>#{messages['Driver.phone']}</rich:column>
+                    <rich:column styleClass="center">#{messages['Common.select']}</rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{driverItem.name}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{driverItem.license}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{driverItem.phone}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide" event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller#{dialogId}" for="driverList#{dialogId}" dataModel="#{dataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink"
+                               operation="hide" event="onclick"/>
+    </h:form>
+</rich:modalPanel>

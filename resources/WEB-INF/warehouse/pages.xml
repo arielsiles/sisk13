@@ -742,6 +742,58 @@
         </navigation>
     </page>
 
+    <!-- Catalogo de Conductores -->
+    <page view-id="/warehouse/driverList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('WAREHOUSEDRIVER','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{driverAction.select(driverItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/driver.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/driver.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/driverList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEDRIVER','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/driverList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/driverList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- Catalogo de Vehiculos -->
+    <page view-id="/warehouse/vehicleList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('WAREHOUSEVEHICLE','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{vehicleAction.select(vehicleItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/vehicle.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/vehicle.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/vehicleList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEVEHICLE','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/vehicleList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/vehicleList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <!-- Vales de Despacho de Productos Terminados -->
     <page view-id="/warehouse/dispatchVoucherList.xhtml"
           login-required="true">

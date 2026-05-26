@@ -13,8 +13,10 @@ import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.warehouse.DispatchPlace;
 import com.encens.khipus.model.warehouse.DispatchState;
 import com.encens.khipus.model.warehouse.DispatchStockImpact;
+import com.encens.khipus.model.warehouse.Driver;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.ProductItemPK;
+import com.encens.khipus.model.warehouse.Vehicle;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.model.warehouse.WarehouseVoucherDispatch;
 import com.encens.khipus.model.warehouse.WarehouseVoucherDispatchDetail;
@@ -23,6 +25,7 @@ import com.encens.khipus.service.warehouse.DispatchVoucherService;
 import com.encens.khipus.service.warehouse.WarehouseCatalogService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.MessageUtils;
+import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
@@ -108,6 +111,30 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
         return em.createQuery(
                 "select g from ProductionGroup g order by g.code")
                 .getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Factory(value = "dispatchDriverList", scope = ScopeType.STATELESS)
+    public List<Driver> getDriverList() {
+        return em.createNamedQuery("Driver.findAllActive").getResultList();
+    }
+
+    /**
+     * Lista de vehiculos validos en el contexto del despacho actual. Si hay
+     * conductor seleccionado, devuelve los vehiculos asociados a el; caso
+     * contrario, devuelve todos los vehiculos activos (placeholder Fase 9.A;
+     * la restriccion estricta por conductor se aplicara en Fase 9.D).
+     */
+    @SuppressWarnings("unchecked")
+    @Factory(value = "dispatchVehicleList", scope = ScopeType.STATELESS)
+    public List<Vehicle> getVehicleList() {
+        WarehouseVoucherDispatch d = getInstance();
+        if (d != null && d.getDriver() != null && d.getDriver().getId() != null) {
+            return em.createNamedQuery("Vehicle.findByDriver")
+                    .setParameter("driverId", d.getDriver().getId())
+                    .getResultList();
+        }
+        return em.createNamedQuery("Vehicle.findAllActive").getResultList();
     }
 
     /* =========================================================
@@ -413,6 +440,78 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
 
     public void clearDestinationPlace() {
         getInstance().setDestinationPlace(null);
+    }
+
+    public void assignDriver(Driver driver) {
+        WarehouseVoucherDispatch d = getInstance();
+        // Si cambia de conductor, el vehiculo previamente seleccionado podria
+        // no estar asociado al nuevo conductor; lo limpiamos para que el
+        // usuario reseleccione desde la lista filtrada.
+        if (d.getDriver() != null && driver != null
+                && d.getDriver().getId() != null
+                && !d.getDriver().getId().equals(driver.getId())) {
+            d.setVehicle(null);
+        }
+        d.setDriver(driver);
+    }
+
+    public void clearDriver() {
+        WarehouseVoucherDispatch d = getInstance();
+        d.setDriver(null);
+        d.setVehicle(null);
+    }
+
+    public void assignVehicle(Vehicle vehicle) {
+        getInstance().setVehicle(vehicle);
+    }
+
+    public void clearVehicle() {
+        getInstance().setVehicle(null);
+    }
+
+    /**
+     * Antes de abrir el modal de seleccion de vehiculo, aplica el filtro
+     * por conductor seleccionado actualmente (si lo hay) en vehicleDataModel,
+     * para que solo aparezcan los vehiculos asociados al conductor.
+     * Si no hay conductor seleccionado, limpia el filtro (muestra todos).
+     */
+    public void prepareSelectVehicle() {
+        Driver d = getInstance().getDriver();
+        Long driverId = (d != null) ? d.getId() : null;
+        VehicleDataModel m = (VehicleDataModel)
+                Component.getInstance("vehicleDataModel", true);
+        if (m != null) {
+            m.setDriverIdFilter(driverId);
+            m.search();
+        }
+    }
+
+    /**
+     * Callback invocado tras crear un Conductor desde el modal inline.
+     *
+     * <p>NOTA sobre el flujo: {@code <f:setPropertyActionListener>} invoca
+     * este metodo via EL ANTES de que createInline persista la entidad, por
+     * lo que {@code driver.getId()} puede ser null aqui. Solo seteamos la
+     * referencia; persist luego mutara el mismo objeto Java para asignarle
+     * el id, y el reRender posterior mostrara los datos persistidos.</p>
+     */
+    public void assignDriverAfterCreate(Driver driver) {
+        if (driver == null) return;
+        getInstance().setDriver(driver);
+    }
+
+    /**
+     * Callback invocado tras crear un Vehiculo desde el modal inline.
+     *
+     * <p>Igual que con {@link #assignDriverAfterCreate}, el id puede ser
+     * null en este punto. Solo seteamos la referencia; la auto-asociacion
+     * del vehiculo al conductor seleccionado se hace en
+     * {@code VehicleAction.createInline()} despues del persist, cuando el
+     * id ya esta disponible.</p>
+     */
+    public void assignVehicleAfterCreate(Vehicle vehicle) {
+        if (vehicle == null) return;
+        getInstance().setVehicle(vehicle);
     }
 
     public void assignExecutorUnit(BusinessUnit executorUnit) {

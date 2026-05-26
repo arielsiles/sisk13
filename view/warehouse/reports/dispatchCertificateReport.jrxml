@@ -54,8 +54,9 @@
         <band height="370">
             <!-- Watermark ANULADO -->
             <textField isBlankWhenNull="true">
-                <reportElement x="100" y="200" width="360" height="80" forecolor="#FF0000"
-                               printWhenExpression="$P{annulled}"/>
+                <reportElement x="100" y="200" width="360" height="80" forecolor="#FF0000">
+                    <printWhenExpression><![CDATA[Boolean.TRUE.equals($P{annulled})]]></printWhenExpression>
+                </reportElement>
                 <textElement textAlignment="Center" rotation="None">
                     <font fontName="Arial" size="60" isBold="true"/>
                 </textElement>
@@ -210,7 +211,7 @@
                 <reportElement x="140" y="158" width="281" height="13"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA[$P{clientName}]]></textFieldExpression>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{clientCode}]]></textFieldExpression>
             </textField>
             <textField isBlankWhenNull="true">
                 <reportElement x="421" y="158" width="80" height="13"/>
@@ -311,95 +312,111 @@
             </subreport>
 
             <!-- Bloque MEDIDOR DE PESO -->
-            <textField positionType="Float">
-                <reportElement x="0" y="280" width="562" height="14" backcolor="#DDDDDD" mode="Opaque"/>
+            <textField>
+                <reportElement x="0" y="280" width="562" height="14" backcolor="#DDDDDD" mode="Opaque" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.5"/></box>
                 <textElement><font fontName="Arial" size="9" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["MEDIDOR DE PESO"]]></textFieldExpression>
             </textField>
-            <textField positionType="Float">
-                <reportElement x="0" y="294" width="120" height="13"/>
+            <textField>
+                <reportElement x="0" y="294" width="120" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["TARA"]]></textFieldExpression>
             </textField>
-            <textField positionType="Float" pattern="#,##0.###" isBlankWhenNull="true">
-                <reportElement x="120" y="294" width="120" height="13"/>
+            <textField pattern="#,##0.###" isBlankWhenNull="true">
+                <reportElement x="120" y="294" width="120" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement textAlignment="Right"><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{tareWeight}]]></textFieldExpression>
             </textField>
-            <textField positionType="Float">
-                <reportElement x="240" y="294" width="60" height="13"/>
+            <textField>
+                <reportElement x="240" y="294" width="60" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["Kilogramos"]]></textFieldExpression>
             </textField>
-            <textField positionType="Float">
-                <reportElement x="300" y="294" width="120" height="13"/>
+            <textField>
+                <reportElement x="300" y="294" width="120" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["N° DE BOLETA PESAJE:"]]></textFieldExpression>
             </textField>
-            <textField positionType="Float" isBlankWhenNull="true">
-                <reportElement x="420" y="294" width="142" height="13"/>
+            <textField isBlankWhenNull="true">
+                <reportElement x="420" y="294" width="142" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA[$P{weighingTicket}]]></textFieldExpression>
             </textField>
 
-            <textField positionType="Float">
-                <reportElement x="0" y="307" width="120" height="13"/>
+            <textField>
+                <reportElement x="0" y="307" width="120" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["BRUTO"]]></textFieldExpression>
             </textField>
-            <textField positionType="Float" pattern="#,##0.###" isBlankWhenNull="true">
-                <reportElement x="120" y="307" width="120" height="13"/>
+            <textField pattern="#,##0.###" isBlankWhenNull="true">
+                <reportElement x="120" y="307" width="120" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement textAlignment="Right"><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{grossWeight}]]></textFieldExpression>
             </textField>
-            <textField positionType="Float">
-                <reportElement x="240" y="307" width="60" height="13"/>
+            <textField>
+                <reportElement x="240" y="307" width="60" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["Kilogramos"]]></textFieldExpression>
             </textField>
 
-            <textField positionType="Float">
-                <reportElement x="0" y="320" width="120" height="13"/>
+            <textField>
+                <reportElement x="0" y="320" width="120" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["NETO"]]></textFieldExpression>
             </textField>
-            <textField positionType="Float" pattern="#,##0.###" isBlankWhenNull="true">
-                <reportElement x="120" y="320" width="120" height="13"/>
+            <textField pattern="#,##0.###" isBlankWhenNull="true">
+                <reportElement x="120" y="320" width="120" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement textAlignment="Right"><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{netWeight}]]></textFieldExpression>
             </textField>
-            <textField positionType="Float">
-                <reportElement x="240" y="320" width="60" height="13"/>
+            <textField>
+                <reportElement x="240" y="320" width="60" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["Kilogramos"]]></textFieldExpression>
             </textField>
 
-            <textField positionType="Float">
-                <reportElement x="300" y="307" width="120" height="13"/>
+            <textField>
+                <reportElement x="300" y="307" width="120" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["PESO NETO CARGA:"]]></textFieldExpression>
             </textField>
-            <textField positionType="Float" pattern="#,##0.000" isBlankWhenNull="true">
-                <reportElement x="420" y="307" width="142" height="13"/>
+            <textField pattern="#,##0.000" isBlankWhenNull="true">
+                <reportElement x="420" y="307" width="142" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA[($P{netWeightTons} != null ? $P{netWeightTons}.toString() : "0") + " Toneladas"]]></textFieldExpression>
             </textField>
         </band>
     </title>
+
+    <pageFooter>
+        <band height="14">
+            <textField>
+                <reportElement x="0" y="0" width="280" height="12"/>
+                <textElement><font fontName="Arial" size="7"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Estado: " + ($P{state} != null ? $P{state} : "")]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="280" y="0" width="282" height="12"/>
+                <textElement textAlignment="Right"><font fontName="Arial" size="7"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Pagina " + $V{PAGE_NUMBER} + " de " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
 
     <summary>
         <band height="220">
@@ -468,19 +485,4 @@
             </textField>
         </band>
     </summary>
-
-    <pageFooter>
-        <band height="14">
-            <textField>
-                <reportElement x="0" y="0" width="280" height="12"/>
-                <textElement><font fontName="Arial" size="7"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA["Estado: " + ($P{state} != null ? $P{state} : "")]]></textFieldExpression>
-            </textField>
-            <textField>
-                <reportElement x="280" y="0" width="282" height="12"/>
-                <textElement textAlignment="Right"><font fontName="Arial" size="7"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA["Pagina " + $V{PAGE_NUMBER} + " de " + $V{PAGE_NUMBER}]]></textFieldExpression>
-            </textField>
-        </band>
-    </pageFooter>
 </jasperReport>

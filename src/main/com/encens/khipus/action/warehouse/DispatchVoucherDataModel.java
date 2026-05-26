@@ -22,11 +22,12 @@ public class DispatchVoucherDataModel extends QueryDataModel<Long, WarehouseVouc
 
     private Date startDate;
     private Date endDate;
+    private String plateFilter;
 
     private static final String[] RESTRICTIONS = {
             "dispatch.deliveryOrderNumber = #{dispatchVoucherDataModel.criteria.deliveryOrderNumber}",
             "lower(dispatch.salesLotCode) like concat('%', concat(lower(#{dispatchVoucherDataModel.criteria.salesLotCode}), '%'))",
-            "lower(dispatch.vehiclePlate) like concat('%', concat(lower(#{dispatchVoucherDataModel.criteria.vehiclePlate}), '%'))",
+            "lower(dispatch.vehicle.plate) like concat('%', concat(lower(#{dispatchVoucherDataModel.plateFilter}), '%'))",
             "dispatch.state = #{dispatchVoucherDataModel.criteria.state}",
             "dispatch.client = #{dispatchVoucherDataModel.criteria.client}",
             "dispatch.transportCompany = #{dispatchVoucherDataModel.criteria.transportCompany}",
@@ -64,5 +65,13 @@ public class DispatchVoucherDataModel extends QueryDataModel<Long, WarehouseVouc
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public String getPlateFilter() {
+        return plateFilter;
+    }
+
+    public void setPlateFilter(String plateFilter) {
+        this.plateFilter = plateFilter;
     }
 }

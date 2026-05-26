@@ -1,0 +1,140 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{vehicleAction.managed}">
+                #{messages['Vehicle.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['Vehicle.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="vehicleForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{vehicleAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!vehicleAction.managed and s:hasPermission('WAREHOUSEVEHICLE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{vehicleAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{vehicleAction.managed and s:hasPermission('WAREHOUSEVEHICLE','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{vehicleAction.managed and s:hasPermission('WAREHOUSEVEHICLE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{vehicleAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{vehicleAction.managed}">
+                            #{messages['Vehicle.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['Vehicle.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="plateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vehicle.plate']}</ui:define>
+                    <h:inputText id="plate" value="#{vehicle.plate}" styleClass="input"
+                                 required="true" maxlength="20" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="brandField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vehicle.brand']}</ui:define>
+                    <h:inputText id="brand" value="#{vehicle.brand}" styleClass="input"
+                                 maxlength="50" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="colorField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vehicle.color']}</ui:define>
+                    <h:inputText id="color" value="#{vehicle.color}" styleClass="input"
+                                 maxlength="30" tabindex="3"/>
+                </s:decorate>
+
+                <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vehicle.state']}</ui:define>
+                    <h:selectOneMenu id="state" value="#{vehicle.state}"
+                                     styleClass="input" required="true" tabindex="4">
+                        <s:selectItems value="#{vehicleStateList}" var="st"
+                                       label="#{messages[st.resourceKey]}"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{vehicleAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!vehicleAction.managed and s:hasPermission('WAREHOUSEVEHICLE','CREATE')}"
+                                 tabindex="5"/>
+
+                <h:commandButton action="#{vehicleAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{vehicleAction.managed and s:hasPermission('WAREHOUSEVEHICLE','UPDATE')}"
+                                 tabindex="6"/>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{vehicleAction.managed and s:hasPermission('WAREHOUSEVEHICLE','DELETE')}"
+                                 tabindex="7">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{vehicleAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="8"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{vehicleAction.managed and s:hasPermission('WAREHOUSEVEHICLE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Vehicle.delete.confirmation']}">
+                        <f:param value="#{vehicle.plate}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{vehicleAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{vehicleAction.managed and s:hasPermission('WAREHOUSEVEHICLE','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#plate" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>
