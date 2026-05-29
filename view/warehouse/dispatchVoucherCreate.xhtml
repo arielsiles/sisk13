@@ -60,6 +60,7 @@
                          tabindex="2"/>
         <app:selectPopUp id="deliverySeller"
                          required="true"
+                         styleClass="inputLarge"
                          textValue="#{dispatchVoucher.deliverySeller.contract.employee.fullName}"
                          value="#{dispatchVoucher.deliverySeller}"
                          dataModel="#{jobContractDataModel}"
@@ -98,13 +99,20 @@
         <ui:define name="label">#{messages['WarehouseDispatch.client']}</ui:define>
         <app:selectPopUp id="client"
                          required="true"
-                         textValue="#{dispatchVoucher.client.codeAndFullName}"
+                         styleClass="inputLarge"
+                         textValue="#{dispatchVoucher.client.fullName}"
                          value="#{dispatchVoucher.client}"
                          dataModel="#{clientDataModel}"
                          clearAction="dispatchVoucherAction.clearClient()"
                          searchModalPanel="clientListModalPanel"
                          reRender="clientField"
                          hotKeySelect="alt+3"/>
+    </s:decorate>
+
+    <s:decorate id="clientTransbordoCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDispatch.clientTransbordoCode']}</ui:define>
+        <h:inputText id="clientTransbordoCode" value="#{dispatchVoucher.clientTransbordoCode}"
+                     maxlength="100" styleClass="inputLarge" tabindex="5"/>
     </s:decorate>
 
     <s:decorate id="productionTurnField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -121,7 +129,7 @@
     <s:decorate id="originPlaceField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['WarehouseDispatch.originPlace']}</ui:define>
         <h:selectOneMenu id="originPlace" value="#{dispatchVoucher.originPlace}"
-                         styleClass="input" required="true" tabindex="6">
+                         styleClass="inputLarge" required="true" tabindex="6">
             <s:selectItems value="#{dispatchOriginPlaceList}" var="place"
                            label="#{place.fullName}"
                            noSelectionLabel="" hideNoSelectionLabel="false"/>
@@ -132,7 +140,7 @@
     <s:decorate id="destinationPlaceField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['WarehouseDispatch.destinationPlace']}</ui:define>
         <h:selectOneMenu id="destinationPlace" value="#{dispatchVoucher.destinationPlace}"
-                         styleClass="input" required="true" tabindex="7">
+                         styleClass="inputLarge" required="true" tabindex="7">
             <s:selectItems value="#{dispatchDestinationPlaceList}" var="place"
                            label="#{place.fullName}"
                            noSelectionLabel="" hideNoSelectionLabel="false"/>

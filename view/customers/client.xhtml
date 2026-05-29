@@ -79,13 +79,6 @@
         </h:selectOneRadio>
     </s:decorate>
 
-    <s:decorate id="transbordoCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.transbordoCode']}</ui:define>
-        <h:inputText id="transbordoCode" value="#{client.transbordoCode}"
-                     required="false" maxlength="30"
-                     styleClass="input" tabindex="1"/>
-    </s:decorate>
-
     <s:div id="personData">
 
         <s:decorate id="idNumberField" template="/include/inputField.xhtml" styleClass="formRow"

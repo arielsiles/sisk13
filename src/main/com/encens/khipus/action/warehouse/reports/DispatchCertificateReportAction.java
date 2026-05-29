@@ -52,7 +52,7 @@ public class DispatchCertificateReportAction extends GenericReportAction {
         Map<String, Object> params = new HashMap<String, Object>();
         params.putAll(buildDispatchParams(dispatch));
         params.putAll(buildCompanyParams());
-        addDetailSubReport(params, dispatch.getDetails());
+        addDetailSubReport(params, dispatch);
 
         String fileName = "Despacho_" +
                 (dispatch.getDeliveryOrderNumber() != null
@@ -77,9 +77,9 @@ public class DispatchCertificateReportAction extends GenericReportAction {
         p.put("bagCount", d.getBagCount());
         p.put("invoiceNumber", paramAsString(d.getInvoiceNumber()));
         p.put("clientName", d.getClient() != null ? d.getClient().getFullName() : "");
-        // clientCode = codigo de transbordo del cliente (campo nuevo en personacliente).
-        // Va impreso en la celda "CLIENTE / TRANSBORDO" del certificado (Sec. 13 del plan).
-        p.put("clientCode", d.getClient() != null ? paramAsString(d.getClient().getTransbordoCode()) : "");
+        // clientCode = codigo CLIENTE / TRANSBORDO del DESPACHO (varia por vale).
+        // Va impreso en la celda "CLIENTE / TRANSBORDO" del certificado.
+        p.put("clientCode", paramAsString(d.getClientTransbordoCode()));
 
         // Vendedor (JobContract -> Contract -> Employee)
         if (d.getDeliverySeller() != null
@@ -149,13 +149,13 @@ public class DispatchCertificateReportAction extends GenericReportAction {
                 ? MessageUtils.getMessage(d.getState().getResourceKey()) : "");
         p.put("annulled", Boolean.valueOf(d.getState() == DispatchState.ANULADO));
 
-        // Descripcion compuesta de productos (texto plano, para usos donde no
-        // se quiera el subreport)
+        // Lista de productos: un renglon por producto (separados por salto de
+        // linea) para la fila "PRODUCTO" de la tabla DATOS DEL DESPACHO.
         StringBuilder sb = new StringBuilder();
         if (d.getDetails() != null) {
             for (WarehouseVoucherDispatchDetail line : d.getDetails()) {
                 if (line.getProductItem() != null) {
-                    if (sb.length() > 0) sb.append(", ");
+                    if (sb.length() > 0) sb.append("\n");
                     sb.append(line.getProductItem().getFullName());
                 }
             }
@@ -181,12 +181,15 @@ public class DispatchCertificateReportAction extends GenericReportAction {
     }
 
     /**
-     * Construye el subreport de productos a partir de la lista de detalles
-     * del despacho. Cada linea se mapea a un map con las claves esperadas por
-     * el JRXML (COLUMN_1..COLUMN_5).
+     * Construye el subreport de productos. Columnas del certificado (COLUMN_1..5):
+     *   1 = CANTIDAD (cantidad del detalle convertida a toneladas)
+     *   2 = PRODUCTO / SERVICIO (nombre del producto, sin codigo)
+     *   3 = DESCRIPCION DETALLADA (observacion de la linea)
+     *   4 = NUMERACION BOLSAS (rango de bolsas de la cabecera: "desde al hasta")
+     *   5 = TOTAL ENTREGADO (en blanco por ahora; se mantiene el formato)
      */
     private void addDetailSubReport(Map<String, Object> mainReportParams,
-                                    List<WarehouseVoucherDispatchDetail> details) {
+                                    WarehouseVoucherDispatch dispatch) {
         Map<String, Object> subReportParams = new HashMap<String, Object>();
 
         TypedReportData subReportData = super.generateSubReport(
@@ -196,16 +199,29 @@ public class DispatchCertificateReportAction extends GenericReportAction {
                 PageOrientation.PORTRAIT,
                 subReportParams);
 
+        // NUMERACION BOLSAS es dato de cabecera (mismo para todas las lineas).
+        String bagRange = "";
+        if (dispatch.getBagsFromNumber() != null && dispatch.getBagsToNumber() != null) {
+            bagRange = dispatch.getBagsFromNumber() + " al " + dispatch.getBagsToNumber();
+        }
+
         // Datos como JRBeanCollectionDataSource (no via EJBQL).
         List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
+        List<WarehouseVoucherDispatchDetail> details = dispatch.getDetails();
         if (details != null) {
             for (WarehouseVoucherDispatchDetail det : details) {
                 Map<String, Object> row = new HashMap<String, Object>();
-                row.put("COLUMN_1", det.getQuantity());
-                row.put("COLUMN_2", det.getMeasureUnit() != null ? det.getMeasureUnit().getName() : "");
-                row.put("COLUMN_3", det.getProductItem() != null ? det.getProductItem().getFullName() : "");
-                row.put("COLUMN_4", det.getBagsCount());
-                row.put("COLUMN_5", paramAsString(det.getObservation()));
+                // CANTIDAD: cantidad del detalle a toneladas (asume unidad base Kg)
+                String cantidadTon = "";
+                if (det.getQuantity() != null) {
+                    BigDecimal tons = BigDecimalUtil.divide(det.getQuantity(), new BigDecimal(1000), 3);
+                    cantidadTon = tons.toString() + " Toneladas";
+                }
+                row.put("COLUMN_1", cantidadTon);
+                row.put("COLUMN_2", det.getProductItem() != null ? det.getProductItem().getName() : "");
+                row.put("COLUMN_3", paramAsString(det.getObservation()));
+                row.put("COLUMN_4", bagRange);
+                row.put("COLUMN_5", "");
                 rows.add(row);
             }
         }

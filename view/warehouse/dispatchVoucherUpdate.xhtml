@@ -107,6 +107,7 @@
                                  tabindex="2"/>
                 <app:selectPopUp id="deliverySeller"
                                  required="true"
+                                 styleClass="inputLarge"
                                  textValue="#{dispatchVoucher.deliverySeller.contract.employee.fullName}"
                                  value="#{dispatchVoucher.deliverySeller}"
                                  dataModel="#{jobContractDataModel}"
@@ -160,7 +161,8 @@
             <c:when test="#{isDraft}">
                 <app:selectPopUp id="client"
                                  required="true"
-                                 textValue="#{dispatchVoucher.client.codeAndFullName}"
+                                 styleClass="inputLarge"
+                                 textValue="#{dispatchVoucher.client.fullName}"
                                  value="#{dispatchVoucher.client}"
                                  dataModel="#{clientDataModel}"
                                  clearAction="dispatchVoucherAction.clearClient()"
@@ -169,7 +171,20 @@
                                  hotKeySelect="alt+3"/>
             </c:when>
             <c:otherwise>
-                <h:outputText value="#{dispatchVoucher.client.codeAndFullName}"/>
+                <h:outputText value="#{dispatchVoucher.client.fullName}"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+
+    <s:decorate id="clientTransbordoCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDispatch.clientTransbordoCode']}</ui:define>
+        <c:choose>
+            <c:when test="#{isDraft}">
+                <h:inputText id="clientTransbordoCode" value="#{dispatchVoucher.clientTransbordoCode}"
+                             maxlength="100" styleClass="inputLarge" tabindex="5"/>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{dispatchVoucher.clientTransbordoCode}"/>
             </c:otherwise>
         </c:choose>
     </s:decorate>
@@ -197,7 +212,7 @@
         <c:choose>
             <c:when test="#{isDraft}">
                 <h:selectOneMenu id="originPlace" value="#{dispatchVoucher.originPlace}"
-                                 styleClass="input" required="true" tabindex="6">
+                                 styleClass="inputLarge" required="true" tabindex="6">
                     <s:selectItems value="#{dispatchOriginPlaceList}" var="place"
                                    label="#{place.fullName}"
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
@@ -215,7 +230,7 @@
         <c:choose>
             <c:when test="#{isDraft}">
                 <h:selectOneMenu id="destinationPlace" value="#{dispatchVoucher.destinationPlace}"
-                                 styleClass="input" required="true" tabindex="7">
+                                 styleClass="inputLarge" required="true" tabindex="7">
                     <s:selectItems value="#{dispatchDestinationPlaceList}" var="place"
                                    label="#{place.fullName}"
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>

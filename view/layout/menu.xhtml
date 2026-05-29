@@ -278,6 +278,11 @@
                     rendered="#{s:hasPermission('WAREHOUSE','VIEW')}"
                     propagation="none"/>
 
+            <s:link view="/warehouse/dispatchVoucherList.xhtml" styleClass="tab-cell"
+                    value="#{messages['menu.warehouse.dispatch']}"
+                    rendered="#{s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"
+                    propagation="none"/>
+
             <rich:dropDownMenu value="#{messages['menu.warehouse.report']}">
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
@@ -505,13 +510,6 @@
                             propagation="none"/>
                 </rich:menuItem>
 
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('WAREHOUSEDISPATCH','VIEW')}">
-                    <s:link view="/warehouse/dispatchVoucherList.xhtml"
-                            value="#{messages['menu.warehouse.dispatch']}"
-                            propagation="none"/>
-                </rich:menuItem>
             </rich:dropDownMenu>
 
         </h:panelGrid>

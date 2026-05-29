@@ -9,9 +9,6 @@ import com.encens.khipus.service.customers.ClientService;
 import com.encens.khipus.service.finances.CashAccountService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
-import org.jboss.seam.international.StatusMessage;
-
-import javax.persistence.EntityManager;
 
 /**
  * @author
@@ -26,9 +23,6 @@ public class ClientAction extends GenericAction<Client> {
     private ClientService clientService;
     @In
     private CashAccountService cashAccountService;
-
-    @In(value = "#{entityManager}")
-    private EntityManager em;
 
     private String clientName;
     private Boolean personFlag = Boolean.TRUE;
@@ -67,10 +61,6 @@ public class ClientAction extends GenericAction<Client> {
     @Override
     public String create() {
 
-        if (!validateTransbordoCodeUniqueness(null)) {
-            return Outcome.REDISPLAY;
-        }
-
         getInstance().setCommission(0.0);
         getInstance().setGuarantee(0.0);
         if (getInstance().getPersonFlag())
@@ -97,37 +87,10 @@ public class ClientAction extends GenericAction<Client> {
     @End
     @Override
     public String update() {
-        if (!validateTransbordoCodeUniqueness(getInstance().getId())) {
-            return Outcome.REDISPLAY;
-        }
         getInstance().setPaymentMethodTypeCode(this.paymentMethodSin.getCode());
         if (regularizeCashAccount != null)
             getInstance().setRegularizeAccount(regularizeCashAccount.getAccountCode());
         return super.update();
-    }
-
-    private boolean validateTransbordoCodeUniqueness(Long currentId) {
-        String code = getInstance().getTransbordoCode();
-        if (code == null || code.trim().isEmpty()) {
-            return true;
-        }
-        String jpql;
-        if (currentId == null) {
-            jpql = "select count(c) from Client c where lower(c.transbordoCode) = lower(:code)";
-        } else {
-            jpql = "select count(c) from Client c where lower(c.transbordoCode) = lower(:code) and c.id <> :id";
-        }
-        javax.persistence.Query q = em.createQuery(jpql).setParameter("code", code.trim());
-        if (currentId != null) {
-            q.setParameter("id", currentId);
-        }
-        Long count = (Long) q.getSingleResult();
-        if (count != null && count > 0) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
-                    "Client.error.transbordoCodeDuplicated", code);
-            return false;
-        }
-        return true;
     }
 
     public void clearRegularizeAccount() {

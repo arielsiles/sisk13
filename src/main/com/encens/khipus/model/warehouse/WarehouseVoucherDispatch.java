@@ -103,6 +103,12 @@ public class WarehouseVoucherDispatch implements BaseModel {
     @JoinColumn(name = "idcliente")
     private Client client;
 
+    /* Codigo CLIENTE / TRANSBORDO: varia por despacho, se imprime en el
+       certificado. Texto libre opcional hasta 100 caracteres. */
+    @Column(name = "codigo_transbordo", length = 100)
+    @Length(max = 100)
+    private String clientTransbordoCode;
+
     /* -------- Turno de produccion -------- */
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
@@ -376,6 +382,14 @@ public class WarehouseVoucherDispatch implements BaseModel {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public String getClientTransbordoCode() {
+        return clientTransbordoCode;
+    }
+
+    public void setClientTransbordoCode(String clientTransbordoCode) {
+        this.clientTransbordoCode = clientTransbordoCode;
     }
 
     public ProductionGroup getProductionTurn() {
