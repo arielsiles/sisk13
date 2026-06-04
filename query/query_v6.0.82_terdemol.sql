@@ -173,3 +173,24 @@ insert into funcionalidad values (467, 'CLIENTCASHACCOUNT', 'Cliente: campo Cuen
 
 -- Actualizar secuencia interna de funcionalidad
 update secuencia set valor = (select max(e.idfuncionalidad)+1 from funcionalidad e) where tabla = 'funcionalidad';
+
+
+-- ============================================================================
+-- 10) Eliminar columna observacion del detalle del despacho
+-- ============================================================================
+--
+--  La "Descripcion detallada" del reporte ahora se genera dinamicamente a
+--  partir de bolsas + tipo de bolsa + producto (no se requiere texto manual
+--  por linea). DROP idempotente: solo elimina si la columna existe.
+-- ----------------------------------------------------------------------------
+SET @col_exists := (SELECT COUNT(*)
+                    FROM information_schema.COLUMNS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'inv_valedespacho_det'
+                    AND COLUMN_NAME = 'observacion');
+SET @sql := IF(@col_exists > 0,
+               'ALTER TABLE inv_valedespacho_det DROP COLUMN observacion',
+               'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;

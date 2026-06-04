@@ -186,7 +186,7 @@ public class DispatchRemisionNoteReportAction extends GenericReportAction {
                 }
                 row.put("COLUMN_1", cantidadTon);
                 row.put("COLUMN_2", det.getProductItem() != null ? det.getProductItem().getName() : "");
-                row.put("COLUMN_3", paramAsString(det.getObservation()));
+                row.put("COLUMN_3", buildDescripcionDetallada(det));
                 row.put("COLUMN_4", bagRange);
                 row.put("COLUMN_5", buildTotalDelivered(det));
                 rows.add(row);
@@ -308,6 +308,18 @@ public class DispatchRemisionNoteReportAction extends GenericReportAction {
         String unit = (n == 1) ? " bolsa " : " bolsas ";
         return n + unit + paramAsString(det.getPackaging().getName())
                 + " de " + paramAsString(det.getPackaging().getCapacityLabel());
+    }
+
+    /**
+     * Texto de la columna DESCRIPCION DETALLADA: amplia TOTAL ENTREGADO con
+     * " de capacidad de {producto}". Vacio si falta envase/bolsas/producto.
+     */
+    private String buildDescripcionDetallada(WarehouseVoucherDispatchDetail det) {
+        String total = buildTotalDelivered(det);
+        if (total.isEmpty() || det.getProductItem() == null) {
+            return "";
+        }
+        return total + " de capacidad de " + paramAsString(det.getProductItem().getName());
     }
 
     @Override

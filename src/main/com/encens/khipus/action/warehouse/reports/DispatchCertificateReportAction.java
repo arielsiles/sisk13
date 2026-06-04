@@ -230,7 +230,7 @@ public class DispatchCertificateReportAction extends GenericReportAction {
                 }
                 row.put("COLUMN_1", cantidadTon);
                 row.put("COLUMN_2", det.getProductItem() != null ? det.getProductItem().getName() : "");
-                row.put("COLUMN_3", paramAsString(det.getObservation()));
+                row.put("COLUMN_3", buildDescripcionDetallada(det));
                 row.put("COLUMN_4", bagRange);
                 // TOTAL ENTREGADO: texto dinamico a partir del tipo de envase y
                 // la cantidad de bolsas de la linea. Ej: "28 bolsas Big Bag de
@@ -261,6 +261,20 @@ public class DispatchCertificateReportAction extends GenericReportAction {
         String unit = (n == 1) ? " bolsa " : " bolsas ";
         return n + unit + paramAsString(det.getPackaging().getName())
                 + " de " + paramAsString(det.getPackaging().getCapacityLabel());
+    }
+
+    /**
+     * Texto de la columna DESCRIPCION DETALLADA: amplia TOTAL ENTREGADO con
+     * " de capacidad de {producto}".
+     *   Ej: "28 bolsas Big Bag de 1 tonelada de capacidad de P.T. BARITINA"
+     * Si la linea no tiene envase/bolsas o producto, retorna cadena vacia.
+     */
+    private String buildDescripcionDetallada(WarehouseVoucherDispatchDetail det) {
+        String total = buildTotalDelivered(det);
+        if (total.isEmpty() || det.getProductItem() == null) {
+            return "";
+        }
+        return total + " de capacidad de " + paramAsString(det.getProductItem().getName());
     }
 
     @Override

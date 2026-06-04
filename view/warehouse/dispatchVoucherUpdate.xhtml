@@ -483,7 +483,6 @@
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.quantity']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bagsCount']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.packaging']}</th>
-            <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.observation']}</th>
             <th class="rich-table-headercell" rendered="#{isDraft}">#{messages['Common.action']}</th>
         </tr>
         </thead>
@@ -540,17 +539,6 @@
                         </c:when>
                         <c:otherwise>
                             <h:outputText value="#{detail.packaging.fullName}"/>
-                        </c:otherwise>
-                    </c:choose>
-                </td>
-                <td class="rich-table-cell">
-                    <c:choose>
-                        <c:when test="#{isDraft}">
-                            <h:inputText value="#{detail.observation}" maxlength="250"
-                                         styleClass="input" style="width: 100%; box-sizing: border-box;"/>
-                        </c:when>
-                        <c:otherwise>
-                            <h:outputText value="#{detail.observation}"/>
                         </c:otherwise>
                     </c:choose>
                 </td>
