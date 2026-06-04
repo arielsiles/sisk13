@@ -292,6 +292,11 @@
                          tabindex="15"
                          style="width:200px;height:40px;"/>
     </s:decorate>
+    <s:decorate id="cellphoneField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Person.cellphone']}</ui:define>
+        <h:inputText id="cellphone" value="#{employee.cellphone}" maxlength="20"
+                     styleClass="input" tabindex="16"/>
+    </s:decorate>
 </s:div>
 
 </h:panelGrid>

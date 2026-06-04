@@ -14,6 +14,7 @@ import com.encens.khipus.model.warehouse.DispatchPlace;
 import com.encens.khipus.model.warehouse.DispatchState;
 import com.encens.khipus.model.warehouse.DispatchStockImpact;
 import com.encens.khipus.model.warehouse.Driver;
+import com.encens.khipus.model.warehouse.InventoryPackaging;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.ProductItemPK;
 import com.encens.khipus.model.warehouse.Vehicle;
@@ -117,6 +118,12 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     @Factory(value = "dispatchDriverList", scope = ScopeType.STATELESS)
     public List<Driver> getDriverList() {
         return em.createNamedQuery("Driver.findAllActive").getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Factory(value = "dispatchPackagingList", scope = ScopeType.STATELESS)
+    public List<InventoryPackaging> getPackagingList() {
+        return em.createNamedQuery("InventoryPackaging.findAllActive").getResultList();
     }
 
     /**
@@ -237,7 +244,44 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
             }
         }
 
+        // V09 (suave, NO bloqueante) - consistencia bolsas x capacidad vs peso
+        // de la linea. Solo aplica si la linea tiene tipo de envase con capacidad
+        // configurada y cantidad de bolsas. Tolerancia: el peso de una bolsa.
+        warnPackagingConsistency(d);
+
         return ok;
+    }
+
+    /**
+     * Advertencia no bloqueante: por cada linea con tipo de envase (capacidad
+     * por bolsa en Kg) y cantidad de bolsas, verifica que bolsas * capacidad
+     * coincida aproximadamente con el peso de la linea (cantidad, en Kg).
+     * Tolera una desviacion menor al peso de una bolsa.
+     */
+    private void warnPackagingConsistency(WarehouseVoucherDispatch d) {
+        if (d.getDetails() == null) {
+            return;
+        }
+        for (WarehouseVoucherDispatchDetail det : d.getDetails()) {
+            InventoryPackaging pkg = det.getPackaging();
+            if (pkg == null || pkg.getUnitCapacityKg() == null
+                    || det.getBagsCount() == null || det.getQuantity() == null) {
+                continue;
+            }
+            if (pkg.getUnitCapacityKg().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+            BigDecimal expected = pkg.getUnitCapacityKg()
+                    .multiply(new BigDecimal(det.getBagsCount()));
+            BigDecimal diff = expected.subtract(det.getQuantity()).abs();
+            if (diff.compareTo(pkg.getUnitCapacityKg()) > 0) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                        "WarehouseDispatch.detail.packagingMismatch",
+                        det.getProductItem() != null ? det.getProductItem().getName() : "",
+                        det.getBagsCount(), pkg.getCapacityLabel(),
+                        expected, det.getQuantity());
+            }
+        }
     }
 
     /* =========================================================

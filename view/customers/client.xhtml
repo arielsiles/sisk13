@@ -202,7 +202,8 @@
 
         </s:div>
 
-        <s:decorate id="paymentMethodField" template="/include/inputField.xhtml" styleClass="formRow">
+        <s:decorate id="paymentMethodField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{s:hasPermission('CLIENTPAYMENT','VIEW')}">
             <ui:define name="label">#{messages['Invoice.paymentMethod']}</ui:define>
             <h:selectOneMenu id="paymentMethod"
                              value="#{clientAction.paymentMethodSin}"
@@ -217,7 +218,8 @@
             </h:selectOneMenu>
         </s:decorate>
 
-    <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+    <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{s:hasPermission('CLIENTCASHACCOUNT','VIEW')}">
         <ui:define name="label">#{messages['Client.deferredCashAccount']}</ui:define>
         <app:selectPopUp id="itemAccount"
                          required="false"
@@ -240,6 +242,20 @@
 </s:div>
 
 <s:div>
+
+    <s:decorate id="codPrefijoField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.codPrefijo']}</ui:define>
+        <h:inputText id="codPrefijo" value="#{client.codPrefijo}" required="false"
+                     maxlength="10" tabindex="8" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
+    <s:decorate id="codigoClienteField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.codigoCliente']}</ui:define>
+        <h:inputText id="codigoCliente" value="#{client.codigo}" required="false"
+                     maxlength="100" tabindex="8" styleClass="input">
+        </h:inputText>
+    </s:decorate>
 
     <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.phone']}</ui:define>
@@ -264,7 +280,8 @@
                          style="width:200px;height:40px;"/>
     </s:decorate>
 
-    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+    <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{s:hasPermission('CLIENTTYPE','VIEW')}">
         <ui:define name="label">#{messages['Client.clientType']}</ui:define>
         <h:selectOneMenu id="documentType"
                          value="#{client.clientType}"
@@ -279,7 +296,8 @@
         </h:selectOneMenu>
     </s:decorate>
 
-    <s:decorate id="territoryField" template="/include/inputField.xhtml" styleClass="formRow">
+    <s:decorate id="territoryField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{s:hasPermission('CLIENTTERRITORY','VIEW')}">
         <ui:define name="label">#{messages['Client.territory']}</ui:define>
         <h:selectOneMenu id="territory"
                          value="#{client.territoriotrabajo}"
@@ -294,7 +312,8 @@
         </h:selectOneMenu>
     </s:decorate>
 
-    <s:decorate id="customerCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
+    <s:decorate id="customerCategoryField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{s:hasPermission('CLIENTCATEGORY','VIEW')}">
         <ui:define name="label">#{messages['Client.customerCategory']}</ui:define>
         <h:selectOneMenu id="documentType"
                          value="#{client.customerCategory}"
@@ -309,7 +328,8 @@
         </h:selectOneMenu>
     </s:decorate>
 
-    <s:decorate id="productDiscountField" template="/include/inputField.xhtml" styleClass="formRow">
+    <s:decorate id="productDiscountField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{s:hasPermission('CLIENTDISCOUNT','VIEW')}">
         <ui:define name="label">#{messages['Client.productDiscountPercentage']}</ui:define>
         <h:inputText id="productDiscount" value="#{client.productDiscount}" required="false" tabindex="8" styleClass="inputTiny">
             <a4j:support event="onchange" reRender="productDiscountField"/>
@@ -317,7 +337,8 @@
         </h:inputText>
     </s:decorate>
 
-    <s:decorate id="additionalDiscountField" template="/include/inputField.xhtml" styleClass="formRow">
+    <s:decorate id="additionalDiscountField" template="/include/inputField.xhtml" styleClass="formRow"
+                rendered="#{s:hasPermission('CLIENTDISCOUNT','VIEW')}">
         <ui:define name="label">#{messages['Client.additionalDiscountPercentage']}</ui:define>
         <h:inputText id="additionalDiscount" value="#{client.additionalDiscount}" required="false" tabindex="8" styleClass="inputTiny">
             <a4j:support event="onchange" reRender="additionalDiscountField"/>

@@ -54,6 +54,12 @@
                      immediate="true"
                      rendered="#{(isDraft or isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
 
+    <h:commandButton action="#{dispatchRemisionNoteReportAction.generateRemisionNote(dispatchVoucher)}"
+                     value="#{messages['WarehouseDispatch.button.printRemisionNote']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
+
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}">
@@ -99,12 +105,6 @@
         <ui:define name="label">#{messages['WarehouseDispatch.deliverySeller']}</ui:define>
         <c:choose>
             <c:when test="#{isDraft}">
-                <app:quickSearch id="quickSearchDeliverySeller"
-                                 textValue="dispatchVoucher.deliverySeller.contract.employee.idNumber"
-                                 value="#{dispatchVoucher.deliverySeller}"
-                                 namedQuery="jobContractByEmployeeIdNumberQuickSearch"
-                                 reRender="deliverySellerField"
-                                 tabindex="2"/>
                 <app:selectPopUp id="deliverySeller"
                                  required="true"
                                  styleClass="inputLarge"
@@ -141,7 +141,7 @@
             <c:when test="#{isDraft}">
                 <app:selectPopUp id="transportCompany"
                                  required="true"
-                                 textValue="#{dispatchVoucher.transportCompany.entity.fullName}"
+                                 textValue="#{dispatchVoucher.transportCompany.entity.acronym}"
                                  value="#{dispatchVoucher.transportCompany}"
                                  dataModel="#{providerDataModel}"
                                  clearAction="dispatchVoucherAction.clearTransportCompany()"
@@ -150,41 +150,31 @@
                                  hotKeySelect="alt+2"/>
             </c:when>
             <c:otherwise>
-                <h:outputText value="#{dispatchVoucher.transportCompany.entity.fullName}"/>
+                <h:outputText value="#{dispatchVoucher.transportCompany.entity.acronym}"/>
             </c:otherwise>
         </c:choose>
     </s:decorate>
 
+    <!-- Cliente/Transbordo: popup particular de clientes que solo expone
+         codPrefijo y codigo (por seguridad). El form muestra solo el
+         client.codigo y mantiene la FK idcliente en el despacho. -->
     <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['WarehouseDispatch.client']}</ui:define>
+        <ui:define name="label">#{messages['WarehouseDispatch.clientTransbordoCode']}</ui:define>
         <c:choose>
             <c:when test="#{isDraft}">
                 <app:selectPopUp id="client"
                                  required="true"
                                  styleClass="inputLarge"
-                                 textValue="#{dispatchVoucher.client.fullName}"
+                                 textValue="#{dispatchVoucher.client.codigo}"
                                  value="#{dispatchVoucher.client}"
-                                 dataModel="#{clientDataModel}"
+                                 dataModel="#{dispatchClientDataModel}"
                                  clearAction="dispatchVoucherAction.clearClient()"
-                                 searchModalPanel="clientListModalPanel"
+                                 searchModalPanel="dispatchClientListModalPanel"
                                  reRender="clientField"
                                  hotKeySelect="alt+3"/>
             </c:when>
             <c:otherwise>
-                <h:outputText value="#{dispatchVoucher.client.fullName}"/>
-            </c:otherwise>
-        </c:choose>
-    </s:decorate>
-
-    <s:decorate id="clientTransbordoCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['WarehouseDispatch.clientTransbordoCode']}</ui:define>
-        <c:choose>
-            <c:when test="#{isDraft}">
-                <h:inputText id="clientTransbordoCode" value="#{dispatchVoucher.clientTransbordoCode}"
-                             maxlength="100" styleClass="inputLarge" tabindex="5"/>
-            </c:when>
-            <c:otherwise>
-                <h:outputText value="#{dispatchVoucher.clientTransbordoCode}"/>
+                <h:outputText value="#{dispatchVoucher.client.codigo}"/>
             </c:otherwise>
         </c:choose>
     </s:decorate>
@@ -492,6 +482,7 @@
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.measureUnit']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.quantity']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bagsCount']}</th>
+            <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.packaging']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.observation']}</th>
             <th class="rich-table-headercell" rendered="#{isDraft}">#{messages['Common.action']}</th>
         </tr>
@@ -540,6 +531,21 @@
                 <td class="rich-table-cell">
                     <c:choose>
                         <c:when test="#{isDraft}">
+                            <h:selectOneMenu value="#{detail.packaging}" styleClass="input">
+                                <s:selectItems value="#{dispatchPackagingList}" var="pkg"
+                                               label="#{pkg.fullName}"
+                                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </c:when>
+                        <c:otherwise>
+                            <h:outputText value="#{detail.packaging.fullName}"/>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td class="rich-table-cell">
+                    <c:choose>
+                        <c:when test="#{isDraft}">
                             <h:inputText value="#{detail.observation}" maxlength="250"
                                          styleClass="input" style="width: 100%; box-sizing: border-box;"/>
                         </c:when>
@@ -569,7 +575,7 @@
     <c:choose>
         <c:when test="#{isDraft}">
             <h:inputTextarea id="observation" value="#{dispatchVoucher.observation}"
-                             rows="2"
+                             rows="4"
                              style="width: 700px; resize: vertical;"
                              tabindex="30">
                 <f:validateLength maximum="1000"/>
@@ -609,6 +615,12 @@
                      immediate="true"
                      rendered="#{(isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"
                      tabindex="43"/>
+    <h:commandButton action="#{dispatchRemisionNoteReportAction.generateRemisionNote(dispatchVoucher)}"
+                     value="#{messages['WarehouseDispatch.button.printRemisionNote']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{(isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"
+                     tabindex="44"/>
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}"
@@ -679,16 +691,16 @@
     </ui:define>
 </s:decorate>
 
-<s:decorate id="clientListModalPanelContainer" template="/finances/clientListModalPanel.xhtml"
+<s:decorate id="dispatchClientListModalPanelContainer" template="/customers/dispatchClientListModalPanel.xhtml"
             rendered="#{isDraft}">
-    <ui:param name="containerId" value="clientListModalPanelContainer"/>
-    <ui:param name="dialogId" value="clientListModalPanel"/>
+    <ui:param name="containerId" value="dispatchClientListModalPanelContainer"/>
+    <ui:param name="dialogId" value="dispatchClientListModalPanel"/>
     <ui:define name="assignButton">
         <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
                            action="#{dispatchVoucherAction.assignClient(clientItem)}"
                            image="/img/active.gif" styleClass="select-image-middle"
                            reRender="clientField"
-                           oncomplete="Richfaces.hideModalPanel('clientListModalPanel');"/>
+                           oncomplete="Richfaces.hideModalPanel('dispatchClientListModalPanel');"/>
     </ui:define>
 </s:decorate>
 
@@ -805,7 +817,7 @@
             </tr>
             <tr class="rich-table-row">
                 <td class="rich-table-cell bold">#{messages['WarehouseDispatch.transportCompany']}</td>
-                <td class="rich-table-cell" colspan="3">#{dispatchVoucher.transportCompany.entity.fullName}</td>
+                <td class="rich-table-cell" colspan="3">#{dispatchVoucher.transportCompany.entity.acronym}</td>
             </tr>
             <tr class="rich-table-row">
                 <td class="rich-table-cell bold">#{messages['WarehouseDispatch.driver']}</td>

@@ -1,0 +1,80 @@
+<rich:modalPanel height="520" width="600" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}">
+
+    <f:facet name="header">
+        <h:outputText>#{messages['WarehouseDispatch.clientTransbordoCode']}</h:outputText>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <h:form id="dispatchClientListForm#{dialogId}">
+        <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+            <s:decorate id="prefijoFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Client.codPrefijo']}</ui:define>
+                <h:inputText id="prefijo" value="#{dispatchClientDataModel.criteria.codPrefijo}"
+                             maxlength="10" styleClass="input" tabindex="2001"/>
+            </s:decorate>
+
+            <s:decorate id="codigoFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Client.codigoCliente']}</ui:define>
+                <h:inputText id="codigo" value="#{dispatchClientDataModel.criteria.codigo}"
+                             maxlength="100" styleClass="input" tabindex="2002"/>
+            </s:decorate>
+
+            <div class="buttons">
+                <a4j:commandButton action="#{dispatchClientDataModel.search}"
+                                   reRender="dispatchClientList, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}"
+                                   id="searchButtonId" tabindex="2003">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </div>
+        </rich:simpleTogglePanel>
+        <br/>
+
+        <rich:dataTable value="#{dispatchClientDataModel}" var="clientItem" id="dispatchClientList"
+                        rows="#{sessionUser.rowsPerPage}" width="100%" columnsWidth="30%, 55%, 15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="client.codPrefijo"
+                                               dataModel="#{dispatchClientDataModel}"
+                                               reRender="dispatchClientList, dataScroller">
+                            #{messages['Client.codPrefijo']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="client.codigo"
+                                               dataModel="#{dispatchClientDataModel}"
+                                               reRender="dispatchClientList, dataScroller">
+                            #{messages['Client.codigoCliente']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column styleClass="center">#{messages['Common.select']}</rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{clientItem.codPrefijo}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{clientItem.codigo}"/>
+            </rich:column>
+            <rich:column styleClass="center">
+                <ui:insert name="assignButton"/>
+                <rich:componentControl for="#{dialogId}" attachTo="assignButton" operation="hide" event="onclick"/>
+            </rich:column>
+        </rich:dataTable>
+        <app:dataScroller id="dataScroller" for="dispatchClientList" dataModel="#{dispatchClientDataModel}"/>
+        <rich:componentControl for="#{dialogId}" attachTo="closeLink, assignButton"
+                               operation="hide" event="onclick"/>
+    </h:form>
+</rich:modalPanel>

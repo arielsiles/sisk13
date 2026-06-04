@@ -794,6 +794,32 @@
         </navigation>
     </page>
 
+    <!-- Catalogo de Tipos de Bolsa/Envase -->
+    <page view-id="/warehouse/inventoryPackagingList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('WAREHOUSEPACKAGING','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{inventoryPackagingAction.select(inventoryPackagingItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/inventoryPackaging.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/inventoryPackaging.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/inventoryPackagingList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEPACKAGING','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/inventoryPackagingList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/inventoryPackagingList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <!-- Vales de Despacho de Productos Terminados -->
     <page view-id="/warehouse/dispatchVoucherList.xhtml"
           login-required="true">

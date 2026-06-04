@@ -77,19 +77,24 @@ public class DispatchCertificateReportAction extends GenericReportAction {
         p.put("bagCount", d.getBagCount());
         p.put("invoiceNumber", paramAsString(d.getInvoiceNumber()));
         p.put("clientName", d.getClient() != null ? d.getClient().getFullName() : "");
-        // clientCode = codigo CLIENTE / TRANSBORDO del DESPACHO (varia por vale).
-        // Va impreso en la celda "CLIENTE / TRANSBORDO" del certificado.
-        p.put("clientCode", paramAsString(d.getClientTransbordoCode()));
+        // clientCode = codigo del cliente seleccionado (Client.codigo). Se
+        // imprime en la celda "CLIENTE / TRANSBORDO" del certificado. La FK
+        // dispatch.client.idcliente mantiene la relacion con el cliente.
+        p.put("clientCode",
+                d.getClient() != null ? paramAsString(d.getClient().getCodigo()) : "");
 
-        // Vendedor (JobContract -> Contract -> Employee)
+        // Vendedor (JobContract -> Contract -> Employee). Celular sale de
+        // persona.telcelular via Employee (que extiende Person).
         if (d.getDeliverySeller() != null
                 && d.getDeliverySeller().getContract() != null
                 && d.getDeliverySeller().getContract().getEmployee() != null) {
             p.put("sellerName", d.getDeliverySeller().getContract().getEmployee().getFullName());
             p.put("sellerCi", paramAsString(d.getDeliverySeller().getContract().getEmployee().getIdNumber()));
+            p.put("sellerPhone", paramAsString(d.getDeliverySeller().getContract().getEmployee().getCellphone()));
         } else {
             p.put("sellerName", "");
             p.put("sellerCi", "");
+            p.put("sellerPhone", "");
         }
         if (d.getDeliverySeller() != null
                 && d.getDeliverySeller().getJob() != null
@@ -98,11 +103,12 @@ public class DispatchCertificateReportAction extends GenericReportAction {
         } else {
             p.put("sellerCharge", "");
         }
-        p.put("sellerPhone", "");
 
-        // Transportadora / conductor / vehiculo
+        // Transportadora / conductor / vehiculo. Solo razon social (acronym),
+        // sin concatenar el NIT/codigo (FinancesEntity.getFullName concatena
+        // "nitNumber + acronym", lo que produce "0 ASOCIACION ...").
         p.put("transportCompany", d.getTransportCompany() != null && d.getTransportCompany().getEntity() != null
-                ? d.getTransportCompany().getEntity().getFullName() : "");
+                ? paramAsString(d.getTransportCompany().getEntity().getAcronym()) : "");
         p.put("driverName", d.getDriver() != null ? paramAsString(d.getDriver().getName()) : "");
         p.put("driverLicense", d.getDriver() != null ? paramAsString(d.getDriver().getLicense()) : "");
         p.put("driverPhone", d.getDriver() != null ? paramAsString(d.getDriver().getPhone()) : "");
@@ -149,13 +155,16 @@ public class DispatchCertificateReportAction extends GenericReportAction {
                 ? MessageUtils.getMessage(d.getState().getResourceKey()) : "");
         p.put("annulled", Boolean.valueOf(d.getState() == DispatchState.ANULADO));
 
-        // Lista de productos: un renglon por producto (separados por salto de
-        // linea) para la fila "PRODUCTO" de la tabla DATOS DEL DESPACHO.
+        // Lista de productos para la fila "PRODUCTO" de la tabla DATOS DEL
+        // DESPACHO. Los productos se separan con coma en UNA sola linea para
+        // no estirar la fila y desalinear el resto de la tabla. El detalle
+        // completo (cantidad, descripcion, etc.) figura en la tabla
+        // CANTIDAD / PRODUCTO / SERVICIO del subreporte.
         StringBuilder sb = new StringBuilder();
         if (d.getDetails() != null) {
             for (WarehouseVoucherDispatchDetail line : d.getDetails()) {
                 if (line.getProductItem() != null) {
-                    if (sb.length() > 0) sb.append("\n");
+                    if (sb.length() > 0) sb.append(", ");
                     sb.append(line.getProductItem().getFullName());
                 }
             }
@@ -212,16 +221,21 @@ public class DispatchCertificateReportAction extends GenericReportAction {
             for (WarehouseVoucherDispatchDetail det : details) {
                 Map<String, Object> row = new HashMap<String, Object>();
                 // CANTIDAD: cantidad del detalle a toneladas (asume unidad base Kg)
+                // Se quitan ceros finales para que "28.000" salga como "28" y
+                // no se confunda con veintiocho mil.
                 String cantidadTon = "";
                 if (det.getQuantity() != null) {
                     BigDecimal tons = BigDecimalUtil.divide(det.getQuantity(), new BigDecimal(1000), 3);
-                    cantidadTon = tons.toString() + " Toneladas";
+                    cantidadTon = tons.stripTrailingZeros().toPlainString() + " Toneladas";
                 }
                 row.put("COLUMN_1", cantidadTon);
                 row.put("COLUMN_2", det.getProductItem() != null ? det.getProductItem().getName() : "");
                 row.put("COLUMN_3", paramAsString(det.getObservation()));
                 row.put("COLUMN_4", bagRange);
-                row.put("COLUMN_5", "");
+                // TOTAL ENTREGADO: texto dinamico a partir del tipo de envase y
+                // la cantidad de bolsas de la linea. Ej: "28 bolsas Big Bag de
+                // 1 tonelada". Si falta envase o bolsas, queda en blanco.
+                row.put("COLUMN_5", buildTotalDelivered(det));
                 rows.add(row);
             }
         }
@@ -229,6 +243,24 @@ public class DispatchCertificateReportAction extends GenericReportAction {
 
         mainReportParams.put("DETAILSUBREPORT", subReportData.getJasperReport());
         mainReportParams.put("DETAILSUBREPORT_DATASOURCE", ds);
+    }
+
+    /**
+     * Construye el texto de la columna TOTAL ENTREGADO a partir del tipo de
+     * envase y la cantidad de bolsas de la linea:
+     *   {bolsas} bolsas {nombreEnvase} de {capacidad}
+     * Ej: "28 bolsas Big Bag de 1 tonelada".
+     * Si la linea no tiene envase o cantidad de bolsas, retorna cadena vacia
+     * (se mantiene el formato del certificado).
+     */
+    private String buildTotalDelivered(WarehouseVoucherDispatchDetail det) {
+        if (det.getPackaging() == null || det.getBagsCount() == null) {
+            return "";
+        }
+        int n = det.getBagsCount();
+        String unit = (n == 1) ? " bolsa " : " bolsas ";
+        return n + unit + paramAsString(det.getPackaging().getName())
+                + " de " + paramAsString(det.getPackaging().getCapacityLabel());
     }
 
     @Override

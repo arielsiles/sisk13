@@ -107,8 +107,11 @@ public class Client implements BaseModel {
     @Column(name = "porcentajegarantia")
     private Double guarantee;
 
-    @Column(name = "codigocliente")
+    @Column(name = "codigocliente", length = 100)
     private String codigo;
+
+    @Column(name = "codprefijo", length = 10)
+    private String codPrefijo;
 
     @Column(name = "tipo_persona")
     private String personType;
@@ -292,6 +295,14 @@ public class Client implements BaseModel {
 
     public void setCodigo(String codigo) {
         this.codigo = codigo;
+    }
+
+    public String getCodPrefijo() {
+        return codPrefijo;
+    }
+
+    public void setCodPrefijo(String codPrefijo) {
+        this.codPrefijo = codPrefijo;
     }
 
     public String getNombreCompleto(){

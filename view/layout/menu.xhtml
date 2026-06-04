@@ -510,6 +510,14 @@
                             propagation="none"/>
                 </rich:menuItem>
 
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WAREHOUSEPACKAGING','VIEW')}">
+                    <s:link view="/warehouse/inventoryPackagingList.xhtml"
+                            value="#{messages['menu.warehouse.dispatch.packaging']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
             </rich:dropDownMenu>
 
         </h:panelGrid>

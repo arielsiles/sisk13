@@ -2,91 +2,79 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-              name="DispatchCertificateDetailSubReport"
+              name="DispatchRemisionNoteWeightSubReport"
               pageWidth="532" pageHeight="792"
               whenNoDataType="AllSectionsNoDetail"
               columnWidth="532"
               leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+
     <field name="cantidad" class="java.lang.String">
         <fieldDescription><![CDATA[COLUMN_1]]></fieldDescription>
     </field>
-    <field name="producto" class="java.lang.String">
+    <field name="peso" class="java.lang.String">
         <fieldDescription><![CDATA[COLUMN_2]]></fieldDescription>
     </field>
-    <field name="descripcion" class="java.lang.String">
+    <field name="producto" class="java.lang.String">
         <fieldDescription><![CDATA[COLUMN_3]]></fieldDescription>
     </field>
-    <field name="numeracionBolsas" class="java.lang.String">
+    <field name="observacion" class="java.lang.String">
         <fieldDescription><![CDATA[COLUMN_4]]></fieldDescription>
     </field>
-    <field name="totalEntregado" class="java.lang.String">
-        <fieldDescription><![CDATA[COLUMN_5]]></fieldDescription>
-    </field>
+
     <columnHeader>
-        <band height="24">
+        <band height="20">
             <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement x="0" y="0" width="66" height="24"/>
+                <reportElement x="0" y="0" width="120" height="20"/>
                 <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["CANTIDAD"]]></textFieldExpression>
             </textField>
             <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement x="66" y="0" width="142" height="24"/>
+                <reportElement x="120" y="0" width="150" height="20"/>
                 <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA["PRODUCTO / SERVICIO"]]></textFieldExpression>
+                <textFieldExpression class="java.lang.String"><![CDATA["CANTIDAD"]]></textFieldExpression>
             </textField>
             <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement x="208" y="0" width="127" height="24"/>
+                <reportElement x="270" y="0" width="110" height="20"/>
                 <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA["DESCRIPCION DETALLADA"]]></textFieldExpression>
+                <textFieldExpression class="java.lang.String"><![CDATA["PRODUCTO"]]></textFieldExpression>
             </textField>
             <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement x="335" y="0" width="70" height="24"/>
+                <reportElement x="380" y="0" width="152" height="20"/>
                 <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA["NUMERACION BOLSAS"]]></textFieldExpression>
-            </textField>
-            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement x="405" y="0" width="127" height="24"/>
-                <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA["TOTAL ENTREGADO"]]></textFieldExpression>
+                <textFieldExpression class="java.lang.String"><![CDATA["OBSERVACION"]]></textFieldExpression>
             </textField>
         </band>
     </columnHeader>
+
     <detail>
-        <band height="24">
+        <band height="40">
             <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="66" height="24"/>
+                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="120" height="40"/>
                 <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA[$F{cantidad}]]></textFieldExpression>
             </textField>
             <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="66" y="0" width="142" height="24"/>
+                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="120" y="0" width="150" height="40"/>
                 <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{peso}]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="270" y="0" width="110" height="40"/>
+                <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA[$F{producto}]]></textFieldExpression>
             </textField>
             <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="208" y="0" width="127" height="24"/>
-                <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA[$F{descripcion}]]></textFieldExpression>
-            </textField>
-            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="335" y="0" width="70" height="24"/>
+                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="380" y="0" width="152" height="40"/>
                 <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA[$F{numeracionBolsas}]]></textFieldExpression>
-            </textField>
-            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
-                <reportElement positionType="Float" stretchType="RelativeToTallestObject" x="405" y="0" width="127" height="24"/>
-                <box padding="2"><pen lineWidth="0.5" lineColor="#000000"/></box>
-                <textElement textAlignment="Left" verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA[$F{totalEntregado}]]></textFieldExpression>
+                <textFieldExpression class="java.lang.String"><![CDATA[$F{observacion}]]></textFieldExpression>
             </textField>
         </band>
     </detail>

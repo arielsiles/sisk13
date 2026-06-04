@@ -81,6 +81,10 @@ public class WarehouseVoucherDispatchDetail implements BaseModel {
     @Column(name = "cantidad_bolsas")
     private Integer bagsCount;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idtipoenvase")
+    private InventoryPackaging packaging;
+
     @Column(name = "observacion", length = 250)
     @Length(max = 250)
     private String observation;
@@ -187,6 +191,14 @@ public class WarehouseVoucherDispatchDetail implements BaseModel {
 
     public void setBagsCount(Integer bagsCount) {
         this.bagsCount = bagsCount;
+    }
+
+    public InventoryPackaging getPackaging() {
+        return packaging;
+    }
+
+    public void setPackaging(InventoryPackaging packaging) {
+        this.packaging = packaging;
     }
 
     public String getObservation() {

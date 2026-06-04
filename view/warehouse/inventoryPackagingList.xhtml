@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['InventoryPackaging.titlePlural']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="inventoryPackagingSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+                <s:decorate id="nameFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryPackaging.name']}</ui:define>
+                    <h:inputText id="name" value="#{inventoryPackagingDataModel.criteria.name}"
+                                 maxlength="80" tabindex="1" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="capacityFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryPackaging.capacityLabel']}</ui:define>
+                    <h:inputText id="capacityLabel" value="#{inventoryPackagingDataModel.criteria.capacityLabel}"
+                                 maxlength="60" tabindex="2" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="stateFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['InventoryPackaging.state']}</ui:define>
+                    <h:selectOneMenu id="state" value="#{inventoryPackagingDataModel.state}"
+                                     styleClass="input" tabindex="3">
+                        <s:selectItems value="#{inventoryPackagingStateList}" var="st"
+                                       label="#{messages[st.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <div class="buttons">
+                    <a4j:commandButton action="#{inventoryPackagingDataModel.search}"
+                                       reRender="inventoryPackagingList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/inventoryPackaging.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEPACKAGING','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{inventoryPackagingDataModel}" var="inventoryPackagingItem" id="inventoryPackagingList"
+                            rows="#{sessionUser.rowsPerPage15}"
+                            width="100%" columnsWidth="35%, 30%, 15%, 10%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="inventoryPackaging.name"
+                                                   dataModel="#{inventoryPackagingDataModel}"
+                                                   reRender="inventoryPackagingList, dataScroller">
+                                #{messages['InventoryPackaging.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="inventoryPackaging.capacityLabel"
+                                                   dataModel="#{inventoryPackagingDataModel}"
+                                                   reRender="inventoryPackagingList, dataScroller">
+                                #{messages['InventoryPackaging.capacityLabel']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['InventoryPackaging.unitCapacityKg']}</rich:column>
+                        <rich:column>#{messages['InventoryPackaging.state']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{inventoryPackagingItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{inventoryPackagingItem.capacityLabel}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{inventoryPackagingItem.unitCapacityKg}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[inventoryPackagingItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WAREHOUSEPACKAGING','VIEW')}"
+                                   action="#{inventoryPackagingAction.select(inventoryPackagingItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="inventoryPackagingList" dataModel="#{inventoryPackagingDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/inventoryPackaging.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEPACKAGING','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

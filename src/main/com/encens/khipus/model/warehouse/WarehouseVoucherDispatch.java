@@ -11,6 +11,7 @@ import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.xproduction.ProductionGroup;
 import com.encens.khipus.util.Constants;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
@@ -102,12 +103,6 @@ public class WarehouseVoucherDispatch implements BaseModel {
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcliente")
     private Client client;
-
-    /* Codigo CLIENTE / TRANSBORDO: varia por despacho, se imprime en el
-       certificado. Texto libre opcional hasta 100 caracteres. */
-    @Column(name = "codigo_transbordo", length = 100)
-    @Length(max = 100)
-    private String clientTransbordoCode;
 
     /* -------- Turno de produccion -------- */
 
@@ -286,6 +281,7 @@ public class WarehouseVoucherDispatch implements BaseModel {
 
     @OneToMany(mappedBy = "dispatch", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private List<WarehouseVoucherDispatchDetail> details = new ArrayList<WarehouseVoucherDispatchDetail>();
 
     /* ================== Getters / Setters ================== */
@@ -382,14 +378,6 @@ public class WarehouseVoucherDispatch implements BaseModel {
 
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    public String getClientTransbordoCode() {
-        return clientTransbordoCode;
-    }
-
-    public void setClientTransbordoCode(String clientTransbordoCode) {
-        this.clientTransbordoCode = clientTransbordoCode;
     }
 
     public ProductionGroup getProductionTurn() {
