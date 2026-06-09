@@ -5,12 +5,15 @@ import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.util.Constants;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Filter;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Detalle (linea) del Vale de Despacho de Productos Terminados.
@@ -81,9 +84,30 @@ public class WarehouseVoucherDispatchDetail implements BaseModel {
     @Column(name = "cantidad_bolsas")
     private Integer bagsCount;
 
+    /**
+     * Numero correlativo inicial de bolsa para esta linea (incluyente).
+     * Junto con bagsToNumber define el rango de codigos de envase generados
+     * al aprobar el despacho. Cada bolsa es: salesLotCode + "/" + lpad(n, 3, '0').
+     */
+    @Column(name = "bolsa_desde")
+    private Integer bagsFromNumber;
+
+    /**
+     * Numero correlativo final de bolsa (incluyente). Si difiere de
+     * (bagsFromNumber + bagsCount - 1), gana bagsCount al generar envases.
+     */
+    @Column(name = "bolsa_hasta")
+    private Integer bagsToNumber;
+
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idtipoenvase")
     private InventoryPackaging packaging;
+
+    @OneToMany(mappedBy = "detail", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+    @OrderBy("correlativeNumber asc")
+    private List<WarehouseVoucherDispatchEnvelope> envelopes = new ArrayList<WarehouseVoucherDispatchEnvelope>();
 
     @Version
     @Column(name = "version")
@@ -189,12 +213,36 @@ public class WarehouseVoucherDispatchDetail implements BaseModel {
         this.bagsCount = bagsCount;
     }
 
+    public Integer getBagsFromNumber() {
+        return bagsFromNumber;
+    }
+
+    public void setBagsFromNumber(Integer bagsFromNumber) {
+        this.bagsFromNumber = bagsFromNumber;
+    }
+
+    public Integer getBagsToNumber() {
+        return bagsToNumber;
+    }
+
+    public void setBagsToNumber(Integer bagsToNumber) {
+        this.bagsToNumber = bagsToNumber;
+    }
+
     public InventoryPackaging getPackaging() {
         return packaging;
     }
 
     public void setPackaging(InventoryPackaging packaging) {
         this.packaging = packaging;
+    }
+
+    public List<WarehouseVoucherDispatchEnvelope> getEnvelopes() {
+        return envelopes;
+    }
+
+    public void setEnvelopes(List<WarehouseVoucherDispatchEnvelope> envelopes) {
+        this.envelopes = envelopes;
     }
 
     public Long getVersion() {

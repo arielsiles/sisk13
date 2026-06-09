@@ -194,3 +194,101 @@ SET @sql := IF(@col_exists > 0,
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+
+-- ============================================================================
+-- 11) Numeracion de bolsas: mover de cabecera al detalle del despacho
+-- ============================================================================
+--
+--  Un despacho puede tener varios productos (detalles) con distintos tipos de
+--  bolsa y rangos de numeracion. La numeracion (desde/hasta) y la cantidad
+--  total de bolsas se mueven del header al detalle.
+--  cantidad_bolsas del header pasa a ser derivado en Java (sum de detalles).
+-- ----------------------------------------------------------------------------
+ALTER TABLE inv_valedespacho
+    DROP COLUMN bolsa_desde,
+    DROP COLUMN bolsa_hasta,
+    DROP COLUMN cantidad_bolsas;
+
+ALTER TABLE inv_valedespacho_det
+    ADD COLUMN bolsa_desde INT NULL AFTER cantidad_bolsas,
+    ADD COLUMN bolsa_hasta INT NULL AFTER bolsa_desde;
+
+
+-- ============================================================================
+-- 12) Tipo de bolsa: texto por defecto del DETALLE DE ENVASE
+-- ============================================================================
+--
+--  Pre-llena la columna DETALLE DE ENVASE del nuevo reporte
+--  "Detalle de Envases Carguio". Texto editable bolsa por bolsa despues.
+-- ----------------------------------------------------------------------------
+ALTER TABLE inv_tipo_envase
+    ADD COLUMN detalle_envase_default VARCHAR(255) NULL AFTER peso_bruto_promedio_kg;
+
+UPDATE inv_tipo_envase
+   SET detalle_envase_default = 'BOLSA BIG BAG SELLADA SIN INPERFECCIONES CON PORTADOCUMENTO'
+ WHERE nombre = 'Big Bag';
+
+
+-- ============================================================================
+-- 13) Tabla de envases del despacho (filas del reporte Carguio)
+-- ============================================================================
+--
+--  Una fila por bolsa fisica del despacho. Se generan al APROBAR el despacho:
+--  por cada detalle, se crean detail.bagsCount filas con correlativos
+--  consecutivos arrancando en detail.bolsa_desde.
+--    codigo_identificacion = salesLotCode + "/" + lpad(correlativo, 3, '0')
+--      ej. "BAR-03-26/057"
+--    detalle_envase        = packaging.detalle_envase_default (editable)
+--    peso_neto_aprox_kg    = packaging.capacidad_kg          (editable)
+--
+--  En estado APROBADO el operador puede editar texto y peso. En FINALIZADO
+--  los envases quedan inmutables (solo se imprime el reporte).
+-- ----------------------------------------------------------------------------
+CREATE TABLE inv_valedespacho_envase (
+    idenvase             BIGINT       NOT NULL AUTO_INCREMENT,
+    idvaledespacho       BIGINT       NOT NULL,
+    iddetalledespacho    BIGINT       NOT NULL,
+    numero_correlativo   INT          NOT NULL,
+    codigo_identificacion VARCHAR(120) NOT NULL,
+    detalle_envase       VARCHAR(255) NULL,
+    peso_neto_aprox_kg   DECIMAL(12,3) NULL,
+    createdby            VARCHAR(4)   NULL,
+    createddate          DATETIME     NULL,
+    updatedby            VARCHAR(4)   NULL,
+    updateddate          DATETIME     NULL,
+    version              BIGINT       DEFAULT 0,
+    idcompania           BIGINT       NOT NULL,
+    PRIMARY KEY (idenvase),
+    KEY ix_envase_dispatch (idvaledespacho),
+    KEY ix_envase_detail (iddetalledespacho),
+    CONSTRAINT fk_envase_dispatch
+        FOREIGN KEY (idvaledespacho) REFERENCES inv_valedespacho (idvaledespacho),
+    CONSTRAINT fk_envase_detail
+        FOREIGN KEY (iddetalledespacho) REFERENCES inv_valedespacho_det (iddetalledespacho),
+    CONSTRAINT fk_envase_compania
+        FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- ============================================================================
+-- 14) Permisos FINALIZAR y DESFINALIZAR el despacho (separados)
+-- ============================================================================
+--
+--  Bitmask: solo VIEW (1) se usa como flag de habilitacion del boton.
+--  idmodulo = 5 (warehouse).
+--
+--  FINALIZAR: operacion frecuente (operador de almacen). Bloquea edicion
+--             de envases del despacho aprobado.
+--  DESFINALIZAR: operacion correctiva/excepcional (supervisor/admin).
+--                Revierte FIN -> APR para permitir correccion de envases.
+-- ----------------------------------------------------------------------------
+insert into funcionalidad values (468, 'WAREHOUSEDISPATCHFINALIZE',   'Finalizar Despacho',    5, 1, 'menu.warehouse.dispatch.finalize',   1);
+insert into funcionalidad values (469, 'WAREHOUSEDISPATCHUNFINALIZE', 'Desfinalizar Despacho', 5, 1, 'menu.warehouse.dispatch.unfinalize', 1);
+
+-- Asignacion por defecto al rol Administrador (idrol=1).
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (468, 1, 1, 1, 5);
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (469, 1, 1, 1, 5);
+
+-- Actualizar secuencia interna de funcionalidad
+update secuencia set valor = (select max(e.idfuncionalidad)+1 from funcionalidad e) where tabla = 'funcionalidad';

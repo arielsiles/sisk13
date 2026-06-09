@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="DispatchEnvelopeReport"
+              pageWidth="612" pageHeight="792"
+              whenNoDataType="AllSectionsNoDetail"
+              isSummaryNewPage="false"
+              columnWidth="532"
+              leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40">
+
+    <parameter name="companyName" class="java.lang.String"/>
+    <parameter name="deliveryOrderNumber" class="java.lang.Long"/>
+    <parameter name="salesLotCode" class="java.lang.String"/>
+    <parameter name="dispatchDate" class="java.util.Date"/>
+    <parameter name="truckDispatchNumber" class="java.lang.Integer"/>
+    <parameter name="driverName" class="java.lang.String"/>
+    <parameter name="driverLicense" class="java.lang.String"/>
+    <parameter name="driverPhone" class="java.lang.String"/>
+    <parameter name="vehiclePlate" class="java.lang.String"/>
+    <parameter name="vehicleBrand" class="java.lang.String"/>
+    <parameter name="vehicleColor" class="java.lang.String"/>
+    <parameter name="state" class="java.lang.String"/>
+    <parameter name="annulled" class="java.lang.Boolean"/>
+    <parameter name="ENVELOPESUBREPORT" class="net.sf.jasperreports.engine.JasperReport"/>
+    <parameter name="ENVELOPESUBREPORT_DATASOURCE" class="net.sf.jasperreports.engine.JRDataSource"/>
+
+    <title>
+        <band height="108">
+            <!-- ============ Cabecera: logo + titulo + empresa ============ -->
+            <image scaleImage="RetainShape" onErrorType="Blank" hAlign="Center" vAlign="Middle">
+                <reportElement x="0" y="0" width="85" height="56"/>
+                <box><pen lineWidth="0.5"/></box>
+                <imageExpression class="java.io.InputStream"><![CDATA[com.encens.khipus.util.JSFUtil.getServletContext().getResourceAsStream("/img/logo-terdemol-v.jpg")]]></imageExpression>
+            </image>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="85" y="0" width="357" height="18"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["REGISTRO"]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true">
+                <reportElement x="85" y="18" width="357" height="38"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="11" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["DETALLE DE ENVASES CARGUIO"]]></textFieldExpression>
+            </textField>
+
+            <!-- TERDEMOL + Terminal de Molienda en un solo bloque (sin linea
+                 interna). Mismo box, dos lineas via textField multi-linea. -->
+            <textField isStretchWithOverflow="true">
+                <reportElement x="442" y="0" width="90" height="32"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="7" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["TERDEMOL S.R.L.\nTerminal de Molienda"]]></textFieldExpression>
+            </textField>
+            <!-- Numero de Orden de Entrega en celda unica combinada,
+                 centrado horizontal y verticalmente. Sin ceros a la
+                 izquierda (numero crudo). -->
+            <textField isStretchWithOverflow="true">
+                <reportElement x="442" y="32" width="90" height="24"/>
+                <box><pen lineWidth="0.5"/></box>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="10" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{deliveryOrderNumber} != null ? $P{deliveryOrderNumber}.toString() : "-"]]></textFieldExpression>
+            </textField>
+
+            <!-- ============ Datos del despacho: LOTE / FECHA / N. CAMION ============ -->
+            <!-- Esta primera fila va SIN bordes (labels y valores), a peticion
+                 del usuario. Posiciones alineadas con las filas CONDUCTOR y
+                 PLACA (col1: x=0/120 label + x=120/180 value; col2: x=300/70
+                 + x=370/60; col3: x=430/50 + x=480/52). -->
+            <staticText>
+                <reportElement x="0" y="66" width="100" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[LOTE:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="100" y="66" width="150" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{salesLotCode}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="250" y="66" width="70" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[FECHA:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true" pattern="dd/MM/yyyy">
+                <reportElement x="320" y="66" width="75" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.util.Date"><![CDATA[$P{dispatchDate}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="395" y="66" width="65" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[N° CAMION:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="460" y="66" width="72" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{truckDispatchNumber} != null ? $P{truckDispatchNumber}.toString() : ""]]></textFieldExpression>
+            </textField>
+
+            <!-- ============ Conductor / Licencia / Celular ============ -->
+            <staticText>
+                <reportElement x="0" y="80" width="100" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[NOMBRE CONDUCTOR:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="100" y="80" width="150" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0.5"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{driverName}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="250" y="80" width="70" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[N° LICENCIA:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="320" y="80" width="75" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0.5"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{driverLicense}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="395" y="80" width="65" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[CELULAR:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="460" y="80" width="72" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0.5"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{driverPhone}]]></textFieldExpression>
+            </textField>
+
+            <!-- ============ Placa / Marca / Color ============ -->
+            <!-- Posiciones alineadas con CONDUCTOR (col1 x=120 w=180, col2
+                 x=370 w=60, col3 x=480 w=52). -->
+            <staticText>
+                <reportElement x="0" y="94" width="100" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[PLACA DE VEHICULO:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="100" y="94" width="150" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0.5"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{vehiclePlate}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="250" y="94" width="70" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[MARCA:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="320" y="94" width="75" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0.5"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{vehicleBrand}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="395" y="94" width="65" height="12"/>
+                <box rightPadding="4"><pen lineWidth="0"/></box>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <text><![CDATA[COLOR:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="460" y="94" width="72" height="12"/>
+                <box leftPadding="4"><pen lineWidth="0.5"/></box>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{vehicleColor}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <pageFooter>
+        <band height="14">
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="0" y="0" width="266" height="12"/>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="7" isItalic="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Estado: " + ($P{state} != null ? $P{state} : "")]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true">
+                <reportElement x="266" y="0" width="266" height="12"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="7" isItalic="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Pagina " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <!-- ============================================================
+         Tabla de envases + firma: en el summary band para que el
+         subreport fluya limpio a las paginas siguientes sin
+         re-renderizar el header ni generar paginas blancas
+         adicionales por el title.
+         ============================================================ -->
+    <summary>
+        <band height="270">
+            <!-- Subreport con la tabla de envases. Inicia en y=20 para
+                 dejar espacio visual entre el bloque header (LOTE/CAMION/
+                 conductor/vehiculo) y el inicio de la tabla. -->
+            <subreport runToBottom="false">
+                <reportElement x="0" y="10" width="532" height="180" isRemoveLineWhenBlank="true"/>
+                <subreportParameter name="REPORT_RESOURCE_BUNDLE">
+                    <subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+                </subreportParameter>
+                <dataSourceExpression><![CDATA[$P{ENVELOPESUBREPORT_DATASOURCE}]]></dataSourceExpression>
+                <subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{ENVELOPESUBREPORT}]]></subreportExpression>
+            </subreport>
+
+            <!-- Firma del conductor centrada bajo la tabla con espacio para
+                 firmar (gap 40pt entre fin de tabla y linea). Nombre +
+                 licencia en un unico textField con markup styled para que JR
+                 no parta el bloque entre paginas. -->
+            <line>
+                <reportElement positionType="Float" x="180" y="230" width="170" height="1"/>
+            </line>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="100" y="234" width="332" height="28"/>
+                <textElement textAlignment="Center" verticalAlignment="Top" markup="styled"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["<b>" + ($P{driverName} != null ? $P{driverName} : "") + "</b>\n<font size=\"8\">" + ($P{driverLicense} != null ? $P{driverLicense} : "") + "</font>"]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+
+</jasperReport>

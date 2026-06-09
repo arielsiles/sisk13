@@ -168,12 +168,6 @@ public class DispatchRemisionNoteReportAction extends GenericReportAction {
                 PageOrientation.PORTRAIT,
                 new HashMap<String, Object>());
 
-        // NUMERACION BOLSAS: dato de cabecera (mismo para todas las lineas).
-        String bagRange = "";
-        if (dispatch.getBagsFromNumber() != null && dispatch.getBagsToNumber() != null) {
-            bagRange = dispatch.getBagsFromNumber() + " al " + dispatch.getBagsToNumber();
-        }
-
         List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
         List<WarehouseVoucherDispatchDetail> details = dispatch.getDetails();
         if (details != null) {
@@ -187,6 +181,11 @@ public class DispatchRemisionNoteReportAction extends GenericReportAction {
                 row.put("COLUMN_1", cantidadTon);
                 row.put("COLUMN_2", det.getProductItem() != null ? det.getProductItem().getName() : "");
                 row.put("COLUMN_3", buildDescripcionDetallada(det));
+                // NUMERACION BOLSAS: rango por linea de detalle (no de cabecera).
+                String bagRange = "";
+                if (det.getBagsFromNumber() != null && det.getBagsToNumber() != null) {
+                    bagRange = det.getBagsFromNumber() + " al " + det.getBagsToNumber();
+                }
                 row.put("COLUMN_4", bagRange);
                 row.put("COLUMN_5", buildTotalDelivered(det));
                 rows.add(row);

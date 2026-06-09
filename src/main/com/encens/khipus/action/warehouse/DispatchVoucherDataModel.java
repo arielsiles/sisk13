@@ -41,6 +41,22 @@ public class DispatchVoucherDataModel extends QueryDataModel<Long, WarehouseVouc
         sortAsc = false;
     }
 
+    /**
+     * QueryDataModel.initEntityQuery() recrea el criteria via newInstance()
+     * la primera vez que se ejecuta la query, sobreescribiendo cualquier
+     * cambio hecho en init(). Sobrescribimos createInstance() para limpiar
+     * el state heredado del field initializer (DispatchState.BORRADOR),
+     * y asi el filtro arranca mostrando todos los estados.
+     */
+    @Override
+    public WarehouseVoucherDispatch createInstance() {
+        WarehouseVoucherDispatch instance = super.createInstance();
+        if (instance != null) {
+            instance.setState(null);
+        }
+        return instance;
+    }
+
     @Override
     public String getEjbql() {
         return "select dispatch from WarehouseVoucherDispatch dispatch";

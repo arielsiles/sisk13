@@ -75,10 +75,6 @@ public class WarehouseVoucherDispatch implements BaseModel {
     @Length(max = 80)
     private String salesLotCode;
 
-    @Column(name = "cantidad_bolsas", nullable = false)
-    @NotNull
-    private Integer bagCount;
-
     @Column(name = "numero_factura", length = 50)
     @Length(max = 50)
     private String invoiceNumber;
@@ -164,16 +160,6 @@ public class WarehouseVoucherDispatch implements BaseModel {
     @Column(name = "peso_neto_kg", nullable = false, precision = 12, scale = 3)
     @NotNull
     private BigDecimal netWeightKg;
-
-    /* -------- Numeracion de bolsas -------- */
-
-    @Column(name = "bolsa_desde", nullable = false)
-    @NotNull
-    private Integer bagsFromNumber;
-
-    @Column(name = "bolsa_hasta", nullable = false)
-    @NotNull
-    private Integer bagsToNumber;
 
     /* -------- Almacen / responsable / unidad / centro de costo -------- */
 
@@ -334,12 +320,21 @@ public class WarehouseVoucherDispatch implements BaseModel {
         this.salesLotCode = salesLotCode;
     }
 
+    /**
+     * Cantidad total de bolsas del despacho, derivado de la suma de
+     * bagsCount de cada detalle. Reemplaza el campo persistente eliminado.
+     */
+    @Transient
     public Integer getBagCount() {
-        return bagCount;
-    }
-
-    public void setBagCount(Integer bagCount) {
-        this.bagCount = bagCount;
+        int total = 0;
+        if (details != null) {
+            for (WarehouseVoucherDispatchDetail d : details) {
+                if (d.getBagsCount() != null) {
+                    total += d.getBagsCount();
+                }
+            }
+        }
+        return total;
     }
 
     public String getInvoiceNumber() {
@@ -474,22 +469,6 @@ public class WarehouseVoucherDispatch implements BaseModel {
 
     public void setNetWeightKg(BigDecimal netWeightKg) {
         this.netWeightKg = netWeightKg;
-    }
-
-    public Integer getBagsFromNumber() {
-        return bagsFromNumber;
-    }
-
-    public void setBagsFromNumber(Integer bagsFromNumber) {
-        this.bagsFromNumber = bagsFromNumber;
-    }
-
-    public Integer getBagsToNumber() {
-        return bagsToNumber;
-    }
-
-    public void setBagsToNumber(Integer bagsToNumber) {
-        this.bagsToNumber = bagsToNumber;
     }
 
     public String getCompanyNumber() {
@@ -686,7 +665,16 @@ public class WarehouseVoucherDispatch implements BaseModel {
         return state == DispatchState.APROBADO;
     }
 
+    public boolean isFinalized() {
+        return state == DispatchState.FINALIZADO;
+    }
+
     public boolean isAnnulled() {
         return state == DispatchState.ANULADO;
+    }
+
+    /** True si el despacho ya genero envases (APROBADO o FINALIZADO). */
+    public boolean hasEnvelopes() {
+        return state == DispatchState.APROBADO || state == DispatchState.FINALIZADO;
     }
 }

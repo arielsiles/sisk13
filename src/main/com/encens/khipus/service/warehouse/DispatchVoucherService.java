@@ -101,4 +101,21 @@ public interface DispatchVoucherService {
                    WarehouseVoucherNotFoundException,
                    InventoryUnitaryBalanceException,
                    InventoryProductItemNotFoundException;
+
+    /**
+     * Transicion APROBADO -> FINALIZADO. Bloquea la edicion posterior de los
+     * envases. No toca inventario ni asientos contables.
+     */
+    WarehouseVoucherDispatch finalizeDispatch(WarehouseVoucherDispatch dispatch);
+
+    /**
+     * Reverso FINALIZADO -> APROBADO. Re-habilita la edicion de los envases.
+     */
+    WarehouseVoucherDispatch unfinalizeDispatch(WarehouseVoucherDispatch dispatch);
+
+    /**
+     * Persiste los cambios del operador a los envases (texto y peso) del
+     * despacho. Solo permitido en estado APROBADO.
+     */
+    WarehouseVoucherDispatch updateEnvelopes(WarehouseVoucherDispatch dispatch);
 }

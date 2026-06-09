@@ -6,6 +6,7 @@ package com.encens.khipus.model.warehouse;
 public enum DispatchState {
     BORRADOR("WarehouseDispatch.state.BORRADOR"),
     APROBADO("WarehouseDispatch.state.APROBADO"),
+    FINALIZADO("WarehouseDispatch.state.FINALIZADO"),
     ANULADO("WarehouseDispatch.state.ANULADO");
 
     private String resourceKey;

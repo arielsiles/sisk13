@@ -65,6 +65,15 @@ public class InventoryPackaging implements BaseModel {
     @Column(name = "peso_bruto_promedio_kg", precision = 12, scale = 3)
     private BigDecimal averageGrossWeightKg;
 
+    /**
+     * Texto por defecto que se pre-llena en la columna DETALLE DE ENVASE del
+     * reporte "Detalle de Envases Carguio" al generar los envases del despacho.
+     * Editable bolsa por bolsa antes de imprimir.
+     */
+    @Column(name = "detalle_envase_default", length = 255)
+    @Length(max = 255)
+    private String defaultEnvelopeDetail;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 3)
     @NotNull
@@ -135,6 +144,14 @@ public class InventoryPackaging implements BaseModel {
 
     public void setAverageGrossWeightKg(BigDecimal averageGrossWeightKg) {
         this.averageGrossWeightKg = averageGrossWeightKg;
+    }
+
+    public String getDefaultEnvelopeDetail() {
+        return defaultEnvelopeDetail;
+    }
+
+    public void setDefaultEnvelopeDetail(String defaultEnvelopeDetail) {
+        this.defaultEnvelopeDetail = defaultEnvelopeDetail;
     }
 
     public DispatchCatalogState getState() {

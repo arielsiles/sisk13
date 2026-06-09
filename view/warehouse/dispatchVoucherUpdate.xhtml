@@ -48,17 +48,27 @@
                        reRender="annulPanel"
                        oncomplete="Richfaces.showModalPanel('annulModal');"/>
 
+    <h:commandButton action="#{dispatchVoucherAction.finalizeDispatch}"
+                     value="#{messages['WarehouseDispatch.button.finalize']}"
+                     styleClass="button"
+                     rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHFINALIZE','VIEW')}"/>
+
+    <h:commandButton action="#{dispatchVoucherAction.unfinalizeDispatch}"
+                     value="#{messages['WarehouseDispatch.button.unfinalize']}"
+                     styleClass="button"
+                     rendered="#{dispatchVoucherAction.finalized and s:hasPermission('WAREHOUSEDISPATCHUNFINALIZE','VIEW')}"/>
+
     <h:commandButton action="#{dispatchCertificateReportAction.generateCertificate(dispatchVoucher)}"
                      value="#{messages['WarehouseDispatch.button.print']}"
                      styleClass="button"
                      immediate="true"
-                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
+                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.finalized or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
 
     <h:commandButton action="#{dispatchRemisionNoteReportAction.generateRemisionNote(dispatchVoucher)}"
                      value="#{messages['WarehouseDispatch.button.printRemisionNote']}"
                      styleClass="button"
                      immediate="true"
-                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
+                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.finalized or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
 
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
@@ -73,7 +83,12 @@
 </div>
 
 <a4j:outputPanel id="messagesPanel" ajaxRendered="true">
-    <rich:messages style="color:#a00;"/>
+    <!-- INFO ya se renderiza en el panel global (verde con icono). Aqui solo
+         mostramos errores/warns para evitar el duplicado al guardar. -->
+    <rich:messages errorStyle="color:#a00;"
+                   warnStyle="color:#a60;"
+                   infoStyle="display:none;"
+                   infoClass="hidden"/>
 </a4j:outputPanel>
 
 <rich:panel id="headerPanel">
@@ -316,7 +331,7 @@
                      required="true" styleClass="inputSmall right"
                      disabled="#{readOnly}" tabindex="18">
             <app:realNumberConverter minimum="0"
-                                     pattern="#{messages['patterns.decimal3FNumber']}"
+                                     pattern="#{messages['patterns.decimalNumber']}"
                                      forId="tareWeight"/>
             <a4j:support event="onblur" ajaxSingle="true"
                          action="#{dispatchVoucherAction.recalculateNetWeight}"
@@ -330,7 +345,7 @@
                      required="true" styleClass="inputSmall right"
                      disabled="#{readOnly}" tabindex="19">
             <app:realNumberConverter minimum="0"
-                                     pattern="#{messages['patterns.decimal3FNumber']}"
+                                     pattern="#{messages['patterns.decimalNumber']}"
                                      forId="grossWeight"/>
             <a4j:support event="onblur" ajaxSingle="true"
                          action="#{dispatchVoucherAction.recalculateNetWeight}"
@@ -341,30 +356,8 @@
     <s:decorate id="weightNetField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['WarehouseDispatch.weight.net']}</ui:define>
         <h:outputText value="#{dispatchVoucher.netWeightKg}" styleClass="bold">
-            <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
         </h:outputText>
-    </s:decorate>
-
-    <s:decorate id="bagsFromField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['WarehouseDispatch.bags.from']}</ui:define>
-        <h:inputText id="bagsFrom" value="#{dispatchVoucher.bagsFromNumber}"
-                     required="true" styleClass="inputSmall right"
-                     disabled="#{readOnly}" tabindex="20">
-            <a4j:support event="onblur" ajaxSingle="true"
-                         action="#{dispatchVoucherAction.recalculateBagCount}"
-                         reRender="bagCountField"/>
-        </h:inputText>
-    </s:decorate>
-
-    <s:decorate id="bagsToField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['WarehouseDispatch.bags.to']}</ui:define>
-        <h:inputText id="bagsTo" value="#{dispatchVoucher.bagsToNumber}"
-                     required="true" styleClass="inputSmall right"
-                     disabled="#{readOnly}" tabindex="21">
-            <a4j:support event="onblur" ajaxSingle="true"
-                         action="#{dispatchVoucherAction.recalculateBagCount}"
-                         reRender="bagCountField"/>
-        </h:inputText>
     </s:decorate>
 
     <s:decorate id="bagCountField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -482,6 +475,8 @@
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.measureUnit']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.quantity']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bagsCount']}</th>
+            <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bags.from']}</th>
+            <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bags.to']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.packaging']}</th>
             <th class="rich-table-headercell" rendered="#{isDraft}">#{messages['Common.action']}</th>
         </tr>
@@ -504,14 +499,14 @@
                                 <h:inputText id="#{qtyInputId}" value="#{detail.quantity}"
                                              required="true" styleClass="inputSmall right">
                                     <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimal6FNumber']}"
+                                                             pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{qtyInputId}"/>
                                 </h:inputText>
                                 <h:message for="#{qtyInputId}" styleClass="errors" style="display:block;"/>
                             </c:when>
                             <c:otherwise>
                                 <h:outputText value="#{detail.quantity}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                                 </h:outputText>
                             </c:otherwise>
                         </c:choose>
@@ -520,10 +515,33 @@
                 <td class="rich-table-cell center">
                     <c:choose>
                         <c:when test="#{isDraft}">
-                            <h:inputText value="#{detail.bagsCount}" styleClass="inputSmall right"/>
+                            <h:inputText value="#{detail.bagsCount}" styleClass="inputSmall right">
+                                <a4j:support event="onblur" ajaxSingle="true"
+                                             reRender="bagCountField"/>
+                            </h:inputText>
                         </c:when>
                         <c:otherwise>
                             <h:outputText value="#{detail.bagsCount}"/>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td class="rich-table-cell center">
+                    <c:choose>
+                        <c:when test="#{isDraft}">
+                            <h:inputText value="#{detail.bagsFromNumber}" styleClass="inputSmall right"/>
+                        </c:when>
+                        <c:otherwise>
+                            <h:outputText value="#{detail.bagsFromNumber}"/>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td class="rich-table-cell center">
+                    <c:choose>
+                        <c:when test="#{isDraft}">
+                            <h:inputText value="#{detail.bagsToNumber}" styleClass="inputSmall right"/>
+                        </c:when>
+                        <c:otherwise>
+                            <h:outputText value="#{detail.bagsToNumber}"/>
                         </c:otherwise>
                     </c:choose>
                 </td>
@@ -577,48 +595,160 @@
 
 </rich:panel>
 
+<rich:spacer height="10"/>
+
+<!-- Botones que envuelven el panel de envases (mismos arriba y abajo):
+     Guardar Envases / Imprimir Detalle de Envases / Cancelar. Visibles
+     solo cuando el despacho tiene envases (APROBADO o FINALIZADO). -->
+<h:panelGroup rendered="#{dispatchVoucherAction.hasEnvelopes}">
+    <div class="buttons">
+        <h:commandButton action="#{dispatchVoucherAction.saveEnvelopes}"
+                         value="#{messages['WarehouseDispatch.button.saveEnvelopes']}"
+                         styleClass="button"
+                         rendered="#{dispatchVoucherAction.envelopesEditable and s:hasPermission('WAREHOUSEDISPATCH','UPDATE')}"/>
+        <h:commandButton action="#{dispatchEnvelopeReportAction.generateEnvelopeReport(dispatchVoucher)}"
+                         value="#{messages['WarehouseDispatch.button.printEnvelopes']}"
+                         styleClass="button"
+                         immediate="true"/>
+        <h:commandButton action="#{dispatchVoucherAction.cancel}"
+                         value="#{messages['WarehouseDispatch.button.cancel']}"
+                         styleClass="button" immediate="true"/>
+    </div>
+</h:panelGroup>
+
+<!-- ============================================================
+     Seccion inline: Detalle de Envases Carguio.
+     Solo visible si el despacho generou envases (APROBADO o FINALIZADO).
+     Editable solo en APROBADO. En FINALIZADO queda readonly.
+     Cada producto se renderiza dentro de un rich:simpleTogglePanel
+     contraido por defecto (para no saturar la pantalla cuando hay
+     decenas/cientos de bolsas por linea).
+     ============================================================ -->
+<rich:panel id="envelopesPanel" rendered="#{dispatchVoucherAction.hasEnvelopes}">
+    <f:facet name="header">#{messages['WarehouseDispatch.envelopes.title']}</f:facet>
+    <c:forEach var="detail" items="#{dispatchVoucher.details}" varStatus="detRow">
+        <rich:simpleTogglePanel rendered="#{not empty detail.envelopes}"
+                                opened="false"
+                                switchType="client"
+                                label="#{detail.productItem.fullName} &#8212; #{detail.packaging.fullName} (#{detail.bagsCount})">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table" style="table-layout: fixed;">
+                <thead class="rich-table-thead">
+                <tr class="rich-table-header">
+                    <th class="rich-table-headercell" style="width:170px;">
+                        #{messages['WarehouseDispatch.envelope.code']}
+                    </th>
+                    <th class="rich-table-headercell">
+                        #{messages['WarehouseDispatch.envelope.detail']}
+                    </th>
+                    <th class="rich-table-headercell" style="width:130px;">
+                        #{messages['WarehouseDispatch.envelope.netWeight']}
+                    </th>
+                </tr>
+                </thead>
+                <c:forEach var="env" items="#{detail.envelopes}" varStatus="envRow">
+                    <c:set var="envWeightId" value="envWeight_#{detRow.index}_#{envRow.index}"/>
+                    <tr class="rich-table-row">
+                        <td class="rich-table-cell">
+                            <h:outputText value="#{env.identificationCode}"/>
+                        </td>
+                        <td class="rich-table-cell" style="overflow: hidden;">
+                            <c:choose>
+                                <c:when test="#{dispatchVoucherAction.envelopesEditable}">
+                                    <h:inputText value="#{env.envelopeDetail}"
+                                                 style="width: 98%; box-sizing: border-box;">
+                                        <f:validateLength maximum="255"/>
+                                    </h:inputText>
+                                </c:when>
+                                <c:otherwise>
+                                    <h:outputText value="#{env.envelopeDetail}"/>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <c:choose>
+                                <c:when test="#{dispatchVoucherAction.envelopesEditable}">
+                                    <h:inputText id="#{envWeightId}"
+                                                 value="#{env.netWeightApproxKg}"
+                                                 styleClass="inputSmall right">
+                                        <app:realNumberConverter minimum="0"
+                                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                                 forId="#{envWeightId}"/>
+                                        <a4j:support event="onblur" ajaxSingle="true"
+                                                     reRender="#{envWeightId}"/>
+                                    </h:inputText>
+                                </c:when>
+                                <c:otherwise>
+                                    <h:outputText value="#{env.netWeightApproxKg}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </rich:simpleTogglePanel>
+        <rich:spacer height="6" rendered="#{not empty detail.envelopes}"/>
+    </c:forEach>
+</rich:panel>
+
+<!-- Bar INFERIOR del formulario: ESPEJO EXACTO del bar superior. Misma
+     logica de rendered por estado para cada boton. Convencion del sistema:
+     top y bottom del formulario siempre identicos. Los botones especificos
+     del panel envases (Guardar Envases / Imprimir Detalle de Envases) van
+     SOLO en el bar intermedio arriba del panel, no aqui. -->
 <div class="buttons">
     <h:commandButton action="#{dispatchVoucherAction.update}"
                      value="#{messages['Common.save']}"
                      styleClass="button"
-                     rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','UPDATE')}"
-                     tabindex="40"/>
+                     rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','UPDATE')}"/>
+
     <a4j:commandButton action="#{dispatchVoucherAction.prepareApprove}"
                        value="#{messages['WarehouseDispatch.button.approve']}"
                        styleClass="button"
                        rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCHAPPROVAL','VIEW')}"
                        reRender="approveStep1Panel, messagesPanel"
-                       oncomplete="Richfaces.showModalPanel('approveStep1Modal');"
-                       tabindex="41"/>
+                       oncomplete="Richfaces.showModalPanel('approveStep1Modal');"/>
+
     <a4j:commandButton action="#{dispatchVoucherAction.prepareAnnul}"
                        value="#{messages['WarehouseDispatch.button.annul']}"
                        styleClass="button"
                        rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHREVERSE','VIEW')}"
                        reRender="annulPanel"
-                       oncomplete="Richfaces.showModalPanel('annulModal');"
-                       tabindex="42"/>
+                       oncomplete="Richfaces.showModalPanel('annulModal');"/>
+
+    <h:commandButton action="#{dispatchVoucherAction.finalizeDispatch}"
+                     value="#{messages['WarehouseDispatch.button.finalize']}"
+                     styleClass="button"
+                     rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHFINALIZE','VIEW')}"/>
+
+    <h:commandButton action="#{dispatchVoucherAction.unfinalizeDispatch}"
+                     value="#{messages['WarehouseDispatch.button.unfinalize']}"
+                     styleClass="button"
+                     rendered="#{dispatchVoucherAction.finalized and s:hasPermission('WAREHOUSEDISPATCHUNFINALIZE','VIEW')}"/>
+
     <h:commandButton action="#{dispatchCertificateReportAction.generateCertificate(dispatchVoucher)}"
                      value="#{messages['WarehouseDispatch.button.print']}"
                      styleClass="button"
                      immediate="true"
-                     rendered="#{(isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"
-                     tabindex="43"/>
+                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.finalized or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
+
     <h:commandButton action="#{dispatchRemisionNoteReportAction.generateRemisionNote(dispatchVoucher)}"
                      value="#{messages['WarehouseDispatch.button.printRemisionNote']}"
                      styleClass="button"
                      immediate="true"
-                     rendered="#{(isApproved or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"
-                     tabindex="44"/>
+                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.finalized or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
+
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
-                     rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}"
-                     tabindex="44">
+                     rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}">
         <rich:componentControl for="deleteConfirmation" event="onclick"
                                disableDefault="true" operation="show"/>
     </h:commandButton>
+
     <h:commandButton action="#{dispatchVoucherAction.cancel}"
                      value="#{messages['WarehouseDispatch.button.cancel']}"
-                     styleClass="button" immediate="true" tabindex="43"/>
+                     styleClass="button" immediate="true"/>
 </div>
 
 </h:form>
@@ -823,13 +953,13 @@
                 <td class="rich-table-cell bold">#{messages['WarehouseDispatch.weight.tare']}</td>
                 <td class="rich-table-cell right">
                     <h:outputText value="#{dispatchVoucher.tareWeightKg}">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </td>
                 <td class="rich-table-cell bold">#{messages['WarehouseDispatch.weight.gross']}</td>
                 <td class="rich-table-cell right">
                     <h:outputText value="#{dispatchVoucher.grossWeightKg}">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </td>
             </tr>
@@ -837,13 +967,12 @@
                 <td class="rich-table-cell bold">#{messages['WarehouseDispatch.weight.net']}</td>
                 <td class="rich-table-cell right bold">
                     <h:outputText value="#{dispatchVoucher.netWeightKg}">
-                        <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </td>
                 <td class="rich-table-cell bold">#{messages['WarehouseDispatch.bagCount']}</td>
                 <td class="rich-table-cell right">
                     #{dispatchVoucher.bagCount}
-                    (#{dispatchVoucher.bagsFromNumber} - #{dispatchVoucher.bagsToNumber})
                 </td>
             </tr>
             <tr class="rich-table-row">

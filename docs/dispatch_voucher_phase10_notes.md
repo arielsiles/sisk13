@@ -220,10 +220,94 @@ PY
 
 ---
 
-## 10. Pendientes conocidos
+## 10.bis Fase 11 — Detalle de Envases Carguio + permisos Finalizar/Desfinalizar + listado
+
+### A. Detalle de Envases Carguio (reporte nuevo)
+
+Reporte por bolsa fisica del despacho. Disponible **solo en estados APROBADO y FINALIZADO**.
+
+#### Modelo nuevo
+- [`WarehouseVoucherDispatchEnvelope`](../src/main/com/encens/khipus/model/warehouse/WarehouseVoucherDispatchEnvelope.java) — tabla `inv_valedespacho_envase`. Una fila por bolsa.
+  - `numero_correlativo INT NOT NULL` — correlativo unico por despacho.
+  - `codigo_identificacion VARCHAR(120) NOT NULL` — codigo impreso/visible en la bolsa.
+  - `detalle_envase VARCHAR(255)` — editable por el operador (texto libre).
+  - `peso_neto_aprox_kg DECIMAL(12,3)` — editable por el operador.
+  - FK `idvaledespacho` + FK `iddetalledespacho` (a que linea de detalle pertenece).
+- `WarehouseVoucherDispatchDetail.envelopes` — `@OneToMany`, `@OrderBy("correlativeNumber ASC")` para iterar en orden estable.
+
+#### Generacion automatica al aprobar
+Al APROBAR el despacho, [`DispatchVoucherServiceBean.generateEnvelopes`](../src/main/com/encens/khipus/service/warehouse/DispatchVoucherServiceBean.java) recorre los detalles y, por cada linea con `bagsCount > 0` y `bagsFromNumber`, crea `bagsCount` envases con correlativos consecutivos `[bagsFromNumber .. bagsFromNumber + bagsCount - 1]`. El `identificationCode` se inicializa con el correlativo formateado por defecto; el operador puede editarlo despues.
+
+#### Edicion (estado APROBADO unicamente)
+- Panel "Detalle de Envases Carguio" en [`dispatchVoucherUpdate.xhtml`](../view/warehouse/dispatchVoucherUpdate.xhtml) editable cuando `isApproved && !finalized`.
+- `DispatchVoucherAction.saveEnvelopes()` llama a `dispatchVoucherService.updateEnvelopes(...)`. El service esta marcado `@TransactionAttribute(REQUIRES_NEW)` — REQUIRED no propagaba bien tras el approve y `em.flush()` tiraba `TransactionRequiredException`.
+
+#### Finalizado
+- Estado nuevo `DispatchState.FINALIZADO` agregado al enum, posterior a APROBADO.
+- `finalizeDispatch` / `unfinalizeDispatch` en el service, tambien `REQUIRES_NEW`.
+- En FINALIZADO los envases son inmutables: el form los muestra read-only y los botones de edicion desaparecen.
+
+#### Reporte
+- [`DispatchEnvelopeReportAction`](../src/main/com/encens/khipus/action/warehouse/reports/DispatchEnvelopeReportAction.java) genera PDF carta vertical.
+- Subreporte tabular [`dispatchEnvelopeTableSubReport.jrxml`](../view/warehouse/reports/dispatchEnvelopeTableSubReport.jrxml) — columnas: N° / Codigo Identificacion / Peso Neto Aprox. (Center) / Detalle. Datasource = lista plana de envases (orden por detalle, luego por correlativo).
+- Reporte principal [`dispatchEnvelopeReport.jrxml`](../view/warehouse/reports/dispatchEnvelopeReport.jrxml):
+  - **Title band (h=108)**: logo + bloque derecho con TERDEMOL + Terminal + celda con N° de orden de entrega centrada (sin label "ORDEN DE ENTREGA N°", sin zero-padding). Luego 3 filas alineadas verticalmente: LOTE/FECHA/CAMION (sin bordes), CONDUCTOR/LICENCIA/CELULAR (con bordes en valores), PLACA/MARCA/COLOR (con bordes). Anchos por columna fijos: col1 100+150, col2 70+75, col3 65+72 (suma 532).
+  - **Summary band (h=270)**: subreporte de envases (y=10) + linea de firma + bloque firma como single styled textField con `markup="styled"` (patron Nota de Remision).
+- Lecciones JR consolidadas:
+  - `markup="styled"` va en `<textElement>`, no en `<textField>`.
+  - `positionType="Float"` va en `<reportElement>`, no en `<line>` directamente.
+  - Multi-line textField atomico no se parte entre paginas — usar single styled textField con `\n` interno para el bloque de firmas, asi no quedan paginas en blanco.
+  - Orden de bands en XSD: `title → pageHeader → columnHeader → detail → columnFooter → pageFooter → lastPageFooter → summary`. Un `pageFooter` despues de `summary` rompe la validacion.
+
+### B. Permisos propios Finalizar / Desfinalizar
+
+Antes ambas operaciones colgaban del permiso generico `WAREHOUSEDISPATCH`. Ahora:
+
+| Permiso | Id func. | Para que rol |
+|---|---|---|
+| `WAREHOUSEDISPATCHFINALIZE` (468) | 5/1 | Operador que cierra el despacho. |
+| `WAREHOUSEDISPATCHUNFINALIZE` (469) | 5/1 | **Supervisor** — revierte FINALIZADO → APROBADO. NO darlo a operadores. |
+
+SQL en seccion 14 de [`query_v6.0.82_terdemol.sql`](../query/query_v6.0.82_terdemol.sql). Etiquetas i18n: `menu.warehouse.dispatch.finalize` = "Finalizar Despacho" y `menu.warehouse.dispatch.unfinalize` = "Desfinalizar Despacho".
+
+Las asignaciones `derechoacceso` se hacen manualmente — son decision del usuario por rol.
+
+### C. Layout de botones (convencion sistema)
+
+Convencion confirmada por el usuario y que aplica a TODO el sistema, no solo a despachos:
+
+> **Las barras superior e inferior del form deben ser ESPEJOS IDENTICOS en cualquier estado.** Los botones "intermedios" (especificos de una seccion, ej. Guardar Envases / Imprimir Detalle de Envases) van **solo arriba de esa seccion**, no abajo.
+
+Aplicado en [`dispatchVoucherUpdate.xhtml`](../view/warehouse/dispatchVoucherUpdate.xhtml):
+- TOP y BOTTOM: Save Draft / Aprobar / Anular / Finalizar / Desfinalizar / Imprimir Certificado / Imprimir Nota / Eliminar / Cancelar. Mismos `rendered` por estado.
+- Intermedia (solo cuando `hasEnvelopes`): Guardar Envases / Imprimir Detalle de Envases / Cancelar — **solo encima del panel**, no debajo.
+- Botones de impresion visibles en BORRADOR / APROBADO / FINALIZADO / ANULADO con `s:hasPermission('WAREHOUSEDISPATCH','VIEW')`.
+
+### D. Listado de despachos — filtro por estado por defecto
+
+[`DispatchVoucherDataModel`](../src/main/com/encens/khipus/action/warehouse/DispatchVoucherDataModel.java) tenia comportamiento de "filtrar siempre por BORRADOR" porque `WarehouseVoucherDispatch.state` tiene field initializer `= DispatchState.BORRADOR` y `QueryDataModel.initEntityQuery()` recrea el `criteria` via `getEntityClass().newInstance()`. Setear `criteria.state = null` en `@Create init()` no funciona — `initEntityQuery` lo sobreescribe despues.
+
+**Fix:** override `createInstance()` para limpiar el `state` en cada creacion de instancia:
+
+```java
+@Override
+public WarehouseVoucherDispatch createInstance() {
+    WarehouseVoucherDispatch instance = super.createInstance();
+    if (instance != null) {
+        instance.setState(null);
+    }
+    return instance;
+}
+```
+
+Patron reusable para cualquier QueryDataModel cuya entidad tenga un enum/state con default no deseado en el filtro.
+
+---
+
+## 11. Pendientes conocidos
 
 - **Asiento contable al aprobar despacho:** opciones A/B/C en plan original sección 15, sin decidir.
-- **Permisos propios para botones de impresión:** actualmente usan `WAREHOUSEDISPATCH,VIEW` genérico.
+- **Permisos propios para botones de impresión (Certificado / Nota Remisión / Detalle Envases):** actualmente usan `WAREHOUSEDISPATCH,VIEW` genérico.
 - **Reflejo del prefijo+código de cliente en el form de despacho:** el cliente seleccionado en Cliente/Transbordo muestra solo `codigo`. Si se quiere mostrar `prefijo + codigo` en el form, agregar a `textValue` del selectPopUp.
 - **InventoryPackaging.averageGrossWeightKg en form catálogo:** se agregó input pero no aparece en la lista (puede agregarse columna si se requiere).
 - **Mensaje viejo `NotaRemision.warehouseEmail`** quedó en `messages_app.properties` sin uso — se puede borrar si no se piensa reactivar el email en el bloque de firma.

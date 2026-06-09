@@ -168,7 +168,8 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
         WarehouseVoucherDispatch merged = dispatchVoucherService.updateDraft(d);
         setInstance(merged);
         addUpdatedMessage();
-        return Outcome.SUCCESS;
+        // Permanecer en el formulario (solo Cancelar/Finalizar navegan al listado).
+        return Outcome.REDISPLAY;
     }
 
     @Override
@@ -208,19 +209,17 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
             ok = false;
         }
 
-        // V04 - bolsa hasta >= bolsa desde y cantidad coincide
-        if (d.getBagsFromNumber() != null && d.getBagsToNumber() != null) {
-            if (d.getBagsToNumber() < d.getBagsFromNumber()) {
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
-                        "WarehouseDispatch.error.bagsRangeInvalid");
-                ok = false;
-            } else if (d.getBagCount() != null) {
-                int expected = d.getBagsToNumber() - d.getBagsFromNumber() + 1;
-                if (!d.getBagCount().equals(expected)) {
+        // V04 - bolsa hasta >= bolsa desde por DETALLE (la numeracion ahora vive
+        // por linea, no en la cabecera). Validacion suave: si ambos estan
+        // definidos en un detalle, hasta debe ser >= desde.
+        if (d.getDetails() != null) {
+            for (WarehouseVoucherDispatchDetail det : d.getDetails()) {
+                if (det.getBagsFromNumber() != null && det.getBagsToNumber() != null
+                        && det.getBagsToNumber() < det.getBagsFromNumber()) {
                     facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
-                            "WarehouseDispatch.error.bagsMismatch",
-                            d.getBagCount(), d.getBagsFromNumber(), d.getBagsToNumber(), expected);
+                            "WarehouseDispatch.error.bagsRangeInvalid");
                     ok = false;
+                    break;
                 }
             }
         }
@@ -298,12 +297,14 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
         }
     }
 
+    /**
+     * Mantenido por compatibilidad con el XHTML existente (onchange de
+     * bolsa_desde/hasta del detalle dispara este metodo). El total de bolsas
+     * del despacho ahora es derivado de la suma por detalle (sin set explicito).
+     * Se conserva el metodo para que los eventos AJAX existentes no fallen.
+     */
     public void recalculateBagCount() {
-        WarehouseVoucherDispatch d = getInstance();
-        if (d.getBagsFromNumber() != null && d.getBagsToNumber() != null
-                && d.getBagsToNumber() >= d.getBagsFromNumber()) {
-            d.setBagCount(d.getBagsToNumber() - d.getBagsFromNumber() + 1);
-        }
+        // no-op: dispatch.bagCount se calcula como suma de detail.bagsCount
     }
 
     /* =========================================================
@@ -570,6 +571,28 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
         getInstance().setResponsible(null);
     }
 
+    /**
+     * Validacion estricta para aprobar: extiende validateDraft con la regla
+     * de packaging requerido por cada detalle (necesario para generar el
+     * default de la columna DETALLE DE ENVASE y del peso neto aprox al
+     * crear los envases).
+     */
+    public boolean validateForApproval() {
+        boolean ok = validateDraft();
+        WarehouseVoucherDispatch d = getInstance();
+        if (d.getDetails() != null) {
+            for (WarehouseVoucherDispatchDetail det : d.getDetails()) {
+                if (det.getPackaging() == null) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                            "WarehouseDispatch.error.packagingRequired",
+                            det.getProductItem() != null ? det.getProductItem().getName() : "");
+                    ok = false;
+                }
+            }
+        }
+        return ok;
+    }
+
     /* =========================================================
      * Aprobacion con doble confirmacion
      * ========================================================= */
@@ -581,7 +604,7 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     public void prepareApprove() {
         approvalStep1Visible = false;
         approvalStep2Visible = false;
-        if (!validateDraft()) {
+        if (!validateForApproval()) {
             return;
         }
         approvalStep1Visible = true;
@@ -710,6 +733,85 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     }
 
     /* =========================================================
+     * Finalizacion / Reverso del despacho aprobado
+     * ========================================================= */
+
+    /**
+     * Transicion APROBADO -> FINALIZADO. En FIN los envases quedan inmutables
+     * y solo se imprime el reporte de Detalle de Envases Carguio.
+     */
+    public String finalizeDispatch() {
+        try {
+            WarehouseVoucherDispatch finalized =
+                    dispatchVoucherService.finalizeDispatch(getInstance());
+            setInstance(finalized);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "WarehouseDispatch.finalize.success");
+            return Outcome.SUCCESS;
+        } catch (IllegalStateException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.finalize.error.notApproved");
+            return Outcome.REDISPLAY;
+        } catch (Exception e) {
+            log.error("Error finalizando despacho", e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.finalize.error");
+            return Outcome.REDISPLAY;
+        }
+    }
+
+    /**
+     * Transicion FINALIZADO -> APROBADO. Re-habilita la edicion de los
+     * envases generados al aprobar. Permanece en el formulario para que el
+     * operador pueda continuar editando.
+     */
+    public String unfinalizeDispatch() {
+        try {
+            WarehouseVoucherDispatch reverted =
+                    dispatchVoucherService.unfinalizeDispatch(getInstance());
+            setInstance(reverted);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "WarehouseDispatch.unfinalize.success");
+            return Outcome.REDISPLAY;
+        } catch (IllegalStateException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.unfinalize.error.notFinalized");
+            return Outcome.REDISPLAY;
+        } catch (Exception e) {
+            log.error("Error desfinalizando despacho", e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.unfinalize.error");
+            return Outcome.REDISPLAY;
+        }
+    }
+
+    /**
+     * Guarda las ediciones de los envases (detalle textual y peso neto
+     * aproximado por bolsa) realizadas desde la seccion inline del
+     * formulario. Solo permitido en estado APROBADO. Permanece en el
+     * formulario tras guardar (solo Cancelar/Finalizar navegan al listado).
+     */
+    public String saveEnvelopes() {
+        try {
+            WarehouseVoucherDispatch saved =
+                    dispatchVoucherService.updateEnvelopes(getInstance());
+            setInstance(saved);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "WarehouseDispatch.envelopes.save.success");
+            return Outcome.REDISPLAY;
+        } catch (IllegalStateException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.envelopes.save.error.notEditable");
+            return Outcome.REDISPLAY;
+        } catch (Exception e) {
+            log.error("Error guardando envases", e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.envelopes.save.error");
+            return Outcome.REDISPLAY;
+        }
+    }
+
+    /* =========================================================
      * Helpers de estado para la vista
      * ========================================================= */
 
@@ -723,9 +825,25 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
         return d != null && d.isApproved();
     }
 
+    public boolean isFinalized() {
+        WarehouseVoucherDispatch d = getInstance();
+        return d != null && d.isFinalized();
+    }
+
     public boolean isAnnulled() {
         WarehouseVoucherDispatch d = getInstance();
         return d != null && d.isAnnulled();
+    }
+
+    /** True si el despacho tiene envases editables (estado APROBADO). */
+    public boolean isEnvelopesEditable() {
+        return isApproved();
+    }
+
+    /** True si el despacho tiene envases generados (APROBADO o FINALIZADO). */
+    public boolean isHasEnvelopes() {
+        WarehouseVoucherDispatch d = getInstance();
+        return d != null && d.hasEnvelopes();
     }
 
     public boolean isWarehouseSelected() {

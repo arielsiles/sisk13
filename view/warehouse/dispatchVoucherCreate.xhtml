@@ -217,7 +217,7 @@
         <h:inputText id="tareWeight" value="#{dispatchVoucher.tareWeightKg}"
                      required="true" styleClass="inputSmall right" tabindex="18">
             <app:realNumberConverter minimum="0"
-                                     pattern="#{messages['patterns.decimal3FNumber']}"
+                                     pattern="#{messages['patterns.decimalNumber']}"
                                      forId="tareWeight"/>
             <a4j:support event="onblur" ajaxSingle="true"
                          action="#{dispatchVoucherAction.recalculateNetWeight}"
@@ -230,7 +230,7 @@
         <h:inputText id="grossWeight" value="#{dispatchVoucher.grossWeightKg}"
                      required="true" styleClass="inputSmall right" tabindex="19">
             <app:realNumberConverter minimum="0"
-                                     pattern="#{messages['patterns.decimal3FNumber']}"
+                                     pattern="#{messages['patterns.decimalNumber']}"
                                      forId="grossWeight"/>
             <a4j:support event="onblur" ajaxSingle="true"
                          action="#{dispatchVoucherAction.recalculateNetWeight}"
@@ -241,28 +241,8 @@
     <s:decorate id="weightNetField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['WarehouseDispatch.weight.net']}</ui:define>
         <h:outputText value="#{dispatchVoucher.netWeightKg}" styleClass="bold">
-            <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
+            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
         </h:outputText>
-    </s:decorate>
-
-    <s:decorate id="bagsFromField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['WarehouseDispatch.bags.from']}</ui:define>
-        <h:inputText id="bagsFrom" value="#{dispatchVoucher.bagsFromNumber}"
-                     required="true" styleClass="inputSmall right" tabindex="20">
-            <a4j:support event="onblur" ajaxSingle="true"
-                         action="#{dispatchVoucherAction.recalculateBagCount}"
-                         reRender="bagCountField"/>
-        </h:inputText>
-    </s:decorate>
-
-    <s:decorate id="bagsToField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['WarehouseDispatch.bags.to']}</ui:define>
-        <h:inputText id="bagsTo" value="#{dispatchVoucher.bagsToNumber}"
-                     required="true" styleClass="inputSmall right" tabindex="21">
-            <a4j:support event="onblur" ajaxSingle="true"
-                         action="#{dispatchVoucherAction.recalculateBagCount}"
-                         reRender="bagCountField"/>
-        </h:inputText>
     </s:decorate>
 
     <s:decorate id="bagCountField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -366,6 +346,8 @@
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.measureUnit']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.quantity']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bagsCount']}</th>
+            <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bags.from']}</th>
+            <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bags.to']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.packaging']}</th>
             <th class="rich-table-headercell">#{messages['Common.action']}</th>
         </tr>
@@ -386,14 +368,23 @@
                         <h:inputText id="#{qtyInputId}" value="#{detail.quantity}"
                                      required="true" styleClass="inputSmall right">
                             <app:realNumberConverter minimum="0"
-                                                     pattern="#{messages['patterns.decimal6FNumber']}"
+                                                     pattern="#{messages['patterns.decimalNumber']}"
                                                      forId="#{qtyInputId}"/>
                         </h:inputText>
                         <h:message for="#{qtyInputId}" styleClass="errors" style="display:block;"/>
                     </s:div>
                 </td>
                 <td class="rich-table-cell center">
-                    <h:inputText value="#{detail.bagsCount}" styleClass="inputSmall right"/>
+                    <h:inputText value="#{detail.bagsCount}" styleClass="inputSmall right">
+                        <a4j:support event="onblur" ajaxSingle="true"
+                                     reRender="bagCountField"/>
+                    </h:inputText>
+                </td>
+                <td class="rich-table-cell center">
+                    <h:inputText value="#{detail.bagsFromNumber}" styleClass="inputSmall right"/>
+                </td>
+                <td class="rich-table-cell center">
+                    <h:inputText value="#{detail.bagsToNumber}" styleClass="inputSmall right"/>
                 </td>
                 <td class="rich-table-cell">
                     <h:selectOneMenu value="#{detail.packaging}" styleClass="input">

@@ -132,9 +132,20 @@ public class DispatchCertificateReportAction extends GenericReportAction {
                 : BigDecimal.ZERO;
         p.put("netWeightTons", netTons);
 
-        // Bolsas
-        p.put("bagsFromNumber", d.getBagsFromNumber());
-        p.put("bagsToNumber", d.getBagsToNumber());
+        // Bolsas: agregado de los detalles (min de bolsa_desde, max de bolsa_hasta).
+        // La numeracion vive ahora en el detalle (un rango por producto). El
+        // encabezado solo muestra el rango global del despacho.
+        Integer minFrom = null, maxTo = null;
+        if (d.getDetails() != null) {
+            for (WarehouseVoucherDispatchDetail det : d.getDetails()) {
+                Integer f = det.getBagsFromNumber();
+                Integer t = det.getBagsToNumber();
+                if (f != null && (minFrom == null || f < minFrom)) minFrom = f;
+                if (t != null && (maxTo == null || t > maxTo)) maxTo = t;
+            }
+        }
+        p.put("bagsFromNumber", minFrom);
+        p.put("bagsToNumber", maxTo);
 
         // Lugares y turno
         p.put("originPlace", d.getOriginPlace() != null ? d.getOriginPlace().getDescription() : "");
@@ -208,12 +219,6 @@ public class DispatchCertificateReportAction extends GenericReportAction {
                 PageOrientation.PORTRAIT,
                 subReportParams);
 
-        // NUMERACION BOLSAS es dato de cabecera (mismo para todas las lineas).
-        String bagRange = "";
-        if (dispatch.getBagsFromNumber() != null && dispatch.getBagsToNumber() != null) {
-            bagRange = dispatch.getBagsFromNumber() + " al " + dispatch.getBagsToNumber();
-        }
-
         // Datos como JRBeanCollectionDataSource (no via EJBQL).
         List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
         List<WarehouseVoucherDispatchDetail> details = dispatch.getDetails();
@@ -231,6 +236,11 @@ public class DispatchCertificateReportAction extends GenericReportAction {
                 row.put("COLUMN_1", cantidadTon);
                 row.put("COLUMN_2", det.getProductItem() != null ? det.getProductItem().getName() : "");
                 row.put("COLUMN_3", buildDescripcionDetallada(det));
+                // NUMERACION BOLSAS: rango por linea de detalle (no de cabecera).
+                String bagRange = "";
+                if (det.getBagsFromNumber() != null && det.getBagsToNumber() != null) {
+                    bagRange = det.getBagsFromNumber() + " al " + det.getBagsToNumber();
+                }
                 row.put("COLUMN_4", bagRange);
                 // TOTAL ENTREGADO: texto dinamico a partir del tipo de envase y
                 // la cantidad de bolsas de la linea. Ej: "28 bolsas Big Bag de

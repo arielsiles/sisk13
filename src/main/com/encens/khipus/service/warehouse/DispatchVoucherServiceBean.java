@@ -20,6 +20,7 @@ import com.encens.khipus.model.warehouse.DispatchState;
 import com.encens.khipus.model.warehouse.DispatchStockImpact;
 import com.encens.khipus.model.warehouse.DocumentTypePK;
 import com.encens.khipus.model.warehouse.InventoryMovement;
+import com.encens.khipus.model.warehouse.InventoryPackaging;
 import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
@@ -27,6 +28,7 @@ import com.encens.khipus.model.warehouse.WarehouseDocumentType;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
 import com.encens.khipus.model.warehouse.WarehouseVoucherDispatch;
 import com.encens.khipus.model.warehouse.WarehouseVoucherDispatchDetail;
+import com.encens.khipus.model.warehouse.WarehouseVoucherDispatchEnvelope;
 import com.encens.khipus.model.warehouse.WarehouseVoucherState;
 import com.encens.khipus.model.warehouse.WarehouseVoucherType;
 import com.encens.khipus.service.common.SequenceGeneratorService;
@@ -310,10 +312,67 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
         dispatch.setState(DispatchState.APROBADO);
         dispatch.setUpdatedBy(financesUserService.getFinancesUserCode());
         dispatch.setUpdatedDate(new Date());
+
+        // 9) Generar envases por cada detalle (Eager). Cada bolsa fisica del
+        //    despacho se materializa como una fila en inv_valedespacho_envase
+        //    con codigo, detalle textual y peso editables hasta que el
+        //    despacho pase a FINALIZADO.
+        generateEnvelopes(dispatch);
+
         WarehouseVoucherDispatch merged = em.merge(dispatch);
         em.flush();
 
         return merged;
+    }
+
+    /**
+     * Materializa una fila por bolsa fisica en cada detalle del despacho.
+     * Numero de filas por detalle = detail.bagsCount (autoritativo). El
+     * correlativo arranca en detail.bagsFromNumber (si null, en 1).
+     * codigo_identificacion = salesLotCode + "/" + lpad(correlativo, 3, '0').
+     */
+    private void generateEnvelopes(WarehouseVoucherDispatch dispatch) {
+        if (dispatch.getDetails() == null) {
+            return;
+        }
+        String lot = dispatch.getSalesLotCode() != null ? dispatch.getSalesLotCode() : "";
+        String userCode = financesUserService.getFinancesUserCode();
+        Date now = new Date();
+
+        for (WarehouseVoucherDispatchDetail det : dispatch.getDetails()) {
+            Integer count = det.getBagsCount();
+            if (count == null || count <= 0) {
+                continue;
+            }
+            int from = det.getBagsFromNumber() != null ? det.getBagsFromNumber() : 1;
+            InventoryPackaging pkg = det.getPackaging();
+            String defaultDetail = pkg != null ? pkg.getDefaultEnvelopeDetail() : null;
+            java.math.BigDecimal defaultWeight = pkg != null ? pkg.getUnitCapacityKg() : null;
+
+            if (det.getEnvelopes() == null) {
+                det.setEnvelopes(new ArrayList<WarehouseVoucherDispatchEnvelope>());
+            }
+            // Idempotencia: si el detalle ya tiene envases (ej. re-aprobacion
+            // tras anulacion), no regeneramos.
+            if (!det.getEnvelopes().isEmpty()) {
+                continue;
+            }
+            for (int i = 0; i < count; i++) {
+                int correlative = from + i;
+                WarehouseVoucherDispatchEnvelope env = new WarehouseVoucherDispatchEnvelope();
+                env.setDispatch(dispatch);
+                env.setDetail(det);
+                env.setCorrelativeNumber(correlative);
+                env.setIdentificationCode(lot + "/" + String.format("%03d", correlative));
+                env.setEnvelopeDetail(defaultDetail);
+                env.setNetWeightApproxKg(defaultWeight);
+                env.setCreatedBy(userCode);
+                env.setCreatedDate(now);
+                env.setUpdatedBy(userCode);
+                env.setUpdatedDate(now);
+                det.getEnvelopes().add(env);
+            }
+        }
     }
 
     private String[] buildGloss(WarehouseVoucherDispatch d) {
@@ -382,6 +441,70 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
         dispatch.setUpdatedBy(userCode);
         dispatch.setUpdatedDate(now);
 
+        WarehouseVoucherDispatch merged = em.merge(dispatch);
+        em.flush();
+        return merged;
+    }
+
+    /* =============================================================
+     * Finalizar / reverso (APR <-> FIN)
+     * ============================================================= */
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public WarehouseVoucherDispatch finalizeDispatch(WarehouseVoucherDispatch dispatch) {
+        if (dispatch.getState() != DispatchState.APROBADO) {
+            throw new IllegalStateException(
+                    "Solo se puede finalizar un despacho APROBADO (actual: "
+                            + dispatch.getState() + ")");
+        }
+        String userCode = financesUserService.getFinancesUserCode();
+        dispatch.setState(DispatchState.FINALIZADO);
+        dispatch.setUpdatedBy(userCode);
+        dispatch.setUpdatedDate(new Date());
+        WarehouseVoucherDispatch merged = em.merge(dispatch);
+        em.flush();
+        return merged;
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public WarehouseVoucherDispatch unfinalizeDispatch(WarehouseVoucherDispatch dispatch) {
+        if (dispatch.getState() != DispatchState.FINALIZADO) {
+            throw new IllegalStateException(
+                    "Solo se puede desfinalizar un despacho FINALIZADO (actual: "
+                            + dispatch.getState() + ")");
+        }
+        String userCode = financesUserService.getFinancesUserCode();
+        dispatch.setState(DispatchState.APROBADO);
+        dispatch.setUpdatedBy(userCode);
+        dispatch.setUpdatedDate(new Date());
+        WarehouseVoucherDispatch merged = em.merge(dispatch);
+        em.flush();
+        return merged;
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public WarehouseVoucherDispatch updateEnvelopes(WarehouseVoucherDispatch dispatch) {
+        if (dispatch.getState() != DispatchState.APROBADO) {
+            throw new IllegalStateException(
+                    "Solo se pueden editar envases de un despacho APROBADO (actual: "
+                            + dispatch.getState() + ")");
+        }
+        String userCode = financesUserService.getFinancesUserCode();
+        Date now = new Date();
+        if (dispatch.getDetails() != null) {
+            for (WarehouseVoucherDispatchDetail det : dispatch.getDetails()) {
+                if (det.getEnvelopes() == null) continue;
+                for (WarehouseVoucherDispatchEnvelope env : det.getEnvelopes()) {
+                    env.setUpdatedBy(userCode);
+                    env.setUpdatedDate(now);
+                }
+            }
+        }
+        dispatch.setUpdatedBy(userCode);
+        dispatch.setUpdatedDate(now);
         WarehouseVoucherDispatch merged = em.merge(dispatch);
         em.flush();
         return merged;
