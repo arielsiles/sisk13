@@ -107,6 +107,29 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     }
 
     @SuppressWarnings("unchecked")
+    @Factory(value = "dispatchApprovedRouteList", scope = ScopeType.STATELESS)
+    public List<com.encens.khipus.model.warehouse.DispatchRoute> getApprovedRoutes() {
+        return em.createNamedQuery("DispatchRoute.findApproved").getResultList();
+    }
+
+    /**
+     * Lista de descripciones tecnicas APROBADAS para el producto de la linea
+     * dada. Usada por el dropdown "Descripcion (Hoja de Ruta)" del detalle.
+     * Si la linea no tiene producto aun, retorna lista vacia.
+     */
+    @SuppressWarnings("unchecked")
+    public List<com.encens.khipus.model.warehouse.ProductDescription>
+            getApprovedDescriptions(com.encens.khipus.model.warehouse.WarehouseVoucherDispatchDetail detail) {
+        if (detail == null || detail.getProductItemCode() == null) {
+            return java.util.Collections.emptyList();
+        }
+        return em.createNamedQuery("ProductDescription.findApprovedByProduct")
+                .setParameter("companyNumber", detail.getProductItemCompanyNumber())
+                .setParameter("productItemCode", detail.getProductItemCode())
+                .getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
     @Factory(value = "dispatchProductionGroupList", scope = ScopeType.STATELESS)
     public List<ProductionGroup> getProductionGroups() {
         return em.createQuery(

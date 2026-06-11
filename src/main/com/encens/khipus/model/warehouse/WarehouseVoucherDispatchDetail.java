@@ -103,6 +103,10 @@ public class WarehouseVoucherDispatchDetail implements BaseModel {
     @JoinColumn(name = "idtipoenvase")
     private InventoryPackaging packaging;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "iddescripcion_producto")
+    private ProductDescription productDescription;
+
     @OneToMany(mappedBy = "detail", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -235,6 +239,14 @@ public class WarehouseVoucherDispatchDetail implements BaseModel {
 
     public void setPackaging(InventoryPackaging packaging) {
         this.packaging = packaging;
+    }
+
+    public ProductDescription getProductDescription() {
+        return productDescription;
+    }
+
+    public void setProductDescription(ProductDescription productDescription) {
+        this.productDescription = productDescription;
     }
 
     public List<WarehouseVoucherDispatchEnvelope> getEnvelopes() {

@@ -304,6 +304,74 @@ Patron reusable para cualquier QueryDataModel cuya entidad tenga un enum/state c
 
 ---
 
+## 10.ter Fase 12 — Hoja de Ruta (catalogos + reporte)
+
+Reporte nuevo con catalogos propios: rutas reusables (paradas + mapa) y descripciones tecnicas reusables por producto. Ambos catalogos tienen ciclo de aprobacion con **estados inmutables** post-aprobacion para no alterar despachos historicos.
+
+### A. Estados de los catalogos (politica)
+
+Nuevo enum [`CatalogApprovalState`](../src/main/com/encens/khipus/model/warehouse/CatalogApprovalState.java): `BORRADOR -> APROBADO -> INACTIVO`. **Sin vuelta atras.**
+
+- **BORRADOR**: editable, NO aparece en selectPopUps del despacho.
+- **APROBADO**: inmutable, aparece en selectPopUps.
+- **INACTIVO**: inmutable, no aparece (terminal).
+
+Politica unica: si una entrada APROBADA necesita cambio, se inactiva y se crea nueva. No hay edicion bajo demanda. Esto preserva la inmutabilidad de los despachos historicos que referencian la entrada.
+
+Patron en los Actions: `update()`, `delete()` y los inputs del form validan `isEditable()`; `approve()` exige `BORRADOR`, `inactivate()` exige `APROBADO`. El form muestra read-only en APROBADO/INACTIVO. Botones cambian segun estado: BORRADOR → Guardar/Aprobar/Eliminar; APROBADO → Inactivar; INACTIVO → nada.
+
+### B. Catalogo `ProductDescription`
+
+Tabla [`inv_descripcion_producto`](../query/query_v6.0.82_terdemol.sql) (seccion 15.a). Entidad [`ProductDescription`](../src/main/com/encens/khipus/model/warehouse/ProductDescription.java) con composite FK al producto via (`no_cia_art`, `cod_art`). Un producto puede tener N descripciones, varias APROBADAS simultaneamente.
+
+- CRUD: [`ProductDescriptionAction`](../src/main/com/encens/khipus/action/warehouse/ProductDescriptionAction.java) + [`ProductDescriptionDataModel`](../src/main/com/encens/khipus/action/warehouse/ProductDescriptionDataModel.java) + [productDescriptionList.xhtml](../view/warehouse/productDescriptionList.xhtml) + [productDescription.xhtml](../view/warehouse/productDescription.xhtml).
+- Permiso `PRODUCTDESCRIPTION` (id 470, CRUD bitmask=15).
+- NamedQuery `ProductDescription.findApprovedByProduct(:companyNumber, :productItemCode)` para alimentar el dropdown del detalle del despacho.
+- En el form del despacho: nueva columna en la grilla de detalle, dropdown filtrado por producto via `dispatchVoucherAction.getApprovedDescriptions(detail)`.
+
+### C. Catalogo `DispatchRoute`
+
+Tabla [`inv_ruta_despacho`](../query/query_v6.0.82_terdemol.sql) (seccion 15.b). Entidad [`DispatchRoute`](../src/main/com/encens/khipus/model/warehouse/DispatchRoute.java).
+
+- **Paradas (`waypoints`)**: campo TEXT con separador ` - ` (decision de diseño - alternativa "entidad hija de stops" descartada por overhead innecesario).
+- **Imagen del mapa**: LONGBLOB en el catalogo, NUNCA replicada al despacho. Una imagen por ruta, reutilizada por N despachos → la BD NO crece a medida de los despachos.
+- **Resize+compresion al guardar**: [`ImageUtils.resizeAndCompress(bytes, 1024)`](../src/main/com/encens/khipus/util/ImageUtils.java) re-codifica a JPEG ~85% calidad max 1024px de ancho. Resultado tipico: 50-150 KB por mapa. Limite duro de entrada: 5 MB.
+- Upload via `<s:fileUpload data="#{dispatchRouteAction.uploadedMapBytes}">`. El action procesa en `create()`/`update()`/`approve()` antes de persistir.
+- Unique key `(idcompania, nombre)` evita duplicados.
+- CRUD: [`DispatchRouteAction`](../src/main/com/encens/khipus/action/warehouse/DispatchRouteAction.java) + [`DispatchRouteDataModel`](../src/main/com/encens/khipus/action/warehouse/DispatchRouteDataModel.java) + [dispatchRouteList.xhtml](../view/warehouse/dispatchRouteList.xhtml) + [dispatchRoute.xhtml](../view/warehouse/dispatchRoute.xhtml).
+- Permiso `WAREHOUSEDISPATCHROUTE` (id 471, CRUD bitmask=15).
+- NamedQuery `DispatchRoute.findApproved` alimenta el dropdown del despacho.
+
+### D. Cambios en el despacho
+
+- `WarehouseVoucherDispatch`: nuevos campos `route` (FK `idruta`) + `validityDays` (`vigencia_dias`). Editables solo en BORRADOR.
+- `WarehouseVoucherDispatchDetail`: nuevo campo `productDescription` (FK `iddescripcion_producto`). Selector por linea en la grilla, filtrado por el producto de la linea.
+- Form: nueva seccion ITINERARIO ya tenia origen/destino - se agrego Ruta + Vigencia. Nueva columna "Descripcion (Hoja de Ruta)" en la grilla de detalle.
+
+### E. Reporte "Hoja de Ruta"
+
+[`DispatchRouteSheetReportAction`](../src/main/com/encens/khipus/action/warehouse/reports/DispatchRouteSheetReportAction.java) + [dispatchRouteSheetReport.jrxml](../view/warehouse/reports/dispatchRouteSheetReport.jrxml). Pagina Carta vertical, una sola pagina (title h=60 + summary h=630 + pageFooter h=14 = 704 ≤ 712 utiles).
+
+**Estructura del summary band** (en orden vertical):
+1. OPERADOR DE ORIGEN: empresa de transporte, conductor + licencia.
+2. DATOS DE VEHICULO: color, marca, placa.
+3. DATOS DE LA CARGA: descripcion (concatena `productDescription.description` de cada linea, con fallback a `productItem.name`) + cantidad total (suma de `details[].quantity`) + unidad (compartida; "Varios" si no coinciden).
+4. ITINERARIO: lugar despacho/entrega (del catalogo `DispatchPlace`), paradas (del catalogo `DispatchRoute`), imagen del mapa.
+5. Vigencia en dias.
+6. Bloque firmas (Resp. Almacen + Conductor) usando el patron single styled textField (seccion 5).
+
+**Imagen del mapa en JR**: parametro `routeMapImage` tipo `java.io.InputStream`, el action provee un `ByteArrayInputStream` sobre `route.mapImage`. Atributo `isUsingCache="false"` en el `<image>` para evitar reutilizacion del InputStream consumido.
+
+### F. Boton "Imprimir Hoja de Ruta"
+
+En barras top/bottom del form del despacho (mismos botones, convencion del sistema). Visible **solo en APROBADO + FINALIZADO** (no en BORRADOR ni ANULADO - decision del usuario porque la hoja solo cobra sentido con datos consolidados). Restringido por permiso `WAREHOUSEDISPATCHROUTESHEET` (id 472, VIEW bitmask=1).
+
+### G. Decisiones tomadas (por si despues hay que recordar)
+
+- **No hay snapshot del nombre/paradas de la ruta en el despacho**: la inmutabilidad del catalogo (APROBADO no se edita) ya garantiza que despachos historicos imprimen los datos originales. Si la ruta cambia, se INACTIVA y se crea nueva.
+- **Sin asignaciones automaticas de permisos**: las 3 funcionalidades nuevas (470/471/472) se agregan a `funcionalidad` pero no a `derechoacceso`. El usuario asigna por rol manualmente.
+- **No-edit-when-unused**: aunque tecnicamente una entrada APROBADA sin referencias podria editarse sin riesgo, la politica es uniforme (APROBADO = inmutable) para simplificar el modelo mental.
+
 ## 11. Pendientes conocidos
 
 - **Asiento contable al aprobar despacho:** opciones A/B/C en plan original sección 15, sin decidir.

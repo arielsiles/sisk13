@@ -220,6 +220,18 @@ public class WarehouseVoucherDispatch implements BaseModel {
     })
     private WarehouseVoucher warehouseVoucher;
 
+    /* -------- Hoja de Ruta -------- */
+
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idruta")
+    private DispatchRoute route;
+
+    @Column(name = "vigencia_dias")
+    private Integer validityDays;
+
+    @Column(name = "vigencia_max_dias")
+    private Integer maximumValidityDays = Integer.valueOf(1);
+
     /* -------- Observacion / auditoria -------- */
 
     @Column(name = "observacion", length = 1000)
@@ -565,6 +577,30 @@ public class WarehouseVoucherDispatch implements BaseModel {
             this.warehouseVoucherCompanyNumber = warehouseVoucher.getId().getCompanyNumber();
             this.warehouseVoucherTransactionNumber = warehouseVoucher.getId().getTransactionNumber();
         }
+    }
+
+    public DispatchRoute getRoute() {
+        return route;
+    }
+
+    public void setRoute(DispatchRoute route) {
+        this.route = route;
+    }
+
+    public Integer getValidityDays() {
+        return validityDays;
+    }
+
+    public void setValidityDays(Integer validityDays) {
+        this.validityDays = validityDays;
+    }
+
+    public Integer getMaximumValidityDays() {
+        return maximumValidityDays;
+    }
+
+    public void setMaximumValidityDays(Integer maximumValidityDays) {
+        this.maximumValidityDays = maximumValidityDays;
     }
 
     public String getObservation() {

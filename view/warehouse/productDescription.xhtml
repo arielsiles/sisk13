@@ -1,0 +1,187 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{productDescriptionAction.managed}">
+                #{messages['ProductDescription.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['ProductDescription.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="productDescriptionForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{productDescriptionAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!productDescriptionAction.managed and s:hasPermission('PRODUCTDESCRIPTION','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{productDescriptionAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productDescriptionAction.managed and productDescription.editable and s:hasPermission('PRODUCTDESCRIPTION','UPDATE')}"/>
+
+                <h:commandButton action="#{productDescriptionAction.approve}" value="#{messages['Common.approve']}"
+                                 styleClass="button"
+                                 rendered="#{productDescriptionAction.managed and productDescription.editable and s:hasPermission('PRODUCTDESCRIPTION','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['ProductDescription.inactivate']}"
+                                 styleClass="button"
+                                 rendered="#{productDescriptionAction.managed and productDescription.approved and s:hasPermission('PRODUCTDESCRIPTION','UPDATE')}">
+                    <rich:componentControl for="inactivateConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{productDescriptionAction.managed and productDescription.editable and s:hasPermission('PRODUCTDESCRIPTION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{productDescriptionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{productDescriptionAction.managed}">
+                            #{messages['ProductDescription.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['ProductDescription.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="stateDisplayField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{productDescriptionAction.managed}">
+                    <ui:define name="label">#{messages['ProductDescription.state']}</ui:define>
+                    <h:outputText value="#{messages[productDescription.state.resourceKey]}" styleClass="bold"/>
+                </s:decorate>
+
+                <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductDescription.productItem']}</ui:define>
+                    <h:panelGroup rendered="#{productDescription.editable}">
+                        <app:selectPopUp id="productItem"
+                                         required="true"
+                                         textValue="#{productDescription.productItem.fullName}"
+                                         value="#{productDescription.productItem}"
+                                         clearAction="#{productDescriptionAction.assignProductItem(null)}"
+                                         searchModalPanel="productItemListModalPanel"
+                                         dataModel="#{productItemSearchDataModel}"
+                                         reRender="productItemField"
+                                         hotKeySelect="alt+2"/>
+                    </h:panelGroup>
+                    <h:outputText value="#{productDescription.productItem.fullName}"
+                                  rendered="#{!productDescription.editable}"/>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductDescription.description']}</ui:define>
+                    <h:inputTextarea id="description"
+                                     value="#{productDescription.description}"
+                                     style="width: 550px; resize: vertical;"
+                                     required="true"
+                                     rows="5"
+                                     readonly="#{!productDescription.editable}"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{productDescriptionAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!productDescriptionAction.managed and s:hasPermission('PRODUCTDESCRIPTION','CREATE')}"/>
+
+                <h:commandButton action="#{productDescriptionAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{productDescriptionAction.managed and productDescription.editable and s:hasPermission('PRODUCTDESCRIPTION','UPDATE')}"/>
+
+                <h:commandButton action="#{productDescriptionAction.approve}" value="#{messages['Common.approve']}"
+                                 styleClass="button"
+                                 rendered="#{productDescriptionAction.managed and productDescription.editable and s:hasPermission('PRODUCTDESCRIPTION','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['ProductDescription.inactivate']}"
+                                 styleClass="button"
+                                 rendered="#{productDescriptionAction.managed and productDescription.approved and s:hasPermission('PRODUCTDESCRIPTION','UPDATE')}">
+                    <rich:componentControl for="inactivateConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{productDescriptionAction.managed and productDescription.editable and s:hasPermission('PRODUCTDESCRIPTION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{productDescriptionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate id="productItemListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml"
+                    rendered="#{productDescription.editable}">
+            <ui:param name="containerId" value="productItemListModalPanelContainer"/>
+            <ui:param name="dialogId" value="productItemListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productDescriptionAction.assignProductItem(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="productItemField"
+                                   oncomplete="Richfaces.hideModalPanel('productItemListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{productDescriptionAction.managed and productDescription.editable and s:hasPermission('PRODUCTDESCRIPTION','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductDescription.delete.confirmation']}">
+                        <f:param value="#{productDescription.shortDescription}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{productDescriptionAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{productDescriptionAction.managed and productDescription.approved and s:hasPermission('PRODUCTDESCRIPTION','UPDATE')}">
+            <ui:param name="dialogId" value="inactivateConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['ProductDescription.inactivate.confirmation.title']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['ProductDescription.inactivate.confirmation']}">
+                        <f:param value="#{productDescription.shortDescription}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{productDescriptionAction.inactivate}"
+                                   value="#{messages['ProductDescription.inactivate']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

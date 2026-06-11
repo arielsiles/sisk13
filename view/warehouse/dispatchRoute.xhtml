@@ -1,0 +1,208 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{dispatchRouteAction.managed}">#{messages['DispatchRoute.edit']}</c:when>
+            <c:otherwise>#{messages['DispatchRoute.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="75%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="dispatchRouteForm" enctype="multipart/form-data">
+
+            <div class="buttons">
+                <h:commandButton action="#{dispatchRouteAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!dispatchRouteAction.managed and s:hasPermission('WAREHOUSEDISPATCHROUTE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{dispatchRouteAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchRouteAction.managed and dispatchRoute.editable and s:hasPermission('WAREHOUSEDISPATCHROUTE','UPDATE')}"/>
+
+                <h:commandButton action="#{dispatchRouteAction.approve}" value="#{messages['Common.approve']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchRouteAction.managed and dispatchRoute.editable and s:hasPermission('WAREHOUSEDISPATCHROUTE','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['DispatchRoute.inactivate']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchRouteAction.managed and dispatchRoute.approved and s:hasPermission('WAREHOUSEDISPATCHROUTE','UPDATE')}">
+                    <rich:componentControl for="inactivateConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchRouteAction.managed and dispatchRoute.editable and s:hasPermission('WAREHOUSEDISPATCHROUTE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{dispatchRouteAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{dispatchRouteAction.managed}">#{messages['DispatchRoute.edit']}</c:when>
+                        <c:otherwise>#{messages['DispatchRoute.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="stateDisplayField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{dispatchRouteAction.managed}">
+                    <ui:define name="label">#{messages['DispatchRoute.state']}</ui:define>
+                    <h:outputText value="#{messages[dispatchRoute.state.resourceKey]}" styleClass="bold"/>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.name']}</ui:define>
+                    <h:inputText id="name" value="#{dispatchRoute.name}" styleClass="input"
+                                 required="true" maxlength="120" tabindex="1"
+                                 readonly="#{!dispatchRoute.editable}"/>
+                </s:decorate>
+
+                <s:decorate id="originField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.originText']}</ui:define>
+                    <h:inputText id="origin" value="#{dispatchRoute.originText}" styleClass="input"
+                                 maxlength="200" tabindex="2"
+                                 readonly="#{!dispatchRoute.editable}"/>
+                </s:decorate>
+
+                <s:decorate id="destField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.destinationText']}</ui:define>
+                    <h:inputText id="dest" value="#{dispatchRoute.destinationText}" styleClass="input"
+                                 maxlength="200" tabindex="3"
+                                 readonly="#{!dispatchRoute.editable}"/>
+                </s:decorate>
+
+                <s:decorate id="waypointsField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.waypoints']}</ui:define>
+                    <h:inputTextarea id="waypoints" value="#{dispatchRoute.waypoints}" styleClass="input"
+                                     required="true" rows="3" cols="80"
+                                     tabindex="4"
+                                     readonly="#{!dispatchRoute.editable}"/>
+                </s:decorate>
+
+                <s:decorate id="distanceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.estimatedDistanceKm']}</ui:define>
+                    <h:inputText id="distance" value="#{dispatchRoute.estimatedDistanceKm}" styleClass="input"
+                                 tabindex="5" readonly="#{!dispatchRoute.editable}">
+                        <app:realNumberConverter minimum="0"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="distance"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="durationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.estimatedDurationHours']}</ui:define>
+                    <h:inputText id="duration" value="#{dispatchRoute.estimatedDurationHours}" styleClass="input"
+                                 tabindex="6" readonly="#{!dispatchRoute.editable}">
+                        <app:realNumberConverter minimum="0"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="duration"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="mapField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{dispatchRoute.editable}">
+                    <ui:define name="label">#{messages['DispatchRoute.mapImage.upload']}</ui:define>
+                    <s:fileUpload id="mapUpload" styleClass="input"
+                                  data="#{dispatchRouteAction.uploadedMapBytes}"
+                                  fileName="#{dispatchRouteAction.uploadedMapName}"
+                                  contentType="#{dispatchRouteAction.uploadedMapContentType}"/>
+                </s:decorate>
+
+                <s:decorate id="mapPreviewField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{dispatchRouteAction.managed and dispatchRoute.mapImage != null}">
+                    <ui:define name="label">#{messages['DispatchRoute.mapImage.current']}</ui:define>
+                    <s:graphicImage value="#{dispatchRoute.mapImage}"
+                                    style="max-width: 600px; max-height: 400px; border: 1px solid #ccc;"/>
+                </s:decorate>
+
+                <s:decorate id="mapNoneField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{dispatchRouteAction.managed and dispatchRoute.mapImage == null}">
+                    <ui:define name="label">#{messages['DispatchRoute.mapImage']}</ui:define>
+                    <h:outputText value="#{messages['DispatchRoute.mapImage.none']}" styleClass="dim"/>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{dispatchRouteAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!dispatchRouteAction.managed and s:hasPermission('WAREHOUSEDISPATCHROUTE','CREATE')}"/>
+
+                <h:commandButton action="#{dispatchRouteAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchRouteAction.managed and dispatchRoute.editable and s:hasPermission('WAREHOUSEDISPATCHROUTE','UPDATE')}"/>
+
+                <h:commandButton action="#{dispatchRouteAction.approve}" value="#{messages['Common.approve']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchRouteAction.managed and dispatchRoute.editable and s:hasPermission('WAREHOUSEDISPATCHROUTE','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['DispatchRoute.inactivate']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchRouteAction.managed and dispatchRoute.approved and s:hasPermission('WAREHOUSEDISPATCHROUTE','UPDATE')}">
+                    <rich:componentControl for="inactivateConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchRouteAction.managed and dispatchRoute.editable and s:hasPermission('WAREHOUSEDISPATCHROUTE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{dispatchRouteAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{dispatchRouteAction.managed and dispatchRoute.editable and s:hasPermission('WAREHOUSEDISPATCHROUTE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DispatchRoute.delete.confirmation']}">
+                        <f:param value="#{dispatchRoute.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{dispatchRouteAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{dispatchRouteAction.managed and dispatchRoute.approved and s:hasPermission('WAREHOUSEDISPATCHROUTE','UPDATE')}">
+            <ui:param name="dialogId" value="inactivateConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['DispatchRoute.inactivate.confirmation.title']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DispatchRoute.inactivate.confirmation']}">
+                        <f:param value="#{dispatchRoute.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{dispatchRouteAction.inactivate}"
+                                   value="#{messages['DispatchRoute.inactivate']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

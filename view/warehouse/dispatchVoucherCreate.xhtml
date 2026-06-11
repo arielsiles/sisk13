@@ -138,6 +138,35 @@
             <s:convertEntity/>
         </h:selectOneMenu>
     </s:decorate>
+
+    <s:decorate id="routeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDispatch.route']}</ui:define>
+        <h:selectOneMenu id="route" value="#{dispatchVoucher.route}"
+                         styleClass="inputLarge" tabindex="7">
+            <s:selectItems value="#{dispatchApprovedRouteList}" var="r"
+                           label="#{r.name}"
+                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+    <s:decorate id="validityDaysField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDispatch.validityDays']}</ui:define>
+        <h:inputText id="validityDays" value="#{dispatchVoucher.validityDays}"
+                     styleClass="inputSmall right" tabindex="7">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                        forId="validityDays"/>
+        </h:inputText>
+    </s:decorate>
+
+    <s:decorate id="maximumValidityDaysField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDispatch.maximumValidityDays']}</ui:define>
+        <h:inputText id="maximumValidityDays" value="#{dispatchVoucher.maximumValidityDays}"
+                     styleClass="inputSmall right" tabindex="7">
+            <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                        forId="maximumValidityDays"/>
+        </h:inputText>
+    </s:decorate>
 </s:div>
 
 <!-- ========== Columna DERECHA: carguio, conductor, balanza, bolsas ========== -->
@@ -349,6 +378,7 @@
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bags.from']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bags.to']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.packaging']}</th>
+            <th class="rich-table-headercell">#{messages['WarehouseDispatch.productDescription']}</th>
             <th class="rich-table-headercell">#{messages['Common.action']}</th>
         </tr>
         </thead>
@@ -390,6 +420,14 @@
                     <h:selectOneMenu value="#{detail.packaging}" styleClass="input">
                         <s:selectItems value="#{dispatchPackagingList}" var="pkg"
                                        label="#{pkg.fullName}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </td>
+                <td class="rich-table-cell">
+                    <h:selectOneMenu value="#{detail.productDescription}" styleClass="input">
+                        <s:selectItems value="#{dispatchVoucherAction.getApprovedDescriptions(detail)}" var="pd"
+                                       label="#{pd.shortDescription}"
                                        noSelectionLabel="" hideNoSelectionLabel="false"/>
                         <s:convertEntity/>
                     </h:selectOneMenu>

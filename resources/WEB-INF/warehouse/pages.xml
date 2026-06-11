@@ -794,6 +794,58 @@
         </navigation>
     </page>
 
+    <!-- Catalogo de Descripciones Tecnicas de Producto -->
+    <page view-id="/warehouse/productDescriptionList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('PRODUCTDESCRIPTION','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{productDescriptionAction.select(pdItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/productDescription.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/productDescription.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/productDescriptionList.xhtml">
+        <restrict>#{s:hasPermission('PRODUCTDESCRIPTION','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/productDescriptionList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/productDescriptionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- Catalogo de Rutas de Despacho -->
+    <page view-id="/warehouse/dispatchRouteList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCHROUTE','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{dispatchRouteAction.select(routeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchRoute.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/dispatchRoute.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/dispatchRouteList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCHROUTE','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchRouteList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/dispatchRouteList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <!-- Catalogo de Tipos de Bolsa/Envase -->
     <page view-id="/warehouse/inventoryPackagingList.xhtml"
           login-required="true">

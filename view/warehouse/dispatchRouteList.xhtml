@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['DispatchRoute.titlePlural']}</ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="dispatchRouteSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+
+                <s:decorate id="nameFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.name']}</ui:define>
+                    <h:inputText id="name" value="#{dispatchRouteDataModel.criteria.name}"
+                                 maxlength="120" tabindex="1" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="originFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.originText']}</ui:define>
+                    <h:inputText id="origin" value="#{dispatchRouteDataModel.criteria.originText}"
+                                 maxlength="200" tabindex="2" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="destFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.destinationText']}</ui:define>
+                    <h:inputText id="dest" value="#{dispatchRouteDataModel.criteria.destinationText}"
+                                 maxlength="200" tabindex="3" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="stateFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchRoute.state']}</ui:define>
+                    <h:selectOneMenu id="state" value="#{dispatchRouteDataModel.state}"
+                                     styleClass="input" tabindex="4">
+                        <s:selectItems value="#{catalogApprovalStateList}" var="st"
+                                       label="#{messages[st.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <div class="buttons">
+                    <a4j:commandButton action="#{dispatchRouteDataModel.search}"
+                                       reRender="dispatchRouteList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="5">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/dispatchRoute.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEDISPATCHROUTE','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{dispatchRouteDataModel}" var="routeItem" id="dispatchRouteList"
+                            rows="#{sessionUser.rowsPerPage15}"
+                            width="100%" columnsWidth="25%, 22%, 22%, 13%, 10%, 8%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="dispatchRoute.name"
+                                                   dataModel="#{dispatchRouteDataModel}"
+                                                   reRender="dispatchRouteList, dataScroller">
+                                #{messages['DispatchRoute.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['DispatchRoute.originText']}</rich:column>
+                        <rich:column>#{messages['DispatchRoute.destinationText']}</rich:column>
+                        <rich:column>#{messages['DispatchRoute.estimatedDistanceKm']}</rich:column>
+                        <rich:column>#{messages['DispatchRoute.state']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{routeItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{routeItem.originText}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{routeItem.destinationText}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{routeItem.estimatedDistanceKm}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[routeItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WAREHOUSEDISPATCHROUTE','VIEW')}"
+                                   action="#{dispatchRouteAction.select(routeItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="dispatchRouteList" dataModel="#{dispatchRouteDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/dispatchRoute.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEDISPATCHROUTE','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

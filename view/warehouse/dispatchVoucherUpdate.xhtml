@@ -70,6 +70,12 @@
                      immediate="true"
                      rendered="#{(isDraft or isApproved or dispatchVoucherAction.finalized or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
 
+    <h:commandButton action="#{dispatchRouteSheetReportAction.generateRouteSheet(dispatchVoucher)}"
+                     value="#{messages['WarehouseDispatch.routeSheet.print']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.finalized) and s:hasPermission('WAREHOUSEDISPATCHROUTESHEET','VIEW')}"/>
+
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"
                      rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCH','DELETE')}">
@@ -244,6 +250,56 @@
             </c:when>
             <c:otherwise>
                 <h:outputText value="#{dispatchVoucher.destinationPlace.fullName}"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+
+    <s:decorate id="routeField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDispatch.route']}</ui:define>
+        <c:choose>
+            <c:when test="#{isDraft}">
+                <h:selectOneMenu id="route" value="#{dispatchVoucher.route}"
+                                 styleClass="inputLarge" tabindex="7">
+                    <s:selectItems value="#{dispatchApprovedRouteList}" var="r"
+                                   label="#{r.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{dispatchVoucher.route.name}"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+
+    <s:decorate id="validityDaysField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDispatch.validityDays']}</ui:define>
+        <c:choose>
+            <c:when test="#{isDraft}">
+                <h:inputText id="validityDays" value="#{dispatchVoucher.validityDays}"
+                             styleClass="inputSmall right" tabindex="7">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                                forId="validityDays"/>
+                </h:inputText>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{dispatchVoucher.validityDays}"/>
+            </c:otherwise>
+        </c:choose>
+    </s:decorate>
+
+    <s:decorate id="maximumValidityDaysField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['WarehouseDispatch.maximumValidityDays']}</ui:define>
+        <c:choose>
+            <c:when test="#{isDraft}">
+                <h:inputText id="maximumValidityDays" value="#{dispatchVoucher.maximumValidityDays}"
+                             styleClass="inputSmall right" tabindex="7">
+                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                                forId="maximumValidityDays"/>
+                </h:inputText>
+            </c:when>
+            <c:otherwise>
+                <h:outputText value="#{dispatchVoucher.maximumValidityDays}"/>
             </c:otherwise>
         </c:choose>
     </s:decorate>
@@ -478,6 +534,7 @@
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bags.from']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.bags.to']}</th>
             <th class="rich-table-headercell">#{messages['WarehouseDispatch.detail.packaging']}</th>
+            <th class="rich-table-headercell">#{messages['WarehouseDispatch.productDescription']}</th>
             <th class="rich-table-headercell" rendered="#{isDraft}">#{messages['Common.action']}</th>
         </tr>
         </thead>
@@ -557,6 +614,21 @@
                         </c:when>
                         <c:otherwise>
                             <h:outputText value="#{detail.packaging.fullName}"/>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+                <td class="rich-table-cell">
+                    <c:choose>
+                        <c:when test="#{isDraft}">
+                            <h:selectOneMenu value="#{detail.productDescription}" styleClass="input">
+                                <s:selectItems value="#{dispatchVoucherAction.getApprovedDescriptions(detail)}" var="pd"
+                                               label="#{pd.shortDescription}"
+                                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </c:when>
+                        <c:otherwise>
+                            <h:outputText value="#{detail.productDescription.shortDescription}"/>
                         </c:otherwise>
                     </c:choose>
                 </td>
@@ -738,6 +810,12 @@
                      styleClass="button"
                      immediate="true"
                      rendered="#{(isDraft or isApproved or dispatchVoucherAction.finalized or dispatchVoucherAction.annulled) and s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"/>
+
+    <h:commandButton action="#{dispatchRouteSheetReportAction.generateRouteSheet(dispatchVoucher)}"
+                     value="#{messages['WarehouseDispatch.routeSheet.print']}"
+                     styleClass="button"
+                     immediate="true"
+                     rendered="#{(isDraft or isApproved or dispatchVoucherAction.finalized) and s:hasPermission('WAREHOUSEDISPATCHROUTESHEET','VIEW')}"/>
 
     <h:commandButton value="#{messages['WarehouseDispatch.button.delete']}"
                      styleClass="button"

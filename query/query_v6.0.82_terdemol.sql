@@ -292,3 +292,127 @@ insert into funcionalidad values (469, 'WAREHOUSEDISPATCHUNFINALIZE', 'Desfinali
 
 -- Actualizar secuencia interna de funcionalidad
 update secuencia set valor = (select max(e.idfuncionalidad)+1 from funcionalidad e) where tabla = 'funcionalidad';
+
+
+-- ============================================================================
+-- 15) HOJA DE RUTA: catalogos ProductDescription + DispatchRoute, FKs en
+--     despacho/detalle, vigencia y permisos
+-- ============================================================================
+--
+--  Cambios introducidos:
+--    a) Tabla inv_descripcion_producto  - descripciones tecnicas reutilizables
+--                                          por producto, con estado
+--                                          BORRADOR/APROBADO/INACTIVO.
+--    b) Tabla inv_ruta_despacho         - catalogo de rutas con paradas e
+--                                          imagen de mapa, mismo ciclo de
+--                                          estados. Una imagen por ruta,
+--                                          reutilizada por N despachos.
+--    c) ALTER inv_valedespacho_det      - FK iddescripcion_producto.
+--    d) ALTER inv_valedespacho          - FK idruta + vigencia_dias.
+--    e) Permisos
+--         470 PRODUCTDESCRIPTION          (CRUD bitmask=15)
+--         471 WAREHOUSEDISPATCHROUTE      (CRUD bitmask=15)
+--         472 WAREHOUSEDISPATCHROUTESHEET (VIEW  bitmask=1, boton de imprimir)
+--
+--  Ciclo de estados de los catalogos (en codigo: enum CatalogApprovalState):
+--    BORRADOR -> APROBADO -> INACTIVO     (sin vuelta atras)
+--    Solo APROBADO se ofrece en selectPopUp del despacho.
+--    APROBADO/INACTIVO son inmutables (no se editan).
+-- ----------------------------------------------------------------------------
+
+-- 15.a) Catalogo de descripciones tecnicas por producto -----------------------
+CREATE TABLE inv_descripcion_producto (
+    iddescripcion_producto BIGINT       NOT NULL AUTO_INCREMENT,
+    no_cia_art             VARCHAR(2)   NOT NULL,
+    cod_art                VARCHAR(6)   NOT NULL,
+    descripcion            LONGTEXT     NOT NULL,
+    estado                 VARCHAR(15)  NOT NULL DEFAULT 'BORRADOR',
+    createdby              VARCHAR(4)   NULL,
+    createddate            DATETIME     NULL,
+    updatedby              VARCHAR(4)   NULL,
+    updateddate            DATETIME     NULL,
+    version                BIGINT       DEFAULT 0,
+    idcompania             BIGINT       NOT NULL,
+    PRIMARY KEY (iddescripcion_producto),
+    KEY ix_descprod_art (no_cia_art, cod_art),
+    KEY ix_descprod_estado (estado),
+    CONSTRAINT fk_descprod_articulo
+        FOREIGN KEY (no_cia_art, cod_art) REFERENCES inv_articulos (no_cia, cod_art),
+    CONSTRAINT fk_descprod_compania
+        FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- 15.b) Catalogo de rutas de despacho ---------------------------------------
+--   imagen_mapa LONGBLOB - se aplica resize+JPEG calidad 85 en el setter del
+--                          action (typical ~50-150 KB por ruta). Una imagen
+--                          por ruta, NUNCA replicada al despacho.
+CREATE TABLE inv_ruta_despacho (
+    idruta                    BIGINT       NOT NULL AUTO_INCREMENT,
+    nombre                    VARCHAR(120) NOT NULL,
+    origen_texto              VARCHAR(200) NULL,
+    destino_texto             VARCHAR(200) NULL,
+    paradas                   LONGTEXT     NOT NULL,
+    imagen_mapa               LONGBLOB     NULL,
+    imagen_mapa_content_type  VARCHAR(50)  NULL,
+    distancia_km              DECIMAL(8,2) NULL,
+    duracion_horas            DECIMAL(6,2) NULL,
+    estado                    VARCHAR(15)  NOT NULL DEFAULT 'BORRADOR',
+    createdby                 VARCHAR(4)   NULL,
+    createddate               DATETIME     NULL,
+    updatedby                 VARCHAR(4)   NULL,
+    updateddate               DATETIME     NULL,
+    version                   BIGINT       DEFAULT 0,
+    idcompania                BIGINT       NOT NULL,
+    PRIMARY KEY (idruta),
+    UNIQUE KEY uq_ruta_nombre (idcompania, nombre),
+    KEY ix_ruta_estado (estado),
+    CONSTRAINT fk_ruta_compania
+        FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- 15.c) FK descripcion en detalle del despacho ------------------------------
+ALTER TABLE inv_valedespacho_det
+    ADD COLUMN iddescripcion_producto BIGINT NULL AFTER cod_med;
+ALTER TABLE inv_valedespacho_det
+    ADD CONSTRAINT fk_valedespdet_descripcion
+        FOREIGN KEY (iddescripcion_producto) REFERENCES inv_descripcion_producto (iddescripcion_producto);
+
+
+-- 15.d) FK ruta + vigencia en cabecera del despacho -------------------------
+ALTER TABLE inv_valedespacho
+    ADD COLUMN idruta        BIGINT NULL,
+    ADD COLUMN vigencia_dias INT    NULL;
+ALTER TABLE inv_valedespacho
+    ADD CONSTRAINT fk_valedespacho_ruta
+        FOREIGN KEY (idruta) REFERENCES inv_ruta_despacho (idruta);
+
+
+-- 15.e) Permisos --------------------------------------------------------------
+--   idmodulo = 5 (warehouse) para los tres.
+--   PRODUCTDESCRIPTION y WAREHOUSEDISPATCHROUTE: CRUD completo (bitmask=15).
+--   WAREHOUSEDISPATCHROUTESHEET: solo VIEW (bitmask=1) - flag del boton.
+insert into funcionalidad values (470, 'PRODUCTDESCRIPTION',          'Catalogo de Descripciones Tecnicas de Producto', 5, 15, 'menu.warehouse.dispatch.productDescription', 1);
+insert into funcionalidad values (471, 'WAREHOUSEDISPATCHROUTE',      'Catalogo de Rutas de Despacho',                  5, 15, 'menu.warehouse.dispatch.route',              1);
+insert into funcionalidad values (472, 'WAREHOUSEDISPATCHROUTESHEET', 'Imprimir Hoja de Ruta',                          5, 1,  'menu.warehouse.dispatch.routeSheet',         1);
+
+-- Asignacion por defecto al rol Administrador (idrol=1). Comentadas - decide el usuario.
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (470, 1, 15, 1, 5);
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (471, 1, 15, 1, 5);
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (472, 1, 1,  1, 5);
+
+-- Actualizar secuencia interna de funcionalidad
+update secuencia set valor = (select max(e.idfuncionalidad)+1 from funcionalidad e) where tabla = 'funcionalidad';
+
+
+-- ============================================================================
+-- 16) Hoja de Ruta: vigencia maxima en dias
+-- ============================================================================
+--
+--  Se agrega vigencia_maxima_dias en inv_valedespacho. Es un dato editable
+--  por el operador en estado BORRADOR junto con vigencia_dias. Se imprime
+--  en la Hoja de Ruta como "(Maximo X Dias)" junto al campo de vigencia.
+-- ----------------------------------------------------------------------------
+ALTER TABLE inv_valedespacho
+    ADD COLUMN vigencia_max_dias INT NULL AFTER vigencia_dias;

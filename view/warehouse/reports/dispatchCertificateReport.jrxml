@@ -74,12 +74,14 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["CERTIFICADO DE RECEPCION DE CARGUIO"]]></textFieldExpression>
             </textField>
 
-            <!-- Celda derecha: empresa + orden (mas angosta) -->
+            <!-- Celda derecha: empresa + orden (mas angosta).
+                 TERDEMOL S.R.L. en negrilla; TERMINAL DE MOLIENDA sin negrilla
+                 (via markup=styled con &lt;b&gt; solo en la primera linea). -->
             <textField isStretchWithOverflow="true">
                 <reportElement x="442" y="0" width="90" height="26"/>
                 <box><pen lineWidth="0.5"/></box>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="7" isBold="true"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA["TERDEMOL S.R.L.\nTERMINAL DE\nMOLIENDA"]]></textFieldExpression>
+                <textElement textAlignment="Center" verticalAlignment="Middle" markup="styled"><font fontName="Arial" size="7"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["<b>TERDEMOL S.R.L.</b>\nTERMINAL DE\nMOLIENDA"]]></textFieldExpression>
             </textField>
             <textField isStretchWithOverflow="true">
                 <reportElement x="442" y="26" width="90" height="18"/>
@@ -87,11 +89,12 @@
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="7" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["ORDEN DE\nENTREGA N°"]]></textFieldExpression>
             </textField>
+            <!-- Valor de la orden: mismo tamano (7) que el label, sin negrilla. -->
             <textField isStretchWithOverflow="true">
                 <reportElement x="442" y="44" width="90" height="12"/>
                 <box><pen lineWidth="0.5"/></box>
-                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA[$P{deliveryOrderNumber} != null ? String.format("%06d", $P{deliveryOrderNumber}) : "-"]]></textFieldExpression>
+                <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="7"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{deliveryOrderNumber} != null ? $P{deliveryOrderNumber}.toString() : "-"]]></textFieldExpression>
             </textField>
 
             <!-- ============ Datos empresa (izq) + Vendedor (der) ============ -->
@@ -190,7 +193,7 @@
                 <reportElement x="467" y="0" width="65" height="13"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA[$P{deliveryOrderNumber} != null ? String.format("%06d", $P{deliveryOrderNumber}) : "-"]]></textFieldExpression>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{deliveryOrderNumber} != null ? $P{deliveryOrderNumber}.toString() : "-"]]></textFieldExpression>
             </textField>
 
             <!-- Fila 2: PRODUCTO (un renglon por producto) | Fecha -->

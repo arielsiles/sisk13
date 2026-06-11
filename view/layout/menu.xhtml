@@ -518,6 +518,22 @@
                             propagation="none"/>
                 </rich:menuItem>
 
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('PRODUCTDESCRIPTION','VIEW')}">
+                    <s:link view="/warehouse/productDescriptionList.xhtml"
+                            value="#{messages['menu.warehouse.dispatch.productDescription']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WAREHOUSEDISPATCHROUTE','VIEW')}">
+                    <s:link view="/warehouse/dispatchRouteList.xhtml"
+                            value="#{messages['menu.warehouse.dispatch.route']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
             </rich:dropDownMenu>
 
         </h:panelGrid>

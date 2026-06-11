@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['ProductDescription.titlePlural']}</ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="productDescriptionSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+
+                <s:decorate id="codeFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductDescription.productItemCode']}</ui:define>
+                    <h:inputText id="code" value="#{productDescriptionDataModel.productItemCodeFilter}"
+                                 maxlength="6" tabindex="1" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="descFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductDescription.description']}</ui:define>
+                    <h:inputText id="descFilter" value="#{productDescriptionDataModel.descriptionFilter}"
+                                 maxlength="80" tabindex="2" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="stateFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductDescription.state']}</ui:define>
+                    <h:selectOneMenu id="state" value="#{productDescriptionDataModel.state}"
+                                     styleClass="input" tabindex="3">
+                        <s:selectItems value="#{catalogApprovalStateList}" var="st"
+                                       label="#{messages[st.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <div class="buttons">
+                    <a4j:commandButton action="#{productDescriptionDataModel.search}"
+                                       reRender="productDescriptionList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/productDescription.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('PRODUCTDESCRIPTION','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{productDescriptionDataModel}" var="pdItem" id="productDescriptionList"
+                            rows="#{sessionUser.rowsPerPage15}"
+                            width="100%" columnsWidth="12%, 28%, 45%, 8%, 7%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="productDescription.productItemCode"
+                                                   dataModel="#{productDescriptionDataModel}"
+                                                   reRender="productDescriptionList, dataScroller">
+                                #{messages['ProductDescription.productItemCode']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['ProductDescription.productItemName']}</rich:column>
+                        <rich:column>#{messages['ProductDescription.description']}</rich:column>
+                        <rich:column>#{messages['ProductDescription.state']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{pdItem.productItemCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pdItem.productItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{pdItem.shortDescription}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[pdItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('PRODUCTDESCRIPTION','VIEW')}"
+                                   action="#{productDescriptionAction.select(pdItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="productDescriptionList" dataModel="#{productDescriptionDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/productDescription.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('PRODUCTDESCRIPTION','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>
