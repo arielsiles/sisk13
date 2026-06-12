@@ -87,7 +87,7 @@
                             id="dispatchVoucherList"
                             rows="#{sessionUser.rowsPerPage15}"
                             width="100%"
-                            columnsWidth="8%, 10%, 18%, 18%, 10%, 12%, 8%, 10%, 6%">
+                            columnsWidth="8%, 10%, 11%, 25%, 10%, 12%, 8%, 10%, 6%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>
@@ -104,7 +104,7 @@
                                 #{messages['WarehouseDispatch.dispatchDate']}
                             </app:commandSortHeader>
                         </rich:column>
-                        <rich:column>#{messages['WarehouseDispatch.client']}</rich:column>
+                        <rich:column styleClass="center">#{messages['WarehouseDispatch.client']}</rich:column>
                         <rich:column>#{messages['WarehouseDispatch.transportCompany']}</rich:column>
                         <rich:column>#{messages['WarehouseDispatch.vehicle.plate']}</rich:column>
                         <rich:column>#{messages['WarehouseDispatch.salesLotCode']}</rich:column>
@@ -123,8 +123,8 @@
                                            timeZone="#{sessionUser.timeZone}"/>
                     </h:outputText>
                 </rich:column>
-                <rich:column>
-                    <h:outputText value="#{dispatchItem.client.fullName}"/>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{dispatchItem.client.codigo}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{dispatchItem.transportCompany.entity.acronym}"/>
