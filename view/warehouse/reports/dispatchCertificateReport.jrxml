@@ -193,7 +193,10 @@
                 <reportElement x="467" y="0" width="65" height="13"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement><font fontName="Arial" size="8"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA[$P{deliveryOrderNumber} != null ? $P{deliveryOrderNumber}.toString() : "-"]]></textFieldExpression>
+                <!-- Esta celda es la unica en TODO el certificado que muestra
+                     el N de orden con 6 digitos y ceros a la izquierda
+                     (a pedido del usuario). El resto queda sin padding. -->
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{deliveryOrderNumber} != null ? String.format("%06d", $P{deliveryOrderNumber}) : "-"]]></textFieldExpression>
             </textField>
 
             <!-- Fila 2: PRODUCTO (un renglon por producto) | Fecha -->
@@ -490,16 +493,31 @@
                 <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["DATOS DEL RECEPCIONISTA DE LA ORDEN"]]></textFieldExpression>
             </textField>
-            <!-- Recuadros de firma (bordeados, continuos: incluyen ENTREGUE/RECIBI sin linea divisoria) -->
+            <!-- Recuadros de firma (bordeados, continuos: incluyen ENTREGUE/RECIBI sin linea divisoria).
+                 Alto extendido de 117 a 132 para que la linea TERDEMOL S.R.L.
+                 (y=378, h=12) quede dentro del borde inferior.
+                 SIN borde inferior: el borde superior del cuadro IMPORTANTE
+                 (que va inmediatamente debajo) hace de divisor unico, asi se
+                 evita la doble linea visible. -->
             <textField isStretchWithOverflow="true">
-                <reportElement x="0" y="261" width="266" height="117" positionType="Float"/>
-                <box><pen lineWidth="0.25"/></box>
+                <reportElement x="0" y="261" width="266" height="132" positionType="Float"/>
+                <box>
+                    <topPen lineWidth="0.25"/>
+                    <leftPen lineWidth="0.25"/>
+                    <bottomPen lineWidth="0"/>
+                    <rightPen lineWidth="0.25"/>
+                </box>
                 <textElement/>
                 <textFieldExpression class="java.lang.String"><![CDATA[""]]></textFieldExpression>
             </textField>
             <textField isStretchWithOverflow="true">
-                <reportElement x="266" y="261" width="266" height="117" positionType="Float"/>
-                <box><pen lineWidth="0.25"/></box>
+                <reportElement x="266" y="261" width="266" height="132" positionType="Float"/>
+                <box>
+                    <topPen lineWidth="0.25"/>
+                    <leftPen lineWidth="0.25"/>
+                    <bottomPen lineWidth="0"/>
+                    <rightPen lineWidth="0.25"/>
+                </box>
                 <textElement/>
                 <textFieldExpression class="java.lang.String"><![CDATA[""]]></textFieldExpression>
             </textField>
@@ -541,6 +559,13 @@
                 <textElement textAlignment="Center"><font fontName="Arial" size="9"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["C.I.: " + ($P{warehouseResponsibleCi} != null ? $P{warehouseResponsibleCi} : "")]]></textFieldExpression>
             </textField>
+            <!-- Nombre de la empresa debajo del C.I. del responsable
+                 (dentro del recuadro de firma, sin negrilla). -->
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="0" y="378" width="266" height="12" positionType="Float"/>
+                <textElement textAlignment="Center"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{companyName} != null ? $P{companyName} : ""]]></textFieldExpression>
+            </textField>
 
             <textField isStretchWithOverflow="true" isBlankWhenNull="true">
                 <reportElement x="266" y="342" width="266" height="12" positionType="Float"/>
@@ -553,11 +578,15 @@
                 <textFieldExpression class="java.lang.String"><![CDATA["C.I.: " + ($P{driverLicense} != null ? $P{driverLicense} : "")]]></textFieldExpression>
             </textField>
 
-            <!-- Disclaimer (cuadro IMPORTANTE, pegado al recuadro de firma) -->
+            <!-- Disclaimer (cuadro IMPORTANTE, pegado al recuadro de firma).
+                 Altura inicial chica + isStretchWithOverflow=true para que el
+                 cuadro se ajuste al texto y no queden espacios verticales.
+                 verticalAlignment=Top para no centrar (eso causaba el padding
+                 superior/inferior visible). -->
             <textField isStretchWithOverflow="true">
-                <reportElement x="0" y="378" width="532" height="80" positionType="Float"/>
+                <reportElement x="0" y="393" width="532" height="12" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
-                <textElement verticalAlignment="Middle" markup="styled"><font fontName="Arial" size="7"/></textElement>
+                <textElement verticalAlignment="Top" markup="styled"><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["<b>IMPORTANTE:</b> Senor transportista, usted se responsabiliza del transporte de la totalidad de los sacos con productos para llevarlos al destino final, comprometiendose a llegar en un plazo no mayor de 3 DIAS al lugar para la entrega de la mercancia. EL TRANSPORTISTA respondera ante las instancias correspondientes por cualquier problema que se presente en la carga, como sustitucion de la misma, agio, violacion de precintos, entre otros. EL TRANSPORTISTA sera responsable de la mercancia desde que inicie el carguio en su vehiculo durante el viaje, hasta la recepcion de la mercaderia por parte del destinatario sin reclamacion, conforme al articulo 956 del codigo de transporte."]]></textFieldExpression>
             </textField>
         </band>

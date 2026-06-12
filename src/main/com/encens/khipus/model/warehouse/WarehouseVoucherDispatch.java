@@ -6,7 +6,6 @@ import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.employees.Employee;
-import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.xproduction.ProductionGroup;
@@ -179,19 +178,6 @@ public class WarehouseVoucherDispatch implements BaseModel {
                     insertable = false, updatable = false)
     })
     private Warehouse warehouse;
-
-    @Column(name = "cod_cc", length = 8)
-    @Length(max = 8)
-    private String costCenterCode;
-
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumns({
-            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia",
-                    insertable = false, updatable = false),
-            @JoinColumn(name = "cod_cc", referencedColumnName = "cod_cc",
-                    insertable = false, updatable = false)
-    })
-    private CostCenter costCenter;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idresponsable")
@@ -509,28 +495,6 @@ public class WarehouseVoucherDispatch implements BaseModel {
             this.warehouseCode = warehouse.getId().getWarehouseCode();
             if (this.companyNumber == null) {
                 this.companyNumber = warehouse.getId().getCompanyNumber();
-            }
-        }
-    }
-
-    public String getCostCenterCode() {
-        return costCenterCode;
-    }
-
-    public void setCostCenterCode(String costCenterCode) {
-        this.costCenterCode = costCenterCode;
-    }
-
-    public CostCenter getCostCenter() {
-        return costCenter;
-    }
-
-    public void setCostCenter(CostCenter costCenter) {
-        this.costCenter = costCenter;
-        if (costCenter != null && costCenter.getId() != null) {
-            this.costCenterCode = costCenter.getId().getCode();
-            if (this.companyNumber == null) {
-                this.companyNumber = costCenter.getId().getCompanyNumber();
             }
         }
     }

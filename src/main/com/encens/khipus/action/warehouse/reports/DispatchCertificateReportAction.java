@@ -23,6 +23,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.security.Restrict;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -225,12 +226,18 @@ public class DispatchCertificateReportAction extends GenericReportAction {
         if (details != null) {
             for (WarehouseVoucherDispatchDetail det : details) {
                 Map<String, Object> row = new HashMap<String, Object>();
-                // CANTIDAD: cantidad del detalle a toneladas (asume unidad base Kg)
-                // Se quitan ceros finales para que "28.000" salga como "28" y
-                // no se confunda con veintiocho mil.
+                // CANTIDAD: cantidad del detalle a toneladas (asume unidad base Kg).
+                // Truncado a 1 decimal (DOWN, NO half-up) y se quitan ceros
+                // finales. Se trunca para no inflar tonelaje:
+                //   28000 kg -> "28 Toneladas"
+                //   28100 kg -> "28.1 Toneladas"
+                //   28500 kg -> "28.5 Toneladas"
+                //   28950 kg -> "28.9 Toneladas"  (NO 29)
+                //   28999 kg -> "28.9 Toneladas"  (NO 29)
                 String cantidadTon = "";
                 if (det.getQuantity() != null) {
-                    BigDecimal tons = BigDecimalUtil.divide(det.getQuantity(), new BigDecimal(1000), 3);
+                    BigDecimal tons = det.getQuantity()
+                            .divide(new BigDecimal(1000), 1, RoundingMode.DOWN);
                     cantidadTon = tons.stripTrailingZeros().toPlainString() + " Toneladas";
                 }
                 row.put("COLUMN_1", cantidadTon);

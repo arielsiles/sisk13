@@ -103,6 +103,23 @@ public interface DispatchVoucherService {
                    InventoryProductItemNotFoundException;
 
     /**
+     * Reverso APROBADO -> BORRADOR.
+     *   1. Re-valida estado APROBADO + WarehouseVoucher enlazado.
+     *   2. Reversa el WarehouseVoucher (devuelve stock + contra-asiento).
+     *   3. Si {@code deleteEnvelopes==true}, elimina todos los envases del
+     *      despacho (en la siguiente aprobacion se regeneran). Si es false,
+     *      los envases existentes se conservan y la re-aprobacion no los
+     *      regenera (idempotencia de generateEnvelopes).
+     *   4. Limpia el FK al vale anulado y deja el despacho en BORRADOR.
+     */
+    WarehouseVoucherDispatch unapproveDispatch(WarehouseVoucherDispatch dispatch,
+                                               boolean deleteEnvelopes)
+            throws ReverseNotAllowedException,
+                   WarehouseVoucherNotFoundException,
+                   InventoryUnitaryBalanceException,
+                   InventoryProductItemNotFoundException;
+
+    /**
      * Transicion APROBADO -> FINALIZADO. Bloquea la edicion posterior de los
      * envases. No toca inventario ni asientos contables.
      */

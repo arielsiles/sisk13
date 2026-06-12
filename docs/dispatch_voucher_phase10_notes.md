@@ -372,6 +372,94 @@ En barras top/bottom del form del despacho (mismos botones, convencion del siste
 - **Sin asignaciones automaticas de permisos**: las 3 funcionalidades nuevas (470/471/472) se agregan a `funcionalidad` pero no a `derechoacceso`. El usuario asigna por rol manualmente.
 - **No-edit-when-unused**: aunque tecnicamente una entrada APROBADA sin referencias podria editarse sin riesgo, la politica es uniforme (APROBADO = inmutable) para simplificar el modelo mental.
 
+## 10.quater Fase 13 — Desaprobar, confirmación Finalizar, ajustes reporte y limpieza CC
+
+Cambios posteriores a la fase 12, sin orden estricto sino agrupados por tema. **SQL de esta fase en secciones 16/17/18 de [query_v6.0.82_terdemol.sql](../query/query_v6.0.82_terdemol.sql), al final del archivo, en orden cronológico.**
+
+### A. Vigencia máxima en la Hoja de Ruta (sección 16)
+
+Nuevo campo `WarehouseVoucherDispatch.maximumValidityDays` (`vigencia_max_dias INT NULL`) con default `= 1` en el field initializer. Editable en BORRADOR, junto a `validityDays`.
+
+En el reporte de Hoja de Ruta, la línea de vigencia se consolidó en **un único `<textField>` con `markup="styled"`** que arma la frase completa con los valores en negrilla:
+
+```
+Solicito que la Hoja de Ruta tenga una vigencia de: <b>X</b> Dias (Maximo <b>Y</b> Dias) (No contempla factores externos)
+```
+
+Reemplazó 3 elementos sueltos (label + value + label) que dejaban espacios irregulares.
+
+### B. Eliminación del Centro de Costo del despacho (sección 17)
+
+Campo histórico que ya no se usa en la operativa, pero el `WarehouseVoucher` generado al aprobar **sí requiere** `cod_cc` (NOT NULL en BD downstream).
+
+Solución: hardcoded en el service.
+
+- **Constante** [`DispatchVoucherServiceBean.DEFAULT_COST_CENTER_CODE = "0111"`](../src/main/com/encens/khipus/service/warehouse/DispatchVoucherServiceBean.java) (CC Terdemol operativo).
+- Al aprobar: `em.find(CostCenter.class, new CostCenterPk(companyNumber, "0111"))` y se asigna al vale. Si no existe el CC `0111`, falla con mensaje claro indicando dónde está la constante.
+- SQL 17.a/17.b: DROP FK + DROP COLUMN `cod_cc` (idempotente vía `information_schema`, busca el nombre del constraint que es autogenerado).
+- Forms create/update: bloque `costCenterField` + modal `costCenterListModalPanel` eliminados.
+- Action: `assignCostCenter`/`clearCostCenter` + import `CostCenter` eliminados.
+- Entidad: campos `costCenter` y `costCenterCode` + getters/setters + import eliminados.
+- i18n: `WarehouseDispatch.costCenter` removida.
+
+Si el día de mañana la empresa cambia el CC operativo, se edita la constante en el bean y se recompila. Sin reverir esta sección.
+
+### C. Desaprobar despacho (sección 18) — APROBADO → BORRADOR
+
+Operación correctiva equivalente a "deshacer el approve" sin pasar por ANULADO. Pensada para casos donde el operador necesita corregir el detalle/envases tras aprobar por error.
+
+**Permiso propio:** `WAREHOUSEDISPATCHUNAPPROVE` (id 473, bitmask=1). Para supervisor/admin, no para operador. SQL en sección 18.
+
+**Service** [`DispatchVoucherServiceBean.unapproveDispatch(dispatch, deleteEnvelopes)`](../src/main/com/encens/khipus/service/warehouse/DispatchVoucherServiceBean.java) — `@TransactionAttribute(REQUIRES_NEW)`:
+1. Valida estado APROBADO + vale enlazado.
+2. **Reversa del vale** vía `reverseWarehouseVoucherService.reverseWarehouseVoucher(...)` (con `skipValidation=true`, mismo patrón que `annul`): devuelve stock, genera contra-asiento contable, marca el vale como ANL.
+3. **Opcional eliminación de envases**: si el flag está en `true`, `det.getEnvelopes().clear()` por cada detalle. `orphanRemoval` (CascadeType.DELETE_ORPHAN) limpia las filas en `inv_valedespacho_envase`.
+4. Limpia el FK al vale (`warehouseVoucher = null` + las 2 columnas `no_cia_vale`/`no_trans_vale`) y vuelve a BORRADOR. **Mantiene `no_orden_entrega`** para trazabilidad — la secuencia DISPATCH_ORDER_NUMBER no se retrocede.
+
+**Re-aprobar después de desaprobar** funciona porque `generateEnvelopes` ya era idempotente (skip si el detalle ya tiene envases). Así:
+- Si el operador eligió "Sí eliminar" → al re-aprobar se regeneran envases nuevos.
+- Si el operador eligió "No eliminar" → al re-aprobar los envases viejos se conservan tal cual.
+
+**UI:** botón "Desaprobar Despacho" en barras top/bottom de `dispatchVoucherUpdate.xhtml`, rendered en APROBADO con `s:hasPermission('WAREHOUSEDISPATCHUNAPPROVE','VIEW')`. Abre el modal `unapproveModal` con un `<h:selectBooleanCheckbox>` ligado a `dispatchVoucherAction.deleteEnvelopesOnUnapprove` (default `true`).
+
+### D. Confirmación al Finalizar
+
+Botón Finalizar pasó de `<h:commandButton action="finalizeDispatch">` directo a `<a4j:commandButton oncomplete="showModalPanel('finalizeModal')">`. El modal advierte que la operación cierra completamente el despacho y solo un supervisor podrá revertirla.
+
+Sin cambios en el service. Mismo patrón visual de modales de confirmación (header + mensaje + botones Atrás / Confirmar).
+
+### E. Conversión KG → Toneladas en el Certificado
+
+Columna CANTIDAD del subreporte del Certificado: la cantidad en kg ahora se muestra en toneladas truncadas a 1 decimal (`RoundingMode.DOWN`, no HALF_UP), con `stripTrailingZeros()` para casos exactos:
+
+```
+28000 kg -> "28 Toneladas"
+28100 kg -> "28.1 Toneladas"
+28500 kg -> "28.5 Toneladas"
+28950 kg -> "28.9 Toneladas"  (NO 29, se TRUNCA, no se redondea)
+28999 kg -> "28.9 Toneladas"
+```
+
+Decisión de diseño: **truncar, no redondear**. Razón del usuario: redondear medio tonel hacia arriba infla el tonelaje impreso.
+
+### F. Ajustes visuales del Certificado
+
+- Columnas DESCRIPCION DETALLADA + TOTAL ENTREGADO del subreporte: `textAlignment="Center"` (antes Left).
+- "TERMINAL DE MOLIENDA" sin negrilla — single textField con `markup="styled"` y `<b>` solo alrededor de "TERDEMOL S.R.L.".
+- Valor "ORDEN DE ENTREGA N°" de la celda superior derecha: sin padding de ceros, sin negrilla, tamaño 7 (mismo que el label).
+- Valor "No. de orden" de la fila PLANTA DE DESPACHO: **único lugar del Certificado** que mantiene `String.format("%06d", ...)` para mostrar con 6 dígitos y ceros a la izquierda (pedido específico del usuario).
+- Línea "TERDEMOL S.R.L." debajo del C.I. del responsable, **dentro del recuadro de firmas**: para que cupiera, el alto del recuadro se extendió de 117 a 132. Usa `$P{companyName}` (si la config trae espacios entre letras, se imprime así — decisión expresa del usuario, no se manipula el valor).
+- Recuadros de firma: borde inferior eliminado vía pen elements individuales (`<topPen>/<leftPen>/<bottomPen lineWidth="0"/>/<rightPen>` en orden XSD-válido). El IMPORTANTE arranca en `y=393` (donde terminaba el borde) → comparten una sola línea horizontal, sin doble borde ni gap.
+- Cuadro IMPORTANTE: altura inicial reducida (h=12) + `isStretchWithOverflow="true"` + `verticalAlignment="Top"` → el cuadro se ajusta exactamente al texto, sin espacios verticales. Font size 8.
+
+### G. Empresa Transportadora en el listado
+
+`view/warehouse/dispatchVoucherList.xhtml`: la columna mostraba `transportCompany.entity.fullName` = "0 ASOCIACION DE TRANSPORTE...". Cambiada a `transportCompany.entity.acronym` (solo razón social).
+
+Mismo patrón ya documentado en sección 4 (FinancesEntity.getFullName concatena NIT + acronym).
+
+---
+
 ## 11. Pendientes conocidos
 
 - **Asiento contable al aprobar despacho:** opciones A/B/C en plan original sección 15, sin decidir.

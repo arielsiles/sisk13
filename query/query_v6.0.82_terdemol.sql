@@ -416,3 +416,67 @@ update secuencia set valor = (select max(e.idfuncionalidad)+1 from funcionalidad
 -- ----------------------------------------------------------------------------
 ALTER TABLE inv_valedespacho
     ADD COLUMN vigencia_max_dias INT NULL AFTER vigencia_dias;
+
+
+-- ============================================================================
+-- 17) Quitar Centro de Costo del despacho
+-- ============================================================================
+--
+--  Campo antiguo del despacho que no se usa en la operativa. Al APROBAR el
+--  despacho, el WarehouseVoucher generado toma el centro de costo desde la
+--  constante DispatchVoucherServiceBean.DEFAULT_COST_CENTER_CODE (por
+--  defecto '0111').
+--
+--  Pasos: 1) drop FK constraint (idempotente, busca por nombre real),
+--         2) drop column cod_cc (idempotente, solo si existe).
+-- ----------------------------------------------------------------------------
+
+-- 17.a) Drop FK que apunta a cod_cc (si existe). El nombre del constraint
+--       puede variar entre BDs (se autogenera), por eso lo buscamos.
+SET @fk_name := (
+    SELECT CONSTRAINT_NAME
+    FROM information_schema.KEY_COLUMN_USAGE
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'inv_valedespacho'
+      AND COLUMN_NAME = 'cod_cc'
+      AND REFERENCED_TABLE_NAME IS NOT NULL
+    LIMIT 1
+);
+SET @sql := IF(@fk_name IS NOT NULL,
+               CONCAT('ALTER TABLE inv_valedespacho DROP FOREIGN KEY ', @fk_name),
+               'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- 17.b) Drop column cod_cc (idempotente)
+SET @col_exists := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'inv_valedespacho'
+      AND COLUMN_NAME = 'cod_cc'
+);
+SET @sql := IF(@col_exists > 0,
+               'ALTER TABLE inv_valedespacho DROP COLUMN cod_cc',
+               'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+
+-- ============================================================================
+-- 18) Permiso DESAPROBAR despacho
+-- ============================================================================
+--
+--  Permite revertir el estado APROBADO -> BORRADOR. Reversa el WarehouseVoucher
+--  generado (devuelve stock) y opcionalmente elimina el detalle de envases
+--  (decision del operador en el dialogo de confirmacion).
+--
+--  Operacion correctiva: NO se debe asignar a operadores comunes, solo a
+--  supervisores o administradores.
+--  idmodulo = 5 (warehouse). Bitmask 1 = solo VIEW como flag del boton.
+-- ----------------------------------------------------------------------------
+insert into funcionalidad values (473, 'WAREHOUSEDISPATCHUNAPPROVE', 'Desaprobar Despacho', 5, 1, 'menu.warehouse.dispatch.unapprove', 1);
+
+-- Asignacion por defecto al rol Administrador (idrol=1). Comentada - decide el usuario.
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (473, 1, 1, 1, 5);
+
+-- Actualizar secuencia interna de funcionalidad
+update secuencia set valor = (select max(e.idfuncionalidad)+1 from funcionalidad e) where tabla = 'funcionalidad';

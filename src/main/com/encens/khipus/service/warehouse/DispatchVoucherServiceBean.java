@@ -16,6 +16,8 @@ import com.encens.khipus.exception.warehouse.WarehouseVoucherApprovedException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherEmptyException;
 import com.encens.khipus.exception.warehouse.WarehouseVoucherNotFoundException;
 import com.encens.khipus.util.ValidatorUtil;
+import com.encens.khipus.model.finances.CostCenter;
+import com.encens.khipus.model.finances.CostCenterPk;
 import com.encens.khipus.model.warehouse.DispatchState;
 import com.encens.khipus.model.warehouse.DispatchStockImpact;
 import com.encens.khipus.model.warehouse.DocumentTypePK;
@@ -60,6 +62,15 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
     public static final String DISPATCH_ORDER_NUMBER_SEQUENCE = "DISPATCH_ORDER_NUMBER";
     public static final String DISPATCH_DOCUMENT_CODE = "DSP";
 
+    /**
+     * Codigo de centro de costo por defecto para el WarehouseVoucher que se
+     * genera al APROBAR el despacho. Se quito el campo "Centro de Costo" del
+     * formulario del despacho (no se usa); este valor cubre el NOT NULL del
+     * cod_cc en inv_valedespacho_h. Si la empresa cambia el CC operativo,
+     * actualizar aqui.
+     */
+    public static final String DEFAULT_COST_CENTER_CODE = "0111";
+
     @In(value = "#{entityManager}")
     private EntityManager em;
 
@@ -100,9 +111,9 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
         dispatch.setUpdatedDate(now);
 
         // El @CompanyListener pone company; el campo no_cia se autollena en
-        // los setters de Warehouse/CostCenter/Provider. Si llega null aqui,
-        // significa que el form no se completo aun - dejamos persistir y
-        // que la BD valide cuando corresponda en aprobacion.
+        // los setters de Warehouse/Provider. Si llega null aqui, significa
+        // que el form no se completo aun - dejamos persistir y que la BD
+        // valide cuando corresponda en aprobacion.
 
         linkDetails(dispatch);
         em.persist(dispatch);
@@ -226,13 +237,25 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
                     "El despacho debe tener al menos una linea para ser aprobado.");
         }
         if (dispatch.getWarehouse() == null
-                || dispatch.getCostCenter() == null
                 || dispatch.getExecutorUnit() == null
                 || dispatch.getResponsible() == null
                 || dispatch.getClient() == null
                 || dispatch.getTransportCompany() == null) {
             throw new IllegalStateException(
                     "Faltan campos obligatorios para aprobar el despacho.");
+        }
+
+        // Centro de costo: se quito del form del despacho. Tomamos el default
+        // configurado (DEFAULT_COST_CENTER_CODE) para alimentar el cod_cc del
+        // WarehouseVoucher generado (es NOT NULL en BD).
+        CostCenter defaultCostCenter = em.find(CostCenter.class,
+                new CostCenterPk(dispatch.getCompanyNumber(), DEFAULT_COST_CENTER_CODE));
+        if (defaultCostCenter == null) {
+            throw new IllegalStateException(
+                    "No se encontro el centro de costo por defecto '"
+                            + DEFAULT_COST_CENTER_CODE + "' para la compania "
+                            + dispatch.getCompanyNumber()
+                            + ". Configurar DispatchVoucherServiceBean.DEFAULT_COST_CENTER_CODE.");
         }
 
         // 2) Asignar N de orden de entrega si no tiene
@@ -254,7 +277,7 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
         WarehouseVoucher vale = new WarehouseVoucher();
         vale.setDate(dispatch.getDispatchDate());
         vale.setExecutorUnit(dispatch.getExecutorUnit());
-        vale.setCostCenter(dispatch.getCostCenter());
+        vale.setCostCenter(defaultCostCenter);
         vale.setWarehouse(dispatch.getWarehouse());
         vale.setResponsible(dispatch.getResponsible());
         vale.setState(WarehouseVoucherState.PEN);
@@ -440,6 +463,66 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
         dispatch.setAnnulDate(now);
         dispatch.setUpdatedBy(userCode);
         dispatch.setUpdatedDate(now);
+
+        WarehouseVoucherDispatch merged = em.merge(dispatch);
+        em.flush();
+        return merged;
+    }
+
+    /* =============================================================
+     * Desaprobar: APROBADO -> BORRADOR
+     * ============================================================= */
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public WarehouseVoucherDispatch unapproveDispatch(WarehouseVoucherDispatch dispatch,
+                                                     boolean deleteEnvelopes)
+            throws ReverseNotAllowedException,
+                   WarehouseVoucherNotFoundException,
+                   InventoryUnitaryBalanceException,
+                   InventoryProductItemNotFoundException {
+
+        if (dispatch.getState() != DispatchState.APROBADO) {
+            throw new IllegalStateException(
+                    "Solo se puede desaprobar un despacho APROBADO (actual: "
+                            + dispatch.getState() + ")");
+        }
+        if (dispatch.getWarehouseVoucher() == null
+                || dispatch.getWarehouseVoucher().getId() == null) {
+            throw new IllegalStateException(
+                    "El despacho no tiene un WarehouseVoucher enlazado; no se puede desaprobar.");
+        }
+
+        String userCode = financesUserService.getFinancesUserCode();
+
+        // 1) Reversa del WarehouseVoucher (devuelve stock + contra-asiento).
+        //    Mismo patron que annul: skipValidation=true.
+        reverseWarehouseVoucherService.reverseWarehouseVoucher(
+                dispatch.getWarehouseVoucher().getId(),
+                "Desaprobacion del despacho N " + dispatch.getDeliveryOrderNumber(),
+                userCode,
+                true);
+
+        // 2) Opcionalmente eliminar envases del despacho. La eliminacion en
+        //    cascada via orphanRemoval ocurre al limpiar la lista de cada
+        //    detalle (mappedBy=detail, CascadeType.DELETE_ORPHAN configurado
+        //    en WarehouseVoucherDispatchDetail.envelopes).
+        if (deleteEnvelopes && dispatch.getDetails() != null) {
+            for (WarehouseVoucherDispatchDetail det : dispatch.getDetails()) {
+                if (det.getEnvelopes() != null) {
+                    det.getEnvelopes().clear();
+                }
+            }
+        }
+
+        // 3) Limpiar FK al vale (esta anulado) y volver a BORRADOR. Mantenemos
+        //    deliveryOrderNumber para trazabilidad (se reutiliza al re-aprobar).
+        dispatch.setWarehouseVoucher(null);
+        dispatch.setWarehouseVoucherCompanyNumber(null);
+        dispatch.setWarehouseVoucherTransactionNumber(null);
+        dispatch.setState(DispatchState.BORRADOR);
+        dispatch.setUpdatedBy(userCode);
+        dispatch.setUpdatedDate(new Date());
 
         WarehouseVoucherDispatch merged = em.merge(dispatch);
         em.flush();

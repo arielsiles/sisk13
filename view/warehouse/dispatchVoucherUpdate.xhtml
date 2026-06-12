@@ -48,10 +48,17 @@
                        reRender="annulPanel"
                        oncomplete="Richfaces.showModalPanel('annulModal');"/>
 
-    <h:commandButton action="#{dispatchVoucherAction.finalizeDispatch}"
-                     value="#{messages['WarehouseDispatch.button.finalize']}"
-                     styleClass="button"
-                     rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHFINALIZE','VIEW')}"/>
+    <a4j:commandButton action="#{dispatchVoucherAction.prepareUnapprove}"
+                       value="#{messages['WarehouseDispatch.unapprove']}"
+                       styleClass="button"
+                       rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHUNAPPROVE','VIEW')}"
+                       reRender="unapprovePanel"
+                       oncomplete="Richfaces.showModalPanel('unapproveModal');"/>
+
+    <a4j:commandButton value="#{messages['WarehouseDispatch.button.finalize']}"
+                       styleClass="button"
+                       rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHFINALIZE','VIEW')}"
+                       oncomplete="Richfaces.showModalPanel('finalizeModal');"/>
 
     <h:commandButton action="#{dispatchVoucherAction.unfinalizeDispatch}"
                      value="#{messages['WarehouseDispatch.button.unfinalize']}"
@@ -470,32 +477,6 @@
         <h:outputText value="#{dispatchVoucher.responsible.fullName}"/>
     </s:decorate>
 
-    <s:decorate id="costCenterField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['WarehouseDispatch.costCenter']}</ui:define>
-        <c:choose>
-            <c:when test="#{isDraft}">
-                <app:quickSearch id="quickSearchCostCenter"
-                                 textValue="dispatchVoucher.costCenter.code"
-                                 value="#{dispatchVoucher.costCenter}"
-                                 searchField="code"
-                                 reRender="costCenterField"
-                                 tabindex="23"/>
-                <app:selectPopUp id="costCenterPopup"
-                                 required="true"
-                                 textValue="#{dispatchVoucher.costCenter.fullName}"
-                                 value="#{dispatchVoucher.costCenter}"
-                                 clearAction="dispatchVoucherAction.clearCostCenter()"
-                                 searchModalPanel="costCenterListModalPanel"
-                                 dataModel="#{costCenterDataModel}"
-                                 reRender="costCenterField"
-                                 hotKeySelect="alt+5"/>
-            </c:when>
-            <c:otherwise>
-                <h:outputText value="#{dispatchVoucher.costCenter.fullName}"/>
-            </c:otherwise>
-        </c:choose>
-    </s:decorate>
-
     <s:decorate id="executorUnitField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['WarehouseDispatch.executorUnit']}</ui:define>
         <h:outputText value="#{dispatchVoucher.executorUnit.fullName}"/>
@@ -789,10 +770,17 @@
                        reRender="annulPanel"
                        oncomplete="Richfaces.showModalPanel('annulModal');"/>
 
-    <h:commandButton action="#{dispatchVoucherAction.finalizeDispatch}"
-                     value="#{messages['WarehouseDispatch.button.finalize']}"
-                     styleClass="button"
-                     rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHFINALIZE','VIEW')}"/>
+    <a4j:commandButton action="#{dispatchVoucherAction.prepareUnapprove}"
+                       value="#{messages['WarehouseDispatch.unapprove']}"
+                       styleClass="button"
+                       rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHUNAPPROVE','VIEW')}"
+                       reRender="unapprovePanel"
+                       oncomplete="Richfaces.showModalPanel('unapproveModal');"/>
+
+    <a4j:commandButton value="#{messages['WarehouseDispatch.button.finalize']}"
+                       styleClass="button"
+                       rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHFINALIZE','VIEW')}"
+                       oncomplete="Richfaces.showModalPanel('finalizeModal');"/>
 
     <h:commandButton action="#{dispatchVoucherAction.unfinalizeDispatch}"
                      value="#{messages['WarehouseDispatch.button.unfinalize']}"
@@ -858,19 +846,6 @@
                            image="/img/active.gif" styleClass="select-image"
                            reRender="warehouseField, responsibleField, executorUnitField, detailListPanel"
                            oncomplete="Richfaces.hideModalPanel('warehouseModalPanel');"/>
-    </ui:define>
-</s:decorate>
-
-<s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml"
-            rendered="#{isDraft}">
-    <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
-    <ui:param name="dialogId" value="costCenterListModalPanel"/>
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
-                           action="#{dispatchVoucherAction.assignCostCenter(costCenterItem)}"
-                           image="/img/active.gif" styleClass="select-image" immediate="true"
-                           reRender="costCenterField"
-                           oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
     </ui:define>
 </s:decorate>
 
@@ -1121,6 +1096,79 @@
         </div>
     </h:form>
     </a4j:outputPanel>
+</rich:modalPanel>
+
+
+<!-- ============================================================
+     Modal DESAPROBAR (APROBADO -> BORRADOR).
+     Pregunta si tambien eliminar el detalle de envases. Si SI: se
+     borran y al re-aprobar se regeneran. Si NO: se conservan tal cual.
+     ============================================================ -->
+<rich:modalPanel id="unapproveModal" width="600" height="260"
+                 autosized="false" zindex="2000" resizeable="false"
+                 rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHUNAPPROVE','VIEW')}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['WarehouseDispatch.unapprove.confirmation.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer"
+                        onclick="Richfaces.hideModalPanel('unapproveModal');"/>
+    </f:facet>
+
+    <a4j:outputPanel id="unapprovePanel" ajaxRendered="true">
+    <h:form id="unapproveForm">
+        <p>#{messages['WarehouseDispatch.unapprove.confirmation.message']}</p>
+        <rich:spacer height="10"/>
+        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['WarehouseDispatch.unapprove.deleteEnvelopes']}</ui:define>
+            <h:selectBooleanCheckbox id="deleteEnvelopesOnUnapprove"
+                                     value="#{dispatchVoucherAction.deleteEnvelopesOnUnapprove}"/>
+        </s:decorate>
+        <rich:spacer height="15"/>
+        <div class="buttons" style="text-align:right;">
+            <a4j:commandButton value="#{messages['WarehouseDispatch.approve.confirm.back']}"
+                               immediate="true"
+                               styleClass="button"
+                               onclick="Richfaces.hideModalPanel('unapproveModal'); return false;"/>
+            <h:commandButton value="#{messages['WarehouseDispatch.unapprove.confirm']}"
+                             action="#{dispatchVoucherAction.confirmUnapprove}"
+                             styleClass="button"
+                             onclick="Richfaces.hideModalPanel('unapproveModal');"/>
+        </div>
+    </h:form>
+    </a4j:outputPanel>
+</rich:modalPanel>
+
+
+<!-- ============================================================
+     Modal FINALIZAR: confirmacion. Una vez finalizado no se puede
+     modificar nada del despacho (solo desfinalizar con permiso).
+     ============================================================ -->
+<rich:modalPanel id="finalizeModal" width="600" height="240"
+                 autosized="false" zindex="2000" resizeable="false"
+                 rendered="#{isApproved and s:hasPermission('WAREHOUSEDISPATCHFINALIZE','VIEW')}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['WarehouseDispatch.finalize.confirmation.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer"
+                        onclick="Richfaces.hideModalPanel('finalizeModal');"/>
+    </f:facet>
+
+    <h:form id="finalizeForm">
+        <p>#{messages['WarehouseDispatch.finalize.confirmation.message']}</p>
+        <rich:spacer height="15"/>
+        <div class="buttons" style="text-align:right;">
+            <a4j:commandButton value="#{messages['WarehouseDispatch.approve.confirm.back']}"
+                               immediate="true"
+                               styleClass="button"
+                               onclick="Richfaces.hideModalPanel('finalizeModal'); return false;"/>
+            <h:commandButton value="#{messages['WarehouseDispatch.button.finalize']}"
+                             action="#{dispatchVoucherAction.finalizeDispatch}"
+                             styleClass="button"
+                             onclick="Richfaces.hideModalPanel('finalizeModal');"/>
+        </div>
+    </h:form>
 </rich:modalPanel>
 
 <!-- ============================================================

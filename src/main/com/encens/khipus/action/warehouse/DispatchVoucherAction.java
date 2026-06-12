@@ -5,7 +5,6 @@ import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.employees.Employee;
-import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.model.finances.MeasureUnit;
 import com.encens.khipus.model.finances.MeasureUnitPk;
@@ -456,15 +455,6 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
         selectedProductItemIds.clear();
     }
 
-    public void assignCostCenter(CostCenter costCenter) {
-        getInstance().setCostCenter(costCenter);
-    }
-
-    public void clearCostCenter() {
-        getInstance().setCostCenter(null);
-        getInstance().setCostCenterCode(null);
-    }
-
     public void assignClient(Client client) {
         getInstance().setClient(client);
     }
@@ -753,6 +743,46 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
 
     public void setAnnulReason(String annulReason) {
         this.annulReason = annulReason;
+    }
+
+    /* =========================================================
+     * Desaprobacion del despacho aprobado (APROBADO -> BORRADOR)
+     * ========================================================= */
+
+    /** Bandera bindeada al checkbox del modal: borrar envases o conservarlos. */
+    private boolean deleteEnvelopesOnUnapprove = true;
+
+    /** Reset del estado del modal antes de mostrarlo. */
+    public void prepareUnapprove() {
+        deleteEnvelopesOnUnapprove = true;
+    }
+
+    public String confirmUnapprove() {
+        try {
+            WarehouseVoucherDispatch unapproved =
+                    dispatchVoucherService.unapproveDispatch(getInstance(), deleteEnvelopesOnUnapprove);
+            setInstance(unapproved);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "WarehouseDispatch.unapprove.success");
+            return Outcome.SUCCESS;
+        } catch (IllegalStateException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.unapprove.error.notApproved");
+            return Outcome.REDISPLAY;
+        } catch (Exception e) {
+            log.error("Error desaprobando despacho", e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseDispatch.unapprove.error");
+            return Outcome.REDISPLAY;
+        }
+    }
+
+    public boolean isDeleteEnvelopesOnUnapprove() {
+        return deleteEnvelopesOnUnapprove;
+    }
+
+    public void setDeleteEnvelopesOnUnapprove(boolean deleteEnvelopesOnUnapprove) {
+        this.deleteEnvelopesOnUnapprove = deleteEnvelopesOnUnapprove;
     }
 
     /* =========================================================
