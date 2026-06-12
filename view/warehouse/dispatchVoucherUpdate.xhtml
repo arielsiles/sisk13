@@ -954,7 +954,7 @@
 <!-- ============================================================
      Modal Step 1 - Revision de datos del despacho
      ============================================================ -->
-<rich:modalPanel id="approveStep1Modal" width="780" height="560"
+<rich:modalPanel id="approveStep1Modal" width="780" height="440"
                  autosized="false" zindex="2000" resizeable="false"
                  rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCHAPPROVAL','VIEW')}">
     <f:facet name="header">
@@ -1174,7 +1174,7 @@
 <!-- ============================================================
      Modal Step 2 - Confirmacion del impacto en inventario
      ============================================================ -->
-<rich:modalPanel id="approveStep2Modal" width="820" height="540"
+<rich:modalPanel id="approveStep2Modal" width="700" height="280"
                  autosized="false" zindex="2000" resizeable="false"
                  rendered="#{isDraft and s:hasPermission('WAREHOUSEDISPATCHAPPROVAL','VIEW')}">
     <f:facet name="header">
@@ -1196,15 +1196,12 @@
 
         <rich:dataTable value="#{dispatchVoucherAction.approvalImpact}" var="impact"
                         width="100%"
-                        columnsWidth="40%, 10%, 12%, 12%, 12%, 14%">
+                        columnsWidth="60%, 20%, 20%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>#{messages['WarehouseDispatch.detail.productItem']}</rich:column>
                     <rich:column>#{messages['WarehouseDispatch.detail.measureUnit']}</rich:column>
-                    <rich:column styleClass="right">#{messages['WarehouseDispatch.approve.preview.current']}</rich:column>
                     <rich:column styleClass="right">#{messages['WarehouseDispatch.detail.quantity']}</rich:column>
-                    <rich:column styleClass="right">#{messages['WarehouseDispatch.approve.preview.after']}</rich:column>
-                    <rich:column styleClass="right">#{messages['WarehouseDispatch.detail.amount']}</rich:column>
                 </rich:columnGroup>
             </f:facet>
             <rich:column>
@@ -1214,24 +1211,9 @@
                 <h:outputText value="#{impact.measureUnit.name}"/>
             </rich:column>
             <rich:column styleClass="right">
-                <h:outputText value="#{impact.currentStock}">
-                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
-                </h:outputText>
-            </rich:column>
-            <rich:column styleClass="right">
-                <h:outputText value="#{impact.requiredQuantity}">
-                    <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
-                </h:outputText>
-            </rich:column>
-            <rich:column styleClass="right">
-                <h:outputText value="#{impact.resultStock}"
+                <h:outputText value="#{impact.requiredQuantity}"
                               style="#{impact.sufficient ? '' : 'color:#a00; font-weight:bold;'}">
                     <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
-                </h:outputText>
-            </rich:column>
-            <rich:column styleClass="right">
-                <h:outputText value="#{impact.amount}">
-                    <app:realNumberConverter pattern="#{messages['patterns.decimal3FNumber']}"/>
                 </h:outputText>
             </rich:column>
         </rich:dataTable>

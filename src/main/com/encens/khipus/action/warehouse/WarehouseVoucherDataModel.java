@@ -6,6 +6,7 @@ import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.Warehouse;
+import com.encens.khipus.model.warehouse.WarehouseDocumentType;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
 import com.encens.khipus.model.warehouse.WarehouseVoucherPK;
 import com.encens.khipus.service.warehouse.MonthProcessService;
@@ -18,6 +19,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.security.Restrict;
 
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +45,9 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
 
     @In
     private MonthProcessService monthProcessService;
+
+    @In(value = "#{entityManager}")
+    private EntityManager em;
 
     private static final String[] RESTRICTIONS = {
             "lower(warehouseVoucher.number) like concat(lower(#{warehouseVoucherDataModel.criteria.number}), '%')",
@@ -77,7 +82,33 @@ public class WarehouseVoucherDataModel extends QueryDataModel<WarehouseVoucherPK
 
         setStartDate(DateUtils.getFirstDayOfMonth(mothProcessDate));
         setEndDate(DateUtils.getLastDayOfMonth(mothProcessDate));
+    }
 
+    /**
+     * QueryDataModel.initEntityQuery() recrea el criteria via newInstance()
+     * la primera vez que se ejecuta la query, sobreescribiendo cualquier
+     * cambio hecho en init(). Sobrescribimos createInstance() para que cada
+     * nueva instancia del criterio salga ya con documentType = EGRESO.
+     * Si EGRESO no existe en BD, deja el filtro vacio.
+     */
+    @Override
+    public WarehouseVoucher createInstance() {
+        WarehouseVoucher instance = super.createInstance();
+        if (instance != null && em != null) {
+            try {
+                @SuppressWarnings("unchecked")
+                List<WarehouseDocumentType> egreso = em.createQuery(
+                        "select dt from WarehouseDocumentType dt where upper(dt.name) = 'EGRESO'")
+                        .setMaxResults(1)
+                        .getResultList();
+                if (!egreso.isEmpty()) {
+                    instance.setDocumentType(egreso.get(0));
+                }
+            } catch (Exception ignored) {
+                // dejar instancia sin filtro de documento
+            }
+        }
+        return instance;
     }
 
     @Override
