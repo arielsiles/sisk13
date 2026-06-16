@@ -321,11 +321,18 @@ public class Client implements BaseModel {
     }
 
     public boolean validNitNumber(){
-        Long number = new Long(getNitNumber());
-        if (number <= 0)
+        String nit = getNitNumber();
+        if (StringUtils.isBlank(nit))
             return false;
-        else
+        try {
+            // NIT numerico tradicional: valido solo si es mayor a cero
+            Long number = new Long(nit.trim());
+            return number > 0;
+        } catch (NumberFormatException e) {
+            // El NIT puede ser un String (ej: "30-71401255" con guiones u otros
+            // caracteres). En ese caso se considera valido al no estar vacio.
             return true;
+        }
     }
 
     public Territoriotrabajo getTerritoriotrabajo() {
