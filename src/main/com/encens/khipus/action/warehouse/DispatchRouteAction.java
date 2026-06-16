@@ -2,6 +2,7 @@ package com.encens.khipus.action.warehouse;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.common.File;
 import com.encens.khipus.model.warehouse.CatalogApprovalState;
 import com.encens.khipus.model.warehouse.DispatchRoute;
 import com.encens.khipus.util.ImageUtils;
@@ -22,9 +23,16 @@ import java.util.Base64;
  * Ciclo de estados: BORRADOR -> APROBADO -> INACTIVO (sin vuelta atras).
  * APROBADO/INACTIVO son inmutables.
  *
- * La imagen del mapa se redimensiona+recomprime (JPEG ~85% calidad, max
- * 1024px) al guardar para acotar el tamano en BD. Patron: una imagen por
- * ruta, NUNCA replicada al despacho.
+ * Flujo de pantalla (igual que el Vale de Despacho):
+ *  - Guardar (create) -> persiste y redirige a la MISMA pantalla en modo edicion
+ *    (pages.xml propaga la conversacion, op=UPDATE preservado).
+ *  - Guardar (update) -> persiste y se queda (Outcome.REDISPLAY).
+ *  - Aprobar / Inactivar / Borrar / Cancelar -> vuelven al listado.
+ *
+ * Imagen del mapa: el upload escribe en el holder {@link #mapFile} (patron de la
+ * foto de Activos Fijos), NUNCA en la entidad; la imagen de la entidad solo se
+ * reemplaza cuando hay un archivo nuevo, por lo que guardar sin re-subir jamas la
+ * pone en null. Se redimensiona+recomprime a JPEG (max 1024px) al guardar.
  */
 @Name("dispatchRouteAction")
 @Scope(ScopeType.CONVERSATION)
@@ -39,13 +47,12 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
     @In(value = "#{entityManager}")
     private EntityManager em;
 
-    /*
-     * El archivo del mapa se sube DIRECTO a la entidad (data="#{dispatchRoute.mapImage}").
-     * Este campo solo actua como senal: s:fileUpload setea el fileName unicamente
-     * cuando el usuario adjunta un archivo nuevo, asi sabemos cuando redimensionar
-     * sin re-comprimir la imagen ya existente en cada guardado.
+    /**
+     * Holder del upload. El s:fileUpload escribe aqui (no en la entidad). Su
+     * value queda en null mientras no se adjunte un archivo nuevo, lo que sirve
+     * de senal para saber cuando reemplazar la imagen de la ruta.
      */
-    private String uploadedMapName;
+    private File mapFile = new File();
 
     @Factory(value = "dispatchRoute", scope = ScopeType.STATELESS)
     public DispatchRoute initDispatchRoute() {
@@ -64,7 +71,13 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
         if (!validateUniqueness(null)) {
             return Outcome.REDISPLAY;
         }
-        return super.create();
+        String outcome = super.create();
+        if (Outcome.SUCCESS.equals(outcome)) {
+            // Quedar en modo edicion tras el redirect-to-self (ver pages.xml):
+            // la conversacion se propaga y op=UPDATE muestra botones e imagen.
+            setOp(OP_UPDATE);
+        }
+        return outcome;
     }
 
     @Override
@@ -81,7 +94,9 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
         if (!validateUniqueness(r.getId())) {
             return Outcome.REDISPLAY;
         }
-        return super.update();
+        String outcome = super.update();
+        // Guardar y permanecer en la pantalla (igual que el Vale de Despacho).
+        return Outcome.SUCCESS.equals(outcome) ? Outcome.REDISPLAY : outcome;
     }
 
     @Override
@@ -125,20 +140,15 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
     }
 
     /**
-     * Si el usuario adjunto un archivo nuevo (uploadedMapName presente), validar
-     * tamano y redimensionar los bytes ya cargados en la entidad, reemplazandolos
-     * por la version JPEG redimensionada. Si no hubo upload nuevo, se conserva la
-     * imagen actual sin re-comprimir. Retorna false con mensaje si no es procesable.
+     * Si se adjunto un archivo nuevo (mapFile.value presente), validar tamano,
+     * redimensionar y reemplazar la imagen de la entidad. Si no hay archivo
+     * nuevo, no se toca la imagen actual (se conserva). Retorna false con mensaje
+     * si la imagen no es procesable.
      */
     private boolean validateAndProcessUpload() {
-        if (uploadedMapName == null || uploadedMapName.trim().isEmpty()) {
-            return true; // no se adjunto archivo nuevo en este guardado
-        }
-        DispatchRoute r = getInstance();
-        byte[] raw = r.getMapImage();
+        byte[] raw = mapFile.getValue();
         if (raw == null || raw.length == 0) {
-            uploadedMapName = null;
-            return true;
+            return true; // sin archivo nuevo: la imagen actual queda intacta
         }
         if (raw.length > MAP_MAX_INPUT_BYTES) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
@@ -147,15 +157,15 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
         }
         try {
             byte[] resized = ImageUtils.resizeAndCompress(raw, MAP_MAX_WIDTH_PX);
+            DispatchRoute r = getInstance();
             r.setMapImage(resized);
             r.setMapImageContentType("image/jpeg");
+            mapFile = new File(); // limpiar el buffer
         } catch (IOException e) {
             log.error("Procesando imagen de ruta", e);
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                     "DispatchRoute.error.imageInvalid");
             return false;
-        } finally {
-            uploadedMapName = null;
         }
         return true;
     }
@@ -191,8 +201,8 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
 
     /**
      * Imagen del mapa embebida como data-URI Base64 para el preview en pantalla.
-     * Se sirve inline (no via el resource servlet de Seam) para que se muestre de
-     * forma confiable durante la edicion. Retorna null si no hay imagen.
+     * Se sirve inline (no via el resource servlet de Seam) para mostrarla de forma
+     * confiable. Retorna null si no hay imagen.
      */
     public String getMapImageDataUri() {
         DispatchRoute r = getInstance();
@@ -207,13 +217,13 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
         return "data:" + contentType + ";base64," + Base64.getEncoder().encodeToString(img);
     }
 
-    /* =============== Senal de upload nuevo =============== */
+    /* =============== Holder del upload =============== */
 
-    public String getUploadedMapName() {
-        return uploadedMapName;
+    public File getMapFile() {
+        return mapFile;
     }
 
-    public void setUploadedMapName(String uploadedMapName) {
-        this.uploadedMapName = uploadedMapName;
+    public void setMapFile(File mapFile) {
+        this.mapFile = mapFile;
     }
 }

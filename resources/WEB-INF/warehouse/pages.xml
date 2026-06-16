@@ -836,6 +836,19 @@
           login-required="true"
           no-conversation-view-id="/warehouse/dispatchRouteList.xhtml">
         <restrict>#{s:hasPermission('WAREHOUSEDISPATCHROUTE','VIEW')}</restrict>
+
+        <!-- Guardar (alta): tras crear redirige a la MISMA pantalla; la conversacion se
+             propaga (instancia + op=UPDATE preservados), quedando en modo edicion con
+             la imagen y los botones segun estado. (update() retorna REDISPLAY y se queda) -->
+        <navigation from-action="#{dispatchRouteAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchRoute.xhtml"/>
+            </rule>
+        </navigation>
+
+        <!-- Aprobar / Inactivar / Borrar / Cancelar -> listado. NO se cierra la
+             conversacion aqui (rompe el redirect de los a4j de los modales): la
+             pagina de listado tiene <end-conversation/> y la cierra al llegar. -->
         <navigation>
             <rule if-outcome="Success">
                 <redirect view-id="/warehouse/dispatchRouteList.xhtml"/>

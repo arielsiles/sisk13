@@ -101,6 +101,7 @@
                         <app:realNumberConverter minimum="0"
                                                  pattern="#{messages['patterns.decimalNumber']}"
                                                  forId="distance"/>
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="distanceField"/>
                     </h:inputText>
                 </s:decorate>
 
@@ -111,6 +112,7 @@
                         <app:realNumberConverter minimum="0"
                                                  pattern="#{messages['patterns.decimalNumber']}"
                                                  forId="duration"/>
+                        <a4j:support event="onblur" ajaxSingle="true" reRender="durationField"/>
                     </h:inputText>
                 </s:decorate>
 
@@ -118,9 +120,10 @@
                             rendered="#{dispatchRoute.editable}">
                     <ui:define name="label">#{messages['DispatchRoute.mapImage.upload']}</ui:define>
                     <s:fileUpload id="mapUpload" styleClass="input"
-                                  data="#{dispatchRoute.mapImage}"
-                                  fileName="#{dispatchRouteAction.uploadedMapName}"
-                                  contentType="#{dispatchRoute.mapImageContentType}"/>
+                                  data="#{dispatchRouteAction.mapFile.value}"
+                                  fileName="#{dispatchRouteAction.mapFile.name}"
+                                  fileSize="#{dispatchRouteAction.mapFile.size}"
+                                  contentType="#{dispatchRouteAction.mapFile.contentType}"/>
                 </s:decorate>
 
                 <s:decorate id="mapPreviewField" template="/include/inputField.xhtml" styleClass="formRow"
