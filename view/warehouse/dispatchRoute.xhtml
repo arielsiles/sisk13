@@ -89,6 +89,7 @@
                     <ui:define name="label">#{messages['DispatchRoute.waypoints']}</ui:define>
                     <h:inputTextarea id="waypoints" value="#{dispatchRoute.waypoints}" styleClass="input"
                                      required="true" rows="3" cols="80"
+                                     style="width: 400px;"
                                      tabindex="4"
                                      readonly="#{!dispatchRoute.editable}"/>
                 </s:decorate>
@@ -117,16 +118,17 @@
                             rendered="#{dispatchRoute.editable}">
                     <ui:define name="label">#{messages['DispatchRoute.mapImage.upload']}</ui:define>
                     <s:fileUpload id="mapUpload" styleClass="input"
-                                  data="#{dispatchRouteAction.uploadedMapBytes}"
+                                  data="#{dispatchRoute.mapImage}"
                                   fileName="#{dispatchRouteAction.uploadedMapName}"
-                                  contentType="#{dispatchRouteAction.uploadedMapContentType}"/>
+                                  contentType="#{dispatchRoute.mapImageContentType}"/>
                 </s:decorate>
 
                 <s:decorate id="mapPreviewField" template="/include/inputField.xhtml" styleClass="formRow"
                             rendered="#{dispatchRouteAction.managed and dispatchRoute.mapImage != null}">
                     <ui:define name="label">#{messages['DispatchRoute.mapImage.current']}</ui:define>
-                    <s:graphicImage value="#{dispatchRoute.mapImage}"
-                                    style="max-width: 600px; max-height: 400px; border: 1px solid #ccc;"/>
+                    <img src="#{dispatchRouteAction.mapImageDataUri}"
+                         alt="#{dispatchRoute.name}"
+                         style="max-width: 600px; max-height: 400px; border: 1px solid #ccc;"/>
                 </s:decorate>
 
                 <s:decorate id="mapNoneField" template="/include/inputField.xhtml" styleClass="formRow"

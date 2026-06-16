@@ -14,6 +14,7 @@ import org.jboss.seam.international.StatusMessage;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
+import java.util.Base64;
 
 /**
  * CRUD del catalogo de Rutas de Despacho.
@@ -38,10 +39,13 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
     @In(value = "#{entityManager}")
     private EntityManager em;
 
-    /* Buffer del upload entrante - se redimensiona y se mueve a la entidad al guardar. */
-    private byte[] uploadedMapBytes;
+    /*
+     * El archivo del mapa se sube DIRECTO a la entidad (data="#{dispatchRoute.mapImage}").
+     * Este campo solo actua como senal: s:fileUpload setea el fileName unicamente
+     * cuando el usuario adjunta un archivo nuevo, asi sabemos cuando redimensionar
+     * sin re-comprimir la imagen ya existente en cada guardado.
+     */
     private String uploadedMapName;
-    private String uploadedMapContentType;
 
     @Factory(value = "dispatchRoute", scope = ScopeType.STATELESS)
     public DispatchRoute initDispatchRoute() {
@@ -121,22 +125,28 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
     }
 
     /**
-     * Si hay bytes nuevos en el buffer, validar tamano, redimensionar y mover
-     * a la entidad. Si no hay upload nuevo, se conserva la imagen actual.
-     * Retorna false con mensaje al usuario si la imagen no es procesable.
+     * Si el usuario adjunto un archivo nuevo (uploadedMapName presente), validar
+     * tamano y redimensionar los bytes ya cargados en la entidad, reemplazandolos
+     * por la version JPEG redimensionada. Si no hubo upload nuevo, se conserva la
+     * imagen actual sin re-comprimir. Retorna false con mensaje si no es procesable.
      */
     private boolean validateAndProcessUpload() {
-        if (uploadedMapBytes == null || uploadedMapBytes.length == 0) {
+        if (uploadedMapName == null || uploadedMapName.trim().isEmpty()) {
+            return true; // no se adjunto archivo nuevo en este guardado
+        }
+        DispatchRoute r = getInstance();
+        byte[] raw = r.getMapImage();
+        if (raw == null || raw.length == 0) {
+            uploadedMapName = null;
             return true;
         }
-        if (uploadedMapBytes.length > MAP_MAX_INPUT_BYTES) {
+        if (raw.length > MAP_MAX_INPUT_BYTES) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                     "DispatchRoute.error.imageTooLarge");
             return false;
         }
         try {
-            byte[] resized = ImageUtils.resizeAndCompress(uploadedMapBytes, MAP_MAX_WIDTH_PX);
-            DispatchRoute r = getInstance();
+            byte[] resized = ImageUtils.resizeAndCompress(raw, MAP_MAX_WIDTH_PX);
             r.setMapImage(resized);
             r.setMapImageContentType("image/jpeg");
         } catch (IOException e) {
@@ -145,9 +155,7 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
                     "DispatchRoute.error.imageInvalid");
             return false;
         } finally {
-            uploadedMapBytes = null;
             uploadedMapName = null;
-            uploadedMapContentType = null;
         }
         return true;
     }
@@ -181,15 +189,25 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
         return "name";
     }
 
-    /* =============== Buffer del upload =============== */
-
-    public byte[] getUploadedMapBytes() {
-        return uploadedMapBytes;
+    /**
+     * Imagen del mapa embebida como data-URI Base64 para el preview en pantalla.
+     * Se sirve inline (no via el resource servlet de Seam) para que se muestre de
+     * forma confiable durante la edicion. Retorna null si no hay imagen.
+     */
+    public String getMapImageDataUri() {
+        DispatchRoute r = getInstance();
+        byte[] img = r.getMapImage();
+        if (img == null || img.length == 0) {
+            return null;
+        }
+        String contentType = r.getMapImageContentType();
+        if (contentType == null || contentType.trim().isEmpty()) {
+            contentType = "image/jpeg";
+        }
+        return "data:" + contentType + ";base64," + Base64.getEncoder().encodeToString(img);
     }
 
-    public void setUploadedMapBytes(byte[] uploadedMapBytes) {
-        this.uploadedMapBytes = uploadedMapBytes;
-    }
+    /* =============== Senal de upload nuevo =============== */
 
     public String getUploadedMapName() {
         return uploadedMapName;
@@ -197,13 +215,5 @@ public class DispatchRouteAction extends GenericAction<DispatchRoute> {
 
     public void setUploadedMapName(String uploadedMapName) {
         this.uploadedMapName = uploadedMapName;
-    }
-
-    public String getUploadedMapContentType() {
-        return uploadedMapContentType;
-    }
-
-    public void setUploadedMapContentType(String uploadedMapContentType) {
-        this.uploadedMapContentType = uploadedMapContentType;
     }
 }
