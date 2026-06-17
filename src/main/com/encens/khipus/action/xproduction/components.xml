@@ -128,6 +128,15 @@
     <framework:entity-query name="productionLineQuery"
                             ejbql="select o from ProductionLine o order by o.name ASC"/>
 
+    <factory name="productionLineTypesEnum"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.ProductionLineType')}"/>
+
+    <!-- Zonas productivas (maestro compartido con el acopio de materia prima),
+         usadas en la distribucion por zonas de las ordenes de produccion BARITINA. -->
+    <factory name="xproductiveZoneList" value="#{xproductiveZoneQuery}"/>
+    <framework:entity-query name="xproductiveZoneQuery"
+                            ejbql="select o from ProductiveZone o order by o.name ASC"/>
+
     <factory name="productionGroupList" value="#{productionGroupQuery}"/>
     <framework:entity-query name="productionGroupQuery"
                             ejbql="select o from ProductionGroup o order by o.name ASC"/>

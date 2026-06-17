@@ -160,7 +160,18 @@ public class ProductionLine implements BaseModel {
         this.mermaFactor = mermaFactor;
     }
 
+    /**
+     * Tipo de linea resuelto desde report_template_code. {@code null} = linea GENERAL.
+     */
+    public ProductionLineType getLineType() {
+        return ProductionLineType.fromCode(reportTemplateCode);
+    }
+
     public boolean isUlexitaTemplate() {
-        return "ULEXITA".equals(reportTemplateCode);
+        return ProductionLineType.ULEXITA == getLineType();
+    }
+
+    public boolean isBaritinaTemplate() {
+        return ProductionLineType.BARITINA == getLineType();
     }
 }

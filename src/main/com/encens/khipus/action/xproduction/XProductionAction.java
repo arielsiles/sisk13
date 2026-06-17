@@ -17,6 +17,7 @@ import com.encens.khipus.service.xproduction.XProductionPlanService;
 import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.service.xproduction.XProductionUlexitaCalc;
 import com.encens.khipus.service.xproduction.XProductionUlexitaService;
+import com.encens.khipus.service.xproduction.XProductionBaritinaService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
@@ -53,6 +54,9 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     private XProductionUlexita ulexitaData;
 
+    private XProductionBaritina baritinaData;
+    private List<XProductionBaritinaZona> baritinaZonaList = new ArrayList<XProductionBaritinaZona>();
+
     @In
     private XProductionPlanAction xproductionPlanAction;
 
@@ -66,6 +70,8 @@ public class XProductionAction extends GenericAction<XProduction> {
     private JobContractService jobContractService;
     @In
     private XProductionUlexitaService xproductionUlexitaService;
+    @In
+    private XProductionBaritinaService xproductionBaritinaService;
     @In(required = false)
     private User currentUser;
 
@@ -104,6 +110,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         }
 
         loadUlexitaData();
+        loadBaritinaData();
 
         return outCome;
     }
@@ -121,6 +128,47 @@ public class XProductionAction extends GenericAction<XProduction> {
         if (ulexitaData == null) {
             ulexitaData = new XProductionUlexita();
             ulexitaData.setProduction(getInstance());
+        }
+    }
+
+    /**
+     * Carga los datos especificos de BARITINA si la linea aplica: cabecera
+     * (uso MP, PT, despacho, turnos) y la distribucion por zonas productivas.
+     * Si aun no existe cabecera, instancia una vacia en memoria para enlazar
+     * campos sin NPE.
+     */
+    private void loadBaritinaData() {
+        baritinaData = null;
+        baritinaZonaList = new ArrayList<XProductionBaritinaZona>();
+        if (getInstance() == null || getInstance().getId() == null) return;
+        if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isBaritinaTemplate()) return;
+        baritinaData = xproductionBaritinaService.findByProduction(getInstance());
+        if (baritinaData == null) {
+            baritinaData = new XProductionBaritina();
+            baritinaData.setProduction(getInstance());
+        }
+        baritinaZonaList = xproductionBaritinaService.findZonasByProduction(getInstance());
+        if (baritinaZonaList == null) {
+            baritinaZonaList = new ArrayList<XProductionBaritinaZona>();
+        }
+    }
+
+    private void persistBaritinaData() {
+        if (getInstance() == null || getInstance().getId() == null) return;
+        if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isBaritinaTemplate()) return;
+        recalcBaritinaZonas();
+        if (baritinaData != null) {
+            if (baritinaData.getProduction() == null) {
+                baritinaData.setProduction(getInstance());
+            }
+            // Snapshot de los valores derivados (Insumo / Productos terminados) en TN.
+            baritinaData.setUsoMpTn(getBaritinaMpUsed());
+            baritinaData.setPtTn(getBaritinaPtProduced());
+            xproductionBaritinaService.save(baritinaData);
+        }
+        for (XProductionBaritinaZona zona : baritinaZonaList) {
+            zona.setProduction(getInstance());
+            xproductionBaritinaService.saveZona(zona);
         }
     }
 
@@ -160,6 +208,10 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     @Override
     public String update() {
+        if (!validateBaritina()) {
+            return Outcome.REDISPLAY;
+        }
+
         XProduction production = getInstance();
         production.setProductionTank(productionTank);
         production.setFormulation(formulation);
@@ -170,6 +222,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setTotalRawMaterial(calculateRawMaterial());
         xproductionService.updateProduction(production, ingredientSupplyList, materialSupplyList, laborList);
         persistUlexitaData();
+        persistBaritinaData();
 
         // Re-snapshot si la orden ya esta aprobada (caso edicion de lab data
         // con permiso PRODUCTION_LAB_DATA:UPDATE). Asi los snapshots reflejan
@@ -187,6 +240,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     @Override
     public String delete() {
+        xproductionBaritinaService.deleteByProduction(getInstance());
         xproductionService.deleteProduction(getInstance());
         addDeletedMessage();
         return Outcome.SUCCESS;
@@ -209,6 +263,10 @@ public class XProductionAction extends GenericAction<XProduction> {
      * Al aprobar la produccion calcula los costos y lo distribuye por cada producto en la produccion
      */
     public void approve(){
+
+        if (!validateBaritina()) {
+            return;
+        }
 
         for (XProductionProduct product : getInstance().getProductionProductList()){
             BigDecimal productCost = BigDecimal.ZERO;
@@ -295,6 +353,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
         xproductionService.updateProduction(getInstance(), ingredientSupplyList, materialSupplyList, laborList);
         persistUlexitaData();
+        persistBaritinaData();
 
         if (getInstance().getProductionLine() != null && getInstance().getProductionLine().isUlexitaTemplate()) {
             xproductionUlexitaService.persistSnapshots(getInstance(),
@@ -366,6 +425,8 @@ public class XProductionAction extends GenericAction<XProduction> {
         setIngredientSupplyList(new ArrayList<XSupply>());
         setMaterialSupplyList(new ArrayList<XSupply>());
         ulexitaData = null;
+        baritinaData = null;
+        baritinaZonaList = new ArrayList<XProductionBaritinaZona>();
     }
 
     public void loadSupplies(){
@@ -896,6 +957,144 @@ public class XProductionAction extends GenericAction<XProduction> {
         return new XProductionUlexitaCalc(
                 getInstance(), ulexitaData, getInstance().getProductionLine(),
                 ingredientSupplyList, getInstance().getProductionProductList());
+    }
+
+    // ------------------------------------------------------------------------
+    // BARITINA - distribucion de materia prima por zonas productivas
+    // ------------------------------------------------------------------------
+
+    public boolean isBaritinaTemplate() {
+        return getInstance() != null
+                && getInstance().getProductionLine() != null
+                && getInstance().getProductionLine().isBaritinaTemplate();
+    }
+
+    public XProductionBaritina getBaritinaData() {
+        if (baritinaData == null && isBaritinaTemplate()) {
+            if (getInstance() != null && getInstance().getId() != null) {
+                baritinaData = xproductionBaritinaService.findByProduction(getInstance());
+            }
+            if (baritinaData == null) {
+                baritinaData = new XProductionBaritina();
+                baritinaData.setProduction(getInstance());
+            }
+        }
+        return baritinaData;
+    }
+
+    public void setBaritinaData(XProductionBaritina baritinaData) {
+        this.baritinaData = baritinaData;
+    }
+
+    public List<XProductionBaritinaZona> getBaritinaZonaList() {
+        return baritinaZonaList;
+    }
+
+    public void setBaritinaZonaList(List<XProductionBaritinaZona> baritinaZonaList) {
+        this.baritinaZonaList = baritinaZonaList;
+    }
+
+    /** Agrega una fila vacia de zona a la distribucion. */
+    public void addBaritinaZona() {
+        XProductionBaritinaZona zona = new XProductionBaritinaZona();
+        zona.setProduction(getInstance());
+        zona.setPorcentaje(BigDecimal.ZERO);
+        zona.setCantidadTn(BigDecimal.ZERO);
+        baritinaZonaList.add(zona);
+    }
+
+    /** Quita una fila de zona (elimina de BD si estaba persistida). */
+    public void removeBaritinaZona(XProductionBaritinaZona zona) {
+        if (zona == null) return;
+        if (zona.getId() != null) {
+            xproductionBaritinaService.removeZona(zona);
+        }
+        baritinaZonaList.remove(zona);
+        recalcBaritinaZonas();
+    }
+
+    /**
+     * Uso de materia prima Baritina (TN) tomado del Insumo: cantidad del insumo
+     * marcado como 'por defecto' en la formulacion, convertida de KG a TN.
+     */
+    public BigDecimal getBaritinaMpUsed() {
+        BigDecimal kg = BigDecimal.ZERO;
+        if (ingredientSupplyList != null) {
+            for (XSupply supply : ingredientSupplyList) {
+                if (supply.hasFormula()
+                        && Boolean.TRUE.equals(supply.getFormulationInput().getInputDefault())
+                        && supply.getQuantity() != null) {
+                    kg = BigDecimalUtil.sum(kg, supply.getQuantity(), 6);
+                }
+            }
+        }
+        return BigDecimalUtil.roundBigDecimal(BigDecimalUtil.divide(kg, BigDecimalUtil.ONE_THOUSAND, 6), 4);
+    }
+
+    /**
+     * Baritina producto terminado (TN): suma de las cantidades de los productos
+     * terminados de la orden, convertida de KG a TN.
+     */
+    public BigDecimal getBaritinaPtProduced() {
+        BigDecimal kg = BigDecimal.ZERO;
+        if (getInstance() != null && getInstance().getProductionProductList() != null) {
+            for (XProductionProduct product : getInstance().getProductionProductList()) {
+                if (product.getQuantity() != null) {
+                    kg = BigDecimalUtil.sum(kg, product.getQuantity(), 6);
+                }
+            }
+        }
+        return BigDecimalUtil.roundBigDecimal(BigDecimalUtil.divide(kg, BigDecimalUtil.ONE_THOUSAND, 6), 4);
+    }
+
+    /** Recalcula cantidad por zona = uso_mp_baritina (TN) * porcentaje / 100. */
+    public void recalcBaritinaZonas() {
+        BigDecimal mp = getBaritinaMpUsed();
+        for (XProductionBaritinaZona zona : baritinaZonaList) {
+            BigDecimal pct = zona.getPorcentaje() != null ? zona.getPorcentaje() : BigDecimal.ZERO;
+            BigDecimal cantidad = BigDecimalUtil.divide(BigDecimalUtil.multiply(mp, pct, 6), BigDecimalUtil.ONE_HUNDRED, 6);
+            zona.setCantidadTn(BigDecimalUtil.roundBigDecimal(cantidad, 4));
+        }
+    }
+
+    /** Suma de los porcentajes de todas las zonas (debe ser 100). */
+    public BigDecimal getBaritinaZonaPctTotal() {
+        BigDecimal total = BigDecimal.ZERO;
+        for (XProductionBaritinaZona zona : baritinaZonaList) {
+            if (zona.getPorcentaje() != null) {
+                total = BigDecimalUtil.sum(total, zona.getPorcentaje(), 4);
+            }
+        }
+        return total;
+    }
+
+    /** True si la suma de porcentajes es 100% (tolerancia 0.01). Para colorear en la vista. */
+    public boolean isBaritinaZonaPctComplete() {
+        BigDecimal diff = getBaritinaZonaPctTotal().subtract(BigDecimalUtil.toBigDecimal(100)).abs();
+        return diff.compareTo(new BigDecimal("0.01")) <= 0;
+    }
+
+    /**
+     * Valida la distribucion por zonas de una orden BARITINA: cada fila debe
+     * tener zona seleccionada y la suma de porcentajes debe ser 100% (tolerancia
+     * 0.01). Sin zonas registradas no bloquea (la orden aun puede ser parcial).
+     */
+    private boolean validateBaritina() {
+        if (!isBaritinaTemplate()) return true;
+        if (baritinaZonaList == null || baritinaZonaList.isEmpty()) return true;
+        for (XProductionBaritinaZona zona : baritinaZonaList) {
+            if (zona.getProductiveZone() == null) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "XProduction.baritina.error.zoneRequired");
+                return false;
+            }
+        }
+        BigDecimal total = getBaritinaZonaPctTotal();
+        BigDecimal diff = total.subtract(BigDecimalUtil.toBigDecimal(100)).abs();
+        if (diff.compareTo(new BigDecimal("0.01")) > 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "XProduction.baritina.error.pctSum");
+            return false;
+        }
+        return true;
     }
 
     /*public BigDecimal getTotalCost() {

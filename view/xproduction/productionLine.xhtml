@@ -83,13 +83,15 @@
                                      styleClass="input250"
                                      tabindex="3">
                         <f:selectItem itemLabel="" itemValue="#{null}"/>
-                        <f:selectItem itemLabel="ULEXITA" itemValue="ULEXITA"/>
+                        <c:forEach var="lineType" items="#{productionLineTypesEnum}">
+                            <f:selectItem itemLabel="#{messages[lineType.resourceKey]}" itemValue="#{lineType.code}"/>
+                        </c:forEach>
                         <a4j:support event="onchange" reRender="ulexitaConfigPanel" ajaxSingle="true"/>
                     </h:selectOneMenu>
                 </s:decorate>
 
                 <s:div id="ulexitaConfigPanel">
-                    <c:if test="#{productionLine.reportTemplateCode == 'ULEXITA'}">
+                    <c:if test="#{productionLine.ulexitaTemplate}">
 
                         <s:decorate id="codArtMpPrincipalField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductionLine.codArtMpPrincipal']}</ui:define>
