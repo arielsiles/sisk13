@@ -384,24 +384,19 @@
 
                     <c:if test="#{xproductionAction.managed}">
                         <rich:spacer height="6"/>
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                            <tr>
-                                <td valign="top" style="width:110px; padding-top:6px; text-align:right; padding-right:8px;">
-                                    <h:outputText value="#{messages['XProduction.observation']}"/>
-                                </td>
-                                <td valign="top">
-                                    <h:inputTextarea id="observation"
-                                                     value="#{xproduction.observation}"
-                                                     required="false"
-                                                     readonly="#{xproductionAction.approved}"
-                                                     style="width:100%; height:48px; box-sizing:border-box; line-height:18px;"
-                                                     rows="2"
-                                                     tabindex="5">
-                                        <f:validateLength maximum="500"/>
-                                    </h:inputTextarea>
-                                </td>
-                            </tr>
-                        </table>
+                        <rich:panel>
+                            <s:decorate id="ulexObsField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['XProduction.observation']}</ui:define>
+                                <h:inputTextarea id="observation"
+                                                 value="#{xproduction.observation}"
+                                                 required="false"
+                                                 readonly="#{xproductionAction.approved}"
+                                                 style="width:180%; height:26px;" rows="1"
+                                                 tabindex="5">
+                                    <f:validateLength maximum="500"/>
+                                </h:inputTextarea>
+                            </s:decorate>
+                        </rich:panel>
                     </c:if>
                 </c:if>
                 </s:div>
@@ -908,7 +903,7 @@
                             </c:forEach>
                             <tr class="rich-table-row" style="font-weight:bold; background-color:#f0f0f0;">
                                 <td class="rich-table-cell right">#{messages['XProduction.baritina.pctTotal']}</td>
-                                <td class="rich-table-cell right"
+                                <td class="rich-table-cell center"
                                     style="color: #{xproductionAction.baritinaZonaPctComplete ? '#35B056' : 'red'};">
                                     <h:outputText value="#{xproductionAction.baritinaZonaPctTotal}">
                                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
