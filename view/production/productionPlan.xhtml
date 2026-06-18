@@ -52,6 +52,12 @@
             <s:defaultAction/>
         </h:commandButton>
 
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{productionPlanAction.managed and productionPlanAction.pending and productionPlanAction.emptyPlan and s:hasPermission('PRODUCTIONPLAN','DELETE')}">
+            <rich:componentControl for="deletePlanConfirmation" event="onclick" disableDefault="true" operation="show"/>
+        </h:commandButton>
+
         <h:commandButton action="#{productionPlanAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
                          rendered="#{!productionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
@@ -303,6 +309,22 @@
                                reRender="productsPanel">
                 <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
             </a4j:commandButton>
+        </ui:define>
+    </s:decorate>
+
+    <s:decorate template="/include/modalDialog.xhtml">
+        <ui:param name="dialogId" value="deletePlanConfirmation"/>
+        <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+        <ui:define name="dialogContent">
+            <p>
+                <h:outputFormat value="#{messages['ProductionPlan.delete.confirmation']}" />
+            </p>
+        </ui:define>
+        <ui:define name="dialogOption">
+            <a4j:commandButton action="#{productionPlanAction.delete}"
+                               value="#{messages['Common.delete']}"
+                               immediate="true"
+                               styleClass="button"/>
         </ui:define>
     </s:decorate>
 

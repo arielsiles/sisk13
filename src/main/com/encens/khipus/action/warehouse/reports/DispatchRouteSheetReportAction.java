@@ -236,11 +236,16 @@ public class DispatchRouteSheetReportAction extends GenericReportAction {
             s.append(name);
         }
         s.append("\n<b>RESP. DE ALMACEN Y COMPRAS</b>");
+        StringBuilder idLine = new StringBuilder();
         if (ci.length() > 0) {
-            s.append("\nC.I.: ").append(ci);
+            idLine.append("C.I.: ").append(ci);
         }
         if (phone.length() > 0) {
-            s.append("\n").append(phone);
+            if (idLine.length() > 0) idLine.append(" / ");
+            idLine.append("CEL.: ").append(phone);
+        }
+        if (idLine.length() > 0) {
+            s.append("\n").append(idLine);
         }
         if (companyName != null && companyName.length() > 0) {
             s.append("\n<b>").append(companyName).append("</b>");
@@ -252,10 +257,11 @@ public class DispatchRouteSheetReportAction extends GenericReportAction {
      * Bloque firma "CONDUCTOR / TRANSPORTISTA".
      */
     private String buildDriverSignature(WarehouseVoucherDispatch d) {
-        String name = "", license = "";
+        String name = "", license = "", phone = "";
         if (d.getDriver() != null) {
             name = paramAsString(d.getDriver().getName());
             license = paramAsString(d.getDriver().getLicense());
+            phone = paramAsString(d.getDriver().getPhone());
         }
         StringBuilder s = new StringBuilder();
         if (name.length() > 0) {
@@ -266,6 +272,9 @@ public class DispatchRouteSheetReportAction extends GenericReportAction {
             s.append(license);
         }
         s.append("\n<b>CONDUCTOR / TRANSPORTISTA</b>");
+        if (phone.length() > 0) {
+            s.append("\nCEL.: ").append(phone);
+        }
         return s.toString();
     }
 

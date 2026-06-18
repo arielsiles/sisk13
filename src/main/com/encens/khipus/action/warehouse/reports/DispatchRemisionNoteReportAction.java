@@ -202,7 +202,7 @@ public class DispatchRemisionNoteReportAction extends GenericReportAction {
      * markup="styled" (negrillas via &lt;b&gt;...&lt;/b&gt;). Las lineas se
      * omiten si su dato no esta cargado (asi el celular vacio no deja una
      * linea en blanco entre el rol y la empresa). Orden:
-     *   nombre / C.I. / RESP. DE ALMACEN Y COMPRAS / celular / EMPRESA
+     *   nombre / RESP. DE ALMACEN Y COMPRAS / "C.I.: x / CEL.: y" / EMPRESA
      */
     private String buildSignatureBlock(WarehouseVoucherDispatch d, String companyName) {
         String name = "", cellphone = "", ci = "";
@@ -215,14 +215,18 @@ public class DispatchRemisionNoteReportAction extends GenericReportAction {
         if (name.length() > 0) {
             sig.append(name);
         }
-        if (ci.length() > 0) {
-            if (sig.length() > 0) sig.append("\n");
-            sig.append("C.I.: ").append(ci);
-        }
         if (sig.length() > 0) sig.append("\n");
         sig.append("<b>RESP. DE ALMACEN Y COMPRAS</b>");
+        StringBuilder idLine = new StringBuilder();
+        if (ci.length() > 0) {
+            idLine.append("C.I.: ").append(ci);
+        }
         if (cellphone.length() > 0) {
-            sig.append("\n").append(cellphone);
+            if (idLine.length() > 0) idLine.append(" / ");
+            idLine.append("CEL.: ").append(cellphone);
+        }
+        if (idLine.length() > 0) {
+            sig.append("\n").append(idLine);
         }
         if (companyName != null && companyName.length() > 0) {
             sig.append("\n<b>").append(companyName).append("</b>");

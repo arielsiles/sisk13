@@ -142,12 +142,21 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
     @Override
     public void increaseProductItemAmount(ProductItem productItem, BigDecimal newQuantityInventory, BigDecimal amountToAdd, BigDecimal amountCTAdd) {
 
-        /** Actualiza Saldo_Mon **/
-        BigDecimal newInvestmentAmount = BigDecimalUtil.sum(productItem.getInvestmentAmount(), amountToAdd, 6);
-        productItem.setInvestmentAmount(newInvestmentAmount);
-        productItem.setUnitCost( BigDecimalUtil.divide(newInvestmentAmount, newQuantityInventory, 6) );
+        /** Actualiza Saldo_Mon.
+         *  Se recarga el ProductItem por su PK desde eventEm para operar sobre la
+         *  instancia gestionada con la version vigente. Asi se evita el
+         *  StaleObjectStateException que ocurria al mergear la copia (con version
+         *  vieja) proveniente de la conversacion cuando la fila de inv_articulos
+         *  fue actualizada por otra transaccion entremedio. */
+        ProductItem managed = eventEm.find(ProductItem.class, productItem.getId());
+        if (managed == null) {
+            managed = productItem;
+        }
 
-        eventEm.merge(productItem);
+        BigDecimal newInvestmentAmount = BigDecimalUtil.sum(managed.getInvestmentAmount(), amountToAdd, 6);
+        managed.setInvestmentAmount(newInvestmentAmount);
+        managed.setUnitCost( BigDecimalUtil.divide(newInvestmentAmount, newQuantityInventory, 6) );
+
         eventEm.flush();
 
     }

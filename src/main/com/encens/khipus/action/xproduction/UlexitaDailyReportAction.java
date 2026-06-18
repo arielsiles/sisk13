@@ -1,17 +1,16 @@
 package com.encens.khipus.action.xproduction;
 
-import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
-import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.xproduction.ProductionLine;
 import com.encens.khipus.model.xproduction.XProduction;
 import com.encens.khipus.model.xproduction.XProductionUlexita;
-import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.model.xproduction.XSupply;
+import com.encens.khipus.service.xproduction.BaritinaDailyReportService;
 import com.encens.khipus.service.xproduction.XProductionUlexitaCalc;
 import com.encens.khipus.service.xproduction.XProductionUlexitaService;
+import com.encens.khipus.util.BigDecimalUtil;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.CellRangeAddress;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
@@ -25,18 +24,22 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 /**
  * Reporte mensual diario de produccion ULEXITA.
  *
- * Genera un Excel (.xls) con una fila por orden de produccion del mes,
- * replicando el formato de la planilla manual "REPORTE DIARIO DE PRODUCCION ULEXITA".
+ * Genera un Excel (.xls) con una fila por DIA del mes (todos los dias,
+ * incluidos los sin orden con saldos arrastrados), replicando la planilla
+ * manual "REPORTE DIARIO DE PRODUCCION ULEXITA".
  *
- * Usa Apache POI HSSF (jar ya presente en lib/). Construye la cabecera multinivel,
- * colores y merges programaticamente; las fechas sin produccion se omiten salvo
- * que se active showEmptyDays.
+ * Los datos de proceso (leyes, Kpa, merma, etc.) son por orden: un dia con
+ * varias ordenes genera varias filas. Los flujos de materia prima y producto
+ * siguen la misma logica que el reporte BARITINA:
+ *  - INGRESO MATERIA PRIMA ULEX: acopio (CollectMaterial) del articulo MP.
+ *  - ULEX DISPONIBLE: saldo_anterior + INGRESO (acumulado).
+ *  - DESPACHO: despachos (WarehouseVoucherDispatch) de los PT.
+ *  - SALDO: saldo_anterior + PT TOTAL BUENO - DESPACHO.
  */
 @Name("ulexitaDailyReportAction")
 @Scope(ScopeType.PAGE)
@@ -48,191 +51,253 @@ public class UlexitaDailyReportAction {
     @In
     private XProductionUlexitaService xproductionUlexitaService;
     @In
-    private CompanyConfigurationService companyConfigurationService;
+    private BaritinaDailyReportService baritinaDailyReportService;
     @In
     private FacesMessages facesMessages;
+
+    private static final BigDecimal THOUSAND = new BigDecimal("1000");
 
     private Integer year;
     private Integer month;
     private ProductionLine productionLine;
-    private boolean showEmptyDays = false;
 
-    // Indices de columnas en el Excel (0-based)
-    // Columnas del Excel generado. Sin huecos: cada indice es una columna usada.
-    // Las columnas S, T, U del Excel manual original eran solo separadores
-    // visuales; aqui se eliminan para compactar el reporte.
+    // Columnas (0-based). A=0 margen. Se agregan INGRESO (tras DIA), DESPACHO y
+    // SALDO (tras PT TOTAL BUENO) respecto a la version anterior.
     private static final int COL_FECHA       = 1;   // B
     private static final int COL_DIA         = 2;   // C
-    private static final int COL_ULEX_DISP   = 3;   // D
-    private static final int COL_CONSUMO     = 4;   // E
-    private static final int COL_GRUPO_D     = 5;   // F
-    private static final int COL_GRUPO_N     = 6;   // G
-    private static final int COL_DILUYENTE   = 7;   // H
-    private static final int COL_BENT_PCT    = 8;   // I
-    private static final int COL_CAOL_PCT    = 9;   // J
-    private static final int COL_REPROC_IN   = 10;  // K
-    private static final int COL_LEY_MP_BENT = 11;  // L
-    private static final int COL_LEY_RECALC  = 12;  // M
-    private static final int COL_LEY_PT      = 13;  // N
-    private static final int COL_GRANULADO   = 14;  // O
-    private static final int COL_PT_A        = 15;  // P
-    private static final int COL_PT_B        = 16;  // Q
-    private static final int COL_PT_BUENO    = 17;  // R
-    private static final int COL_REPROC_OUT  = 18;  // S
-    private static final int COL_KPM_BENT    = 19;  // T
-    private static final int COL_KPM_MERMA   = 20;  // U
-    private static final int COL_KPA         = 21;  // V
-    private static final int COL_MERMA       = 22;  // W
-    private static final int COL_MERMA_PCT   = 23;  // X
-    private static final int COL_OBS         = 24;  // Y
+    private static final int COL_INGRESO     = 3;   // D  (NUEVA)
+    private static final int COL_ULEX_DISP   = 4;   // E  (saldo MP = saldo_ant + INGRESO)
+    private static final int COL_CONSUMO     = 5;   // F
+    private static final int COL_GRUPO_D     = 6;   // G
+    private static final int COL_GRUPO_N     = 7;   // H
+    private static final int COL_DILUYENTE   = 8;   // I
+    private static final int COL_BENT_PCT    = 9;   // J
+    private static final int COL_CAOL_PCT    = 10;  // K
+    private static final int COL_REPROC_IN   = 11;  // L
+    private static final int COL_LEY_MP_BENT = 12;  // M
+    private static final int COL_LEY_RECALC  = 13;  // N
+    private static final int COL_LEY_PT      = 14;  // O
+    private static final int COL_GRANULADO   = 15;  // P
+    private static final int COL_PT_A        = 16;  // Q
+    private static final int COL_PT_B        = 17;  // R
+    private static final int COL_PT_BUENO    = 18;  // S
+    private static final int COL_DESPACHO    = 19;  // T  (NUEVA)
+    private static final int COL_SALDO       = 20;  // U  (NUEVA: saldo PT)
+    private static final int COL_REPROC_OUT  = 21;  // V
+    private static final int COL_KPM_BENT    = 22;  // W
+    private static final int COL_KPM_MERMA   = 23;  // X
+    private static final int COL_KPA         = 24;  // Y
+    private static final int COL_MERMA       = 25;  // Z
+    private static final int COL_MERMA_PCT   = 26;  // AA
+    private static final int COL_OBS         = 27;  // AB
+    private static final int LAST_COL        = 27;
 
-    private static final int LAST_COL        = 24;
-    // Layout de filas:
-    //   fila 0 (Excel 1): titulo (centrado, mergeado todas las cols)
-    //   fila 1 (Excel 2): periodo (desde col B)
-    //   fila 2 (Excel 3): blank
-    //   fila 3 (Excel 4): cabecera principal — para F/G mergea horizontal con
-    //                     "GRUPO"; para P/Q mergea horizontal con "PRODUCTO (TN)";
-    //                     resto de columnas mergea vertical hasta fila 4
-    //   fila 4 (Excel 5): subcabecera D/N en F/G y A/B en P/Q; resto vacio
-    //                     (parte de las celdas mergeadas verticalmente)
-    //   fila 5+ (Excel 6+): datos
     private static final int HEADER_ROW1     = 3;
     private static final int HEADER_ROW2     = 4;
-    private static final int SALDO_ROW       = 5;   // fila "SALDO ANT."
+    private static final int SALDO_ROW       = 5;
     private static final int DATA_START_ROW  = 6;
-
-    @Create
-    public void init() {
-        Calendar c = Calendar.getInstance();
-        year = c.get(Calendar.YEAR);
-        month = c.get(Calendar.MONTH) + 1;
-    }
 
     public void generateReport() {
         if (productionLine == null) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
-                    "DailyProductionReport.error.lineRequired");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "DailyProductionReport.error.lineRequired");
             return;
         }
         if (year == null || month == null) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
-                    "DailyProductionReport.error.periodRequired");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "DailyProductionReport.error.periodRequired");
             return;
         }
         try {
-            CompanyConfiguration cc = companyConfigurationService.findCompanyConfiguration();
-            List<XProduction> producciones =
-                    xproductionUlexitaService.findProductionsByLineAndMonth(productionLine, year, month);
+            Calendar c = Calendar.getInstance();
+            c.clear();
+            c.set(year, month - 1, 1, 0, 0, 0);
+            Date firstDay = c.getTime();
+            int lastDayNum = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+            c.add(Calendar.MONTH, 1);
+            Date nextMonth = c.getTime();
+
+            List<XProduction> allOrders = baritinaDailyReportService.findProductions(productionLine, new Date(0), nextMonth);
+
+            // Articulos: MP principal de la linea (config), PT clasificacion A/B
+            String mpCod = productionLine.getCodArtMpPrincipal();
+            if (mpCod == null) mpCod = deriveDefaultInputCod(allOrders);
+            Set<String> ptCods = new LinkedHashSet<String>();
+            if (productionLine.getCodArtPtA() != null) ptCods.add(productionLine.getCodArtPtA());
+            if (productionLine.getCodArtPtB() != null) ptCods.add(productionLine.getCodArtPtB());
+            if (ptCods.isEmpty()) ptCods = derivePtCods(allOrders);
+
+            // Ordenes del periodo agrupadas por dia + sumas previas para saldos iniciales
+            Map<Integer, List<XProduction>> ordersByDay = new HashMap<Integer, List<XProduction>>();
+            BigDecimal usoBeforeTn = BigDecimal.ZERO;
+            BigDecimal ptBuenoBeforeTn = BigDecimal.ZERO;
+            for (XProduction p : allOrders) {
+                if (p.getInitDate() == null) continue;
+                if (p.getInitDate().before(firstDay)) {
+                    usoBeforeTn = BigDecimalUtil.sum(usoBeforeTn, tn(usoMpQty(p, mpCod)), 6);
+                    XProductionUlexita u = xproductionUlexitaService.findByProduction(p);
+                    XProductionUlexitaCalc calc = new XProductionUlexitaCalc(
+                            p, u, p.getProductionLine(), p.getSupplyList(), p.getProductionProductList());
+                    ptBuenoBeforeTn = BigDecimalUtil.sum(ptBuenoBeforeTn, nz(calc.getPtTotalBueno()), 6);
+                    continue;
+                }
+                if (!p.getInitDate().before(nextMonth)) continue;
+                Calendar dc = Calendar.getInstance();
+                dc.setTime(p.getInitDate());
+                int day = dc.get(Calendar.DAY_OF_MONTH);
+                List<XProduction> list = ordersByDay.get(day);
+                if (list == null) { list = new ArrayList<XProduction>(); ordersByDay.put(day, list); }
+                list.add(p);
+            }
+
+            // Acopio (INGRESO) y Despacho por dia
+            Map<Integer, BigDecimal> ingresoByDay = bucketByDay(baritinaDailyReportService.sumAcopioByDay(mpCod, firstDay, nextMonth));
+            Map<Integer, BigDecimal> despachoByDay = bucketByDay(baritinaDailyReportService.dispatchRows(ptCods, firstDay, nextMonth));
+
+            // Saldos iniciales (estilo BARITINA)
+            BigDecimal ulexDisp = BigDecimalUtil.subtract(tn(baritinaDailyReportService.sumAcopioBefore(mpCod, firstDay)), usoBeforeTn, 6);
+            BigDecimal saldoPt = BigDecimalUtil.subtract(ptBuenoBeforeTn, tn(baritinaDailyReportService.sumDispatchBefore(ptCods, firstDay)), 6);
 
             HSSFWorkbook wb = new HSSFWorkbook();
             HSSFSheet sheet = wb.createSheet("ULEXITA " + month + "-" + year);
             sheet.setDisplayGridlines(false);
+            Styles s = buildStyles(wb);
+            buildHeader(sheet, s);
 
-            Styles styles = buildStyles(wb);
-            buildHeader(sheet, styles, cc);
+            // Fila SALDO ANT.: etiqueta combinada B-C (totalsLabel, sin wrapText)
+            // para que el texto no agrande el alto de la fila.
+            HSSFRow rs = sheet.createRow(SALDO_ROW);
+            setText(rs, COL_FECHA, "SALDO ANT.", s.totalsLabel);
+            setText(rs, COL_DIA, null, s.totalsLabel);
+            sheet.addMergedRegion(new CellRangeAddress(SALDO_ROW, SALDO_ROW, COL_FECHA, COL_DIA));
+            for (int col = COL_INGRESO; col <= LAST_COL; col++) setText(rs, col, null, s.body);
+            setNumber(rs, COL_ULEX_DISP, ulexDisp, s.body);
+            setNumber(rs, COL_SALDO, saldoPt, s.body);
+            setText(rs, COL_OBS, null, s.obsLeft);
 
-            int rowIdx = DATA_START_ROW;
             BigDecimal[] totals = new BigDecimal[LAST_COL + 1];
+            int rowIdx = DATA_START_ROW;
+            SimpleDateFormat fmt = new SimpleDateFormat("dd-MMM");
 
-            for (XProduction p : producciones) {
-                XProductionUlexita u = xproductionUlexitaService.findByProduction(p);
-                XProductionUlexitaCalc calc = new XProductionUlexitaCalc(
-                        p, u, p.getProductionLine(), p.getSupplyList(), p.getProductionProductList());
-                writeDataRow(sheet, rowIdx++, p, u, calc, styles);
-                accumulate(totals, p, u, calc);
+            for (int d = 1; d <= lastDayNum; d++) {
+                Calendar dayCal = Calendar.getInstance();
+                dayCal.clear();
+                dayCal.set(year, month - 1, d);
+                Date date = dayCal.getTime();
+
+                BigDecimal ingreso = tn(ingresoByDay.get(d));   // acopio KG -> TN
+                BigDecimal despacho = tn(despachoByDay.get(d)); // despacho KG -> TN
+                // ULEX DISP = saldo_ant + INGRESO - CONSUMO.
+                // El INGRESO (acopio) se suma una vez por dia; el CONSUMO se resta por orden.
+                ulexDisp = BigDecimalUtil.sum(ulexDisp, ingreso, 6);
+
+                List<XProduction> dayOrders = ordersByDay.get(d);
+                if (dayOrders == null || dayOrders.isEmpty()) {
+                    // Dia sin orden: fila en blanco con saldos arrastrados
+                    saldoPt = BigDecimalUtil.subtract(saldoPt, despacho, 6);
+                    HSSFRow row = sheet.createRow(rowIdx++);
+                    writeFlowCells(row, s, fmt.format(date), dayLetter(date), ingreso, ulexDisp, despacho, saldoPt, null);
+                    blankProcessCells(row, s);
+                    addTotals(totals, ingreso, despacho, null, null);
+                } else {
+                    boolean first = true;
+                    for (XProduction p : dayOrders) {
+                        XProductionUlexita u = xproductionUlexitaService.findByProduction(p);
+                        XProductionUlexitaCalc calc = new XProductionUlexitaCalc(
+                                p, u, p.getProductionLine(), p.getSupplyList(), p.getProductionProductList());
+                        BigDecimal rowIngreso = first ? ingreso : BigDecimal.ZERO;
+                        BigDecimal rowDespacho = first ? despacho : BigDecimal.ZERO;
+                        // Restar el CONSUMO de la orden al ULEX DISPONIBLE
+                        BigDecimal consumo = (p.isApproved() && u != null && u.getConsumoMpCalcSnap() != null)
+                                ? u.getConsumoMpCalcSnap() : calc.getConsumoMpCalc();
+                        ulexDisp = BigDecimalUtil.subtract(ulexDisp, nz(consumo), 6);
+                        saldoPt = BigDecimalUtil.subtract(BigDecimalUtil.sum(saldoPt, nz(calc.getPtTotalBueno()), 6), rowDespacho, 6);
+
+                        HSSFRow row = sheet.createRow(rowIdx++);
+                        writeFlowCells(row, s, fmt.format(date), dayLetter(date), rowIngreso, ulexDisp, rowDespacho, saldoPt, p.getObservation());
+                        writeProcessCells(row, s, p, u, calc);
+                        addTotals(totals, rowIngreso, rowDespacho, u, calc);
+                        first = false;
+                    }
+                }
             }
 
-            writeTotalsRow(sheet, rowIdx, totals, styles);
-
-            for (int i = 0; i <= LAST_COL; i++) {
-                sheet.setColumnWidth(i, columnWidthFor(i));
+            // Fila TOTAL MES
+            HSSFRow rt = sheet.createRow(rowIdx);
+            setText(rt, COL_FECHA, "TOTAL MES:", s.totalsLabel);
+            setText(rt, COL_DIA, null, s.totalsLabel);
+            sheet.addMergedRegion(new CellRangeAddress(rowIdx, rowIdx, COL_FECHA, COL_DIA));
+            for (int col = COL_INGRESO; col <= LAST_COL; col++) {
+                if (totals[col] != null) setNumber(rt, col, totals[col], s.totals);
+                else setText(rt, col, null, s.totals);
             }
+            setNumber(rt, COL_ULEX_DISP, ulexDisp, s.totals); // ultimo saldo
+            setNumber(rt, COL_SALDO, saldoPt, s.totals);      // ultimo saldo
+
+            for (int i = 0; i <= LAST_COL; i++) sheet.setColumnWidth(i, columnWidthFor(i));
 
             sendResponse(wb);
-        } catch (CompanyConfigurationNotFoundException e) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "CompanyConfiguration.notFound");
         } catch (Exception e) {
             log.error("Error generando reporte ULEXITA", e);
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
-                    "DailyProductionReport.error.generic");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "DailyProductionReport.error.generic");
         }
     }
 
     // ------------------------------------------------------------------ cabecera
 
-    private void buildHeader(HSSFSheet sheet, Styles s, CompanyConfiguration cc) {
-        // Fila 0: titulo principal (mergeado de B en adelante)
+    private void buildHeader(HSSFSheet sheet, Styles s) {
         HSSFRow r0 = sheet.createRow(0);
         HSSFCell cTitle = r0.createCell(COL_FECHA);
         cTitle.setCellValue("REPORTE DIARIO DE PRODUCCION \"" + safeUpper(productionLine.getName()) + "\"");
         cTitle.setCellStyle(s.title);
         sheet.addMergedRegion(new CellRangeAddress(0, 0, COL_FECHA, LAST_COL));
 
-        // Fila 1: periodo (desde col B = COL_FECHA)
-        HSSFRow r1 = sheet.createRow(1);
-        r1.createCell(COL_FECHA).setCellValue("Periodo: " + monthName(month) + " " + year);
+        sheet.createRow(1).createCell(COL_FECHA).setCellValue("Periodo: " + monthName(month) + " " + year);
 
-        // Fila 2: blank (espacio visual)
-
-        // Fila 3 + 4: cabecera de dos filas con merges.
-        //   - F/G: row1 "GRUPO" mergeado horizontal; row2 "D"/"N"
-        //   - P/Q: row1 "PRODUCTO (TN)" mergeado horizontal; row2 "A"/"B"
-        //   - Resto de columnas: row1 con el nombre, mergeado verticalmente con row2
         HSSFRow rh1 = sheet.createRow(HEADER_ROW1);
         HSSFRow rh2 = sheet.createRow(HEADER_ROW2);
-        // Alto de cabecera: 28 puntos (~37 px), igual al Excel manual original
-        rh1.setHeightInPoints(28f);
-        rh2.setHeightInPoints(28f);
+        rh1.setHeightInPoints(32f);
+        rh2.setHeightInPoints(32f);
 
-        // Columnas con merge vertical (rh1 + rh2 misma columna)
-        putHeader(sheet, rh1, rh2, COL_FECHA,       "FECHA",                          s.header);
-        putHeader(sheet, rh1, rh2, COL_DIA,         "DIA",                            s.header);
-        putHeader(sheet, rh1, rh2, COL_ULEX_DISP,   "ULEX DISPONIBLE",                s.header);
-        putHeader(sheet, rh1, rh2, COL_CONSUMO,     "CONSUMO MATERIA PRIMA ULEX (TN)",s.header);
-        putHeader(sheet, rh1, rh2, COL_DILUYENTE,   "Diluyente añadido (TN)",         s.header);
+        putHeader(sheet, rh1, rh2, COL_FECHA,       "FECHA",                              s.header);
+        putHeader(sheet, rh1, rh2, COL_DIA,         "DIA",                                s.header);
+        putHeader(sheet, rh1, rh2, COL_INGRESO,     "INGRESO MATERIA PRIMA ULEX (TN)",    s.header);
+        putHeader(sheet, rh1, rh2, COL_ULEX_DISP,   "ULEX DISPONIBLE (TN)",               s.header);
+        putHeader(sheet, rh1, rh2, COL_CONSUMO,     "CONSUMO MATERIA PRIMA ULEX (TN)",    s.header);
+        putHeader(sheet, rh1, rh2, COL_DILUYENTE,   "Diluyente añadido (TN)",             s.header);
         putHeader(sheet, rh1, rh2, COL_BENT_PCT,    "Proporcion bentonita en el diluyente %", s.header);
         putHeader(sheet, rh1, rh2, COL_CAOL_PCT,    "Proporcion caolin en el diluyente %", s.header);
-        putHeader(sheet, rh1, rh2, COL_REPROC_IN,   "Consumo Reproceso (TN)",         s.header);
-        putHeader(sheet, rh1, rh2, COL_LEY_MP_BENT, "Ley MP con bentonita",           s.header);
-        putHeader(sheet, rh1, rh2, COL_LEY_RECALC,  "Ley MP recalculada",             s.header);
-        putHeader(sheet, rh1, rh2, COL_LEY_PT,      "Ley PT",                         s.header);
-        putHeader(sheet, rh1, rh2, COL_GRANULADO,   "PRODUCTO GRANULADO (TN)",        s.header);
-        putHeader(sheet, rh1, rh2, COL_PT_BUENO,    "PT TOTAL BUENO (TN)",            s.header);
-        putHeader(sheet, rh1, rh2, COL_REPROC_OUT,  "REPROCESO final (TN)",           s.header);
-        putHeader(sheet, rh1, rh2, COL_KPM_BENT,    "Kpm bentonita",                  s.header);
-        putHeader(sheet, rh1, rh2, COL_KPM_MERMA,   "Kpm merma",                      s.header);
-        putHeader(sheet, rh1, rh2, COL_KPA,         "Kpa",                            s.header);
-        putHeader(sheet, rh1, rh2, COL_MERMA,       "MERMA (TN)",                     s.header);
-        putHeader(sheet, rh1, rh2, COL_MERMA_PCT,   "% MERMA",                        s.header);
-        putHeader(sheet, rh1, rh2, COL_OBS,         "OBSERVACIONES",                  s.header);
+        putHeader(sheet, rh1, rh2, COL_REPROC_IN,   "Consumo Reproceso (TN)",             s.header);
+        putHeader(sheet, rh1, rh2, COL_LEY_MP_BENT, "Ley MP con bentonita",               s.header);
+        putHeader(sheet, rh1, rh2, COL_LEY_RECALC,  "Ley MP recalculada",                 s.header);
+        putHeader(sheet, rh1, rh2, COL_LEY_PT,      "Ley PT",                             s.header);
+        putHeader(sheet, rh1, rh2, COL_GRANULADO,   "PRODUCTO GRANULADO (TN)",            s.header);
+        putHeader(sheet, rh1, rh2, COL_PT_BUENO,    "PT TOTAL BUENO (TN)",                s.header);
+        putHeader(sheet, rh1, rh2, COL_DESPACHO,    "DESPACHO (TN)",                      s.header);
+        putHeader(sheet, rh1, rh2, COL_SALDO,       "SALDO (TN)",                         s.header);
+        putHeader(sheet, rh1, rh2, COL_REPROC_OUT,  "REPROCESO final (TN)",               s.header);
+        putHeader(sheet, rh1, rh2, COL_KPM_BENT,    "Kpm bentonita",                      s.header);
+        putHeader(sheet, rh1, rh2, COL_KPM_MERMA,   "Kpm merma",                          s.header);
+        putHeader(sheet, rh1, rh2, COL_KPA,         "Kpa",                                s.header);
+        putHeader(sheet, rh1, rh2, COL_MERMA,       "MERMA (TN)",                         s.header);
+        putHeader(sheet, rh1, rh2, COL_MERMA_PCT,   "% MERMA",                            s.header);
+        putHeader(sheet, rh1, rh2, COL_OBS,         "OBSERVACIONES",                      s.header);
 
-        // GRUPO: row1 mergeado F-G, row2 separadas D/N
+        // GRUPO: row1 mergeado D-N, row2 separadas D/N
         setText(rh1, COL_GRUPO_D, "GRUPO", s.header);
         setText(rh1, COL_GRUPO_N, null, s.header);
         sheet.addMergedRegion(new CellRangeAddress(HEADER_ROW1, HEADER_ROW1, COL_GRUPO_D, COL_GRUPO_N));
         setText(rh2, COL_GRUPO_D, "D", s.header);
         setText(rh2, COL_GRUPO_N, "N", s.header);
 
-        // PRODUCTO (TN): row1 mergeado P-Q, row2 separadas A/B
+        // PRODUCTO (TN): row1 mergeado A-B, row2 separadas A/B
         setText(rh1, COL_PT_A, "PRODUCTO (TN)", s.header);
         setText(rh1, COL_PT_B, null, s.header);
         sheet.addMergedRegion(new CellRangeAddress(HEADER_ROW1, HEADER_ROW1, COL_PT_A, COL_PT_B));
         setText(rh2, COL_PT_A, "A", s.header);
         setText(rh2, COL_PT_B, "B", s.header);
 
-        // Fila SALDO: etiqueta en col B, resto vacio pero con borde en toda la fila
-        HSSFRow rs = sheet.createRow(SALDO_ROW);
-        setText(rs, COL_FECHA, "SALDO", s.header);
-        for (int col = COL_DIA; col <= LAST_COL; col++) {
-            setText(rs, col, null, s.body);
-        }
-
-        // Pin del encabezado al hacer scroll vertical
         sheet.createFreezePane(0, DATA_START_ROW);
     }
 
-    /** Escribe un header con merge vertical (rh1+rh2 misma columna). */
     private static void putHeader(HSSFSheet sheet, HSSFRow rh1, HSSFRow rh2, int col,
                                   String value, HSSFCellStyle style) {
         setText(rh1, col, value, style);
@@ -240,25 +305,28 @@ public class UlexitaDailyReportAction {
         sheet.addMergedRegion(new CellRangeAddress(HEADER_ROW1, HEADER_ROW2, col, col));
     }
 
-    // ------------------------------------------------------------------ filas de datos
+    // ------------------------------------------------------------------ filas
 
-    private void writeDataRow(HSSFSheet sheet, int rowIdx, XProduction p, XProductionUlexita u,
-                              XProductionUlexitaCalc calc, Styles s) {
-        HSSFRow row = sheet.createRow(rowIdx);
-        SimpleDateFormat fmt = new SimpleDateFormat("dd-MMM");
-        setText(row, COL_FECHA, fmt.format(p.getInitDate()), s.body);
-        setText(row, COL_DIA, calc.getDia(), s.bodyCenter);
-
-        BigDecimal ulexDisp = (p.isApproved() && u != null) ? u.getUlexDisponibleSnap() : null;
+    /** Celdas comunes (flujos de MP/PT, fecha, dia, observaciones). */
+    private void writeFlowCells(HSSFRow row, Styles s, String fecha, String dia,
+                                BigDecimal ingreso, BigDecimal ulexDisp,
+                                BigDecimal despacho, BigDecimal saldoPt, String obs) {
+        setText(row, COL_FECHA, fecha, s.body);
+        setText(row, COL_DIA, dia, s.bodyCenter);
+        if (!isZero(ingreso)) setNumber(row, COL_INGRESO, ingreso, s.body); else setText(row, COL_INGRESO, null, s.body);
         setNumber(row, COL_ULEX_DISP, ulexDisp, s.body);
+        if (!isZero(despacho)) setNumber(row, COL_DESPACHO, despacho, s.body); else setText(row, COL_DESPACHO, null, s.body);
+        setNumber(row, COL_SALDO, saldoPt, s.body);
+        setText(row, COL_OBS, obs, s.obsLeft);
+    }
 
+    /** Columnas de proceso (calc por orden). */
+    private void writeProcessCells(HSSFRow row, Styles s, XProduction p, XProductionUlexita u, XProductionUlexitaCalc calc) {
         BigDecimal consumoCalc = (p.isApproved() && u != null && u.getConsumoMpCalcSnap() != null)
                 ? u.getConsumoMpCalcSnap() : calc.getConsumoMpCalc();
         setNumber(row, COL_CONSUMO, consumoCalc, s.body);
-
         setText(row, COL_GRUPO_D, calc.isShiftDay() ? "X" : "", s.bodyCenter);
         setText(row, COL_GRUPO_N, calc.isShiftNight() ? "X" : "", s.bodyCenter);
-
         setNumber(row, COL_DILUYENTE,   calc.getDiluyenteTotal(),  s.body);
         setNumber(row, COL_BENT_PCT,    calc.getBentonitaPct(),    s.body);
         setNumber(row, COL_CAOL_PCT,    calc.getCaolinPct(),       s.body);
@@ -276,17 +344,20 @@ public class UlexitaDailyReportAction {
         setNumber(row, COL_KPA,         calc.getKpa(),             s.body);
         setNumber(row, COL_MERMA,       calc.getMerma(),           s.body);
         setNumber(row, COL_MERMA_PCT,   calc.getMermaPct(),        s.bodyPct);
-
-        if (p.getObservation() != null) {
-            setText(row, COL_OBS, p.getObservation(), s.body);
-        }
     }
 
-    private void accumulate(BigDecimal[] totals, XProduction p, XProductionUlexita u, XProductionUlexitaCalc calc) {
-        addToTotals(totals, COL_ULEX_DISP, (p.isApproved() && u != null) ? u.getUlexDisponibleSnap() : null);
-        addToTotals(totals, COL_CONSUMO,
-                (p.isApproved() && u != null && u.getConsumoMpCalcSnap() != null)
-                        ? u.getConsumoMpCalcSnap() : calc.getConsumoMpCalc());
+    /** Columnas de proceso vacias (dia sin orden), con borde. */
+    private void blankProcessCells(HSSFRow row, Styles s) {
+        for (int col = COL_CONSUMO; col <= COL_PT_BUENO; col++) setText(row, col, null, s.body);
+        for (int col = COL_REPROC_OUT; col <= COL_MERMA_PCT; col++) setText(row, col, null, s.body);
+    }
+
+    private void addTotals(BigDecimal[] totals, BigDecimal ingreso, BigDecimal despacho,
+                           XProductionUlexita u, XProductionUlexitaCalc calc) {
+        addToTotals(totals, COL_INGRESO, ingreso);
+        addToTotals(totals, COL_DESPACHO, despacho);
+        if (calc == null) return;
+        addToTotals(totals, COL_CONSUMO,    calc.getConsumoMpCalc());
         addToTotals(totals, COL_DILUYENTE,  calc.getDiluyenteTotal());
         addToTotals(totals, COL_REPROC_IN,  u != null ? u.getConsumoReprocesoTn() : null);
         addToTotals(totals, COL_GRANULADO,  u != null ? u.getProductoGranuladoTn() : null);
@@ -297,24 +368,116 @@ public class UlexitaDailyReportAction {
         addToTotals(totals, COL_MERMA,      calc.getMerma());
     }
 
-    private void writeTotalsRow(HSSFSheet sheet, int rowIdx, BigDecimal[] totals, Styles s) {
-        HSSFRow row = sheet.createRow(rowIdx);
-        // Etiqueta "TOTAL MES:" mergeada en B-C
-        setText(row, COL_FECHA, "TOTAL MES:", s.totalsLabel);
-        setText(row, COL_DIA, null, s.totalsLabel);
-        sheet.addMergedRegion(new CellRangeAddress(rowIdx, rowIdx, COL_FECHA, COL_DIA));
-        // Recorrer todas las columnas para asegurar que cada celda tenga borde,
-        // tanto las que tienen suma como las vacias (calculadas).
-        for (int col = COL_ULEX_DISP; col <= LAST_COL; col++) {
-            if (totals[col] != null) {
-                setNumber(row, col, totals[col], s.totals);
-            } else {
-                setText(row, col, null, s.totals);
+    // ------------------------------------------------------------------ derivacion
+
+    private String deriveDefaultInputCod(List<XProduction> orders) {
+        for (XProduction p : orders) {
+            for (XSupply sup : p.getSupplyList()) {
+                if (sup.hasFormula() && Boolean.TRUE.equals(sup.getFormulationInput().getInputDefault())) {
+                    return sup.getProductItemCode();
+                }
             }
         }
+        return null;
+    }
+
+    private Set<String> derivePtCods(List<XProduction> orders) {
+        Set<String> set = new LinkedHashSet<String>();
+        for (XProduction p : orders) {
+            for (com.encens.khipus.model.xproduction.XProductionProduct pr : p.getProductionProductList()) {
+                if (pr.getProductItemCode() != null) set.add(pr.getProductItemCode());
+            }
+        }
+        return set;
+    }
+
+    /** Consumo de MP (KG) de la orden: suma de insumos cuyo cod_art = mpCod. */
+    private BigDecimal usoMpQty(XProduction p, String mpCod) {
+        BigDecimal q = BigDecimal.ZERO;
+        if (mpCod == null) return q;
+        for (XSupply sup : p.getSupplyList()) {
+            if (mpCod.equals(sup.getProductItemCode()) && sup.getQuantity() != null) {
+                q = BigDecimalUtil.sum(q, sup.getQuantity(), 6);
+            }
+        }
+        return q;
     }
 
     // ------------------------------------------------------------------ helpers
+
+    private static BigDecimal tn(BigDecimal kg) {
+        if (kg == null) return BigDecimal.ZERO;
+        return BigDecimalUtil.divide(kg, THOUSAND, 6);
+    }
+
+    private static BigDecimal nz(BigDecimal v) { return v == null ? BigDecimal.ZERO : v; }
+
+    private static boolean isZero(BigDecimal v) { return v == null || v.compareTo(BigDecimal.ZERO) == 0; }
+
+    private static Map<Integer, BigDecimal> bucketByDay(List<Object[]> rows) {
+        Map<Integer, BigDecimal> map = new HashMap<Integer, BigDecimal>();
+        for (Object[] r : rows) {
+            if (r[0] == null || r[1] == null) continue;
+            Calendar cc = Calendar.getInstance();
+            cc.setTime((Date) r[0]);
+            int day = cc.get(Calendar.DAY_OF_MONTH);
+            BigDecimal prev = map.get(day);
+            map.put(day, prev == null ? (BigDecimal) r[1] : prev.add((BigDecimal) r[1]));
+        }
+        return map;
+    }
+
+    private static void addToTotals(BigDecimal[] totals, int col, BigDecimal value) {
+        if (value == null) return;
+        totals[col] = (totals[col] == null) ? value : totals[col].add(value);
+    }
+
+    private int columnWidthFor(int col) {
+        switch (col) {
+            case 0:               return 915;   // A margen
+            case COL_FECHA:       return 2400;  // FECHA
+            case COL_DIA:         return 1000;  // DIA
+            case COL_GRUPO_D:
+            case COL_GRUPO_N:     return 1100;  // GRUPO D/N
+            case COL_OBS:         return 9000;  // OBSERVACIONES
+            case COL_GRANULADO:   return pxWidth(92);  // PRODUCTO GRANULADO (TN)
+            case COL_REPROC_OUT:  return pxWidth(88);  // REPROCESO final (TN)
+            case COL_INGRESO:
+            case COL_ULEX_DISP:
+            case COL_CONSUMO:
+            case COL_DESPACHO:
+            case COL_SALDO:       return 3328;
+            default:              return 2800;
+        }
+    }
+
+    /** Convierte pixeles a unidades POI: poiUnits = (px - 5) * 256 / 7. */
+    private static int pxWidth(int px) {
+        return (int) Math.round((px - 5) * 256.0 / 7.0);
+    }
+
+    private static String safeUpper(String s) { return s == null ? "" : s.toUpperCase(); }
+
+    private static String dayLetter(Date d) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        switch (c.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.MONDAY:    return "L";
+            case Calendar.TUESDAY:   return "M";
+            case Calendar.WEDNESDAY: return "M";
+            case Calendar.THURSDAY:  return "J";
+            case Calendar.FRIDAY:    return "V";
+            case Calendar.SATURDAY:  return "S";
+            case Calendar.SUNDAY:    return "D";
+            default: return "";
+        }
+    }
+
+    private static String monthName(int m) {
+        String[] n = {"Enero","Febrero","Marzo","Abril","Mayo","Junio",
+                      "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"};
+        return (m >= 1 && m <= 12) ? n[m - 1] : "";
+    }
 
     private static void setText(HSSFRow row, int col, String value, HSSFCellStyle style) {
         HSSFCell cell = row.createCell(col);
@@ -324,56 +487,8 @@ public class UlexitaDailyReportAction {
 
     private static void setNumber(HSSFRow row, int col, BigDecimal value, HSSFCellStyle style) {
         HSSFCell cell = row.createCell(col);
-        if (value != null) {
-            cell.setCellValue(value.doubleValue());
-        }
+        if (value != null) cell.setCellValue(value.doubleValue());
         if (style != null) cell.setCellStyle(style);
-    }
-
-    private static void addToTotals(BigDecimal[] totals, int col, BigDecimal value) {
-        if (value == null) return;
-        totals[col] = (totals[col] == null) ? value : totals[col].add(value);
-    }
-
-    private int columnWidthFor(int col) {
-        // POI usa unidades de 1/256 de char-width.
-        // Conversion px -> POI: poiUnits ≈ (px - 5) * 256 / 7
-        //   25 px ≈ 915,  30 px ≈ 914,  75 px ≈ 2560,  96 px ≈ 3328
-        switch (col) {
-            case 0:                                                   return 915;   // A — margen, 25 px
-            case COL_FECHA:                                           return 2400;  // B — FECHA
-            case COL_DIA:                                             return 1200;  // C — DIA
-            case COL_ULEX_DISP:                                                     // D
-            case COL_CONSUMO:                                                       // E
-            case COL_DILUYENTE:                                                     // H
-            case COL_BENT_PCT:                                                      // I
-            case COL_CAOL_PCT:                                                      // J
-            case COL_REPROC_IN:                                                     // K
-            case COL_LEY_MP_BENT:                                                   // L
-            case COL_LEY_RECALC:    return 3328;                                    // M — 96 px
-            case COL_GRUPO_D:                                                       // F
-            case COL_GRUPO_N:       return 1100;                                    // G — 30 px
-            case COL_LEY_PT:                                                        // N
-            case COL_PT_A:                                                          // P
-            case COL_PT_B:                                                          // Q
-            case COL_KPM_BENT:                                                      // T
-            case COL_KPM_MERMA:                                                     // U
-            case COL_KPA:                                                           // V
-            case COL_MERMA:                                                         // W
-            case COL_MERMA_PCT:     return 2560;                                    // X — 75 px
-            case COL_OBS:           return 8000;                                    // Y — Observaciones
-            default:                return 3600;                                    // O, R, S — defaults
-        }
-    }
-
-    private static String safeUpper(String s) {
-        return s == null ? "" : s.toUpperCase();
-    }
-
-    private static String monthName(int m) {
-        String[] n = {"Enero","Febrero","Marzo","Abril","Mayo","Junio",
-                      "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"};
-        return (m >= 1 && m <= 12) ? n[m - 1] : "";
     }
 
     private void sendResponse(HSSFWorkbook wb) throws Exception {
@@ -397,21 +512,17 @@ public class UlexitaDailyReportAction {
     // ------------------------------------------------------------------ estilos
 
     private static class Styles {
-        HSSFCellStyle title;
-        HSSFCellStyle header;
-        HSSFCellStyle body, bodyCenter, bodyPct;
-        HSSFCellStyle totals, totalsLabel;
+        HSSFCellStyle title, header, body, bodyCenter, bodyPct, obsLeft, totals, totalsLabel;
     }
 
     private Styles buildStyles(HSSFWorkbook wb) {
         Styles s = new Styles();
         HSSFDataFormat fmt = wb.createDataFormat();
-        short num2 = fmt.getFormat("#,##0.00");   // todos los numericos a 2 decimales
-        short pct  = fmt.getFormat("0.00%");      // % tambien a 2 decimales
+        short num2 = fmt.getFormat("#,##0.00");
+        short pct = fmt.getFormat("0.00%");
 
         HSSFFont bold = wb.createFont();
         bold.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-
         HSSFFont titleFont = wb.createFont();
         titleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
         titleFont.setFontHeightInPoints((short) 14);
@@ -420,7 +531,6 @@ public class UlexitaDailyReportAction {
         s.title.setFont(titleFont);
         s.title.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
-        // Header sin color de fondo, bordes finos, alineado centro, wrap text
         s.header = wb.createCellStyle();
         s.header.setFont(bold);
         s.header.setAlignment(HSSFCellStyle.ALIGN_CENTER);
@@ -428,24 +538,25 @@ public class UlexitaDailyReportAction {
         s.header.setWrapText(true);
         applyBorders(s.header);
 
-        // Body numerico (2 decimales, alineado derecha)
         s.body = wb.createCellStyle();
         s.body.setDataFormat(num2);
         s.body.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
         applyBorders(s.body);
 
-        // Body texto centrado (DIA, GRUPO D/N)
         s.bodyCenter = wb.createCellStyle();
         s.bodyCenter.setAlignment(HSSFCellStyle.ALIGN_CENTER);
         applyBorders(s.bodyCenter);
 
-        // Body porcentaje (2 decimales)
         s.bodyPct = wb.createCellStyle();
         s.bodyPct.setDataFormat(pct);
         s.bodyPct.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
         applyBorders(s.bodyPct);
 
-        // Totales: bold, sin color de fondo (solo bordes y bold para distinguir)
+        s.obsLeft = wb.createCellStyle();
+        s.obsLeft.setAlignment(HSSFCellStyle.ALIGN_LEFT);
+        s.obsLeft.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        applyBorders(s.obsLeft);
+
         s.totals = wb.createCellStyle();
         s.totals.setDataFormat(num2);
         s.totals.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
@@ -477,7 +588,4 @@ public class UlexitaDailyReportAction {
 
     public ProductionLine getProductionLine() { return productionLine; }
     public void setProductionLine(ProductionLine productionLine) { this.productionLine = productionLine; }
-
-    public boolean isShowEmptyDays() { return showEmptyDays; }
-    public void setShowEmptyDays(boolean showEmptyDays) { this.showEmptyDays = showEmptyDays; }
 }

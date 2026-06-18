@@ -384,27 +384,78 @@
 
                     <c:if test="#{xproductionAction.managed}">
                         <rich:spacer height="6"/>
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                            <tr>
-                                <td valign="top" style="width:110px; padding-top:6px; text-align:right; padding-right:8px;">
-                                    <h:outputText value="#{messages['XProduction.observation']}"/>
-                                </td>
-                                <td valign="top">
-                                    <h:inputTextarea id="observation"
-                                                     value="#{xproduction.observation}"
-                                                     required="false"
-                                                     readonly="#{xproductionAction.approved}"
-                                                     style="width:100%; height:48px; box-sizing:border-box; line-height:18px;"
-                                                     rows="2"
-                                                     tabindex="5">
-                                        <f:validateLength maximum="500"/>
-                                    </h:inputTextarea>
-                                </td>
-                            </tr>
-                        </table>
+                        <rich:panel>
+                            <s:decorate id="ulexObsField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['XProduction.observation']}</ui:define>
+                                <h:inputTextarea id="observation"
+                                                 value="#{xproduction.observation}"
+                                                 required="false"
+                                                 readonly="#{xproductionAction.approved}"
+                                                 style="width:180%; height:26px;" rows="1"
+                                                 tabindex="5">
+                                    <f:validateLength maximum="500"/>
+                                </h:inputTextarea>
+                            </s:decorate>
+                        </rich:panel>
                     </c:if>
                 </c:if>
                 </s:div>
+
+                <s:div id="baritinaCalcPanel">
+                <c:if test="#{xproductionAction.baritinaTemplate}">
+                    <rich:panel styleClass="ulexCalcHeaderPanel">
+                        <f:facet name="header">#{messages['XProduction.baritina.section.summary']}</f:facet>
+                        <h:panelGrid columns="4" width="100%" cellpadding="3" cellspacing="0" border="0"
+                                     style="background-color:#f0f0f0;"
+                                     columnClasses="ulexCalcLabel,ulexCalcVal,ulexCalcLabel,ulexCalcVal">
+
+                            <h:outputText value="#{messages['XProduction.baritina.mpUsed']}"/>
+                            <h:outputText value="#{xproductionAction.baritinaMpUsed}" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                            <h:outputText value="#{messages['XProduction.baritina.ptProduced']}"/>
+                            <h:outputText value="#{xproductionAction.baritinaPtProduced}" styleClass="right">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+
+                            <h:outputText value="#{messages['XProduction.baritina.pctTotal']}"/>
+                            <h:outputText value="#{xproductionAction.baritinaZonaPctTotal}" styleClass="right"
+                                          style="color: #{xproductionAction.baritinaZonaPctComplete ? '#35B056' : 'red'}; font-weight:bold;">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                            <h:outputText value=""/>
+                            <h:outputText value=""/>
+
+                        </h:panelGrid>
+                    </rich:panel>
+                </c:if>
+                </s:div>
+
+                <c:if test="#{xproductionAction.baritinaTemplate}">
+                    <s:div id="baritinaExtraPanel" style="margin-top:6px;">
+                        <rich:panel>
+                            <f:facet name="header">#{messages['XProduction.baritina.section.extra']}</f:facet>
+
+                            <s:decorate id="baritinaShiftsField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['XProduction.baritina.shifts']}</ui:define>
+                                <rich:inputNumberSpinner id="baritinaShifts"
+                                                         value="#{xproductionAction.baritinaData.turnos}"
+                                                         minValue="0" maxValue="99" step="1"
+                                                         styleClass="inputSmall right"
+                                                         disabled="#{xproductionAction.approved}"/>
+                            </s:decorate>
+
+                            <s:decorate id="baritinaObsField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['XProduction.baritina.observation']}</ui:define>
+                                <h:inputTextarea id="baritinaObs" value="#{xproductionAction.baritinaData.observacion}"
+                                                 readonly="#{xproductionAction.approved}"
+                                                 style="width:180%; height:26px;" rows="1">
+                                    <f:validateLength maximum="500"/>
+                                </h:inputTextarea>
+                            </s:decorate>
+                        </rich:panel>
+                    </s:div>
+                </c:if>
 
                 <rich:spacer height="10" />
 
@@ -479,7 +530,10 @@
                                     <app:realNumberConverter minimum="0"
                                                              pattern="#{messages['patterns.decimal4FNumber']}"
                                                              forId="#{quantityInputFieldId}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ingredientPanel, totalCostField, totalRawMaterialField" />
+                                    <a4j:support event="onblur" ajaxSingle="true"
+                                                 action="#{xproductionAction.recalcBaritinaZonas}"
+                                                 rendered="#{!xproductionAction.approved}"
+                                                 reRender="ingredientPanel, totalCostField, totalRawMaterialField#{xproductionAction.baritinaTemplate ? ', baritinaCalcPanel, baritinaZonaPanel' : ''}" />
                                 </h:inputText>
                                 <h:message for="#{quantityInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
                             </td>
@@ -765,6 +819,111 @@
     <rich:spacer height="10" />
     </c:if>
 
+    <c:if test="#{xproductionAction.baritinaTemplate}">
+    <rich:tabPanel selectedTab="baritinaDataTab">
+        <rich:tab name="baritinaDataTab" label="#{messages['XProduction.tab.baritinaData']}">
+            <s:div id="baritinaPanel" style="padding:8px;">
+
+                <!-- Distribucion del uso de materia prima por zona productiva -->
+                <rich:simpleTogglePanel switchType="client" opened="true"
+                                        label="#{messages['XProduction.baritina.section.zones']}">
+
+                    <div class="buttons">
+                        <a4j:commandButton id="addBaritinaZonaButton"
+                                           value="#{messages['XProduction.baritina.addZone']}"
+                                           action="#{xproductionAction.addBaritinaZona}"
+                                           styleClass="button"
+                                           ajaxSingle="true"
+                                           immediate="true"
+                                           rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                                           reRender="baritinaZonaPanel"/>
+                    </div>
+
+                    <s:div id="baritinaZonaPanel">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                            <thead class="rich-table-thead">
+                            <tr class="rich-table-header">
+                                <th class="rich-table-headercell" width="50%">#{messages['XProduction.baritina.zone']}</th>
+                                <th class="rich-table-headercell" width="20%">#{messages['XProduction.baritina.pct']}</th>
+                                <th class="rich-table-headercell" width="25%">#{messages['XProduction.baritina.quantity']}</th>
+                                <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
+                            </tr>
+                            </thead>
+                            <c:forEach var="zonaDetail" items="#{xproductionAction.baritinaZonaList}" varStatus="row">
+                                <c:set var="zonaSelectFieldId" value="zonaSelectField_#{row.index}"/>
+                                <c:set var="zonaPctFieldId" value="zonaPctField_#{row.index}"/>
+
+                                <tr class="rich-table-row">
+                                    <td class="rich-table-cell center">
+                                        <h:selectOneMenu id="#{zonaSelectFieldId}"
+                                                         value="#{zonaDetail.productiveZone}"
+                                                         styleClass="input250"
+                                                         disabled="#{xproductionAction.approved}">
+                                            <s:selectItems value="#{xproductiveZoneList}"
+                                                           var="zone"
+                                                           label="#{zone.fullName}"
+                                                           noSelectionLabel=""
+                                                           hideNoSelectionLabel="false"/>
+                                            <s:convertEntity/>
+                                            <a4j:support event="onchange" ajaxSingle="true"
+                                                         rendered="#{!xproductionAction.approved}"/>
+                                        </h:selectOneMenu>
+                                    </td>
+                                    <td class="rich-table-cell center">
+                                        <h:inputText id="#{zonaPctFieldId}"
+                                                     value="#{zonaDetail.porcentaje}"
+                                                     readonly="#{xproductionAction.approved}"
+                                                     styleClass="inputSmall right">
+                                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                                     forId="#{zonaPctFieldId}" minimum="0" maximum="100"/>
+                                            <a4j:support event="onblur" ajaxSingle="true"
+                                                         action="#{xproductionAction.recalcBaritinaZonas}"
+                                                         rendered="#{!xproductionAction.approved}"
+                                                         reRender="baritinaZonaPanel, baritinaCalcPanel"/>
+                                        </h:inputText>
+                                    </td>
+                                    <td class="rich-table-cell center">
+                                        <h:inputText value="#{zonaDetail.cantidadTn}"
+                                                     readonly="true"
+                                                     styleClass="inputSmall right">
+                                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                        </h:inputText>
+                                    </td>
+                                    <td class="rich-table-cell center">
+                                        <a4j:commandLink immediate="true"
+                                                         title="#{messages['Common.remove']}"
+                                                         action="#{xproductionAction.removeBaritinaZona(zonaDetail)}"
+                                                         ajaxSingle="true"
+                                                         rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                                                         reRender="baritinaZonaPanel, baritinaCalcPanel">
+                                            <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                        </a4j:commandLink>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                            <tr class="rich-table-row" style="font-weight:bold; background-color:#f0f0f0;">
+                                <td class="rich-table-cell right">#{messages['XProduction.baritina.pctTotal']}</td>
+                                <td class="rich-table-cell center"
+                                    style="color: #{xproductionAction.baritinaZonaPctComplete ? '#35B056' : 'red'};">
+                                    <h:outputText value="#{xproductionAction.baritinaZonaPctTotal}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </td>
+                                <td class="rich-table-cell"></td>
+                                <td class="rich-table-cell"></td>
+                            </tr>
+                        </table>
+                    </s:div>
+
+                </rich:simpleTogglePanel>
+
+            </s:div>
+        </rich:tab>
+    </rich:tabPanel>
+
+    <rich:spacer height="10" />
+    </c:if>
+
     <rich:tabPanel id="finalProductPanel" switchType="ajax" selectedTab="#{xproductionAction.activeTabName}">
         <rich:tab name="productsTab" label="#{messages['Production.products']}" action="#{xproductionAction.enableProductsTab}" ajaxSingle="true" immediate="true">
             <s:div id="finalProductList">
@@ -797,7 +956,7 @@
                                      rendered="#{xproductionAction.pending}">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                      minimum="0" forId="qtyInput"/>
-                            <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="finalProductList"/>
+                            <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="finalProductList#{xproductionAction.baritinaTemplate ? ', baritinaCalcPanel' : ''}"/>
                         </h:inputText>
                         <h:outputText value="#{product.quantity}" rendered="#{xproductionAction.approved}">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />

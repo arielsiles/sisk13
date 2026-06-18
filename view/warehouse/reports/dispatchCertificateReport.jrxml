@@ -385,7 +385,7 @@
                 <textElement textAlignment="Center"><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["TARA"]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.###" isBlankWhenNull="true">
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement x="266" y="165" width="128" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement textAlignment="Center"><font fontName="Arial" size="8"/></textElement>
@@ -405,7 +405,7 @@
                 <textElement textAlignment="Center"><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["BRUTO"]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.###" isBlankWhenNull="true">
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement x="266" y="178" width="128" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement textAlignment="Center"><font fontName="Arial" size="8"/></textElement>
@@ -425,7 +425,7 @@
                 <textElement textAlignment="Center"><font fontName="Arial" size="8"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["NETO"]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" pattern="#,##0.###" isBlankWhenNull="true">
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement x="266" y="191" width="128" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement textAlignment="Center"><font fontName="Arial" size="8"/></textElement>
@@ -445,11 +445,11 @@
                 <textElement textAlignment="Center"><font fontName="Arial" size="8" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["PESO NETO CARGA"]]></textFieldExpression>
             </textField>
-            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+            <textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
                 <reportElement x="266" y="204" width="128" height="13" positionType="Float"/>
                 <box padding="2"><pen lineWidth="0.25"/></box>
                 <textElement textAlignment="Center"><font fontName="Arial" size="8" isBold="true"/></textElement>
-                <textFieldExpression class="java.lang.String"><![CDATA[$P{netWeightTons} != null ? $P{netWeightTons}.toString() : ""]]></textFieldExpression>
+                <textFieldExpression class="java.math.BigDecimal"><![CDATA[$P{netWeightTons}]]></textFieldExpression>
             </textField>
             <textField isStretchWithOverflow="true">
                 <reportElement x="394" y="204" width="138" height="13" positionType="Float"/>

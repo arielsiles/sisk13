@@ -631,6 +631,32 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
         return result;
     }
 
+    /**
+     * True si el plan esta vacio: sin productos (lista en edicion) y sin ordenes
+     * de produccion asociadas. Solo en ese caso se permite borrarlo.
+     */
+    public boolean isEmptyPlan() {
+        if (!isManaged() || getInstance() == null) return false;
+        boolean noProducts = (productList == null || productList.isEmpty());
+        boolean noProductions = (getInstance().getProductionList() == null
+                || getInstance().getProductionList().isEmpty());
+        return noProducts && noProductions;
+    }
+
+    /**
+     * Elimina el plan solo si esta vacio (sin productos ni ordenes). Guarda de
+     * seguridad ademas del render condicional del boton.
+     */
+    @Override
+    @End(ifOutcome = Outcome.SUCCESS)
+    public String delete() {
+        if (!isEmptyPlan()) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "ProductionPlan.message.notEmpty");
+            return Outcome.REDISPLAY;
+        }
+        return super.delete();
+    }
+
     public BigDecimal getDestinedMilk(Production production){
 
         BigDecimal result = BigDecimal.ZERO;

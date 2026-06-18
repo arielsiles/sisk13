@@ -306,6 +306,11 @@
                 <textElement textAlignment="Center"><font fontName="Arial" size="9" isBold="true"/></textElement>
                 <textFieldExpression class="java.lang.String"><![CDATA["CONDUCTOR / TRANSPORTISTA"]]></textFieldExpression>
             </textField>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement x="266" y="312" width="266" height="12" positionType="Float"/>
+                <textElement textAlignment="Center"><font fontName="Arial" size="9"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA[$P{driverPhone} != null && $P{driverPhone}.length() > 0 ? "CEL.: " + $P{driverPhone} : null]]></textFieldExpression>
+            </textField>
 
             <!-- RECIBI CONFORME (label, abajo) -->
             <textField isStretchWithOverflow="true">
