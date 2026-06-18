@@ -88,3 +88,20 @@ SET @sql := IF(@col_exists > 0,
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+
+-- ----------------------------------------------------------------------------
+-- 4) Permiso propio para "Reporte Produccion Diaria"
+--    Hasta ahora el menu Produccion > Reportes > Reporte Produccion Diaria se
+--    mostraba con el permiso generico PRODUCTION:VIEW (compartido con las
+--    ordenes de produccion). Se le da su propia funcionalidad para poder
+--    habilitarlo/ocultarlo por rol de forma independiente, igual que
+--    PRODUCTION_INPUTS_REPORT (id 315).
+--      idmodulo = 11 (xproduction) ; permiso bitmask = VIEW(1)
+--      resourceKey = menu.xproduction.dailyProductionReport
+--    Orden de columnas igual a las demas altas de funcionalidad:
+--      (id, codigo, descripcion, idmodulo, permiso, nombrerecurso, habilitado)
+-- ----------------------------------------------------------------------------
+insert into funcionalidad
+values (474, 'PRODUCTION_DAILY_REPORT', 'Reporte de Produccion Diaria (ULEXITA/BARITINA)',
+        11, 1, 'menu.xproduction.dailyProductionReport', 1);

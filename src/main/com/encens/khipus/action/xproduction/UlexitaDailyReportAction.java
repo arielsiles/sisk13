@@ -162,10 +162,13 @@ public class UlexitaDailyReportAction {
             Styles s = buildStyles(wb);
             buildHeader(sheet, s);
 
-            // Fila SALDO ANT.
+            // Fila SALDO ANT.: etiqueta combinada B-C (totalsLabel, sin wrapText)
+            // para que el texto no agrande el alto de la fila.
             HSSFRow rs = sheet.createRow(SALDO_ROW);
-            setText(rs, COL_FECHA, "SALDO ANT.", s.header);
-            for (int col = COL_DIA; col <= LAST_COL; col++) setText(rs, col, null, s.body);
+            setText(rs, COL_FECHA, "SALDO ANT.", s.totalsLabel);
+            setText(rs, COL_DIA, null, s.totalsLabel);
+            sheet.addMergedRegion(new CellRangeAddress(SALDO_ROW, SALDO_ROW, COL_FECHA, COL_DIA));
+            for (int col = COL_INGRESO; col <= LAST_COL; col++) setText(rs, col, null, s.body);
             setNumber(rs, COL_ULEX_DISP, ulexDisp, s.body);
             setNumber(rs, COL_SALDO, saldoPt, s.body);
             setText(rs, COL_OBS, null, s.obsLeft);
@@ -180,8 +183,8 @@ public class UlexitaDailyReportAction {
                 dayCal.set(year, month - 1, d);
                 Date date = dayCal.getTime();
 
-                BigDecimal ingreso = nz(ingresoByDay.get(d));
-                BigDecimal despacho = nz(despachoByDay.get(d));
+                BigDecimal ingreso = tn(ingresoByDay.get(d));   // acopio KG -> TN
+                BigDecimal despacho = tn(despachoByDay.get(d)); // despacho KG -> TN
                 // ULEX DISP = saldo_ant + INGRESO - CONSUMO.
                 // El INGRESO (acopio) se suma una vez por dia; el CONSUMO se resta por orden.
                 ulexDisp = BigDecimalUtil.sum(ulexDisp, ingreso, 6);
@@ -437,6 +440,8 @@ public class UlexitaDailyReportAction {
             case COL_GRUPO_D:
             case COL_GRUPO_N:     return 1100;  // GRUPO D/N
             case COL_OBS:         return 9000;  // OBSERVACIONES
+            case COL_GRANULADO:   return pxWidth(92);  // PRODUCTO GRANULADO (TN)
+            case COL_REPROC_OUT:  return pxWidth(88);  // REPROCESO final (TN)
             case COL_INGRESO:
             case COL_ULEX_DISP:
             case COL_CONSUMO:
@@ -444,6 +449,11 @@ public class UlexitaDailyReportAction {
             case COL_SALDO:       return 3328;
             default:              return 2800;
         }
+    }
+
+    /** Convierte pixeles a unidades POI: poiUnits = (px - 5) * 256 / 7. */
+    private static int pxWidth(int px) {
+        return (int) Math.round((px - 5) * 256.0 / 7.0);
     }
 
     private static String safeUpper(String s) { return s == null ? "" : s.toUpperCase(); }
