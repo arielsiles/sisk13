@@ -1,5 +1,10 @@
 # Reporte Diario de Producción ULEXITA — Especificación Funcional y Técnica
 
+> **Fórmulas de cálculo:** la fuente única de las fórmulas de la orden de producción
+> (Kpa, Kpm bentonita, Kpm merma, MERMA, %MERMA, Ley MP recalculada, Consumo MP, etc.)
+> es [`xproduction_ordenes_calculos.md`](xproduction_ordenes_calculos.md). Este documento
+> describe el **reporte**; ante cualquier diferencia de fórmula, prevalece aquel.
+
 ## 1. Contexto y objetivo
 
 El módulo `xproduction` actual gestiona órdenes de producción genéricas (insumos, materiales, productos terminados, mano de obra). La planta requiere ahora capturar y reportar información específica de la **línea ULEXITA** que hoy se lleva en una planilla Excel manual ("REPORTE DIARIO DE PRODUCCION ULEXITA"). El sistema debe:
@@ -38,7 +43,7 @@ El módulo `xproduction` actual gestiona órdenes de producción genéricas (ins
 | B | FECHA | Dato | `xproduction.initDate` (existente) |
 | C | DIA | Calc | Día semana derivado de `initDate` |
 | D | ULEX DISPONIBLE | Dato | `XProductionUlexita.ulexDisponibleSnap` (snapshot al aprobar; UI muestra saldo en vivo desde inventario) |
-| E | CONSUMO MATERIA PRIMA ULEX (TN) — calc | Calc | `MERMA + Kpa × PT_TOTAL_BUENO`, snapshot al aprobar en `consumoMpCalcSnap` |
+| E | CONSUMO MATERIA PRIMA ULEX (TN) — calc | Calc | `MERMA + Kpa × PT_TOTAL_BUENO − consumo_reproceso`, snapshot al aprobar en `consumoMpCalcSnap` |
 | — | CONSUMO MATERIA PRIMA ULEX (TN) — real | Calc | `Σ xpr_insumo.cantidad WHERE cod_art = línea.codArtMpPrincipal` (columna adicional en pantalla; el Excel mantiene solo el calculado teórico) |
 | F-G | GRUPO (D/N) | Dato | `xproduction.tipoturno` (existente) |
 | H | Diluyente añadido (TN) | Dato | `XProductionUlexita.diluyenteTotalTn` si está poblado, o `Σ insumos diluyentes` |
@@ -46,7 +51,7 @@ El módulo `xproduction` actual gestiona órdenes de producción genéricas (ins
 | J | Proporción caolín % | Calc | `100 − bentonita%` |
 | K | Consumo Reproceso (TN) | Dato | `XProductionUlexita.consumoReprocesoTn` |
 | L | Ley MP con bentonita | Dato (lab) | `XProductionUlexita.leyMpBentonita` |
-| M | Ley MP recalculada | Calc | `Ley_PT / Kpm_bentonita` |
+| M | Ley MP recalculada | Calc | `Ley_PT / Kpm_merma` |
 | N | Ley PT | Dato (lab) | `XProductionUlexita.leyPt` |
 | O | PRODUCTO GRANULADO (TN) | Dato | `XProductionUlexita.productoGranuladoTn` |
 | P | PRODUCTO A (TN) | Dato | `xpr_producto.cantidad WHERE cod_art = línea.codArtPtA` |
@@ -187,8 +192,8 @@ class XProductionUlexitaCalc {
   BigDecimal    getKpmMerma();             // (Kpm_b − 1) − diluyente / (PT × mermaFactor × Kpa) + 1
   BigDecimal    getMerma();                // (Kpm_m − 1) × mermaFactor × Kpa × PT
   BigDecimal    getMermaPct();             // MERMA / (MERMA + GRANULADO)
-  BigDecimal    getLeyMpRecalc();          // ley_pt / Kpm_bentonita
-  BigDecimal    getConsumoMpCalc();        // MERMA + Kpa × PT
+  BigDecimal    getLeyMpRecalc();          // ley_pt / Kpm_merma
+  BigDecimal    getConsumoMpCalc();        // MERMA + Kpa × PT − consumo_reproceso
 }
 ```
 

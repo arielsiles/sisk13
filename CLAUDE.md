@@ -57,6 +57,10 @@ src/main/com/encens/khipus/
 - **warehouse**: Inventory management, movements
 - **purchases**: Procurement processes
 
+> **XProduction (órdenes de producción):** los cálculos de la orden por tipo de línea
+> (ULEXITA, BARITINA, General), templates y costeo están documentados en
+> `docs/xproduction_ordenes_calculos.md`.
+
 ### Configuration Files
 - **Database**: `resources/khipus-{profile}-ds.xml`
 - **Persistence**: `resources/META-INF/persistence-{profile}.xml`
