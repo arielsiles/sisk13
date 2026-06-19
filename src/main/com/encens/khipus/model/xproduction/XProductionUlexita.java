@@ -53,9 +53,6 @@ public class XProductionUlexita implements BaseModel {
     @Column(name = "bentonita_pct", precision = 8, scale = 4)
     private BigDecimal bentonitaPct;
 
-    @Column(name = "ulex_disponible_snap", precision = 14, scale = 4)
-    private BigDecimal ulexDisponibleSnap;
-
     @Column(name = "consumo_mp_calc_snap", precision = 14, scale = 4)
     private BigDecimal consumoMpCalcSnap;
 
@@ -191,14 +188,6 @@ public class XProductionUlexita implements BaseModel {
 
     public void setBentonitaPct(BigDecimal bentonitaPct) {
         this.bentonitaPct = bentonitaPct;
-    }
-
-    public BigDecimal getUlexDisponibleSnap() {
-        return ulexDisponibleSnap;
-    }
-
-    public void setUlexDisponibleSnap(BigDecimal ulexDisponibleSnap) {
-        this.ulexDisponibleSnap = ulexDisponibleSnap;
     }
 
     public BigDecimal getConsumoMpCalcSnap() {

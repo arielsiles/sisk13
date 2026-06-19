@@ -11,7 +11,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -73,14 +72,10 @@ public class XProductionUlexitaServiceBean implements XProductionUlexitaService 
     }
 
     @Override
-    public void persistSnapshots(XProduction production, BigDecimal ulexAvailable, String userCode) {
+    public void persistSnapshots(XProduction production, String userCode) {
         if (production == null) return;
         XProductionUlexita u = findByProduction(production);
         if (u == null) return;
-
-        if (ulexAvailable != null) {
-            u.setUlexDisponibleSnap(ulexAvailable);
-        }
 
         // forceLive=true: durante la generacion del snapshot leemos siempre
         // los valores frescos calculados desde inputs y configuracion actual,

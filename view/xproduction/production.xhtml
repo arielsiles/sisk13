@@ -337,7 +337,7 @@
                                      columnClasses="ulexCalcLabel,ulexCalcVal,ulexCalcLabel,ulexCalcVal">
 
                             <h:outputText value="#{messages['XProduction.ulexita.consumoMpCalc']}"/>
-                            <h:outputText value="#{xproductionAction.ulexitaCalc.consumoMpCalc}" title="MERMA + Kpa * PT" styleClass="right">
+                            <h:outputText value="#{xproductionAction.ulexitaCalc.consumoMpCalc}" title="MERMA + Kpa * PT - Consumo Reproceso" styleClass="right">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
                             <h:outputText value="#{messages['XProduction.ulexita.kpmBent']}"/>
@@ -495,18 +495,21 @@
             </s:div>
         </h:panelGrid>
 
-    <rich:tabPanel selectedTab="ingredientTab">
-        <rich:tab name="ingredientTab" label="#{messages['Production.ingredient']}">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+    <td valign="top" width="50%" style="padding-right:4px;">
+
+    <rich:panel>
+        <f:facet name="header">Insumos</f:facet>
             <s:div id="ingredientPanel">
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell" width="40%">#{messages['Supply.name']}</th>
-                        <th class="rich-table-headercell" width="5%">#{messages['Supply.unity']}</th>
+                        <th class="rich-table-headercell" width="74%">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell" width="3%">Un</th>
                         <th class="rich-table-headercell" width="10%">#{messages['Supply.quantity']}</th>
-                        <th class="rich-table-headercell" width="10%">#{messages['Supply.netCost']}</th>
-                        <th class="rich-table-headercell" width="30%">#{messages['Supply.affect']}</th>
-                        <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
+                        <th class="rich-table-headercell" width="10%">Costo</th>
+                        <th class="rich-table-headercell" width="3%"></th>
                     </tr>
                     </thead>
                     <c:forEach var="supplyDetail" items="#{xproductionAction.ingredientSupplyList}" varStatus="row">
@@ -528,7 +531,7 @@
                                              readonly="#{xproductionAction.approved}"
                                              styleClass="inputSmall right">
                                     <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimal4FNumber']}"
+                                                             pattern="#{messages['patterns.decimalNumber']}"
                                                              forId="#{quantityInputFieldId}"/>
                                     <a4j:support event="onblur" ajaxSingle="true"
                                                  action="#{xproductionAction.recalcBaritinaZonas}"
@@ -540,29 +543,10 @@
 
                             <td class="rich-table-cell" align="right">
                                 <h:outputText value="#{xproductionAction.getSupplyUnitCost(supplyDetail)}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}" />
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                                 </h:outputText>
                             </td>
 
-                            <td class="rich-table-cell center">
-                                <h:selectOneMenu id="#{productInputFieldId}"
-                                                 value="#{supplyDetail.productionProduct}"
-                                                 styleClass="input250"
-                                                 rendered="#{!xproductionAction.hasFormula(supplyDetail)}"
-                                                 required="false"
-                                                 disabled="#{xproductionAction.approved}"
-                                                 tabindex="7">
-                                    <s:selectItems value="#{xproductionProductList}"
-                                                   var="product"
-                                                   label="#{product.productItem.name}"
-                                                   noSelectionLabel="#{messages['ProductionPlan.product.allProducts']}"
-                                                   hideNoSelectionLabel="false"/>
-                                    <s:convertEntity/>
-                                </h:selectOneMenu>
-
-                                <c:if test="#{xproductionAction.managed}">
-                                </c:if>
-                            </td>
                             <td class="rich-table-cell center">
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
@@ -578,23 +562,22 @@
 
                 </table>
             </s:div>
-        </rich:tab>
-    </rich:tabPanel>
+        </rich:panel>
 
-    <rich:spacer height="10" />
+    </td>
+    <td valign="top" width="50%" style="padding-left:4px;">
 
-    <rich:tabPanel selectedTab="materialTab">
-        <rich:tab name="materialTab" label="#{messages['Production.material']}">
+    <rich:panel>
+        <f:facet name="header">Materiales</f:facet>
             <s:div id="materialPanel">
                 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                     <thead class="rich-table-thead">
                     <tr class="rich-table-header">
-                        <th class="rich-table-headercell" width="40%">#{messages['Supply.name']}</th>
-                        <th class="rich-table-headercell" width="5%">#{messages['Supply.unity']}</th>
+                        <th class="rich-table-headercell" width="74%">#{messages['Supply.name']}</th>
+                        <th class="rich-table-headercell" width="3%">Un</th>
                         <th class="rich-table-headercell" width="10%">#{messages['Supply.quantity']}</th>
-                        <th class="rich-table-headercell" width="10%">#{messages['Supply.netCost']}</th>
-                        <th class="rich-table-headercell" width="30%">#{messages['Supply.affect']}</th>
-                        <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
+                        <th class="rich-table-headercell" width="10%">Costo</th>
+                        <th class="rich-table-headercell" width="3%"></th>
                     </tr>
                     </thead>
                     <c:forEach var="materialDetail" items="#{xproductionAction.materialSupplyList}" varStatus="row">
@@ -624,26 +607,10 @@
 
                             <td class="rich-table-cell" align="right">
                                 <h:outputText value="#{materialDetail.productItem.unitCost}">
-                                    <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}" />
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                                 </h:outputText>
                             </td>
 
-                            <td class="rich-table-cell center">
-                                <h:selectOneMenu id="#{productMaterialInputFieldId}"
-                                                 value="#{materialDetail.productionProduct}"
-                                                 styleClass="input250"
-                                                 rendered="#{!xproductionAction.hasFormula(materialDetail)}"
-                                                 required="false"
-                                                 disabled="#{xproductionAction.approved}"
-                                                 tabindex="7">
-                                <s:selectItems value="#{xproductionProductList}"
-                                               var="product"
-                                               label="#{product.productItem.name}"
-                                               noSelectionLabel="#{messages['ProductionPlan.product.allProducts']}"
-                                               hideNoSelectionLabel="false"/>
-                                <s:convertEntity/>
-                                </h:selectOneMenu>
-                            </td>
                             <td class="rich-table-cell center">
                                 <!-- todo -->
                                 <a4j:commandLink id="#{removeMaterialInputFieldId}"
@@ -660,8 +627,11 @@
                     </c:forEach>
                 </table>
             </s:div>
-        </rich:tab>
-    </rich:tabPanel>
+        </rich:panel>
+
+    </td>
+    </tr>
+    </table>
 
     <rich:spacer height="10" />
 
@@ -710,22 +680,13 @@
                     <rich:simpleTogglePanel switchType="client" opened="true"
                                             label="#{messages['XProduction.ulexita.section.production']}">
 
-                        <s:decorate id="ulexAvailableField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['XProduction.ulexita.ulexAvailable']}</ui:define>
-                            <h:inputText id="ulexAvailable" value="#{xproductionAction.ulexitaData.ulexDisponibleSnap}"
-                                         styleClass="inputSmall right" disabled="true">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
-                                                         forId="ulexAvailable"/>
-                            </h:inputText>
-                        </s:decorate>
-
                         <s:decorate id="diluentTotalField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['XProduction.ulexita.diluentTotal']}</ui:define>
                             <h:inputText id="diluentTotal" value="#{xproductionAction.ulexitaData.diluyenteTotalTn}"
                                          styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="diluentTotal" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -735,7 +696,7 @@
                                          styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="bentonitePct" minimum="0" maximum="100"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -745,7 +706,7 @@
                                          styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="reprocessIn" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -755,7 +716,7 @@
                                          styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="granulado" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -765,7 +726,7 @@
                                          styleClass="inputSmall right" readonly="#{xproductionAction.approved}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="reprocessOut" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -783,7 +744,7 @@
                                          style="background-color:#fffbcc;">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="leyMpBent" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -795,7 +756,7 @@
                                          style="background-color:#fffbcc;">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="leyPt" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="ulexitaPanel, ulexitaCalcPanel"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -956,7 +917,7 @@
                                      rendered="#{xproductionAction.pending}">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                      minimum="0" forId="qtyInput"/>
-                            <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" reRender="finalProductList#{xproductionAction.baritinaTemplate ? ', baritinaCalcPanel' : ''}"/>
+                            <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="finalProductList#{xproductionAction.baritinaTemplate ? ', baritinaCalcPanel' : ''}#{xproductionAction.ulexitaTemplate ? ', ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField' : ''}"/>
                         </h:inputText>
                         <h:outputText value="#{product.quantity}" rendered="#{xproductionAction.approved}">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />

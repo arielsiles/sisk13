@@ -197,6 +197,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
         Long seq = sequenceService.createOrUpdateNextSequenceValue(Constants.PRODUCTION_CODE);
         production.setCode(seq.intValue());
+        syncMpFromConsumo();
         xproductionService.createProduction(production, ingredientSupplyList, materialSupplyList);
 
         production.setInitDate(production.getProductionPlan().getDate());
@@ -218,6 +219,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setProductionGroup(productionGroup);
         production.setProductionShiftType(productionShiftType);
 
+        syncMpFromConsumo();
         production.setTotalCost(calculateTotalCost());
         production.setTotalRawMaterial(calculateRawMaterial());
         xproductionService.updateProduction(production, ingredientSupplyList, materialSupplyList, laborList);
@@ -230,9 +232,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         if (production.isApproved()
                 && production.getProductionLine() != null
                 && production.getProductionLine().isUlexitaTemplate()) {
-            xproductionUlexitaService.persistSnapshots(production,
-                    ulexitaData != null ? ulexitaData.getUlexDisponibleSnap() : null,
-                    currentUserCode());
+            xproductionUlexitaService.persistSnapshots(production, currentUserCode());
         }
 
         return Outcome.SUCCESS;
@@ -267,6 +267,8 @@ public class XProductionAction extends GenericAction<XProduction> {
         if (!validateBaritina()) {
             return;
         }
+
+        syncMpFromConsumo();
 
         for (XProductionProduct product : getInstance().getProductionProductList()){
             BigDecimal productCost = BigDecimal.ZERO;
@@ -356,9 +358,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         persistBaritinaData();
 
         if (getInstance().getProductionLine() != null && getInstance().getProductionLine().isUlexitaTemplate()) {
-            xproductionUlexitaService.persistSnapshots(getInstance(),
-                    ulexitaData != null ? ulexitaData.getUlexDisponibleSnap() : null,
-                    currentUserCode());
+            xproductionUlexitaService.persistSnapshots(getInstance(), currentUserCode());
         }
 
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Production.message.approveProduction");
@@ -932,9 +932,6 @@ public class XProductionAction extends GenericAction<XProduction> {
                 ulexitaData.setProduction(getInstance());
             }
         }
-        if (ulexitaData != null && ulexitaData.getUlexDisponibleSnap() == null) {
-            ulexitaData.setUlexDisponibleSnap(BigDecimal.ZERO);
-        }
         return ulexitaData;
     }
 
@@ -957,6 +954,37 @@ public class XProductionAction extends GenericAction<XProduction> {
         return new XProductionUlexitaCalc(
                 getInstance(), ulexitaData, getInstance().getProductionLine(),
                 ingredientSupplyList, getInstance().getProductionProductList());
+    }
+
+    /**
+     * Sincroniza la cantidad del insumo de Materia Prima por defecto (ingrediente
+     * marcado inputDefault en la formulacion) con el 'Consumo Materia Prima (TN)'
+     * calculado (getConsumoMpCalc = MERMA + Kpa*PT - consumo reproceso),
+     * respetando la unidad del insumo (KG -> TN*1000). Se invoca al editar los
+     * datos del proceso/PT (ajax) y antes de persistir, mientras la orden no
+     * este aprobada. No-op para lineas que no son ULEXITA.
+     */
+    public void syncMpFromConsumo() {
+        if (!isUlexitaTemplate() || getInstance() == null || getInstance().isApproved()) return;
+        XProductionUlexitaCalc calc = getUlexitaCalc();
+        if (calc == null) return;
+        BigDecimal consumoTn = calc.getConsumoMpCalc();
+        if (consumoTn == null || ingredientSupplyList == null) return;
+        // Tomar el valor tal como se muestra en Datos Calculados (2 decimales),
+        // no el valor con los decimales finos del calculo interno. Asi 33,57 TN
+        // se vuelca como 33.570,0000 KG y no 33.572,7740.
+        BigDecimal consumoShown = BigDecimalUtil.roundBigDecimal(consumoTn, 2);
+        for (XSupply supply : ingredientSupplyList) {
+            if (supply.hasFormula()
+                    && Boolean.TRUE.equals(supply.getFormulationInput().getInputDefault())) {
+                String unit = supply.getProductItem() != null ? supply.getProductItem().getUsageMeasureCode() : null;
+                BigDecimal qty = XProductionUlexitaCalc.UNIT_KG.equalsIgnoreCase(unit)
+                        ? BigDecimalUtil.multiply(consumoShown, BigDecimalUtil.ONE_THOUSAND, 4)
+                        : BigDecimalUtil.roundBigDecimal(consumoShown, 4);
+                supply.setQuantity(qty);
+                break;
+            }
+        }
     }
 
     // ------------------------------------------------------------------------

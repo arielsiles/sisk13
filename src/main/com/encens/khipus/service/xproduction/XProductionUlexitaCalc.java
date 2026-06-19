@@ -227,24 +227,25 @@ public class XProductionUlexitaCalc {
         return merma.divide(denom, SCALE, RoundingMode.HALF_UP);
     }
 
-    /** Ley MP recalculada = Ley_PT / Kpm_bentonita. Excel col M. */
+    /** Ley MP recalculada = Ley_PT / Kpm_merma. Excel col M. */
     public BigDecimal getLeyMpRecalc() {
         if (useSnapshots()) return ulexita.getLeyMpRecalcSnap();
         if (ulexita == null) return null;
         BigDecimal num = ulexita.getLeyPt();
-        BigDecimal den = getKpmBentonita();
+        BigDecimal den = getKpmMerma();
         if (num == null || !isPositive(den)) return null;
         return num.divide(den, SCALE, RoundingMode.HALF_UP);
     }
 
-    /** Consumo MP teorico = MERMA + Kpa * PT_TOTAL_BUENO. Excel col E. */
+    /** Consumo MP teorico = MERMA + Kpa * PT_TOTAL_BUENO - CONSUMO_REPROCESO. Excel col E. */
     public BigDecimal getConsumoMpCalc() {
         if (useSnapshots()) return ulexita.getConsumoMpCalcSnap();
         BigDecimal merma = getMerma();
         BigDecimal kpa = getKpa();
         BigDecimal pt = getPtTotalBueno();
         if (merma == null || kpa == null || pt == null) return null;
-        return merma.add(kpa.multiply(pt)).setScale(SCALE, RoundingMode.HALF_UP);
+        BigDecimal reproceso = ulexita != null ? ulexita.getConsumoReprocesoTn() : null;
+        return merma.add(kpa.multiply(pt)).subtract(nullToZero(reproceso)).setScale(SCALE, RoundingMode.HALF_UP);
     }
 
     // ------------------------------------------------------------------ getters auxiliares

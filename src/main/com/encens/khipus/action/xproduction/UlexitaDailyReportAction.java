@@ -439,21 +439,27 @@ public class UlexitaDailyReportAction {
             case COL_DIA:         return 1000;  // DIA
             case COL_GRUPO_D:
             case COL_GRUPO_N:     return 1100;  // GRUPO D/N
-            case COL_OBS:         return 9000;  // OBSERVACIONES
+            case COL_OBS:         return pxWidth(370); // OBSERVACIONES
+            case COL_LEY_RECALC:  return pxWidth(82);  // Ley MP recalculada
             case COL_GRANULADO:   return pxWidth(92);  // PRODUCTO GRANULADO (TN)
-            case COL_REPROC_OUT:  return pxWidth(88);  // REPROCESO final (TN)
+            case COL_SALDO:       return pxWidth(78);  // SALDO (TN)
+            case COL_REPROC_OUT:  return pxWidth(86);  // REPROCESO final (TN)
             case COL_INGRESO:
             case COL_ULEX_DISP:
             case COL_CONSUMO:
-            case COL_DESPACHO:
-            case COL_SALDO:       return 3328;
+            case COL_DESPACHO:    return 3328;
             default:              return 2800;
         }
     }
 
-    /** Convierte pixeles a unidades POI: poiUnits = (px - 5) * 256 / 7. */
+    /**
+     * Convierte pixeles a unidades POI: poiUnits = px * 256 / 7.
+     * El ancho mostrado en Excel coincide con el px solicitado (sin el offset
+     * de 5px de la formula clasica, que en la practica dejaba las columnas 5px
+     * mas angostas que lo pedido).
+     */
     private static int pxWidth(int px) {
-        return (int) Math.round((px - 5) * 256.0 / 7.0);
+        return (int) Math.round(px * 256.0 / 7.0);
     }
 
     private static String safeUpper(String s) { return s == null ? "" : s.toUpperCase(); }

@@ -39,8 +39,7 @@ public interface XProductionUlexitaService {
      * reportados para ordenes ya snapshoteadas.
      *
      * @param production produccion a snapshotear
-     * @param ulexAvailable saldo de inventario al inicio (puede ser null)
      * @param userCode codigo del usuario (financesCode) que dispara el snapshot
      */
-    void persistSnapshots(XProduction production, java.math.BigDecimal ulexAvailable, String userCode);
+    void persistSnapshots(XProduction production, String userCode);
 }
