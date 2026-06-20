@@ -22,7 +22,8 @@ import java.util.List;
 public class ProductItemDataModel extends QueryDataModel<ProductItemPK, ProductItem> {
     private static final String[] RESTRICTIONS = {
             "lower(productItem.id.productItemCode) like concat(lower(#{productItemDataModel.criteria.id.productItemCode}), '%')",
-            "lower(productItem.name) like concat('%', concat(lower(#{productItemDataModel.criteria.name}), '%'))"
+            "lower(productItem.name) like concat('%', concat(lower(#{productItemDataModel.criteria.name}), '%'))",
+            "productItem.warehouseCode = #{productItemDataModel.criteria.warehouse.warehouseCode}"
     };
 
     @Create

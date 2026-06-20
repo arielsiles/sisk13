@@ -23,30 +23,59 @@
                              cellspacing="0"
                              border="0"
                              columnClasses="width50percent,width50percent">
-                    <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
-                        <h:inputText id="productItemCode"
-                                     value="#{productItemDataModel.criteria.id.productItemCode}"
-                                     maxlength="150"
-                                     tabindex="1"
-                                     styleClass="input"/>
-                    </s:decorate>
-                    <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
-                        <h:inputText id="name"
-                                     value="#{productItemDataModel.criteria.name}"
-                                     maxlength="150"
-                                     tabindex="2"
-                                     styleClass="input"/>
-                        <a4j:commandButton action="#{productItemDataModel.search}"
-                                           reRender="productItemList, dataScroller"
-                                           styleClass="button"
-                                           value="#{messages['Common.search']}"
-                                           id="searchButtonId"
-                                           tabindex="3">
-                            <s:defaultAction/>
-                        </a4j:commandButton>
-                    </s:decorate>
+                    <h:panelGrid columns="1"
+                                 width="100%"
+                                 cellpadding="0"
+                                 cellspacing="0"
+                                 border="0">
+                        <s:decorate id="productItemCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductItem.productItemCode']}</ui:define>
+                            <h:inputText id="productItemCode"
+                                         value="#{productItemDataModel.criteria.id.productItemCode}"
+                                         maxlength="150"
+                                         tabindex="1"
+                                         styleClass="input"/>
+                        </s:decorate>
+                        <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductItem.name']}</ui:define>
+                            <h:inputText id="name"
+                                         value="#{productItemDataModel.criteria.name}"
+                                         maxlength="150"
+                                         tabindex="2"
+                                         styleClass="input"/>
+                        </s:decorate>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1"
+                                 width="100%"
+                                 cellpadding="0"
+                                 cellspacing="0"
+                                 border="0">
+                        <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['WarehouseVoucher.warehouse']}</ui:define>
+                            <h:selectOneMenu id="warehouse"
+                                             value="#{productItemDataModel.criteria.warehouse}"
+                                             tabindex="3"
+                                             styleClass="input">
+                                <s:selectItems value="#{warehouseList.resultList}"
+                                               var="element"
+                                               label="#{element.fullName}"
+                                               noSelectionLabel=""
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEntity/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                        <s:decorate id="searchButtonField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label"></ui:define>
+                            <a4j:commandButton action="#{productItemDataModel.search}"
+                                               reRender="productItemList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="4">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </h:panelGrid>
                 </h:panelGrid>
                 <rich:jQuery selector="#productItemCode" query="focus()" timing="onload"/>
             </rich:simpleTogglePanel>
@@ -61,7 +90,7 @@
             <rich:dataTable value="#{productItemDataModel}"
                             var="productItemItem"
                             id="productItemList"
-                            rows="#{sessionUser.rowsPerPage}"
+                            rows="15"
                             width="100%"
                             columnsWidth="10%, 25%, 10%, 15%, 15%, 15%, 10%">
 
