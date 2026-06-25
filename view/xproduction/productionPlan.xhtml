@@ -31,7 +31,7 @@
                            value="#{messages['ProductionPlan.addProduct']}"
                            styleClass="button"
                            immediate="true"
-                           rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"
+                           rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                            oncomplete="Richfaces.showModalPanel('productionProductListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
                            reRender="productionProductListModalPanel">
@@ -43,24 +43,24 @@
                          value="#{messages['ProductionPlan.addProduction']}"
                          styleClass="button"
                          immediate="true"
-                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"/>
+                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"/>
 
         <h:commandButton action="#{xproductionPlanAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
-                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('PRODUCTIONPLAN','UPDATE')}"
+                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
         <h:commandButton value="#{messages['Common.delete']}"
                          styleClass="button"
-                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and xproductionPlanAction.emptyPlan and s:hasPermission('PRODUCTIONPLAN','DELETE')}">
+                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and xproductionPlanAction.emptyPlan and s:hasPermission('XPRODUCTION_PLAN','DELETE')}">
             <rich:componentControl for="deletePlanConfirmation" event="onclick" disableDefault="true" operation="show"/>
         </h:commandButton>
 
         <h:commandButton action="#{xproductionPlanAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
-                         rendered="#{!xproductionPlanAction.managed and s:hasPermission('PRODUCTIONPLAN','CREATE')}"
+                         rendered="#{!xproductionPlanAction.managed and s:hasPermission('XPRODUCTION_PLAN','CREATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
@@ -170,7 +170,7 @@
                 <rich:column styleClass="center">
                     <h:commandLink value="#{messages['Common.select']}" immediate="true"
                                    action="#{xproductionAction.select(productionItem)}"
-                                   rendered="#{s:hasPermission('PRODUCTION','VIEW')}" />
+                                   rendered="#{s:hasPermission('XPRODUCTION_PLAN','VIEW')}" />
                 </rich:column>
             </rich:dataTable>
             <app:dataScroller id="productionListDataScrollerId"

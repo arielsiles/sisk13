@@ -131,7 +131,10 @@ public class XProductionAction extends GenericAction<XProduction> {
         ulexitaData = null;
         if (getInstance() == null || getInstance().getId() == null) return;
         if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isUlexitaTemplate()) return;
-        ulexitaData = xproductionUlexitaService.findByProduction(getInstance());
+        // Relectura fresca desde BD: al entrar a la orden en una conversacion larga
+        // (p.ej. Produccion) hay que ver los ultimos datos de lab guardados por otra
+        // sesion, no la copia obsoleta del entity manager.
+        ulexitaData = xproductionUlexitaService.findByProductionFresh(getInstance());
         if (ulexitaData == null) {
             ulexitaData = new XProductionUlexita();
             ulexitaData.setProduction(getInstance());
@@ -439,7 +442,7 @@ public class XProductionAction extends GenericAction<XProduction> {
      * produccion (PRODUCTION:UPDATE) y solo mientras la orden esta pendiente.
      */
     public boolean isCanEditProduction() {
-        return isPending() && Identity.instance().hasPermission("PRODUCTION", "UPDATE");
+        return isPending() && Identity.instance().hasPermission("XPRODUCTION_PLAN", "UPDATE");
     }
 
     /**
@@ -983,7 +986,7 @@ public class XProductionAction extends GenericAction<XProduction> {
     public XProductionUlexita getUlexitaData() {
         if (ulexitaData == null && isUlexitaTemplate()) {
             if (getInstance() != null && getInstance().getId() != null) {
-                ulexitaData = xproductionUlexitaService.findByProduction(getInstance());
+                ulexitaData = xproductionUlexitaService.findByProductionFresh(getInstance());
             }
             if (ulexitaData == null) {
                 ulexitaData = new XProductionUlexita();

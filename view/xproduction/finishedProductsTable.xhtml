@@ -59,7 +59,7 @@
                                  ajaxSingle="true"
                                  immediate="true"
                                  action="#{xproductionAction.removeProductionProduct(product)}"
-                                 rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                 rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','DELETE')}"
                                  reRender="finalProductList, ingredientPanel, materialPanel, assignProductionProduct">
                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                 </a4j:commandLink>

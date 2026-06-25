@@ -38,6 +38,17 @@ public class XProductionUlexitaServiceBean implements XProductionUlexitaService 
     }
 
     @Override
+    public XProductionUlexita findByProductionFresh(XProduction production) {
+        XProductionUlexita u = findByProduction(production);
+        if (u != null) {
+            // Descarta la copia en memoria (posiblemente obsoleta por otra sesion)
+            // y trae el estado real de la BD.
+            em.refresh(u);
+        }
+        return u;
+    }
+
+    @Override
     public void save(XProductionUlexita ulexita) {
         if (ulexita == null) return;
         if (ulexita.getId() == null) {

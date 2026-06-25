@@ -35,7 +35,7 @@
                            styleClass="button"
                            ajaxSingle="true"
                            immediate="true"
-                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                            reRender="ingredientPanel, totalCostField, totalRawMaterialField">
         </a4j:commandButton>
 
@@ -46,7 +46,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                            reRender="productItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
@@ -59,7 +59,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('ingredientItemsByWarehouseListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                            reRender="ingredientItemsByWarehouseListModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
@@ -72,7 +72,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('generalEmployeeListModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE') and s:hasPermission('PRODUCTION_LABOR','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE') and s:hasPermission('PRODUCTION_LABOR','UPDATE')}"
                            reRender="generalEmployeeListModalPanel">
             <f:attribute name="dataModelObject" value="#{generalEmployeeDataModel}"/>
         </a4j:commandButton>
@@ -84,7 +84,7 @@
                            immediate="true"
                            oncomplete="Richfaces.showModalPanel('addFinishedProductModalPanel');"
                            actionListener="#{selectPopUpAction.select}"
-                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                            reRender="addFinishedProductModalPanel">
             <f:attribute name="entityManagerName" value=""/>
             <f:attribute name="dataModelObject" value="#{productionProductsDataModel}"/>
@@ -92,14 +92,14 @@
 
         <h:commandButton action="#{xproductionAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
-                         rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                         rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                          tabindex="1">
             <s:defaultAction/>
         </h:commandButton>
 
         <h:commandButton action="#{xproductionAction.create}" value="#{messages['Common.save']}"
                          styleClass="button"
-                         rendered="#{!xproductionAction.managed and s:hasPermission('PRODUCTION','CREATE')}">
+                         rendered="#{!xproductionAction.managed and s:hasPermission('XPRODUCTION_PLAN','CREATE')}">
         </h:commandButton>
 
         <h:commandButton action="#{xproductionAction.saveLabData}" value="#{messages['Production.saveLabData']}"
@@ -108,7 +108,7 @@
                                      xproductionAction.pending and
                                      xproductionAction.ulexitaTemplate and
                                      s:hasPermission('PRODUCTION_LAB_DATA','UPDATE') and
-                                     !s:hasPermission('PRODUCTION','UPDATE')}"
+                                     !s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                          tabindex="2">
         </h:commandButton>
 
@@ -116,13 +116,13 @@
                          styleClass="button"
                          rendered="#{xproductionAction.managed and
                                      xproductionAction.pending and
-                                     s:hasPermission('PRODUCTION','UPDATE')}"
+                                     s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                          tabindex="2">
         </h:commandButton>
 
         <h:commandButton value="#{messages['Common.delete']}"
                          styleClass="button"
-                         rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}">
+                         rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','DELETE')}">
             <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
                                    operation="show"/>
         </h:commandButton>
@@ -486,7 +486,7 @@
                                          ajaxSingle="true"
                                          immediate="true"
                                          action="#{xproductionAction.assignProduct(productionProduct)}"
-                                         rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                                         rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                                          reRender="assignProductionProduct, ingredientPanel, materialPanel, finalProductPanel, finalProductList">
                         </a4j:commandLink>
                     </rich:column>
@@ -555,7 +555,7 @@
                                                  title="#{messages['Common.remove']}"
                                                  action="#{xproductionAction.removeSupply(supplyDetail)}"
                                                  ajaxSingle="true"
-                                                 rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                                 rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','DELETE')}"
                                                  reRender="ingredientPanel, totalCostField, totalRawMaterialField">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -621,7 +621,7 @@
                                                  ajaxSingle="true"
                                                  immediate="true"
                                                  action="#{xproductionAction.removeSupply(materialDetail)}"
-                                                 rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                                 rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','DELETE')}"
                                                  reRender="materialPanel, totalCostField">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -715,7 +715,7 @@
                                          styleClass="inputSmall right" readonly="#{!xproductionAction.canEditProduction}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="diluentTotal" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="diluentTotalField, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -725,7 +725,7 @@
                                          styleClass="inputSmall right" readonly="#{!xproductionAction.canEditProduction}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="bentonitePct" minimum="0" maximum="100"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="bentonitePctField, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -735,7 +735,7 @@
                                          styleClass="inputSmall right" readonly="#{!xproductionAction.canEditProduction}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="reprocessIn" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="reprocessInField, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -745,7 +745,7 @@
                                          styleClass="inputSmall right" readonly="#{!xproductionAction.canEditProduction}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="granulado" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="granuladoField, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -755,7 +755,7 @@
                                          styleClass="inputSmall right" readonly="#{!xproductionAction.canEditProduction}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="reprocessOut" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="reprocessOutField, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                             <h:outputText value="#{xproductionAction.reprocFinalArticleName}"
                                           rendered="#{not empty xproductionAction.reprocFinalArticleName}"
@@ -772,11 +772,11 @@
                             <ui:define name="label">#{messages['XProduction.ulexita.leyMpBent']}</ui:define>
                             <h:inputText id="leyMpBent" value="#{xproductionAction.ulexitaData.leyMpBentonita}"
                                          styleClass="inputSmall right"
-                                         readonly="#{!xproductionAction.canEditLabData}"
+                                         disabled="#{!xproductionAction.canEditLabData}"
                                          style="background-color:#fffbcc;">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="leyMpBent" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="leyMpBentField, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
@@ -784,18 +784,18 @@
                             <ui:define name="label">#{messages['XProduction.ulexita.leyPt']}</ui:define>
                             <h:inputText id="leyPt" value="#{xproductionAction.ulexitaData.leyPt}"
                                          styleClass="inputSmall right"
-                                         readonly="#{!xproductionAction.canEditLabData}"
+                                         disabled="#{!xproductionAction.canEditLabData}"
                                          style="background-color:#fffbcc;">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                          forId="leyPt" minimum="0"/>
-                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="ulexitaPanel, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
+                                <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.syncMpFromConsumo}" reRender="leyPtField, ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField"/>
                             </h:inputText>
                         </s:decorate>
 
                         <s:decorate id="observacionLabField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['XProduction.ulexita.observacionLab']}</ui:define>
                             <h:inputTextarea id="observacionLab" value="#{xproductionAction.ulexitaData.observacionLab}"
-                                             readonly="#{!xproductionAction.canEditLabData}"
+                                             disabled="#{!xproductionAction.canEditLabData}"
                                              style="width:98%; height:50px; background-color:#fffbcc;" rows="3">
                                 <f:validateLength maximum="500"/>
                             </h:inputTextarea>
@@ -827,7 +827,7 @@
                                            styleClass="button"
                                            ajaxSingle="true"
                                            immediate="true"
-                                           rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                                           rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                                            reRender="baritinaZonaPanel"/>
                     </div>
                     <s:div id="baritinaZonaPanel">
@@ -885,7 +885,7 @@
                                                          title="#{messages['Common.remove']}"
                                                          action="#{xproductionAction.removeBaritinaZona(zonaDetail)}"
                                                          ajaxSingle="true"
-                                                         rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','UPDATE')}"
+                                                         rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
                                                          reRender="baritinaZonaPanel, baritinaCalcPanel">
                                             <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                         </a4j:commandLink>
@@ -976,7 +976,7 @@
                                                  ajaxSingle="true"
                                                  immediate="true"
                                                  action="#{xproductionAction.removeLabor(laborDetail)}"
-                                                 rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                                 rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','DELETE')}"
                                                  reRender="laborPanel">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
@@ -996,6 +996,113 @@
     </rich:tabPanel>-->
 
     </rich:panel>
+
+    <rich:spacer height="8" />
+    <div class="buttons">
+
+        <a4j:commandButton id="recalculateCommandButtonBottom"
+                           action="#{xproductionAction.recalculateSupplies()}"
+                           value="#{messages['Production.recalculate']}"
+                           styleClass="button"
+                           ajaxSingle="true"
+                           immediate="true"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
+                           reRender="ingredientPanel, totalCostField, totalRawMaterialField">
+        </a4j:commandButton>
+
+        <a4j:commandButton id="addMaterialCommandButtonBottom"
+                           action="#{productItemByWarehouseDataModel.reset()}"
+                           value="#{messages['Production.addMaterial']}"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('productItemsByWarehouseListModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
+                           reRender="productItemsByWarehouseListModalPanel">
+            <f:attribute name="entityManagerName" value=""/>
+            <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+        </a4j:commandButton>
+
+        <a4j:commandButton id="addIngredientCommandButtonBottom"
+                           action="#{productItemByWarehouseDataModel.reset()}"
+                           value="#{messages['Production.addIngredient']}"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('ingredientItemsByWarehouseListModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
+                           reRender="ingredientItemsByWarehouseListModalPanel">
+            <f:attribute name="entityManagerName" value=""/>
+            <f:attribute name="dataModelObject" value="#{productItemByWarehouseDataModel}"/>
+        </a4j:commandButton>
+
+        <a4j:commandButton id="addProductionLaborButtonBottom"
+                           action="#{productItemByWarehouseDataModel.reset()}"
+                           value="#{messages['Production.addLabor']}"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('generalEmployeeListModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE') and s:hasPermission('PRODUCTION_LABOR','UPDATE')}"
+                           reRender="generalEmployeeListModalPanel">
+            <f:attribute name="dataModelObject" value="#{generalEmployeeDataModel}"/>
+        </a4j:commandButton>
+
+        <a4j:commandButton id="addFinishedProductButtonBottom"
+                           action="#{productionProductsDataModel.reset()}"
+                           value="#{messages['Production.addFinishedProduct']}"
+                           styleClass="button"
+                           immediate="true"
+                           oncomplete="Richfaces.showModalPanel('addFinishedProductModalPanel');"
+                           actionListener="#{selectPopUpAction.select}"
+                           rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
+                           reRender="addFinishedProductModalPanel">
+            <f:attribute name="entityManagerName" value=""/>
+            <f:attribute name="dataModelObject" value="#{productionProductsDataModel}"/>
+        </a4j:commandButton>
+
+        <h:commandButton action="#{xproductionAction.update}" value="#{messages['Common.update']}"
+                         styleClass="button"
+                         rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}">
+        </h:commandButton>
+
+        <h:commandButton action="#{xproductionAction.create}" value="#{messages['Common.save']}"
+                         styleClass="button"
+                         rendered="#{!xproductionAction.managed and s:hasPermission('XPRODUCTION_PLAN','CREATE')}">
+        </h:commandButton>
+
+        <h:commandButton action="#{xproductionAction.saveLabData}" value="#{messages['Production.saveLabData']}"
+                         styleClass="button"
+                         rendered="#{xproductionAction.managed and
+                                     xproductionAction.pending and
+                                     xproductionAction.ulexitaTemplate and
+                                     s:hasPermission('PRODUCTION_LAB_DATA','UPDATE') and
+                                     !s:hasPermission('XPRODUCTION_PLAN','UPDATE')}">
+        </h:commandButton>
+
+        <h:commandButton action="#{xproductionAction.approve}" value="#{messages['Common.approve']}"
+                         styleClass="button"
+                         rendered="#{xproductionAction.managed and
+                                     xproductionAction.pending and
+                                     s:hasPermission('XPRODUCTION_PLAN','UPDATE')}">
+        </h:commandButton>
+
+        <h:commandButton value="#{messages['Common.delete']}"
+                         styleClass="button"
+                         rendered="#{xproductionAction.managed and xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','DELETE')}">
+            <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+
+        <h:commandButton action="#{xproductionAction.disapprove}" value="#{messages['Common.disapprove']}"
+                         styleClass="button"
+                         rendered="#{xproductionAction.approved and s:hasPermission('PRODUCTION_DISAPPROVE','UPDATE')}">
+        </h:commandButton>
+
+        <h:commandButton action="#{xproductionAction.cancel}" value="#{messages['Common.cancel']}"
+                         styleClass="button" immediate="true">
+        </h:commandButton>
+    </div>
 
 </h:form>
 

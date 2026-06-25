@@ -20,6 +20,15 @@ public interface XProductionUlexitaService {
     /** Busca el registro ULEXITA asociado a una produccion. null si no existe. */
     XProductionUlexita findByProduction(XProduction production);
 
+    /**
+     * Igual que {@link #findByProduction}, pero fuerza la relectura desde la BD
+     * ({@code em.refresh}). Necesario al CARGAR la orden en una conversacion larga:
+     * el entity manager puede tener una copia obsoleta si otra sesion (p.ej.
+     * Laboratorio) actualizo los datos; asi se evita mostrarlos viejos o
+     * sobrescribirlos al guardar.
+     */
+    XProductionUlexita findByProductionFresh(XProduction production);
+
     /** Crea o actualiza el registro ULEXITA. */
     void save(XProductionUlexita ulexita);
 
