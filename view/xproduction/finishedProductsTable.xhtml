@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <s:div id="finalProductList">
+        <rich:dataTable id="productList"
+                        value="#{xproduction.productionProductList}"
+                        var="product"
+                        width="100%" columnsWidth="45%, 10%, 15%, 15%, 10%, 5%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>#{messages['ProductionPlan.product.name']}</rich:column>
+                    <rich:column>#{messages['Supply.unity']}</rich:column>
+                    <rich:column>#{messages['ProductionPlan.product.quantity']}</rich:column>
+                    <rich:column>#{messages['Production.totalCost']}</rich:column>
+                    <rich:column>CU</rich:column>
+                    <rich:column>#{messages['Common.action']}</rich:column>
+                </rich:columnGroup>
+            </f:facet>
+
+            <rich:column>
+                <h:outputText value="#{product.productItem.fullName}" />
+            </rich:column>
+            <rich:column styleClass="center">
+                <h:outputText value="#{product.productItem.usageMeasureCode}" />
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:inputText id="qtyInput"
+                             value="#{product.quantity}"
+                             styleClass="inputSmall right"
+                             readonly="#{!xproductionAction.canEditProduction}"
+                             rendered="#{xproductionAction.pending}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                             minimum="0" forId="qtyInput"/>
+                    <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.recalcOnPtChange}" reRender="finalProductList#{xproductionAction.baritinaTemplate ? ', baritinaCalcPanel, baritinaZonaPanel, ingredientPanel, totalCostField, totalRawMaterialField' : ''}#{xproductionAction.ulexitaTemplate ? ', ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField' : ''}"/>
+                </h:inputText>
+                <h:outputText value="#{product.quantity}" rendered="#{xproductionAction.approved}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{product.cost}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{product.unitCost}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
+                </h:outputText>
+            </rich:column>
+            <rich:column styleClass="center">
+                <a4j:commandLink id="removeProductCommandLink"
+                                 title="#{messages['Common.remove']}"
+                                 ajaxSingle="true"
+                                 immediate="true"
+                                 action="#{xproductionAction.removeProductionProduct(product)}"
+                                 rendered="#{xproductionAction.pending and s:hasPermission('PRODUCTION','DELETE')}"
+                                 reRender="finalProductList, ingredientPanel, materialPanel, assignProductionProduct">
+                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </rich:column>
+
+        </rich:dataTable>
+    </s:div>
+
+</ui:composition>

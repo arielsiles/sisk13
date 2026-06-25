@@ -54,6 +54,15 @@ public class ProductionLine implements BaseModel {
     @Column(name = "merma_factor")
     private BigDecimal mermaFactor;
 
+    @Column(name = "cod_art_reproc_final", length = 20)
+    private String codArtReprocFinal;
+
+    @Column(name = "cod_art_pt_principal", length = 20)
+    private String codArtPtPrincipal;
+
+    @Column(name = "factor_pt_mp", precision = 10, scale = 4)
+    private BigDecimal factorPtMp;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     @NotNull
@@ -158,6 +167,33 @@ public class ProductionLine implements BaseModel {
 
     public void setMermaFactor(BigDecimal mermaFactor) {
         this.mermaFactor = mermaFactor;
+    }
+
+    /** ULEXITA: cod_art del articulo (ej. 'Ulexita Procesada') donde se acumula el Reproceso final (TN) al aprobar. */
+    public String getCodArtReprocFinal() {
+        return codArtReprocFinal;
+    }
+
+    public void setCodArtReprocFinal(String codArtReprocFinal) {
+        this.codArtReprocFinal = codArtReprocFinal;
+    }
+
+    /** BARITINA: cod_art del Producto Terminado principal que dispara el calculo MP = PT * factor. */
+    public String getCodArtPtPrincipal() {
+        return codArtPtPrincipal;
+    }
+
+    public void setCodArtPtPrincipal(String codArtPtPrincipal) {
+        this.codArtPtPrincipal = codArtPtPrincipal;
+    }
+
+    /** BARITINA: factor de conversion PT -> Materia Prima (MP = PT * factor). */
+    public BigDecimal getFactorPtMp() {
+        return factorPtMp;
+    }
+
+    public void setFactorPtMp(BigDecimal factorPtMp) {
+        this.factorPtMp = factorPtMp;
     }
 
     /**

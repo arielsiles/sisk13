@@ -240,7 +240,31 @@ cantidad guardada (y por ende Costo Total / M.P. Usada / snapshots) refleje el c
 Tablas satélite: `xpr_produccion_baritina` (cabecera) y `xpr_produccion_baritina_zona`
 (distribución). Lógica en `XProductionAction` (métodos `baritina*`).
 
-### 4.1 Resumen Baritina
+### 4.1 Cálculo de Materia Prima desde el PT — `syncBaritinaMpFromPt`
+
+Al ingresar la cantidad del **Producto Terminado principal** de la línea (el de
+`cod_art = ProductionLine.codArtPtPrincipal`, configurado en el catálogo de Líneas), la
+**Materia Prima por defecto** (insumo `inputDefault` de la formulación) se calcula como:
+
+```
+MP = PT · factor          (factor = ProductionLine.factorPtMp, configurable por línea)
+```
+
+El resultado **respeta la unidad** del insumo (la cantidad del PT se convierte a la unidad
+de la MP: KG↔TN) y se redondea a **2 decimales** (el valor mostrado).
+
+Ejemplo: PT = 24.000,00 KG · factor 1,02 → MP = 24.480,00 KG.
+
+Es **no-op** si: la orden está aprobada, la línea no tiene `factorPtMp` (nulo o ≤ 0), o no
+hay PT principal cargado (en ese caso se respeta la MP ingresada manualmente).
+
+Se dispara en vivo al editar la cantidad del PT (vía `recalcOnPtChange`, que además recalcula
+la distribución por zonas) y en `create` / `update` / `approve` antes de persistir.
+
+Configuración (catálogo de Líneas de Producción → columnas en `xpr_linea`):
+`cod_art_pt_principal` y `factor_pt_mp` (SQL `query/query_v6.0.88_terdemol.sql`).
+
+### 4.2 Resumen Baritina
 
 | Magnitud | Fórmula |
 |---|---|
@@ -248,7 +272,7 @@ Tablas satélite: `xpr_produccion_baritina` (cabecera) y `xpr_produccion_baritin
 | **Baritina PT (TN)** | Σ cantidad (KG) de los productos terminados de la orden / 1000 |
 | **Suma de proporciones (%)** | Σ porcentajes de todas las zonas (debe ser 100) |
 
-### 4.2 Distribución por zona productiva
+### 4.3 Distribución por zona productiva
 
 Cada fila asigna un porcentaje del uso de MP a una **zona productiva** (maestro
 `zonaproductiva` del módulo de acopio: SACACA, HUALLATARI, PATOYU, 3 CRUCES, ANZALDO,
@@ -261,7 +285,7 @@ cantidad_zona (TN) = UsoMpBaritina · porcentaje / 100
 Se dispara al editar la cantidad del insumo, el porcentaje de una zona o al agregar/quitar
 una zona.
 
-### 4.3 Validación al guardar/aprobar — `validateBaritina`
+### 4.4 Validación al guardar/aprobar — `validateBaritina`
 
 - Cada fila debe tener **zona seleccionada**.
 - La **suma de porcentajes** debe ser **100%** (tolerancia 0.01).

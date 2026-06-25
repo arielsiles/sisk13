@@ -95,32 +95,67 @@
 
                         <s:decorate id="codArtMpPrincipalField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductionLine.codArtMpPrincipal']}</ui:define>
-                            <h:inputText id="codArtMpPrincipal" value="#{productionLine.codArtMpPrincipal}"
-                                         styleClass="inputSmall" maxlength="20" tabindex="4"/>
+                            <app:selectPopUp id="codArtMpPrincipal"
+                                             textValue="#{productionLineAction.mpPrincipalItem.fullName}"
+                                             value="#{productionLineAction.mpPrincipalItem}"
+                                             clearAction="#{productionLineAction.clearMpPrincipal()}"
+                                             searchModalPanel="mpPrincipalListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="codArtMpPrincipalField"
+                                             styleClass="input250"
+                                             hotKeySelect="alt+4"/>
                         </s:decorate>
 
                         <s:decorate id="codArtPtAField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductionLine.codArtPtA']}</ui:define>
-                            <h:inputText id="codArtPtA" value="#{productionLine.codArtPtA}"
-                                         styleClass="inputSmall" maxlength="20" tabindex="5"/>
+                            <app:selectPopUp id="codArtPtA"
+                                             textValue="#{productionLineAction.ptAItem.fullName}"
+                                             value="#{productionLineAction.ptAItem}"
+                                             clearAction="#{productionLineAction.clearPtA()}"
+                                             searchModalPanel="ptAListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="codArtPtAField"
+                                             styleClass="input250"
+                                             hotKeySelect="alt+5"/>
                         </s:decorate>
 
                         <s:decorate id="codArtPtBField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductionLine.codArtPtB']}</ui:define>
-                            <h:inputText id="codArtPtB" value="#{productionLine.codArtPtB}"
-                                         styleClass="inputSmall" maxlength="20" tabindex="6"/>
+                            <app:selectPopUp id="codArtPtB"
+                                             textValue="#{productionLineAction.ptBItem.fullName}"
+                                             value="#{productionLineAction.ptBItem}"
+                                             clearAction="#{productionLineAction.clearPtB()}"
+                                             searchModalPanel="ptBListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="codArtPtBField"
+                                             styleClass="input250"
+                                             hotKeySelect="alt+6"/>
                         </s:decorate>
 
                         <s:decorate id="codArtDiluyBentField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductionLine.codArtDiluyBent']}</ui:define>
-                            <h:inputText id="codArtDiluyBent" value="#{productionLine.codArtDiluyBent}"
-                                         styleClass="inputSmall" maxlength="20" tabindex="7"/>
+                            <app:selectPopUp id="codArtDiluyBent"
+                                             textValue="#{productionLineAction.diluyBentItem.fullName}"
+                                             value="#{productionLineAction.diluyBentItem}"
+                                             clearAction="#{productionLineAction.clearDiluyBent()}"
+                                             searchModalPanel="diluyBentListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="codArtDiluyBentField"
+                                             styleClass="input250"
+                                             hotKeySelect="alt+7"/>
                         </s:decorate>
 
                         <s:decorate id="codArtDiluyCaolinField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductionLine.codArtDiluyCaolin']}</ui:define>
-                            <h:inputText id="codArtDiluyCaolin" value="#{productionLine.codArtDiluyCaolin}"
-                                         styleClass="inputSmall" maxlength="20" tabindex="8"/>
+                            <app:selectPopUp id="codArtDiluyCaolin"
+                                             textValue="#{productionLineAction.diluyCaolinItem.fullName}"
+                                             value="#{productionLineAction.diluyCaolinItem}"
+                                             clearAction="#{productionLineAction.clearDiluyCaolin()}"
+                                             searchModalPanel="diluyCaolinListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="codArtDiluyCaolinField"
+                                             styleClass="input250"
+                                             hotKeySelect="alt+8"/>
                         </s:decorate>
 
                         <s:decorate id="mermaFactorField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -132,10 +167,141 @@
                             </h:inputText>
                         </s:decorate>
 
+                        <s:decorate id="codArtReprocFinalField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.codArtReprocFinal']}</ui:define>
+                            <app:selectPopUp id="codArtReprocFinal"
+                                             textValue="#{productionLineAction.reprocFinalItem.fullName}"
+                                             value="#{productionLineAction.reprocFinalItem}"
+                                             clearAction="#{productionLineAction.clearReprocFinal()}"
+                                             searchModalPanel="reprocFinalListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="codArtReprocFinalField"
+                                             styleClass="input250"
+                                             hotKeySelect="alt+0"/>
+                        </s:decorate>
+
+                    </c:if>
+
+                    <c:if test="#{productionLine.baritinaTemplate}">
+
+                        <s:decorate id="codArtPtPrincipalField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.codArtPtPrincipal']}</ui:define>
+                            <app:selectPopUp id="codArtPtPrincipal"
+                                             textValue="#{productionLineAction.ptPrincipalItem.fullName}"
+                                             value="#{productionLineAction.ptPrincipalItem}"
+                                             clearAction="#{productionLineAction.clearPtPrincipal()}"
+                                             searchModalPanel="ptPrincipalListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="codArtPtPrincipalField"
+                                             styleClass="input250"
+                                             hotKeySelect="alt+4"/>
+                        </s:decorate>
+
+                        <s:decorate id="factorPtMpField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.factorPtMp']}</ui:define>
+                            <h:inputText id="factorPtMp" value="#{productionLine.factorPtMp}"
+                                         styleClass="inputSmall right" tabindex="5">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"
+                                                         forId="factorPtMp"/>
+                            </h:inputText>
+                        </s:decorate>
+
                     </c:if>
                 </s:div>
 
             </rich:panel>
         </h:form>
+
+        <!-- Selectores de articulos (reutilizan productItemList2ModalPanel + productItemSearchDataModel) -->
+        <s:decorate id="mpPrincipalListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="mpPrincipalListModalPanelContainer"/>
+            <ui:param name="dialogId" value="mpPrincipalListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productionLineAction.assignMpPrincipal(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="codArtMpPrincipalField"
+                                   oncomplete="Richfaces.hideModalPanel('mpPrincipalListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="ptAListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="ptAListModalPanelContainer"/>
+            <ui:param name="dialogId" value="ptAListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productionLineAction.assignPtA(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="codArtPtAField"
+                                   oncomplete="Richfaces.hideModalPanel('ptAListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="ptBListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="ptBListModalPanelContainer"/>
+            <ui:param name="dialogId" value="ptBListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productionLineAction.assignPtB(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="codArtPtBField"
+                                   oncomplete="Richfaces.hideModalPanel('ptBListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="diluyBentListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="diluyBentListModalPanelContainer"/>
+            <ui:param name="dialogId" value="diluyBentListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productionLineAction.assignDiluyBent(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="codArtDiluyBentField"
+                                   oncomplete="Richfaces.hideModalPanel('diluyBentListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="diluyCaolinListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="diluyCaolinListModalPanelContainer"/>
+            <ui:param name="dialogId" value="diluyCaolinListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productionLineAction.assignDiluyCaolin(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="codArtDiluyCaolinField"
+                                   oncomplete="Richfaces.hideModalPanel('diluyCaolinListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="reprocFinalListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="reprocFinalListModalPanelContainer"/>
+            <ui:param name="dialogId" value="reprocFinalListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productionLineAction.assignReprocFinal(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="codArtReprocFinalField"
+                                   oncomplete="Richfaces.hideModalPanel('reprocFinalListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="ptPrincipalListModalPanelContainer" template="/warehouse/productItemList2ModalPanel.xhtml">
+            <ui:param name="containerId" value="ptPrincipalListModalPanelContainer"/>
+            <ui:param name="dialogId" value="ptPrincipalListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{productionLineAction.assignPtPrincipal(productItemItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="codArtPtPrincipalField"
+                                   oncomplete="Richfaces.hideModalPanel('ptPrincipalListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
     </ui:define>
 </ui:composition>

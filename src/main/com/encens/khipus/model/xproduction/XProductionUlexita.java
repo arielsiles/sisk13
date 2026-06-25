@@ -109,6 +109,12 @@ public class XProductionUlexita implements BaseModel {
     @Column(name = "observacion_lab", length = 500)
     private String observacionLab;
 
+    /** Articulo (cod_art) donde se acumula el Reproceso final (TN) al aprobar. Se copia
+     *  desde la config de la linea al guardar, para que la orden conserve con que articulo
+     *  se haran los movimientos de inventario aunque luego cambie la linea. */
+    @Column(name = "cod_art_reproc_final", length = 20)
+    private String codArtReprocFinal;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -204,6 +210,14 @@ public class XProductionUlexita implements BaseModel {
 
     public void setObservacionLab(String observacionLab) {
         this.observacionLab = observacionLab;
+    }
+
+    public String getCodArtReprocFinal() {
+        return codArtReprocFinal;
+    }
+
+    public void setCodArtReprocFinal(String codArtReprocFinal) {
+        this.codArtReprocFinal = codArtReprocFinal;
     }
 
     public long getVersion() {

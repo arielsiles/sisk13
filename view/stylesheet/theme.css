@@ -366,6 +366,14 @@ input, select, textarea {
     width: 150px;
 }
 
+.inputDateNarrow {
+    width: 135px;
+}
+
+.zonesPanelBody {
+    padding-top: 2px !important;
+}
+
 .inputSmall {
     width: 75px;
 }

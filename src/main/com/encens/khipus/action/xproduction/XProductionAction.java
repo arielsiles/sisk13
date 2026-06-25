@@ -13,6 +13,7 @@ import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.employees.JobContractService;
+import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.service.xproduction.XProductionPlanService;
 import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.service.xproduction.XProductionUlexitaCalc;
@@ -23,6 +24,7 @@ import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
+import org.jboss.seam.security.Identity;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -53,6 +55,9 @@ public class XProductionAction extends GenericAction<XProduction> {
     private String activeTabName = "productsTab";
 
     private XProductionUlexita ulexitaData;
+    /* Articulo destino del Reproceso final (resuelto desde la linea, solo para mostrar). */
+    private ProductItem reprocFinalArticle;
+    private boolean reprocFinalArticleResolved;
 
     private XProductionBaritina baritinaData;
     private List<XProductionBaritinaZona> baritinaZonaList = new ArrayList<XProductionBaritinaZona>();
@@ -72,6 +77,8 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XProductionUlexitaService xproductionUlexitaService;
     @In
     private XProductionBaritinaService xproductionBaritinaService;
+    @In(create = true)
+    private ProductItemService productItemService;
     @In(required = false)
     private User currentUser;
 
@@ -179,6 +186,9 @@ public class XProductionAction extends GenericAction<XProduction> {
         if (ulexitaData.getProduction() == null) {
             ulexitaData.setProduction(getInstance());
         }
+        // Persistir el articulo destino del Reproceso final configurado en la linea,
+        // para que la orden conserve con que articulo se haran los movimientos de inventario.
+        ulexitaData.setCodArtReprocFinal(getInstance().getProductionLine().getCodArtReprocFinal());
         xproductionUlexitaService.save(ulexitaData);
     }
 
@@ -198,6 +208,8 @@ public class XProductionAction extends GenericAction<XProduction> {
         Long seq = sequenceService.createOrUpdateNextSequenceValue(Constants.PRODUCTION_CODE);
         production.setCode(seq.intValue());
         syncMpFromConsumo();
+        syncBaritinaMpFromPt();
+        recalcBaritinaZonas();
         xproductionService.createProduction(production, ingredientSupplyList, materialSupplyList);
 
         production.setInitDate(production.getProductionPlan().getDate());
@@ -220,6 +232,8 @@ public class XProductionAction extends GenericAction<XProduction> {
         production.setProductionShiftType(productionShiftType);
 
         syncMpFromConsumo();
+        syncBaritinaMpFromPt();
+        recalcBaritinaZonas();
         production.setTotalCost(calculateTotalCost());
         production.setTotalRawMaterial(calculateRawMaterial());
         xproductionService.updateProduction(production, ingredientSupplyList, materialSupplyList, laborList);
@@ -269,6 +283,12 @@ public class XProductionAction extends GenericAction<XProduction> {
         }
 
         syncMpFromConsumo();
+        syncBaritinaMpFromPt();
+        recalcBaritinaZonas();
+
+        if (!validateSupplyQuantities()) {
+            return;
+        }
 
         for (XProductionProduct product : getInstance().getProductionProductList()){
             BigDecimal productCost = BigDecimal.ZERO;
@@ -411,6 +431,44 @@ public class XProductionAction extends GenericAction<XProduction> {
                 result = true;
         }
         return result;
+    }
+
+    /**
+     * Permiso para EDITAR los datos generales/de produccion de la orden (datos de
+     * produccion, insumos, materiales, zonas, PT, cabecera). Solo usuarios de
+     * produccion (PRODUCTION:UPDATE) y solo mientras la orden esta pendiente.
+     */
+    public boolean isCanEditProduction() {
+        return isPending() && Identity.instance().hasPermission("PRODUCTION", "UPDATE");
+    }
+
+    /**
+     * Permiso para EDITAR los Datos de Laboratorio. SOLO usuarios de laboratorio
+     * (PRODUCTION_LAB_DATA:UPDATE), mientras la orden esta pendiente. Los usuarios
+     * de produccion (PRODUCTION:UPDATE) NO pueden modificar estos datos: el
+     * registro de laboratorio es exclusivo de laboratorio. En aprobado nadie edita.
+     */
+    public boolean isCanEditLabData() {
+        return isPending() && Identity.instance().hasPermission("PRODUCTION_LAB_DATA", "UPDATE");
+    }
+
+    /**
+     * Guardado dedicado para usuarios de laboratorio: registra los Datos de
+     * Laboratorio y persiste tambien los datos derivados ('Datos Calculados'):
+     * al cambiar las leyes se recalcula el Consumo MP y se vuelca al insumo MP por
+     * defecto, por lo que hay que persistir los insumos ademas de la data ULEXITA.
+     */
+    public String saveLabData() {
+        XProduction production = getInstance();
+        // Recalcular y volcar el Consumo MP al insumo MP por defecto (no-op si no es ULEXITA).
+        syncMpFromConsumo();
+        production.setTotalCost(calculateTotalCost());
+        production.setTotalRawMaterial(calculateRawMaterial());
+        // Persistir insumos/materiales (con la cantidad de MP recalculada) y la data de lab.
+        xproductionService.updateProduction(production, ingredientSupplyList, materialSupplyList, laborList);
+        persistUlexitaData();
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "Production.message.labDataSaved");
+        return Outcome.SUCCESS;
     }
 
     public void clearAction(){
@@ -774,13 +832,13 @@ public class XProductionAction extends GenericAction<XProduction> {
         BigDecimal materialCost = BigDecimal.ZERO;
 
         for (XSupply supply : ingredientSupplyList){
-            BigDecimal cost = BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6);
+            BigDecimal cost = BigDecimalUtil.multiply(nz(supply.getQuantity()), nz(supply.getUnitCost()), 6);
             ingredientCost = BigDecimalUtil.sum(ingredientCost, cost, 6);
             //System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
         }
 
         for (XSupply supply : materialSupplyList){
-            BigDecimal cost = BigDecimalUtil.multiply(supply.getQuantity(), supply.getUnitCost(), 6);
+            BigDecimal cost = BigDecimalUtil.multiply(nz(supply.getQuantity()), nz(supply.getUnitCost()), 6);
             materialCost = BigDecimalUtil.sum(materialCost, cost, 6);
             //System.out.println("===>>> " + supply.getProductItem().getFullName() + "\t\t\t " + supply.getQuantity() + "\t\t - " + supply.getUnitCost() + "\t\t - " + cost);
         }
@@ -804,7 +862,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
             if (supply.hasFormula()){
                 if (supply.getFormulationInput().getInputDefault()){
-                    result = BigDecimalUtil.sum(result, supply.getQuantity(), 6);
+                    result = BigDecimalUtil.sum(result, nz(supply.getQuantity()), 6);
                 }
             }
 
@@ -1075,6 +1133,105 @@ public class XProductionAction extends GenericAction<XProduction> {
         return BigDecimalUtil.roundBigDecimal(BigDecimalUtil.divide(kg, BigDecimalUtil.ONE_THOUSAND, 6), 4);
     }
 
+    /**
+     * BARITINA: al ingresar la cantidad del Producto Terminado principal de la
+     * linea (cod_art = line.codArtPtPrincipal), calcula la Materia Prima por
+     * defecto como MP = PT * factor (line.factorPtMp) y la vuelca en la cantidad
+     * del insumo marcado inputDefault, respetando la unidad (KG/TN).
+     *
+     * No-op si: no es baritina, la orden esta aprobada, la linea no tiene factor
+     * configurado (nulo o <= 0), o no hay PT principal cargado. El valor se
+     * redondea a 2 decimales (el mostrado).
+     */
+    public void syncBaritinaMpFromPt() {
+        if (!isBaritinaTemplate() || getInstance() == null || getInstance().isApproved()) return;
+        ProductionLine line = getInstance().getProductionLine();
+        if (line == null) return;
+        BigDecimal factor = line.getFactorPtMp();
+        if (factor == null || factor.signum() <= 0) return;
+
+        String ptCod = line.getCodArtPtPrincipal();
+        if (ptCod == null) return;
+
+        BigDecimal ptQty = BigDecimal.ZERO;
+        String ptUnit = null;
+        boolean found = false;
+        if (getInstance().getProductionProductList() != null) {
+            for (XProductionProduct p : getInstance().getProductionProductList()) {
+                if (ptCod.equals(p.getProductItemCode()) && p.getQuantity() != null) {
+                    ptQty = BigDecimalUtil.sum(ptQty, p.getQuantity(), 6);
+                    if (ptUnit == null && p.getProductItem() != null) {
+                        ptUnit = p.getProductItem().getUsageMeasureCode();
+                    }
+                    found = true;
+                }
+            }
+        }
+        if (!found || ingredientSupplyList == null) return;
+
+        for (XSupply supply : ingredientSupplyList) {
+            if (supply.hasFormula()
+                    && Boolean.TRUE.equals(supply.getFormulationInput().getInputDefault())) {
+                String mpUnit = supply.getProductItem() != null ? supply.getProductItem().getUsageMeasureCode() : null;
+                BigDecimal ptInMpUnit = convertQtyToUnit(ptQty, ptUnit, mpUnit);
+                BigDecimal mpQty = BigDecimalUtil.roundBigDecimal(BigDecimalUtil.multiply(ptInMpUnit, factor, 6), 2);
+                supply.setQuantity(mpQty);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Nombre del articulo configurado en la linea (cod_art_reproc_final) donde se
+     * acumula el Reproceso final (TN) al aprobar. Devuelve el nombre completo; si no
+     * se resuelve el articulo, el codigo; {@code null} si no hay nada configurado.
+     * Se cachea por codigo para no golpear la BD en cada render.
+     */
+    public String getReprocFinalArticleName() {
+        // Fuente: el articulo guardado en la orden si ya existe (refleja lo persistido,
+        // aunque luego cambie la config); si no, la config actual de la linea.
+        String code = ulexitaData != null ? ulexitaData.getCodArtReprocFinal() : null;
+        if (code == null || code.trim().isEmpty()) {
+            ProductionLine line = getInstance() == null ? null : getInstance().getProductionLine();
+            code = line == null ? null : line.getCodArtReprocFinal();
+        }
+        if (code == null || code.trim().isEmpty()) {
+            return null;
+        }
+        if (!reprocFinalArticleResolved || reprocFinalArticle == null
+                || !code.equals(reprocFinalArticle.getProductItemCode())) {
+            try {
+                reprocFinalArticle = productItemService.findProductItemByCode(code);
+            } catch (Exception e) {
+                reprocFinalArticle = null;
+            }
+            reprocFinalArticleResolved = true;
+        }
+        return reprocFinalArticle == null ? code : reprocFinalArticle.getFullName();
+    }
+
+    /** Convierte una cantidad de la unidad origen a la destino (KG<->TN). Igual unidad: sin cambio. */
+    private BigDecimal convertQtyToUnit(BigDecimal value, String fromUnit, String toUnit) {
+        if (value == null) return BigDecimal.ZERO;
+        boolean fromKg = "KG".equalsIgnoreCase(fromUnit);
+        boolean toKg = "KG".equalsIgnoreCase(toUnit);
+        if (fromKg == toKg) return value;
+        if (fromKg) return BigDecimalUtil.divide(value, BigDecimalUtil.ONE_THOUSAND, 6); // KG -> TN
+        return BigDecimalUtil.multiply(value, BigDecimalUtil.ONE_THOUSAND, 6);           // TN -> KG
+    }
+
+    /**
+     * Despachador para el evento de cambio de cantidad de un Producto Terminado.
+     * Aplica el recalculo segun el tipo de linea (cada sync es no-op si no aplica):
+     * ULEXITA vuelca el Consumo MP; BARITINA vuelca PT*factor a la MP y recalcula
+     * la distribucion por zonas.
+     */
+    public void recalcOnPtChange() {
+        syncMpFromConsumo();
+        syncBaritinaMpFromPt();
+        recalcBaritinaZonas();
+    }
+
     /** Recalcula cantidad por zona = uso_mp_baritina (TN) * porcentaje / 100. */
     public void recalcBaritinaZonas() {
         BigDecimal mp = getBaritinaMpUsed();
@@ -1123,6 +1280,41 @@ public class XProductionAction extends GenericAction<XProduction> {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Valida que ningun insumo ni material tenga cantidad nula o en cero antes
+     * de aprobar la orden. Lista los articulos afectados en el area de mensajes
+     * por defecto. Retorna false (bloquea la aprobacion) si encuentra alguno.
+     */
+    private boolean validateSupplyQuantities() {
+        StringBuilder zeros = new StringBuilder();
+        for (XSupply s : ingredientSupplyList) {
+            if (isZeroQuantity(s)) appendSupplyName(zeros, s);
+        }
+        for (XSupply s : materialSupplyList) {
+            if (isZeroQuantity(s)) appendSupplyName(zeros, s);
+        }
+        if (zeros.length() > 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "XProduction.error.supplyQuantityZero", zeros.toString());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isZeroQuantity(XSupply s) {
+        return s == null || s.getQuantity() == null || s.getQuantity().signum() == 0;
+    }
+
+    private void appendSupplyName(StringBuilder sb, XSupply s) {
+        if (sb.length() > 0) sb.append(", ");
+        sb.append(s.getProductItem() != null ? s.getProductItem().getFullName() : s.getProductItemCode());
+    }
+
+    /** Devuelve ZERO si el valor es nulo. Para calculos tolerantes a cantidades/costos sin cargar. */
+    private static BigDecimal nz(BigDecimal v) {
+        return v == null ? BigDecimal.ZERO : v;
     }
 
     /*public BigDecimal getTotalCost() {
