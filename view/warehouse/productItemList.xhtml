@@ -92,11 +92,11 @@
                             id="productItemList"
                             rows="15"
                             width="100%"
-                            columnsWidth="10%, 25%, 10%, 15%, 15%, 15%, 10%">
+                            columnsWidth="6%, 37%, 20%, 9%, 8%, 10%, 10%">
 
                 <f:facet name="header">
                     <rich:columnGroup>
-                        <rich:column>
+                        <rich:column styleClass="center">
                             <app:commandSortHeader sortProperty="productItem.productItemCode"
                                                    dataModel="#{productItemDataModel}"
                                                    reRender="productItemList, dataScroller">
@@ -109,13 +109,14 @@
                                 #{messages['ProductItem.name']}
                             </app:commandSortHeader>
                         </rich:column>
-                        <rich:column>
-                            <app:commandSortHeader sortProperty="productItem.state" dataModel="#{productItemDataModel}"
+                        <rich:column styleClass="center">
+                            <app:commandSortHeader sortProperty="productItem.warehouse.name"
+                                                   dataModel="#{productItemDataModel}"
                                                    reRender="productItemList, dataScroller">
-                                #{messages['ProductItem.state']}
+                                #{messages['WarehouseVoucher.warehouse']}
                             </app:commandSortHeader>
                         </rich:column>
-                        <rich:column>
+                        <rich:column styleClass="center">
                             <app:commandSortHeader sortProperty="productItem.usageMeasureUnit.name"
                                                    dataModel="#{productItemDataModel}"
                                                    reRender="productItemList, dataScroller">
@@ -123,12 +124,18 @@
                             </app:commandSortHeader>
                         </rich:column>
                         <rich:column>
+                            <app:commandSortHeader sortProperty="productItem.state" dataModel="#{productItemDataModel}"
+                                                   reRender="productItemList, dataScroller">
+                                #{messages['ProductItem.state']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <!--<rich:column>
                             <app:commandSortHeader sortProperty="productItem.investmentAmount"
                                                    dataModel="#{productItemDataModel}"
                                                    reRender="productItemList, dataScroller">
                                 #{messages['ProductItem.investmentAmount']}
                             </app:commandSortHeader>
-                        </rich:column>
+                        </rich:column>-->
                         <rich:column>
                             <app:commandSortHeader sortProperty="productItem.unitCost"
                                                    dataModel="#{productItemDataModel}"
@@ -141,23 +148,26 @@
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
-                <rich:column>
+                <rich:column styleClass="center">
                     <h:outputText value="#{productItemItem.productItemCode}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{productItemItem.name}"/>
                 </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{productItemItem.warehouse.fullName}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{productItemItem.usageMeasureUnit.name}"/>
+                </rich:column>
                 <rich:column>
                     <h:outputText value="#{messages[productItemItem.state.resourceKey]}"/>
                 </rich:column>
-                <rich:column>
-                    <h:outputText value="#{productItemItem.usageMeasureUnit.name}"/>
-                </rich:column>
-                <rich:column styleClass="right">
+                <!--<rich:column styleClass="right">
                     <h:outputText value="#{productItemItem.investmentAmount}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
-                </rich:column>
+                </rich:column>-->
                 <rich:column styleClass="right">
                     <h:outputText value="#{productItemItem.unitCost}">
                         <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"/>

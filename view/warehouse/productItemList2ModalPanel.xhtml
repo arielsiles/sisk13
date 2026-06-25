@@ -56,7 +56,7 @@
                         id="productItemList"
                         rows="#{sessionUser.rowsPerPage}"
                         width="100%"
-                        columnsWidth="20%, 45%, 20%, 15%">
+                        columnsWidth="8%, 27%, 51%, 8%, 6%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column>
@@ -64,6 +64,13 @@
                                                dataModel="#{productItemSearchDataModel}"
                                                reRender="productItemList, dataScroller">
                             #{messages['ProductItem.productItemCode']}
+                        </app:commandSortHeader>
+                    </rich:column>
+                    <rich:column>
+                        <app:commandSortHeader sortProperty="productItem.warehouse.name"
+                                               dataModel="#{productItemSearchDataModel}"
+                                               reRender="productItemList, dataScroller">
+                            #{messages['WarehouseVoucher.warehouse']}
                         </app:commandSortHeader>
                     </rich:column>
                     <rich:column>
@@ -84,7 +91,7 @@
                         <app:commandSortHeader sortProperty="productItem.unitCost"
                                                dataModel="#{productItemSearchDataModel}"
                                                reRender="productItemList, dataScroller">
-                            #{messages['ProductItem.unitCost']}
+                            CU
                         </app:commandSortHeader>
                     </rich:column>
                     <rich:column styleClass="center">
@@ -94,6 +101,9 @@
             </f:facet>
             <rich:column>
                 <h:outputText value="#{productItemItem.productItemCode}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{productItemItem.warehouse.fullName}"/>
             </rich:column>
             <rich:column>
                 <h:outputText value="#{productItemItem.name}"/>
