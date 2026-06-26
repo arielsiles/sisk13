@@ -4,6 +4,7 @@ import com.encens.khipus.model.production.CollectMaterialState;
 import com.encens.khipus.model.production.ProductionState;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.model.warehouse.ProductItemState;
 import com.encens.khipus.model.warehouse.SubGroup;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.model.warehouse.WarehouseState;
@@ -57,10 +58,11 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
         //    sin subgrupo.
         List<Object[]> products = em.createQuery(
                 "select p, sg from ProductItem p left join p.subGroup sg " +
-                "where p.warehouseCode = :wc and p.companyNumber = :cn " +
+                "where p.warehouseCode = :wc and p.companyNumber = :cn and p.state = :vig " +
                 "order by sg.name, p.name")
                 .setParameter("wc", warehouseCode)
                 .setParameter("cn", companyNumber)
+                .setParameter("vig", ProductItemState.VIG)
                 .getResultList();
         for (Object[] r : products) {
             ProductItem p = (ProductItem) r[0];
