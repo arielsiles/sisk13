@@ -43,6 +43,20 @@
         </framework:restrictions>
     </framework:entity-query>
 
+    <!-- Tipos de documento permitidos para un usuario con restriccion de vales activa.
+         La restriccion 'in (...)' se omite si el usuario no esta restringido o no tiene
+         tipos configurados (el EL allowedDocumentCodes devuelve null). -->
+    <factory name="warehouseRestrictedDocumentTypeList" value="#{warehouseRestrictedDocumentTypeQuery}"/>
+    <framework:entity-query name="warehouseRestrictedDocumentTypeQuery"
+                            ejbql="select documentType from WarehouseDocumentType documentType">
+        <framework:restrictions>
+            <value>documentType.state !=
+                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.DocumentTypeState', 'BLO')}
+            </value>
+            <value>documentType.id.documentCode in (#{warehouseVoucherRestrictionResolver.allowedDocumentCodes})</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
     <factory name="productTransferDocumentTypeList" value="#{productTransferDocumentTypeQuery}"/>
     <framework:entity-query name="productTransferDocumentTypeQuery"
                             ejbql="select documentType from WarehouseDocumentType documentType">

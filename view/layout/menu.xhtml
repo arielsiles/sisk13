@@ -496,6 +496,14 @@
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','VIEW')}">
+                    <s:link view="/warehouse/restrictedVoucherConfigList.xhtml"
+                            value="#{messages['menu.warehouse.voucher.restriction']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
                                rendered="#{s:hasPermission('WAREHOUSEDRIVER','VIEW')}">
                     <s:link view="/warehouse/driverList.xhtml"
                             value="#{messages['menu.warehouse.dispatch.driver']}"
@@ -799,6 +807,12 @@
                 </rich:menuItem>
 
             </rich:dropDownMenu>
+
+            <s:link view="/xproduction/warehouseBalance.xhtml"
+                    value="#{messages['menu.xproduction.balance']}"
+                    styleClass="tab-cell"
+                    rendered="#{s:hasPermission('XPRODUCTION_BALANCE','VIEW')}"
+                    propagation="none"/>
 
             <rich:dropDownMenu value="#{messages['menu.xproduction.reports']}" >
                 <rich:menuItem submitMode="none"

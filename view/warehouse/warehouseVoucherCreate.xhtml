@@ -24,6 +24,13 @@
 <c:if test="#{not isEnabledSpecialOperations}">
     <c:set var="selectList" value="#{warehouseDocumentTypeList}"/>
 </c:if>
+<!-- Restriccion de vales por usuario: si el usuario restringido tiene tipos de documento
+     configurados, el combo se limita a esos tipos. Lista vacia o usuario no restringido =>
+     se conserva el comportamiento normal (Interpretacion A). -->
+<c:set var="restrictedDocumentCodes" value="#{warehouseVoucherRestrictionResolver.allowedDocumentCodes}"/>
+<c:if test="#{not empty restrictedDocumentCodes}">
+    <c:set var="selectList" value="#{warehouseRestrictedDocumentTypeList}"/>
+</c:if>
 
 <c:set var="mainComponentIdsToRerender"
        value="documentTypeField, transferorder, lowCheckField, productionLineDiv, destinationDiv, analyticDetailDiv, expenseTypeDiv, expenseCashAccountDiv, petitionerJobContractPanel, executorUnitLeftSidePanel, executorUnitRightSidePanel, movementDetailListPanel, descriptionField, contraAccountDiv, cashAccountListModalPanelDiv"/>
@@ -97,6 +104,10 @@
                 <app:restriction
                         condition="documentType.warehouseVoucherType != #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseVoucherType','S')}"/>
             </c:if>
+            <!-- Restriccion de vales por usuario: el typeahead tampoco permite elegir un
+                 tipo fuera de la lista configurada (null => se omite). -->
+            <app:restriction
+                    condition="documentType.id.documentCode in (#{warehouseVoucherRestrictionResolver.allowedDocumentCodes})"/>
         </ui:define>
     </app:quickSearch>
     <h:selectOneMenu id="documentType"
@@ -230,6 +241,10 @@
                         condition="warehouse.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.WarehouseState','VIG')}"/>
                 <app:restriction
                         condition="warehouse.executorUnit = #{warehouseVoucherCreateAction.warehouseVoucher.executorUnit}"/>
+                <!-- Restriccion de vales por usuario: el typeahead tampoco permite elegir un
+                     almacen fuera de la lista configurada (null => se omite). -->
+                <app:restriction
+                        condition="warehouse in (#{warehouseVoucherRestrictionResolver.allowedWarehouses})"/>
             </ui:define>
         </app:quickSearch>
         <app:selectPopUp id="warehouseSelectPopup"

@@ -130,6 +130,10 @@ public class WarehouseVoucherUpdateAction extends WarehouseVoucherGeneralAction 
         if (!Outcome.SUCCESS.equals(validationOutcome)) {
             return validationOutcome;
         }
+        // Refuerzo de servidor de la restriccion de vales por usuario.
+        if (!validateUserRestriction(inventoryMovement.getMovementDetailList())) {
+            return Outcome.REDISPLAY;
+        }
         resetValidateQuantityMappings();
 
         try {

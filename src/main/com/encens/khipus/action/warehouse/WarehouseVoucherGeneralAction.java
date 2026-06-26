@@ -47,6 +47,9 @@ public class WarehouseVoucherGeneralAction extends GenericAction<WarehouseVouche
     @In
     private InventoryService inventoryService;
 
+    @In(value = "warehouseVoucherRestrictionResolver", create = true, required = false)
+    private WarehouseVoucherRestrictionResolver warehouseVoucherRestrictionResolver;
+
     private static final Integer SCALE = 6;
 
     protected WarehouseVoucher warehouseVoucher = new WarehouseVoucher();
@@ -396,6 +399,53 @@ public class WarehouseVoucherGeneralAction extends GenericAction<WarehouseVouche
 
     public boolean isEnabledResponsibleField() {
         return warehouseVoucher.isConsumption() || warehouseVoucher.isOutput();
+    }
+
+    /**
+     * Refuerzo de servidor de la restriccion de vales por usuario.
+     * Valida que el Tipo de Documento, el Almacen y cada Articulo del vale
+     * esten dentro de lo permitido para el usuario logueado. Cierra el bypass
+     * del filtro de UI (typeahead o peticion manipulada).
+     * Si el usuario no esta restringido, no hace nada y retorna true.
+     *
+     * @param details detalles de movimiento a validar (articulos)
+     * @return true si todo es valido; false si algo no esta permitido
+     *         (agrega el/los mensaje(s) de error correspondiente(s))
+     */
+    protected boolean validateUserRestriction(List<MovementDetail> details) {
+        if (warehouseVoucherRestrictionResolver == null
+                || !warehouseVoucherRestrictionResolver.isRestricted()) {
+            return true;
+        }
+
+        boolean valid = true;
+
+        if (!warehouseVoucherRestrictionResolver.isDocumentTypeAllowed(warehouseVoucher.getDocumentType())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseVoucher.restriction.documentTypeNotAllowed");
+            valid = false;
+        }
+
+        if (!warehouseVoucherRestrictionResolver.isWarehouseAllowed(warehouseVoucher.getWarehouse())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WarehouseVoucher.restriction.warehouseNotAllowed");
+            valid = false;
+        }
+
+        if (details != null) {
+            for (MovementDetail detail : details) {
+                if (detail != null
+                        && !warehouseVoucherRestrictionResolver.isProductItemAllowed(detail.getProductItem())) {
+                    String productItemName = detail.getProductItem() != null
+                            ? detail.getProductItem().getFullName() : "";
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                            "WarehouseVoucher.restriction.productItemNotAllowed", productItemName);
+                    valid = false;
+                }
+            }
+        }
+
+        return valid;
     }
 
     /* getters and setters */

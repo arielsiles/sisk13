@@ -742,6 +742,32 @@
         </navigation>
     </page>
 
+    <!-- Restriccion de Vales por Usuario -->
+    <page view-id="/warehouse/restrictedVoucherConfigList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{restrictedVoucherConfigAction.select(configItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/restrictedVoucherConfig.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/restrictedVoucherConfig.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/restrictedVoucherConfigList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/restrictedVoucherConfigList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/restrictedVoucherConfigList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <!-- Catalogo de Conductores -->
     <page view-id="/warehouse/driverList.xhtml"
           login-required="true">

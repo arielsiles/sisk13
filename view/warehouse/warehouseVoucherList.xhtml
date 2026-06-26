@@ -5,6 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
@@ -68,18 +69,20 @@
                                  reRender="productItemField"
                                  hotKeySelect="alt+1"/>
             </s:decorate>
-            <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['WarehousePurchaseOrder.provider']}</ui:define>
-                <app:selectPopUp id="provider"
-                                 required="false"
-                                 textValue="#{warehouseVoucherDataModel.provider.fullName}"
-                                 value="#{warehouseVoucherDataModel.provider}"
-                                 clearAction="warehouseVoucherDataModel.cleanProvider()"
-                                 searchModalPanel="providerListModalPanel"
-                                 dataModel="#{providerDataModel}"
-                                 reRender="providerField"
-                                 tabindex="4"/>
-            </s:decorate>
+            <c:if test="#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}">
+                <s:decorate id="providerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WarehousePurchaseOrder.provider']}</ui:define>
+                    <app:selectPopUp id="provider"
+                                     required="false"
+                                     textValue="#{warehouseVoucherDataModel.provider.fullName}"
+                                     value="#{warehouseVoucherDataModel.provider}"
+                                     clearAction="warehouseVoucherDataModel.cleanProvider()"
+                                     searchModalPanel="providerListModalPanel"
+                                     dataModel="#{providerDataModel}"
+                                     reRender="providerField"
+                                     tabindex="4"/>
+                </s:decorate>
+            </c:if>
             <s:decorate id="costCenterCodeField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">
                     <h:outputText value="#{messages['WarehouseVoucher.costCenter']}"/>
@@ -394,17 +397,19 @@
 </div>
 </h:form>
 
-<s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton"
-                           title="#{messages['Common.choose']}"
-                           action="#{warehouseVoucherDataModel.setProvider(providerItem)}"
-                           image="/img/active.gif"
-                           styleClass="select-image"
-                           reRender="providerField"
-                           oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
-    </ui:define>
-</s:decorate>
+<c:if test="#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}">
+    <s:decorate id="providerListModalPanelContainer" template="/finances/providerListModalPanel.xhtml">
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{warehouseVoucherDataModel.setProvider(providerItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               reRender="providerField"
+                               oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</c:if>
 
 <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
     <ui:param name="containerId" value="costCenterListModalPanelContainer"/>

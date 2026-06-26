@@ -1,0 +1,276 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{restrictedVoucherConfigAction.managed}">
+                #{messages['RestrictedVoucherConfig.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['RestrictedVoucherConfig.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="restrictedVoucherConfigForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{restrictedVoucherConfigAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!restrictedVoucherConfigAction.managed and s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton id="updateButtonId"
+                                 action="#{restrictedVoucherConfigAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{restrictedVoucherConfigAction.managed and s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{restrictedVoucherConfigAction.managed and s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{restrictedVoucherConfigAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{restrictedVoucherConfigAction.managed}">
+                            #{messages['RestrictedVoucherConfig.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['RestrictedVoucherConfig.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="userField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RestrictedVoucherConfig.user']}</ui:define>
+                    <h:selectOneMenu id="user" value="#{restrictedVoucherConfig.user}"
+                                     styleClass="input" required="true" tabindex="1">
+                        <s:selectItems value="#{restrictedConfigUserList}" var="userItem"
+                                       label="#{userItem.username}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RestrictedVoucherConfig.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{restrictedVoucherConfig.active}" tabindex="2"/>
+                </s:decorate>
+
+                <rich:spacer height="10"/>
+                <h:outputText value="#{messages['RestrictedVoucherConfig.help']}" styleClass="label-blue"/>
+                <rich:spacer height="10"/>
+
+                <!-- ====================== TIPOS DE DOCUMENTO ====================== -->
+                <app:fieldset id="documentTypesFields" title="#{messages['RestrictedVoucherConfig.documentTypes']}">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['WarehouseVoucher.documentType']}</ui:define>
+                        <h:selectOneMenu id="documentTypeSelect"
+                                         value="#{restrictedVoucherConfigAction.selectedDocumentType}"
+                                         styleClass="input" tabindex="3">
+                            <s:selectItems value="#{warehouseSpecialDocumentTypeList}" var="documentTypeItem"
+                                           label="#{documentTypeItem.fullName}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                        <a4j:commandButton value="#{messages['Common.add']}"
+                                           action="#{restrictedVoucherConfigAction.addSelectedDocumentType}"
+                                           reRender="documentTypesPanel, documentTypeSelect"
+                                           styleClass="button"/>
+                    </s:decorate>
+
+                    <s:div id="documentTypesPanel">
+                        <rich:dataTable value="#{restrictedVoucherConfig.documentTypes}" var="documentTypeRow"
+                                        rendered="#{not empty restrictedVoucherConfig.documentTypes}"
+                                        width="100%" columnsWidth="90%, 10%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['WarehouseVoucher.documentType']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column>
+                                <h:outputText value="#{documentTypeRow.documentType.fullName}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{restrictedVoucherConfigAction.removeDocumentType(documentTypeRow)}"
+                                                 ajaxSingle="true"
+                                                 reRender="documentTypesPanel">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                    </s:div>
+                </app:fieldset>
+
+                <!-- ====================== ALMACENES ====================== -->
+                <app:fieldset id="warehousesFields" title="#{messages['RestrictedVoucherConfig.warehouses']}">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['WarehouseVoucher.warehouse']}</ui:define>
+                        <h:selectOneMenu id="warehouseSelect"
+                                         value="#{restrictedVoucherConfigAction.selectedWarehouse}"
+                                         styleClass="input" tabindex="4">
+                            <s:selectItems value="#{warehouseList}" var="warehouseItemOption"
+                                           label="#{warehouseItemOption.fullName}"
+                                           noSelectionLabel=""
+                                           hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                        <a4j:commandButton value="#{messages['Common.add']}"
+                                           action="#{restrictedVoucherConfigAction.addSelectedWarehouse}"
+                                           reRender="warehousesPanel, warehouseSelect"
+                                           styleClass="button"/>
+                    </s:decorate>
+
+                    <s:div id="warehousesPanel">
+                        <rich:dataTable value="#{restrictedVoucherConfig.warehouses}" var="warehouseRow"
+                                        rendered="#{not empty restrictedVoucherConfig.warehouses}"
+                                        width="100%" columnsWidth="90%, 10%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['WarehouseVoucher.warehouse']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column>
+                                <h:outputText value="#{warehouseRow.warehouse.fullName}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{restrictedVoucherConfigAction.removeWarehouse(warehouseRow)}"
+                                                 ajaxSingle="true"
+                                                 reRender="warehousesPanel">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                    </s:div>
+                </app:fieldset>
+
+                <!-- ====================== ARTICULOS ====================== -->
+                <app:fieldset id="productItemsFields" title="#{messages['RestrictedVoucherConfig.productItems']}">
+                    <div class="buttons">
+                        <a4j:commandButton id="addProductItemCommandButton"
+                                           action="#{productItemSearchDataModel.reset()}"
+                                           value="#{messages['RestrictedVoucherConfig.addProductItem']}"
+                                           styleClass="button"
+                                           immediate="true"
+                                           oncomplete="Richfaces.showModalPanel('restrictedConfigProductItemsModalPanel');"
+                                           actionListener="#{selectPopUpAction.select}"
+                                           reRender="restrictedConfigProductItemsModalPanel">
+                            <f:attribute name="entityManagerName" value=""/>
+                            <f:attribute name="dataModelObject" value="#{productItemSearchDataModel}"/>
+                        </a4j:commandButton>
+                    </div>
+
+                    <s:div id="productItemsPanel">
+                        <rich:dataTable value="#{restrictedVoucherConfig.productItems}" var="productItemRow"
+                                        rendered="#{not empty restrictedVoucherConfig.productItems}"
+                                        width="100%" columnsWidth="20%, 70%, 10%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['ProductItem.productItemCode']}</rich:column>
+                                    <rich:column>#{messages['ProductItem.name']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column>
+                                <h:outputText value="#{productItemRow.productItem.productItemCode}"/>
+                            </rich:column>
+                            <rich:column>
+                                <h:outputText value="#{productItemRow.productItem.name}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.remove']}"
+                                                 action="#{restrictedVoucherConfigAction.removeProductItem(productItemRow)}"
+                                                 ajaxSingle="true"
+                                                 reRender="productItemsPanel">
+                                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                    </s:div>
+                </app:fieldset>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{restrictedVoucherConfigAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!restrictedVoucherConfigAction.managed and s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','CREATE')}"/>
+
+                <h:commandButton action="#{restrictedVoucherConfigAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{restrictedVoucherConfigAction.managed and s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','UPDATE')}"/>
+
+                <h:commandButton action="#{restrictedVoucherConfigAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+        </h:form>
+
+        <!-- Modal de seleccion de articulos (multi-seleccion) reutilizado del modulo de vales -->
+        <s:decorate id="restrictedConfigProductItemsModalPanelContainer"
+                    template="/warehouse/productItemsListModalPanel.xhtml">
+            <ui:param name="containerId" value="restrictedConfigProductItemsModalPanelContainer"/>
+            <ui:param name="dialogId" value="restrictedConfigProductItemsModalPanel"/>
+            <ui:define name="addButton">
+                <a4j:commandButton id="addButton"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   action="#{restrictedVoucherConfigAction.addProductItems(productItemSearchDataModel.selectedProductItems)}"
+                                   value="#{messages['Common.add']}"
+                                   reRender="productItemsPanel"
+                                   styleClass="button"
+                                   oncomplete="Richfaces.hideModalPanel('restrictedConfigProductItemsModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{restrictedVoucherConfigAction.managed and s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['RestrictedVoucherConfig.delete.confirmation']}">
+                        <f:param value="#{restrictedVoucherConfig.user.username}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{restrictedVoucherConfigAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{restrictedVoucherConfigAction.managed and s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

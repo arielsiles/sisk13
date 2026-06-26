@@ -24,7 +24,10 @@ public class WarehouseSearchDataModel extends QueryDataModel<WarehousePK, Wareho
             "lower(warehouse.name) like concat('%', concat(lower(#{warehouseSearchDataModel.criteria.name}), '%'))",
             "lower(warehouse.warehouseCode) like concat(lower(#{warehouseSearchDataModel.criteria.warehouseCode}), '%')",
             "warehouse.state = #{warehouseSearchDataModel.criteria.state}",
-            "warehouse.executorUnit = #{warehouseSearchDataModel.criteria.executorUnit}"};
+            "warehouse.executorUnit = #{warehouseSearchDataModel.criteria.executorUnit}",
+            // Restriccion de vales por usuario: solo aplica si el usuario esta restringido y tiene
+            // almacenes configurados (si no, el EL devuelve null y la restriccion se omite).
+            "warehouse in (#{warehouseVoucherRestrictionResolver.allowedWarehouses})"};
 
     @Create
     public void init() {

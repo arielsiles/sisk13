@@ -1,0 +1,96 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['RestrictedVoucherConfig.titlePlural']}</ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="restrictedVoucherConfigSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+                <s:decorate id="usernameFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['RestrictedVoucherConfig.user']}</ui:define>
+                    <h:inputText id="username" value="#{restrictedVoucherConfigDataModel.username}"
+                                 maxlength="50" tabindex="1" styleClass="input"/>
+                </s:decorate>
+
+                <div class="buttons">
+                    <a4j:commandButton action="#{restrictedVoucherConfigDataModel.search}"
+                                       reRender="restrictedVoucherConfigList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="2">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+
+                <rich:jQuery selector="#username" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/restrictedVoucherConfig.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{restrictedVoucherConfigDataModel}" var="configItem"
+                            id="restrictedVoucherConfigList"
+                            rows="#{sessionUser.rowsPerPage15}"
+                            width="100%" columnsWidth="30%, 15%, 15%, 15%, 15%, 10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="restrictedVoucherConfig.user.username"
+                                                   dataModel="#{restrictedVoucherConfigDataModel}"
+                                                   reRender="restrictedVoucherConfigList, dataScroller">
+                                #{messages['RestrictedVoucherConfig.user']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">#{messages['RestrictedVoucherConfig.active']}</rich:column>
+                        <rich:column styleClass="center">#{messages['RestrictedVoucherConfig.documentTypes']}</rich:column>
+                        <rich:column styleClass="center">#{messages['RestrictedVoucherConfig.warehouses']}</rich:column>
+                        <rich:column styleClass="center">#{messages['RestrictedVoucherConfig.productItems']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{configItem.user.username}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{configItem.active ? messages['Common.yes'] : messages['Common.no']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{configItem.documentTypeCount}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{configItem.warehouseCount}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{configItem.productItemCount}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','VIEW')}"
+                                   action="#{restrictedVoucherConfigAction.select(configItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="restrictedVoucherConfigList"
+                              dataModel="#{restrictedVoucherConfigDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/restrictedVoucherConfig.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEVOUCHERRESTRICTION','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

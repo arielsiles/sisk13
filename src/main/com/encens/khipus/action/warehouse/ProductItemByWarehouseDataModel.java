@@ -31,7 +31,10 @@ public class ProductItemByWarehouseDataModel extends QueryDataModel<InventoryPK,
                     "inventory.warehouse = #{dispatchVoucher.warehouse}",
                     "lower(inventory.productItem.id.productItemCode) like concat(lower(#{productItemByWarehouseDataModel.productItemCode}), '%')",
                     "lower(inventory.productItem.name) like concat('%',concat(lower(#{productItemByWarehouseDataModel.productItemName}), '%'))",
-                    "inventory.productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"
+                    "inventory.productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}",
+                    // Restriccion de vales por usuario: solo aplica si el usuario esta restringido y tiene
+                    // articulos configurados (si no, el EL devuelve null y la restriccion se omite).
+                    "inventory.productItem in (#{warehouseVoucherRestrictionResolver.allowedProductItems})"
             };
 
     @Create
