@@ -15,6 +15,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -98,10 +99,41 @@ public class WarehouseVoucherRestrictionResolver implements Serializable {
     }
 
     /**
-     * @return codigos de Tipo de Documento (cod_doc) permitidos, o {@code null}
-     *         si no hay restriccion / la lista esta vacia.
+     * AISLAMIENTO POR PANTALLA: la restriccion de almacen/articulo/tipo-doc solo
+     * debe filtrar en las pantallas de VALE. Los modelos de datos
+     * (WarehouseSearchDataModel, ProductItemByWarehouseDataModel) son COMPARTIDOS
+     * con despacho, produccion y reportes; para no afectarlos, los getters que
+     * usan esos modelos via EL devuelven null cuando la pantalla activa NO es de
+     * vale. La validacion de servidor usa las listas "raw" (sin este gate), por
+     * lo que siempre enforce al guardar un vale.
+     *
+     * Pantallas de vale (donde SI aplica el filtro):
+     *  - warehouseVoucherCreate.xhtml  (crear vale)
+     *  - warehouseVoucherUpdate.xhtml  (editar vale)
+     *  - movementDetail.xhtml          (anadir detalle desde la edicion del vale)
      */
-    public List<String> getAllowedDocumentCodes() {
+    private boolean isVoucherScreen() {
+        try {
+            FacesContext ctx = FacesContext.getCurrentInstance();
+            if (ctx == null || ctx.getViewRoot() == null) {
+                return false;
+            }
+            String viewId = ctx.getViewRoot().getViewId();
+            if (viewId == null) {
+                return false;
+            }
+            return viewId.contains("warehouseVoucherCreate")
+                    || viewId.contains("warehouseVoucherUpdate")
+                    || viewId.contains("movementDetail");
+        } catch (Exception e) {
+            // fail-open: si no se puede determinar la pantalla, NO se restringe.
+            return false;
+        }
+    }
+
+    /* ---- Listas "raw" (basadas solo en la config, sin gate de pantalla) ---- */
+
+    private List<String> rawAllowedDocumentCodes() {
         ensureLoaded();
         if (config == null) {
             return null;
@@ -115,11 +147,7 @@ public class WarehouseVoucherRestrictionResolver implements Serializable {
         return codes.isEmpty() ? null : codes;
     }
 
-    /**
-     * @return Almacenes permitidos, o {@code null} si no hay restriccion / la
-     *         lista esta vacia.
-     */
-    public List<Warehouse> getAllowedWarehouses() {
+    private List<Warehouse> rawAllowedWarehouses() {
         ensureLoaded();
         if (config == null) {
             return null;
@@ -133,11 +161,7 @@ public class WarehouseVoucherRestrictionResolver implements Serializable {
         return warehouses.isEmpty() ? null : warehouses;
     }
 
-    /**
-     * @return Articulos permitidos, o {@code null} si no hay restriccion / la
-     *         lista esta vacia.
-     */
-    public List<ProductItem> getAllowedProductItems() {
+    private List<ProductItem> rawAllowedProductItems() {
         ensureLoaded();
         if (config == null) {
             return null;
@@ -151,10 +175,27 @@ public class WarehouseVoucherRestrictionResolver implements Serializable {
         return productItems.isEmpty() ? null : productItems;
     }
 
-    /* ---- Validaciones de servidor (refuerzo anti-bypass) ---- */
+    /* ---- Getters EL (para los modelos COMPARTIDOS): gated por pantalla de vale.
+           Fuera de las pantallas de vale devuelven null => sin restriccion (despacho,
+           produccion, reportes quedan intactos). ---- */
+
+    public List<String> getAllowedDocumentCodes() {
+        return isVoucherScreen() ? rawAllowedDocumentCodes() : null;
+    }
+
+    public List<Warehouse> getAllowedWarehouses() {
+        return isVoucherScreen() ? rawAllowedWarehouses() : null;
+    }
+
+    public List<ProductItem> getAllowedProductItems() {
+        return isVoucherScreen() ? rawAllowedProductItems() : null;
+    }
+
+    /* ---- Validaciones de servidor (refuerzo anti-bypass): usan las listas raw,
+           por lo que SIEMPRE enforce al guardar un vale, sin depender del viewId. ---- */
 
     public boolean isDocumentTypeAllowed(WarehouseDocumentType documentType) {
-        List<String> codes = getAllowedDocumentCodes();
+        List<String> codes = rawAllowedDocumentCodes();
         if (codes == null) {
             return true;
         }
@@ -164,7 +205,7 @@ public class WarehouseVoucherRestrictionResolver implements Serializable {
     }
 
     public boolean isWarehouseAllowed(Warehouse warehouse) {
-        List<Warehouse> allowed = getAllowedWarehouses();
+        List<Warehouse> allowed = rawAllowedWarehouses();
         if (allowed == null || warehouse == null) {
             return true;
         }
@@ -177,7 +218,7 @@ public class WarehouseVoucherRestrictionResolver implements Serializable {
     }
 
     public boolean isProductItemAllowed(ProductItem productItem) {
-        List<ProductItem> allowed = getAllowedProductItems();
+        List<ProductItem> allowed = rawAllowedProductItems();
         if (allowed == null || productItem == null) {
             return true;
         }
