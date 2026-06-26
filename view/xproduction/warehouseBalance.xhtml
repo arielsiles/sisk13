@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['XProductionBalance.title']}</ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="xproduction"/>
+
+    <ui:define name="body">
+        <style type="text/css">
+            .balanceTable .rich-subtable-row:hover td {
+                background-color: #eaf2fb;
+            }
+            .groupHeaderCell {
+                font-weight: bold;
+                background-color: #dfe7f0;
+            }
+        </style>
+        <h:form id="warehouseBalanceForm">
+
+            <rich:panel id="filterPanel">
+                <f:facet name="header">#{messages['XProductionBalance.filter']}</f:facet>
+
+                <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProductionBalance.warehouse']}</ui:define>
+                    <h:selectOneMenu id="warehouse"
+                                     value="#{xproductionBalanceAction.selectedWarehouse}"
+                                     styleClass="input250">
+                        <s:selectItems value="#{xproductionBalanceAction.warehouses}"
+                                       var="w"
+                                       label="#{w.fullName}"
+                                       noSelectionLabel="#{messages['XProductionBalance.selectWarehouse']}"
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+
+                    <a4j:commandButton id="refreshButton"
+                                       value="#{messages['XProductionBalance.refresh']}"
+                                       action="#{xproductionBalanceAction.refresh}"
+                                       styleClass="button"
+                                       style="margin-left:10px;"
+                                       reRender="balancePanel">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+            </rich:panel>
+
+            <rich:spacer height="8"/>
+
+            <s:div id="balancePanel">
+                <rich:dataTable id="balanceTable"
+                                value="#{xproductionBalanceAction.groups}"
+                                var="group"
+                                width="100%"
+                                styleClass="balanceTable">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column width="15%">#{messages['XProductionBalance.code']}</rich:column>
+                            <rich:column width="55%">#{messages['XProductionBalance.name']}</rich:column>
+                            <rich:column width="12%">#{messages['XProductionBalance.unit']}</rich:column>
+                            <rich:column width="18%" styleClass="right">#{messages['XProductionBalance.balance']}</rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column colspan="4" styleClass="groupHeaderCell">
+                        <h:outputText value="#{group.subGroupName}"/>
+                    </rich:column>
+
+                    <rich:subTable var="row" value="#{group.rows}">
+                        <rich:column width="15%">
+                            <h:outputText value="#{row.productItemCode}"/>
+                        </rich:column>
+                        <rich:column width="55%">
+                            <h:outputText value="#{row.name}"/>
+                        </rich:column>
+                        <rich:column width="12%" styleClass="center">
+                            <h:outputText value="#{row.measureCode}"/>
+                        </rich:column>
+                        <rich:column width="18%" styleClass="right">
+                            <h:outputText value="#{row.balance}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                    </rich:subTable>
+                </rich:dataTable>
+            </s:div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

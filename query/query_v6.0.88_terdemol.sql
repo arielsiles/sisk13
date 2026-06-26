@@ -129,3 +129,22 @@ update funcionalidad
 update funcionalidad
    set nombrerecurso = 'menu.xproduction.production.labor'
  where codigo = 'PRODUCTION_LABOR';
+
+-- ============================================================================
+-- Permiso propio para la vista "Saldos" (Produccion > Saldos)
+-- ============================================================================
+--
+-- Muestra los saldos de almacen (Materia Prima / Producto Terminado) recalculados
+-- desde el origen de los movimientos. Funcionalidad propia para habilitar/ocultar
+-- por rol el menu y la vista.
+--   idmodulo = 11 (xproduction) ; permiso bitmask = VIEW(1)
+--   resourceKey = Functionality.xproduction.balance  (panel de permisos: "Saldos MP/PT")
+--   (el menu usa otra clave 'menu.xproduction.balance' = "Saldos")
+-- Orden de columnas: (id, codigo, descripcion, idmodulo, permiso, nombrerecurso, habilitado)
+--
+-- NOTA: solo se registra la funcionalidad. La asignacion de accesos
+-- (derechoacceso) se hace por el panel de permisos del sistema.
+-- ----------------------------------------------------------------------------
+insert into funcionalidad
+values (476, 'XPRODUCTION_BALANCE', 'Saldos de almacen (Materia Prima / Producto Terminado)',
+        11, 1, 'Functionality.xproduction.balance', 1);
