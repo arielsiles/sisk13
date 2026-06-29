@@ -202,7 +202,10 @@ Tabla satélite de inputs/snapshots: `xpr_produccion_ulexita`.
 
 > Nota histórica: "Ley MP recalculada" usaba antes `leyPt / Kpm_bentonita` y "Consumo MP"
 > no restaba el reproceso. Ambas fórmulas fueron corregidas; los snapshots de órdenes ya
-> aprobadas se migran con `query/query_v6.0.87_terdemol.sql`.
+> aprobadas se migran con `query/query_v6.0.87_terdemol.sql`. La v6.0.87 solo corrigió el
+> snapshot; el insumo MP y el costeo de las órdenes aprobadas se realinean al snapshot
+> corregido con `query/query_v6.0.90_terdemol.sql` (cantidad de `5-ULEXITA`,
+> `xpr_produccion.costototal`/`totalmp` y `costo`/`costouni` de cada PT).
 
 Cualquier división por cero o input requerido nulo hace que el getter retorne `null`
 (la UI/reporte lo interpretan como celda vacía).
@@ -343,4 +346,4 @@ No se hardcodean cadenas de tipo en acciones ni vistas: todo se resuelve por
 | Distribución BARITINA | `XProductionAction.java` (métodos `baritina*`), `XProductionBaritinaServiceBean.java` |
 | Vista de la orden | `view/xproduction/production.xhtml` |
 | Reporte diario ULEXITA | `docs/xproduction_ulexita_daily_report_spec.md` |
-| Migraciones recientes | `query/query_v6.0.76/77/86/87_terdemol.sql` |
+| Migraciones recientes | `query/query_v6.0.76/77/86/87/90_terdemol.sql` |
