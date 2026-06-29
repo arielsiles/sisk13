@@ -830,6 +830,16 @@ public class WarehouseVoucher implements BaseModel {
         this.updatedBy = updatedBy;
     }
 
+    /**
+     * Texto de auditoria de usuario para el tooltip del listado de vales:
+     * "creador >> modificador" (mismo formato que Voucher de contabilidad).
+     */
+    public String userAudit() {
+        String creado = createdBy != null ? createdBy : "";
+        String modificado = updatedBy != null ? " >> " + updatedBy : "";
+        return creado + modificado;
+    }
+
     public boolean isDestinarionAreaProduction(){
         return getDestination() != null ? getDestination().getDestinationTypeArea().equals(DestinationTypeArea.PRODUCTION) : false;
     }
