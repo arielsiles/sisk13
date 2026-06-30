@@ -1,4 +1,6 @@
 -- ============================================================================
+-- Ejecutar todo desde 1 hasta 5, luego revisa 6 y continua con 7
+-- ============================================================================
 -- ACTUALIZACION de saldos y valor del Almacen de Materias Primas (cod_alm = 4)
 --   con COSTO PROMEDIO PONDERADO MOVIL (perpetuo), procesando los movimientos
 --   en ORDEN CRONOLOGICO:
@@ -12,6 +14,9 @@
 --           costo   = se mantiene (valor y saldo bajan en proporcion)
 --     - Entradas SIN costo de compra (PT producido, reproceso final): entran al
 --       costo promedio vigente (suben saldo y valor, no cambian el costo).
+--     - Si el saldo corriente se hace NEGATIVO en algun punto (estacionalidad/
+--       datos), el movil no es confiable: ese articulo usa PROMEDIO SIMPLE de las
+--       entradas valuadas (paso 4.c). La cantidad no cambia.
 --
 --   Al final por articulo:
 --       inv_inventario.saldo_uni        = saldo final
@@ -50,27 +55,27 @@ SET @alm := '4';
 -- ----------------------------------------------------------------------------
 DROP TABLE IF EXISTS wrk_mov_mp;
 CREATE TABLE wrk_mov_mp (
-    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
-    no_cia    VARCHAR(2)    NOT NULL,
-    cod_art   VARCHAR(6)    NOT NULL,
-    fecha     DATE          NOT NULL,
-    ord       INT           NOT NULL,          -- 1 = entrada, 2 = salida (mismo dia)
-    clase     CHAR(2)       NOT NULL,          -- 'EV' entrada valuada, 'EC' entrada a costo, 'S' salida
-    cantidad  DECIMAL(20,4) NOT NULL,
-    valor_in  DECIMAL(20,6) NULL,              -- valor neto (solo 'EV')
-    KEY ix_art (no_cia, cod_art, fecha, ord, id)
+                            id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            no_cia    VARCHAR(2)    NOT NULL,
+                            cod_art   VARCHAR(6)    NOT NULL,
+                            fecha     DATE          NOT NULL,
+                            ord       INT           NOT NULL,          -- 1 = entrada, 2 = salida (mismo dia)
+                            clase     CHAR(2)       NOT NULL,          -- 'EV' entrada valuada, 'EC' entrada a costo, 'S' salida
+                            cantidad  DECIMAL(20,4) NOT NULL,
+                            valor_in  DECIMAL(20,6) NULL,              -- valor neto (solo 'EV')
+                            KEY ix_art (no_cia, cod_art, fecha, ord, id)
 ) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS wrk_costo_mp;
 CREATE TABLE wrk_costo_mp (
-    no_cia        VARCHAR(2)    NOT NULL,
-    cod_art       VARCHAR(6)    NOT NULL,
-    saldo_new     DECIMAL(14,2) NULL,
-    saldo_mon_new DECIMAL(20,2) NULL,
-    costo_uni_new DECIMAL(16,6) NULL,
-    detalle_rows  INT           NULL,
-    neg_balance   INT           NULL,          -- 1 = el saldo corriente fue negativo (costo NO confiable)
-    PRIMARY KEY (no_cia, cod_art)
+                              no_cia        VARCHAR(2)    NOT NULL,
+                              cod_art       VARCHAR(6)    NOT NULL,
+                              saldo_new     DECIMAL(14,2) NULL,
+                              saldo_mon_new DECIMAL(20,2) NULL,
+                              costo_uni_new DECIMAL(16,6) NULL,
+                              detalle_rows  INT           NULL,
+                              neg_balance   INT           NULL,          -- 1 = el saldo corriente fue negativo (costo NO confiable)
+                              PRIMARY KEY (no_cia, cod_art)
 ) ENGINE=InnoDB;
 
 -- ----------------------------------------------------------------------------
@@ -83,10 +88,10 @@ INSERT INTO wrk_mov_mp (no_cia, cod_art, fecha, ord, clase, cantidad, valor_in)
 SELECT p.no_cia, p.cod_art, COALESCE(a.fecha, '1900-01-01'), 1, 'EV',
        COALESCE(a.pesoneto, 0),
        ROUND(((a.pesoprov + a.pesobal) / 2 / 1000) * a.precio
-             * (CASE WHEN a.tienefac = 1 THEN 0.87 ELSE 1 END), 6)
+                 * (CASE WHEN a.tienefac = 1 THEN 0.87 ELSE 1 END), 6)
 FROM inv_articulos p
-JOIN metaproductoproduccion mp ON mp.cod_art = p.cod_art
-JOIN acopiomp a ON a.idmetaproductoproduccion = mp.idmetaproductoproduccion
+         JOIN metaproductoproduccion mp ON mp.cod_art = p.cod_art
+         JOIN acopiomp a ON a.idmetaproductoproduccion = mp.idmetaproductoproduccion
 WHERE p.cod_alm = @alm AND p.estado = 'VIG' AND a.estado <> 'ANL';
 
 -- 2.b Kardex 'E' (ENTRADA valuada). valor = monto.
@@ -94,7 +99,7 @@ INSERT INTO wrk_mov_mp (no_cia, cod_art, fecha, ord, clase, cantidad, valor_in)
 SELECT m.no_cia, m.cod_art, COALESCE(m.fecha, '1900-01-01'), 1, 'EV',
        COALESCE(m.cantidad, 0), COALESCE(m.monto, 0)
 FROM inv_movdet m
-JOIN inv_articulos p ON p.no_cia = m.no_cia AND p.cod_art = m.cod_art
+         JOIN inv_articulos p ON p.no_cia = m.no_cia AND p.cod_art = m.cod_art
 WHERE p.cod_alm = @alm AND p.estado = 'VIG'
   AND m.cod_alm = @alm AND m.estado <> 'ANL' AND m.tipo_mov = 'E';
 
@@ -103,7 +108,7 @@ INSERT INTO wrk_mov_mp (no_cia, cod_art, fecha, ord, clase, cantidad, valor_in)
 SELECT m.no_cia, m.cod_art, COALESCE(m.fecha, '1900-01-01'), 2, 'S',
        COALESCE(m.cantidad, 0), NULL
 FROM inv_movdet m
-JOIN inv_articulos p ON p.no_cia = m.no_cia AND p.cod_art = m.cod_art
+         JOIN inv_articulos p ON p.no_cia = m.no_cia AND p.cod_art = m.cod_art
 WHERE p.cod_alm = @alm AND p.estado = 'VIG'
   AND m.cod_alm = @alm AND m.estado <> 'ANL' AND m.tipo_mov = 'S';
 
@@ -112,8 +117,8 @@ INSERT INTO wrk_mov_mp (no_cia, cod_art, fecha, ord, clase, cantidad, valor_in)
 SELECT p.no_cia, p.cod_art, COALESCE(DATE(pr.fechainicio), '1900-01-01'), 2, 'S',
        COALESCE(xi.cantidad, 0), NULL
 FROM inv_articulos p
-JOIN xpr_insumo xi ON xi.cod_art = p.cod_art
-JOIN xpr_produccion pr ON pr.idproduccion = xi.idproduccion
+         JOIN xpr_insumo xi ON xi.cod_art = p.cod_art
+         JOIN xpr_produccion pr ON pr.idproduccion = xi.idproduccion
 WHERE p.cod_alm = @alm AND p.estado = 'VIG' AND pr.estado <> 'ANL';
 
 -- 2.e PT producido (ENTRADA a costo vigente). Para MP normalmente vacio.
@@ -121,8 +126,8 @@ INSERT INTO wrk_mov_mp (no_cia, cod_art, fecha, ord, clase, cantidad, valor_in)
 SELECT p.no_cia, p.cod_art, COALESCE(DATE(pr.fechainicio), '1900-01-01'), 1, 'EC',
        COALESCE(xpp.cantidad, 0), NULL
 FROM inv_articulos p
-JOIN xpr_producto xpp ON xpp.cod_art = p.cod_art
-JOIN xpr_produccion pr ON pr.idproduccion = xpp.idproduccion
+         JOIN xpr_producto xpp ON xpp.cod_art = p.cod_art
+         JOIN xpr_produccion pr ON pr.idproduccion = xpp.idproduccion
 WHERE p.cod_alm = @alm AND p.estado = 'VIG' AND pr.estado <> 'ANL';
 
 -- 2.f Reproceso ULEXITA: final = ENTRADA a costo vigente ; consumo = SALIDA.
@@ -132,8 +137,8 @@ SELECT p.no_cia, p.cod_art, COALESCE(DATE(pr.fechainicio), '1900-01-01'), 1, 'EC
        (CASE WHEN UPPER(TRIM(p.cod_med)) = 'KG' THEN COALESCE(u.reproceso_final_tn,0) * 1000
              ELSE COALESCE(u.reproceso_final_tn,0) END), NULL
 FROM inv_articulos p
-JOIN xpr_produccion_ulexita u ON u.cod_art_reproc_final = p.cod_art
-JOIN xpr_produccion pr ON pr.idproduccion = u.idproduccion
+         JOIN xpr_produccion_ulexita u ON u.cod_art_reproc_final = p.cod_art
+         JOIN xpr_produccion pr ON pr.idproduccion = u.idproduccion
 WHERE p.cod_alm = @alm AND p.estado = 'VIG' AND pr.estado <> 'ANL'
   AND COALESCE(u.reproceso_final_tn,0) <> 0;
 
@@ -142,8 +147,8 @@ SELECT p.no_cia, p.cod_art, COALESCE(DATE(pr.fechainicio), '1900-01-01'), 2, 'S'
        (CASE WHEN UPPER(TRIM(p.cod_med)) = 'KG' THEN COALESCE(u.consumo_reproceso_tn,0) * 1000
              ELSE COALESCE(u.consumo_reproceso_tn,0) END), NULL
 FROM inv_articulos p
-JOIN xpr_produccion_ulexita u ON u.cod_art_reproc_final = p.cod_art
-JOIN xpr_produccion pr ON pr.idproduccion = u.idproduccion
+         JOIN xpr_produccion_ulexita u ON u.cod_art_reproc_final = p.cod_art
+         JOIN xpr_produccion pr ON pr.idproduccion = u.idproduccion
 WHERE p.cod_alm = @alm AND p.estado = 'VIG' AND pr.estado <> 'ANL'
   AND COALESCE(u.consumo_reproceso_tn,0) <> 0;
 
@@ -228,34 +233,64 @@ CALL sp_costo_promedio_movil_mp();
 -- 4.b Cantidad de filas de detalle por articulo (para saber si se puede fijar
 --     inv_inventario_detalle sin repartir).
 UPDATE wrk_costo_mp w
-LEFT JOIN ( SELECT no_cia, cod_alm, cod_art, COUNT(*) AS n
-            FROM inv_inventario_detalle WHERE cod_alm = @alm
-            GROUP BY no_cia, cod_alm, cod_art ) d
-       ON d.no_cia = w.no_cia AND d.cod_art = w.cod_art
+    LEFT JOIN ( SELECT no_cia, cod_alm, cod_art, COUNT(*) AS n
+                FROM inv_inventario_detalle WHERE cod_alm = @alm
+                GROUP BY no_cia, cod_alm, cod_art ) d
+    ON d.no_cia = w.no_cia AND d.cod_art = w.cod_art
 SET w.detalle_rows = COALESCE(d.n, 0);
+
+-- ----------------------------------------------------------------------------
+-- 4.c Articulos con saldo corriente negativo (neg_balance=1): el promedio MOVIL
+--     no es confiable (hubo tramos sin stock por estacionalidad/datos), entonces
+--     se reemplaza el COSTO por el PROMEDIO SIMPLE de las entradas valuadas
+--     (acopio neto + vales 'E') = SUM(valor)/SUM(cantidad). La cantidad
+--     (saldo_new) NO cambia. Regla: movil donde el saldo nunca se hace negativo;
+--     simple donde si. (Asi no hay UPDATE manual fuera del script.)
+-- ----------------------------------------------------------------------------
+UPDATE wrk_costo_mp w
+SET w.costo_uni_new = ROUND(
+        ( COALESCE((SELECT SUM(((a.pesoprov + a.pesobal)/2/1000) * a.precio
+                                * (CASE WHEN a.tienefac = 1 THEN 0.87 ELSE 1 END))
+                    FROM acopiomp a JOIN metaproductoproduccion mp ON mp.idmetaproductoproduccion = a.idmetaproductoproduccion
+                    WHERE mp.cod_art = w.cod_art AND a.estado <> 'ANL'), 0)
+        + COALESCE((SELECT SUM(m.monto) FROM inv_movdet m
+                    WHERE m.no_cia = w.no_cia AND m.cod_alm = @alm AND m.cod_art = w.cod_art
+                      AND m.estado <> 'ANL' AND m.tipo_mov = 'E'), 0) )
+        / NULLIF(
+        ( COALESCE((SELECT SUM(a.pesoneto) FROM acopiomp a JOIN metaproductoproduccion mp ON mp.idmetaproductoproduccion = a.idmetaproductoproduccion
+                    WHERE mp.cod_art = w.cod_art AND a.estado <> 'ANL'), 0)
+        + COALESCE((SELECT SUM(m.cantidad) FROM inv_movdet m
+                    WHERE m.no_cia = w.no_cia AND m.cod_alm = @alm AND m.cod_art = w.cod_art
+                      AND m.estado <> 'ANL' AND m.tipo_mov = 'E'), 0) ), 0)
+    , 6)
+WHERE w.neg_balance = 1;
+
+UPDATE wrk_costo_mp w
+SET w.saldo_mon_new = ROUND(w.saldo_new * COALESCE(w.costo_uni_new, 0), 2)
+WHERE w.neg_balance = 1;
 
 -- ----------------------------------------------------------------------------
 -- 5) Respaldo de valores ORIGINALES (idempotente, una sola vez).
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS bkp_v6090_balance_mp (
-    no_cia        VARCHAR(2)    NOT NULL,
-    cod_art       VARCHAR(6)    NOT NULL,
-    saldo_old     DECIMAL(14,2) NULL,
-    saldo_det_old DECIMAL(14,2) NULL,
-    detalle_rows  INT           NULL,
-    saldo_mon_old DECIMAL(20,6) NULL,
-    costo_uni_old DECIMAL(16,6) NULL,
-    saldo_new     DECIMAL(14,2) NULL,
-    saldo_mon_new DECIMAL(20,2) NULL,
-    costo_uni_new DECIMAL(16,6) NULL,
-    neg_balance   INT           NULL,
-    backed_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (no_cia, cod_art)
+                                                    no_cia        VARCHAR(2)    NOT NULL,
+                                                    cod_art       VARCHAR(6)    NOT NULL,
+                                                    saldo_old     DECIMAL(14,2) NULL,
+                                                    saldo_det_old DECIMAL(14,2) NULL,
+                                                    detalle_rows  INT           NULL,
+                                                    saldo_mon_old DECIMAL(20,6) NULL,
+                                                    costo_uni_old DECIMAL(16,6) NULL,
+                                                    saldo_new     DECIMAL(14,2) NULL,
+                                                    saldo_mon_new DECIMAL(20,2) NULL,
+                                                    costo_uni_new DECIMAL(16,6) NULL,
+                                                    neg_balance   INT           NULL,
+                                                    backed_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                    PRIMARY KEY (no_cia, cod_art)
 ) ENGINE=InnoDB;
 
 INSERT INTO bkp_v6090_balance_mp
-    (no_cia, cod_art, saldo_old, saldo_det_old, detalle_rows,
-     saldo_mon_old, costo_uni_old, saldo_new, saldo_mon_new, costo_uni_new, neg_balance)
+(no_cia, cod_art, saldo_old, saldo_det_old, detalle_rows,
+ saldo_mon_old, costo_uni_old, saldo_new, saldo_mon_new, costo_uni_new, neg_balance)
 SELECT w.no_cia, w.cod_art,
        inv.saldo_uni,
        COALESCE(det.cant_det, 0),
@@ -263,12 +298,12 @@ SELECT w.no_cia, w.cod_art,
        p.saldo_mon, p.costo_uni,
        w.saldo_new, w.saldo_mon_new, w.costo_uni_new, w.neg_balance
 FROM wrk_costo_mp w
-JOIN inv_articulos p ON p.no_cia = w.no_cia AND p.cod_art = w.cod_art
-LEFT JOIN inv_inventario inv ON inv.no_cia = w.no_cia AND inv.cod_alm = @alm AND inv.cod_art = w.cod_art
-LEFT JOIN ( SELECT no_cia, cod_alm, cod_art, SUM(cantidad) AS cant_det
-            FROM inv_inventario_detalle WHERE cod_alm = @alm
-            GROUP BY no_cia, cod_alm, cod_art ) det
-       ON det.no_cia = w.no_cia AND det.cod_art = w.cod_art
+         JOIN inv_articulos p ON p.no_cia = w.no_cia AND p.cod_art = w.cod_art
+         LEFT JOIN inv_inventario inv ON inv.no_cia = w.no_cia AND inv.cod_alm = @alm AND inv.cod_art = w.cod_art
+         LEFT JOIN ( SELECT no_cia, cod_alm, cod_art, SUM(cantidad) AS cant_det
+                     FROM inv_inventario_detalle WHERE cod_alm = @alm
+                     GROUP BY no_cia, cod_alm, cod_art ) det
+                   ON det.no_cia = w.no_cia AND det.cod_art = w.cod_art
 WHERE NOT EXISTS (SELECT 1 FROM bkp_v6090_balance_mp b
                   WHERE b.no_cia = w.no_cia AND b.cod_art = w.cod_art);
 
@@ -281,7 +316,7 @@ SELECT b.cod_art,
        b.costo_uni_old, b.costo_uni_new,
        b.saldo_mon_old, b.saldo_mon_new,
        b.detalle_rows,
-       b.neg_balance              -- 1 = saldo corriente fue negativo => costo NO confiable, revisar a mano
+       b.neg_balance              -- 1 = saldo corriente fue negativo => costo por PROMEDIO SIMPLE (paso 4.c), no movil
 FROM bkp_v6090_balance_mp b
 ORDER BY b.neg_balance DESC, ABS(COALESCE(b.saldo_mon_new,0) - COALESCE(b.saldo_mon_old,0)) DESC, b.cod_art;
 

@@ -7,7 +7,10 @@
 --       * inv_inventario_detalle.cantidad     (sumado por centro de costo)
 --   Tambien muestra saldo_mon y costo_uni actuales de inv_articulos (referencia).
 --
---   SOLO LECTURA. No modifica nada.
+--   Incluye al inicio UNA correccion de dato puntual (Paso 0): el acopio
+--   MP-ULEX-100-24 tiene pesoprov=289070 (un digito de mas; error de carga). Se
+--   corrige a 28970 (= pesobal = pesoneto), que es lo que valuo su asiento de 2024.
+--   Es idempotente (solo actua si el dato sigue mal). El resto es SOLO LECTURA.
 --
 -- FUENTES DEL SALDO (estado <> 'ANL' en todas; igual que la vista):
 --   2) Kardex   : inv_movdet  (tipo_mov 'E' suma, 'S' resta) filtrado por cod_alm
@@ -27,6 +30,15 @@
 --   * inv_inventario_detalle puede tener varias filas por articulo (por centro de
 --     costo): se suma cantidad.
 -- ----------------------------------------------------------------------------
+
+-- ----------------------------------------------------------------------------
+-- PASO 0: correccion de dato (idempotente). El acopio MP-ULEX-100-24 tiene
+--   pesoprov=289070 (debe ser 28970). El asiento contable ya estaba bien (uso el
+--   neto); esto alinea el peso de origen con el resto y con la contabilidad.
+-- ----------------------------------------------------------------------------
+UPDATE acopiomp
+SET pesoprov = 28970.00
+WHERE codigo = 'MP-ULEX-100-24' AND pesoprov = 289070.00;
 
 SET @alm := '4';
 
