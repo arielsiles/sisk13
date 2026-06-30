@@ -1032,12 +1032,20 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
 
         List<MovementDetail> pendantDetails = getPendantDetails(pendantInventoryMovement, movementDetailType);
 
+        // Despacho con control de stock desactivado: NO mover inventario (ni
+        // saldo, ni historial, ni costo). El vale se aprueba igual para registrar
+        // despachos de meses atras; el inventario se regulariza despues. Solo
+        // aplica a vales DSP con la configuracion desactivada.
+        boolean skipInventory = isDispatchStockControlDisabled(warehouseVoucher);
+
         for (MovementDetail movementDetail : pendantDetails) {
             movementDetail.setState(warehouseVoucher.getState());
             movementDetail.setMovementDetailDate(approvedMovement.getMovementDate());
-            removeFromInventory(warehouseVoucher, warehouse, movementDetail);
-            inventoryHistoryService.updateInventoryHistory(movementDetail);
-            updateProductItemInformationForOutputs(warehouseVoucher, movementDetail);
+            if (!skipInventory) {
+                removeFromInventory(warehouseVoucher, warehouse, movementDetail);
+                inventoryHistoryService.updateInventoryHistory(movementDetail);
+                updateProductItemInformationForOutputs(warehouseVoucher, movementDetail);
+            }
             getEntityManager().merge(movementDetail);
             getEntityManager().flush();
 
@@ -1140,11 +1148,7 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
                     BigDecimalUtil.subtract(productItem.getInvestmentAmount(), movementDetail.getAmount(), 6);
 
             System.out.println("...SALIDA...isOutput...OJO no actualiza CT...");
-            // Despacho con control de stock desactivado: permitir monto negativo
-            // (no cortar por monto insuficiente). Solo aplica a vales DSP con la
-            // configuracion desactivada; cualquier otro vale valida como hoy.
-            if (!isDispatchStockControlDisabled(warehouseVoucher)
-                    && BigDecimal.ZERO.compareTo(newInvestmentAmount) == 1) {
+            if (BigDecimal.ZERO.compareTo(newInvestmentAmount) == 1) {
                 throw new ProductItemAmountException(
                         "There is not enough amount for process the movement detail",
                         productItem.getInvestmentAmount(),
@@ -1184,23 +1188,18 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             }
         }
 
-        // Despacho con control de stock desactivado: permitir saldo negativo
-        // (no cortar por stock insuficiente). Solo aplica a vales DSP con la
-        // configuracion desactivada; cualquier otro vale valida como hoy.
-        boolean skipStockControl = isDispatchStockControlDisabled(warehouseVoucher);
-
         BigDecimal requiredQuantity = movementDetail.getQuantity();
         BigDecimal availableQuantity = inventoryDetail.getQuantity();
         BigDecimal newAvailableQuantity = BigDecimalUtil.subtract(availableQuantity, requiredQuantity);
 
-        if (!skipStockControl && BigDecimal.ZERO.compareTo(newAvailableQuantity) == 1) {
+        if (BigDecimal.ZERO.compareTo(newAvailableQuantity) == 1) {
             throw new InventoryUnitaryBalanceException(availableQuantity, movementDetail.getProductItem());
         }
 
         BigDecimal actualUnitaryBalance = inventory.getUnitaryBalance();
         BigDecimal newUnitaryBalance = BigDecimalUtil.subtract(actualUnitaryBalance, requiredQuantity);
 
-        if (!skipStockControl && BigDecimal.ZERO.compareTo(newUnitaryBalance) == 1) {
+        if (BigDecimal.ZERO.compareTo(newUnitaryBalance) == 1) {
             throw new InventoryUnitaryBalanceException(actualUnitaryBalance, movementDetail.getProductItem());
         }
 
