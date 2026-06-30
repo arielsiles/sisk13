@@ -1,0 +1,166 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{dispatchObservationAction.managed}">
+                #{messages['DispatchObservation.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['DispatchObservation.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="dispatchObservationForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{dispatchObservationAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!dispatchObservationAction.managed and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{dispatchObservationAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchObservationAction.managed and dispatchObservation.editable and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','UPDATE')}"/>
+
+                <h:commandButton action="#{dispatchObservationAction.approve}" value="#{messages['Common.approve']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchObservationAction.managed and dispatchObservation.editable and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['DispatchObservation.inactivate']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchObservationAction.managed and dispatchObservation.approved and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','UPDATE')}">
+                    <rich:componentControl for="inactivateConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchObservationAction.managed and dispatchObservation.editable and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{dispatchObservationAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{dispatchObservationAction.managed}">
+                            #{messages['DispatchObservation.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['DispatchObservation.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="stateDisplayField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{dispatchObservationAction.managed}">
+                    <ui:define name="label">#{messages['DispatchObservation.state']}</ui:define>
+                    <h:outputText value="#{messages[dispatchObservation.state.resourceKey]}" styleClass="bold"/>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchObservation.name']}</ui:define>
+                    <h:inputText id="name" value="#{dispatchObservation.name}"
+                                 required="true" maxlength="120" styleClass="inputLarge"
+                                 readonly="#{!dispatchObservation.editable}"/>
+                </s:decorate>
+
+                <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchObservation.observation']}</ui:define>
+                    <h:inputTextarea id="observation"
+                                     value="#{dispatchObservation.observation}"
+                                     style="width: 550px; resize: vertical;"
+                                     required="true"
+                                     rows="5"
+                                     onkeyup="if(this.value.length>1000)this.value=this.value.substring(0,1000);"
+                                     readonly="#{!dispatchObservation.editable}">
+                        <f:validateLength maximum="1000"/>
+                    </h:inputTextarea>
+                </s:decorate>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{dispatchObservationAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!dispatchObservationAction.managed and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','CREATE')}"/>
+
+                <h:commandButton action="#{dispatchObservationAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchObservationAction.managed and dispatchObservation.editable and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','UPDATE')}"/>
+
+                <h:commandButton action="#{dispatchObservationAction.approve}" value="#{messages['Common.approve']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchObservationAction.managed and dispatchObservation.editable and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','UPDATE')}"/>
+
+                <h:commandButton value="#{messages['DispatchObservation.inactivate']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchObservationAction.managed and dispatchObservation.approved and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','UPDATE')}">
+                    <rich:componentControl for="inactivateConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{dispatchObservationAction.managed and dispatchObservation.editable and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{dispatchObservationAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{dispatchObservationAction.managed and dispatchObservation.editable and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DispatchObservation.delete.confirmation']}">
+                        <f:param value="#{dispatchObservation.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{dispatchObservationAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{dispatchObservationAction.managed and dispatchObservation.approved and s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','UPDATE')}">
+            <ui:param name="dialogId" value="inactivateConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['DispatchObservation.inactivate.confirmation.title']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['DispatchObservation.inactivate.confirmation']}">
+                        <f:param value="#{dispatchObservation.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{dispatchObservationAction.inactivate}"
+                                   value="#{messages['DispatchObservation.inactivate']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+    </ui:define>
+</ui:composition>

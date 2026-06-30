@@ -15,8 +15,9 @@ package com.encens.khipus.model.warehouse;
  * una nueva (politica unica, sin verificar si tiene referencias).
  *
  * Usado por:
- *   - {@link ProductDescription} (catalogo de descripciones tecnicas por producto)
- *   - {@link DispatchRoute}      (catalogo de rutas de despacho)
+ *   - {@link ProductDescription}  (catalogo de descripciones tecnicas por producto)
+ *   - {@link DispatchRoute}       (catalogo de rutas de despacho)
+ *   - {@link DispatchObservation} (catalogo de observaciones de despacho)
  */
 public enum CatalogApprovalState {
     BORRADOR("CatalogApprovalState.BORRADOR"),

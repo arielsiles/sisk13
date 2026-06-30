@@ -112,6 +112,16 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     }
 
     /**
+     * Observaciones de despacho APROBADAS para el dropdown del formulario.
+     * Solo el estado APROBADO se ofrece para seleccion.
+     */
+    @SuppressWarnings("unchecked")
+    @Factory(value = "dispatchApprovedObservationList", scope = ScopeType.STATELESS)
+    public List<com.encens.khipus.model.warehouse.DispatchObservation> getApprovedObservations() {
+        return em.createNamedQuery("DispatchObservation.findApproved").getResultList();
+    }
+
+    /**
      * Lista de descripciones tecnicas APROBADAS para el producto de la linea
      * dada. Usada por el dropdown "Descripcion (Hoja de Ruta)" del detalle.
      * Si la linea no tiene producto aun, retorna lista vacia.

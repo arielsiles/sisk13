@@ -89,6 +89,13 @@
                                   rendered="#{!productDescription.editable}"/>
                 </s:decorate>
 
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProductDescription.name']}</ui:define>
+                    <h:inputText id="name" value="#{productDescription.name}"
+                                 required="true" maxlength="120" styleClass="inputLarge"
+                                 readonly="#{!productDescription.editable}"/>
+                </s:decorate>
+
                 <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['ProductDescription.description']}</ui:define>
                     <h:inputTextarea id="description"

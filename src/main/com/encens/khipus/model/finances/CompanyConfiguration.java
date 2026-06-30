@@ -449,6 +449,16 @@ public class CompanyConfiguration {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean purchaseOrderCodificationEnabled;
 
+    /**
+     * Interruptor (por empresa) del control de stock en la APROBACION del
+     * despacho. true = control activo (comportamiento normal). false = permite
+     * registrar despachos de meses atras sin validar stock suficiente. Default
+     * 1 en BD. Lo consume el flujo de despacho, NO el servicio de vales.
+     */
+    @Column(name = "desp_controla_inventario", nullable = false)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    private boolean dispatchInventoryControl = true;
+
     @Column(name = "retencionprestamoanti", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean retentionForLoanAndAdvance;
@@ -1128,6 +1138,14 @@ public class CompanyConfiguration {
 
     public void setPurchaseOrderCodificationEnabled(boolean purchaseOrderCodificationEnabled) {
         this.purchaseOrderCodificationEnabled = purchaseOrderCodificationEnabled;
+    }
+
+    public boolean isDispatchInventoryControl() {
+        return dispatchInventoryControl;
+    }
+
+    public void setDispatchInventoryControl(boolean dispatchInventoryControl) {
+        this.dispatchInventoryControl = dispatchInventoryControl;
     }
 
     public boolean isRetentionForLoanAndAdvance() {

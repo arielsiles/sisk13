@@ -408,7 +408,7 @@
                 <td class="rich-table-cell">
                     <h:selectOneMenu value="#{detail.productDescription}" styleClass="input">
                         <s:selectItems value="#{dispatchVoucherAction.getApprovedDescriptions(detail)}" var="pd"
-                                       label="#{pd.shortDescription}"
+                                       label="#{pd.displayName}"
                                        noSelectionLabel="" hideNoSelectionLabel="false"/>
                         <s:convertEntity/>
                     </h:selectOneMenu>
@@ -431,12 +431,12 @@
 
 <s:decorate id="observationField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['WarehouseDispatch.observation']}</ui:define>
-    <h:inputTextarea id="observation" value="#{dispatchVoucher.observation}"
-                     rows="4"
-                     style="width: 700px; resize: vertical;"
-                     tabindex="30">
-        <f:validateLength maximum="1000"/>
-    </h:inputTextarea>
+    <h:selectOneMenu id="observation" value="#{dispatchVoucher.observation}"
+                     styleClass="inputLarge" tabindex="30">
+        <s:selectItems value="#{dispatchApprovedObservationList}" var="obs"
+                       itemValue="#{obs.observation}" label="#{obs.name}"
+                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+    </h:selectOneMenu>
 </s:decorate>
 
 </rich:panel>

@@ -603,7 +603,7 @@
                         <c:when test="#{isDraft}">
                             <h:selectOneMenu value="#{detail.productDescription}" styleClass="input">
                                 <s:selectItems value="#{dispatchVoucherAction.getApprovedDescriptions(detail)}" var="pd"
-                                               label="#{pd.shortDescription}"
+                                               label="#{pd.displayName}"
                                                noSelectionLabel="" hideNoSelectionLabel="false"/>
                                 <s:convertEntity/>
                             </h:selectOneMenu>
@@ -633,12 +633,12 @@
     <ui:define name="label">#{messages['WarehouseDispatch.observation']}</ui:define>
     <c:choose>
         <c:when test="#{isDraft}">
-            <h:inputTextarea id="observation" value="#{dispatchVoucher.observation}"
-                             rows="4"
-                             style="width: 700px; resize: vertical;"
-                             tabindex="30">
-                <f:validateLength maximum="1000"/>
-            </h:inputTextarea>
+            <h:selectOneMenu id="observation" value="#{dispatchVoucher.observation}"
+                             styleClass="inputLarge" tabindex="30">
+                <s:selectItems value="#{dispatchApprovedObservationList}" var="obs"
+                               itemValue="#{obs.observation}" label="#{obs.name}"
+                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+            </h:selectOneMenu>
         </c:when>
         <c:otherwise>
             <h:outputText value="#{dispatchVoucher.observation}"/>

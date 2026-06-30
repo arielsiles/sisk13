@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['DispatchObservation.titlePlural']}</ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="selectedTab" value="warehouses"/>
+    <ui:define name="body">
+        <h:form id="dispatchObservationSearch">
+
+            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
+
+                <s:decorate id="nameFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchObservation.name']}</ui:define>
+                    <h:inputText id="name" value="#{dispatchObservationDataModel.nameFilter}"
+                                 maxlength="120" tabindex="1" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="obsFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchObservation.observation']}</ui:define>
+                    <h:inputText id="obsFilter" value="#{dispatchObservationDataModel.observationFilter}"
+                                 maxlength="80" tabindex="2" styleClass="input"/>
+                </s:decorate>
+
+                <s:decorate id="stateFilter" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['DispatchObservation.state']}</ui:define>
+                    <h:selectOneMenu id="state" value="#{dispatchObservationDataModel.state}"
+                                     styleClass="input" tabindex="3">
+                        <s:selectItems value="#{catalogApprovalStateList}" var="st"
+                                       label="#{messages[st.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <div class="buttons">
+                    <a4j:commandButton action="#{dispatchObservationDataModel.search}"
+                                       reRender="dispatchObservationList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/dispatchObservation.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{dispatchObservationDataModel}" var="obsItem" id="dispatchObservationList"
+                            rows="#{sessionUser.rowsPerPage15}"
+                            width="100%" columnsWidth="30%, 53%, 10%, 7%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="dispatchObservation.name"
+                                                   dataModel="#{dispatchObservationDataModel}"
+                                                   reRender="dispatchObservationList, dataScroller">
+                                #{messages['DispatchObservation.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['DispatchObservation.observation']}</rich:column>
+                        <rich:column>#{messages['DispatchObservation.state']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{obsItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{obsItem.shortObservation}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[obsItem.state.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','VIEW')}"
+                                   action="#{dispatchObservationAction.select(obsItem)}">
+                        <s:conversationPropagation value="begin"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="dispatchObservationList" dataModel="#{dispatchObservationDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/warehouse/dispatchObservation.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','CREATE')}"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

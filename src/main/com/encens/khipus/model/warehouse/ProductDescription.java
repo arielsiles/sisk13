@@ -66,6 +66,15 @@ public class ProductDescription implements BaseModel {
     })
     private ProductItem productItem;
 
+    /**
+     * Nombre descriptivo corto. Es lo que se muestra en el dropdown del
+     * despacho (en vez del texto largo). Nullable para no romper registros
+     * existentes; getDisplayName() hace fallback al resumen de la descripcion.
+     */
+    @Column(name = "nombre", length = 120)
+    @Length(max = 120)
+    private String name;
+
     @Lob
     @Column(name = "descripcion", nullable = false)
     @NotNull
@@ -137,6 +146,14 @@ public class ProductDescription implements BaseModel {
             this.productItemCompanyNumber = productItem.getId().getCompanyNumber();
             this.productItemCode = productItem.getId().getProductItemCode();
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -215,6 +232,17 @@ public class ProductDescription implements BaseModel {
 
     public boolean isInactive() {
         return state == CatalogApprovalState.INACTIVO;
+    }
+
+    /**
+     * Etiqueta para el dropdown del despacho: el nombre descriptivo si fue
+     * cargado; si no (registros antiguos), cae al resumen de la descripcion.
+     */
+    public String getDisplayName() {
+        if (name != null && !name.trim().isEmpty()) {
+            return name.trim();
+        }
+        return getShortDescription();
     }
 
     /** Resumen corto (primeros 60 caracteres) para listas y mensajes. */

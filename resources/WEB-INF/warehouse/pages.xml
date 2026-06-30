@@ -846,6 +846,32 @@
         </navigation>
     </page>
 
+    <!-- Catalogo de Observaciones de Despacho -->
+    <page view-id="/warehouse/dispatchObservationList.xhtml"
+          login-required="true">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{dispatchObservationAction.select(obsItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchObservation.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/warehouse/dispatchObservation.xhtml"
+          login-required="true"
+          no-conversation-view-id="/warehouse/dispatchObservationList.xhtml">
+        <restrict>#{s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','VIEW')}</restrict>
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/warehouse/dispatchObservationList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/warehouse/dispatchObservationList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <!-- Catalogo de Rutas de Despacho -->
     <page view-id="/warehouse/dispatchRouteList.xhtml"
           login-required="true">

@@ -536,6 +536,14 @@
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WAREHOUSEDISPATCHOBSERVATION','VIEW')}">
+                    <s:link view="/warehouse/dispatchObservationList.xhtml"
+                            value="#{messages['menu.warehouse.dispatch.observation']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
                                rendered="#{s:hasPermission('WAREHOUSEDISPATCHROUTE','VIEW')}">
                     <s:link view="/warehouse/dispatchRouteList.xhtml"
                             value="#{messages['menu.warehouse.dispatch.route']}"
