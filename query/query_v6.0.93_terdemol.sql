@@ -98,11 +98,21 @@ ALTER TABLE inv_descripcion_producto
 --  SOLO afecta a los vales de Despacho (documento DSP). Compras, produccion y
 --  transferencias NO se ven afectados. Default 1 = sin cambios respecto a hoy.
 --  Cuando se regularice el inventario, volver a poner en 1 con un UPDATE.
+--
+--  IMPORTANTE: el tipo debe ser INT (no TINYINT(1)). El mapeo del entity usa
+--  IntegerBooleanUserType y el validador de Hibernate exige columna 'integer';
+--  TINYINT(1) lo reporta el driver MySQL como 'bit' y el despliegue falla con
+--  "Wrong column type ... Found: bit, expected: integer". Las demas columnas
+--  booleanas de configuracion (occodifactiva, etc.) son int(11).
 -- ----------------------------------------------------------------------------
 ALTER TABLE configuracion
-    ADD COLUMN desp_controla_inventario TINYINT(1) NOT NULL DEFAULT 1;
+    ADD COLUMN desp_controla_inventario INT NOT NULL DEFAULT 1;
+
+-- Si la columna YA fue creada como TINYINT(1) (despliegue previo fallido),
+-- corregir el tipo a INT con:
+--   ALTER TABLE configuracion MODIFY COLUMN desp_controla_inventario INT NOT NULL DEFAULT 1;
 
 -- Para activar la etapa de carga retroactiva (desactivar control de stock):
---   UPDATE configuracion SET desp_controla_inventario = 0 WHERE no_cia = '1';
+   UPDATE configuracion SET desp_controla_inventario = 0 WHERE no_cia = '1';
 -- Para reactivar el control cuando el inventario este al dia:
 --   UPDATE configuracion SET desp_controla_inventario = 1 WHERE no_cia = '1';
