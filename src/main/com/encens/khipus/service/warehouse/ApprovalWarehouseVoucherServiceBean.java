@@ -14,6 +14,7 @@ import com.encens.khipus.exception.warehouse.*;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.interceptor.FinancesUser;
 import com.encens.khipus.model.admin.BusinessUnit;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.CostCenterPk;
 import com.encens.khipus.model.warehouse.*;
@@ -962,6 +963,11 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
                                              MovementDetail movementDetail,
                                              boolean isUpdate) throws InventoryException {
 
+        // Despacho con control de stock desactivado: no validar stock suficiente.
+        if (isDispatchStockControlDisabled(warehouseVoucher)) {
+            return;
+        }
+
         Inventory inventory = getInventory(warehouse, movementDetail.getProductItem());
         if (null == inventory) {
             throw new InventoryException(
@@ -1134,7 +1140,11 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
                     BigDecimalUtil.subtract(productItem.getInvestmentAmount(), movementDetail.getAmount(), 6);
 
             System.out.println("...SALIDA...isOutput...OJO no actualiza CT...");
-            if (BigDecimal.ZERO.compareTo(newInvestmentAmount) == 1) {
+            // Despacho con control de stock desactivado: permitir monto negativo
+            // (no cortar por monto insuficiente). Solo aplica a vales DSP con la
+            // configuracion desactivada; cualquier otro vale valida como hoy.
+            if (!isDispatchStockControlDisabled(warehouseVoucher)
+                    && BigDecimal.ZERO.compareTo(newInvestmentAmount) == 1) {
                 throw new ProductItemAmountException(
                         "There is not enough amount for process the movement detail",
                         productItem.getInvestmentAmount(),
@@ -1174,18 +1184,23 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
             }
         }
 
+        // Despacho con control de stock desactivado: permitir saldo negativo
+        // (no cortar por stock insuficiente). Solo aplica a vales DSP con la
+        // configuracion desactivada; cualquier otro vale valida como hoy.
+        boolean skipStockControl = isDispatchStockControlDisabled(warehouseVoucher);
+
         BigDecimal requiredQuantity = movementDetail.getQuantity();
         BigDecimal availableQuantity = inventoryDetail.getQuantity();
         BigDecimal newAvailableQuantity = BigDecimalUtil.subtract(availableQuantity, requiredQuantity);
 
-        if (BigDecimal.ZERO.compareTo(newAvailableQuantity) == 1) {
+        if (!skipStockControl && BigDecimal.ZERO.compareTo(newAvailableQuantity) == 1) {
             throw new InventoryUnitaryBalanceException(availableQuantity, movementDetail.getProductItem());
         }
 
         BigDecimal actualUnitaryBalance = inventory.getUnitaryBalance();
         BigDecimal newUnitaryBalance = BigDecimalUtil.subtract(actualUnitaryBalance, requiredQuantity);
 
-        if (BigDecimal.ZERO.compareTo(newUnitaryBalance) == 1) {
+        if (!skipStockControl && BigDecimal.ZERO.compareTo(newUnitaryBalance) == 1) {
             throw new InventoryUnitaryBalanceException(actualUnitaryBalance, movementDetail.getProductItem());
         }
 
@@ -1435,9 +1450,36 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         return warehouseVoucher.getWarehouse().getId().getWarehouseCode() + "-" + counter;
     }
 
+    /**
+     * Control de stock del DESPACHO desactivado: SOLO para vales de despacho
+     * (documento DSP) y SOLO si la empresa tiene configuracion
+     * desp_controla_inventario = 0. Para CUALQUIER otro vale (compras,
+     * produccion, transferencias) o con la configuracion en 1, retorna false y
+     * el comportamiento es IDENTICO al actual. Sirve para registrar despachos
+     * de meses atras sin que la validacion de stock suficiente los rechace; el
+     * inventario igual se mueve (puede quedar negativo) y se reactiva luego.
+     */
+    private boolean isDispatchStockControlDisabled(WarehouseVoucher warehouseVoucher) {
+        if (warehouseVoucher == null) {
+            return false;
+        }
+        // "DSP" = codigo de documento del Vale de Despacho.
+        if (!"DSP".equals(warehouseVoucher.getDocumentCode())) {
+            return false;
+        }
+        CompanyConfiguration cfg = getEntityManager().find(
+                CompanyConfiguration.class, warehouseVoucher.getCompanyNumber());
+        return cfg != null && !cfg.isDispatchInventoryControl();
+    }
+
     @SuppressWarnings(value = "unchecked")
     private void validateOutputDetails(WarehouseVoucher warehouseVoucher,
                                        Warehouse warehouse) throws InventoryException {
+
+        // Despacho con control de stock desactivado: no validar stock suficiente.
+        if (isDispatchStockControlDisabled(warehouseVoucher)) {
+            return;
+        }
 
         List<InventoryMessage> messages = new ArrayList<InventoryMessage>();
 
