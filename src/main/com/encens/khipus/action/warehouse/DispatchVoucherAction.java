@@ -640,17 +640,36 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     public void confirmApprovalStep1() {
         approvalStep1Visible = false;
         approvalImpact = dispatchVoucherService.calculateInventoryImpact(getInstance());
-        // Si alguna linea no tiene stock suficiente, mostrar advertencia
-        for (DispatchStockImpact i : approvalImpact) {
-            if (!i.isSufficient()) {
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
-                        "WarehouseDispatch.error.insufficientStock",
-                        i.getProductItem().getFullName(),
-                        i.getCurrentStock(),
-                        i.getRequiredQuantity());
+        // Con el control de stock desactivado no se muestra advertencia: se aprueba igual.
+        if (!isStockControlDisabled()) {
+            for (DispatchStockImpact i : approvalImpact) {
+                if (!i.isSufficient()) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                            "WarehouseDispatch.error.insufficientStock",
+                            i.getProductItem().getFullName(),
+                            i.getCurrentStock(),
+                            i.getRequiredQuantity());
+                }
             }
         }
         approvalStep2Visible = true;
+    }
+
+    /**
+     * Control de stock del despacho desactivado para la empresa del despacho
+     * (CompanyConfiguration.desp_controla_inventario = 0). Cuando esta activo,
+     * la aprobacion no valida stock suficiente y permite saldo negativo, para
+     * registrar despachos de meses atras. Solo afecta a Despachos.
+     */
+    public boolean isStockControlDisabled() {
+        WarehouseVoucherDispatch d = getInstance();
+        if (d == null || d.getCompanyNumber() == null) {
+            return false;
+        }
+        com.encens.khipus.model.finances.CompanyConfiguration cfg =
+                em.find(com.encens.khipus.model.finances.CompanyConfiguration.class,
+                        d.getCompanyNumber());
+        return cfg != null && !cfg.isDispatchInventoryControl();
     }
 
     /**
@@ -707,6 +726,10 @@ public class DispatchVoucherAction extends GenericAction<WarehouseVoucherDispatc
     }
 
     public boolean isApprovalImpactSufficient() {
+        // Control de stock desactivado: permitir aprobar aunque no haya stock.
+        if (isStockControlDisabled()) {
+            return true;
+        }
         if (approvalImpact == null) {
             return false;
         }

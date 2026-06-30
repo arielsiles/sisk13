@@ -113,6 +113,6 @@ ALTER TABLE configuracion
 --   ALTER TABLE configuracion MODIFY COLUMN desp_controla_inventario INT NOT NULL DEFAULT 1;
 
 -- Para activar la etapa de carga retroactiva (desactivar control de stock):
-   UPDATE configuracion SET desp_controla_inventario = 0 WHERE no_cia = '1';
+   UPDATE configuracion SET desp_controla_inventario = 0 WHERE no_cia = '01';
 -- Para reactivar el control cuando el inventario este al dia:
---   UPDATE configuracion SET desp_controla_inventario = 1 WHERE no_cia = '1';
+--   UPDATE configuracion SET desp_controla_inventario = 1 WHERE no_cia = '01';
