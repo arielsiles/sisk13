@@ -121,19 +121,23 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
         eventEm.merge(inventoryDetail);
         eventEm.flush();
 
-        /** Update ProductItem **/
-        BigDecimal price = BigDecimalUtil.divide(collectMaterial.getPrice(), BigDecimalUtil.ONE_HUNDRED, 6);
-        BigDecimal amountToAdd = BigDecimal.ZERO;
-        BigDecimal amountCTAdd = BigDecimal.ZERO;
-
+        /** Update ProductItem (valor NETO, consistente con la contabilizacion del acopio
+         *  en CollectMaterialServiceBean.createCollectMaterialListAccounting):
+         *    precio es Bs/Tonelada; la cantidad que entra al inventario es la misma que se
+         *    suma al saldo (balanceWeight, en KG). Valor bruto = (KG / 1000) * precio; si hay
+         *    factura se descuenta el IVA (credito fiscal): neto = bruto - bruto * VAT.
+         *  Correccion: antes usaba precio/100 (en vez de /1000) y dividia por VAT_COMPLEMENT
+         *  (en vez de descontar el IVA), lo que inflaba saldo_mon/costo_uni ~13x. */
+        BigDecimal weightTon  = BigDecimalUtil.divide(quantity, BigDecimalUtil.ONE_THOUSAND, 6);
+        BigDecimal grossAmount = BigDecimalUtil.multiply(weightTon, collectMaterial.getPrice(), 6);
+        BigDecimal amountToAdd;
         if ( collectMaterial.getHasInvoice() ) {
-            BigDecimal newPrice = BigDecimalUtil.divide(price, Constants.VAT_COMPLEMENT);
-            amountToAdd = BigDecimalUtil.multiply(quantity, newPrice, 6);
-            amountCTAdd = BigDecimalUtil.multiply(quantity, price, 6);
+            BigDecimal taxCreditFiscal = BigDecimalUtil.multiply(grossAmount, Constants.VAT, 6);
+            amountToAdd = BigDecimalUtil.subtract(grossAmount, taxCreditFiscal, 6);
         } else {
-            amountToAdd = BigDecimalUtil.multiply(quantity, price, 6);
-            amountCTAdd = amountToAdd;
+            amountToAdd = grossAmount;
         }
+        BigDecimal amountCTAdd = amountToAdd;
 
         increaseProductItemAmount(collectMaterial.getMetaProduct().getProductItem(), newAvailableQuantity, amountToAdd, amountCTAdd);
 
