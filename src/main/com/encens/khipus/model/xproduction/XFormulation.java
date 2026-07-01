@@ -40,6 +40,12 @@ public class XFormulation implements BaseModel {
     @Column(name = "nombre", nullable = false)
     private String name;
 
+    /** Sigla corta del producto de la formulacion (ej. ULEX, BAR, RFOS, RUMI).
+     *  Se muestra en el calendario del Plan de Produccion para identificar de un
+     *  vistazo que se produce ese dia. Configurable en el catalogo de Formulaciones. */
+    @Column(name = "sigla", length = 10)
+    private String sigla;
+
     @Column(name = "estado")
     @Enumerated(EnumType.STRING)
     private FormulationState state = FormulationState.PEN;
@@ -79,6 +85,14 @@ public class XFormulation implements BaseModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSigla() {
+        return sigla;
+    }
+
+    public void setSigla(String sigla) {
+        this.sigla = sigla;
     }
 
     public BigDecimal getCapacity() {

@@ -26,24 +26,11 @@
 
     <div class="buttons">
 
-        <a4j:commandButton id="addProductCommandButton"
-                           action="#{productionProductsDataModel.reset()}"
-                           value="#{messages['ProductionPlan.addProduct']}"
-                           styleClass="button"
-                           immediate="true"
-                           rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"
-                           oncomplete="Richfaces.showModalPanel('productionProductListModalPanel');"
-                           actionListener="#{selectPopUpAction.select}"
-                           reRender="productionProductListModalPanel">
-            <f:attribute name="entityManagerName" value=""/>
-            <f:attribute name="dataModelObject" value="#{productionProductsDataModel}"/>
-        </a4j:commandButton>
-
         <h:commandButton action="#{xproductionPlanAction.addProduction}"
                          value="#{messages['ProductionPlan.addProduction']}"
                          styleClass="button"
                          immediate="true"
-                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.pending and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"/>
+                         rendered="#{xproductionPlanAction.managed and xproductionPlanAction.canAddOrder and s:hasPermission('XPRODUCTION_PLAN','UPDATE')}"/>
 
         <h:commandButton action="#{xproductionPlanAction.update}" value="#{messages['Common.update']}"
                          styleClass="button"
@@ -277,21 +264,6 @@
 
 </h:form>
 
-
-    <s:decorate id="productionProductListModalPanelContainer" template="/warehouse/productionProductListModalPanel.xhtml">
-        <ui:param name="containerId" value="productionProductListModalPanelContainer"/>
-        <ui:param name="dialogId" value="productionProductListModalPanel"/>
-        <ui:define name="addButton">
-            <a4j:commandButton id="addButton"
-                               immediate="true"
-                               ajaxSingle="true"
-                               action="#{xproductionPlanAction.addProductItems(productionProductsDataModel.selectedProductItems)}"
-                               value="#{messages['Common.add']}"
-                               reRender="productsPanel"
-                               styleClass="button"
-                               oncomplete="Richfaces.hideModalPanel('productionProductListModalPanel');"/>
-        </ui:define>
-    </s:decorate>
 
     <s:decorate template="/include/modalDialog.xhtml">
         <ui:param name="dialogId" value="deleteConfirmation"/>

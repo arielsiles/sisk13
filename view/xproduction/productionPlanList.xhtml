@@ -9,121 +9,145 @@
                 template="/layout/template.xhtml">
     <ui:define name="pageTitle">#{messages['ProductionPlan.list']}</ui:define>
     <ui:param name="bodyWidth" value="100%"/>
-
     <ui:param name="selectedTab" value="xproduction"/>
+
     <ui:define name="body">
-        <style type="text/css">
-            .special tr[id] {
-                display: none;
-            }
+        <a4j:loadStyle src="/stylesheet/xproduction-calendar.css?v=4"/>
 
-            .top-aligned {
-                vertical-align: top;
-                border: none;
-            }
-
-            .row-borders {
-                border-top: solid #616161 thin;
-                border-bottom: solid #616161 thin;
-            }
-        </style>
         <h:form id="productionPlanSearch">
 
-            <rich:simpleTogglePanel id="productionPlanSearchPanel" label="#{messages['ProductionPlan.search']}" switchType="client">
+            <a4j:outputPanel id="calendarPanel" layout="block" styleClass="xpr-cal-wrap">
 
-                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.startDate']}</ui:define>
-                    <rich:calendar id="startDate"
-                                   value="#{xproductionPlanDataModel.startDate}"
-                                   styleClass="input"
-                                   datePattern="#{messages['patterns.date']}"
-                                   enableManualInput="true"
-                                   tabindex="1">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}"
-                                           timeZone="#{sessionUser.timeZone}"
-                                           type="date"/>
-                    </rich:calendar>
-                </s:decorate>
+                <!-- ============ Barra de herramientas ============ -->
+                <div class="xpr-cal-toolbar">
+                    <span class="xpr-left">
+                        <a4j:commandLink styleClass="xpr-cal-nav"
+                                         action="#{xproductionCalendar.prev}"
+                                         reRender="calendarPanel"
+                                         title="#{messages['ProductionPlan.calendar.prev']}">&#8249;</a4j:commandLink>
+                        <a4j:commandLink styleClass="xpr-cal-nav"
+                                         action="#{xproductionCalendar.goToday}"
+                                         reRender="calendarPanel"
+                                         value="#{messages['ProductionPlan.calendar.today']}"/>
+                        <a4j:commandLink styleClass="xpr-cal-nav"
+                                         action="#{xproductionCalendar.next}"
+                                         reRender="calendarPanel"
+                                         title="#{messages['ProductionPlan.calendar.next']}">&#8250;</a4j:commandLink>
 
-                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['ProductionPlan.endDate']}</ui:define>
-                    <rich:calendar id="endDate"
-                                   value="#{xproductionPlanDataModel.endDate}"
-                                   styleClass="input"
-                                   datePattern="#{messages['patterns.date']}"
-                                   enableManualInput="true"
-                                   tabindex="2">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}"
-                                           timeZone="#{sessionUser.timeZone}"
-                                           type="date"/>
-                    </rich:calendar>
+                        <span class="xpr-cal-period">#{xproductionCalendar.periodLabel}</span>
+                    </span>
 
-                    <a4j:commandButton action="#{xproductionPlanDataModel.search}"
-                                       reRender="productionPlanList, dataScroller, productionPlanningList, dataScrollerProductionPlan"
-                                       styleClass="button"
-                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
-                        <s:defaultAction/>
-                    </a4j:commandButton>
-                </s:decorate>
-            </rich:simpleTogglePanel>
+                    <span class="xpr-right">
+                        <span class="xpr-cal-filter">
+                            #{messages['ProductionPlan.state']}:
+                            <h:selectOneMenu value="#{xproductionCalendar.stateFilter}">
+                                <s:selectItems value="#{xproductionCalendar.states}"
+                                               var="st"
+                                               label="#{messages[st.resourceKey]}"
+                                               noSelectionLabel="#{messages['ProductionPlan.calendar.allStates']}"
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                                <a4j:support event="onchange"
+                                             action="#{xproductionCalendar.build}"
+                                             reRender="calendarPanel"/>
+                            </h:selectOneMenu>
+                        </span>
 
-            <div class="buttons">
-                <s:button value="#{messages['Common.new']}"
-                          view="/xproduction/productionPlan.xhtml"
-                          styleClass="button"
-                          rendered="#{s:hasPermission('XPRODUCTION_PLAN','CREATE')}"
-                          propagation="none"
-                          tabindex="4"/>
-            </div>
+                        <span class="xpr-cal-toggle-group">
+                            <a4j:commandLink styleClass="xpr-cal-toggle #{xproductionCalendar.monthView ? 'xpr-on' : ''}"
+                                             action="#{xproductionCalendar.showMonth}"
+                                             reRender="calendarPanel"
+                                             value="#{messages['ProductionPlan.calendar.month']}"/>
+                            <a4j:commandLink styleClass="xpr-cal-toggle #{xproductionCalendar.weekView ? 'xpr-on' : ''}"
+                                             action="#{xproductionCalendar.showWeek}"
+                                             reRender="calendarPanel"
+                                             value="#{messages['ProductionPlan.calendar.week']}"/>
+                        </span>
 
+                        <s:button value="#{messages['Common.new']}"
+                                  view="/xproduction/productionPlan.xhtml"
+                                  styleClass="xpr-cal-nav"
+                                  style="margin-left:10px; padding:3px 14px;"
+                                  rendered="#{s:hasPermission('XPRODUCTION_PLAN','CREATE')}"
+                                  propagation="none"/>
+                    </span>
+                </div>
 
+                <!-- ============ Grilla del calendario ============ -->
+                <table class="xpr-cal-table #{xproductionCalendar.monthView ? 'xpr-month' : 'xpr-week'}" cellspacing="0" cellpadding="0">
+                    <thead>
+                    <tr>
+                        <th>#{messages['ProductionPlan.calendar.dow.mon']}</th>
+                        <th>#{messages['ProductionPlan.calendar.dow.tue']}</th>
+                        <th>#{messages['ProductionPlan.calendar.dow.wed']}</th>
+                        <th>#{messages['ProductionPlan.calendar.dow.thu']}</th>
+                        <th>#{messages['ProductionPlan.calendar.dow.fri']}</th>
+                        <th>#{messages['ProductionPlan.calendar.dow.sat']}</th>
+                        <th>#{messages['ProductionPlan.calendar.dow.sun']}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <a4j:repeat value="#{xproductionCalendar.weeks}" var="week">
+                        <tr>
+                            <a4j:repeat value="#{week}" var="day">
+                                <td class="#{day.inMonth ? '' : 'xpr-cal-out'} #{day.today ? 'xpr-cal-today' : ''}">
 
-            <rich:dataGrid id="productionPlanningList" value="#{xproductionPlanDataModel}" var="productionPlanItem"
-                           width="100%" columns="3" elements="6" border="0" rowClasses="row-borders"
-                           columnClasses="top-aligned" style="border: none;">
+                                    <div class="xpr-cal-daynum">#{day.dayNumber}</div>
 
-                <rich:panel style="position:relative; top:0;">
-                    <f:facet name="header">
-                        <h:outputFormat value="{0,date,d MMM}, {0,date,yyyy}">
-                            <f:param value="#{productionPlanItem.date}"/>
-                        </h:outputFormat>
-                    </f:facet>
-                    <s:div>
-                        <h:commandLink style="float:left;" value="#{messages['Common.select']}"
-                                       action="#{xproductionPlanAction.select(productionPlanItem)}"/>
+                                    <h:commandLink styleClass="xpr-event xpr-st-#{day.stateCss}"
+                                                   action="#{xproductionPlanAction.select(day.plan)}"
+                                                   rendered="#{day.hasPlan}">
 
-                    </s:div>
-                    <s:div style="float:right;">
-                        <!--#{messages['ProductionPlanning.etiq.totalMilk']} #{productionPlanningItem.totalMilk}-->
-                    </s:div>
-                    <rich:dataTable value="#{xproductionPlanAction.getProductionProductList(productionPlanItem)}"
-                                    var="productionProductItem"
-                                    id="productionOrderList"
-                                    width="100%">
-                        <f:facet name="header">
-                            <rich:columnGroup>
-                                <rich:column>#{messages['ProductionOrder.processedProduct.name']}</rich:column>
-                                <rich:column>#{messages['ProductionOrder.quantity']}</rich:column>
-                                <rich:column>#{messages['ProductionOrder.estateOrderProduction']}</rich:column>
-                            </rich:columnGroup>
-                        </f:facet>
-                        <rich:column>
-                            <h:outputText value="#{productionProductItem.productItem.fullName}"/>
-                        </rich:column>
-                        <rich:column styleClass="right">
-                            <h:outputText value="#{productionProductItem.quantity}"/>
-                        </rich:column>
-                        <rich:column styleClass="center">
-                            <h:outputText value="#{messages[productionPlanItem.state.resourceKey]}"
-                                          style="color: #{productionPlanItem.state=='PEN' ? 'red' : (productionPlanItem.state=='APR' ? '#1a52bc' : (productionPlanItem.state=='FIN' ? '#35B056' : (productionPlanItem.state=='SUS' ? '#ECB700' : '')))}"
-                            />
-                        </rich:column>
-                    </rich:dataTable>
+                                        <span class="xpr-event-dots">
+                                            <ui:repeat value="#{day.orderStates}" var="ost">
+                                                <span class="xpr-dot xpr-st-#{ost}"></span>
+                                            </ui:repeat>
+                                        </span>
 
-                </rich:panel>
-            </rich:dataGrid>
-            <app:dataScroller id="dataScrollerProductionPlan" for="productionPlanningList" dataModel="#{xproductionPlanDataModel}"/>
-            <!----><!----><!---->
+                                        <span class="xpr-event-orders">
+                                            #{day.orders} #{messages['ProductionPlan.calendar.orders']}
+                                        </span>
+
+                                        <h:panelGroup rendered="#{not empty day.siglas}">
+                                            <span class="xpr-event-siglas">#{day.siglas}</span>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup rendered="#{xproductionCalendar.weekView}">
+                                            <span class="xpr-event-products">
+                                                <ui:repeat value="#{day.plan.productionProductList}" var="pp">
+                                                    <span class="xpr-prod-row">
+                                                        <span class="xpr-prod-qty">
+                                                            <h:outputText value="#{pp.quantity}">
+                                                                <f:convertNumber pattern="#,##0.###"/>
+                                                            </h:outputText>
+                                                        </span>
+                                                        <h:outputText value="#{pp.productItem.fullName}"/>
+                                                    </span>
+                                                </ui:repeat>
+                                            </span>
+                                        </h:panelGroup>
+
+                                    </h:commandLink>
+
+                                </td>
+                            </a4j:repeat>
+                        </tr>
+                    </a4j:repeat>
+                    </tbody>
+                </table>
+
+                <!-- ============ Leyenda de estados ============ -->
+                <div class="xpr-cal-totals">
+                    <span class="xpr-cal-legend">
+                        <span class="xpr-dot xpr-st-pen"></span>#{messages['Production.state.PEN']}
+                        <span class="xpr-dot xpr-st-eje"></span>#{messages['Production.state.EJE']}
+                        <span class="xpr-dot xpr-st-apr"></span>#{messages['Production.state.APR']}
+                        <span class="xpr-dot xpr-st-fin"></span>#{messages['Production.state.FIN']}
+                        <span class="xpr-dot xpr-st-conta"></span>#{messages['Production.state.CONTA']}
+                    </span>
+                </div>
+
+            </a4j:outputPanel>
 
         </h:form>
     </ui:define>

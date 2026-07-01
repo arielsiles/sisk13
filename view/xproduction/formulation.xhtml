@@ -87,6 +87,12 @@
             </h:inputText>
         </s:decorate>
 
+        <s:decorate id="siglaField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Formulation.sigla']}</ui:define>
+            <h:inputText id="sigla" value="#{xformulation.sigla}" styleClass="inputSmall" maxlength="10" tabindex="2">
+            </h:inputText>
+        </s:decorate>
+
         <s:decorate id="categoryField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Formulation.category']}</ui:define>
             <h:selectOneMenu id="categoryId"

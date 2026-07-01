@@ -675,6 +675,29 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
     }
 
     /**
+     * True si se pueden agregar mas ordenes al plan. Se bloquea SOLO cuando el
+     * plan ya tiene ordenes y TODAS estan Finalizadas (FIN) o Contabilizadas
+     * (CONTA). Con al menos una orden en otro estado (o sin ordenes), se permite
+     * agregar. Asi aprobar una orden ya no impide seguir agregando ordenes.
+     */
+    public boolean isCanAddOrder() {
+        if (!isManaged() || getInstance() == null) {
+            return false;
+        }
+        List<XProduction> productions = getInstance().getProductionList();
+        if (productions == null || productions.isEmpty()) {
+            return true;
+        }
+        for (XProduction production : productions) {
+            ProductionState st = production.getState();
+            if (st != ProductionState.FIN && st != ProductionState.CONTA) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * True si el plan esta vacio: sin productos (lista en edicion) y sin ordenes
      * de produccion asociadas. Solo en ese caso se permite borrarlo.
      */

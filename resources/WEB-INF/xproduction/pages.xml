@@ -529,6 +529,11 @@
                 <redirect view-id="/xproduction/productionPlan.xhtml"/>
             </rule>
         </navigation>
+        <navigation from-action="#{xproductionPlanAction.select(day.plan)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/xproduction/productionPlan.xhtml"/>
+            </rule>
+        </navigation>
     </page>
 
     <page view-id="/xproduction/formulation.xhtml" no-conversation-view-id="/xproduction/formulationList.xhtml">
