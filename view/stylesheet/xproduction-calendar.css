@@ -167,12 +167,16 @@
 .xpr-cal-today .xpr-cal-daynum {
     color: #fff;
     background: #1a52bc;
-    border-radius: 10px;
+    border-radius: 50%;          /* circulo perfecto */
     display: inline-block;
     float: right;
-    min-width: 16px;
+    width: 18px;                 /* mismo ancho y alto => circulo, sirva 1 o 2 digitos */
+    height: 18px;
+    line-height: 18px;
+    padding: 0;
     text-align: center;
-    padding: 1px 5px;
+    font-size: 11px;
+    margin: 0 0 1px 0;           /* gap circulo->card = 1px + 2px (margin-top card) = 3px, igual al superior */
 }
 
 /* ---------- Evento (plan del dia) ---------- */
