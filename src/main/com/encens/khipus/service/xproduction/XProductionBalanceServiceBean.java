@@ -74,14 +74,15 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
                             p.getUsageMeasureCode(), sgCode, sgName, BigDecimal.ZERO));
         }
 
-        // 2) Kardex inv_movdet (vales de entrada/salida + despachos), por tipo E/S. Estado != ANL.
+        // 2) Kardex inv_movdet (vales de entrada/salida + despachos), por tipo E/S. Solo vales
+        //    APROBADOS (mismo criterio que el reporte de movimientos por articulo).
         List<Object[]> movements = em.createQuery(
                 "select md.productItemCode, md.movementType, sum(md.quantity) from MovementDetail md " +
-                "where md.companyNumber = :cn and md.warehouseCode = :wc and md.state <> :anl " +
+                "where md.companyNumber = :cn and md.warehouseCode = :wc and md.state = :apr " +
                 "group by md.productItemCode, md.movementType")
                 .setParameter("cn", companyNumber)
                 .setParameter("wc", warehouseCode)
-                .setParameter("anl", WarehouseVoucherState.ANL)
+                .setParameter("apr", WarehouseVoucherState.APR)
                 .getResultList();
         for (Object[] r : movements) {
             WarehouseBalanceRow row = rows.get((String) r[0]);
@@ -95,12 +96,14 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
             }
         }
 
-        // 3) Acopio de Materia Prima (entrada). Estado != ANL. Atribuido al almacen del articulo.
+        // 3) Acopio de Materia Prima (entrada). Se usa el Peso Empresa (pesobal / balanceWeight)
+        //    y solo acopios Aprobados/Contabilizados (mismo criterio que el reporte de movimientos).
         List<Object[]> collect = em.createQuery(
-                "select cm.metaProduct.productItemCode, sum(cm.netWeight) from CollectMaterial cm " +
-                "where cm.state <> :anl " +
+                "select cm.metaProduct.productItemCode, sum(cm.balanceWeight) from CollectMaterial cm " +
+                "where cm.state in (:apr, :conta) " +
                 "group by cm.metaProduct.productItemCode")
-                .setParameter("anl", CollectMaterialState.ANL)
+                .setParameter("apr", CollectMaterialState.APR)
+                .setParameter("conta", CollectMaterialState.CONTA)
                 .getResultList();
         applySums(rows, collect, true);
 

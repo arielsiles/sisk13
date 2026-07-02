@@ -46,4 +46,10 @@ public interface XProductionService {
     List<XSupply> getRawMaterialInProduction(String productItemCode, Date initDate, Date endDate);
 
     List<XSupply> getAllRawMaterialInProduction(Date initDate, Date endDate);
+
+    /**
+     * Reproceso de ordenes de linea ULEXITA (tabla satelite xpr_produccion_ulexita) atribuido
+     * a un articulo via cod_art_reproc_final, en el rango de fechas. Ordenes no anuladas.
+     */
+    List<XProductionUlexita> getUlexitaReprocessByArticle(String productItemCode, Date initDate, Date endDate);
 }

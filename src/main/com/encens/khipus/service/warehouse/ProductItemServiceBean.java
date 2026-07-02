@@ -256,6 +256,19 @@ public class ProductItemServiceBean extends GenericServiceBean implements Produc
         return  quantity;
     }
 
+    @SuppressWarnings("unchecked")
+    public InitialInventory findLatestInitialInventory(String productItemCode, String maxYear){
+        List<InitialInventory> list = em.createQuery(
+                "select i from InitialInventory i " +
+                "where i.productItemCode = :productItemCode and i.year <= :maxYear " +
+                "order by i.year desc")
+                .setParameter("productItemCode", productItemCode)
+                .setParameter("maxYear", maxYear)
+                .setMaxResults(1)
+                .getResultList();
+        return list.isEmpty() ? null : list.get(0);
+    }
+
     public List<InventoryPeriod> getInventoryPeriodInitialList(String warehouseCode, String year){
         return (List<InventoryPeriod>)em.createQuery("select i from InventoryPeriod i " +
                                  "where i.warehouseCode =:warehouseCode " +
