@@ -1,17 +1,16 @@
 package com.encens.khipus.action.warehouse.reports;
 
 import com.encens.khipus.action.reports.GenericReportAction;
+import com.encens.khipus.action.reports.ReportFormat;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
-import com.encens.khipus.model.customers.ArticleOrder;
-import com.encens.khipus.model.customers.SaleTypeEnum;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.XProductionProduct;
+import com.encens.khipus.model.xproduction.XProductionUlexita;
 import com.encens.khipus.model.xproduction.XSupply;
-import com.encens.khipus.service.customers.ArticleOrderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.CollectMaterialService;
 import com.encens.khipus.service.production.ProductionOrderService;
@@ -59,10 +58,16 @@ public class KardexProductMovementAction extends GenericReportAction {
     private Date endDate;
     private ProductItem productItem;
 
+    /** Resultado calculado para mostrar en pantalla (misma data que PDF/Excel). */
+    private List<CollectionData> resultList = new ArrayList<CollectionData>();
+    private BigDecimal previousAmount = BigDecimal.ZERO;
+    private BigDecimal totalEntradas = BigDecimal.ZERO;
+    private BigDecimal totalSalidas = BigDecimal.ZERO;
+    private BigDecimal saldoFinal = BigDecimal.ZERO;
+    private boolean showResults = false;
+
     @In
     private MovementDetailService movementDetailService;
-    @In
-    private ArticleOrderService articleOrderService;
     @In
     private ProductItemService productItemService;
     @In
@@ -80,6 +85,10 @@ public class KardexProductMovementAction extends GenericReportAction {
     @Create
     public void init() {
         restrictions = new String[]{};
+        // Rango por defecto: 1ro de enero del año actual hasta hoy (reporte mas agil).
+        Date today = new Date();
+        startDate = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(today));
+        endDate = today;
     }
 
 
@@ -95,17 +104,7 @@ public class KardexProductMovementAction extends GenericReportAction {
             companyConfiguration = companyConfigurationService.findCompanyConfiguration();
         } catch (CompanyConfigurationNotFoundException e) {facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,"CompanyConfiguration.notFound");;}
 
-        Collection<CollectionData> beanCollection = calculateCollectionData();
-
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
-        DecimalFormat df = new DecimalFormat("#,###.00");
-
-        BigDecimal previousAmount = BigDecimal.ZERO;
-
-        if (startDate != null) {
-            //previousAmount = movementDetailService.calculateInitialQuantityToKardex(Constants.defaultCompanyNumber, productItem.getProductItemCode(), startDate);
-            previousAmount = calculateInitialAmountToKardex(productItem.getProductItemCode(), startDate);
-        }
+        Collection<CollectionData> beanCollection = computeReport();
 
         HashMap parameters = new HashMap();
         Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -134,34 +133,86 @@ public class KardexProductMovementAction extends GenericReportAction {
         }
     }
 
+    /**
+     * Fuente unica de datos del reporte: arma la coleccion ordenada, calcula el saldo
+     * anterior, el saldo corrido por fila (CollectionData.amount) y los totales.
+     * Usada por la vista en pantalla, el PDF y el Excel para que siempre coincidan.
+     */
+    public List<CollectionData> computeReport() {
+        List<CollectionData> datas = new ArrayList<CollectionData>(calculateCollectionData());
+
+        previousAmount = BigDecimal.ZERO;
+        if (startDate != null && productItem != null) {
+            previousAmount = calculateInitialAmountToKardex(productItem.getProductItemCode(), startDate);
+        }
+
+        BigDecimal saldo = previousAmount;
+        totalEntradas = BigDecimal.ZERO;
+        totalSalidas = BigDecimal.ZERO;
+        for (CollectionData data : datas) {
+            saldo = BigDecimalUtil.sum(saldo, data.getAmountEntry(), 2);
+            saldo = BigDecimalUtil.subtract(saldo, data.getAmountOutput(), 2);
+            data.setAmount(saldo);
+            totalEntradas = BigDecimalUtil.sum(totalEntradas, data.getAmountEntry(), 2);
+            totalSalidas = BigDecimalUtil.sum(totalSalidas, data.getAmountOutput(), 2);
+        }
+        saldoFinal = saldo;
+        resultList = datas;
+        return datas;
+    }
+
+    /** Accion del boton "Ver en pantalla": valida, calcula y muestra el panel de resultados. */
+    public void preview() {
+        if (productItem == null || productItem.getProductItemCode() == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Reports.kardex.productItem.required");
+            showResults = false;
+            return;
+        }
+        computeReport();
+        showResults = true;
+    }
+
+    /** Descarga el reporte en PDF con los filtros actuales. */
+    public void downloadPdf() {
+        setReportFormat(ReportFormat.PDF);
+        generateReport();
+    }
+
+    /** Descarga el reporte en Excel con los filtros actuales. */
+    public void downloadExcel() {
+        setReportFormat(ReportFormat.XLS);
+        generateReport();
+    }
+
     public Collection<CollectionData> calculateCollectionData(){
 
         List<CollectionData> datas = new ArrayList<CollectionData>();
 
+        /*
+         * Fuentes de inventario para un articulo (mismo criterio que la vista "Saldos de Almacen"
+         * XProductionBalanceService, para que el saldo del reporte cuadre con ese saldo):
+         *   inv_movdet (MovementDetail)  vales/despachos aprobados  -> E (+) / S (-)
+         *   pro_acopiomateriaprima (CollectMaterial) Peso Empresa    -> E (+)  (estados APR/CONTA)
+         *   xpr_producto (XProductionProduct) PT producido           -> E (+)  (orden no ANL)
+         *   xpr_insumo (XSupply) consumo de MP/insumos en produccion -> S (-)  (orden no ANL)
+         *   xpr_produccion_ulexita (XProductionUlexita) reproceso    -> E/S    (orden no ANL)
+         *
+         * Se quitaron a proposito las fuentes del modelo de produccion viejo
+         * (pro_ordenproduccion/ProductionOrder, pro_productobase/BaseProduct y
+         * pro_producto/ProductionProduct) y las ventas (cli_articulopedido/ArticleOrder,
+         * contado y credito): la vista de saldos no las considera y, para almacenes de MP/PT,
+         * las salidas por venta ya vienen registradas en inv_movdet (S), por lo que contarlas
+         * de nuevo duplicaria el movimiento.
+         */
         List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItem.getProductItemCode(), startDate, endDate);
-        List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
-        List<ArticleOrder> orderDetailList      = articleOrderService.findOrderDetailByCodeAndDate(productItem.getProductItemCode(), startDate, endDate);
 
-        //List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItem.getProductItemCode(), startDate, endDate);
-        //List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(startDate, endDate);
-
-        List<ProductionProduct> productionProductList = productionOrderService.findProductionByProductItem(productItem.getProductItemCode(), startDate, endDate);
         List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByProductItem(productItem.getProductItemCode(), startDate, endDate);
 
         List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterialByCode(productItem.getProductItemCode(), startDate, endDate);
 
         List<XSupply> supplyList = xproductionService.getRawMaterialInProduction( productItem.getProductItemCode(), startDate, endDate);
 
-        /*for (ProductionOrder po:productionOrderList){
-            CollectionData collectionData = new CollectionData(
-                    po.getProductionPlanning().getDate(),
-                    po.getCode(),
-                    BigDecimalUtil.toBigDecimal(po.getProducedAmount()),
-                    BigDecimal.ZERO,
-                    "E",
-                    "ORDEN DE PRODUCCION NRO. " + po.getCode());
-            datas.add(collectionData);
-        }*/
+        List<XProductionUlexita> ulexitaReprocessList = xproductionService.getUlexitaReprocessByArticle(productItem.getProductItemCode(), startDate, endDate);
 
         for (CollectMaterial collectMaterial : collectMaterialList) {
             CollectionData collectionData = new CollectionData(
@@ -175,18 +226,11 @@ public class KardexProductMovementAction extends GenericReportAction {
         }
 
 
-        for (ProductionProduct product : productionProductList){
-            CollectionData collectionData = new CollectionData(
-                    formatearFecha(product.getProductionPlan().getDate(), "E"),
-                    product.getProductItemCode() ,
-                    product.getQuantity() ,
-                    BigDecimal.ZERO,
-                    "E",
-                    "ORDEN DE PRODUCCION FECHA " + DateUtils.format(product.getProductionPlan().getDate(), "dd/MM/yyyy") );
-            datas.add(collectionData);
-        }
-        // XProduction...
+        // XProduction: Producto Terminado producido (entrada). Se excluyen ordenes anuladas.
         for (XProductionProduct product : xproductionProductList){
+            if (product.getProduction() != null && ProductionState.ANL.equals(product.getProduction().getState())) {
+                continue;
+            }
             CollectionData collectionData = new CollectionData(
                     formatearFecha(product.getProductionPlan().getDate(), "E"),
                     product.getProductItemCode() ,
@@ -196,21 +240,6 @@ public class KardexProductMovementAction extends GenericReportAction {
                     "ORDEN DE PRODUCCION FECHA " + DateUtils.format(product.getProductionPlan().getDate(), "dd/MM/yyyy") );
             datas.add(collectionData);
         }
-
-        /*for (BaseProduct baseProduct:baseProductList){
-            for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
-                if (singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode().equals(productItem.getProductItemCode())){
-                    CollectionData collectionData = new CollectionData(
-                            baseProduct.getProductionPlanningBase().getDate(),
-                            baseProduct.getCode(),
-                            BigDecimalUtil.toBigDecimal(singleProduct.getAmount()),
-                            BigDecimal.ZERO,
-                            "E",
-                            "REPROCESO DE PRODUCCION NRO. " + baseProduct.getCode());
-                    datas.add(collectionData);
-                }
-            }
-        }*/
 
         for (MovementDetail md:movementDetailList){
             CollectionData collectionData = new CollectionData(
@@ -225,6 +254,9 @@ public class KardexProductMovementAction extends GenericReportAction {
         }
 
         for ( XSupply supply : supplyList ){
+            if (supply.getProduction() != null && ProductionState.ANL.equals(supply.getProduction().getState())) {
+                continue;
+            }
             String dateString = DateUtils.format(supply.getProduction().getProductionPlan().getDate(), "dd/MM/yyyy");
             CollectionData collectionData = new CollectionData( formatearFecha(supply.getProduction().getProductionPlan().getDate(), "S"),
                     supply.getProduction().getCode().toString(),
@@ -235,41 +267,32 @@ public class KardexProductMovementAction extends GenericReportAction {
             datas.add(collectionData);
         }
 
-        for (ArticleOrder ao:cashSaleDetailList){
-            String invoiceLabel = "";
-            if (ao.getVentaDirecta().getMovement() != null){
-                invoiceLabel = "F-" + ao.getVentaDirecta().getMovement().getNumber().toString() + " ";
-            }
-            CollectionData collectionData = new CollectionData( formatearFecha(ao.getVentaDirecta().getFechaPedido(), "S"),
-                                                                ao.getVentaDirecta().getCodigo().toString(),
-                                                                BigDecimal.ZERO,
-                                                                BigDecimalUtil.toBigDecimal(ao.getTotal()),
-                                                                "S",
-                    invoiceLabel + "Venta al contado "+ao.getVentaDirecta().getCodigo() + " " + ao.getVentaDirecta().getCliente().getFullName());
-            datas.add(collectionData);
-        }
+        // Reproceso de ordenes ULEXITA (xpr_produccion_ulexita): reproceso final -> entrada,
+        // consumo reproceso -> salida. Valores en TN, se convierten a la unidad del articulo.
+        for (XProductionUlexita ulexita : ulexitaReprocessList){
+            Date planDate = ulexita.getProduction().getProductionPlan().getDate();
+            String dateString = DateUtils.format(planDate, "dd/MM/yyyy");
+            String unit = productItem.getUsageMeasureCode();
 
-        for (ArticleOrder ao:orderDetailList){
-
-            String invoiceLabel = "";
-            if (ao.getCustomerOrder().getMovement() != null){
-                invoiceLabel = "F-" + ao.getCustomerOrder().getMovement().getNumber().toString() + " ";
+            BigDecimal reprocesoFinal = tnToUnit(ulexita.getReprocesoFinalTn(), unit);
+            if (reprocesoFinal.compareTo(BigDecimal.ZERO) != 0) {
+                datas.add(new CollectionData(formatearFecha(planDate, "E"),
+                        ulexita.getProduction().getCode().toString(),
+                        reprocesoFinal,
+                        BigDecimal.ZERO,
+                        "E",
+                        "Reproceso final ULEXITA produccion " + ulexita.getProduction().getCode() + " " + dateString));
             }
 
-            String typeLabel = "Venta a credito ";
-            if (ao.getCustomerOrder().getSaleType() != null){
-                if (ao.getCustomerOrder().getSaleType().equals(SaleTypeEnum.CASH))
-                    typeLabel = "Venta al contado ";
+            BigDecimal consumoReproceso = tnToUnit(ulexita.getConsumoReprocesoTn(), unit);
+            if (consumoReproceso.compareTo(BigDecimal.ZERO) != 0) {
+                datas.add(new CollectionData(formatearFecha(planDate, "S"),
+                        ulexita.getProduction().getCode().toString(),
+                        BigDecimal.ZERO,
+                        consumoReproceso,
+                        "S",
+                        "Consumo reproceso ULEXITA produccion " + ulexita.getProduction().getCode() + " " + dateString));
             }
-
-            CollectionData collectionData = new CollectionData(
-                                                                formatearFecha(ao.getCustomerOrder().getOrderDate(), "S"),
-                                                                ao.getCustomerOrder().getCode().toString(),
-                                                                BigDecimal.ZERO,
-                                                                BigDecimalUtil.toBigDecimal(ao.getTotal()),
-                                                                "S",
-                    invoiceLabel + typeLabel + ao.getCustomerOrder().getCode() + " " + ao.getCustomerOrder().getClient().getFullName());
-            datas.add(collectionData);
         }
 
         Collections.sort(datas, new Comparator<CollectionData>() {
@@ -306,6 +329,24 @@ public class KardexProductMovementAction extends GenericReportAction {
         return fechaHora;
     }
 
+    /** Convierte un valor en TN a la unidad del articulo (KG = x1000; otra unidad = se asume TN). */
+    static BigDecimal tnToUnit(BigDecimal tn, String measureCode){
+        if (tn == null) {
+            return BigDecimal.ZERO;
+        }
+        if ("KG".equalsIgnoreCase(measureCode)) {
+            return tn.multiply(new BigDecimal("1000"));
+        }
+        return tn;
+    }
+
+    /*
+     * Saldo a la fecha de inicio: se acumulan las mismas fuentes que la lista de movimientos
+     * (ver calculateCollectionData) desde el 1ro de enero hasta el dia anterior a initDate.
+     * Se quitaron a proposito el modelo de produccion viejo (pro_ordenproduccion/ProductionOrder,
+     * pro_productobase/BaseProduct, pro_producto/ProductionProduct) y las ventas
+     * (cli_articulopedido/ArticleOrder), por las mismas razones descritas en calculateCollectionData.
+     */
     public BigDecimal calculateInitialAmountToKardex(String productItemCode, Date initDate){
 
         Calendar calendar = Calendar.getInstance();
@@ -321,30 +362,10 @@ public class KardexProductMovementAction extends GenericReportAction {
         initialQuantity = productItemService.getInitialInventoryYear(productItemCode, DateUtils.getCurrentYear(firstDate).toString());
 
         List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItemCode, firstDate, initDate);
-        List<ArticleOrder> cashSaleDetailList   = articleOrderService.findCashSaleDetailByCodeAndDate(productItemCode, firstDate, initDate);
-        List<ArticleOrder> orderDetailList     = articleOrderService.findOrderDetailByCodeAndDate(productItemCode, firstDate, initDate);
-
-        List<ProductionOrder> productionOrderList = productionOrderService.findProductionOrdersByProductItem(productItemCode, firstDate, initDate);
-        List<BaseProduct> baseProductList         = productionOrderService.findBaseProductByDate(firstDate, initDate);
-        List<ProductionProduct> productionProductList = productionOrderService.findProductionByDate(firstDate, initDate);
-
-
-        /** PR_PRODUCCION **/ /*** REVISAR DESDE EL 1 MAYO 2019 ***/
-        for (ProductionProduct product : productionProductList){
-            if (productItemCode.equals(product.getProductItemCode())){
-                initialQuantity = BigDecimalUtil.sum(initialQuantity, product.getQuantity(), 2);
-            }
-        }
-        for (ProductionOrder po:productionOrderList){
-            initialQuantity = BigDecimalUtil.sum(initialQuantity, BigDecimalUtil.toBigDecimal(po.getProducedAmount()), 2);
-        }
-        for (BaseProduct baseProduct:baseProductList){
-            for (SingleProduct singleProduct:baseProduct.getSingleProducts()){
-                if (singleProduct.getProductProcessingSingle().getMetaProduct().getProductItem().getProductItemCode().equals(productItemCode)){
-                    initialQuantity = BigDecimalUtil.sum(initialQuantity, BigDecimalUtil.toBigDecimal(singleProduct.getAmount()), 2);
-                }
-            }
-        }
+        List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterialByCode(productItemCode, firstDate, initDate);
+        List<XProductionProduct> xproductionProductList = productionOrderService.findXProductionByProductItem(productItemCode, firstDate, initDate);
+        List<XSupply> supplyList = xproductionService.getRawMaterialInProduction(productItemCode, firstDate, initDate);
+        List<XProductionUlexita> ulexitaReprocessList = xproductionService.getUlexitaReprocessByArticle(productItemCode, firstDate, initDate);
 
         for (MovementDetail md:movementDetailList){
             if (md.getMovementType().equals(MovementDetailType.E))
@@ -353,12 +374,32 @@ public class KardexProductMovementAction extends GenericReportAction {
                 initialQuantity = BigDecimalUtil.subtract(initialQuantity, md.getQuantity(), 2);
         }
 
-        for (ArticleOrder ao:cashSaleDetailList){
-            initialQuantity = BigDecimalUtil.subtract(initialQuantity, BigDecimalUtil.toBigDecimal(ao.getTotal()), 2);
+        // Acopio de materia prima (entrada): Peso Empresa (balanceWeight)
+        for (CollectMaterial collectMaterial : collectMaterialList){
+            initialQuantity = BigDecimalUtil.sum(initialQuantity, collectMaterial.getBalanceWeight(), 2);
         }
 
-        for (ArticleOrder ao:orderDetailList){
-            initialQuantity = BigDecimalUtil.subtract(initialQuantity, BigDecimalUtil.toBigDecimal(ao.getTotal()), 2);
+        // XProduction: Producto Terminado producido (entrada). Se excluyen ordenes anuladas.
+        for (XProductionProduct product : xproductionProductList){
+            if (product.getProduction() != null && ProductionState.ANL.equals(product.getProduction().getState())) {
+                continue;
+            }
+            initialQuantity = BigDecimalUtil.sum(initialQuantity, product.getQuantity(), 2);
+        }
+
+        // XProduction: consumo de materia prima/insumos (salida). Se excluyen ordenes anuladas.
+        for (XSupply supply : supplyList){
+            if (supply.getProduction() != null && ProductionState.ANL.equals(supply.getProduction().getState())) {
+                continue;
+            }
+            initialQuantity = BigDecimalUtil.subtract(initialQuantity, supply.getQuantity(), 2);
+        }
+
+        // Reproceso ULEXITA (TN -> unidad): reproceso final entra, consumo reproceso sale.
+        String unit = productItem.getUsageMeasureCode();
+        for (XProductionUlexita ulexita : ulexitaReprocessList){
+            initialQuantity = BigDecimalUtil.sum(initialQuantity, tnToUnit(ulexita.getReprocesoFinalTn(), unit), 2);
+            initialQuantity = BigDecimalUtil.subtract(initialQuantity, tnToUnit(ulexita.getConsumoReprocesoTn(), unit), 2);
         }
 
         return  initialQuantity;
@@ -510,6 +551,30 @@ public class KardexProductMovementAction extends GenericReportAction {
 
     public void assignProductItem(ProductItem productItem) {
         this.productItem = productItem;
+    }
+
+    public List<CollectionData> getResultList() {
+        return resultList;
+    }
+
+    public BigDecimal getPreviousAmount() {
+        return previousAmount;
+    }
+
+    public BigDecimal getTotalEntradas() {
+        return totalEntradas;
+    }
+
+    public BigDecimal getTotalSalidas() {
+        return totalSalidas;
+    }
+
+    public BigDecimal getSaldoFinal() {
+        return saldoFinal;
+    }
+
+    public boolean isShowResults() {
+        return showResults;
     }
 
     public Date getStartDate() {

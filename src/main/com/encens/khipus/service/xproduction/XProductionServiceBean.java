@@ -1,6 +1,7 @@
 package com.encens.khipus.service.xproduction;
 
 
+import com.encens.khipus.model.production.ProductionState;
 import com.encens.khipus.model.production.SupplyType;
 import com.encens.khipus.model.warehouse.WarehouseType;
 import com.encens.khipus.model.xproduction.*;
@@ -305,6 +306,23 @@ public class XProductionServiceBean implements XProductionService {
                 .getResultList();
 
         return resultList;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<XProductionUlexita> getUlexitaReprocessByArticle(String productItemCode, Date initDate, Date endDate){
+
+        return em.createQuery("select u " +
+                        " from XProductionUlexita u " +
+                        " left join u.production pr " +
+                        " left join pr.productionPlan pl " +
+                        " where pl.date between :initDate and :endDate " +
+                        " and u.codArtReprocFinal = :productItemCode " +
+                        " and pr.state <> :anl ")
+                .setParameter("initDate", initDate)
+                .setParameter("endDate", endDate)
+                .setParameter("productItemCode", productItemCode)
+                .setParameter("anl", ProductionState.ANL)
+                .getResultList();
     }
 
 }

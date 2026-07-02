@@ -10,10 +10,16 @@
 
     <ui:define name="pageTitle">#{messages['Reports.kardex.movement.titleReport']}</ui:define>
     <ui:param name="bodyAlign" value="center"/>
-    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyWidth" value="80%"/>
 
     <ui:param name="selectedTab" value="warehouses"/>
     <ui:define name="body">
+        <style type="text/css">
+            /* Rollover por CSS: aplica a todas las filas aunque se pagine por AJAX. */
+            .kardexTable tbody tr:hover td { background-color: #eaf2fb !important; }
+            /* Descripcion: recorta con "..." y muestra el texto completo en el title (hover). */
+            .ellipsisCell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: help; }
+        </style>
         <h:form id="estimationStockReportForm">
 
             <rich:panel>
@@ -21,87 +27,166 @@
                     #{messages['Reports.kardex.movement.titleReport']}
                 </f:facet>
 
-                <s:decorate id="productItemField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Reports.kardex.productItem']}</ui:define>
-                    <app:quickSearch id="productItemQuickSearch"
-                                     textValue="kardexProductMovementAction.productItem.productItemCode"
-                                     value="#{kardexProductMovementAction.productItem}"
-                                     searchField="productItemCode"
-                                     alias="productItem"
-                                     reRender="productItemField"
-                                     tabindex="5">
-                        <ui:define name="restrictions">
-                            <app:restriction
-                                    condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
-                        </ui:define>
-                    </app:quickSearch>
-                    <app:selectPopUp id="productItem" styleClass="inputLarge"
-                                     textValue="#{kardexProductMovementAction.productItem.name}"
-                                     value="#{kardexProductMovementAction.productItem}"
-                                     clearAction="kardexProductMovementAction.cleanProductItem()"
-                                     searchModalPanel="productItemListModalPanel"
-                                     dataModel="#{productItemSearchDataModel}"
-                                     reRender="productItemField"
-                                     hotKeySelect="alt+2"/>
-                </s:decorate>
+                <h:panelGrid columns="5" cellpadding="4" style="white-space:nowrap;"
+                             columnClasses="label,,label,,">
+                    <h:outputText value="#{messages['Reports.kardex.productItem']}"/>
+                    <a4j:outputPanel id="productItemField" layout="inline">
+                        <app:quickSearch id="productItemQuickSearch"
+                                         textValue="kardexProductMovementAction.productItem.productItemCode"
+                                         value="#{kardexProductMovementAction.productItem}"
+                                         searchField="productItemCode"
+                                         alias="productItem"
+                                         reRender="productItemField"
+                                         tabindex="5">
+                            <ui:define name="restrictions">
+                                <app:restriction
+                                        condition="productItem.state = #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.ProductItemState', 'VIG')}"/>
+                            </ui:define>
+                        </app:quickSearch>
+                        <app:selectPopUp id="productItem" styleClass="inputLarge"
+                                         textValue="#{kardexProductMovementAction.productItem.name}"
+                                         value="#{kardexProductMovementAction.productItem}"
+                                         clearAction="kardexProductMovementAction.cleanProductItem()"
+                                         searchModalPanel="productItemListModalPanel"
+                                         dataModel="#{productItemSearchDataModel}"
+                                         reRender="productItemField"
+                                         hotKeySelect="alt+2"/>
+                    </a4j:outputPanel>
 
-                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Reports.kardex.movement.startDate']}</ui:define>
-                    <rich:calendar id="startDate"
-                                   value="#{kardexProductMovementAction.startDate}"
-                                   datePattern="#{messages['patterns.date']}"
-                                   enableManualInput="true"
-                                   required="true"
-                                   tabindex="1">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}"
-                                           timeZone="#{sessionUser.timeZone}"
-                                           type="date"/>
-                    </rich:calendar>
-                </s:decorate>
+                    <h:outputText value="#{messages['Reports.kardex.movement.period']}"/>
+                    <h:panelGroup>
+                        <rich:calendar id="startDate"
+                                       value="#{kardexProductMovementAction.startDate}"
+                                       datePattern="#{messages['patterns.date']}"
+                                       inputClass="inputSmall"
+                                       enableManualInput="true"
+                                       required="true"
+                                       tabindex="1">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                        </rich:calendar>
+                        <h:outputText value=" - "/>
+                        <rich:calendar id="endDate"
+                                       value="#{kardexProductMovementAction.endDate}"
+                                       datePattern="#{messages['patterns.date']}"
+                                       inputClass="inputSmall"
+                                       enableManualInput="true"
+                                       required="true"
+                                       tabindex="2">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}"
+                                               type="date"/>
+                            <app:dateRangeValidator forId="startDate"
+                                                    forLabel="#{messages['Reports.kardex.movement.startDate']}"
+                                                    type="greater"/>
+                        </rich:calendar>
+                    </h:panelGroup>
 
-                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Reports.kardex.movement.endDate']}</ui:define>
-                    <rich:calendar id="endDate"
-                                   value="#{kardexProductMovementAction.endDate}"
-                                   datePattern="#{messages['patterns.date']}"
-                                   enableManualInput="true"
-                                   required="true"
-                                   tabindex="2">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}"
-                                           timeZone="#{sessionUser.timeZone}"
-                                           type="date"/>
-                        <app:dateRangeValidator forId="startDate"
-                                                forLabel="#{messages['Reports.kardex.movement.startDate']}"
-                                                type="greater"/>
-                    </rich:calendar>
-                </s:decorate>
-
+                    <a4j:commandButton action="#{kardexProductMovementAction.preview}"
+                                       styleClass="button"
+                                       value="#{messages['Reports.kardex.movement.view']}"
+                                       id="viewButtonId" tabindex="4"
+                                       reRender="resultsWrap, messagesPanel">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </h:panelGrid>
             </rich:panel>
 
-            <rich:panel id="reportDefaultOptionsPanel">
-                <f:facet name="header">
-                    #{messages['Reports.options']}
-                </f:facet>
-                <s:decorate id="formatField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Reports.format']}</ui:define>
-                    <h:selectOneMenu id="reportFormat"
-                                     value="#{kardexProductMovementAction.reportFormat}"
-                                     styleClass="input"
-                                     tabindex="3">
-                        <f:selectItem itemLabel="PDF" itemValue="#{enumerationUtil.getEnumValue('com.encens.khipus.action.reports.ReportFormat', 'PDF')}"/>
-                        <f:selectItem itemLabel="EXCEL" itemValue="#{enumerationUtil.getEnumValue('com.encens.khipus.action.reports.ReportFormat', 'XLS')}"/>
-                        <s:convertEnum/>
-                    </h:selectOneMenu>
-                </s:decorate>
-            </rich:panel>
+            <a4j:outputPanel id="messagesPanel" layout="block">
+                <rich:messages styleClass="errors"/>
+            </a4j:outputPanel>
 
-            <div class="buttons">
-                <h:commandButton action="#{kardexProductMovementAction.generateReport}"
-                                 styleClass="button"
-                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
-                    <s:defaultAction/>
-                </h:commandButton>
-            </div>
+            <a4j:outputPanel id="resultsWrap" layout="block">
+                <rich:panel rendered="#{kardexProductMovementAction.showResults}">
+
+                    <h:panelGrid columns="2" width="100%" columnClasses="middle,right" style="margin-bottom:6px;">
+                        <h:panelGroup>
+                            <h:outputText value="#{messages['Reports.kardex.movement.previousBalance']}: " styleClass="label" style="font-weight:bold;"/>
+                            <h:outputText value="#{kardexProductMovementAction.previousAmount}" style="font-weight:bold;">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <h:commandButton action="#{kardexProductMovementAction.downloadPdf}"
+                                             styleClass="button"
+                                             value="#{messages['Reports.kardex.movement.downloadPdf']}"/>
+                            <h:commandButton action="#{kardexProductMovementAction.downloadExcel}"
+                                             styleClass="button"
+                                             value="#{messages['Reports.kardex.movement.downloadExcel']}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    <rich:dataTable id="resultsTable" value="#{kardexProductMovementAction.resultList}" var="row"
+                                    rows="20" width="100%" style="table-layout:fixed;" styleClass="kardexTable"
+                                    columnsWidth="9%, 11%, 10%, 10%, 12%, 48%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>#{messages['Reports.kardex.movement.date']}</rich:column>
+                                <rich:column>#{messages['Reports.kardex.movement.code']}</rich:column>
+                                <rich:column styleClass="right">#{messages['Reports.kardex.movement.entry']}</rich:column>
+                                <rich:column styleClass="right">#{messages['Reports.kardex.movement.output']}</rich:column>
+                                <rich:column styleClass="right">#{messages['Reports.kardex.movement.balance']}</rich:column>
+                                <rich:column>#{messages['Reports.kardex.movement.description']}</rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+
+                        <rich:column styleClass="center">
+                            <h:outputText value="#{row.date}">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="center" style="white-space:nowrap;"><h:outputText value="#{row.code}"/></rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{row.amountEntry}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{row.amountOutput}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{row.amount}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column>
+                            <div class="ellipsisCell" title="#{row.description}">
+                                <h:outputText value="#{row.description}"/>
+                            </div>
+                        </rich:column>
+
+                        <f:facet name="footer">
+                            <rich:columnGroup>
+                                <rich:column colspan="2" styleClass="right">#{messages['Reports.kardex.movement.totals']}</rich:column>
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{kardexProductMovementAction.totalEntradas}">
+                                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </rich:column>
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{kardexProductMovementAction.totalSalidas}">
+                                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </rich:column>
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{kardexProductMovementAction.saldoFinal}">
+                                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </rich:column>
+                                <rich:column/>
+                            </rich:columnGroup>
+                        </f:facet>
+                    </rich:dataTable>
+
+                    <rich:spacer height="6"/>
+
+                    <rich:datascroller for="resultsTable" maxPages="10"
+                                       renderIfSinglePage="false"/>
+                </rich:panel>
+            </a4j:outputPanel>
 
         </h:form>
 
