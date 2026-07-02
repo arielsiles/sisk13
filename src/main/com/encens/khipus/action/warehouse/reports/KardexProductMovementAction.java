@@ -65,6 +65,8 @@ public class KardexProductMovementAction extends GenericReportAction {
     private BigDecimal totalSalidas = BigDecimal.ZERO;
     private BigDecimal saldoFinal = BigDecimal.ZERO;
     private boolean showResults = false;
+    /** Descripcion completa seleccionada para mostrar en el modal al hacer click. */
+    private String selectedDescription;
 
     @In
     private MovementDetailService movementDetailService;
@@ -575,6 +577,15 @@ public class KardexProductMovementAction extends GenericReportAction {
 
     public boolean isShowResults() {
         return showResults;
+    }
+
+    /** Guarda la descripcion a mostrar en el modal (accion del click en la celda). */
+    public void selectDescription(String description) {
+        this.selectedDescription = description;
+    }
+
+    public String getSelectedDescription() {
+        return selectedDescription;
     }
 
     public Date getStartDate() {
