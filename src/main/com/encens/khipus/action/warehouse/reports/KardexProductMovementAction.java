@@ -5,6 +5,7 @@ import com.encens.khipus.action.reports.ReportFormat;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.*;
+import com.encens.khipus.model.warehouse.InitialInventory;
 import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
@@ -67,6 +68,8 @@ public class KardexProductMovementAction extends GenericReportAction {
     private boolean showResults = false;
     /** Descripcion completa seleccionada para mostrar en el modal al hacer click. */
     private String selectedDescription;
+    /** Año de origen para recalcular el saldo cuando no hay ningun inv_inicio cargado. */
+    private static final int ORIGIN_YEAR = 2000;
 
     @In
     private MovementDetailService movementDetailService;
@@ -344,24 +347,39 @@ public class KardexProductMovementAction extends GenericReportAction {
 
     /*
      * Saldo a la fecha de inicio: se acumulan las mismas fuentes que la lista de movimientos
-     * (ver calculateCollectionData) desde el 1ro de enero hasta el dia anterior a initDate.
+     * (ver calculateCollectionData) hasta el dia anterior a initDate.
      * Se quitaron a proposito el modelo de produccion viejo (pro_ordenproduccion/ProductionOrder,
      * pro_productobase/BaseProduct, pro_producto/ProductionProduct) y las ventas
      * (cli_articulopedido/ArticleOrder), por las mismas razones descritas en calculateCollectionData.
+     *
+     * Base del saldo (robusto): se toma el inv_inicio de la gestion mas reciente <= año del
+     * reporte que TENGA registro para el articulo, y se acumulan los movimientos desde el 1ro
+     * de enero de esa gestion. Si el articulo no tiene ningun inv_inicio <= año del reporte, se
+     * recalcula todo el historico desde ORIGIN_YEAR (evita saldo 0 por falta de carga de apertura).
+     * Se distingue "no cargado" de "cargado en 0" por la existencia del registro, no por el valor.
      */
     public BigDecimal calculateInitialAmountToKardex(String productItemCode, Date initDate){
 
         Calendar calendar = Calendar.getInstance();
         BigDecimal initialQuantity = BigDecimal.ZERO;
 
-        /** 1er dia del año **/
-        Date firstDate = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(initDate));
+        /** Año del inicio del reporte (antes de restar el dia) **/
+        String reportYear = DateUtils.getCurrentYear(initDate).toString();
+
         /** Restando un dia a la fecha **/
         calendar.setTime(initDate);
         calendar.add(Calendar.DAY_OF_YEAR, -1);
         initDate = calendar.getTime();
 
-        initialQuantity = productItemService.getInitialInventoryYear(productItemCode, DateUtils.getCurrentYear(firstDate).toString());
+        /** Base + fecha desde la cual acumular **/
+        Date firstDate;
+        InitialInventory base = productItemService.findLatestInitialInventory(productItemCode, reportYear);
+        if (base != null) {
+            initialQuantity = (base.getQuantity() != null) ? base.getQuantity() : BigDecimal.ZERO;
+            firstDate = DateUtils.firstDayOfYear(Integer.valueOf(base.getYear()));
+        } else {
+            firstDate = DateUtils.firstDayOfYear(ORIGIN_YEAR);
+        }
 
         List<MovementDetail> movementDetailList = movementDetailService.findDetailListByProductAndDate(productItemCode, firstDate, initDate);
         List<CollectMaterial> collectMaterialList = collectMaterialService.findApprovedCollectMaterialByCode(productItemCode, firstDate, initDate);

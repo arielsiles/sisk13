@@ -6,6 +6,7 @@ import com.encens.khipus.exception.warehouse.ProductItemMinimalStockIsGreaterTha
 import com.encens.khipus.exception.warehouse.ProductItemNotFoundException;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.customers.*;
+import com.encens.khipus.model.warehouse.InitialInventory;
 import com.encens.khipus.model.warehouse.InventoryPeriod;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.WarehouseVoucher;
@@ -64,6 +65,12 @@ public interface ProductItemService extends GenericService {
 
     @SuppressWarnings(value = "unchecked")
     public BigDecimal getInitialInventoryYear(String productItemCode, String year);
+
+    /**
+     * Devuelve el registro inv_inicio de la gestion mas reciente <= maxYear para el articulo,
+     * o null si no existe ninguno. Permite distinguir "no cargado" (null) de "cargado en 0".
+     */
+    public InitialInventory findLatestInitialInventory(String productItemCode, String maxYear);
 
     void createProductInventory(ProductItem productItem);
 
