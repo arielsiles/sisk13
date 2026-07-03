@@ -2,6 +2,7 @@ package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.contacts.Country;
+import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.model.contacts.Person;
 import com.encens.khipus.util.Constants;
 import org.apache.commons.lang.StringUtils;
@@ -100,10 +101,6 @@ public class ClientContact implements BaseModel {
     @Length(max = 30)
     private String workPhone;
 
-    @Column(name = "fax", length = 30)
-    @Length(max = 30)
-    private String fax;
-
     @Column(name = "web", length = 200)
     @Length(max = 200)
     private String website;
@@ -111,6 +108,10 @@ public class ClientContact implements BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idpais", nullable = true)
     private Country country;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "iddepartamento", nullable = true)
+    private Department department;
 
     @Column(name = "ciudad", length = 150)
     @Length(max = 150)
@@ -206,6 +207,14 @@ public class ClientContact implements BaseModel {
         this.country = country;
     }
 
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     public String getCity() {
         return city;
     }
@@ -244,14 +253,6 @@ public class ClientContact implements BaseModel {
 
     public void setWorkPhone(String workPhone) {
         this.workPhone = workPhone;
-    }
-
-    public String getFax() {
-        return fax;
-    }
-
-    public void setFax(String fax) {
-        this.fax = fax;
     }
 
     public String getWebsite() {

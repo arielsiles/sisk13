@@ -67,10 +67,6 @@ public class ClientAction extends GenericAction<Client> {
 
         getInstance().setCommission(0.0);
         getInstance().setGuarantee(0.0);
-        if (getInstance().getPersonFlag())
-            getInstance().setPersonType("cliente");
-        else
-            getInstance().setPersonType("institucion");
 
         if (getInstance().getName() == null)
             getInstance().setName("");

@@ -20,6 +20,23 @@
         </framework:restrictions>
     </framework:entity-query>
 
+    <!-- Departamentos filtrados por pais, dedicados a la pantalla de Cliente
+         (uno para el cliente y otro para el contacto, para que sus filtros por
+         pais no se combinen con AND en la misma pagina). -->
+    <factory name="clientDepartmentList" value="#{clientDepartmentQuery}"/>
+    <framework:entity-query name="clientDepartmentQuery" ejbql="select d from Department d order by d.name">
+        <framework:restrictions>
+            <value>d.country = #{client.country}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
+    <factory name="contactDepartmentList" value="#{contactDepartmentQuery}"/>
+    <framework:entity-query name="contactDepartmentQuery" ejbql="select d from Department d order by d.name">
+        <framework:restrictions>
+            <value>d.country = #{clientAction.contact.country}</value>
+        </framework:restrictions>
+    </framework:entity-query>
+
     <factory name="cityList" value="#{cityQuery}"/>
     <framework:entity-query name="cityQuery" ejbql="select c from City c">
         <framework:restrictions>

@@ -268,10 +268,31 @@
         </h:inputText>
     </s:decorate>
 
+    <s:decorate id="mobileField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.mobile']}</ui:define>
+        <h:inputText id="mobile" value="#{client.mobile}" required="false"
+                     maxlength="30" tabindex="8" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
     <s:decorate id="emailField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.email']}</ui:define>
         <h:inputText id="email" value="#{client.email}" required="false"
                      maxlength="100" tabindex="8" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
+    <s:decorate id="companyField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.company']}</ui:define>
+        <h:inputText id="company" value="#{client.companyName}" required="false"
+                     maxlength="200" tabindex="8" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
+    <s:decorate id="websiteField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.website']}</ui:define>
+        <h:inputText id="website" value="#{client.website}" required="false"
+                     maxlength="200" tabindex="8" styleClass="input">
         </h:inputText>
     </s:decorate>
 
@@ -282,6 +303,37 @@
                          styleClass="textarea"
                          tabindex="9"
                          style="width:200px;height:40px;"/>
+    </s:decorate>
+
+    <s:decorate id="clientCountryField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.country']}</ui:define>
+        <h:selectOneMenu id="clientCountry" value="#{client.country}" styleClass="input" tabindex="9">
+            <s:selectItems value="#{countryList}" var="country" label="#{country.name}"
+                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:support event="onchange" ajaxSingle="true"
+                         reRender="clientDepartmentField, clientCountryCode"/>
+        </h:selectOneMenu>
+        <s:span id="clientCountryCode">
+            <rich:spacer width="5"/>
+            <h:outputText value="#{client.country.prefix}"/>
+        </s:span>
+    </s:decorate>
+
+    <s:decorate id="clientDepartmentField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.department']}</ui:define>
+        <h:selectOneMenu id="clientDepartment" value="#{client.department}" styleClass="input" tabindex="9">
+            <s:selectItems value="#{clientDepartmentList.resultList}" var="dep" label="#{dep.name}"
+                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+    </s:decorate>
+
+    <s:decorate id="clientCityField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.city']}</ui:define>
+        <h:inputText id="clientCity" value="#{client.city}" required="false"
+                     maxlength="150" tabindex="9" styleClass="input">
+        </h:inputText>
     </s:decorate>
 
     <s:decorate id="documentTypeField" template="/include/inputField.xhtml" styleClass="formRow"
@@ -362,6 +414,11 @@
 <rich:panel id="contactsPanel">
     <f:facet name="header">#{messages['ClientContact.list']}</f:facet>
 
+    <s:fragment rendered="#{!clientAction.managed}">
+        <h:outputText value="#{messages['ClientContact.saveClientFirst']}"/>
+    </s:fragment>
+
+    <s:fragment rendered="#{clientAction.managed}">
     <div class="buttons">
         <a4j:commandButton value="#{messages['ClientContact.add']}"
                            styleClass="button"
@@ -424,6 +481,7 @@
     </rich:dataTable>
 
     <h:outputText value="#{messages['ClientContact.empty']}" rendered="#{empty client.contacts}"/>
+    </s:fragment>
 </rich:panel>
 
 </rich:tab>
@@ -545,10 +603,6 @@
                         <ui:define name="label">#{messages['ClientContact.workPhone']}</ui:define>
                         <h:inputText value="#{clientAction.contact.workPhone}" maxlength="30" styleClass="input"/>
                     </s:decorate>
-                    <s:decorate id="ccFaxField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['ClientContact.fax']}</ui:define>
-                        <h:inputText value="#{clientAction.contact.fax}" maxlength="30" styleClass="input"/>
-                    </s:decorate>
                 </s:div>
             </h:panelGrid>
         </app:fieldset>
@@ -561,6 +615,20 @@
                         <ui:define name="label">#{messages['ClientContact.country']}</ui:define>
                         <h:selectOneMenu value="#{clientAction.contact.country}" styleClass="input">
                             <s:selectItems value="#{countryList}" var="country" label="#{country.name}"
+                                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                            <a4j:support event="onchange" ajaxSingle="true"
+                                         reRender="ccDepartmentField, ccCountryCode"/>
+                        </h:selectOneMenu>
+                        <s:span id="ccCountryCode">
+                            <rich:spacer width="5"/>
+                            <h:outputText value="#{clientAction.contact.country.prefix}"/>
+                        </s:span>
+                    </s:decorate>
+                    <s:decorate id="ccDepartmentField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.department']}</ui:define>
+                        <h:selectOneMenu value="#{clientAction.contact.department}" styleClass="input">
+                            <s:selectItems value="#{contactDepartmentList.resultList}" var="dep" label="#{dep.name}"
                                            noSelectionLabel="" hideNoSelectionLabel="false"/>
                             <s:convertEntity/>
                         </h:selectOneMenu>
