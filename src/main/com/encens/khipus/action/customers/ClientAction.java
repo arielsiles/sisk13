@@ -3,6 +3,7 @@ package com.encens.khipus.action.customers;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.customers.ClientContact;
 import com.encens.khipus.model.customers.PaymentMethodSin;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.service.customers.ClientService;
@@ -30,6 +31,9 @@ public class ClientAction extends GenericAction<Client> {
     private CashAccount regularizeCashAccount;
 
     private boolean showNitExtension = false;
+
+    /* Contacto en edicion (holder del modal de personas de contacto) */
+    private ClientContact contact;
 
     @Factory(value = "client", scope = ScopeType.STATELESS)
     public Client initClient() {
@@ -96,6 +100,66 @@ public class ClientAction extends GenericAction<Client> {
     public void clearRegularizeAccount() {
         setRegularizeCashAccount(null);
         getInstance().setRegularizeAccount(null);
+    }
+
+    /* ==================== Personas de contacto ==================== */
+
+    /**
+     * Prepara un contacto nuevo para el modal (aun no se agrega a la lista;
+     * se agrega recien al aceptar).
+     */
+    public void newContact() {
+        contact = new ClientContact();
+        contact.setClient(getInstance());
+        contact.setActive(Boolean.TRUE);
+        contact.setPrimaryContact(Boolean.FALSE);
+    }
+
+    /**
+     * Abre el modal apuntando a un contacto existente de la lista (edicion in situ).
+     */
+    public void editContact(ClientContact clientContact) {
+        contact = clientContact;
+    }
+
+    /**
+     * Confirma el contacto del modal. Si es nuevo lo agrega a la lista del cliente;
+     * los cambios se persisten por cascade al guardar el cliente. Garantiza un solo
+     * contacto principal.
+     */
+    public void acceptContact() {
+        if (contact == null)
+            return;
+
+        if (contact.getClient() == null)
+            contact.setClient(getInstance());
+
+        if (!getInstance().getContacts().contains(contact))
+            getInstance().getContacts().add(contact);
+
+        if (Boolean.TRUE.equals(contact.getPrimaryContact())) {
+            for (ClientContact other : getInstance().getContacts()) {
+                if (other != contact)
+                    other.setPrimaryContact(Boolean.FALSE);
+            }
+        }
+
+        contact = null;
+    }
+
+    /**
+     * Quita un contacto de la lista. El DELETE_ORPHAN lo elimina de la BD al guardar.
+     */
+    public void removeContact(ClientContact clientContact) {
+        getInstance().getContacts().remove(clientContact);
+    }
+
+    public ClientContact getContact() {
+        return contact;
+    }
+
+    public void setContact(ClientContact contact) {
+        this.contact = contact;
     }
 
     public void updateShowNitExtension() {

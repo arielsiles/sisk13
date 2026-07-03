@@ -7,7 +7,9 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -138,6 +140,11 @@ public class Client implements BaseModel {
     @JoinColumn(name = "idterritoriotrabajo", referencedColumnName = "idterritoriotrabajo")
     @ManyToOne
     private Territoriotrabajo territoriotrabajo;
+
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @org.hibernate.annotations.Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+    private List<ClientContact> contacts = new ArrayList<ClientContact>(0);
 
     public Long getId() {
         return id;
@@ -445,6 +452,14 @@ public class Client implements BaseModel {
 
     public void setRegularizeAccount(String regularizeAccount) {
         this.regularizeAccount = regularizeAccount;
+    }
+
+    public List<ClientContact> getContacts() {
+        return contacts;
+    }
+
+    public void setContacts(List<ClientContact> contacts) {
+        this.contacts = contacts;
     }
 
 }

@@ -49,6 +49,10 @@
     </h:commandButton>
 </div>
 
+<rich:tabPanel id="clientTabPanel" switchType="client">
+
+<rich:tab name="dataTab" label="#{messages['Client.tab.data']}">
+
 <rich:panel id="formPanel">
 
 <f:facet name="header">
@@ -351,6 +355,80 @@
 </h:panelGrid>
 </rich:panel>
 
+</rich:tab>
+
+<rich:tab name="contactsTab" label="#{messages['Client.tab.contacts']}">
+
+<rich:panel id="contactsPanel">
+    <f:facet name="header">#{messages['ClientContact.list']}</f:facet>
+
+    <div class="buttons">
+        <a4j:commandButton value="#{messages['ClientContact.add']}"
+                           styleClass="button"
+                           ajaxSingle="true"
+                           immediate="true"
+                           action="#{clientAction.newContact}"
+                           reRender="contactForm"
+                           oncomplete="Richfaces.showModalPanel('contactModalPanel');"/>
+    </div>
+
+    <rich:dataTable id="contactsTable" value="#{client.contacts}" var="cc"
+                    rendered="#{not empty client.contacts}" width="100%">
+        <rich:column>
+            <f:facet name="header">#{messages['ClientContact.fullName']}</f:facet>
+            #{cc.fullName}
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">#{messages['ClientContact.position']}</f:facet>
+            #{cc.position}
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">#{messages['ClientContact.mobile']}</f:facet>
+            #{cc.mobile}
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">#{messages['ClientContact.phone']}</f:facet>
+            #{cc.phone}
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">#{messages['ClientContact.email']}</f:facet>
+            #{cc.email}
+        </rich:column>
+        <rich:column style="text-align:center;">
+            <f:facet name="header">#{messages['ClientContact.primaryContact']}</f:facet>
+            <h:graphicImage value="/img/active.gif" rendered="#{cc.primaryContact}"/>
+        </rich:column>
+        <rich:column style="text-align:center;">
+            <f:facet name="header">#{messages['ClientContact.active']}</f:facet>
+            <h:graphicImage value="/img/active.gif" rendered="#{cc.active}"/>
+        </rich:column>
+        <rich:column style="text-align:center;">
+            <f:facet name="header">#{messages['Common.action']}</f:facet>
+            <a4j:commandLink action="#{clientAction.editContact(cc)}"
+                             ajaxSingle="true"
+                             immediate="true"
+                             reRender="contactForm"
+                             oncomplete="Richfaces.showModalPanel('contactModalPanel');">
+                <h:graphicImage value="/img/edit.gif" style="border:0"/>
+            </a4j:commandLink>
+            <rich:spacer width="10"/>
+            <a4j:commandLink title="#{messages['ClientContact.remove']}"
+                             ajaxSingle="true"
+                             immediate="true"
+                             action="#{clientAction.removeContact(cc)}"
+                             reRender="contactsPanel">
+                <h:graphicImage value="/img/close.png" style="border:0"
+                                alt="#{messages['ClientContact.remove']}"/>
+            </a4j:commandLink>
+        </rich:column>
+    </rich:dataTable>
+
+    <h:outputText value="#{messages['ClientContact.empty']}" rendered="#{empty client.contacts}"/>
+</rich:panel>
+
+</rich:tab>
+</rich:tabPanel>
+
 <div class="buttons">
 
 </div>
@@ -391,6 +469,138 @@
     </ui:define>
 </s:decorate>
 
+
+<rich:modalPanel id="contactModalPanel" width="660" autosized="true" zindex="2000">
+    <f:facet name="header">
+        <h:outputText value="#{messages['ClientContact.edit']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideContactLink"/>
+        <rich:componentControl for="contactModalPanel" attachTo="hideContactLink" operation="hide" event="onclick"/>
+    </f:facet>
+
+    <h:form id="contactForm">
+        <app:fieldset id="ccPersonalFieldset" title="#{messages['ClientContact.section.personal']}">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:div>
+                    <s:decorate id="ccFirstNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.firstName']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.firstName}" required="true"
+                                     maxlength="200" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="ccLastNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.lastName']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.lastName}" maxlength="200" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="ccCompanyField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.company']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.companyName}" maxlength="200" styleClass="input"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="ccPositionField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.position']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.position}" maxlength="150" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="ccAreaField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.area']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.area}" maxlength="150" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="ccPrimaryField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.primaryContact']}</ui:define>
+                        <h:selectBooleanCheckbox value="#{clientAction.contact.primaryContact}"/>
+                    </s:decorate>
+                    <s:decorate id="ccActiveField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.active']}</ui:define>
+                        <h:selectBooleanCheckbox value="#{clientAction.contact.active}"/>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </app:fieldset>
+
+        <app:fieldset id="ccCommFieldset" title="#{messages['ClientContact.section.communication']}">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:div>
+                    <s:decorate id="ccEmailField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.email']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.email}" maxlength="150" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="ccWebsiteField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.website']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.website}" maxlength="200" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="ccPhoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.phone']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.phone}" maxlength="30" styleClass="input"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="ccMobileField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.mobile']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.mobile}" maxlength="30" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="ccWorkPhoneField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.workPhone']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.workPhone}" maxlength="30" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate id="ccFaxField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.fax']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.fax}" maxlength="30" styleClass="input"/>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </app:fieldset>
+
+        <app:fieldset id="ccLocationFieldset" title="#{messages['ClientContact.section.location']}">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width50percent,width50percent">
+                <s:div>
+                    <s:decorate id="ccCountryField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.country']}</ui:define>
+                        <h:selectOneMenu value="#{clientAction.contact.country}" styleClass="input">
+                            <s:selectItems value="#{countryList}" var="country" label="#{country.name}"
+                                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+                            <s:convertEntity/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate id="ccCityField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.city']}</ui:define>
+                        <h:inputText value="#{clientAction.contact.city}" maxlength="150" styleClass="input"/>
+                    </s:decorate>
+                </s:div>
+                <s:div>
+                    <s:decorate id="ccAddressField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ClientContact.address']}</ui:define>
+                        <h:inputTextarea value="#{clientAction.contact.address}" styleClass="textarea"
+                                         style="width:230px;height:62px;"/>
+                    </s:decorate>
+                </s:div>
+            </h:panelGrid>
+        </app:fieldset>
+
+        <app:fieldset id="ccNotesFieldset" title="#{messages['ClientContact.section.notes']}">
+            <s:div>
+                <s:decorate id="ccNotesField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ClientContact.notes']}</ui:define>
+                    <h:inputTextarea value="#{clientAction.contact.notes}" styleClass="textarea"
+                                     style="width:440px;height:55px;"/>
+                </s:decorate>
+            </s:div>
+        </app:fieldset>
+
+        <div class="buttonsRight">
+            <a4j:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                <rich:componentControl for="contactModalPanel" operation="hide" event="onclick"/>
+            </a4j:commandButton>
+            <a4j:commandButton value="#{messages['Common.accept']}" styleClass="button"
+                               action="#{clientAction.acceptContact}"
+                               reRender="contactsPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity==null}) Richfaces.hideModalPanel('contactModalPanel');"/>
+        </div>
+    </h:form>
+</rich:modalPanel>
 
 <s:fragment rendered="#{!clientAction.managed}">
     <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
