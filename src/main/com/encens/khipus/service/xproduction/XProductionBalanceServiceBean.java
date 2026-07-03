@@ -19,6 +19,8 @@ import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,15 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
     private EntityManager em;
 
     private static final BigDecimal THOUSAND = new BigDecimal("1000");
+
+    /**
+     * Filtro "hasta la fecha" para las fuentes de produccion (4/5/6): usa la fecha del
+     * plan de produccion ({@code productionPlan.date}). Las ordenes sin plan (sin fecha)
+     * se cuentan siempre, para no alterar los totales actuales. Requiere el alias
+     * {@code pl} (plan) y el parametro {@code :cutoff}.
+     */
+    private static final String PRODUCTION_DATE_FILTER =
+            "(pl.date is null or pl.date <= :cutoff) ";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -47,11 +58,15 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<WarehouseBalanceRow> computeBalances(String companyNumber, String warehouseCode) {
+    public List<WarehouseBalanceRow> computeBalances(String companyNumber, String warehouseCode, Date date) {
         Map<String, WarehouseBalanceRow> rows = new LinkedHashMap<String, WarehouseBalanceRow>();
         if (companyNumber == null || warehouseCode == null) {
             return new ArrayList<WarehouseBalanceRow>();
         }
+
+        // Corte "hasta la fecha": se normaliza al fin del dia seleccionado para incluir
+        // tanto fechas guardadas a medianoche (DATE) como con hora (TIMESTAMP).
+        Date cutoff = endOfDay(date != null ? date : new Date());
 
         // 1) Todos los productos del almacen (incluso saldo 0), ordenados por
         //    Subgrupo y luego por nombre (A-Z). LEFT JOIN para incluir articulos
@@ -79,10 +94,12 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
         List<Object[]> movements = em.createQuery(
                 "select md.productItemCode, md.movementType, sum(md.quantity) from MovementDetail md " +
                 "where md.companyNumber = :cn and md.warehouseCode = :wc and md.state = :apr " +
+                "and md.movementDetailDate <= :cutoff " +
                 "group by md.productItemCode, md.movementType")
                 .setParameter("cn", companyNumber)
                 .setParameter("wc", warehouseCode)
                 .setParameter("apr", WarehouseVoucherState.APR)
+                .setParameter("cutoff", cutoff)
                 .getResultList();
         for (Object[] r : movements) {
             WarehouseBalanceRow row = rows.get((String) r[0]);
@@ -100,28 +117,34 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
         //    y solo acopios Aprobados/Contabilizados (mismo criterio que el reporte de movimientos).
         List<Object[]> collect = em.createQuery(
                 "select cm.metaProduct.productItemCode, sum(cm.balanceWeight) from CollectMaterial cm " +
-                "where cm.state in (:apr, :conta) " +
+                "where cm.state in (:apr, :conta) and cm.date <= :cutoff " +
                 "group by cm.metaProduct.productItemCode")
                 .setParameter("apr", CollectMaterialState.APR)
                 .setParameter("conta", CollectMaterialState.CONTA)
+                .setParameter("cutoff", cutoff)
                 .getResultList();
         applySums(rows, collect, true);
 
-        // 4) Produccion: Producto Terminado producido (entrada). Orden != ANL.
+        // 4) Produccion: Producto Terminado producido (entrada). Orden != ANL y con
+        //    fecha del plan de produccion <= corte.
         List<Object[]> produced = em.createQuery(
                 "select pp.productItemCode, sum(pp.quantity) from XProductionProduct pp " +
-                "where pp.production.state <> :anl " +
+                "left join pp.production pr left join pr.productionPlan pl " +
+                "where pr.state <> :anl and " + PRODUCTION_DATE_FILTER +
                 "group by pp.productItemCode")
                 .setParameter("anl", ProductionState.ANL)
+                .setParameter("cutoff", cutoff)
                 .getResultList();
         applySums(rows, produced, true);
 
         // 5) Produccion: consumo de insumos (salida). Incluye PT usado como insumo. Orden != ANL.
         List<Object[]> consumed = em.createQuery(
                 "select s.productItemCode, sum(s.quantity) from XSupply s " +
-                "where s.production.state <> :anl " +
+                "left join s.production pr left join pr.productionPlan pl " +
+                "where pr.state <> :anl and " + PRODUCTION_DATE_FILTER +
                 "group by s.productItemCode")
                 .setParameter("anl", ProductionState.ANL)
+                .setParameter("cutoff", cutoff)
                 .getResultList();
         applySums(rows, consumed, false);
 
@@ -133,9 +156,11 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
         List<Object[]> reproceso = em.createQuery(
                 "select u.codArtReprocFinal, sum(u.reprocesoFinalTn), sum(u.consumoReprocesoTn) " +
                 "from XProductionUlexita u " +
-                "where u.codArtReprocFinal is not null and u.production.state <> :anl " +
+                "left join u.production pr left join pr.productionPlan pl " +
+                "where u.codArtReprocFinal is not null and pr.state <> :anl and " + PRODUCTION_DATE_FILTER +
                 "group by u.codArtReprocFinal")
                 .setParameter("anl", ProductionState.ANL)
+                .setParameter("cutoff", cutoff)
                 .getResultList();
         for (Object[] r : reproceso) {
             WarehouseBalanceRow row = rows.get((String) r[0]);
@@ -147,6 +172,17 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
         }
 
         return new ArrayList<WarehouseBalanceRow>(rows.values());
+    }
+
+    /** Fin del dia (23:59:59.999) de la fecha dada, usado como corte inclusivo "hasta la fecha". */
+    private Date endOfDay(Date d) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        c.set(Calendar.HOUR_OF_DAY, 23);
+        c.set(Calendar.MINUTE, 59);
+        c.set(Calendar.SECOND, 59);
+        c.set(Calendar.MILLISECOND, 999);
+        return c.getTime();
     }
 
     /** Convierte un valor en TN a la unidad del articulo (KG = x1000; otra = se asume TN). */
