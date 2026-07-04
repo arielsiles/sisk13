@@ -17,7 +17,8 @@
         </c:otherwise>
     </c:choose>
 </ui:define>
-<ui:param name="bodyWidth" value="90%"/>
+<ui:param name="bodyWidth" value="85%"/>
+<ui:param name="bodyAlign" value="center"/>
 <ui:param name="selectedTab" value="customers"/>
 <ui:define name="body">
 
@@ -49,25 +50,19 @@
     </h:commandButton>
 </div>
 
-<rich:tabPanel id="clientTabPanel" switchType="client">
-
-<rich:tab name="dataTab" label="#{messages['Client.tab.data']}">
-
 <rich:panel id="formPanel">
-
 <f:facet name="header">
     <c:choose>
-        <c:when test="#{clientAction.managed}">
-            #{messages['Client.edit']}
-        </c:when>
-        <c:otherwise>
-            #{messages['Client.new']}
-        </c:otherwise>
+        <c:when test="#{clientAction.managed}">#{messages['Client.edit']}</c:when>
+        <c:otherwise>#{messages['Client.new']}</c:otherwise>
     </c:choose>
 </f:facet>
+
 <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
              columnClasses="width50percent,width50percent">
 <s:div>
+
+    <app:fieldset id="identFieldset" title="#{messages['Client.section.identification']}">
 
     <s:decorate id="personFlagField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.message.select']}</ui:define>
@@ -143,13 +138,9 @@
         </s:decorate>-->
     </s:div>
 
-    <br />
-    <s:div>
-        <h:outputLabel style="font-weight: bold;font-size: 9pt;" >#{messages['Invoice.dataToBill']}</h:outputLabel>
-    </s:div>
-    <br />
+    </app:fieldset>
 
-    <!--<app:fieldset id="dataToBillFielset" title="#{messages['Invoice.billing']}">-->
+    <app:fieldset id="billingFieldset" title="#{messages['Invoice.dataToBill']}">
 
         <s:decorate id="documentField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Invoice.document']}</ui:define>
@@ -240,26 +231,69 @@
         </app:selectPopUp>
     </s:decorate>
 
-    <!--</app:fieldset>-->
-
+    </app:fieldset>
 
 </s:div>
 
 <s:div>
 
-    <s:decorate id="codPrefijoField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.codPrefijo']}</ui:define>
-        <h:inputText id="codPrefijo" value="#{client.codPrefijo}" required="false"
-                     maxlength="10" tabindex="8" styleClass="input">
-        </h:inputText>
+    <app:fieldset id="locationFieldset" title="#{messages['Client.section.location']}">
+
+    <s:decorate id="clientCountryField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.country']}</ui:define>
+        <h:selectOneMenu id="clientCountry" value="#{client.country}" required="true" styleClass="input" tabindex="8">
+            <s:selectItems value="#{countryList}" var="country" label="#{country.name}"
+                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:support event="onchange" ajaxSingle="true"
+                         action="#{clientAction.clearClientDepartment}"
+                         reRender="clientDepartmentField, clientCityField, clientCountryCode"/>
+        </h:selectOneMenu>
+        <s:span id="clientCountryCode">
+            <rich:spacer width="5"/>
+            <h:outputText value="#{client.country.prefix}"/>
+        </s:span>
     </s:decorate>
 
-    <s:decorate id="codigoClienteField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.codigoCliente']}</ui:define>
-        <h:inputText id="codigoCliente" value="#{client.codigo}" required="false"
-                     maxlength="100" tabindex="8" styleClass="input">
-        </h:inputText>
+    <s:decorate id="clientDepartmentField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.department']}</ui:define>
+        <h:selectOneMenu id="clientDepartment" value="#{client.department}" required="true" styleClass="input" tabindex="8">
+            <s:selectItems value="#{clientDepartmentList.resultList}" var="dep" label="#{dep.name}"
+                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+            <a4j:support event="onchange" ajaxSingle="true"
+                         action="#{clientAction.clearClientCity}" reRender="clientCityField"/>
+        </h:selectOneMenu>
     </s:decorate>
+
+    <s:decorate id="clientCityField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.city']}</ui:define>
+        <h:selectOneMenu id="clientCity" value="#{client.city}" required="true" styleClass="input" tabindex="8">
+            <s:selectItems value="#{clientCityList.resultList}" var="ci" label="#{ci.name}"
+                           noSelectionLabel="" hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
+        <a4j:commandLink title="#{messages['Client.city.add']}"
+                         ajaxSingle="true" immediate="true"
+                         action="#{clientAction.openNewCity('client')}"
+                         reRender="cityModalForm"
+                         oncomplete="Richfaces.showModalPanel('cityModalPanel');">
+            <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+        </a4j:commandLink>
+    </s:decorate>
+
+    <s:decorate id="addressField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.address']}</ui:define>
+        <h:inputTextarea id="address"
+                         value="#{client.address}"
+                         styleClass="textarea"
+                         tabindex="9"
+                         style="width:200px;height:40px;"/>
+    </s:decorate>
+
+    </app:fieldset>
+
+    <app:fieldset id="commFieldset" title="#{messages['Client.section.communication']}">
 
     <s:decorate id="phoneField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.phone']}</ui:define>
@@ -296,43 +330,21 @@
         </h:inputText>
     </s:decorate>
 
-    <s:decorate id="addressField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.address']}</ui:define>
-        <h:inputTextarea id="address"
-                         value="#{client.address}"
-                         styleClass="textarea"
-                         tabindex="9"
-                         style="width:200px;height:40px;"/>
+    </app:fieldset>
+
+    <app:fieldset id="commercialFieldset" title="#{messages['Client.section.commercial']}">
+
+    <s:decorate id="codPrefijoField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.codPrefijo']}</ui:define>
+        <h:inputText id="codPrefijo" value="#{client.codPrefijo}" required="false"
+                     maxlength="10" tabindex="8" styleClass="input">
+        </h:inputText>
     </s:decorate>
 
-    <s:decorate id="clientCountryField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.country']}</ui:define>
-        <h:selectOneMenu id="clientCountry" value="#{client.country}" styleClass="input" tabindex="9">
-            <s:selectItems value="#{countryList}" var="country" label="#{country.name}"
-                           noSelectionLabel="" hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-            <a4j:support event="onchange" ajaxSingle="true"
-                         reRender="clientDepartmentField, clientCountryCode"/>
-        </h:selectOneMenu>
-        <s:span id="clientCountryCode">
-            <rich:spacer width="5"/>
-            <h:outputText value="#{client.country.prefix}"/>
-        </s:span>
-    </s:decorate>
-
-    <s:decorate id="clientDepartmentField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.department']}</ui:define>
-        <h:selectOneMenu id="clientDepartment" value="#{client.department}" styleClass="input" tabindex="9">
-            <s:selectItems value="#{clientDepartmentList.resultList}" var="dep" label="#{dep.name}"
-                           noSelectionLabel="" hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-
-    <s:decorate id="clientCityField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define name="label">#{messages['Client.city']}</ui:define>
-        <h:inputText id="clientCity" value="#{client.city}" required="false"
-                     maxlength="150" tabindex="9" styleClass="input">
+    <s:decorate id="codigoClienteField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.codigoCliente']}</ui:define>
+        <h:inputText id="codigoCliente" value="#{client.codigo}" required="false"
+                     maxlength="100" tabindex="8" styleClass="input">
         </h:inputText>
     </s:decorate>
 
@@ -402,14 +414,12 @@
         </h:inputText>
     </s:decorate>
 
+    </app:fieldset>
+
 </s:div>
 
 </h:panelGrid>
 </rich:panel>
-
-</rich:tab>
-
-<rich:tab name="contactsTab" label="#{messages['Client.tab.contacts']}">
 
 <rich:panel id="contactsPanel">
     <f:facet name="header">#{messages['ClientContact.list']}</f:facet>
@@ -420,13 +430,14 @@
 
     <s:fragment rendered="#{clientAction.managed}">
     <div class="buttons">
-        <a4j:commandButton value="#{messages['ClientContact.add']}"
-                           styleClass="button"
-                           ajaxSingle="true"
-                           immediate="true"
-                           action="#{clientAction.newContact}"
-                           reRender="contactForm"
-                           oncomplete="Richfaces.showModalPanel('contactModalPanel');"/>
+        <a4j:commandLink title="#{messages['ClientContact.add']}"
+                         ajaxSingle="true"
+                         immediate="true"
+                         action="#{clientAction.newContact}"
+                         reRender="contactForm"
+                         oncomplete="Richfaces.showModalPanel('contactModalPanel');">
+            <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+        </a4j:commandLink>
     </div>
 
     <rich:dataTable id="contactsTable" value="#{client.contacts}" var="cc"
@@ -484,9 +495,6 @@
     </s:fragment>
 </rich:panel>
 
-</rich:tab>
-</rich:tabPanel>
-
 <div class="buttons">
 
 </div>
@@ -528,9 +536,9 @@
 </s:decorate>
 
 
-<rich:modalPanel id="contactModalPanel" width="660" autosized="true" zindex="2000">
+<rich:modalPanel id="contactModalPanel" width="780" autosized="true" zindex="2000">
     <f:facet name="header">
-        <h:outputText value="#{messages['ClientContact.edit']}"/>
+        <h:outputText value="#{clientAction.contactModalTitle}"/>
     </f:facet>
     <f:facet name="controls">
         <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideContactLink"/>
@@ -608,44 +616,51 @@
         </app:fieldset>
 
         <app:fieldset id="ccLocationFieldset" title="#{messages['ClientContact.section.location']}">
-            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
-                         columnClasses="width50percent,width50percent">
-                <s:div>
-                    <s:decorate id="ccCountryField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['ClientContact.country']}</ui:define>
-                        <h:selectOneMenu value="#{clientAction.contact.country}" styleClass="input">
-                            <s:selectItems value="#{countryList}" var="country" label="#{country.name}"
-                                           noSelectionLabel="" hideNoSelectionLabel="false"/>
-                            <s:convertEntity/>
-                            <a4j:support event="onchange" ajaxSingle="true"
-                                         reRender="ccDepartmentField, ccCountryCode"/>
-                        </h:selectOneMenu>
-                        <s:span id="ccCountryCode">
-                            <rich:spacer width="5"/>
-                            <h:outputText value="#{clientAction.contact.country.prefix}"/>
-                        </s:span>
-                    </s:decorate>
-                    <s:decorate id="ccDepartmentField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['ClientContact.department']}</ui:define>
-                        <h:selectOneMenu value="#{clientAction.contact.department}" styleClass="input">
-                            <s:selectItems value="#{contactDepartmentList.resultList}" var="dep" label="#{dep.name}"
-                                           noSelectionLabel="" hideNoSelectionLabel="false"/>
-                            <s:convertEntity/>
-                        </h:selectOneMenu>
-                    </s:decorate>
-                    <s:decorate id="ccCityField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['ClientContact.city']}</ui:define>
-                        <h:inputText value="#{clientAction.contact.city}" maxlength="150" styleClass="input"/>
-                    </s:decorate>
-                </s:div>
-                <s:div>
-                    <s:decorate id="ccAddressField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['ClientContact.address']}</ui:define>
-                        <h:inputTextarea value="#{clientAction.contact.address}" styleClass="textarea"
-                                         style="width:230px;height:62px;"/>
-                    </s:decorate>
-                </s:div>
-            </h:panelGrid>
+            <s:decorate id="ccCountryField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ClientContact.country']}</ui:define>
+                <h:selectOneMenu value="#{clientAction.contact.country}" styleClass="input">
+                    <s:selectItems value="#{countryList}" var="country" label="#{country.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onchange" ajaxSingle="true"
+                                 action="#{clientAction.clearContactDepartment}"
+                                 reRender="ccDepartmentField, ccCityField, ccCountryCode"/>
+                </h:selectOneMenu>
+                <s:span id="ccCountryCode">
+                    <rich:spacer width="5"/>
+                    <h:outputText value="#{clientAction.contact.country.prefix}"/>
+                </s:span>
+            </s:decorate>
+            <s:decorate id="ccDepartmentField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ClientContact.department']}</ui:define>
+                <h:selectOneMenu value="#{clientAction.contact.department}" styleClass="input">
+                    <s:selectItems value="#{contactDepartmentList.resultList}" var="dep" label="#{dep.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                    <a4j:support event="onchange" ajaxSingle="true"
+                                 action="#{clientAction.clearContactCity}" reRender="ccCityField"/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="ccCityField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ClientContact.city']}</ui:define>
+                <h:selectOneMenu value="#{clientAction.contact.city}" styleClass="input">
+                    <s:selectItems value="#{contactCityList.resultList}" var="ci" label="#{ci.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+                <a4j:commandLink title="#{messages['Client.city.add']}"
+                                 ajaxSingle="true" immediate="true"
+                                 action="#{clientAction.openNewCity('contact')}"
+                                 reRender="cityModalForm"
+                                 oncomplete="Richfaces.showModalPanel('cityModalPanel');">
+                    <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                </a4j:commandLink>
+            </s:decorate>
+            <s:decorate id="ccAddressField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ClientContact.address']}</ui:define>
+                <h:inputTextarea value="#{clientAction.contact.address}" styleClass="textarea"
+                                 style="width:400px;height:50px;"/>
+            </s:decorate>
         </app:fieldset>
 
         <app:fieldset id="ccNotesFieldset" title="#{messages['ClientContact.section.notes']}">
@@ -666,6 +681,36 @@
                                action="#{clientAction.acceptContact}"
                                reRender="contactsPanel"
                                oncomplete="if (#{facesContext.maximumSeverity==null}) Richfaces.hideModalPanel('contactModalPanel');"/>
+        </div>
+    </h:form>
+</rich:modalPanel>
+
+<rich:modalPanel id="cityModalPanel" width="460" autosized="true" zindex="2500">
+    <f:facet name="header">
+        <h:outputText value="#{messages['Client.city.add']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideCityLink"/>
+        <rich:componentControl for="cityModalPanel" attachTo="hideCityLink" operation="hide" event="onclick"/>
+    </f:facet>
+    <h:form id="cityModalForm">
+        <h:panelGrid columns="3" cellpadding="4" style="margin:10px;">
+            <h:outputText value="#{messages['Client.city']}:" style="white-space:nowrap;font-weight:bold;"/>
+            <h:inputText id="newCity" value="#{clientAction.newCityName}" required="true"
+                         maxlength="150" styleClass="input"/>
+            <h:outputText value="*" styleClass="required"/>
+        </h:panelGrid>
+        <h:message for="newCity" styleClass="errors" style="display:block;margin-left:10px;"/>
+        <br/>
+
+        <div class="buttonsRight">
+            <a4j:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                <rich:componentControl for="cityModalPanel" operation="hide" event="onclick"/>
+            </a4j:commandButton>
+            <a4j:commandButton value="#{messages['Common.accept']}" styleClass="button"
+                               action="#{clientAction.acceptNewCity}"
+                               reRender="clientCityField, ccCityField"
+                               oncomplete="if (#{facesContext.maximumSeverity==null}) Richfaces.hideModalPanel('cityModalPanel');"/>
         </div>
     </h:form>
 </rich:modalPanel>

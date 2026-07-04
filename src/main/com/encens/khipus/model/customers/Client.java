@@ -1,6 +1,7 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.model.contacts.City;
 import com.encens.khipus.model.contacts.Country;
 import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.util.Constants;
@@ -107,8 +108,9 @@ public class Client implements BaseModel {
     @JoinColumn(name = "iddepartamento", nullable = true)
     private Department department;
 
-    @Column(name = "ciudad")
-    private String city;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idciudad", nullable = true)
+    private City city;
 
     @Column(name = "nit")
     private String nitNumber;
@@ -547,11 +549,11 @@ public class Client implements BaseModel {
         this.department = department;
     }
 
-    public String getCity() {
+    public City getCity() {
         return city;
     }
 
-    public void setCity(String city) {
+    public void setCity(City city) {
         this.city = city;
     }
 

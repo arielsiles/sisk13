@@ -2,6 +2,8 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.contacts.City;
+import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.model.customers.Client;
 import com.encens.khipus.model.customers.ClientContact;
 import com.encens.khipus.model.customers.PaymentMethodSin;
@@ -10,6 +12,7 @@ import com.encens.khipus.service.customers.ClientService;
 import com.encens.khipus.service.finances.CashAccountService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.international.StatusMessage;
 
 /**
  * @author
@@ -34,6 +37,11 @@ public class ClientAction extends GenericAction<Client> {
 
     /* Contacto en edicion (holder del modal de personas de contacto) */
     private ClientContact contact;
+    private boolean contactIsNew;
+
+    /* Modal "+ nueva ciudad": nombre tecleado y a quien se asigna (client|contact) */
+    private String newCityName;
+    private String cityTarget;
 
     @Factory(value = "client", scope = ScopeType.STATELESS)
     public Client initClient() {
@@ -109,6 +117,7 @@ public class ClientAction extends GenericAction<Client> {
         contact.setClient(getInstance());
         contact.setActive(Boolean.TRUE);
         contact.setPrimaryContact(Boolean.FALSE);
+        contactIsNew = true;
     }
 
     /**
@@ -116,6 +125,11 @@ public class ClientAction extends GenericAction<Client> {
      */
     public void editContact(ClientContact clientContact) {
         contact = clientContact;
+        contactIsNew = false;
+    }
+
+    public String getContactModalTitle() {
+        return messages.get(contactIsNew ? "ClientContact.new" : "ClientContact.edit");
     }
 
     /**
@@ -156,6 +170,75 @@ public class ClientAction extends GenericAction<Client> {
 
     public void setContact(ClientContact contact) {
         this.contact = contact;
+    }
+
+    /* ==================== Ciudad (catalogo + alta rapida) ==================== */
+
+    /** Al cambiar el departamento se limpia la ciudad (podria no pertenecer al nuevo). */
+    public void clearClientCity() {
+        getInstance().setCity(null);
+    }
+
+    public void clearContactCity() {
+        if (contact != null)
+            contact.setCity(null);
+    }
+
+    /** Al cambiar el pais se limpian departamento y ciudad (quedarian fuera de lista). */
+    public void clearClientDepartment() {
+        getInstance().setDepartment(null);
+        getInstance().setCity(null);
+    }
+
+    public void clearContactDepartment() {
+        if (contact != null) {
+            contact.setDepartment(null);
+            contact.setCity(null);
+        }
+    }
+
+    /** Abre el modal de alta de ciudad para el destino indicado (client|contact). */
+    public void openNewCity(String target) {
+        this.cityTarget = target;
+        this.newCityName = null;
+    }
+
+    private Department targetDepartment() {
+        return "contact".equals(cityTarget)
+                ? (contact != null ? contact.getDepartment() : null)
+                : getInstance().getDepartment();
+    }
+
+    public String getNewCityDepartmentName() {
+        Department dep = targetDepartment();
+        return dep != null ? dep.getName() : "";
+    }
+
+    /**
+     * Registra la ciudad nueva (find-or-create: si ya existe en el departamento
+     * la reutiliza, evitando duplicados) y la selecciona en el destino.
+     */
+    public void acceptNewCity() {
+        Department dep = targetDepartment();
+        if (dep == null) {
+            facesMessages.add(StatusMessage.Severity.WARN, messages.get("Client.city.needDepartment"));
+            return;
+        }
+        City city = clientService.findOrCreateCity(newCityName, dep);
+        if (city == null)
+            return;
+        if ("contact".equals(cityTarget))
+            contact.setCity(city);
+        else
+            getInstance().setCity(city);
+    }
+
+    public String getNewCityName() {
+        return newCityName;
+    }
+
+    public void setNewCityName(String newCityName) {
+        this.newCityName = newCityName;
     }
 
     public void updateShowNitExtension() {

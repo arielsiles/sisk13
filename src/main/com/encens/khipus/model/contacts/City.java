@@ -20,6 +20,13 @@ import javax.persistence.*;
         pkColumnValue = "ciudad",
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
+@NamedQueries({
+        @NamedQuery(name = "City.findByNameAndDepartment",
+                query = "select c from City c where c.department =:department and upper(c.name) =:name"),
+        @NamedQuery(name = "City.findByDepartment",
+                query = "select c from City c where c.department =:department order by c.name")
+})
+
 @javax.persistence.Entity
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
