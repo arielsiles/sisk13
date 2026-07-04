@@ -144,9 +144,6 @@ public class ClientAction extends GenericAction<Client> {
         if (contact.getClient() == null)
             contact.setClient(getInstance());
 
-        if (!getInstance().getContacts().contains(contact))
-            getInstance().getContacts().add(contact);
-
         if (Boolean.TRUE.equals(contact.getPrimaryContact())) {
             for (ClientContact other : getInstance().getContacts()) {
                 if (other != contact)
@@ -154,14 +151,21 @@ public class ClientAction extends GenericAction<Client> {
             }
         }
 
+        // Se persiste de inmediato (el cliente ya existe): al Aceptar queda guardado
+        // aunque luego se cancele la edicion del cliente.
+        ClientContact saved = clientService.saveContact(contact);
+        if (!getInstance().getContacts().contains(saved))
+            getInstance().getContacts().add(saved);
+
         contact = null;
     }
 
     /**
-     * Quita un contacto de la lista. El DELETE_ORPHAN lo elimina de la BD al guardar.
+     * Quita un contacto de la lista y lo elimina de la BD de inmediato.
      */
     public void removeContact(ClientContact clientContact) {
         getInstance().getContacts().remove(clientContact);
+        clientService.deleteContact(clientContact);
     }
 
     public ClientContact getContact() {

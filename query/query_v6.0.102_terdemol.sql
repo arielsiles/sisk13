@@ -29,3 +29,32 @@ ALTER TABLE contactocliente
 -- ----------------------------------------------------------------------------
 UPDATE pais SET prefijo = '+591', codigoarea = NULL
 WHERE nombre = 'BOLIVIA' AND idcompania = 1;
+
+-- ============================================================================
+-- Permisos faltantes: catalogos del menu "Contacto"
+-- ============================================================================
+--
+--  El menu global "Contacto" (view/layout/menu.xhtml) y sus vistas ya usan
+--  s:hasPermission(...) sobre estos codigos, pero las funcionalidades no estaban
+--  registradas en la tabla 'funcionalidad'. Se agregan aqui.
+--
+--  permiso = 15 (VIEW=1 + CREATE=2 + UPDATE=4 + DELETE=8): las cinco vistas
+--  (list + edit) implementan las cuatro acciones (ver PermissionType).
+--
+--  idmodulo: DOCUMENTTYPE -> 1 (customers, model.customers.DocumentType);
+--            TITLE/SALUTATION/MARITALSTATUS/ORGANIZATION -> 3 (contacts,
+--            model.contacts.*).
+--
+--  nombrerecurso: claves ya existentes en messages_app.properties (no se agrega
+--  texto nuevo).
+--
+--  Orden de columnas: (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+--
+--  NOTA: solo se registra la funcionalidad. La asignacion de accesos
+--  (derechoacceso) se hace por el panel de permisos del sistema.
+-- ----------------------------------------------------------------------------
+insert into funcionalidad values (479, 'DOCUMENTTYPE',  'Catalogo de Tipos de Documento', 1, 15, 'menu.customers.configuration.documentType',  1);
+insert into funcionalidad values (480, 'TITLE',         'Catalogo de Titulos',            3, 15, 'menu.customers.configuration.title',         1);
+insert into funcionalidad values (481, 'SALUTATION',    'Catalogo de Saludos',            3, 15, 'menu.customers.configuration.salutation',    1);
+insert into funcionalidad values (482, 'MARITALSTATUS', 'Catalogo de Estados Civiles',    3, 15, 'menu.customers.configuration.maritalStatus', 1);
+insert into funcionalidad values (483, 'ORGANIZATION',  'Catalogo de Organizaciones',     3, 15, 'menu.contacts.configuration.organization',   1);

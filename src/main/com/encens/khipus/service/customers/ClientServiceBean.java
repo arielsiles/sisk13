@@ -3,6 +3,7 @@ package com.encens.khipus.service.customers;
 import com.encens.khipus.model.contacts.City;
 import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.customers.ClientContact;
 import com.encens.khipus.model.customers.PaymentMethodSin;
 import com.encens.khipus.model.finances.VoucherDetail;
 import org.jboss.seam.annotations.AutoCreate;
@@ -146,6 +147,25 @@ public class ClientServiceBean implements ClientService {
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;
+        }
+    }
+
+    @Override
+    public ClientContact saveContact(ClientContact contact) {
+        if (contact.getId() == null)
+            em.persist(contact);        // nuevo: inserta
+        em.flush();                     // gestionado: persiste ediciones al instante
+        return contact;
+    }
+
+    @Override
+    public void deleteContact(ClientContact contact) {
+        if (contact.getId() != null) {
+            ClientContact managed = em.find(ClientContact.class, contact.getId());
+            if (managed != null) {
+                em.remove(managed);
+                em.flush();
+            }
         }
     }
 

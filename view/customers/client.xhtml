@@ -484,7 +484,8 @@
                              ajaxSingle="true"
                              immediate="true"
                              action="#{clientAction.removeContact(cc)}"
-                             reRender="contactsPanel">
+                             reRender="contactsPanel"
+                             onclick="if (!confirm('#{messages['ClientContact.remove.confirm']}')) return false;">
                 <h:graphicImage value="/img/close.png" style="border:0"
                                 alt="#{messages['ClientContact.remove']}"/>
             </a4j:commandLink>
@@ -677,7 +678,7 @@
             <a4j:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
                 <rich:componentControl for="contactModalPanel" operation="hide" event="onclick"/>
             </a4j:commandButton>
-            <a4j:commandButton value="#{messages['Common.accept']}" styleClass="button"
+            <a4j:commandButton value="#{messages['Common.save']}" styleClass="button"
                                action="#{clientAction.acceptContact}"
                                reRender="contactsPanel"
                                oncomplete="if (#{facesContext.maximumSeverity==null}) Richfaces.hideModalPanel('contactModalPanel');"/>
