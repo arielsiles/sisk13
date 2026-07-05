@@ -94,6 +94,9 @@ public class Client implements BaseModel {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "fax")
+    private String fax;
+
     @Column(name = "empresa")
     private String companyName;
 
@@ -300,6 +303,29 @@ public class Client implements BaseModel {
         return nitCiCexPasOd + nitNumber + ((getComplement() != null) ? " " + getComplement() : "");
     }
 
+    /**
+     * Identificacion para mostrar (sigla del documento + numero), null-safe:
+     * tolera tipo de documento o sinCode nulos, y usa el NIT si existe o el
+     * numero de documento (CI) en su defecto.
+     */
+    public String getIdentificationDisplay() {
+        String sigla = "";
+        if (getInvoiceDocumentType() != null && getInvoiceDocumentType().getSinCode() != null) {
+            int sinCode = getInvoiceDocumentType().getSinCode();
+            switch (sinCode) {
+                case 1: sigla = "CI-";  break;
+                case 2: sigla = "CEX-"; break;
+                case 3: sigla = "PAS-"; break;
+                case 4: sigla = "OD-";  break;
+                case 5: sigla = "NIT-"; break;
+                default: sigla = "";
+            }
+        }
+        String number = (nitNumber != null && nitNumber.trim().length() > 0)
+                ? nitNumber : (idNumber != null ? idNumber : "");
+        return sigla + number;
+    }
+
     public void setNitNumber(String nit) {
         this.nitNumber = nit;
     }
@@ -459,6 +485,14 @@ public class Client implements BaseModel {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax;
     }
 
     public String getComplement() {

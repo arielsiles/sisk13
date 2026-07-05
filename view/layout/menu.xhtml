@@ -1557,6 +1557,12 @@
             </rich:menuItem>
         </rich:dropDownMenu>
 
+        <s:link view="/sales/salesOrderList.xhtml"
+                value="#{messages['menu.customers.sales.salesOrder']}"
+                rendered="#{s:hasPermission('SALESORDER','VIEW')}"
+                styleClass="tab-cell"
+                propagation="none"/>
+
         <s:link view="/customers/salesBox.xhtml"
                 value="#{messages['menu.customers.sales']}"
                 action="#{salesAction.openSale()}"
@@ -1738,7 +1744,11 @@
                 s:hasPermission('DISCOUNTPOLICY','VIEW') or
                 s:hasPermission('CUSTOMERDISCOUNTRULE','VIEW') or
                 s:hasPermission('CUSTOMERCATEGORY','VIEW') or
-                s:hasPermission('PARTNERCLUBCATEGORY','VIEW')}">
+                s:hasPermission('PARTNERCLUBCATEGORY','VIEW') or
+                s:hasPermission('INCOTERM','VIEW') or
+                s:hasPermission('COMMERCIALCOSTCENTER','VIEW') or
+                s:hasPermission('SALESORDERNOTE','VIEW') or
+                s:hasPermission('SALESORDERTERM','VIEW')}">
 
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
@@ -1825,6 +1835,31 @@
             <rich:menuItem submitMode="none" styleClass="main-menu-item">
                 <s:link view="/finances/cashBoxTypeList.xhtml"
                         value="#{messages['menu.finances.configuration.cashBoxType']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none" styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('INCOTERM','VIEW')}">
+                <s:link view="/sales/incotermList.xhtml"
+                        value="#{messages['menu.customers.configuration.incoterm']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none" styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('COMMERCIALCOSTCENTER','VIEW')}">
+                <s:link view="/sales/commercialCostCenterList.xhtml"
+                        value="#{messages['menu.customers.configuration.commercialCostCenter']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none" styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('SALESORDERNOTE','VIEW')}">
+                <s:link view="/sales/salesOrderNoteList.xhtml"
+                        value="#{messages['menu.customers.configuration.salesOrderNote']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none" styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('SALESORDERTERM','VIEW')}">
+                <s:link view="/sales/salesOrderTermList.xhtml"
+                        value="#{messages['menu.customers.configuration.salesOrderTerm']}"
                         propagation="none"/>
             </rich:menuItem>
 

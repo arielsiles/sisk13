@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pages xmlns="http://jboss.com/products/seam/pages"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd">
+
+    <page view-id="/sales/*" login-required="true"/>
+
+    <!-- ===================== Orden de Venta ===================== -->
+    <page view-id="/sales/salesOrderList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{salesOrderAction.select(salesOrderItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/salesOrder.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/sales/salesOrder.xhtml" no-conversation-view-id="/sales/salesOrderList.xhtml">
+        <!-- Guardar-y-seguir: al crear, redirige a la MISMA pantalla en modo edicion
+             (la conversacion se propaga y conserva op=UPDATE). update() queda con
+             REDISPLAY, no navega. -->
+        <navigation from-action="#{salesOrderAction.create}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/salesOrder.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesOrderAction.sendToReview}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/salesOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesOrderAction.approve}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/salesOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesOrderAction.reject}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/salesOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesOrderAction.nullify}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/salesOrderList.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{salesOrderAction.cancel}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/sales/salesOrderList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- ===================== Catalogo Incoterm ===================== -->
+    <page view-id="/sales/incotermList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{incotermAction.select(incotermItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/incoterm.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/sales/incoterm.xhtml" no-conversation-view-id="/sales/incotermList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/sales/incotermList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- ============== Catalogo Centro de Costo Comercial ============== -->
+    <page view-id="/sales/commercialCostCenterList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{commercialCostCenterAction.select(commercialCostCenterItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/commercialCostCenter.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/sales/commercialCostCenter.xhtml" no-conversation-view-id="/sales/commercialCostCenterList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/sales/commercialCostCenterList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- ==================== Catalogo Notas ==================== -->
+    <page view-id="/sales/salesOrderNoteList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{salesOrderNoteAction.select(salesOrderNoteItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/salesOrderNote.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/sales/salesOrderNote.xhtml" no-conversation-view-id="/sales/salesOrderNoteList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/sales/salesOrderNoteList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- ============== Catalogo Terminos de cabecera ============== -->
+    <page view-id="/sales/salesOrderTermList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{salesOrderTermAction.select(salesOrderTermItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/sales/salesOrderTerm.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/sales/salesOrderTerm.xhtml" no-conversation-view-id="/sales/salesOrderTermList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/sales/salesOrderTermList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+</pages>

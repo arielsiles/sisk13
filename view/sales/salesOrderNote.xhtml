@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{salesOrderNoteAction.managed}">#{messages['SalesOrderNote.edit']}</c:when>
+            <c:otherwise>#{messages['SalesOrderNote.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="salesOrderNoteForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{salesOrderNoteAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 rendered="#{!salesOrderNoteAction.managed and s:hasPermission('SALESORDERNOTE','CREATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton id="updateButtonId"
+                                 action="#{salesOrderNoteAction.update}"
+                                 value="#{messages['Common.update']}"
+                                 rendered="#{salesOrderNoteAction.managed and s:hasPermission('SALESORDERNOTE','UPDATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{salesOrderNoteAction.managed and s:hasPermission('SALESORDERNOTE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick"
+                                           disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{salesOrderNoteAction.cancel}"
+                                 styleClass="button"
+                                 value="#{messages['Common.cancel']}"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{salesOrderNoteAction.managed}">#{messages['SalesOrderNote.edit']}</c:when>
+                        <c:otherwise>#{messages['SalesOrderNote.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="textField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalesOrderNote.text']}</ui:define>
+                    <h:inputTextarea id="text" value="#{salesOrderNote.text}" styleClass="input"
+                                     rows="4" cols="70" required="true" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="sortOrderField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalesOrderNote.sortOrder']}</ui:define>
+                    <h:inputText id="sortOrder" value="#{salesOrderNote.sortOrder}" styleClass="inputSmall"
+                                 maxlength="4" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SalesOrderNote.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{salesOrderNote.active}" tabindex="3"/>
+                </s:decorate>
+            </rich:panel>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{salesOrderNoteAction.managed and s:hasPermission('SALESORDERNOTE','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>#{messages['SalesOrderNote.delete.confirmation']}</p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <h:commandButton action="#{salesOrderNoteAction.delete}"
+                                 value="#{messages['Common.delete']}"
+                                 immediate="true"
+                                 styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#text" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

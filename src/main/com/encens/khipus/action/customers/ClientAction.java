@@ -279,12 +279,10 @@ public class ClientAction extends GenericAction<Client> {
     }
 
     public boolean hasDocumentTypeCI(){
-        boolean result = false;
-        if (getInstance().getInvoiceDocumentType() != null)
-            if (getInstance().getInvoiceDocumentType().getSinCode() == 1)
-                result = true;
-
-        return result;
+        if (getInstance().getInvoiceDocumentType() == null)
+            return false;
+        Integer sinCode = getInstance().getInvoiceDocumentType().getSinCode();
+        return sinCode != null && sinCode == 1;
     }
 
     public PaymentMethodSin getPaymentMethodSin() {

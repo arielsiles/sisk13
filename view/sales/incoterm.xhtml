@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{incotermAction.managed}">#{messages['Incoterm.edit']}</c:when>
+            <c:otherwise>#{messages['Incoterm.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="incotermForm">
+            <div class="buttons">
+                <h:commandButton id="createButtonId"
+                                 action="#{incotermAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 rendered="#{!incotermAction.managed and s:hasPermission('INCOTERM','CREATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton id="updateButtonId"
+                                 action="#{incotermAction.update}"
+                                 value="#{messages['Common.update']}"
+                                 rendered="#{incotermAction.managed and s:hasPermission('INCOTERM','UPDATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{incotermAction.managed and s:hasPermission('INCOTERM','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick"
+                                           disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{incotermAction.cancel}"
+                                 styleClass="button"
+                                 value="#{messages['Common.cancel']}"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{incotermAction.managed}">#{messages['Incoterm.edit']}</c:when>
+                        <c:otherwise>#{messages['Incoterm.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Incoterm.code']}</ui:define>
+                    <h:inputText id="code" value="#{incoterm.code}" styleClass="input" required="true"
+                                 maxlength="10" tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Incoterm.name']}</ui:define>
+                    <h:inputText id="name" value="#{incoterm.name}" styleClass="input" required="true"
+                                 maxlength="150" tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Incoterm.description']}</ui:define>
+                    <h:inputTextarea id="description" value="#{incoterm.description}" styleClass="input"
+                                     rows="2" cols="60" tabindex="3"/>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Incoterm.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{incoterm.active}" tabindex="4"/>
+                </s:decorate>
+            </rich:panel>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{incotermAction.managed and s:hasPermission('INCOTERM','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Incoterm.delete.confirmation']}">
+                        <f:param value="#{incoterm.fullName}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <h:commandButton action="#{incotermAction.delete}"
+                                 value="#{messages['Common.delete']}"
+                                 immediate="true"
+                                 styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

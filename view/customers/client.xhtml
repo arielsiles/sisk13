@@ -316,6 +316,13 @@
         </h:inputText>
     </s:decorate>
 
+    <s:decorate id="faxField" template="/include/inputField.xhtml" styleClass="formRow">
+        <ui:define name="label">#{messages['Client.fax']}</ui:define>
+        <h:inputText id="fax" value="#{client.fax}" required="false"
+                     maxlength="30" tabindex="8" styleClass="input">
+        </h:inputText>
+    </s:decorate>
+
     <s:decorate id="companyField" template="/include/inputField.xhtml" styleClass="formRow">
         <ui:define name="label">#{messages['Client.company']}</ui:define>
         <h:inputText id="company" value="#{client.companyName}" required="false"

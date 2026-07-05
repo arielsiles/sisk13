@@ -58,3 +58,7 @@ insert into funcionalidad values (480, 'TITLE',         'Catalogo de Titulos',  
 insert into funcionalidad values (481, 'SALUTATION',    'Catalogo de Saludos',            3, 15, 'menu.customers.configuration.salutation',    1);
 insert into funcionalidad values (482, 'MARITALSTATUS', 'Catalogo de Estados Civiles',    3, 15, 'menu.customers.configuration.maritalStatus', 1);
 insert into funcionalidad values (483, 'ORGANIZATION',  'Catalogo de Organizaciones',     3, 15, 'menu.contacts.configuration.organization',   1);
+
+UPDATE secuencia
+SET valor = (SELECT COALESCE(MAX(idtipodocumento), 0) + 1 FROM tipodocumento)
+WHERE tabla = 'tipodocumento';
