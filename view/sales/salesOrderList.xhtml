@@ -27,7 +27,7 @@
                     </s:decorate>
                     <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['SalesOrder.state']}</ui:define>
-                        <h:selectOneMenu id="state" value="#{salesOrderDataModel.criteria.state}" styleClass="input">
+                        <h:selectOneMenu id="state" value="#{salesOrderDataModel.state}" styleClass="input">
                             <s:selectItems value="#{salesOrderAction.stateList}" var="st"
                                            label="#{messages[st.resourceKey]}"
                                            noSelectionLabel="#{messages['Common.all']}"/>

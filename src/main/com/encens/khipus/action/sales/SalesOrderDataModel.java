@@ -25,12 +25,23 @@ public class SalesOrderDataModel extends QueryDataModel<Long, SalesOrder> {
     private static final String[] RESTRICTIONS = {
             "lower(salesOrder.orderNumber) like concat(lower(#{salesOrderDataModel.criteria.orderNumber}), '%')",
             "lower(salesOrder.buyerName) like concat('%', concat(lower(#{salesOrderDataModel.criteria.buyerName}), '%'))",
-            "salesOrder.state = #{salesOrderDataModel.criteria.state}",
+            "salesOrder.state = #{salesOrderDataModel.state}",
             "salesOrder.date >= #{salesOrderDataModel.startDate}",
             "salesOrder.date <= #{salesOrderDataModel.endDate}"};
 
+    /** Estado como campo propio (null = Todos). No se usa criteria.state porque la
+     *  entidad inicializa state=BOR y filtraria por Borrador por defecto. */
+    private com.encens.khipus.model.sales.SalesOrderState state;
     private java.util.Date startDate;
     private java.util.Date endDate;
+
+    public com.encens.khipus.model.sales.SalesOrderState getState() {
+        return state;
+    }
+
+    public void setState(com.encens.khipus.model.sales.SalesOrderState state) {
+        this.state = state;
+    }
 
     @Create
     public void init() {

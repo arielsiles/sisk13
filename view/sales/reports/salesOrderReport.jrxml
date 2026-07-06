@@ -4,7 +4,7 @@
               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
               name="salesOrderReport" pageWidth="612" pageHeight="792" orientation="Portrait"
               whenNoDataType="AllSectionsNoDetail" columnWidth="532" leftMargin="40" rightMargin="40"
-              topMargin="30" bottomMargin="30">
+              topMargin="30" bottomMargin="15">
 
     <parameter name="P_number" class="java.lang.String"/>
     <parameter name="P_date" class="java.lang.String"/>
@@ -30,6 +30,8 @@
     <parameter name="P_recharge" class="java.math.BigDecimal"/>
     <parameter name="P_total" class="java.math.BigDecimal"/>
     <parameter name="P_notes" class="java.lang.String"/>
+    <parameter name="P_approved" class="java.lang.Boolean"/>
+    <parameter name="P_securityCode" class="java.lang.String"/>
 
     <field name="col1" class="java.lang.Long"><fieldDescription><![CDATA[COLUMN_1]]></fieldDescription></field>
     <field name="col2" class="java.lang.String"><fieldDescription><![CDATA[COLUMN_2]]></fieldDescription></field>
@@ -252,6 +254,26 @@
             </textField>
         </band>
     </detail>
+
+    <pageFooter>
+        <band height="32">
+            <!-- No aprobada: solo el estado -->
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="18" width="400" height="12">
+                    <printWhenExpression><![CDATA[!Boolean.TRUE.equals($P{P_approved})]]></printWhenExpression>
+                </reportElement>
+                <textElement verticalAlignment="Middle"><font fontName="Arial" size="8" isBold="true"/></textElement>
+                <textFieldExpression class="java.lang.String"><![CDATA["Estado: " + $P{P_state}]]></textFieldExpression>
+            </textField>
+            <!-- Aprobada: codigo de seguridad (barcode) a todo el ancho -->
+            <image scaleImage="RetainShape" hAlign="Center" onErrorType="Blank">
+                <reportElement x="0" y="2" width="532" height="28">
+                    <printWhenExpression><![CDATA[Boolean.TRUE.equals($P{P_approved})]]></printWhenExpression>
+                </reportElement>
+                <imageExpression class="java.io.InputStream"><![CDATA[com.encens.khipus.util.barcode.BarcodeRenderer.paintInByteOutputStream($P{P_securityCode}, 200, "code128")]]></imageExpression>
+            </image>
+        </band>
+    </pageFooter>
 
     <summary>
         <band height="230">

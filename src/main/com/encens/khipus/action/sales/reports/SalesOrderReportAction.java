@@ -5,6 +5,7 @@ import com.encens.khipus.action.reports.ReportFormat;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.sales.SalesOrder;
 import com.encens.khipus.model.sales.SalesOrderNote;
+import com.encens.khipus.model.sales.SalesOrderState;
 import com.encens.khipus.util.MessageUtils;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
@@ -67,6 +68,9 @@ public class SalesOrderReportAction extends GenericReportAction {
         params.put("P_date", formatDate(o.getDate()));
         params.put("P_deliveryDate", formatDate(o.getDeliveryDate()));
         params.put("P_state", o.getState() != null ? MessageUtils.getMessage(o.getState().getResourceKey()) : "");
+        boolean approved = o.getState() != null && SalesOrderState.APR.equals(o.getState());
+        params.put("P_approved", Boolean.valueOf(approved));
+        params.put("P_securityCode", approved ? buildSecurityCode(o) : "");
         params.put("P_buyerName", nvl(o.getBuyerName()));
         params.put("P_buyerReg", nvl(o.getBuyerRegNumber()));
         params.put("P_buyerAddress", nvl(o.getBuyerAddress()));
@@ -103,6 +107,28 @@ public class SalesOrderReportAction extends GenericReportAction {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Codigo de seguridad (firma) para ordenes aprobadas: hash SHA-256 de los
+     * datos clave de la orden -> hex en mayusculas. Deterministico y verificable.
+     */
+    private String buildSecurityCode(SalesOrder o) {
+        try {
+            String raw = o.getId() + "|" + o.getOrderNumber()
+                    + "|" + (o.getApprovedBy() != null ? o.getApprovedBy() : "")
+                    + "|" + (o.getApprovedAt() != null ? o.getApprovedAt().getTime() : 0L)
+                    + "|" + (o.getTotalAmount() != null ? o.getTotalAmount().toPlainString() : "0");
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(raw.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02X", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return nvl(o.getOrderNumber());
+        }
     }
 
     private String currencySymbol(FinancesCurrencyType currency) {
