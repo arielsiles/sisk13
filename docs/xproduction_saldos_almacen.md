@@ -55,7 +55,17 @@ Solo almacenes de tipo **Materia Prima** o **Producto Terminado**, no bloqueados
 
 ---
 
-## 3. Cálculo del saldo — `computeBalances(companyNumber, warehouseCode)`
+## 3. Cálculo del saldo — `computeBalances(companyNumber, warehouseCode, date)`
+
+> **Corte por fecha:** el saldo se calcula **hasta `date`** (inclusive). El filtro se
+> abre en el panel con un `rich:calendar` (`XProductionBalanceAction.balanceDate`, por
+> defecto la **fecha actual**) y cada fuente cuenta solo los movimientos con fecha `<=` al
+> **fin del día** seleccionado (`endOfDay`, para incluir fechas guardadas con hora). Fechas
+> por fuente: `MovementDetail.movementDetailDate` (2), `CollectMaterial.date` (3) y, para
+> producción (4/5/6), `productionPlan.date` (la **fecha del plan** de producción, mismo
+> criterio que el reporte de insumos `findProductionInputsByDates`); las órdenes sin plan
+> se cuentan siempre para no alterar los totales actuales.
+
 
 El saldo de cada artículo se arma en memoria a partir de **un query de productos** + **cinco
 queries de agregación (`GROUP BY`)** que se aplican sobre las filas. Esto evita recorrer

@@ -60,6 +60,7 @@
             <value>/WEB-INF/production/pages.xml</value>
             <value>/WEB-INF/xproduction/pages.xml</value>
             <value>/WEB-INF/accounting/pages.xml</value>
+            <value>/WEB-INF/sales/pages.xml</value>
 
         </navigation:resources>
     </navigation:pages>

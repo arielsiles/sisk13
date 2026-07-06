@@ -3,6 +3,7 @@ package com.encens.khipus.service.xproduction;
 import com.encens.khipus.model.warehouse.Warehouse;
 
 import javax.ejb.Local;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,6 +28,9 @@ public interface XProductionBalanceService {
      *         − Σ XSupply            [consumo en ordenes: MP o PT usado como insumo]
      * Atribuido por el almacen (cod_alm) del articulo. Excluye solo movimientos ANL.
      * Devuelve TODOS los productos del almacen, incluso con saldo 0.
+     *
+     * El saldo se calcula HASTA {@code date} (inclusive, fin del dia): cada fuente
+     * cuenta solo los movimientos cuya fecha sea &lt;= a la fecha seleccionada.
      */
-    List<WarehouseBalanceRow> computeBalances(String companyNumber, String warehouseCode);
+    List<WarehouseBalanceRow> computeBalances(String companyNumber, String warehouseCode, Date date);
 }

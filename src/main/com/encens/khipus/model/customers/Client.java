@@ -1,13 +1,18 @@
 package com.encens.khipus.model.customers;
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.model.contacts.City;
+import com.encens.khipus.model.contacts.Country;
+import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.util.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -83,8 +88,32 @@ public class Client implements BaseModel {
     @Column(name = "telefono")
     private Integer phone;
 
+    @Column(name = "celular")
+    private String mobile;
+
     @Column(name = "email")
     private String email;
+
+    @Column(name = "fax")
+    private String fax;
+
+    @Column(name = "empresa")
+    private String companyName;
+
+    @Column(name = "web")
+    private String website;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idpais", nullable = true)
+    private Country country;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "iddepartamento", nullable = true)
+    private Department department;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idciudad", nullable = true)
+    private City city;
 
     @Column(name = "nit")
     private String nitNumber;
@@ -113,7 +142,7 @@ public class Client implements BaseModel {
     @Column(name = "codprefijo", length = 10)
     private String codPrefijo;
 
-    @Column(name = "tipo_persona")
+    @Column(name = "clase_cliente")
     private String personType;
 
     @Column(name = "espersona", nullable = true)
@@ -138,6 +167,11 @@ public class Client implements BaseModel {
     @JoinColumn(name = "idterritoriotrabajo", referencedColumnName = "idterritoriotrabajo")
     @ManyToOne
     private Territoriotrabajo territoriotrabajo;
+
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @org.hibernate.annotations.Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+    private List<ClientContact> contacts = new ArrayList<ClientContact>(0);
 
     public Long getId() {
         return id;
@@ -269,6 +303,29 @@ public class Client implements BaseModel {
         return nitCiCexPasOd + nitNumber + ((getComplement() != null) ? " " + getComplement() : "");
     }
 
+    /**
+     * Identificacion para mostrar (sigla del documento + numero), null-safe:
+     * tolera tipo de documento o sinCode nulos, y usa el NIT si existe o el
+     * numero de documento (CI) en su defecto.
+     */
+    public String getIdentificationDisplay() {
+        String sigla = "";
+        if (getInvoiceDocumentType() != null && getInvoiceDocumentType().getSinCode() != null) {
+            int sinCode = getInvoiceDocumentType().getSinCode();
+            switch (sinCode) {
+                case 1: sigla = "CI-";  break;
+                case 2: sigla = "CEX-"; break;
+                case 3: sigla = "PAS-"; break;
+                case 4: sigla = "OD-";  break;
+                case 5: sigla = "NIT-"; break;
+                default: sigla = "";
+            }
+        }
+        String number = (nitNumber != null && nitNumber.trim().length() > 0)
+                ? nitNumber : (idNumber != null ? idNumber : "");
+        return sigla + number;
+    }
+
     public void setNitNumber(String nit) {
         this.nitNumber = nit;
     }
@@ -383,6 +440,29 @@ public class Client implements BaseModel {
         this.personType = personType;
     }
 
+    /**
+     * Clase de cliente (persona/institucion) como valor tipado, derivado de la
+     * unica fuente de verdad {@link #personFlag}. Equivale al company_type de Odoo.
+     */
+    @Transient
+    public ClientKind getKind() {
+        return Boolean.FALSE.equals(personFlag) ? ClientKind.INSTITUTION : ClientKind.PERSON;
+    }
+
+    public void setKind(ClientKind kind) {
+        this.personFlag = (kind != ClientKind.INSTITUTION);
+    }
+
+    /**
+     * Mantiene la columna clase_cliente sincronizada con personFlag en cada
+     * insert/update, en un unico punto (sin literales dispersos).
+     */
+    @PrePersist
+    @PreUpdate
+    private void syncClientKind() {
+        this.personType = getKind().getValue();
+    }
+
     public Double getGuarantee() {
         return guarantee;
     }
@@ -405,6 +485,14 @@ public class Client implements BaseModel {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax;
     }
 
     public String getComplement() {
@@ -445,6 +533,62 @@ public class Client implements BaseModel {
 
     public void setRegularizeAccount(String regularizeAccount) {
         this.regularizeAccount = regularizeAccount;
+    }
+
+    public List<ClientContact> getContacts() {
+        return contacts;
+    }
+
+    public void setContacts(List<ClientContact> contacts) {
+        this.contacts = contacts;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 
 }

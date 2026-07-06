@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['Incoterm.list']}</ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="incotermSearch">
+            <rich:simpleTogglePanel label="#{messages['Incoterm.search']}" switchType="client">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Incoterm.code']}</ui:define>
+                    <h:inputText id="code" value="#{incotermDataModel.criteria.code}"
+                                 maxlength="10" tabindex="1" styleClass="input"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Incoterm.name']}</ui:define>
+                    <h:inputText id="name" value="#{incotermDataModel.criteria.name}"
+                                 maxlength="150" tabindex="2" styleClass="input">
+                    </h:inputText>
+                    <a4j:commandButton action="#{incotermDataModel.search}"
+                                       reRender="incotermList"
+                                       styleClass="button" id="searchButtonId" tabindex="3"
+                                       value="#{messages['Common.search']}">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </s:decorate>
+                <rich:jQuery selector="#code" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/sales/incoterm.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('INCOTERM','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{incotermDataModel}" var="incotermItem"
+                            id="incotermList" rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="15%, 45%, 25%, 15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="incoterm.code"
+                                                   dataModel="#{incotermDataModel}"
+                                                   reRender="incotermList, dataScroller">
+                                #{messages['Incoterm.code']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['Incoterm.name']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Incoterm.active']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column>
+                    <h:outputText value="#{incotermItem.code}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{incotermItem.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:graphicImage value="/img/check.png" rendered="#{incotermItem.active}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{incotermAction.select(incotermItem)}"
+                                   rendered="#{s:hasPermission('INCOTERM','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="incotermList" dataModel="#{incotermDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/sales/incoterm.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('INCOTERM','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

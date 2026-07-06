@@ -20,6 +20,42 @@
         </framework:restrictions>
     </framework:entity-query>
 
+    <!-- Departamentos filtrados por pais, dedicados a la pantalla de Cliente
+         (uno para el cliente y otro para el contacto, para que sus filtros por
+         pais no se combinen con AND en la misma pagina). -->
+    <factory name="clientDepartmentList" value="#{clientDepartmentQuery}"/>
+    <framework:entity-query name="clientDepartmentQuery" ejbql="select d from Department d">
+        <framework:restrictions>
+            <value>d.country = #{client.country}</value>
+        </framework:restrictions>
+        <framework:order>d.name</framework:order>
+    </framework:entity-query>
+
+    <factory name="contactDepartmentList" value="#{contactDepartmentQuery}"/>
+    <framework:entity-query name="contactDepartmentQuery" ejbql="select d from Department d">
+        <framework:restrictions>
+            <value>d.country = #{clientAction.contact.country}</value>
+        </framework:restrictions>
+        <framework:order>d.name</framework:order>
+    </framework:entity-query>
+
+    <!-- Ciudades filtradas por departamento, dedicadas a la pantalla de Cliente. -->
+    <factory name="clientCityList" value="#{clientCityQuery}"/>
+    <framework:entity-query name="clientCityQuery" ejbql="select c from City c">
+        <framework:restrictions>
+            <value>c.department = #{client.department}</value>
+        </framework:restrictions>
+        <framework:order>c.name</framework:order>
+    </framework:entity-query>
+
+    <factory name="contactCityList" value="#{contactCityQuery}"/>
+    <framework:entity-query name="contactCityQuery" ejbql="select c from City c">
+        <framework:restrictions>
+            <value>c.department = #{clientAction.contact.department}</value>
+        </framework:restrictions>
+        <framework:order>c.name</framework:order>
+    </framework:entity-query>
+
     <factory name="cityList" value="#{cityQuery}"/>
     <framework:entity-query name="cityQuery" ejbql="select c from City c">
         <framework:restrictions>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="utf8mb4" collation="utf8mb4_0900_ai_ci">terdemol</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="entidad" view="colnames">
+<left>584</left>
+<top>17</top>
+<width>158</width>
+<height>197</height>
+<sql_create_table>CREATE TABLE `entidad` (
+  `identidad` bigint NOT NULL,
+  `noidentificacion` varchar(100) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `version` bigint DEFAULT NULL,
+  `iddireccion` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idtipodocumento` bigint DEFAULT NULL,
+  `idexttipodocumento` bigint DEFAULT NULL,
+  PRIMARY KEY (`identidad`),
+  KEY `fk_companiaentidad` (`idcompania`),
+  KEY `fk_direccionentidad` (`iddireccion`),
+  KEY `fk_exttipodocumentoentidad` (`idexttipodocumento`),
+  KEY `fk_tipodocumentoentidad` (`idtipodocumento`),
+  CONSTRAINT `fk_companiaentidad` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
+  CONSTRAINT `fk_direccionentidad` FOREIGN KEY (`iddireccion`) REFERENCES `direccion` (`iddireccion`),
+  CONSTRAINT `fk_exttipodocumentoentidad` FOREIGN KEY (`idexttipodocumento`) REFERENCES `exttipodocumento` (`idexttipodocumento`),
+  CONSTRAINT `fk_tipodocumentoentidad` FOREIGN KEY (`idtipodocumento`) REFERENCES `tipodocumento` (`idtipodocumento`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
+</table>
+<table name="persona" view="colnames">
+<left>847</left>
+<top>98</top>
+<width>161</width>
+<height>299</height>
+<sql_create_table>CREATE TABLE `persona` (
+  `fechanacimiento` date DEFAULT NULL,
+  `nombres` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `genero` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `domicilio` varchar(500) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `apellidopaterno` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `apellidomaterno` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `profesion` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL,
+  `telcelular` varchar(20) DEFAULT NULL,
+  `idpersona` bigint NOT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idpais` bigint DEFAULT NULL,
+  `idestadocivil` bigint DEFAULT NULL,
+  `idsaludo` bigint DEFAULT NULL,
+  PRIMARY KEY (`idpersona`),
+  KEY `fk_companiapersona` (`idcompania`),
+  KEY `fk_estadocivilpersona` (`idestadocivil`),
+  KEY `fk_paispersona` (`idpais`),
+  KEY `fk_saludopersona` (`idsaludo`),
+  CONSTRAINT `fk_companiapersona` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
+  CONSTRAINT `fk_estadocivilpersona` FOREIGN KEY (`idestadocivil`) REFERENCES `estadocivil` (`idestadocivil`),
+  CONSTRAINT `fk_paispersona` FOREIGN KEY (`idpais`) REFERENCES `pais` (`idpais`),
+  CONSTRAINT `fk_saludopersona` FOREIGN KEY (`idsaludo`) REFERENCES `saludo` (`idsaludo`),
+  CONSTRAINT `persona_ibfk_1` FOREIGN KEY (`idpersona`) REFERENCES `entidad` (`identidad`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="empleado" view="colnames">
+<left>1200</left>
+<top>31</top>
+<width>199</width>
+<height>299</height>
+<sql_create_table>CREATE TABLE `empleado` (
+  `flagafp` int DEFAULT NULL,
+  `flagcontrol` int DEFAULT NULL,
+  `codigoempleado` varchar(255) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `fechaingreso` date DEFAULT NULL,
+  `flagjubilado` int DEFAULT NULL,
+  `codigomarcacion` varchar(100) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `tipodepago` varchar(20) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `flagret` int DEFAULT NULL,
+  `fechasalida` date DEFAULT NULL,
+  `salario` decimal(13,2) DEFAULT NULL,
+  `idempleado` bigint NOT NULL,
+  `idunidadnegocio` bigint DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`idempleado`),
+  KEY `fk_companiaempleado` (`idcompania`),
+  KEY `fk_unidadnegocioempleado` (`idunidadnegocio`),
+  CONSTRAINT `empleado_ibfk_1` FOREIGN KEY (`idempleado`) REFERENCES `persona` (`idpersona`),
+  CONSTRAINT `fk_companiaempleado` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
+  CONSTRAINT `fk_unidadnegocioempleado` FOREIGN KEY (`idunidadnegocio`) REFERENCES `unidadnegocio` (`idunidadnegocio`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
+</table>
+<table name="institucion" view="colnames">
+<left>261</left>
+<top>243</top>
+<width>166</width>
+<height>148</height>
+<sql_create_table>CREATE TABLE `institucion` (
+  `aniversario` date DEFAULT NULL,
+  `razonsocial` varchar(200) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `idinstitucion` bigint NOT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  PRIMARY KEY (`idinstitucion`),
+  KEY `fk_companiainstitucion` (`idcompania`),
+  CONSTRAINT `fk_companiainstitucion` FOREIGN KEY (`idcompania`) REFERENCES `compania` (`idcompania`),
+  CONSTRAINT `institucion_ibfk_1` FOREIGN KEY (`idinstitucion`) REFERENCES `entidad` (`identidad`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
+</table>
+<table name="cliente" view="colnames">
+<left>279</left>
+<top>440</top>
+<width>178</width>
+<height>197</height>
+<sql_create_table>CREATE TABLE `cliente` (
+  `idcliente` bigint DEFAULT NULL,
+  `fechaprimeracompra` date DEFAULT NULL,
+  `fechaultimacompra` date DEFAULT NULL,
+  `nocliente` varchar(100) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `totalimporteadquirido` decimal(13,2) DEFAULT NULL,
+  `totalarticulosadquiridos` int DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
+</table>
+<table name="personacliente" view="colnames">
+<left>600</left>
+<top>435</top>
+<width>277</width>
+<height>311</height>
+<sql_create_table>CREATE TABLE `personacliente` (
+  `IDPERSONACLIENTE` bigint NOT NULL,
+  `AM` varchar(255) DEFAULT NULL,
+  `AP` varchar(255) DEFAULT NULL,
+  `CEM_COD` varchar(255) DEFAULT NULL,
+  `EST_CIVIL` varchar(255) DEFAULT NULL,
+  `FECHA_NAC` date DEFAULT NULL,
+  `NOM` varchar(255) DEFAULT NULL,
+  `NRO_DOC` varchar(255) DEFAULT NULL,
+  `COMP` varchar(10) DEFAULT NULL,
+  `OCU_COD` varchar(255) DEFAULT NULL,
+  `SEXO` varchar(255) DEFAULT NULL,
+  `SIS_COD` varchar(255) DEFAULT NULL,
+  `TDO_COD` varchar(255) DEFAULT NULL,
+  `TIPO_PERSONA` varchar(45) DEFAULT NULL,
+  `ctaregula` varchar(20) DEFAULT NULL,
+  `DIRECCION` varchar(100) DEFAULT NULL,
+  `TELEFONO` int DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `idtipodocsin` bigint DEFAULT NULL,
+  `NIT` varchar(20) DEFAULT NULL,
+  `codigocliente` varchar(100) DEFAULT NULL,
+  `codprefijo` varchar(10) DEFAULT NULL,
+  `RAZONSOCIAL` varchar(100) DEFAULT NULL,
+  `CODMETODOPAGOSIN` int DEFAULT NULL,
+  `OBSERVACION` varchar(100) DEFAULT NULL,
+  `IDRETENCION` bigint DEFAULT NULL,
+  `IDTIPOCLIENTE` bigint DEFAULT NULL,
+  `idcategoriacliente` bigint DEFAULT NULL,
+  `IDDEPARTAMENTO` bigint DEFAULT NULL,
+  `DESCUENTO` decimal(10,2) DEFAULT NULL,
+  `DESCUENTOPROD` decimal(10,2) DEFAULT NULL,
+  `PORCENTAJECOMISION` double DEFAULT NULL,
+  `PORCENTAJEGARANTIA` double DEFAULT NULL,
+  `IDTERRITORIOTRABAJO` bigint DEFAULT NULL,
+  `con_factura` int NOT NULL DEFAULT '1',
+  `ESPERSONA` int DEFAULT NULL,
+  `deuda` double DEFAULT NULL,
+  PRIMARY KEY (`IDPERSONACLIENTE`),
+  KEY `idcategoriacliente` (`idcategoriacliente`),
+  CONSTRAINT `personacliente_ibfk_1` FOREIGN KEY (`idcategoriacliente`) REFERENCES `categoriacliente` (`idcategoriacliente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3</sql_create_table>
+</table>
+<table name="productormateriaprima" view="colnames">
+<left>1200</left>
+<top>390</top>
+<width>207</width>
+<height>282</height>
+<sql_create_table>CREATE TABLE `productormateriaprima` (
+  `idproductormateriaprima` bigint NOT NULL,
+  `licenciaimpuestos` varchar(200) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `licenciaimpuestos2011` varchar(200) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `fechaexpiralicenciaimpuesto` date DEFAULT NULL,
+  `fechafinimpuesto2011` date DEFAULT NULL,
+  `esresponsable` int DEFAULT NULL,
+  `activo` int DEFAULT NULL,
+  `numerocuenta` varchar(50) DEFAULT NULL,
+  `fechainicialicenciaimpuesto` date DEFAULT NULL,
+  `fechainiimpuesto2011` date DEFAULT NULL,
+  `idcompania` bigint DEFAULT NULL,
+  `idzonaproductiva` bigint DEFAULT NULL,
+  PRIMARY KEY (`idproductormateriaprima`),
+  KEY `idzonaproductiva` (`idzonaproductiva`),
+  CONSTRAINT `productormateriaprima_ibfk_1` FOREIGN KEY (`idproductormateriaprima`) REFERENCES `persona` (`idpersona`),
+  CONSTRAINT `productormateriaprima_ibfk_2` FOREIGN KEY (`idzonaproductiva`) REFERENCES `zonaproductiva` (`idzonaproductiva`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>

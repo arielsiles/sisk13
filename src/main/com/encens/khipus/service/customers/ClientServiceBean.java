@@ -1,6 +1,9 @@
 package com.encens.khipus.service.customers;
 
+import com.encens.khipus.model.contacts.City;
+import com.encens.khipus.model.contacts.Department;
 import com.encens.khipus.model.customers.Client;
+import com.encens.khipus.model.customers.ClientContact;
 import com.encens.khipus.model.customers.PaymentMethodSin;
 import com.encens.khipus.model.finances.VoucherDetail;
 import org.jboss.seam.annotations.AutoCreate;
@@ -95,6 +98,74 @@ public class ClientServiceBean implements ClientService {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"La persona con Nro. CI: " + idNumber +
                     " no se encuentra registrado en Clientes. Completar la contabilidad.");
             return null;
+        }
+    }
+
+    @Override
+    public City findOrCreateCity(String name, Department department) {
+        if (name == null || name.trim().length() == 0 || department == null)
+            return null;
+
+        String normalized = name.trim().toUpperCase();
+        try {
+            return (City) em.createNamedQuery("City.findByNameAndDepartment")
+                    .setParameter("department", department)
+                    .setParameter("name", normalized)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            City city = new City();
+            city.setName(normalized);
+            city.setDepartment(department);
+            em.persist(city);   // company se asigna via CompanyListener
+            em.flush();
+            return city;
+        }
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked"})
+    public List<City> suggestCities(Department department, String prefix) {
+        if (department == null)
+            return new ArrayList<City>();
+        String p = (prefix == null ? "" : prefix.trim().toUpperCase());
+        return em.createQuery("select c from City c where c.department =:dep " +
+                "and upper(c.name) like :p order by c.name")
+                .setParameter("dep", department)
+                .setParameter("p", p + "%")
+                .setMaxResults(10)
+                .getResultList();
+    }
+
+    @Override
+    public City findCity(String name, Department department) {
+        if (name == null || name.trim().length() == 0 || department == null)
+            return null;
+        try {
+            return (City) em.createNamedQuery("City.findByNameAndDepartment")
+                    .setParameter("department", department)
+                    .setParameter("name", name.trim().toUpperCase())
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public ClientContact saveContact(ClientContact contact) {
+        if (contact.getId() == null)
+            em.persist(contact);        // nuevo: inserta
+        em.flush();                     // gestionado: persiste ediciones al instante
+        return contact;
+    }
+
+    @Override
+    public void deleteContact(ClientContact contact) {
+        if (contact.getId() != null) {
+            ClientContact managed = em.find(ClientContact.class, contact.getId());
+            if (managed != null) {
+                em.remove(managed);
+                em.flush();
+            }
         }
     }
 

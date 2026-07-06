@@ -1,0 +1,681 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{salesOrderAction.managed}">#{messages['SalesOrder.edit']} #{salesOrder.orderNumber}</c:when>
+            <c:otherwise>#{messages['SalesOrder.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="salesOrderForm">
+            <div class="buttons">
+                <h:commandButton action="#{salesOrderAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 rendered="#{!salesOrderAction.managed and s:hasPermission('SALESORDER','CREATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{salesOrderAction.update}"
+                                 value="#{messages['Common.update']}"
+                                 rendered="#{salesOrderAction.managed and salesOrder.draft and s:hasPermission('SALESORDER','UPDATE')}"
+                                 styleClass="button">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['SalesOrder.button.send']}"
+                                 styleClass="button"
+                                 rendered="#{salesOrderAction.managed and salesOrder.draft and s:hasPermission('SALESORDERSEND','VIEW')}">
+                    <rich:componentControl for="sendConfirmPanel" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['SalesOrder.button.approve']}"
+                                 styleClass="button"
+                                 rendered="#{salesOrderAction.managed and salesOrder.inReview and s:hasPermission('SALESORDERAPPROVE','VIEW')}">
+                    <rich:componentControl for="approveConfirmPanel" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['SalesOrder.button.reject']}"
+                                 styleClass="button"
+                                 rendered="#{salesOrderAction.managed and salesOrder.inReview and s:hasPermission('SALESORDERAPPROVE','VIEW')}">
+                    <rich:componentControl for="rejectConfirmPanel" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['SalesOrder.button.nullify']}"
+                                 styleClass="button"
+                                 rendered="#{salesOrderAction.managed and !salesOrder.nullified and s:hasPermission('SALESORDERNULLIFY','VIEW')}">
+                    <rich:componentControl for="nullifyConfirmPanel" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{salesOrderReportAction.generateReport(salesOrder)}"
+                                 value="#{messages['SalesOrder.button.print']}"
+                                 rendered="#{salesOrderAction.managed and s:hasPermission('SALESORDER','VIEW')}"
+                                 styleClass="button"/>
+                <h:commandButton action="#{salesOrderAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button"
+                                 immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{salesOrderAction.managed}">
+                            #{messages['SalesOrder.edit']} #{salesOrder.orderNumber} - #{messages[salesOrder.state.resourceKey]}
+                        </c:when>
+                        <c:otherwise>#{messages['SalesOrder.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <!-- ===== Fila superior: 2 columnas ===== -->
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+
+                    <s:div id="leftCol">
+                        <app:fieldset id="generalFieldset" title="#{messages['SalesOrder.section.general']}">
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.deliveryDate']}</ui:define>
+                                <rich:calendar value="#{salesOrder.deliveryDate}" datePattern="dd/MM/yyyy"
+                                               enableManualInput="true" disabled="#{!salesOrderAction.editable}"
+                                               inputClass="input"/>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.currency']}</ui:define>
+                                <h:selectOneMenu value="#{salesOrder.currency}" styleClass="input"
+                                                 disabled="#{!salesOrderAction.editable}">
+                                    <s:selectItems value="#{salesOrderAction.currencyTypes}" var="cur"
+                                                   label="#{messages[cur.resourceKey]} - #{messages[cur.symbolResourceKey]}"/>
+                                    <s:convertEnum/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                        </app:fieldset>
+
+                        <app:fieldset id="buyerFieldset" title="#{messages['SalesOrder.section.buyer']}">
+                            <s:decorate id="clientField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.client']}</ui:define>
+                                <s:fragment rendered="#{salesOrderAction.editable}">
+                                    <app:selectPopUp id="clientFieldId"
+                                                     required="true"
+                                                     textValue="#{salesOrder.client.nombreCompleto}"
+                                                     value="#{salesOrder.client}"
+                                                     clearAction="#{salesOrderAction.clearClient()}"
+                                                     searchModalPanel="salesClientListModalPanel"
+                                                     dataModel="#{clientDataModel}"
+                                                     reRender="clientField, buyerPanel"/>
+                                </s:fragment>
+                                <s:fragment rendered="#{!salesOrderAction.editable}">
+                                    <h:outputText value="#{salesOrder.client.nombreCompleto}" styleClass="input"/>
+                                </s:fragment>
+                            </s:decorate>
+
+                            <s:div id="buyerPanel">
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.buyer.name']}</ui:define>
+                                    <h:inputText value="#{salesOrder.buyerName}" styleClass="input" maxlength="300"
+                                                 disabled="#{!salesOrderAction.editable}"/>
+                                </s:decorate>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.buyer.regNumber']}</ui:define>
+                                    <h:inputText value="#{salesOrder.buyerRegNumber}" styleClass="input" maxlength="50"
+                                                 disabled="#{!salesOrderAction.editable}"/>
+                                </s:decorate>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.buyer.address']}</ui:define>
+                                    <h:inputText value="#{salesOrder.buyerAddress}" styleClass="input" maxlength="500"
+                                                 disabled="#{!salesOrderAction.editable}"/>
+                                </s:decorate>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.buyer.phone']}</ui:define>
+                                    <h:inputText value="#{salesOrder.buyerPhone}" styleClass="input" maxlength="50"
+                                                 disabled="#{!salesOrderAction.editable}"/>
+                                </s:decorate>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.buyer.fax']}</ui:define>
+                                    <h:inputText value="#{salesOrder.buyerFax}" styleClass="input" maxlength="50"
+                                                 disabled="#{!salesOrderAction.editable}"/>
+                                </s:decorate>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.buyer.email']}</ui:define>
+                                    <h:inputText value="#{salesOrder.buyerEmail}" styleClass="input" maxlength="150"
+                                                 disabled="#{!salesOrderAction.editable}"/>
+                                </s:decorate>
+                            </s:div>
+                        </app:fieldset>
+
+                        <app:fieldset id="termFieldset" title="#{messages['SalesOrder.headerTerm']}">
+                            <s:div id="termPanel">
+                                <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+                                    <tr>
+                                        <td style="vertical-align:middle;">
+                                            <div style="border:1px solid #c9cdd6;background:#fafbfc;padding:6px 8px;min-height:18px;color:#333;white-space:normal;word-break:break-word;">
+                                                <h:outputText value="#{salesOrder.headerTerm}"
+                                                              rendered="#{not empty salesOrder.headerTerm}"/>
+                                                <h:outputText value="#{messages['SalesOrder.headerTerm.empty']}"
+                                                              style="color:#9aa0a6;font-style:italic;"
+                                                              rendered="#{empty salesOrder.headerTerm}"/>
+                                            </div>
+                                        </td>
+                                        <td style="vertical-align:middle;width:26px;text-align:center;padding-left:8px;">
+                                            <a4j:commandLink title="#{messages['SalesOrder.headerTerm.add']}"
+                                                             rendered="#{salesOrderAction.editable}"
+                                                             ajaxSingle="true" immediate="true"
+                                                             reRender="availableTermsPanel"
+                                                             oncomplete="Richfaces.showModalPanel('termModalPanel');">
+                                                <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                                            </a4j:commandLink>
+                                        </td>
+                                        <td style="vertical-align:middle;width:26px;text-align:center;">
+                                            <a4j:commandLink action="#{salesOrderAction.clearHeaderTerm}"
+                                                             rendered="#{salesOrderAction.editable and not empty salesOrder.headerTerm}"
+                                                             ajaxSingle="true" reRender="termPanel"
+                                                             title="#{messages['Common.remove']}">
+                                                <h:graphicImage value="/img/close.png" styleClass="select-image-middle"/>
+                                            </a4j:commandLink>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </s:div>
+                        </app:fieldset>
+                    </s:div>
+
+                    <s:div id="rightCol">
+                        <app:fieldset id="commercialFieldset" title="#{messages['SalesOrder.section.commercial']}">
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.incoterm']}</ui:define>
+                                <h:selectOneMenu value="#{salesOrder.incoterm}" styleClass="input"
+                                                 disabled="#{!salesOrderAction.editable}">
+                                    <s:selectItems value="#{salesOrderAction.incotermList}" var="inc"
+                                                   label="#{inc.fullName}" noSelectionLabel=""/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.incotermPlace']}</ui:define>
+                                <h:inputText value="#{salesOrder.incotermPlace}" styleClass="input" maxlength="200"
+                                             disabled="#{!salesOrderAction.editable}"/>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.quotation']}</ui:define>
+                                <h:inputText value="#{salesOrder.quotation}" styleClass="input" maxlength="100"
+                                             disabled="#{!salesOrderAction.editable}"/>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.scCode']}</ui:define>
+                                <h:inputText value="#{salesOrder.scCode}" styleClass="input" maxlength="100"
+                                             disabled="#{!salesOrderAction.editable}"/>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.ccCode']}</ui:define>
+                                <h:inputText value="#{salesOrder.ccCode}" styleClass="input" maxlength="100"
+                                             disabled="#{!salesOrderAction.editable}"/>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalesOrder.paymentConditions']}</ui:define>
+                                <h:inputTextarea value="#{salesOrder.paymentConditions}" styleClass="input" rows="4"
+                                                 cols="45" disabled="#{!salesOrderAction.editable}"/>
+                            </s:decorate>
+                        </app:fieldset>
+
+                        <app:fieldset id="totalsFieldset" title="#{messages['SalesOrder.section.totals']}">
+                            <s:div id="totalsPanel">
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.subTotal']}</ui:define>
+                                    <h:outputText value="#{salesOrder.subTotalAmount}" styleClass="input">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </s:decorate>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.discount']}</ui:define>
+                                    <h:inputText id="discountInput" value="#{salesOrder.discountAmount}"
+                                                 styleClass="inputSmall right" disabled="#{!salesOrderAction.editable}">
+                                        <app:realNumberConverter minimum="0"
+                                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                                 forId="discountInput"/>
+                                        <a4j:support event="onblur" action="#{salesOrderAction.recalculate}"
+                                                     reRender="totalsPanel" ajaxSingle="true"/>
+                                    </h:inputText>
+                                </s:decorate>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.recharge']}</ui:define>
+                                    <h:inputText id="rechargeInput" value="#{salesOrder.rechargeAmount}"
+                                                 styleClass="inputSmall right" disabled="#{!salesOrderAction.editable}">
+                                        <app:realNumberConverter minimum="0"
+                                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                                 forId="rechargeInput"/>
+                                        <a4j:support event="onblur" action="#{salesOrderAction.recalculate}"
+                                                     reRender="totalsPanel" ajaxSingle="true"/>
+                                    </h:inputText>
+                                </s:decorate>
+                                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                    <ui:define name="label">#{messages['SalesOrder.total']}</ui:define>
+                                    <h:outputText value="#{salesOrder.totalAmount}" styleClass="input"
+                                                  style="font-weight:bold">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </s:decorate>
+                            </s:div>
+                        </app:fieldset>
+                    </s:div>
+                </h:panelGrid>
+
+                <!-- ===== Items (ancho completo) ===== -->
+                <app:fieldset id="itemsFieldset" title="#{messages['SalesOrder.section.items']}">
+                    <s:div id="itemsPanel">
+                        <div class="buttons" style="#{salesOrderAction.editable ? '' : 'display:none'}">
+                            <a4j:commandButton id="addProductItemCommandButton"
+                                               action="#{productItemsForSalesDataModel.reset()}"
+                                               value="#{messages['SalesOrder.addProducts']}"
+                                               styleClass="button"
+                                               immediate="true"
+                                               oncomplete="Richfaces.showModalPanel('productItemsForSalesModalPanel');"
+                                               actionListener="#{selectPopUpAction.select}"
+                                               reRender="productItemsForSalesModalPanel">
+                                <f:attribute name="entityManagerName" value=""/>
+                                <f:attribute name="dataModelObject" value="#{productItemsForSalesDataModel}"/>
+                            </a4j:commandButton>
+                        </div>
+
+                        <rich:dataTable value="#{salesOrder.detailList}" var="detail" id="detailTable" width="100%"
+                                        rendered="#{not empty salesOrder.detailList}"
+                                        columnsWidth="4%, 9%, 14%, 24%, 10%, 9%, 9%, 9%, 4%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column styleClass="center">#{messages['SalesOrder.detail.item']}</rich:column>
+                                    <rich:column>#{messages['SalesOrder.detail.code']}</rich:column>
+                                    <rich:column>#{messages['SalesOrder.detail.costCenter']}</rich:column>
+                                    <rich:column>#{messages['SalesOrder.detail.description']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['SalesOrder.detail.measure']}</rich:column>
+                                    <rich:column styleClass="right">#{messages['SalesOrder.detail.quantity']}</rich:column>
+                                    <rich:column styleClass="right">#{messages['SalesOrder.detail.unitPrice']}</rich:column>
+                                    <rich:column styleClass="right">#{messages['SalesOrder.detail.total']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{detail.detailNumber}"/>
+                            </rich:column>
+                            <rich:column>
+                                <h:outputText value="#{detail.productItemCode}"/>
+                            </rich:column>
+                            <rich:column>
+                                <h:selectOneMenu value="#{detail.costCenter}" styleClass="input"
+                                                 disabled="#{!salesOrderAction.editable}">
+                                    <s:selectItems value="#{salesOrderAction.costCenterList}" var="cc"
+                                                   label="#{cc.fullName}" noSelectionLabel=""/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </rich:column>
+                            <rich:column>
+                                <h:inputText value="#{detail.description}" styleClass="input" maxlength="500"
+                                             disabled="#{!salesOrderAction.editable}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:selectOneMenu value="#{detail.measureUnit}" styleClass="input"
+                                                 disabled="#{!salesOrderAction.editable}">
+                                    <f:selectItems value="#{salesOrderAction.measureUnitSelectItems}"/>
+                                </h:selectOneMenu>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <h:inputText id="quantityInput" value="#{detail.quantity}" styleClass="inputSmall right"
+                                             disabled="#{!salesOrderAction.editable}">
+                                    <app:realNumberConverter minimum="0"
+                                                             pattern="#{messages['patterns.decimalNumber']}"
+                                                             forId="quantityInput"/>
+                                    <a4j:support event="onblur" action="#{salesOrderAction.recalculate}"
+                                                 reRender="lineTotalDiv, totalsPanel" ajaxSingle="true"/>
+                                </h:inputText>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <h:inputText id="unitPriceInput" value="#{detail.unitPrice}" styleClass="inputSmall right"
+                                             disabled="#{!salesOrderAction.editable}">
+                                    <app:realNumberConverter minimum="0"
+                                                             pattern="#{messages['patterns.decimalNumber']}"
+                                                             forId="unitPriceInput"/>
+                                    <a4j:support event="onblur" action="#{salesOrderAction.recalculate}"
+                                                 reRender="lineTotalDiv, totalsPanel" ajaxSingle="true"/>
+                                </h:inputText>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <s:div id="lineTotalDiv">
+                                    <h:outputText value="#{detail.totalAmount}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </s:div>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <a4j:commandLink action="#{salesOrderAction.removeDetail(detail)}"
+                                                 rendered="#{salesOrderAction.editable}"
+                                                 ajaxSingle="true" reRender="itemsPanel, totalsPanel"
+                                                 title="#{messages['Common.remove']}">
+                                    <h:graphicImage value="/img/close.png" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                        <h:outputText value="#{messages['SalesOrder.detail.empty']}"
+                                      rendered="#{empty salesOrder.detailList}"/>
+                    </s:div>
+                </app:fieldset>
+
+                <!-- ===== Comentarios (ancho completo, debajo de items) ===== -->
+                <app:fieldset id="commentsFieldset" title="#{messages['SalesOrder.section.comments']}">
+                    <div class="buttons" style="#{salesOrderAction.editable ? '' : 'display:none'}">
+                        <a4j:commandLink title="#{messages['SalesOrder.comments.add']}"
+                                         ajaxSingle="true" immediate="true"
+                                         action="#{salesOrderAction.clearNewComment}"
+                                         reRender="commentModalForm"
+                                         oncomplete="Richfaces.showModalPanel('commentModalPanel');">
+                            <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </div>
+                    <s:div id="commentsPanel">
+                        <rich:dataTable value="#{salesOrderAction.commentLines}" var="line" rowKeyVar="idx"
+                                        id="commentsTable" width="100%" columnsWidth="95%, 5%"
+                                        rendered="#{not empty salesOrderAction.commentLines}">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['SalesOrder.comments']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column>
+                                <h:outputText value="#{line}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <a4j:commandLink action="#{salesOrderAction.removeCommentAt(idx)}"
+                                                 rendered="#{salesOrderAction.editable}"
+                                                 ajaxSingle="true" reRender="commentsPanel"
+                                                 title="#{messages['Common.remove']}">
+                                    <h:graphicImage value="/img/close.png" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                        <h:outputText value="#{messages['SalesOrder.comments.empty']}"
+                                      rendered="#{empty salesOrderAction.commentLines}"/>
+                    </s:div>
+                </app:fieldset>
+
+                <!-- ===== Notas (ancho completo) ===== -->
+                <app:fieldset id="notesFieldset" title="#{messages['SalesOrder.section.notes']}">
+                    <div class="buttons" style="#{salesOrderAction.editable ? '' : 'display:none'}">
+                        <a4j:commandLink title="#{messages['SalesOrder.notes.add']}"
+                                         ajaxSingle="true" immediate="true"
+                                         reRender="availableNotesPanel"
+                                         oncomplete="Richfaces.showModalPanel('noteModalPanel');">
+                            <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                        </a4j:commandLink>
+                    </div>
+                    <s:div id="notesPanel">
+                        <rich:dataTable value="#{salesOrder.selectedNotes}" var="sn" id="selectedNotesTable"
+                                        width="100%" columnsWidth="95%, 5%"
+                                        rendered="#{not empty salesOrder.selectedNotes}">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['SalesOrder.notes']}</rich:column>
+                                    <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column>
+                                <h:outputText value="#{sn.text}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <a4j:commandLink action="#{salesOrderAction.removeSelectedNote(sn)}"
+                                                 rendered="#{salesOrderAction.editable}"
+                                                 ajaxSingle="true" reRender="notesPanel"
+                                                 title="#{messages['Common.remove']}">
+                                    <h:graphicImage value="/img/close.png" styleClass="select-image-middle"/>
+                                </a4j:commandLink>
+                            </rich:column>
+                        </rich:dataTable>
+                        <h:outputText value="#{messages['SalesOrder.notes.empty']}"
+                                      rendered="#{empty salesOrder.selectedNotes}"/>
+                    </s:div>
+                </app:fieldset>
+
+                <!-- ===== Observaciones de Gerencia (ancho completo) ===== -->
+                <app:fieldset id="observationsFieldset" title="#{messages['SalesOrder.section.observations']}"
+                              rendered="#{not empty salesOrder.managementObservations}">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SalesOrder.managementObservations']}</ui:define>
+                        <h:outputText value="#{salesOrder.managementObservations}" styleClass="input"/>
+                    </s:decorate>
+                </app:fieldset>
+            </rich:panel>
+        </h:form>
+
+        <!-- ===== Modal seleccion de cliente (exclusivo ventas) ===== -->
+        <s:div id="salesClientListModalPanelDiv">
+            <s:decorate id="salesClientListModalPanelContainer" template="/sales/salesClientListModalPanel.xhtml">
+                <ui:param name="containerId" value="salesClientListModalPanelContainer"/>
+                <ui:param name="dialogId" value="salesClientListModalPanel"/>
+                <ui:define name="assignButton">
+                    <a4j:commandButton id="assignButton"
+                                       action="#{salesOrderAction.assignClient(clientItem)}"
+                                       image="/img/active.gif"
+                                       styleClass="select-image-middle"
+                                       reRender="clientField, buyerPanel"
+                                       oncomplete="Richfaces.hideModalPanel('salesClientListModalPanel');"/>
+                </ui:define>
+            </s:decorate>
+        </s:div>
+
+        <!-- ===== Modal seleccion de productos terminados ===== -->
+        <s:decorate id="productItemsForSalesModalPanelContainer"
+                    template="/warehouse/productItemsForSalesModalPanel.xhtml">
+            <ui:param name="containerId" value="productItemsForSalesModalPanelContainer"/>
+            <ui:param name="dialogId" value="productItemsForSalesModalPanel"/>
+            <ui:define name="addButton">
+                <a4j:commandButton id="addButton"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   action="#{salesOrderAction.addProductItems(productItemsForSalesDataModel.selectedProductItems)}"
+                                   value="#{messages['Common.add']}"
+                                   reRender="itemsPanel, totalsPanel"
+                                   styleClass="button"
+                                   oncomplete="Richfaces.hideModalPanel('productItemsForSalesModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <!-- ===== Modal: agregar comentario ===== -->
+        <rich:modalPanel id="commentModalPanel" width="620" autosized="true" zindex="2000">
+            <f:facet name="header">
+                <h:outputText value="#{messages['SalesOrder.comments.add']}"/>
+            </f:facet>
+            <f:facet name="controls">
+                <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideCommentLink"/>
+                <rich:componentControl for="commentModalPanel" attachTo="hideCommentLink" operation="hide" event="onclick"/>
+            </f:facet>
+            <h:form id="commentModalForm">
+                <h:panelGrid columns="1" width="100%" style="text-align:center" cellpadding="6">
+                    <h:outputText value="#{messages['SalesOrder.comments']}" styleClass="label"/>
+                    <h:inputTextarea value="#{salesOrderAction.newComment}"
+                                     rows="3" maxlength="500"
+                                     style="width:560px;resize:vertical;"/>
+                </h:panelGrid>
+                <div class="buttons" style="text-align:center">
+                    <a4j:commandButton value="#{messages['Common.accept']}"
+                                       action="#{salesOrderAction.addComment}"
+                                       reRender="commentsPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity==null}) Richfaces.hideModalPanel('commentModalPanel');"
+                                       styleClass="button"/>
+                    <a4j:commandButton value="#{messages['Common.cancel']}" immediate="true" styleClass="button">
+                        <rich:componentControl for="commentModalPanel" operation="hide" event="onclick"/>
+                    </a4j:commandButton>
+                </div>
+            </h:form>
+        </rich:modalPanel>
+
+        <!-- ===== Modales de confirmacion de flujo ===== -->
+        <rich:modalPanel id="sendConfirmPanel" width="400" autosized="true" zindex="2000">
+            <f:facet name="header"><h:outputText value="#{messages['SalesOrder.button.send']}"/></f:facet>
+            <f:facet name="controls">
+                <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideSendLink"/>
+                <rich:componentControl for="sendConfirmPanel" attachTo="hideSendLink" operation="hide" event="onclick"/>
+            </f:facet>
+            <h:form id="sendConfirmForm">
+                <h:panelGrid columns="1" width="100%" style="text-align:center" cellpadding="8">
+                    <h:outputText value="#{messages['SalesOrder.confirm.send']}"/>
+                </h:panelGrid>
+                <div class="buttons" style="text-align:center">
+                    <a4j:commandButton value="#{messages['Common.accept']}"
+                                       action="#{salesOrderAction.sendToReview}" styleClass="button"/>
+                    <a4j:commandButton value="#{messages['Common.cancel']}" immediate="true" styleClass="button">
+                        <rich:componentControl for="sendConfirmPanel" operation="hide" event="onclick"/>
+                    </a4j:commandButton>
+                </div>
+            </h:form>
+        </rich:modalPanel>
+
+        <rich:modalPanel id="approveConfirmPanel" width="400" autosized="true" zindex="2000">
+            <f:facet name="header"><h:outputText value="#{messages['SalesOrder.button.approve']}"/></f:facet>
+            <f:facet name="controls">
+                <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideApproveLink"/>
+                <rich:componentControl for="approveConfirmPanel" attachTo="hideApproveLink" operation="hide" event="onclick"/>
+            </f:facet>
+            <h:form id="approveConfirmForm">
+                <h:panelGrid columns="1" width="100%" style="text-align:center" cellpadding="8">
+                    <h:outputText value="#{messages['SalesOrder.confirm.approve']}"/>
+                </h:panelGrid>
+                <div class="buttons" style="text-align:center">
+                    <a4j:commandButton value="#{messages['Common.accept']}"
+                                       action="#{salesOrderAction.approve}" styleClass="button"/>
+                    <a4j:commandButton value="#{messages['Common.cancel']}" immediate="true" styleClass="button">
+                        <rich:componentControl for="approveConfirmPanel" operation="hide" event="onclick"/>
+                    </a4j:commandButton>
+                </div>
+            </h:form>
+        </rich:modalPanel>
+
+        <rich:modalPanel id="rejectConfirmPanel" width="480" autosized="true" zindex="2000">
+            <f:facet name="header"><h:outputText value="#{messages['SalesOrder.button.reject']}"/></f:facet>
+            <f:facet name="controls">
+                <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideRejectLink"/>
+                <rich:componentControl for="rejectConfirmPanel" attachTo="hideRejectLink" operation="hide" event="onclick"/>
+            </f:facet>
+            <h:form id="rejectConfirmForm">
+                <h:panelGrid columns="1" width="100%" style="text-align:center" cellpadding="6">
+                    <h:outputText value="#{messages['SalesOrder.confirm.reject']}"/>
+                    <h:outputText value="#{messages['SalesOrder.managementObservations']}" styleClass="label"/>
+                    <h:inputTextarea value="#{salesOrder.managementObservations}"
+                                     rows="3" maxlength="2000" style="width:420px;resize:vertical;"/>
+                </h:panelGrid>
+                <div class="buttons" style="text-align:center">
+                    <a4j:commandButton value="#{messages['Common.accept']}"
+                                       action="#{salesOrderAction.reject}" styleClass="button"/>
+                    <a4j:commandButton value="#{messages['Common.cancel']}" immediate="true" styleClass="button">
+                        <rich:componentControl for="rejectConfirmPanel" operation="hide" event="onclick"/>
+                    </a4j:commandButton>
+                </div>
+            </h:form>
+        </rich:modalPanel>
+
+        <rich:modalPanel id="nullifyConfirmPanel" width="420" autosized="true" zindex="2000">
+            <f:facet name="header"><h:outputText value="#{messages['SalesOrder.button.nullify']}"/></f:facet>
+            <f:facet name="controls">
+                <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideNullifyLink"/>
+                <rich:componentControl for="nullifyConfirmPanel" attachTo="hideNullifyLink" operation="hide" event="onclick"/>
+            </f:facet>
+            <h:form id="nullifyConfirmForm">
+                <h:panelGrid columns="1" width="100%" style="text-align:center" cellpadding="8">
+                    <h:outputText value="#{messages['SalesOrder.confirm.nullify']}"/>
+                </h:panelGrid>
+                <div class="buttons" style="text-align:center">
+                    <a4j:commandButton value="#{messages['Common.accept']}"
+                                       action="#{salesOrderAction.nullify}" styleClass="button"/>
+                    <a4j:commandButton value="#{messages['Common.cancel']}" immediate="true" styleClass="button">
+                        <rich:componentControl for="nullifyConfirmPanel" operation="hide" event="onclick"/>
+                    </a4j:commandButton>
+                </div>
+            </h:form>
+        </rich:modalPanel>
+
+        <!-- ===== Modal: notas predefinidas ===== -->
+        <rich:modalPanel id="noteModalPanel" width="720" autosized="true" zindex="2000">
+            <f:facet name="header">
+                <h:outputText value="#{messages['SalesOrder.notes.modalTitle']}"/>
+            </f:facet>
+            <f:facet name="controls">
+                <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideNoteLink"/>
+                <rich:componentControl for="noteModalPanel" attachTo="hideNoteLink" operation="hide" event="onclick"/>
+            </f:facet>
+            <h:form id="noteModalForm">
+                <s:div id="availableNotesPanel">
+                    <rich:dataTable value="#{salesOrderAction.availableNotes}" var="note" id="availableNotesTable"
+                                    width="100%" columnsWidth="92%, 8%"
+                                    rendered="#{not empty salesOrderAction.availableNotes}">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>#{messages['SalesOrder.notes']}</rich:column>
+                                <rich:column styleClass="center">#{messages['Common.add']}</rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{note.text}"/>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <a4j:commandLink action="#{salesOrderAction.addNote(note)}" ajaxSingle="true"
+                                             reRender="availableNotesPanel, notesPanel"
+                                             title="#{messages['Common.add']}">
+                                <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                        </rich:column>
+                    </rich:dataTable>
+                    <h:outputText value="#{messages['SalesOrder.notes.available.empty']}"
+                                  rendered="#{empty salesOrderAction.availableNotes}"/>
+                </s:div>
+                <div class="buttons">
+                    <a4j:commandButton value="#{messages['Common.close']}" immediate="true" styleClass="button">
+                        <rich:componentControl for="noteModalPanel" operation="hide" event="onclick"/>
+                    </a4j:commandButton>
+                </div>
+            </h:form>
+        </rich:modalPanel>
+
+        <!-- ===== Modal: terminos de cabecera (seleccion unica, reemplaza) ===== -->
+        <rich:modalPanel id="termModalPanel" width="720" autosized="true" zindex="2000">
+            <f:facet name="header">
+                <h:outputText value="#{messages['SalesOrder.headerTerm.modalTitle']}"/>
+            </f:facet>
+            <f:facet name="controls">
+                <h:graphicImage value="/img/close.png" style="cursor:pointer" id="hideTermLink"/>
+                <rich:componentControl for="termModalPanel" attachTo="hideTermLink" operation="hide" event="onclick"/>
+            </f:facet>
+            <h:form id="termModalForm">
+                <s:div id="availableTermsPanel">
+                    <rich:dataTable value="#{salesOrderAction.activeTerms}" var="term" id="activeTermsTable"
+                                    width="100%" columnsWidth="92%, 8%"
+                                    rendered="#{not empty salesOrderAction.activeTerms}">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>#{messages['SalesOrder.headerTerm']}</rich:column>
+                                <rich:column styleClass="center">#{messages['Common.add']}</rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText value="#{term.text}"/>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <a4j:commandLink action="#{salesOrderAction.addHeaderTerm(term)}" ajaxSingle="true"
+                                             reRender="termPanel" title="#{messages['Common.add']}"
+                                             oncomplete="Richfaces.hideModalPanel('termModalPanel');">
+                                <h:graphicImage value="/img/add.png" styleClass="select-image-middle"/>
+                            </a4j:commandLink>
+                        </rich:column>
+                    </rich:dataTable>
+                    <h:outputText value="#{messages['SalesOrder.headerTerm.available.empty']}"
+                                  rendered="#{empty salesOrderAction.activeTerms}"/>
+                </s:div>
+                <div class="buttons">
+                    <a4j:commandButton value="#{messages['Common.close']}" immediate="true" styleClass="button">
+                        <rich:componentControl for="termModalPanel" operation="hide" event="onclick"/>
+                    </a4j:commandButton>
+                </div>
+            </h:form>
+        </rich:modalPanel>
+    </ui:define>
+</ui:composition>

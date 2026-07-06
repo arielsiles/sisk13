@@ -10,6 +10,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,6 +26,8 @@ public class XProductionBalanceAction {
     private XProductionBalanceService xproductionBalanceService;
 
     private Warehouse selectedWarehouse;
+    /** Fecha de corte: los saldos se calculan hasta esta fecha. Por defecto, la fecha actual. */
+    private Date balanceDate = new Date();
     private List<WarehouseBalanceRow> balanceList = new ArrayList<WarehouseBalanceRow>();
 
     /** Almacenes de Materia Prima y Producto Terminado para el filtro. */
@@ -40,7 +43,8 @@ public class XProductionBalanceAction {
         }
         balanceList = xproductionBalanceService.computeBalances(
                 selectedWarehouse.getId().getCompanyNumber(),
-                selectedWarehouse.getId().getWarehouseCode());
+                selectedWarehouse.getId().getWarehouseCode(),
+                balanceDate);
     }
 
     public Warehouse getSelectedWarehouse() {
@@ -49,6 +53,14 @@ public class XProductionBalanceAction {
 
     public void setSelectedWarehouse(Warehouse selectedWarehouse) {
         this.selectedWarehouse = selectedWarehouse;
+    }
+
+    public Date getBalanceDate() {
+        return balanceDate;
+    }
+
+    public void setBalanceDate(Date balanceDate) {
+        this.balanceDate = balanceDate;
     }
 
     public List<WarehouseBalanceRow> getBalanceList() {

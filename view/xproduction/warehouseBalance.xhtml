@@ -28,6 +28,20 @@
             <rich:panel id="filterPanel">
                 <f:facet name="header">#{messages['XProductionBalance.filter']}</f:facet>
 
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['XProductionBalance.date']}</ui:define>
+                    <rich:calendar id="balanceDate"
+                                   value="#{xproductionBalanceAction.balanceDate}"
+                                   popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   inputClass="inputDateNarrow"
+                                   enableManualInput="false">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
                 <s:decorate id="warehouseField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['XProductionBalance.warehouse']}</ui:define>
                     <h:selectOneMenu id="warehouse"
