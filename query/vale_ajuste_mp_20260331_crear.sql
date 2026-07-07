@@ -25,13 +25,14 @@
 --     cod_art  articulo          sistema(KG)   fisico(KG)     SALIDA(KG)
 --     -------  ----------------  -----------   ----------   ------------
 --        1     ROCA FOSFORICA      3.779.497       60.000      3.719.497
+--        2     CALCITA                76.830       27.630         49.200   (= PIEDRA CALIZA)
 --        3     YESO AGRICOLA       1.316.000       30.820      1.285.180
 --        4     BARITINA              830.410      151.520        678.890
 --        5     ULEXITA             2.829.610            0      2.829.610   (fisico "-", se deja en 0)
 --        7     BENTONITA           1.286.177      125.630      1.160.547
 --
---   Excluidos: CALCITA (2), DOLOMITA (6), CAOLIN (2037) -> sin saldo fisico.
---              PIEDRA CALIZA -> fuera por indicacion.
+--   PIEDRA CALIZA del inventario fisico corresponde al articulo CALCITA (2).
+--   Excluidos: DOLOMITA (6), CAOLIN (2037) -> sin saldo fisico.
 --
 -- Para RE-EJECUTAR: correr antes query/vale_ajuste_mp_20260331_eliminar.sql
 --   (borra el vale por su marca no_vale) y volver a correr este.
@@ -82,6 +83,7 @@ CREATE TEMPORARY TABLE tmp_ajuste_mp (
 );
 INSERT INTO tmp_ajuste_mp (cod_art, salida) VALUES
     ('1', 3719497.00),   -- ROCA FOSFORICA
+    ('2',   49200.00),   -- CALCITA  (= PIEDRA CALIZA del inventario fisico)
     ('3', 1285180.00),   -- YESO AGRICOLA
     ('4',  678890.00),   -- BARITINA
     ('5', 2829610.00),   -- ULEXITA  (fisico "-", se deja en 0)
