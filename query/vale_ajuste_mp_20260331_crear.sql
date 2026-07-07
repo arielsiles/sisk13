@@ -49,10 +49,12 @@ SET @gloss   := 'Ajuste a inventario fisico MP al 31/03/2026';
 
 -- Valores fijos (por indicacion):
 SET @cia     := '01';        -- compania
-SET @cod_doc := '0111';      -- tipo de documento de SALIDA (tipo_vale = 'S')
 SET @idun    := 2;           -- unidad de negocio (idunidadnegocio)
 SET @no_usr  := 'ADM';       -- inv_mov.no_usr (codigo de usuario)
 SET @creado_por := 'admin';  -- inv_vales.created_by (login del usuario)
+
+-- Tipo de documento de SALIDA (tipo_vale = 'S'). Columna varchar(3).
+SET @cod_doc := 'EGR';
 
 -- Centro de costo: se REUTILIZA de un vale de MP reciente. Fijarlo a mano si se
 -- prefiere (SET @cod_cc := '...';).
