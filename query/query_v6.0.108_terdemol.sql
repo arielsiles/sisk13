@@ -34,8 +34,8 @@ insert into funcionalidad values (495, 'SALESLIST',  'Lista de ventas',  1, 1, '
 -- (496 'CLIENTLIST' se descarto: el menu "Clientes" usa el permiso EXISTENTE
 --  'CLIENT' (id 262), que es el que protege la pantalla clientList y el que ya
 --  tienen los roles. No se crea un permiso nuevo. Limpieza por si se inserto antes:)
-delete from derechoacceso where idfuncionalidad = 496;
-delete from funcionalidad  where idfuncionalidad = 496 and codigo = 'CLIENTLIST';
+-- delete from derechoacceso where idfuncionalidad = 496;
+-- delete from funcionalidad  where idfuncionalidad = 496 and codigo = 'CLIENTLIST';
 
 -- Sub-items del dropdown Reportes (antes SALES)
 insert into funcionalidad values (497, 'SALESREPORTCUSTOMER',        'Reporte Ventas por Cliente',              1, 1, 'Functionality.customers.report.salesCustomer',        1);
