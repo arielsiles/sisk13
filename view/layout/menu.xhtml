@@ -808,9 +808,11 @@
                     rendered="#{s:hasPermission('XFORMULATION','VIEW')}"
                     propagation="none"/>
 
-            <rich:dropDownMenu value="#{messages['menu.xproduction.process']}" >
+            <rich:dropDownMenu value="#{messages['menu.xproduction.process']}"
+                               rendered="#{s:hasPermission('XPRODUCTION_DISTRIBUTIONINDIRECTCOST','VIEW') or s:hasPermission('XPRODUCTION_CLOSINGPRODUCTIONCOST','VIEW')}">
                 <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item">
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('XPRODUCTION_DISTRIBUTIONINDIRECTCOST','VIEW')}">
 
                     <s:link view="/xproduction/distributionIndirectCost.xhtml"
                             value="#{messages['menu.xproduction.process.distributionIndirectCost']}"
@@ -818,9 +820,10 @@
                 </rich:menuItem>
 
                 <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item">
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('XPRODUCTION_CLOSINGPRODUCTIONCOST','VIEW')}">
                     <s:link view="/accounting/generateClosingProductionCostAccounts.xhtml"
-                            value="Cierre de Ctas - Costo de Producción"
+                            value="#{messages['menu.xproduction.process.closingProductionCost']}"
                             propagation="none" />
                 </rich:menuItem>
 
@@ -832,7 +835,8 @@
                     rendered="#{s:hasPermission('XPRODUCTION_BALANCE','VIEW')}"
                     propagation="none"/>
 
-            <rich:dropDownMenu value="#{messages['menu.xproduction.reports']}" >
+            <rich:dropDownMenu value="#{messages['menu.xproduction.reports']}"
+                               rendered="#{s:hasPermission('PRODUCTION_INPUTS_REPORT','VIEW') or s:hasPermission('PRODUCTION_DAILY_REPORT','VIEW')}">
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
                                rendered="#{s:hasPermission('PRODUCTION_INPUTS_REPORT','VIEW')}">
