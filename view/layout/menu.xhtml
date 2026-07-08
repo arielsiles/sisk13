@@ -1956,7 +1956,94 @@
 </rich:tab>
 
 <!-- Desabilitado -->
-<rich:tab id="finances2" label="#{messages['menu.finances']}" disabled="#{disableMenu}" rendered="true">
+<rich:tab id="finances2" label="#{messages['menu.finances']}" disabled="#{disableMenu}"
+          rendered="#{s:hasPermission('ACCOUNTING','VIEW') or
+                      s:hasPermission('MAJORACCOUNTING','VIEW') or
+                      s:hasPermission('DIARY_BOOK','VIEW') or
+                      s:hasPermission('DIARY_MAJOR','VIEW') or
+                      s:hasPermission('ACCOUNTINGPLAN','VIEW') or
+                      s:hasPermission('PURCHASEBOOKREPORT','VIEW') or
+                      s:hasPermission('WAREHOUSEPURCHASEORDER','VIEW') or
+                      s:hasPermission('WAREHOUSEVOUCHER','VIEW') or
+                      s:hasPermission('PRODUCTDELIVERY','VIEW') or
+                      s:hasPermission('INVENTORY','VIEW') or
+                      s:hasPermission('KARDEXREPORT','VIEW') or
+                      s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW') or
+                      s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW') or
+                      s:hasPermission('PRODUCTITEMBYPROVIDERHISTORYREPORT','VIEW') or
+                      s:hasPermission('ARTICLESREPORT','VIEW') or
+                      s:hasPermission('VALUEDWAREHOUSERESIDUEREPORT','VIEW') or
+                      s:hasPermission('WAREHOUSEVOUCHERREPORT','VIEW') or
+                      s:hasPermission('SUBGROUPREPORT','VIEW') or
+                      s:hasPermission('KARDEXSUMMARYREPORT','VIEW') or
+                      s:hasPermission('GROUP','VIEW') or
+                      s:hasPermission('WAREHOUSE','VIEW') or
+                      s:hasPermission('WAREHOUSEDOCUMENTTYPE','VIEW') or
+                      s:hasPermission('PRODUCTITEM','VIEW') or
+                      s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW') or
+                      s:hasPermission('PREPAREDELIVERY','VIEW') or
+                      s:hasPermission('APPROVEDALLACCOUNTENTRIES','VIEW') or
+                      s:hasPermission('GENERAL_INVENTORY_REPORT','VIEW') or
+                      s:hasPermission('PRODUCT_MOVEMENT_REPORT','VIEW') or
+                      s:hasPermission('ITEM_DESTINATION_REPORT','VIEW') or
+                      s:hasPermission('WAREHOUSEVOUCHER_DESTINATION_REPORT','VIEW') or
+                      s:hasPermission('VALUED_PHYSICAL_INVENTORY_REPORT','VIEW') or
+                      s:hasPermission('WAREHOUSE_INPUTS_OUTPUTS_REPORT','VIEW') or
+                      s:hasPermission('GENERALVALUEDEVOLUTIONREPORT','VIEW') or
+                      s:hasPermission('PENDINGSOLDPRODUCTDELIVERYREPORT','VIEW') or
+                      s:hasPermission('DESTINATION','VIEW') or
+                      s:hasPermission('FIXEDASSETPURCHASEORDER','VIEW') or
+                      s:hasPermission('FIXEDASSET','VIEW') or
+                      s:hasPermission('FIXEDASSETCHANGEMONTHSGUARANTY','VIEW') or
+                      s:hasPermission('FIXEDASSETSREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETVOUCHERREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETBARCODEREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETGROUPSREPORT','VIEW') or
+                      s:hasPermission('DEPRECIATEDFIXEDASSETSREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETFILEREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETBYCUSTODIANREPORT','VIEW') or
+                      s:hasPermission('DEPRECIATIONSUMMARYREPORT','VIEW') or
+                      s:hasPermission('ACCUMULATEDDEPRECIATIONSUMMARYREPORT','VIEW') or
+                      s:hasPermission('ACCUMDEPRECIATIONSUMMBYFIXEDASSETREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETEVOLUTIONSUMMARYREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETGROUP','VIEW') or
+                      s:hasPermission('PURCHASEORDERCAUSE','VIEW') or
+                      s:hasPermission('FIXEDASSETSUBGROUP','VIEW') or
+                      s:hasPermission('FIXEDASSETMOVEMENTTYPE','VIEW') or
+                      s:hasPermission('FIXEDASSETMAINTENANCEREQUEST','VIEW') or
+                      s:hasPermission('FIXEDASSETMAINTENANCE','VIEW') or
+                      s:hasPermission('FIXEDASSETVOUCHER','VIEW') or
+                      s:hasPermission('FIXEDASSETLOCATION','VIEW') or
+                      s:hasPermission('FIXEDASSETMAINTENANCEREQUESTREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETINVENTORYREPORT','VIEW') or
+                      s:hasPermission('FIXEDASSETTRANSFERENCEINVENTORYREPORT','VIEW') or
+                      s:hasPermission('ENTRYBUDGETS','VIEW') or
+                      s:hasPermission('EXPENSEBUDGET','VIEW') or
+                      s:hasPermission('EXPENSEBUDGETREPORT','VIEW') or
+                      s:hasPermission('ENTRYBUDGETREPORT','VIEW') or
+                      s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW') or
+                      s:hasPermission('EXPENSEBUDGETCONSOLIDATEDEXECREPORT','VIEW') or
+                      s:hasPermission('EXPENSEBUDGETGLOBALEXECUTIONREPORT','VIEW') or
+                      s:hasPermission('CLASSIFIERS','VIEW') or
+                      s:hasPermission('BUDGETPROGRAM','VIEW') or
+                      s:hasPermission('BUDGETDISTRIBUTION','VIEW') or
+                      s:hasPermission('BANKINGMOVEMENTSYNC','VIEW') or
+                      s:hasPermission('ROTATORYFUND','VIEW') or
+                      s:hasPermission('OTHERRECEIVABLES','VIEW') or
+                      s:hasPermission('REPORTROTATORYFUND','VIEW') or
+                      s:hasPermission('REPORTROTATORYFUNDBALANCES','VIEW') or
+                      s:hasPermission('REPORTROTATORYFUNDBALANCESDETAIL','VIEW') or
+                      s:hasPermission('REPORTROTATORYFUNDPAYRECEIVABLE','VIEW') or
+                      s:hasPermission('REPORTRETRIEVEBYDEBTOR','VIEW') or
+                      s:hasPermission('REPORTROTATORYFUNDCOLLECTIONDETAIL','VIEW') or
+                      s:hasPermission('REPORTROTATORYFUNDINVOICECOLLECTION','VIEW') or
+                      s:hasPermission('ROTFUNDBYACCOUNTREPORT','VIEW') or
+                      s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW') or
+                      s:hasPermission('REPORTPURCHASEORDER','VIEW') or
+                      s:hasPermission('MEASUREUNIT','VIEW') or
+                      s:hasPermission('CASHACCOUNTGROUP','VIEW') or
+                      s:hasPermission('COSTCENTER','VIEW') or
+                      s:hasPermission('COSTCENTERGROUP','VIEW')}">
     <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
 
     <rich:dropDownMenu value="#{messages['menu.finances.accounting']}" rendered="#{s:hasPermission('ACCOUNTING','VIEW') or s:hasPermission('MAJORACCOUNTING','VIEW')}">
