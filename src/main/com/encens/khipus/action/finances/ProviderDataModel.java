@@ -22,7 +22,12 @@ import java.util.List;
  */
 @Name("providerDataModel")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}")
+// La Transportadora del Despacho es un proveedor y se elige con este datamodel;
+// por eso se permite instanciarlo tambien con el permiso de Despacho, de modo que
+// un usuario de despachos no requiera WAREHOUSEPROVIDERMAN (que ademas habilita el
+// menu/catalogo de Proveedores). La seguridad de cada pantalla sigue en su propio
+// restrict (p.ej. dispatchVoucher* -> WAREHOUSEDISPATCH).
+@Restrict("#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW') or s:hasPermission('WAREHOUSEDISPATCH','VIEW')}")
 public class ProviderDataModel extends QueryDataModel<ProviderPk, Provider> {
 
     private static final String[] RESTRICTIONS = {
