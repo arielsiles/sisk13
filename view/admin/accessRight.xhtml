@@ -26,6 +26,13 @@
             .actionColumn {
                 width: 15%;
             }
+
+            /* Rollover: resalta la fila de funcionalidad bajo el cursor para
+               no equivocarse de fila al asignar permisos. */
+            .permTable tbody tr:hover td {
+                background-color: #fff3bf;
+                cursor: pointer;
+            }
         </style>
 
         <div class="buttons">
@@ -64,6 +71,7 @@
                 </f:facet>
                 <h:dataTable id="functionsPerModule" value="#{roleAction.functionsPerModule[module.id]}"
                              var="systemFunction" width="100%"
+                             styleClass="permTable"
                              columnClasses="functionColumn, actionColumn, actionColumn, actionColumn, actionColumn">
                     <h:column headerClass="left">
                         <f:facet name="header">
