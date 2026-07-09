@@ -9,6 +9,7 @@ import com.encens.khipus.model.employees.GestionPayroll;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.production.MetaProduct;
+import com.encens.khipus.model.production.PayRollType;
 import com.encens.khipus.model.production.Periodo;
 import com.encens.khipus.model.production.ProductiveZone;
 import com.encens.khipus.model.production.RawMaterialPayRoll;
@@ -210,11 +211,15 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
      */
     @Override
     protected List<String> getRestrictions() {
+        // Seam exige exactamente un value binding #{...} por restriccion; por eso se
+        // bindea el tipo por EL (getReportType) en vez de un literal del enum.
         List<String> result = new ArrayList<String>(Arrays.asList(restrictions));
-        result.add(excess
-                ? "rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.EXCEDENTE"
-                : "rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL");
+        result.add("rawMaterialPayRoll.type = #{rawMaterialGeneralPayRollReportAction.reportType}");
         return result;
+    }
+
+    public PayRollType getReportType() {
+        return excess ? PayRollType.EXCEDENTE : PayRollType.NORMAL;
     }
 
     public boolean isExcess() {
