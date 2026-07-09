@@ -460,6 +460,19 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     }*/
 
     public Gestion getGestion() {
+        // Default solo si aun no hay seleccion (primer render): la gestion de la
+        // planilla si es existente, o la ultima gestion. Asi los precios vigentes
+        // se resuelven ya en la primera entrada, sin esperar a que el usuario
+        // cambie el combo.
+        if (gestion == null) {
+            if (getInstance().getId() != null && getInstance().getStartDate() != null) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(getInstance().getStartDate());
+                gestion = gestionService.getGestion(cal.get(Calendar.YEAR));
+            } else {
+                gestion = gestionService.getLastGestion();
+            }
+        }
         return gestion;
     }
 
@@ -571,17 +584,18 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
      *  panel de generacion). null si aun no se elige gestion o no hay config vigente.
      *  Memoiza por (gestion, mes, periodo) para no consultar la BD en cada acceso del render. */
     public MilkPriceConfig getCurrentPriceConfig() {
-        if (gestion == null) {
+        Gestion g = getGestion();
+        if (g == null) {
             return null;
         }
         Month m = getMonth();
         Periodo p = getPeriodo();
-        String key = gestion.getYear() + "-" + m.getValue() + "-" + p.name();
+        String key = g.getYear() + "-" + m.getValue() + "-" + p.name();
         if (!key.equals(cachedPriceKey)) {
             Calendar ini = Calendar.getInstance();
             Calendar fin = Calendar.getInstance();
-            ini.set(gestion.getYear(), m.getValue(), p.getInitDay());
-            fin.set(gestion.getYear(), m.getValue(), p.getEndDay(m.getValue() + 1, gestion.getYear()));
+            ini.set(g.getYear(), m.getValue(), p.getInitDay());
+            fin.set(g.getYear(), m.getValue(), p.getEndDay(m.getValue() + 1, g.getYear()));
             cachedPriceConfig = milkPriceConfigService.findVigente(ini.getTime(), fin.getTime());
             cachedPriceKey = key;
         }
