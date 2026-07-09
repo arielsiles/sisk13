@@ -22,12 +22,8 @@ public class ProducerCollectionRestrictionAction extends GenericAction<ProducerC
 
     @Factory(value = "producerCollectionRestriction", scope = ScopeType.STATELESS)
     public ProducerCollectionRestriction initProducerCollectionRestriction() {
-        if (getInstance().getMaxLitersPerDay() == null) {
-            getInstance().setMaxLitersPerDay(80.0);
-            getInstance().setExcessPriceWeekday(4.0);
-            getInstance().setExcessPriceSunday(4.0);
-            getInstance().setState("ENABLE");
-        }
+        // Los valores por defecto (cupo 80, precios 4.00, estado ENABLE) vienen de
+        // los inicializadores de campo de la entidad, para no clobbear en postback.
         return getInstance();
     }
 

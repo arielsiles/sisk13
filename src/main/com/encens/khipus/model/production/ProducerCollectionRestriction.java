@@ -35,13 +35,13 @@ public class ProducerCollectionRestriction implements BaseModel {
     private RawMaterialProducer rawMaterialProducer;
 
     @Column(name = "cupolitrosdia", columnDefinition = "DECIMAL(16,2)", nullable = false)
-    private Double maxLitersPerDay;
+    private double maxLitersPerDay = 80.0;
 
     @Column(name = "precioexcedentehabil", columnDefinition = "DECIMAL(9,2)", nullable = false)
-    private Double excessPriceWeekday;
+    private double excessPriceWeekday = 4.0;
 
     @Column(name = "precioexcedentedomingo", columnDefinition = "DECIMAL(9,2)", nullable = false)
-    private Double excessPriceSunday;
+    private double excessPriceSunday = 4.0;
 
     @Column(name = "fechaini", columnDefinition = "DATE", nullable = false)
     private Date startDate;
@@ -50,7 +50,7 @@ public class ProducerCollectionRestriction implements BaseModel {
     private Date endDate;
 
     @Column(name = "estado", columnDefinition = "VARCHAR(10)", nullable = false)
-    private String state;
+    private String state = "ENABLE";
 
     public Long getId() {
         return id;
@@ -68,27 +68,27 @@ public class ProducerCollectionRestriction implements BaseModel {
         this.rawMaterialProducer = rawMaterialProducer;
     }
 
-    public Double getMaxLitersPerDay() {
+    public double getMaxLitersPerDay() {
         return maxLitersPerDay;
     }
 
-    public void setMaxLitersPerDay(Double maxLitersPerDay) {
+    public void setMaxLitersPerDay(double maxLitersPerDay) {
         this.maxLitersPerDay = maxLitersPerDay;
     }
 
-    public Double getExcessPriceWeekday() {
+    public double getExcessPriceWeekday() {
         return excessPriceWeekday;
     }
 
-    public void setExcessPriceWeekday(Double excessPriceWeekday) {
+    public void setExcessPriceWeekday(double excessPriceWeekday) {
         this.excessPriceWeekday = excessPriceWeekday;
     }
 
-    public Double getExcessPriceSunday() {
+    public double getExcessPriceSunday() {
         return excessPriceSunday;
     }
 
-    public void setExcessPriceSunday(Double excessPriceSunday) {
+    public void setExcessPriceSunday(double excessPriceSunday) {
         this.excessPriceSunday = excessPriceSunday;
     }
 

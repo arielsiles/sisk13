@@ -13,9 +13,7 @@ import java.util.List;
 @Scope(ScopeType.PAGE)
 public class ProducerCollectionRestrictionDataModel extends QueryDataModel<Long, ProducerCollectionRestriction> {
 
-    private static final String[] RESTRICTIONS = {
-            "producerCollectionRestriction.state = #{producerCollectionRestrictionDataModel.criteria.state}"
-    };
+    private static final String[] RESTRICTIONS = {};
 
     @Override
     public String getEjbql() {
