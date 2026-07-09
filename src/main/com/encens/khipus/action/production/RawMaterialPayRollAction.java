@@ -14,6 +14,7 @@ import com.encens.khipus.model.production.*;
 import com.encens.khipus.service.employees.GestionService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.CollectedRawMaterialCalculatorService;
+import com.encens.khipus.service.production.ProducerCollectionRestrictionService;
 import com.encens.khipus.service.production.ProductiveZoneService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
 import com.encens.khipus.util.Constants;
@@ -69,6 +70,10 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     /** @Claude OPT-6: Inyeccion de servicio para pre-calcular peso total quincenal **/
     @In
     private CollectedRawMaterialCalculatorService collectedRawMaterialCalculatorService;
+
+    /** Excedentes de acopio: config de cupo/precios por productor. **/
+    @In
+    private ProducerCollectionRestrictionService producerCollectionRestrictionService;
 
     @Override
     protected GenericService getService() {
@@ -239,6 +244,10 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
             Map<Long, ProducerTax> producerTaxCache = rawMaterialPayRollService.preloadProducerTaxes(
                     rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
+            /** Excedentes de acopio (Modelo A): config de cupo/precios por productor. **/
+            Map<Long, ProducerCollectionRestriction> restrictionCache = producerCollectionRestrictionService.preloadRestrictions(
+                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+
             for (ProductiveZone zone : productiveZones) {
                 if (zone.getGroup().equals("ILVA")) {
                     RawMaterialPayRoll payRoll = new RawMaterialPayRoll();
@@ -253,7 +262,7 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                     payRoll.setIue(rawMaterialPayRoll.getIue());
 
                     rawMaterialPayRollService.validate(payRoll);
-                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight, producerTaxCache, getDayFilter());
+                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight, producerTaxCache, restrictionCache, getDayFilter());
                     rawMaterialPayRollService.createAll(payRoll);
 
                     for (int i = 0; i < payRoll.getRawMaterialPayRecordList().size(); i++) {
@@ -262,6 +271,27 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                             String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
                             facesMessages.add(StatusMessage.Severity.ERROR,
                                 "Liquido pagable negativo: " + producerName + " (" + zone.getFullName() + ") = " + rec.getLiquidPayable() + " Bs");
+                        }
+                    }
+
+                    /** Planilla de EXCEDENTE de la misma zona y tipo de dia (habil/domingo).
+                     *  Requiere dayFilter 1/2 para elegir el precio de excedente. Solo se
+                     *  persiste si hay excedente (algun productor supero su cupo). **/
+                    if (getDayFilter() != 0 && !restrictionCache.isEmpty()) {
+                        RawMaterialPayRoll excessPayRoll = new RawMaterialPayRoll();
+                        excessPayRoll.setEndDate(rawMaterialPayRoll.getEndDate());
+                        excessPayRoll.setStartDate(rawMaterialPayRoll.getStartDate());
+                        excessPayRoll.setCompany(rawMaterialPayRoll.getCompany());
+                        excessPayRoll.setMetaProduct(rawMaterialPayRoll.getMetaProduct());
+                        excessPayRoll.setUnitPrice(rawMaterialPayRoll.getUnitPrice());
+                        excessPayRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
+                        excessPayRoll.setProductiveZone(zone);
+                        excessPayRoll.setIt(rawMaterialPayRoll.getIt());
+                        excessPayRoll.setIue(rawMaterialPayRoll.getIue());
+
+                        rawMaterialPayRollService.generateExcessPayroll(excessPayRoll, restrictionCache, getDayFilter());
+                        if (!excessPayRoll.getRawMaterialPayRecordList().isEmpty()) {
+                            rawMaterialPayRollService.createAll(excessPayRoll);
                         }
                     }
                 }

@@ -152,17 +152,23 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     }
 
     @Override
-    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, Map<Long, ProducerTax> producerTaxCache, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException {
+    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, Map<Long, ProducerTax> producerTaxCache, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException {
+        /** Excedentes de acopio (Modelo A): se topa la cantidad pagable de cada productor
+         *  con restriccion vigente y se calcula el excedente por dia/GAB. El excedente se
+         *  paga en su propia planilla (EXCEDENTE); aqui solo se paga la leche normal (<=cupo). **/
+        CappedCollection capped = buildCappedCollection(rawMaterialPayRoll, restrictionCache, dayFilter);
+
         Double totalReservaGAB = 0.0;
         if(discountProducer != null && dayFilter != 2) {
-            Double totalWeightFortnightGAB = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), rawMaterialPayRoll.getProductiveZone(), dayFilter);
-            Double percentageReserveGAB = ((totalWeightFortnightGAB * 100) / totalWeightFortnight) / 100;
+            // Reserva sobre leche NORMAL: se resta el excedente del peso de la GAB.
+            Double totalWeightFortnightGAB = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), rawMaterialPayRoll.getProductiveZone(), dayFilter) - capped.totalExcess;
+            Double percentageReserveGAB = (totalWeightFortnight == 0.0) ? 0.0 : ((totalWeightFortnightGAB * 100) / totalWeightFortnight) / 100;
             totalReservaGAB = (RoundUtil.getRoundValue(totalWeightFortnight * discountProducer.getReserve(), 2, RoundUtil.RoundMode.SYMMETRIC) * rawMaterialPayRoll.getUnitPrice()) * percentageReserveGAB;
         }
 
         Map<Date, Double> differences = createMapOfDifferencesWeights(rawMaterialPayRoll, dayFilter);
 
-        Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache, dayFilter);
+        Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache, capped, dayFilter);
         Double alcoholByGAB = (dayFilter == 2) ? 0.0 : salaryMovementGABService.getAlcoholBayGAB(rawMaterialPayRoll.getProductiveZone(), rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
         /** @Claude OPT-4: Pre-carga batch de descuentos por zona en vez de por productor **/
@@ -298,6 +304,79 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         rawMaterialPayRoll.setTotalOtherIncomeByGAB(totalIncome);
         rawMaterialPayRoll.setTotalGA(totalGA);
         rawMaterialPayRoll.setTotalCommission(totalCommission);
+        return rawMaterialPayRoll;
+    }
+
+    @Override
+    public RawMaterialPayRoll generateExcessPayroll(RawMaterialPayRoll rawMaterialPayRoll, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter) throws RawMaterialPayRollException {
+        rawMaterialPayRoll.setType(PayRollType.EXCEDENTE);
+        CappedCollection capped = buildCappedCollection(rawMaterialPayRoll, restrictionCache, dayFilter);
+
+        Double totalAmount = 0.0;
+        Double totalMount = 0.0;
+        Double totalLiquid = 0.0;
+
+        for (Map.Entry<Long, Double> entry : capped.excessByProducer.entrySet()) {
+            Long producerId = entry.getKey();
+            Double excessQty = entry.getValue();
+            if (excessQty == null || excessQty <= 0.0) continue;
+
+            ProducerCollectionRestriction restriction = (restrictionCache == null) ? null : restrictionCache.get(producerId);
+            if (restriction == null) continue;
+            Double price = (dayFilter == 2) ? restriction.getExcessPriceSunday() : restriction.getExcessPriceWeekday();
+
+            Double amount = RoundUtil.getRoundValue(excessQty, 2, RoundUtil.RoundMode.SYMMETRIC);
+            Double earned = RoundUtil.getRoundValue(excessQty * price, 2, RoundUtil.RoundMode.SYMMETRIC);
+
+            RawMaterialPayRecord record = new RawMaterialPayRecord();
+            record.setTotalAmount(amount);
+            record.setProductiveZoneAdjustment(0.0);
+            record.setEarnedMoney(earned);
+            record.setTotalPayCollected(earned);
+            record.setDiscountReserve(0.0);
+            record.setDiscountGA(0.0);
+            record.setLiquidPayable(earned);
+
+            // Planilla EXCEDENTE pura: sin retencion ni descuentos (todo en 0).
+            RawMaterialProducerDiscount discount = new RawMaterialProducerDiscount();
+            discount.setRawMaterialProducer(capped.producers.get(producerId));
+            discount.setConcentrated(0.0);
+            discount.setCommission(0.0);
+            discount.setYogurt(0.0);
+            discount.setVeterinary(0.0);
+            discount.setCredit(0.0);
+            discount.setCans(0.0);
+            discount.setOtherDiscount(0.0);
+            discount.setOtherIncoming(0.0);
+            discount.setAlcohol(0.0);
+            discount.setWithholdingTax(0.0);
+            discount.setRawMaterialPayRecord(record);
+            record.setRawMaterialProducerDiscount(discount);
+
+            record.setRawMaterialPayRoll(rawMaterialPayRoll);
+            rawMaterialPayRoll.getRawMaterialPayRecordList().add(record);
+
+            totalAmount += amount;
+            totalMount += earned;
+            totalLiquid += earned;
+        }
+
+        rawMaterialPayRoll.setTotalCollectedByGAB(RoundUtil.getRoundValue(totalAmount, 2, RoundUtil.RoundMode.SYMMETRIC));
+        rawMaterialPayRoll.setTotalMountCollectdByGAB(RoundUtil.getRoundValue(totalMount, 2, RoundUtil.RoundMode.SYMMETRIC));
+        rawMaterialPayRoll.setTotalLiquidByGAB(RoundUtil.getRoundValue(totalLiquid, 2, RoundUtil.RoundMode.SYMMETRIC));
+        rawMaterialPayRoll.setTotalRetentionGAB(0.0);
+        rawMaterialPayRoll.setTotalReserveDicount(0.0);
+        rawMaterialPayRoll.setTotalCreditByGAB(0.0);
+        rawMaterialPayRoll.setTotalAlcoholByGAB(0.0);
+        rawMaterialPayRoll.setTotalConcentratedByGAB(0.0);
+        rawMaterialPayRoll.setTotalVeterinaryByGAB(0.0);
+        rawMaterialPayRoll.setTotalYogourdByGAB(0.0);
+        rawMaterialPayRoll.setTotalRecipByGAB(0.0);
+        rawMaterialPayRoll.setTotalOtherDiscountByGAB(0.0);
+        rawMaterialPayRoll.setTotalAdjustmentByGAB(0.0);
+        rawMaterialPayRoll.setTotalOtherIncomeByGAB(0.0);
+        rawMaterialPayRoll.setTotalGA(0.0);
+        rawMaterialPayRoll.setTotalCommission(0.0);
         return rawMaterialPayRoll;
     }
 
@@ -491,6 +570,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " where rawMaterialPayRoll.startDate =:fechaIni" +
                 " and rawMaterialPayRoll.endDate =:fechaFin" +
                 " and rawMaterialPayRecord.liquidPayable > 0" +
+                " and rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL" +
                 " and rawMaterialPayRoll.metaProduct =:metaProduct";
         if(rawMaterialProducer!=null)
         {
@@ -571,6 +651,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " where rawMaterialPayRoll.startDate >= :fechaIni" +
                 " and rawMaterialPayRoll.endDate <= :fechaFin" +
                 " and rawMaterialPayRecord.liquidPayable > 0" +
+                " and rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL" +
                 " and rawMaterialPayRoll.metaProduct =:metaProduct " +
                 " group by rawMaterialProducer.firstName, rawMaterialProducer.lastName, rawMaterialProducer.maidenName, rawMaterialPayRoll.unitPrice, productiveZone.name, rawMaterialProducer.idNumber ";
 
@@ -890,51 +971,47 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return result;
     }
 
-    /** @Claude OPT-2, OPT-3: Parametro producerTaxCache para evitar lazy loading N+1 **/
-    private Map<Long, Aux> createMapOfProducers(RawMaterialPayRoll rawMaterialPayRoll, Map<Date, Double> differences, Double totalReservaGAB, DiscountProducer discountProducer, Map<Long, ProducerTax> producerTaxCache, int dayFilter) throws RawMaterialPayRollException {
+    /** @Claude OPT-2, OPT-3: producerTaxCache evita N+1. Excedentes (Modelo A): usa la
+     *  coleccion topada (CappedCollection) -> paga la leche NORMAL (<=cupo) por productor. **/
+    private Map<Long, Aux> createMapOfProducers(RawMaterialPayRoll rawMaterialPayRoll, Map<Date, Double> differences, Double totalReservaGAB, DiscountProducer discountProducer, Map<Long, ProducerTax> producerTaxCache, CappedCollection capped, int dayFilter) throws RawMaterialPayRollException {
         double taxRate = rawMaterialPayRoll.getTaxRate() / 100;
-        List<Object[]> collectedProducers = find("RawMaterialPayRoll.findCollectedAmountByMetaProductBetweenDates", rawMaterialPayRoll);
         Map<Long, Aux> map = new HashMap<Long, Aux>();
         Double totalMoneyCollectedByGab = 0.0;
 
         /** @Claude OPT-2: Cache de licencia fiscal por productor para evitar N+1 queries **/
         Map<Long, Boolean> licenseCache = new HashMap<Long, Boolean>();
 
-        for (Object[] obj : collectedProducers) {
-            Date date = (Date) obj[0];
-            if (!shouldIncludeDate(date, dayFilter)) continue;
-            RawMaterialProducer rawMaterialProducer = (RawMaterialProducer) obj[1];
-            Double amount = (Double) obj[2];
+        for (Map.Entry<Long, Double> entry : capped.normalByProducer.entrySet()) {
+            Long producerId = entry.getKey();
+            Double normalAmount = entry.getValue();
+            if (normalAmount == null || normalAmount <= 0.0) continue;
 
-            Aux aux = map.get(rawMaterialProducer.getId());
-            if (aux == null) {
-                aux = new Aux();
-                aux.producer = rawMaterialProducer;
-                map.put(rawMaterialProducer.getId(), aux);
-            }
+            RawMaterialProducer rawMaterialProducer = capped.producers.get(producerId);
+            Aux aux = new Aux();
+            aux.producer = rawMaterialProducer;
+            map.put(producerId, aux);
 
-            Double earned = amount * rawMaterialPayRoll.getUnitPrice();
+            Double earned = normalAmount * rawMaterialPayRoll.getUnitPrice();
 
-            /** @Claude OPT-2: Usa cache de licencia en vez de recalcular por cada fila **/
-            Boolean hasLic = licenseCache.get(rawMaterialProducer.getId());
+            /** @Claude OPT-2/3: cache de licencia + ProducerTax pre-cargado **/
+            Boolean hasLic = licenseCache.get(producerId);
             if (hasLic == null) {
-                /** @Claude OPT-3: Usa ProducerTax pre-cargado en vez de lazy loading **/
-                ProducerTax producerTax = producerTaxCache.get(rawMaterialProducer.getId());
-                hasLic = hasLicenseFromTax(producerTax);
-                licenseCache.put(rawMaterialProducer.getId(), hasLic);
+                hasLic = hasLicenseFromTax(producerTaxCache.get(producerId));
+                licenseCache.put(producerId, hasLic);
             }
+            // taxRate es constante por productor -> retencion sobre el ganado NORMAL
             Double withholding = (dayFilter == 2) ? 0.0 : (hasLic ? 0.0 : earned * taxRate);
 
-            aux.collectedAmount += amount;
-            aux.earnedMoney += earned;
-            aux.collectedTotalMoney += earned;
-            aux.withholdingTax += withholding;
-            aux.discountGA += (dayFilter == 2) ? 0.0 : amount * Constants.DISCOUNT_GA;
+            aux.collectedAmount = normalAmount;
+            aux.earnedMoney = earned;
+            aux.collectedTotalMoney = earned;
+            aux.withholdingTax = withholding;
+            aux.discountGA = (dayFilter == 2) ? 0.0 : normalAmount * Constants.DISCOUNT_GA;
 
             totalMoneyCollectedByGab += earned;
         }
 
-        /** @Claude OPT-7: Consolidacion de addProrationAlcohol + addProrationPorcentaje + addReserveDiscountPorcentaje en una sola iteracion **/
+        /** @Claude OPT-7: Consolidacion de prorrateos en una sola iteracion **/
         applyProrations(map, rawMaterialPayRoll, totalMoneyCollectedByGab, getDiffMoneyTotalGab(differences), totalReservaGAB, discountProducer);
 
         // R7. Excluir productores sin acopio: no generar registros ni aplicar descuentos
@@ -946,6 +1023,73 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         }
 
         return map;
+    }
+
+    /**
+     * Excedentes de acopio (Modelo A). Agrega el acopio real por (productor, dia),
+     * aplica el cupo diario del productor (si tiene restriccion vigente) y separa:
+     *  - normalByProducer: suma de min(dia, cupo) -> lo que paga la planilla NORMAL
+     *  - excessByProducer: suma de max(dia - cupo, 0) -> lo que paga la planilla EXCEDENTE
+     *  - excessByDay / totalExcess: excedente por dia y total de la GAB (para la reserva).
+     * Sin restriccion vigente, normal = total y excedente = 0 (comportamiento actual).
+     */
+    private CappedCollection buildCappedCollection(RawMaterialPayRoll rawMaterialPayRoll, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter) {
+        CappedCollection cc = new CappedCollection();
+        List<Object[]> collectedProducers = find("RawMaterialPayRoll.findCollectedAmountByMetaProductBetweenDates", rawMaterialPayRoll);
+
+        // 1) Totales por (productor, dia)
+        Map<Long, Map<Date, Double>> daily = new HashMap<Long, Map<Date, Double>>();
+        for (Object[] obj : collectedProducers) {
+            Date date = (Date) obj[0];
+            if (!shouldIncludeDate(date, dayFilter)) continue;
+            RawMaterialProducer producer = (RawMaterialProducer) obj[1];
+            Double amount = (Double) obj[2];
+
+            cc.producers.put(producer.getId(), producer);
+            Map<Date, Double> byDay = daily.get(producer.getId());
+            if (byDay == null) {
+                byDay = new HashMap<Date, Double>();
+                daily.put(producer.getId(), byDay);
+            }
+            Double prev = byDay.get(date);
+            byDay.put(date, (prev == null ? 0.0 : prev) + amount);
+        }
+
+        // 2) Aplica cupo por dia
+        for (Map.Entry<Long, Map<Date, Double>> e : daily.entrySet()) {
+            Long producerId = e.getKey();
+            ProducerCollectionRestriction restriction = (restrictionCache == null) ? null : restrictionCache.get(producerId);
+            Double cap = (restriction == null) ? null : restriction.getMaxLitersPerDay();
+
+            double normalSum = 0.0;
+            double excessSum = 0.0;
+            for (Map.Entry<Date, Double> d : e.getValue().entrySet()) {
+                double dailyTotal = d.getValue();
+                double normal = (cap != null && dailyTotal > cap) ? cap : dailyTotal;
+                double excess = dailyTotal - normal;
+                normalSum += normal;
+                if (excess > 0.0) {
+                    excessSum += excess;
+                    Double pd = cc.excessByDay.get(d.getKey());
+                    cc.excessByDay.put(d.getKey(), (pd == null ? 0.0 : pd) + excess);
+                    cc.totalExcess += excess;
+                }
+            }
+            cc.normalByProducer.put(producerId, normalSum);
+            if (excessSum > 0.0) {
+                cc.excessByProducer.put(producerId, excessSum);
+            }
+        }
+        return cc;
+    }
+
+    /** Resultado del topado por cupo (Modelo A) para una GAB/periodo. */
+    class CappedCollection {
+        public Map<Long, RawMaterialProducer> producers = new HashMap<Long, RawMaterialProducer>();
+        public Map<Long, Double> normalByProducer = new HashMap<Long, Double>();
+        public Map<Long, Double> excessByProducer = new HashMap<Long, Double>();
+        public Map<Date, Double> excessByDay = new HashMap<Date, Double>();
+        public double totalExcess = 0.0;
     }
 
     private boolean shouldIncludeDate(Date date, int dayFilter) {
@@ -1414,6 +1558,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 "from RawMaterialPayRoll rawMaterialPayRoll " +
                 "where rawMaterialPayRoll.startDate = :startDate " +
                 "and rawMaterialPayRoll.endDate <=  :endDate"
+                + " and rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL "
                 + restricZone + restricMeta
                 + " GROUP BY rawMaterialPayRoll.unitPrice,rawMaterialPayRoll.iue,rawMaterialPayRoll.it,rawMaterialPayRoll.taxRate ";
     }

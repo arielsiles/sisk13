@@ -20,7 +20,14 @@ public interface RawMaterialPayRollService extends GenericService {
 
     public List<DiscountProducer> findDiscountsProducerByDate(Date date);
 
-    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, Map<Long, ProducerTax> producerTaxCache, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException;
+    public RawMaterialPayRoll generatePayroll(RawMaterialPayRoll rawMaterialPayRoll, DiscountProducer discountProducer, Double totalWeightFortnight, Map<Long, ProducerTax> producerTaxCache, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter) throws EntryNotFoundException, RawMaterialPayRollException;
+
+    /**
+     * Genera una planilla de EXCEDENTE (pura): paga solo el excedente de cada
+     * productor restringido al precio de excedente configurado (habil/domingo,
+     * segun dayFilter), sin ajuste, reserva, alcohol, descuentos ni retencion.
+     */
+    public RawMaterialPayRoll generateExcessPayroll(RawMaterialPayRoll rawMaterialPayRoll, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter) throws RawMaterialPayRollException;
 
     Map<Long, ProducerTax> preloadProducerTaxes(Date startDate, Date endDate);
 

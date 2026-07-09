@@ -240,6 +240,10 @@ public class RawMaterialPayRoll implements BaseModel {
     @Enumerated(EnumType.STRING)
     private StatePayRoll state = StatePayRoll.PENDING;
 
+    @Column(name = "tipoplanilla", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private PayRollType type = PayRollType.NORMAL;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -344,6 +348,14 @@ public class RawMaterialPayRoll implements BaseModel {
 
     public void setState(StatePayRoll state) {
         this.state = state;
+    }
+
+    public PayRollType getType() {
+        return type;
+    }
+
+    public void setType(PayRollType type) {
+        this.type = type;
     }
 
     public long getVersion() {

@@ -58,3 +58,15 @@ WHERE tabla = 'funcionalidad';
 -- INSERT INTO derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo)
 -- SELECT f.idfuncionalidad, 1, 15, 1, f.idmodulo FROM funcionalidad f
 --  WHERE f.codigo = 'PRODUCERCOLLECTIONRESTRICTION';
+
+-- ============================================================================
+-- FASE 3: tipo de planilla (NORMAL / EXCEDENTE)
+-- ============================================================================
+-- Discrimina la planilla normal de la de excedentes. Las planillas existentes
+-- quedan como NORMAL (default), asi la generacion actual no cambia.
+-- Requiere ejecutarse antes de desplegar (hbm2ddl.auto=validate).
+ALTER TABLE planillapagomateriaprima
+    ADD COLUMN tipoplanilla VARCHAR(20) NOT NULL DEFAULT 'NORMAL';
+
+UPDATE planillapagomateriaprima SET tipoplanilla = 'NORMAL'
+ WHERE tipoplanilla IS NULL OR tipoplanilla = '';
