@@ -18,7 +18,8 @@
         </c:otherwise>
     </c:choose>
 </ui:define>
-<ui:param name="bodyWidth" value="100%"/>
+<ui:param name="bodyWidth" value="80%"/>
+<ui:param name="bodyAlign" value="center"/>
 <ui:param name="selectedTab" value="products"/>
 <ui:define name="body">
 <style type="text/css">
@@ -85,6 +86,8 @@
                                    label="#{gestion.year}"
                                    hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
+                    <a4j:support event="onchange" reRender="priceConfigPanel" ajaxSingle="true"
+                                 process="gestion,month,periodo"/>
                 </h:selectOneMenu>
             </s:decorate>
 
@@ -99,6 +102,8 @@
                                    label="#{messages[month.resourceKey]}"
                                    hideNoSelectionLabel="false"/>
                     <s:convertEnum/>
+                    <a4j:support event="onchange" reRender="priceConfigPanel" ajaxSingle="true"
+                                 process="gestion,month,periodo"/>
                 </h:selectOneMenu>
             </s:decorate>
 
@@ -112,6 +117,8 @@
                                    label="#{messages[periodos.resourceKey]}"
                                    hideNoSelectionLabel="false"/>
                     <s:convertEnum/>
+                    <a4j:support event="onchange" reRender="priceConfigPanel" ajaxSingle="true"
+                                 process="gestion,month,periodo"/>
                 </h:selectOneMenu>
             </s:decorate>
 
@@ -137,6 +144,36 @@
                     <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:inputText>
             </s:decorate>
+
+            <!-- Precios que se aplicaran al generar (config global vigente para el periodo). -->
+            <a4j:outputPanel id="priceConfigPanel" layout="block">
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{!rawMaterialPayRollAction.managed}">
+                    <ui:define name="label">#{messages['RawMaterialPayRoll.currentPriceConfig']}</ui:define>
+                    <h:panelGrid columns="2" cellpadding="1" cellspacing="0"
+                                 rendered="#{rawMaterialPayRollAction.currentPriceConfig != null}">
+                        <h:outputText value="#{messages['MilkPriceConfig.priceWeekday']}:"/>
+                        <h:outputText value="#{rawMaterialPayRollAction.currentPriceConfig.priceWeekday}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                        <h:outputText value="#{messages['MilkPriceConfig.priceSunday']}:"/>
+                        <h:outputText value="#{rawMaterialPayRollAction.currentPriceConfig.priceSunday}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                        <h:outputText value="#{messages['MilkPriceConfig.excessPriceWeekday']}:"/>
+                        <h:outputText value="#{rawMaterialPayRollAction.currentPriceConfig.excessPriceWeekday}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                        <h:outputText value="#{messages['MilkPriceConfig.excessPriceSunday']}:"/>
+                        <h:outputText value="#{rawMaterialPayRollAction.currentPriceConfig.excessPriceSunday}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </h:panelGrid>
+                    <h:outputText value="#{messages['MilkPriceConfig.error.notFound']}"
+                                  style="color:#c00000;font-weight:bold;"
+                                  rendered="#{rawMaterialPayRollAction.currentPriceConfig == null}"/>
+                </s:decorate>
+            </a4j:outputPanel>
 
         </s:div>
 

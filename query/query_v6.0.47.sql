@@ -105,21 +105,22 @@ INSERT INTO secuencia (tabla, valor)
 
 -- 4.3) Funcionalidad / permiso del catalogo de precios ----------------------
 --   Bitmask permiso: VIEW=1, CREATE=2, UPDATE=4, DELETE=8. CRUD completo = 15.
---   idmodulo se toma del mismo modulo de Produccion (RESERVPRODUCERMILK).
+--   Se precalcula en variables: el INSERT no lee la tabla destino (evita el
+--   error 1093 de MySQL y las subconsultas anidadas). @idmod se toma del modulo
+--   de Produccion (RESERVPRODUCERMILK); si no existe, el INSERT no hace nada.
+SET @idmod  = (SELECT idmodulo FROM funcionalidad WHERE codigo = 'RESERVPRODUCERMILK' LIMIT 1);
+SET @newid  = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+SET @existe = (SELECT COUNT(*) FROM funcionalidad WHERE codigo = 'MILKPRICECONFIG');
+
 INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
-SELECT
-    (SELECT MAX(t.idfuncionalidad) + 1 FROM (SELECT idfuncionalidad FROM funcionalidad) t),
-    'MILKPRICECONFIG',
-    'Precios de Acopio de Leche (habil/domingo/excedente, con vigencia)',
-    (SELECT t2.idmodulo FROM (SELECT idmodulo, codigo FROM funcionalidad) t2 WHERE t2.codigo = 'RESERVPRODUCERMILK' LIMIT 1),
-    15,
-    'Functionality.production.milkPriceConfig',
-    1
+SELECT @newid, 'MILKPRICECONFIG',
+       'Precios de Acopio de Leche (habil/domingo/excedente, con vigencia)',
+       @idmod, 15, 'Functionality.production.milkPriceConfig', 1
 FROM dual
-WHERE NOT EXISTS (SELECT 1 FROM (SELECT codigo FROM funcionalidad) fx WHERE fx.codigo = 'MILKPRICECONFIG');
+WHERE @existe = 0 AND @idmod IS NOT NULL;
 
 -- Actualizar secuencia interna de funcionalidad
-UPDATE secuencia SET valor = (SELECT MAX(t.idfuncionalidad) + 1 FROM (SELECT idfuncionalidad FROM funcionalidad) t)
+UPDATE secuencia SET valor = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad)
 WHERE tabla = 'funcionalidad';
 
 -- Asignacion por defecto al rol Administrador (idrol=1). Descomentar si se requiere:

@@ -564,6 +564,30 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         this.editIT = editIT;
     }
 
+    private transient MilkPriceConfig cachedPriceConfig;
+    private transient String cachedPriceKey;
+
+    /** Config de precios vigente para el periodo seleccionado (para mostrarla en el
+     *  panel de generacion). null si aun no se elige gestion o no hay config vigente.
+     *  Memoiza por (gestion, mes, periodo) para no consultar la BD en cada acceso del render. */
+    public MilkPriceConfig getCurrentPriceConfig() {
+        if (gestion == null) {
+            return null;
+        }
+        Month m = getMonth();
+        Periodo p = getPeriodo();
+        String key = gestion.getYear() + "-" + m.getValue() + "-" + p.name();
+        if (!key.equals(cachedPriceKey)) {
+            Calendar ini = Calendar.getInstance();
+            Calendar fin = Calendar.getInstance();
+            ini.set(gestion.getYear(), m.getValue(), p.getInitDay());
+            fin.set(gestion.getYear(), m.getValue(), p.getEndDay(m.getValue() + 1, gestion.getYear()));
+            cachedPriceConfig = milkPriceConfigService.findVigente(ini.getTime(), fin.getTime());
+            cachedPriceKey = key;
+        }
+        return cachedPriceConfig;
+    }
+
     /** Construye una planilla base (fechas, zona, producto, impuestos) con el
      *  precio unitario dado. El tipo (NORMAL/EXCEDENTE) y el tipo de dia los fija
      *  el llamador. */
