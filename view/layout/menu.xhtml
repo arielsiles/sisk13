@@ -1713,6 +1713,14 @@
 
     <rich:menuItem submitMode="none"
                    styleClass="main-menu-item"
+                   rendered="#{s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','VIEW')}">
+        <s:link view="/production/producerCollectionRestrictionList.xhtml"
+                value="#{messages['menu.production.configuration.producerCollectionRestriction']}"
+                propagation="none"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none"
+                   styleClass="main-menu-item"
 
             >
         <s:link view="/production/processedProductList.xhtml"

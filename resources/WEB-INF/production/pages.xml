@@ -401,6 +401,26 @@
         </navigation>
     </page>
 
+    <page view-id="/production/producerCollectionRestrictionList.xhtml">
+        <restrict>#{s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{producerCollectionRestrictionAction.select(producerCollectionRestrictionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/producerCollectionRestriction.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/production/producerCollectionRestriction.xhtml"
+          no-conversation-view-id="/production/producerCollectionRestrictionList.xhtml">
+        <restrict>#{s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','VIEW')}</restrict>
+        <navigation>
+            <rule>
+                <redirect view-id="/production/producerCollectionRestrictionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/production/rawMaterialProducerList.xhtml">
         <end-conversation/>
         <navigation from-action="#{rawMaterialProducerAction.select(rawMaterialProducerItem)}">

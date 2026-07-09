@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ProducerCollectionRestriction.list']}</ui:define>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="producerCollectionRestrictionSearch">
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/producerCollectionRestriction.xhtml"
+                          styleClass="button" propagation="none"
+                          rendered="#{s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{producerCollectionRestrictionDataModel}" var="producerCollectionRestrictionItem"
+                            id="producerCollectionRestrictionList"
+                            rows="#{sessionUser.rowsPerPage}" width="100%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>#{messages['ProducerCollectionRestriction.producer']}</rich:column>
+                        <rich:column>#{messages['ProducerCollectionRestriction.maxLitersPerDay']}</rich:column>
+                        <rich:column>#{messages['ProducerCollectionRestriction.excessPriceWeekday']}</rich:column>
+                        <rich:column>#{messages['ProducerCollectionRestriction.excessPriceSunday']}</rich:column>
+                        <rich:column>#{messages['ProducerCollectionRestriction.startDate']}</rich:column>
+                        <rich:column>#{messages['ProducerCollectionRestriction.endDate']}</rich:column>
+                        <rich:column>#{messages['ProducerCollectionRestriction.state']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column><h:outputText value="#{producerCollectionRestrictionItem.rawMaterialProducer.fullName}"/></rich:column>
+                <rich:column><h:outputText value="#{producerCollectionRestrictionItem.maxLitersPerDay}"/></rich:column>
+                <rich:column><h:outputText value="#{producerCollectionRestrictionItem.excessPriceWeekday}"/></rich:column>
+                <rich:column><h:outputText value="#{producerCollectionRestrictionItem.excessPriceSunday}"/></rich:column>
+                <rich:column><h:outputText value="#{producerCollectionRestrictionItem.startDate}"/></rich:column>
+                <rich:column><h:outputText value="#{producerCollectionRestrictionItem.endDate}"/></rich:column>
+                <rich:column>
+                    <h:outputText value="#{producerCollectionRestrictionItem.state == 'ENABLE' ? messages['Common.enabled'] : messages['Common.disabled']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{producerCollectionRestrictionAction.select(producerCollectionRestrictionItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="producerCollectionRestrictionList"
+                              dataModel="#{producerCollectionRestrictionDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/producerCollectionRestriction.xhtml"
+                          styleClass="button" propagation="none"
+                          rendered="#{s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

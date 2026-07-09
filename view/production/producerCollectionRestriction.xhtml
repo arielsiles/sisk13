@@ -1,0 +1,154 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{producerCollectionRestrictionAction.managed}">#{messages['Common.edit']}</c:when>
+            <c:otherwise>#{messages['Common.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="55%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="producerCollectionRestrictionForm">
+            <div class="buttons">
+                <h:commandButton action="#{producerCollectionRestrictionAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!producerCollectionRestrictionAction.managed and s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{producerCollectionRestrictionAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{producerCollectionRestrictionAction.managed and s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                                 rendered="#{producerCollectionRestrictionAction.managed and s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{producerCollectionRestrictionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{producerCollectionRestrictionAction.managed}">#{messages['Common.edit']}</c:when>
+                        <c:otherwise>#{messages['Common.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="rawMaterialProducerField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProducerCollectionRestriction.producer']}</ui:define>
+                    <app:selectPopUp id="rawMaterialProducer"
+                                     required="true"
+                                     textValue="#{producerCollectionRestriction.rawMaterialProducer.fullName}"
+                                     value="#{producerCollectionRestriction.rawMaterialProducer}"
+                                     dataModel="#{rawMaterialProducerDataModel}"
+                                     clearAction="producerCollectionRestrictionAction.clearRawMaterialProducer()"
+                                     searchModalPanel="rawMaterialProducerListModalPanel"
+                                     reRender="rawMaterialProducerField"
+                                     readOnly="#{producerCollectionRestrictionAction.managed}"/>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProducerCollectionRestriction.maxLitersPerDay']}</ui:define>
+                    <h:inputText value="#{producerCollectionRestriction.maxLitersPerDay}" styleClass="input"
+                                 required="true" tabindex="2">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProducerCollectionRestriction.excessPriceWeekday']}</ui:define>
+                    <h:inputText value="#{producerCollectionRestriction.excessPriceWeekday}" styleClass="input"
+                                 required="true" tabindex="3">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProducerCollectionRestriction.excessPriceSunday']}</ui:define>
+                    <h:inputText value="#{producerCollectionRestriction.excessPriceSunday}" styleClass="input"
+                                 required="true" tabindex="4">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProducerCollectionRestriction.startDate']}</ui:define>
+                    <rich:calendar id="startDate" value="#{producerCollectionRestriction.startDate}" popup="true"
+                                   datePattern="#{messages['patterns.date']}" styleClass="input"
+                                   enableManualInput="true" required="true" tabindex="5">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProducerCollectionRestriction.endDate']}</ui:define>
+                    <rich:calendar id="endDate" value="#{producerCollectionRestriction.endDate}" popup="true"
+                                   datePattern="#{messages['patterns.date']}" styleClass="input"
+                                   enableManualInput="true" required="true" tabindex="6">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:div id="stateDiv">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ProducerCollectionRestriction.state']}</ui:define>
+                        <h:selectBooleanCheckbox id="stateField" value="#{producerCollectionRestrictionAction.state}"
+                                                 tabindex="7">
+                            <a4j:support event="onclick" ajaxSingle="true" reRender="stateDiv"/>
+                        </h:selectBooleanCheckbox>
+                    </s:decorate>
+                </s:div>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{producerCollectionRestrictionAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!producerCollectionRestrictionAction.managed and s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','CREATE')}"/>
+                <h:commandButton action="#{producerCollectionRestrictionAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{producerCollectionRestrictionAction.managed and s:hasPermission('PRODUCERCOLLECTIONRESTRICTION','UPDATE')}"/>
+                <h:commandButton action="#{producerCollectionRestrictionAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{producerCollectionRestrictionAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p><h:outputText value="#{messages['ProducerCollectionRestriction.delete.confirmation']}"/></p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{producerCollectionRestrictionAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true" styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="rawMaterialProducerModalPanelContainer"
+                    template="/production/searchRawMaterialProducerModalPanel.xhtml"
+                    rendered="#{not producerCollectionRestrictionAction.managed}">
+            <ui:param name="dialogId" value="rawMaterialProducerListModalPanel"/>
+            <ui:param name="dataModel" value="#{rawMaterialProducerDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{producerCollectionRestrictionAction.selectRawMaterialProducer(rawMaterialProducerItem)}"
+                                   image="/img/active.gif"
+                                   ajaxSingle="true"
+                                   reRender="rawMaterialProducerField"
+                                   oncomplete="Richfaces.hideModalPanel('rawMaterialProducerListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>
