@@ -119,43 +119,15 @@
 
         <s:div>
 
-            <a4j:region>
-            <s:decorate id="unitPriceField" template="/include/inputField.xhtml" styleClass="formRow">
+            <!-- Precio: se muestra solo al ver una planilla existente (dato historico).
+                 En la generacion los precios (habil/domingo/excedente) salen de la
+                 configuracion global vigente (Precios de Acopio de Leche). -->
+            <s:decorate id="unitPriceField" template="/include/inputField.xhtml" styleClass="formRow"
+                        rendered="#{rawMaterialPayRollAction.managed}">
                 <ui:define name="label">#{messages['RawMaterialPayRoll.unitPrice']}</ui:define>
-                <h:inputText value="#{rawMaterialPayRoll.unitPrice}" required="true"
-                             disabled="#{!rawMaterialPayRollAction.editPriceMilk}"
-                             readonly="#{!rawMaterialPayRollAction.editPriceMilk}">
+                <h:inputText value="#{rawMaterialPayRoll.unitPrice}" disabled="true" readonly="true">
                     <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:inputText>
-                <a4j:commandLink immediate="true" reRender="unitPriceField"
-                                 action="#{rawMaterialPayRollAction.setEditPriceMilk(true)}"
-                                 rendered="#{!rawMaterialPayRollAction.editPriceMilk}"
-                                 title="Editar" ajaxSingle="true">
-                    <h:graphicImage value="/img/edit3.png" styleClass="select-image-middle"/>
-                </a4j:commandLink>
-                <a4j:commandLink reRender="unitPriceField"
-                                 action="#{rawMaterialPayRollAction.setEditPriceMilk(false)}"
-                                 rendered="#{rawMaterialPayRollAction.editPriceMilk}"
-                                 title="Confirmar">
-                    <h:graphicImage value="/img/active.gif" styleClass="select-image-middle"/>
-                </a4j:commandLink>
-            </s:decorate>
-            </a4j:region>
-
-            <s:decorate id="dayFilterField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">Filtro dias</ui:define>
-                <h:selectBooleanCheckbox id="sinDomingos"
-                    value="#{rawMaterialPayRollAction.sinDomingos}"
-                    disabled="#{rawMaterialPayRollAction.managed}">
-                    <a4j:support event="onchange" reRender="dayFilterField" ajaxSingle="true"/>
-                </h:selectBooleanCheckbox>
-                <h:outputText value=" Sin domingos" style="margin-right:15px;"/>
-                <h:selectBooleanCheckbox id="soloDomingos"
-                    value="#{rawMaterialPayRollAction.soloDomingos}"
-                    disabled="#{rawMaterialPayRollAction.managed}">
-                    <a4j:support event="onchange" reRender="dayFilterField" ajaxSingle="true"/>
-                </h:selectBooleanCheckbox>
-                <h:outputText value=" Solo domingos"/>
             </s:decorate>
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">

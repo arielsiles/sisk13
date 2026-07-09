@@ -421,6 +421,26 @@
         </navigation>
     </page>
 
+    <page view-id="/production/milkPriceConfigList.xhtml">
+        <restrict>#{s:hasPermission('MILKPRICECONFIG','VIEW')}</restrict>
+        <end-conversation/>
+        <navigation from-action="#{milkPriceConfigAction.select(milkPriceConfigItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/milkPriceConfig.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/production/milkPriceConfig.xhtml"
+          no-conversation-view-id="/production/milkPriceConfigList.xhtml">
+        <restrict>#{s:hasPermission('MILKPRICECONFIG','VIEW')}</restrict>
+        <navigation>
+            <rule>
+                <redirect view-id="/production/milkPriceConfigList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/production/rawMaterialProducerList.xhtml">
         <end-conversation/>
         <navigation from-action="#{rawMaterialProducerAction.select(rawMaterialProducerItem)}">

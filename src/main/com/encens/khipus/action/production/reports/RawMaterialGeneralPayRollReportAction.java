@@ -8,6 +8,7 @@ import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.GestionPayroll;
 import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.finances.CompanyConfiguration;
+import com.encens.khipus.model.production.DayType;
 import com.encens.khipus.model.production.MetaProduct;
 import com.encens.khipus.model.production.PayRollType;
 import com.encens.khipus.model.production.Periodo;
@@ -87,6 +88,8 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
     private boolean soloDomingos;
     /** true -> genera la PLANILLA DE EXCEDENTES (tipo=EXCEDENTE); false -> planilla normal. */
     private boolean excess = false;
+    /** Tipo de dia de la planilla normal a reportar (HABIL / DOMINGO). Ignorado si excess. */
+    private DayType reportDayType = DayType.HABIL;
 
     private List<GestionPayroll> gestionPayrollList;
 
@@ -94,14 +97,26 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
     private GeneratedPayrollType generatedPayrollType = GeneratedPayrollType.OFFICIAL;
 
 
+    /** Boton "Planilla Habiles": planilla normal de dias habiles (NORMAL + HABIL). */
     public void generateReport() throws ParseException {
         this.excess = false;
+        this.reportDayType = DayType.HABIL;
+        this.groupByProperty = null;
         buildAndGenerate();
     }
 
-    /** Boton "Planilla de Excedentes": mismo periodo/filtros, pero tipo = EXCEDENTE. */
+    /** Boton "Planilla Domingos": planilla normal de domingos (NORMAL + DOMINGO). */
+    public void generateSundayReport() throws ParseException {
+        this.excess = false;
+        this.reportDayType = DayType.DOMINGO;
+        this.groupByProperty = null;
+        buildAndGenerate();
+    }
+
+    /** Boton "Planilla de Excedentes": tipo = EXCEDENTE, con columnas habil y domingo. */
     public void generateExcessReport() throws ParseException {
         this.excess = true;
+        this.groupByProperty = "rawMaterialProducer.idNumber, rawMaterialProducer.firstName, rawMaterialProducer.lastName, rawMaterialProducer.maidenName";
         buildAndGenerate();
     }
 
@@ -138,7 +153,14 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
         TypedReportData typedReportData;
         TypedReportData mostrar = new TypedReportData();
 
-        String title = excess ? "PLANILLA DE ACOPIO EXCEDENTES" : "PLANILLA DE PAGO A PRODUCTORES";
+        String title;
+        if (excess) {
+            title = "PLANILLA DE ACOPIO EXCEDENTES";
+        } else if (reportDayType == DayType.DOMINGO) {
+            title = "PLANILLA DE PAGO A PRODUCTORES - DOMINGOS";
+        } else {
+            title = "PLANILLA DE PAGO A PRODUCTORES";
+        }
 
         System.out.println("=====> PERIODO: " + periodo.getResourceKey().toString());
         params.put("reportTitle", title);
@@ -147,7 +169,7 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
         params.put("locationName", companyConfiguration.getLocationName());
         String periodoText = (periodo.getResourceKey().equals("Periodo.first") ? "1RA QUINCENA " : "2DA QUINCENA ")
                 + getMes(month).toUpperCase() + " " + gestion.getYear();
-        if (soloDomingos) {
+        if (!excess && reportDayType == DayType.DOMINGO) {
             List<Integer> sundayDays = collectedRawMaterialCalculatorService
                     .getSundayDaysWithCollection(startDate, endDate, metaProduct);
             StringBuilder sb = new StringBuilder(" - DOMINGOS ");
@@ -157,9 +179,18 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
             }
             periodoText += sb.toString();
         }
-        List<RawMaterialPayRoll> payRolls = rawMaterialPayRollService.findAll(startDate, endDate, metaProduct);
-        if (payRolls != null && !payRolls.isEmpty()) {
-            periodoText += "    Precio: " + String.format("%.2f", payRolls.get(0).getUnitPrice());
+        // Precio de referencia: para habiles/domingos se muestra el de la planilla
+        // de ese tipo de dia. Para excedentes el precio varia por productor (columnas).
+        if (!excess) {
+            List<RawMaterialPayRoll> payRolls = rawMaterialPayRollService.findAll(startDate, endDate, metaProduct);
+            if (payRolls != null) {
+                for (RawMaterialPayRoll pr : payRolls) {
+                    if (pr.getType() == PayRollType.NORMAL && pr.getDayType() == reportDayType) {
+                        periodoText += "    Precio: " + String.format("%.2f", pr.getUnitPrice());
+                        break;
+                    }
+                }
+            }
         }
         params.put("periodo", periodoText);
         params.put("startDate", df.format(dateIni.getTime()));
@@ -169,8 +200,11 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
         params.put("dateEnd", "Fecha Fin - " + FastDateFormat.getInstance("dd-MM-yyyy").format(dateEnd));
 
 
+        String jrxmlPath = excess
+                ? "/production/reports/rawMaterialExcessPayRollReport.jrxml"
+                : "/production/reports/rawMaterialGeneralPayRollReport.jrxml";
         typedReportData = super.getReport("RawMaterialPayRollReport",
-                "/production/reports/rawMaterialGeneralPayRollReport.jrxml",
+                jrxmlPath,
                 MessageUtils.getMessage("Report.rawMaterialPayRollReportAction"), params);
 
         jasperPrint1 = typedReportData.getJasperPrint();
@@ -189,6 +223,9 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
 
     @Override
     protected String getEjbql() {
+        if (excess) {
+            return getExcessEjbql();
+        }
         return "SELECT " +
                 " productiveZone.name as gab," +
                 " rawMaterialProducer.idNumber," +
@@ -206,6 +243,31 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
     }
 
     /**
+     * Pivote de excedentes por productor: consolida en columnas los litros y el
+     * total de dias habiles y de domingos (tipoplanilla = EXCEDENTE). El precio
+     * de cada bloque se deriva en el jrxml (total / litros).
+     * Orden de columnas (mapeadas por posicion COLUMN_1..7 en el jrxml):
+     *   1 CI, 2 Nombre, 3 litros habil, 4 total habil,
+     *   5 litros domingo, 6 total domingo, 7 total a pagar.
+     */
+    private String getExcessEjbql() {
+        String habil = "com.encens.khipus.model.production.DayType.HABIL";
+        String domingo = "com.encens.khipus.model.production.DayType.DOMINGO";
+        return "SELECT " +
+                " rawMaterialProducer.idNumber," +
+                " rawMaterialProducer.firstName || ' ' || rawMaterialProducer.lastName || ' ' || rawMaterialProducer.maidenName," +
+                " sum(case when rawMaterialPayRoll.dayType = " + habil + " then rawMaterialPayRecord.totalAmount else 0.0 end)," +
+                " sum(case when rawMaterialPayRoll.dayType = " + habil + " then rawMaterialPayRecord.totalPayCollected else 0.0 end)," +
+                " sum(case when rawMaterialPayRoll.dayType = " + domingo + " then rawMaterialPayRecord.totalAmount else 0.0 end)," +
+                " sum(case when rawMaterialPayRoll.dayType = " + domingo + " then rawMaterialPayRecord.totalPayCollected else 0.0 end)," +
+                " sum(rawMaterialPayRecord.totalPayCollected)" +
+                " FROM RawMaterialPayRecord rawMaterialPayRecord " +
+                " JOIN rawMaterialPayRecord.rawMaterialProducerDiscount rawMaterialProducerDiscount" +
+                " JOIN rawMaterialProducerDiscount.rawMaterialProducer rawMaterialProducer" +
+                " JOIN rawMaterialPayRecord.rawMaterialPayRoll rawMaterialPayRoll";
+    }
+
+    /**
      * Filtra por tipo de planilla: EXCEDENTE para el reporte de excedentes,
      * NORMAL para el reporte de pago (evita que el excedente figure en lo normal).
      */
@@ -215,11 +277,19 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
         // bindea el tipo por EL (getReportType) en vez de un literal del enum.
         List<String> result = new ArrayList<String>(Arrays.asList(restrictions));
         result.add("rawMaterialPayRoll.type = #{rawMaterialGeneralPayRollReportAction.reportType}");
+        // Habiles/domingos filtran ademas por tipo de dia; el excedente consolida ambos.
+        if (!excess) {
+            result.add("rawMaterialPayRoll.dayType = #{rawMaterialGeneralPayRollReportAction.reportDayType}");
+        }
         return result;
     }
 
     public PayRollType getReportType() {
         return excess ? PayRollType.EXCEDENTE : PayRollType.NORMAL;
+    }
+
+    public DayType getReportDayType() {
+        return reportDayType;
     }
 
     public boolean isExcess() {

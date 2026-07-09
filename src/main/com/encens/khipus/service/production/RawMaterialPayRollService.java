@@ -24,10 +24,11 @@ public interface RawMaterialPayRollService extends GenericService {
 
     /**
      * Genera una planilla de EXCEDENTE (pura): paga solo el excedente de cada
-     * productor restringido al precio de excedente configurado (habil/domingo,
-     * segun dayFilter), sin ajuste, reserva, alcohol, descuentos ni retencion.
+     * productor restringido, sin ajuste, reserva, alcohol, descuentos ni retencion.
+     * Precio de excedente = override negociado por el productor (&gt;0) o, si no,
+     * globalExcessPrice (precio de excedente global segun tipo de dia).
      */
-    public RawMaterialPayRoll generateExcessPayroll(RawMaterialPayRoll rawMaterialPayRoll, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter) throws RawMaterialPayRollException;
+    public RawMaterialPayRoll generateExcessPayroll(RawMaterialPayRoll rawMaterialPayRoll, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter, double globalExcessPrice) throws RawMaterialPayRollException;
 
     Map<Long, ProducerTax> preloadProducerTaxes(Date startDate, Date endDate);
 

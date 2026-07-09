@@ -244,6 +244,10 @@ public class RawMaterialPayRoll implements BaseModel {
     @Enumerated(EnumType.STRING)
     private PayRollType type = PayRollType.NORMAL;
 
+    @Column(name = "tipodia", nullable = false, length = 10)
+    @Enumerated(EnumType.STRING)
+    private DayType dayType = DayType.NINGUNO;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -356,6 +360,14 @@ public class RawMaterialPayRoll implements BaseModel {
 
     public void setType(PayRollType type) {
         this.type = type;
+    }
+
+    public DayType getDayType() {
+        return dayType;
+    }
+
+    public void setDayType(DayType dayType) {
+        this.dayType = dayType;
     }
 
     public long getVersion() {

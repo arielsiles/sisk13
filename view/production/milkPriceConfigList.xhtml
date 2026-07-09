@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['MilkPriceConfig.list']}</ui:define>
+
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="milkPriceConfigSearch">
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/milkPriceConfig.xhtml"
+                          styleClass="button" propagation="none"
+                          rendered="#{s:hasPermission('MILKPRICECONFIG','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{milkPriceConfigDataModel}" var="milkPriceConfigItem"
+                            id="milkPriceConfigList"
+                            rows="#{sessionUser.rowsPerPage}" width="100%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>#{messages['MilkPriceConfig.priceWeekday']}</rich:column>
+                        <rich:column>#{messages['MilkPriceConfig.priceSunday']}</rich:column>
+                        <rich:column>#{messages['MilkPriceConfig.excessPriceWeekday']}</rich:column>
+                        <rich:column>#{messages['MilkPriceConfig.excessPriceSunday']}</rich:column>
+                        <rich:column>#{messages['MilkPriceConfig.startDate']}</rich:column>
+                        <rich:column>#{messages['MilkPriceConfig.endDate']}</rich:column>
+                        <rich:column>#{messages['MilkPriceConfig.state']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column><h:outputText value="#{milkPriceConfigItem.priceWeekday}"/></rich:column>
+                <rich:column><h:outputText value="#{milkPriceConfigItem.priceSunday}"/></rich:column>
+                <rich:column><h:outputText value="#{milkPriceConfigItem.excessPriceWeekday}"/></rich:column>
+                <rich:column><h:outputText value="#{milkPriceConfigItem.excessPriceSunday}"/></rich:column>
+                <rich:column><h:outputText value="#{milkPriceConfigItem.startDate}"/></rich:column>
+                <rich:column><h:outputText value="#{milkPriceConfigItem.endDate}"/></rich:column>
+                <rich:column>
+                    <h:outputText value="#{milkPriceConfigItem.state == 'ENABLE' ? messages['Common.enabled'] : messages['Common.disabled']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{milkPriceConfigAction.select(milkPriceConfigItem)}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="milkPriceConfigList"
+                              dataModel="#{milkPriceConfigDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/production/milkPriceConfig.xhtml"
+                          styleClass="button" propagation="none"
+                          rendered="#{s:hasPermission('MILKPRICECONFIG','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

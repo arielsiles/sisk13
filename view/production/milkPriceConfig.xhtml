@@ -1,0 +1,134 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{milkPriceConfigAction.managed}">#{messages['Common.edit']}</c:when>
+            <c:otherwise>#{messages['Common.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="55%"/>
+    <ui:param name="selectedTab" value="products"/>
+    <ui:define name="body">
+        <h:form id="milkPriceConfigForm">
+            <div class="buttons">
+                <h:commandButton action="#{milkPriceConfigAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!milkPriceConfigAction.managed and s:hasPermission('MILKPRICECONFIG','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{milkPriceConfigAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{milkPriceConfigAction.managed and s:hasPermission('MILKPRICECONFIG','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                                 rendered="#{milkPriceConfigAction.managed and s:hasPermission('MILKPRICECONFIG','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{milkPriceConfigAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{milkPriceConfigAction.managed}">#{messages['Common.edit']}</c:when>
+                        <c:otherwise>#{messages['Common.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MilkPriceConfig.priceWeekday']}</ui:define>
+                    <h:inputText value="#{milkPriceConfig.priceWeekday}" styleClass="input"
+                                 required="true" tabindex="1">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MilkPriceConfig.priceSunday']}</ui:define>
+                    <h:inputText value="#{milkPriceConfig.priceSunday}" styleClass="input"
+                                 required="true" tabindex="2">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MilkPriceConfig.excessPriceWeekday']}</ui:define>
+                    <h:inputText value="#{milkPriceConfig.excessPriceWeekday}" styleClass="input"
+                                 required="true" tabindex="3">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MilkPriceConfig.excessPriceSunday']}</ui:define>
+                    <h:inputText value="#{milkPriceConfig.excessPriceSunday}" styleClass="input"
+                                 required="true" tabindex="4">
+                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MilkPriceConfig.startDate']}</ui:define>
+                    <rich:calendar id="startDate" value="#{milkPriceConfig.startDate}" popup="true"
+                                   datePattern="#{messages['patterns.date']}" styleClass="input"
+                                   enableManualInput="true" required="true" tabindex="5">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MilkPriceConfig.endDate']}</ui:define>
+                    <rich:calendar id="endDate" value="#{milkPriceConfig.endDate}" popup="true"
+                                   datePattern="#{messages['patterns.date']}" styleClass="input"
+                                   enableManualInput="true" required="true" tabindex="6">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:div id="stateDiv">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['MilkPriceConfig.state']}</ui:define>
+                        <h:selectBooleanCheckbox id="stateField" value="#{milkPriceConfigAction.state}"
+                                                 tabindex="7">
+                            <a4j:support event="onclick" ajaxSingle="true" reRender="stateDiv"/>
+                        </h:selectBooleanCheckbox>
+                    </s:decorate>
+                </s:div>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{milkPriceConfigAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!milkPriceConfigAction.managed and s:hasPermission('MILKPRICECONFIG','CREATE')}"/>
+                <h:commandButton action="#{milkPriceConfigAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{milkPriceConfigAction.managed and s:hasPermission('MILKPRICECONFIG','UPDATE')}"/>
+                <h:commandButton action="#{milkPriceConfigAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{milkPriceConfigAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p><h:outputText value="#{messages['MilkPriceConfig.delete.confirmation']}"/></p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{milkPriceConfigAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true" styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

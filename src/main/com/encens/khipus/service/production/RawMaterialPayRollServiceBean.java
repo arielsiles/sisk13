@@ -308,7 +308,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     }
 
     @Override
-    public RawMaterialPayRoll generateExcessPayroll(RawMaterialPayRoll rawMaterialPayRoll, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter) throws RawMaterialPayRollException {
+    public RawMaterialPayRoll generateExcessPayroll(RawMaterialPayRoll rawMaterialPayRoll, Map<Long, ProducerCollectionRestriction> restrictionCache, int dayFilter, double globalExcessPrice) throws RawMaterialPayRollException {
         rawMaterialPayRoll.setType(PayRollType.EXCEDENTE);
         CappedCollection capped = buildCappedCollection(rawMaterialPayRoll, restrictionCache, dayFilter);
 
@@ -323,7 +323,10 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
 
             ProducerCollectionRestriction restriction = (restrictionCache == null) ? null : restrictionCache.get(producerId);
             if (restriction == null) continue;
-            Double price = (dayFilter == 2) ? restriction.getExcessPriceSunday() : restriction.getExcessPriceWeekday();
+            // Precio de excedente: override negociado por el productor (>0) o, si no,
+            // el precio de excedente global de la config vigente (habil/domingo).
+            double override = (dayFilter == 2) ? restriction.getExcessPriceSunday() : restriction.getExcessPriceWeekday();
+            double price = (override > 0.0) ? override : globalExcessPrice;
 
             Double amount = RoundUtil.getRoundValue(excessQty, 2, RoundUtil.RoundMode.SYMMETRIC);
             Double earned = RoundUtil.getRoundValue(excessQty * price, 2, RoundUtil.RoundMode.SYMMETRIC);
@@ -571,6 +574,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " and rawMaterialPayRoll.endDate =:fechaFin" +
                 " and rawMaterialPayRecord.liquidPayable > 0" +
                 " and rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL" +
+                " and rawMaterialPayRoll.dayType = com.encens.khipus.model.production.DayType.HABIL" +
                 " and rawMaterialPayRoll.metaProduct =:metaProduct";
         if(rawMaterialProducer!=null)
         {
@@ -652,6 +656,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " and rawMaterialPayRoll.endDate <= :fechaFin" +
                 " and rawMaterialPayRecord.liquidPayable > 0" +
                 " and rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL" +
+                " and rawMaterialPayRoll.dayType = com.encens.khipus.model.production.DayType.HABIL" +
                 " and rawMaterialPayRoll.metaProduct =:metaProduct " +
                 " group by rawMaterialProducer.firstName, rawMaterialProducer.lastName, rawMaterialProducer.maidenName, rawMaterialPayRoll.unitPrice, productiveZone.name, rawMaterialProducer.idNumber ";
 

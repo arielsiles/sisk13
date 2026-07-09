@@ -95,12 +95,6 @@
                         </h:selectOneMenu>
                     </s:decorate>
 
-                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">Solo Domingos</ui:define>
-                        <h:selectBooleanCheckbox id="soloDomingos"
-                            value="#{rawMaterialGeneralPayRollReportAction.soloDomingos}"/>
-                    </s:decorate>
-
                 </h:panelGroup>
             </h:panelGrid>
 
@@ -112,12 +106,15 @@
         <div class="buttons">
             <h:commandButton action="#{rawMaterialGeneralPayRollReportAction.generateReport}"
                              styleClass="button"
-                             value="#{messages['Common.generate']}" id="searchButtonId" tabindex="2">
+                             value="#{messages['RawMaterialPayRoll.weekdayReport']}" id="searchButtonId" tabindex="2">
                 <s:defaultAction/>
             </h:commandButton>
+            <h:commandButton action="#{rawMaterialGeneralPayRollReportAction.generateSundayReport}"
+                             styleClass="button"
+                             value="#{messages['RawMaterialPayRoll.sundayReport']}" tabindex="3"/>
             <h:commandButton action="#{rawMaterialGeneralPayRollReportAction.generateExcessReport}"
                              styleClass="button"
-                             value="#{messages['RawMaterialPayRoll.excessReport']}" tabindex="3"/>
+                             value="#{messages['RawMaterialPayRoll.excessReport']}" tabindex="4"/>
         </div>
 
     </h:form>

@@ -14,6 +14,7 @@ import com.encens.khipus.model.production.*;
 import com.encens.khipus.service.employees.GestionService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.service.production.CollectedRawMaterialCalculatorService;
+import com.encens.khipus.service.production.MilkPriceConfigService;
 import com.encens.khipus.service.production.ProducerCollectionRestrictionService;
 import com.encens.khipus.service.production.ProductiveZoneService;
 import com.encens.khipus.service.production.RawMaterialPayRollService;
@@ -49,8 +50,6 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     private Month month;
     private Periodo periodo;
     private List<GestionPayroll> gestionPayrollList;
-    private boolean sinDomingos = false;
-    private boolean soloDomingos = false;
     private ProductiveZone productiveZone = null;
 
     private List<RawMaterialPayRoll> rawMaterialPayRollList;
@@ -74,6 +73,10 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     /** Excedentes de acopio: config de cupo/precios por productor. **/
     @In
     private ProducerCollectionRestrictionService producerCollectionRestrictionService;
+
+    /** Precios de acopio (habil/domingo/excedente) con vigencia. **/
+    @In
+    private MilkPriceConfigService milkPriceConfigService;
 
     @Override
     protected GenericService getService() {
@@ -238,61 +241,65 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
             List<ProductiveZone> productiveZones = productiveZoneService.findAllThatDoNotHaveCollectionForm(
                     rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
-            Double totalWeightFortnight = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
-                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), getDayFilter());
+            // Precios desde la configuracion global vigente (con vigencia).
+            MilkPriceConfig priceConfig = milkPriceConfigService.findVigente(
+                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
+            if (priceConfig == null) {
+                facesMessages.addFromResourceBundle(ERROR, "MilkPriceConfig.error.notFound");
+                return Outcome.REDISPLAY;
+            }
 
             Map<Long, ProducerTax> producerTaxCache = rawMaterialPayRollService.preloadProducerTaxes(
                     rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
-            /** Excedentes de acopio (Modelo A): config de cupo/precios por productor. **/
+            /** Excedentes de acopio (Modelo A): cupo por productor + override de precio. **/
             Map<Long, ProducerCollectionRestriction> restrictionCache = producerCollectionRestrictionService.preloadRestrictions(
                     rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
+            // Base de prorrateo de la reserva: peso de dias habiles (dayFilter=1).
+            Double totalWeightHabil = collectedRawMaterialCalculatorService.calculateCollectedAmountBetweenDates(
+                    rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct(), 1);
+
+            /** Proceso unico: por cada zona se generan hasta 4 planillas
+             *  (NORMAL/HABIL, NORMAL/DOMINGO, EXCEDENTE/HABIL, EXCEDENTE/DOMINGO).
+             *  validate() se llama una sola vez por zona (la planilla habil): validar
+             *  las demas detectaria la recien creada como cruce de vigencia. **/
             for (ProductiveZone zone : productiveZones) {
-                if (zone.getGroup().equals("ILVA")) {
-                    RawMaterialPayRoll payRoll = new RawMaterialPayRoll();
-                    payRoll.setEndDate(rawMaterialPayRoll.getEndDate());
-                    payRoll.setStartDate(rawMaterialPayRoll.getStartDate());
-                    payRoll.setCompany(rawMaterialPayRoll.getCompany());
-                    payRoll.setMetaProduct(rawMaterialPayRoll.getMetaProduct());
-                    payRoll.setUnitPrice(rawMaterialPayRoll.getUnitPrice());
-                    payRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
-                    payRoll.setProductiveZone(zone);
-                    payRoll.setIt(rawMaterialPayRoll.getIt());
-                    payRoll.setIue(rawMaterialPayRoll.getIue());
+                if (!zone.getGroup().equals("ILVA")) continue;
 
-                    rawMaterialPayRollService.validate(payRoll);
-                    rawMaterialPayRollService.generatePayroll(payRoll, discountProducer, totalWeightFortnight, producerTaxCache, restrictionCache, getDayFilter());
-                    rawMaterialPayRollService.createAll(payRoll);
+                // 1) NORMAL / HABIL: dias habiles al precio habil. Lleva reserva y descuentos.
+                RawMaterialPayRoll habil = buildBasePayRoll(rawMaterialPayRoll, zone, priceConfig.getPriceWeekday());
+                habil.setType(PayRollType.NORMAL);
+                habil.setDayType(DayType.HABIL);
+                rawMaterialPayRollService.validate(habil);
+                rawMaterialPayRollService.generatePayroll(habil, discountProducer, totalWeightHabil, producerTaxCache, restrictionCache, 1);
+                rawMaterialPayRollService.createAll(habil);
+                warnNegativeLiquid(habil, zone);
 
-                    for (int i = 0; i < payRoll.getRawMaterialPayRecordList().size(); i++) {
-                        RawMaterialPayRecord rec = payRoll.getRawMaterialPayRecordList().get(i);
-                        if (rec.getLiquidPayable() < 0) {
-                            String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
-                            facesMessages.add(StatusMessage.Severity.ERROR,
-                                "Liquido pagable negativo: " + producerName + " (" + zone.getFullName() + ") = " + rec.getLiquidPayable() + " Bs");
-                        }
+                // 2) NORMAL / DOMINGO: solo domingos al precio domingo. Pura (sin descuentos/reserva).
+                RawMaterialPayRoll domingo = buildBasePayRoll(rawMaterialPayRoll, zone, priceConfig.getPriceSunday());
+                domingo.setType(PayRollType.NORMAL);
+                domingo.setDayType(DayType.DOMINGO);
+                rawMaterialPayRollService.generatePayroll(domingo, discountProducer, 0.0, producerTaxCache, restrictionCache, 2);
+                if (!domingo.getRawMaterialPayRecordList().isEmpty()) {
+                    rawMaterialPayRollService.createAll(domingo);
+                    warnNegativeLiquid(domingo, zone);
+                }
+
+                // 3) EXCEDENTE por tipo de dia (solo si hay productores con restriccion vigente).
+                if (!restrictionCache.isEmpty()) {
+                    RawMaterialPayRoll excHabil = buildBasePayRoll(rawMaterialPayRoll, zone, priceConfig.getPriceWeekday());
+                    excHabil.setDayType(DayType.HABIL);
+                    rawMaterialPayRollService.generateExcessPayroll(excHabil, restrictionCache, 1, priceConfig.getExcessPriceWeekday());
+                    if (!excHabil.getRawMaterialPayRecordList().isEmpty()) {
+                        rawMaterialPayRollService.createAll(excHabil);
                     }
 
-                    /** Planilla de EXCEDENTE de la misma zona y tipo de dia (habil/domingo).
-                     *  Requiere dayFilter 1/2 para elegir el precio de excedente. Solo se
-                     *  persiste si hay excedente (algun productor supero su cupo). **/
-                    if (getDayFilter() != 0 && !restrictionCache.isEmpty()) {
-                        RawMaterialPayRoll excessPayRoll = new RawMaterialPayRoll();
-                        excessPayRoll.setEndDate(rawMaterialPayRoll.getEndDate());
-                        excessPayRoll.setStartDate(rawMaterialPayRoll.getStartDate());
-                        excessPayRoll.setCompany(rawMaterialPayRoll.getCompany());
-                        excessPayRoll.setMetaProduct(rawMaterialPayRoll.getMetaProduct());
-                        excessPayRoll.setUnitPrice(rawMaterialPayRoll.getUnitPrice());
-                        excessPayRoll.setTaxRate(rawMaterialPayRoll.getTaxRate());
-                        excessPayRoll.setProductiveZone(zone);
-                        excessPayRoll.setIt(rawMaterialPayRoll.getIt());
-                        excessPayRoll.setIue(rawMaterialPayRoll.getIue());
-
-                        rawMaterialPayRollService.generateExcessPayroll(excessPayRoll, restrictionCache, getDayFilter());
-                        if (!excessPayRoll.getRawMaterialPayRecordList().isEmpty()) {
-                            rawMaterialPayRollService.createAll(excessPayRoll);
-                        }
+                    RawMaterialPayRoll excDomingo = buildBasePayRoll(rawMaterialPayRoll, zone, priceConfig.getPriceSunday());
+                    excDomingo.setDayType(DayType.DOMINGO);
+                    rawMaterialPayRollService.generateExcessPayroll(excDomingo, restrictionCache, 2, priceConfig.getExcessPriceSunday());
+                    if (!excDomingo.getRawMaterialPayRecordList().isEmpty()) {
+                        rawMaterialPayRollService.createAll(excDomingo);
                     }
                 }
             }
@@ -557,27 +564,30 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         this.editIT = editIT;
     }
 
-    public boolean isSinDomingos() {
-        return sinDomingos;
+    /** Construye una planilla base (fechas, zona, producto, impuestos) con el
+     *  precio unitario dado. El tipo (NORMAL/EXCEDENTE) y el tipo de dia los fija
+     *  el llamador. */
+    private RawMaterialPayRoll buildBasePayRoll(RawMaterialPayRoll source, ProductiveZone zone, double unitPrice) {
+        RawMaterialPayRoll payRoll = new RawMaterialPayRoll();
+        payRoll.setStartDate(source.getStartDate());
+        payRoll.setEndDate(source.getEndDate());
+        payRoll.setCompany(source.getCompany());
+        payRoll.setMetaProduct(source.getMetaProduct());
+        payRoll.setUnitPrice(unitPrice);
+        payRoll.setTaxRate(source.getTaxRate());
+        payRoll.setProductiveZone(zone);
+        payRoll.setIt(source.getIt());
+        payRoll.setIue(source.getIue());
+        return payRoll;
     }
 
-    public void setSinDomingos(boolean sinDomingos) {
-        this.sinDomingos = sinDomingos;
-        if (sinDomingos) this.soloDomingos = false;
-    }
-
-    public boolean isSoloDomingos() {
-        return soloDomingos;
-    }
-
-    public void setSoloDomingos(boolean soloDomingos) {
-        this.soloDomingos = soloDomingos;
-        if (soloDomingos) this.sinDomingos = false;
-    }
-
-    private int getDayFilter() {
-        if (sinDomingos) return 1;
-        if (soloDomingos) return 2;
-        return 0;
+    private void warnNegativeLiquid(RawMaterialPayRoll payRoll, ProductiveZone zone) {
+        for (RawMaterialPayRecord rec : payRoll.getRawMaterialPayRecordList()) {
+            if (rec.getLiquidPayable() < 0) {
+                String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
+                facesMessages.add(StatusMessage.Severity.ERROR,
+                        "Liquido pagable negativo: " + producerName + " (" + zone.getFullName() + ") = " + rec.getLiquidPayable() + " Bs");
+            }
+        }
     }
 }
