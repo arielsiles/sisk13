@@ -115,6 +115,9 @@
                              value="#{messages['Common.generate']}" id="searchButtonId" tabindex="2">
                 <s:defaultAction/>
             </h:commandButton>
+            <h:commandButton action="#{rawMaterialGeneralPayRollReportAction.generateExcessReport}"
+                             styleClass="button"
+                             value="#{messages['RawMaterialPayRoll.excessReport']}" tabindex="3"/>
         </div>
 
     </h:form>

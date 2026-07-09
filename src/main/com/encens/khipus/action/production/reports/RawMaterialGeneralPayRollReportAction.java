@@ -84,6 +84,8 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
     private Calendar dateIni;
     private Calendar dateEnd;
     private boolean soloDomingos;
+    /** true -> genera la PLANILLA DE EXCEDENTES (tipo=EXCEDENTE); false -> planilla normal. */
+    private boolean excess = false;
 
     private List<GestionPayroll> gestionPayrollList;
 
@@ -92,6 +94,17 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
 
 
     public void generateReport() throws ParseException {
+        this.excess = false;
+        buildAndGenerate();
+    }
+
+    /** Boton "Planilla de Excedentes": mismo periodo/filtros, pero tipo = EXCEDENTE. */
+    public void generateExcessReport() throws ParseException {
+        this.excess = true;
+        buildAndGenerate();
+    }
+
+    private void buildAndGenerate() throws ParseException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
         dateIni = Calendar.getInstance();
@@ -124,7 +137,7 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
         TypedReportData typedReportData;
         TypedReportData mostrar = new TypedReportData();
 
-        String title = "PLANILLA DE PAGO A PRODUCTORES";
+        String title = excess ? "PLANILLA DE ACOPIO EXCEDENTES" : "PLANILLA DE PAGO A PRODUCTORES";
 
         System.out.println("=====> PERIODO: " + periodo.getResourceKey().toString());
         params.put("reportTitle", title);
@@ -189,6 +202,27 @@ public class RawMaterialGeneralPayRollReportAction extends GenericReportAction {
                 " JOIN rawMaterialPayRoll.productiveZone productiveZone" +
                 "";
 
+    }
+
+    /**
+     * Filtra por tipo de planilla: EXCEDENTE para el reporte de excedentes,
+     * NORMAL para el reporte de pago (evita que el excedente figure en lo normal).
+     */
+    @Override
+    protected List<String> getRestrictions() {
+        List<String> result = new ArrayList<String>(Arrays.asList(restrictions));
+        result.add(excess
+                ? "rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.EXCEDENTE"
+                : "rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL");
+        return result;
+    }
+
+    public boolean isExcess() {
+        return excess;
+    }
+
+    public void setExcess(boolean excess) {
+        this.excess = excess;
     }
 
     private String getMes(Month month) {
