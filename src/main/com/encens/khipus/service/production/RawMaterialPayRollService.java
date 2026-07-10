@@ -44,6 +44,8 @@ public interface RawMaterialPayRollService extends GenericService {
 
     RawMaterialPayRollServiceBean.Discounts getDiscounts(Date dateIni, Date dateEnd, ProductiveZone zone, MetaProduct metaProduct);
 
+    RawMaterialPayRollServiceBean.Discounts getDiscounts(Date dateIni, Date dateEnd, MetaProduct metaProduct, PayRollType type, DayType dayType);
+
     RawMaterialPayRollServiceBean.SummaryTotal getSumaryTotal(Date dateIni, Date dateEnd, ProductiveZone zone, MetaProduct metaProduct);
 
     List<RawMaterialPayRecordDetailDummy> generateDetails(RawMaterialPayRecord rawMaterialPayRecord) throws RawMaterialPayRollException;
@@ -87,4 +89,6 @@ public interface RawMaterialPayRollService extends GenericService {
     public List<BoletaPagoProductor> findBoletaDePagoGA(Date fechaIni,Date fechaFin, RawMaterialProducer rawMaterialProducer,ProductiveZone productiveZone,MetaProduct metaProduct);
 
     Double getSumAdjustmentFromRecords(Date startDate, Date endDate, MetaProduct metaProduct);
+
+    Double getSumAdjustmentFromRecords(Date startDate, Date endDate, MetaProduct metaProduct, PayRollType type, DayType dayType);
 }

@@ -34,43 +34,42 @@
 	<group name="rowGroup">
 		<groupExpression><![CDATA[]]></groupExpression>
 		<groupHeader>
-			<band height="40">
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement key="date_text" positionType="Float" x="63" y="12" width="450" height="13"/>
-					<box padding="1">
-						<pen lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitleParam} + " DEL "+$P{startDate}+" AL "+$P{endDate}]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement key="date_text" positionType="Float" x="63" y="0" width="450" height="13"/>
-					<box padding="1">
-						<pen lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{reportTitle}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement x="63" y="25" width="450" height="13" isRemoveLineWhenBlank="true">
-						<printWhenExpression><![CDATA[$P{domingos_acopio} != null && !$P{domingos_acopio}.isEmpty()]]></printWhenExpression>
-					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Arial" size="9" isBold="true"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{domingos_acopio}]]></textFieldExpression>
-				</textField>
-			</band>
+			<band height="74">
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement x="15" y="0" width="567" height="12"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial" size="9" isBold="true"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$P{empresaLinea1}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement x="15" y="12" width="567" height="12"/>
+						<textElement verticalAlignment="Middle">
+							<font fontName="Arial" size="9" isBold="true"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$P{empresaLinea2}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement x="0" y="46" width="582" height="13"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="9" isBold="true"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$P{tituloReporte}]]></textFieldExpression>
+					</textField>
+					<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+						<reportElement x="0" y="59" width="582" height="13"/>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="Arial" size="9" isBold="true"/>
+						</textElement>
+						<textFieldExpression class="java.lang.String"><![CDATA[$P{periodoTexto}]]></textFieldExpression>
+					</textField>
+				</band>
 		</groupHeader>
 	</group>
 	<group name="resumen_principal">
 		<groupExpression><![CDATA[$V{PAGE_NUMBER}]]></groupExpression>
 		<groupHeader>
-			<band height="297">
+			<band height="440">
 				<frame>
 					<reportElement positionType="Float" x="105" y="1" width="362" height="296" forecolor="#FFFFFF"/>
 					<box leftPadding="0" rightPadding="0">
@@ -80,10 +79,15 @@
 						<bottomPen lineWidth="1.0"/>
 						<rightPen lineWidth="1.0"/>
 					</box>
+					<staticText>
+						<reportElement x="54" y="2" width="120" height="12"/>
+						<textElement verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+						<text><![CDATA[QUINCENA]]></text>
+					</staticText>
 					<textField>
 						<reportElement x="240" y="279" width="76" height="12"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="Arial" size="9" isBold="false"/>
+							<font fontName="Arial" size="9" isBold="true"/>
 						</textElement>
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{liquid_pay}]]></textFieldExpression>
 					</textField>
@@ -143,11 +147,11 @@
 						</graphicElement>
 					</line>
 					<staticText>
-						<reportElement x="54" y="41" width="70" height="12"/>
+						<reportElement x="54" y="41" width="100" height="12"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
-						<text><![CDATA[Pesado]]></text>
+						<text><![CDATA[Pesaje de Acopio]]></text>
 					</staticText>
 					<textField>
 						<reportElement x="127" y="41" width="72" height="12"/>
@@ -220,9 +224,9 @@
 					<staticText>
 						<reportElement x="54" y="279" width="156" height="12"/>
 						<textElement verticalAlignment="Middle">
-							<font fontName="Arial" size="9" isBold="false"/>
+							<font fontName="Arial" size="9" isBold="true"/>
 						</textElement>
-						<text><![CDATA[Liquido Pagable]]></text>
+						<text><![CDATA[Liquido Quincena]]></text>
 					</staticText>
 					<textField>
 						<reportElement x="240" y="136" width="76" height="12"/>
@@ -253,11 +257,11 @@
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{recip}]]></textFieldExpression>
 					</textField>
 					<staticText>
-						<reportElement x="54" y="15" width="70" height="12"/>
+						<reportElement x="54" y="15" width="100" height="12"/>
 						<textElement verticalAlignment="Middle">
 							<font fontName="Arial" size="9" isBold="false"/>
 						</textElement>
-						<text><![CDATA[Acopiado]]></text>
+						<text><![CDATA[Acopio Productor]]></text>
 					</staticText>
 					<staticText>
 						<reportElement x="216" y="3" width="23" height="12"/>
@@ -387,14 +391,14 @@
 					<textField>
 						<reportElement x="240" y="67" width="77" height="12"/>
 						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="Arial" size="9" isBold="false"/>
+							<font fontName="Arial" size="9" isBold="true"/>
 						</textElement>
 						<textFieldExpression class="java.lang.String"><![CDATA[$P{total_other_incom}]]></textFieldExpression>
 					</textField>
 					<staticText>
 						<reportElement x="54" y="67" width="70" height="12"/>
 						<textElement verticalAlignment="Middle">
-							<font fontName="Arial" size="9" isBold="false"/>
+							<font fontName="Arial" size="9" isBold="true"/>
 						</textElement>
 						<text><![CDATA[Total]]></text>
 					</staticText>
@@ -460,6 +464,127 @@
 						<font fontName="Arial" size="9" isBold="false"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{comision}]]></textFieldExpression>
+				</textField>
+				<!-- ================= BLOQUE DOMINGOS ================= -->
+				<staticText>
+					<reportElement x="159" y="305" width="250" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+					<text><![CDATA[DOMINGOS]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="159" y="320" width="100" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
+					<text><![CDATA[Acopio Domingos]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="232" y="320" width="72" height="12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{dom_litros}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="306" y="320" width="13" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<text><![CDATA[Lt.]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="321" y="320" width="23" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{dom_pu}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="345" y="320" width="76" height="12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{dom_total}]]></textFieldExpression>
+				</textField>
+				<line><reportElement x="345" y="333" width="76" height="1"/><graphicElement><pen lineWidth="0.5"/></graphicElement></line>
+				<staticText>
+					<reportElement x="159" y="335" width="150" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+					<text><![CDATA[Liquido Domingos]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="345" y="335" width="76" height="12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{dom_total}]]></textFieldExpression>
+				</textField>
+				<!-- ================= BLOQUE EXCEDENTES ================= -->
+				<staticText>
+					<reportElement x="159" y="353" width="250" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+					<text><![CDATA[EXCEDENTES]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="159" y="368" width="100" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
+					<text><![CDATA[Excedentes Quincena]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="232" y="368" width="72" height="12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{exq_litros}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="306" y="368" width="13" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<text><![CDATA[Lt.]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="321" y="368" width="23" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{exq_pu}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="345" y="368" width="76" height="12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{exq_total}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="159" y="381" width="100" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="8"/></textElement>
+					<text><![CDATA[Excedentes Domingos]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="232" y="381" width="72" height="12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{exd_litros}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="306" y="381" width="13" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<text><![CDATA[Lt.]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="321" y="381" width="23" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{exd_pu}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="345" y="381" width="76" height="12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="9"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{exd_total}]]></textFieldExpression>
+				</textField>
+				<line><reportElement x="345" y="394" width="76" height="1"/><graphicElement><pen lineWidth="0.5"/></graphicElement></line>
+				<staticText>
+					<reportElement x="159" y="396" width="150" height="12"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+					<text><![CDATA[Liquido Excedentes]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="345" y="396" width="76" height="12"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="9" isBold="true"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{exc_total}]]></textFieldExpression>
+				</textField>
+				<!-- ================= LIQUIDO PAGABLE TOTAL ================= -->
+				<line><reportElement x="159" y="416" width="262" height="1"/><graphicElement><pen lineWidth="1.0"/></graphicElement></line>
+				<staticText>
+					<reportElement x="159" y="419" width="180" height="14"/>
+					<textElement verticalAlignment="Middle"><font fontName="Arial" size="10" isBold="true"/></textElement>
+					<text><![CDATA[LIQUIDO PAGABLE TOTAL]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="339" y="419" width="82" height="14"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="Arial" size="10" isBold="true"/></textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{liquid_total}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>

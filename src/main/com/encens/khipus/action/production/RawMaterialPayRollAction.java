@@ -585,11 +585,13 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
      *  Memoiza por (gestion, mes, periodo) para no consultar la BD en cada acceso del render. */
     public MilkPriceConfig getCurrentPriceConfig() {
         Gestion g = getGestion();
-        if (g == null) {
+        // Usar los campos (la seleccion real). getMonth()/getPeriodo() recalculan al
+        // mes/periodo ACTUAL en modo generacion e ignorarian lo elegido por el usuario.
+        Month m = (this.month != null) ? this.month : getMonth();
+        Periodo p = (this.periodo != null) ? this.periodo : getPeriodo();
+        if (g == null || m == null || p == null) {
             return null;
         }
-        Month m = getMonth();
-        Periodo p = getPeriodo();
         String key = g.getYear() + "-" + m.getValue() + "-" + p.name();
         if (!key.equals(cachedPriceKey)) {
             Calendar ini = Calendar.getInstance();

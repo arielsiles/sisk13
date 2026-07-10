@@ -1,6 +1,12 @@
-# Análisis: Generación de Planillas de Acopio de Leche — v2 (generación actual)
+# Análisis: Generación de Planillas de Acopio de Leche — v2 (histórico)
 
-> **Versión 2** — documenta la generación **actual** del código (con filtro de días,
+> ⚠️ **SUPERSEDIDO POR v3.** Para el estado actual del feature (planilla única, excedentes por
+> cupo, precios con vigencia, 3 reportes y resumen por bloques) leer
+> [`analisis-planilla-acopio-leche-v3.md`](analisis-planilla-acopio-leche-v3.md).
+> Este v2 se conserva como referencia del **motor de cálculo por-productor** (fórmulas, prorrateos,
+> redondeos), que v3 sigue usando y referencia.
+>
+> **Versión 2** — documenta la generación previa (single-planilla, con filtro de días,
 > pre-cálculos batch `@Claude OPT-1..7`, nuevo `calculateLiquidPayable` con `BigDecimal`).
 > La v1 (`analisis-planilla-acopio-leche-v1.md`) describe la generación anterior y se
 > conserva como referencia histórica.

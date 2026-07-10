@@ -718,15 +718,48 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     }
 
     public Discounts getDiscounts(Date dateIni, Date dateEnd, ProductiveZone zone, MetaProduct metaProduct) {
-        Discounts discounts = new Discounts();
-
         List<Object[]> datas = getEntityManager().createNamedQuery("RawMaterialPayRoll.getDiscounts")
                 .setParameter("startDate", dateIni, TemporalType.DATE)
                 .setParameter("endDate", dateEnd, TemporalType.DATE)
                         //.setParameter("productiveZone", zone)
                 .setParameter("metaProduct", metaProduct)
                 .getResultList();
+        return buildDiscounts(datas);
+    }
 
+    /**
+     * Igual que getDiscounts pero acotado a un tipo de planilla y tipo de dia
+     * (para el resumen por bloques: NORMAL/HABIL, NORMAL/DOMINGO, EXCEDENTE/HABIL,
+     * EXCEDENTE/DOMINGO). Mismo orden de columnas que la named query getDiscounts.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Discounts getDiscounts(Date dateIni, Date dateEnd, MetaProduct metaProduct, PayRollType type, DayType dayType) {
+        List<Object[]> datas = getEntityManager().createQuery(
+                "select " +
+                " sum(p.totalMountCollectdByGAB), sum(p.totalCollectedByGAB), sum(p.totalAlcoholByGAB), " +
+                " sum(p.totalConcentratedByGAB), sum(p.totalYogourdByGAB), sum(p.totalRecipByGAB), " +
+                " sum(p.totalRetentionGAB), sum(p.totalVeterinaryByGAB), sum(p.totalCreditByGAB), " +
+                " sum(p.totalDiscountByGAB), sum(p.totalLiquidByGAB), sum(p.totalOtherDiscountByGAB), " +
+                " sum(p.totalOtherIncomeByGAB), sum(p.totalAdjustmentByGAB), sum(p.totalCommission), " +
+                " p.unitPrice, sum(p.totalReserveDicount), sum(p.totalGA) " +
+                " from RawMaterialPayRoll p " +
+                " where p.startDate = :startDate and p.endDate <= :endDate " +
+                " and p.metaProduct = :metaProduct and p.type = :type and p.dayType = :dayType " +
+                " group by p.unitPrice")
+                .setParameter("startDate", dateIni, TemporalType.DATE)
+                .setParameter("endDate", dateEnd, TemporalType.DATE)
+                .setParameter("metaProduct", metaProduct)
+                .setParameter("type", type)
+                .setParameter("dayType", dayType)
+                .getResultList();
+        return buildDiscounts(datas);
+    }
+
+    /** Acumula las filas (agrupadas por precio) en un Discounts. Orden de columnas
+     *  identico al de la named query RawMaterialPayRoll.getDiscounts. */
+    private Discounts buildDiscounts(List<Object[]> datas) {
+        Discounts discounts = new Discounts();
         discounts.mount = 0.0;
         discounts.collected = 0.0;
         discounts.alcohol = 0.0;
@@ -780,6 +813,26 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 .setParameter("startDate", startDate, TemporalType.DATE)
                 .setParameter("endDate", endDate, TemporalType.DATE)
                 .setParameter("metaProduct", metaProduct)
+                .getResultList();
+        return result.isEmpty() || result.get(0) == null ? 0.0 : result.get(0);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Double getSumAdjustmentFromRecords(Date startDate, Date endDate, MetaProduct metaProduct, PayRollType type, DayType dayType) {
+        List<Double> result = getEntityManager().createQuery(
+                "SELECT COALESCE(SUM(r.productiveZoneAdjustment), 0.0) " +
+                "FROM RawMaterialPayRecord r " +
+                "WHERE r.rawMaterialPayRoll.startDate = :startDate " +
+                "AND r.rawMaterialPayRoll.endDate <= :endDate " +
+                "AND r.rawMaterialPayRoll.metaProduct = :metaProduct " +
+                "AND r.rawMaterialPayRoll.type = :type " +
+                "AND r.rawMaterialPayRoll.dayType = :dayType")
+                .setParameter("startDate", startDate, TemporalType.DATE)
+                .setParameter("endDate", endDate, TemporalType.DATE)
+                .setParameter("metaProduct", metaProduct)
+                .setParameter("type", type)
+                .setParameter("dayType", dayType)
                 .getResultList();
         return result.isEmpty() || result.get(0) == null ? 0.0 : result.get(0);
     }

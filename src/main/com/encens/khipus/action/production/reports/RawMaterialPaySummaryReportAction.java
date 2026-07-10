@@ -9,9 +9,12 @@ import com.encens.khipus.model.employees.GeneratedPayrollType;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.GestionPayroll;
 import com.encens.khipus.model.employees.Month;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.model.production.*;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.ClientService;
@@ -60,6 +63,8 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
     private ClientService clientService;
     @In
     CollectedRawMaterialCalculatorService collectedRawMaterialCalculatorService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
     private String summaryReportTitle;
     private String gestionTitle;
@@ -119,6 +124,19 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         reportParameters.put("startDate", df.format(dateIni.getTime()));
         reportParameters.put("endDate", df.format(dateEnd.getTime()));
 
+        // Cabecera como la boleta de pago: dos lineas de compania (de configuracion),
+        // titulo del reporte y periodo.
+        CompanyConfiguration companyConfiguration = null;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "CompanyConfiguration.notFound");
+        }
+        reportParameters.put("empresaLinea1", companyConfiguration != null ? companyConfiguration.getTitle() : "");
+        reportParameters.put("empresaLinea2", companyConfiguration != null ? companyConfiguration.getCompanyName() : "");
+        reportParameters.put("tituloReporte", "RESUMEN GENERAL DE PAGO A PRODUCTORES LECHEROS");
+        reportParameters.put("periodoTexto", "PERIODO DEL " + df.format(dateIni.getTime()) + " AL " + df.format(dateEnd.getTime()));
+
         if (soloDomingos) {
             try {
                 DateFormat dateFormat2 = new SimpleDateFormat("yyyy/MM/dd");
@@ -150,19 +168,21 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
     }
 
     private void    addSummaryTotal(HashMap<String, Object> params) throws ParseException {
-        //discounts = rawMaterialPayRollService.getDiscounts(dateIni.getTime(),dateEnd.getTime(),null,null);
         DecimalFormat df = new DecimalFormat("#,##0.00");
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
         Date startDate = dateFormat.parse(dateFormat.format(dateIni.getTime()));
         Date endDate = dateFormat.parse(dateFormat.format(dateEnd.getTime()));
 
-        discounts = rawMaterialPayRollService.getDiscounts(startDate, endDate, zone, metaProduct);
-
-        summaryTotal = rawMaterialPayRollService.getSumaryTotal(startDate, endDate, zone, metaProduct);
+        // ===== BLOQUE QUINCENA (DIAS HABILES) = reproduce el reporte anterior =====
+        //   Solo las planillas NORMAL/HABIL llevan diferencia, descuentos, retencion,
+        //   IT/IUE, reserva y GA. Domingos y excedentes son planillas puras.
+        discounts = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
+                PayRollType.NORMAL, DayType.HABIL);
 
         Double totalMoneyCollected = discounts.mount;
-        Double totalDifferencesMoney = rawMaterialPayRollService.getSumAdjustmentFromRecords(startDate, endDate, metaProduct);
+        Double totalDifferencesMoney = rawMaterialPayRollService.getSumAdjustmentFromRecords(startDate, endDate, metaProduct,
+                PayRollType.NORMAL, DayType.HABIL);
         Double diffTotal = (discounts.unitPrice != 0) ? totalDifferencesMoney / discounts.unitPrice : 0.0;
         Double balanceWeightTotal = discounts.collected + diffTotal;
         Double totalMoneyBalance = totalMoneyCollected + totalDifferencesMoney;
@@ -183,7 +203,6 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         Double totalDiscount = discounts.alcohol + discounts.concentrated + discounts.yogurt
                 + discounts.veterinary + discounts.credit + discounts.recip + discounts.retention
                 + discounts.otherDiscount + reservProducer + reserveGA + discounts.commission;
-        //Double liquidPay = totalMoney - totalDifferences;
         params.put("alcohol", df.format(discounts.alcohol));
         params.put("concentrated", df.format(discounts.concentrated));
         params.put("yogurt", df.format(discounts.yogurt));
@@ -198,17 +217,38 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         RawMaterialPayRoll rawMaterialPayRoll =  rawMaterialPayRollService.getTotalsRawMaterialPayRoll(startDate,endDate,null,null);
         porcentageIUE = rawMaterialPayRoll.getIue() / rawMaterialPayRoll.getTaxRate();
 
-        //iue = discounts.retention * 0.625;
         iue = discounts.retention * porcentageIUE;
-        //it = discounts.retention * 0.375;
         it = discounts.retention - iue;
         params.put("iue", df.format(iue));
         params.put("it", df.format(it));
         params.put("reserva_productores", df.format(reservProducer));
         params.put("reserveGA", df.format(reserveGA));
         params.put("total_differences", df.format(totalDiscount));
-        params.put("liquid_pay", df.format(discounts.liquid));
+        params.put("liquid_pay", df.format(discounts.liquid));   // Liquido Habiles
 
+        // ===== BLOQUE DOMINGOS (planilla pura: litros x precio) =====
+        RawMaterialPayRollServiceBean.Discounts dom = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
+                PayRollType.NORMAL, DayType.DOMINGO);
+        params.put("dom_litros", df.format(dom.collected));
+        params.put("dom_pu", df.format(dom.unitPrice));
+        params.put("dom_total", df.format(dom.liquid));          // Liquido Domingos
+
+        // ===== BLOQUE EXCEDENTES (puras: litros x precio de excedente) =====
+        RawMaterialPayRollServiceBean.Discounts exQ = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
+                PayRollType.EXCEDENTE, DayType.HABIL);
+        RawMaterialPayRollServiceBean.Discounts exD = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
+                PayRollType.EXCEDENTE, DayType.DOMINGO);
+        params.put("exq_litros", df.format(exQ.collected));
+        params.put("exq_pu", df.format(exQ.unitPrice));
+        params.put("exq_total", df.format(exQ.liquid));
+        params.put("exd_litros", df.format(exD.collected));
+        params.put("exd_pu", df.format(exD.unitPrice));
+        params.put("exd_total", df.format(exD.liquid));
+        params.put("exc_total", df.format(exQ.liquid + exD.liquid));   // Liquido Excedentes
+
+        // ===== TOTAL DEFINITIVO = suma de los subtotales de los bloques =====
+        Double liquidTotal = discounts.liquid + dom.liquid + exQ.liquid + exD.liquid;
+        params.put("liquid_total", df.format(liquidTotal));
     }
 
 
