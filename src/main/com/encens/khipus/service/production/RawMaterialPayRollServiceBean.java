@@ -1878,6 +1878,37 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         }
     }
 
+    /**
+     * Monto REALMENTE COBRADO por MOVIMIENTO (aplicaciones del periodo, con tope/arrastre) para un
+     * tipo de movimiento. Fuente correcta para el asiento: la suma es identica al descuento que
+     * bajo el liquido (no al valor nominal de la deuda), asi el comprobante siempre cuadra.
+     * Se agrupa por movimiento (una linea por deuda, igual que el formato historico), llevando el
+     * idNumber del productor para resolver el Cliente. Un movimiento pudo cobrarse en varios
+     * registros: por eso se suma. Ordenado por movimiento para salida estable.
+     * Cada fila = [idNumber (String), suma montoaplicado (Double)].
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Object[]> getAppliedDiscountsByProducer(Date startDate, Date endDate, MetaProduct metaProduct, TypeMovementProducer type) {
+        return getEntityManager().createQuery(
+                "select p.idNumber, sum(a.appliedAmount) " +
+                " from DiscountApplication a " +
+                " join a.salaryMovementProducer m " +
+                " join m.rawMaterialProducer p " +
+                " where a.rawMaterialPayRecord.rawMaterialPayRoll.startDate = :start " +
+                " and a.rawMaterialPayRecord.rawMaterialPayRoll.endDate = :end " +
+                " and a.rawMaterialPayRecord.rawMaterialPayRoll.metaProduct = :meta " +
+                " and m.typeMovementProducer = :type " +
+                " group by m.id, p.idNumber " +
+                " having sum(a.appliedAmount) > 0" +
+                " order by m.id")
+                .setParameter("start", startDate, TemporalType.DATE)
+                .setParameter("end", endDate, TemporalType.DATE)
+                .setParameter("meta", metaProduct)
+                .setParameter("type", type)
+                .getResultList();
+    }
+
     /** Cambia el estado de todas las planillas del periodo/producto (PENDING/APPROVED/CONTABILIZADO). */
     @Override
     public void setPayRollsState(Date startDate, Date endDate, MetaProduct metaProduct, StatePayRoll state) {

@@ -124,8 +124,8 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
 
     public void exportToExcel() {
         try {
-            Date filterStartDate = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getStartDate() : null;
-            Date filterEndDate = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getEndDate() : null;
+            Date filterStartDate = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getEffectiveStartDate() : null;
+            Date filterEndDate = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getEffectiveEndDate() : null;
             TypeMovementProducer filterType = salaryMovementProducerDataModel != null && salaryMovementProducerDataModel.getCriteria() != null
                     ? salaryMovementProducerDataModel.getCriteria().getTypeMovementProducer() : null;
             String filterFirstName = salaryMovementProducerDataModel != null ? salaryMovementProducerDataModel.getFirstName() : null;

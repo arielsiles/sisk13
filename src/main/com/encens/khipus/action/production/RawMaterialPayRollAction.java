@@ -184,6 +184,11 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                     // annulVoucher solo persiste; el estado ANL lo debe fijar el caller (igual que
                     // VoucherUpdateAction/VoucherCreateAction). Sin esto el asiento quedaba en PEN.
                     voucher.setState(com.encens.khipus.model.finances.VoucherState.ANL.toString());
+                    // Marca visible en la glosa del asiento anulado (sin duplicar si ya la tiene).
+                    String gloss = voucher.getGloss() == null ? "" : voucher.getGloss();
+                    if (!gloss.startsWith("*** ANULADO ***")) {
+                        voucher.setGloss("*** ANULADO *** " + gloss);
+                    }
                     voucherAccoutingService.annulVoucher(voucher);
                 }
             }

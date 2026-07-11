@@ -87,6 +87,14 @@ public interface RawMaterialPayRollService extends GenericService {
     /** Reversa de la deuda al anular/revertir: restaura saldo de los movimientos. */
     void revertDiscountDebts(Date startDate, Date endDate, MetaProduct metaProduct);
 
+    /**
+     * Monto de descuento REALMENTE COBRADO (aplicado, con tope/arrastre) en el periodo, por
+     * productor, para un tipo de movimiento (VETERINARIO, YOGURT, ...). Es lo que debe ir al
+     * asiento (Clientes Productores): la suma cuadra con el descuento que bajo el liquido, no con
+     * el valor NOMINAL de la deuda. Cada fila = [idNumber (String), suma montoaplicado (Double)].
+     */
+    List<Object[]> getAppliedDiscountsByProducer(Date startDate, Date endDate, MetaProduct metaProduct, TypeMovementProducer type);
+
     /** Cambia el estado de todas las planillas del periodo/producto. */
     void setPayRollsState(Date startDate, Date endDate, MetaProduct metaProduct, StatePayRoll state);
 

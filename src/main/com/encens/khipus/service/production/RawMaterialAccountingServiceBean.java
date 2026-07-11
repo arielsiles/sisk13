@@ -17,6 +17,9 @@ import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -90,23 +93,20 @@ public class RawMaterialAccountingServiceBean extends ExtendedGenericServiceBean
             addDetail(voucher, Constants.ACCOUNT_ACREEDORES_BIENESSERVICIOS, totalLiquid, false,
                     Constants.PROVIDER_CODE_PRODUCTORES, "LIQUIDO QUINCENA (HABILES)");
 
-        // Veterinario -> Clientes Productores (por productor)
+        // Veterinario -> Clientes Productores (una linea por descuento). Se postea el monto REALMENTE
+        // COBRADO esta quincena (aplicaciones con tope/arrastre), NO el valor nominal de la deuda:
+        // asi la suma cuadra con el descuento que bajo el liquido (lo no cobrado queda como saldo del
+        // productor y se cobra en la proxima quincena). Ordenado por nombre de productor.
         if (discounts.veterinary > 0) {
             TypeMovementProducer type = typeMovementProducerService.findTypeMovementProducer(SalaryMovementProducerTypeEnum.VETE);
-            List<SalaryMovementProducer> movs = salaryMovementProducerService.findSalaryMovementProducerList(startDate, endDate, type);
-            for (SalaryMovementProducer m : movs) {
-                Client client = clientService.findClientByIdNumber(m.getRawMaterialProducer().getIdNumber());
-                addDetailClient(voucher, Constants.ACCOUNT_CLIENTESPRODUCTORES, m.getValor(), client);
-            }
+            addClientDiscountLines(voucher, Constants.ACCOUNT_CLIENTESPRODUCTORES,
+                    rawMaterialPayRollService.getAppliedDiscountsByProducer(startDate, endDate, metaProduct, type));
         }
-        // Yogurt/Lacteos -> Clientes (por productor)
+        // Yogurt/Lacteos -> Clientes (una linea por descuento). Idem: monto realmente cobrado, no el nominal.
         if (discounts.yogurt > 0) {
             TypeMovementProducer type = typeMovementProducerService.findTypeMovementProducer(SalaryMovementProducerTypeEnum.LACT);
-            List<SalaryMovementProducer> movs = salaryMovementProducerService.findSalaryMovementProducerList(startDate, endDate, type);
-            for (SalaryMovementProducer m : movs) {
-                Client client = clientService.findClientByIdNumber(m.getRawMaterialProducer().getIdNumber());
-                addDetailClient(voucher, Constants.ACCOUNT_CLIENTES, m.getValor(), client);
-            }
+            addClientDiscountLines(voucher, Constants.ACCOUNT_CLIENTES,
+                    rawMaterialPayRollService.getAppliedDiscountsByProducer(startDate, endDate, metaProduct, type));
         }
 
         if (discounts.credit > 0)
@@ -155,6 +155,31 @@ public class RawMaterialAccountingServiceBean extends ExtendedGenericServiceBean
         if (providerCode != null) d.setProviderCode(providerCode);
         if (gloss != null) d.setGloss(gloss);
         voucher.addVoucherDetail(d);
+    }
+
+    /**
+     * Postea las lineas de descuento por productor de una cuenta (Clientes Productores / Clientes),
+     * UNA linea por descuento (no fusiona), ordenadas por nombre del productor para que quien tenga
+     * mas de un descuento salga con sus lineas consecutivas. Cada fila = [idNumber, montoAplicado].
+     */
+    private void addClientDiscountLines(Voucher voucher, String account, List<Object[]> rows) {
+        List<Object[]> lines = new ArrayList<Object[]>();
+        for (Object[] row : rows) {
+            double applied = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
+            if (applied <= 0) continue;
+            Client client = clientService.findClientByIdNumber((String) row[0]);
+            lines.add(new Object[]{client, applied});
+        }
+        Collections.sort(lines, new Comparator<Object[]>() {
+            public int compare(Object[] a, Object[] b) {
+                String na = a[0] != null ? ((Client) a[0]).getFullName() : "";
+                String nb = b[0] != null ? ((Client) b[0]).getFullName() : "";
+                return na.compareToIgnoreCase(nb);
+            }
+        });
+        for (Object[] line : lines) {
+            addDetailClient(voucher, account, (Double) line[1], (Client) line[0]);
+        }
     }
 
     private void addDetailClient(Voucher voucher, String account, double amount, Client client) {

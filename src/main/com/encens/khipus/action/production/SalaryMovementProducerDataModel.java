@@ -1,14 +1,20 @@
 package com.encens.khipus.action.production;
 
 import com.encens.khipus.framework.action.QueryDataModel;
+import com.encens.khipus.model.employees.Month;
 import com.encens.khipus.model.production.SalaryMovementProducer;
 import com.encens.khipus.model.production.SalaryMovementProducerState;
+import com.encens.khipus.model.production.TypeMovementProducer;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -30,9 +36,21 @@ public class SalaryMovementProducerDataModel extends QueryDataModel<Long, Salary
     private String maidenName;
     private SalaryMovementProducerState state;
 
+    /** Selectores de periodo (atajo para calcular startDate/endDate por quincena). */
+    private Integer year;
+    private Month monthEnum;
+    private Integer quincena;
+
+    /** Totalizadores de lo filtrado, calculados de forma perezosa tras cada busqueda. */
+    private Double totalAmount;
+    private Double totalSaldo;
+    private boolean totalsDirty = true;
+
     private static final String[] RESTRICTIONS = {
             "salaryMovementProducer.date >= #{salaryMovementProducerDataModel.startDate}",
             "salaryMovementProducer.date <= #{salaryMovementProducerDataModel.endDate}",
+            "salaryMovementProducer.date >= #{salaryMovementProducerDataModel.periodStartDate}",
+            "salaryMovementProducer.date <= #{salaryMovementProducerDataModel.periodEndDate}",
             "salaryMovementProducer.typeMovementProducer = #{salaryMovementProducerDataModel.criteria.typeMovementProducer}",
             "salaryMovementProducer.state = #{salaryMovementProducerDataModel.state}",
             "upper(rawMaterialProducer.firstName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.firstName})), '%')",
@@ -61,6 +79,86 @@ public class SalaryMovementProducerDataModel extends QueryDataModel<Long, Salary
     public void defaultSort() {
         sortProperty = "salaryMovementProducer.date";
         this.sortAsc = false;
+        applyDefaultPeriod();
+    }
+
+    /** Defaults del filtro de periodo: anio actual, mes actual, primera quincena. */
+    private void applyDefaultPeriod() {
+        Calendar cal = Calendar.getInstance();
+        this.year = cal.get(Calendar.YEAR);
+        this.monthEnum = Month.getMonthByCalendarIndex(cal.get(Calendar.MONTH));
+        this.quincena = 1;
+    }
+
+    /**
+     * Inicio del periodo (anio/mes/quincena) como filtro independiente de las fechas.
+     * Retorna null si el periodo esta incompleto, para que la restriccion se omita.
+     */
+    public Date getPeriodStartDate() {
+        if (year == null || monthEnum == null || quincena == null) {
+            return null;
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.clear();
+        cal.set(year, monthEnum.getValue(), (quincena == 2 ? 16 : 1), 0, 0, 0);
+        return cal.getTime();
+    }
+
+    /** Fin del periodo (anio/mes/quincena) como filtro independiente de las fechas. */
+    public Date getPeriodEndDate() {
+        if (year == null || monthEnum == null || quincena == null) {
+            return null;
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.clear();
+        cal.set(year, monthEnum.getValue(), 1, 0, 0, 0);
+        if (quincena == 2) {
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        } else {
+            cal.set(Calendar.DAY_OF_MONTH, 15);
+        }
+        return cal.getTime();
+    }
+
+    /**
+     * Rango efectivo (interseccion) entre las fechas manuales y el periodo,
+     * equivalente al AND de ambas restricciones. Lo usa la exportacion a Excel.
+     */
+    public Date getEffectiveStartDate() {
+        Date periodStart = getPeriodStartDate();
+        if (startDate == null) {
+            return periodStart;
+        }
+        if (periodStart == null) {
+            return startDate;
+        }
+        return startDate.after(periodStart) ? startDate : periodStart;
+    }
+
+    public Date getEffectiveEndDate() {
+        Date periodEnd = getPeriodEndDate();
+        if (endDate == null) {
+            return periodEnd;
+        }
+        if (periodEnd == null) {
+            return endDate;
+        }
+        return endDate.before(periodEnd) ? endDate : periodEnd;
+    }
+
+    /** Limpia todos los filtros y vuelve al periodo por defecto. */
+    public void clearFilters() {
+        this.firstName = null;
+        this.lastName = null;
+        this.maidenName = null;
+        this.state = null;
+        this.startDate = null;
+        this.endDate = null;
+        if (getCriteria() != null) {
+            getCriteria().setTypeMovementProducer(null);
+        }
+        applyDefaultPeriod();
+        search();
     }
 
     @Override
@@ -119,5 +217,144 @@ public class SalaryMovementProducerDataModel extends QueryDataModel<Long, Salary
     /** Valores para el combo del filtro por estado (PENDIENTE / PAGADO). */
     public SalaryMovementProducerState[] getStates() {
         return SalaryMovementProducerState.values();
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public Month getMonthEnum() {
+        return monthEnum;
+    }
+
+    public void setMonthEnum(Month monthEnum) {
+        this.monthEnum = monthEnum;
+    }
+
+    public Integer getQuincena() {
+        return quincena;
+    }
+
+    public void setQuincena(Integer quincena) {
+        this.quincena = quincena;
+    }
+
+    /** Meses para el combo del filtro de periodo. */
+    public Month[] getMonthList() {
+        return Month.values();
+    }
+
+    /** Lista de anios para el combo (anio actual y los 5 previos). */
+    public List<Integer> getYearList() {
+        List<Integer> years = new ArrayList<Integer>();
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        for (int y = currentYear; y >= currentYear - 5; y--) {
+            years.add(y);
+        }
+        return years;
+    }
+
+    @Override
+    public void search() {
+        super.search();
+        // Reinicia la cache de conteo/estado para que el paginador refleje el nuevo filtro.
+        update();
+        this.totalsDirty = true;
+    }
+
+    public Double getTotalAmount() {
+        computeTotalsIfNeeded();
+        return totalAmount;
+    }
+
+    public Double getTotalSaldo() {
+        computeTotalsIfNeeded();
+        return totalSaldo;
+    }
+
+    private void computeTotalsIfNeeded() {
+        if (!totalsDirty) {
+            return;
+        }
+        computeTotals();
+        totalsDirty = false;
+    }
+
+    /** Suma Monto y Saldo aplicando los mismos filtros que la lista. */
+    private void computeTotals() {
+        TypeMovementProducer typeMovementProducer =
+                getCriteria() != null ? getCriteria().getTypeMovementProducer() : null;
+        Date periodStart = getPeriodStartDate();
+        Date periodEnd = getPeriodEndDate();
+
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("select coalesce(sum(s.valor), 0), coalesce(sum(s.saldo), 0)");
+        jpql.append(" from SalaryMovementProducer s");
+        jpql.append(" left join s.rawMaterialProducer rawMaterialProducer");
+        jpql.append(" where 1 = 1");
+        if (startDate != null) {
+            jpql.append(" and s.date >= :startDate");
+        }
+        if (endDate != null) {
+            jpql.append(" and s.date <= :endDate");
+        }
+        if (periodStart != null) {
+            jpql.append(" and s.date >= :periodStart");
+        }
+        if (periodEnd != null) {
+            jpql.append(" and s.date <= :periodEnd");
+        }
+        if (typeMovementProducer != null) {
+            jpql.append(" and s.typeMovementProducer = :typeMovementProducer");
+        }
+        if (state != null) {
+            jpql.append(" and s.state = :state");
+        }
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            jpql.append(" and upper(rawMaterialProducer.firstName) like :firstName");
+        }
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            jpql.append(" and upper(rawMaterialProducer.lastName) like :lastName");
+        }
+        if (maidenName != null && !maidenName.trim().isEmpty()) {
+            jpql.append(" and upper(rawMaterialProducer.maidenName) like :maidenName");
+        }
+
+        Query query = getEntityManager().createQuery(jpql.toString());
+        if (startDate != null) {
+            query.setParameter("startDate", startDate, TemporalType.DATE);
+        }
+        if (endDate != null) {
+            query.setParameter("endDate", endDate, TemporalType.DATE);
+        }
+        if (periodStart != null) {
+            query.setParameter("periodStart", periodStart, TemporalType.DATE);
+        }
+        if (periodEnd != null) {
+            query.setParameter("periodEnd", periodEnd, TemporalType.DATE);
+        }
+        if (typeMovementProducer != null) {
+            query.setParameter("typeMovementProducer", typeMovementProducer);
+        }
+        if (state != null) {
+            query.setParameter("state", state);
+        }
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            query.setParameter("firstName", "%" + firstName.trim().toUpperCase() + "%");
+        }
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            query.setParameter("lastName", "%" + lastName.trim().toUpperCase() + "%");
+        }
+        if (maidenName != null && !maidenName.trim().isEmpty()) {
+            query.setParameter("maidenName", "%" + maidenName.trim().toUpperCase() + "%");
+        }
+
+        Object[] result = (Object[]) query.getSingleResult();
+        this.totalAmount = result[0] != null ? ((Number) result[0]).doubleValue() : 0.0;
+        this.totalSaldo = result[1] != null ? ((Number) result[1]).doubleValue() : 0.0;
     }
 }

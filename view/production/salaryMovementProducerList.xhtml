@@ -14,86 +14,148 @@
     <ui:define name="body">
         <h:form id="salaryMovementProducerSearch">
             <rich:simpleTogglePanel label="#{messages['SalaryMovementProducer.search']}" switchType="client">
-                <h:panelGrid columns="2" width="100%">
+                <s:div id="filterForm">
+                <h:panelGrid columns="1" width="100%">
 
-                    <s:div>
+                    <s:div style="display:flex; flex-wrap:wrap; align-items:flex-start; gap:20px;">
 
-                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['RawMaterialCollectionSession.startDate']}</ui:define>
-                            <rich:calendar value="#{salaryMovementProducerDataModel.startDate}"
-                                           enableManualInput="true"
-                                           datePattern="#{messages['patterns.date']}"
-                                           tabindex="1" styleClass="input">
-                            </rich:calendar>
-                        </s:decorate>
-                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['RawMaterialCollectionSession.state']}</ui:define>
-                            <rich:calendar value="#{salaryMovementProducerDataModel.endDate}"
-                                           enableManualInput="true"
-                                           datePattern="#{messages['patterns.date']}"
-                                           tabindex="2" styleClass="input">
-                            </rich:calendar>
-                        </s:decorate>
+                        <!-- IZQUIERDA: Nombre y apellidos -->
+                        <s:div style="flex:1; min-width:280px;">
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
+                                <h:inputText id="firstName" value="#{salaryMovementProducerDataModel.firstName}"
+                                             maxlength="100" tabindex="1" styleClass="input">
+                                </h:inputText>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
+                                <h:inputText id="lastName" value="#{salaryMovementProducerDataModel.lastName}"
+                                             maxlength="100" tabindex="2" styleClass="input">
+                                </h:inputText>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
+                                <h:inputText id="maidenName" value="#{salaryMovementProducerDataModel.maidenName}"
+                                             maxlength="100" tabindex="3" styleClass="input">
+                                </h:inputText>
+                            </s:decorate>
+                        </s:div>
 
-                        <s:decorate id="typeMovementProducerField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['SalaryMovementProducer.typeMovementProducer']}</ui:define>
-                            <h:selectOneMenu id="typeMovementProducer"
-                                             value="#{salaryMovementProducerDataModel.criteria.typeMovementProducer}"
-                                             styleClass="input"
-                                             tabindex="3">
-                                <s:selectItems value="#{typeMovementProducerList}" var="typeMovementProducer"
-                                               label="#{typeMovementProducer.name}"
-                                               hideNoSelectionLabel="false"
-                                               noSelectionLabel=""/>
-                                <s:convertEntity/>
-                            </h:selectOneMenu>
-                        </s:decorate>
+                        <!-- DERECHA: Tipo de descuento, Estado y fechas -->
+                        <s:div style="flex:1; min-width:280px;">
+                            <s:decorate id="typeMovementProducerField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalaryMovementProducer.typeMovementProducer']}</ui:define>
+                                <h:selectOneMenu id="typeMovementProducer"
+                                                 value="#{salaryMovementProducerDataModel.criteria.typeMovementProducer}"
+                                                 styleClass="input"
+                                                 tabindex="4">
+                                    <s:selectItems value="#{typeMovementProducerList}" var="typeMovementProducer"
+                                                   label="#{typeMovementProducer.name}"
+                                                   hideNoSelectionLabel="false"
+                                                   noSelectionLabel=""/>
+                                    <s:convertEntity/>
+                                </h:selectOneMenu>
+                            </s:decorate>
 
-                        <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['SalaryMovementProducer.state']}</ui:define>
-                            <h:selectOneMenu id="state"
-                                             value="#{salaryMovementProducerDataModel.state}"
-                                             styleClass="input"
-                                             tabindex="3">
-                                <s:selectItems value="#{salaryMovementProducerDataModel.states}"
-                                               var="element"
-                                               label="#{messages[element.resourceKey]}"
-                                               noSelectionLabel=""
-                                               hideNoSelectionLabel="false"/>
-                                <s:convertEnum/>
-                            </h:selectOneMenu>
-                        </s:decorate>
+                            <s:decorate id="stateField" template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['SalaryMovementProducer.state']}</ui:define>
+                                <h:selectOneMenu id="state"
+                                                 value="#{salaryMovementProducerDataModel.state}"
+                                                 styleClass="input"
+                                                 tabindex="5">
+                                    <s:selectItems value="#{salaryMovementProducerDataModel.states}"
+                                                   var="element"
+                                                   label="#{messages[element.resourceKey]}"
+                                                   noSelectionLabel=""
+                                                   hideNoSelectionLabel="false"/>
+                                    <s:convertEnum/>
+                                </h:selectOneMenu>
+                            </s:decorate>
+
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['RawMaterialCollectionSession.startDate']}</ui:define>
+                                <rich:calendar value="#{salaryMovementProducerDataModel.startDate}"
+                                               enableManualInput="true"
+                                               datePattern="#{messages['patterns.date']}"
+                                               tabindex="6" styleClass="input"/>
+                            </s:decorate>
+                            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                                <ui:define name="label">#{messages['RawMaterialCollectionSession.endDate']}</ui:define>
+                                <rich:calendar value="#{salaryMovementProducerDataModel.endDate}"
+                                               enableManualInput="true"
+                                               datePattern="#{messages['patterns.date']}"
+                                               tabindex="7" styleClass="input"/>
+                            </s:decorate>
+                        </s:div>
 
                     </s:div>
 
-                    <s:div>
+                    <!-- ABAJO CENTRADO: Anio, Mes, Quincena (independientes de las fechas), acciones y totales -->
+                    <s:div styleClass="salaryPeriodRow"
+                           style="display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-end; gap:14px; text-align:center; margin-top:8px;">
 
-                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Person.firstName']}</ui:define>
-                            <h:inputText id="firstName" value="#{salaryMovementProducerDataModel.firstName}"
-                                         maxlength="100" tabindex="3" styleClass="input">
-                            </h:inputText>
-                        </s:decorate>
-                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Person.lastName']}</ui:define>
-                            <h:inputText id="lastName" value="#{salaryMovementProducerDataModel.lastName}"
-                                         maxlength="100" tabindex="4" styleClass="input">
-                            </h:inputText>
-                        </s:decorate>
-                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
-                            <h:inputText id="maidenName" value="#{salaryMovementProducerDataModel.maidenName}"
-                                         maxlength="100" tabindex="5" styleClass="input">
-                            </h:inputText>
-                            <a4j:commandButton action="#{salaryMovementProducerDataModel.search}" reRender="salaryMovementProducerList, dataScroller"
+                        <s:div style="display:flex; flex-direction:column; text-align:left;">
+                            <h:outputLabel value="#{messages['Common.year']}" styleClass="label"/>
+                            <h:selectOneMenu value="#{salaryMovementProducerDataModel.year}"
+                                             styleClass="input" style="width:90px;" tabindex="8">
+                                <s:selectItems value="#{salaryMovementProducerDataModel.yearList}" var="y" label="#{y}"
+                                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                                <f:converter converterId="javax.faces.Integer"/>
+                            </h:selectOneMenu>
+                        </s:div>
+
+                        <s:div style="display:flex; flex-direction:column; text-align:left;">
+                            <h:outputLabel value="#{messages['Common.month']}" styleClass="label"/>
+                            <h:selectOneMenu value="#{salaryMovementProducerDataModel.monthEnum}"
+                                             styleClass="input" style="width:120px;" tabindex="9">
+                                <s:selectItems value="#{salaryMovementProducerDataModel.monthList}" var="m"
+                                               label="#{messages[m.resourceKey]}"
+                                               noSelectionLabel="" hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:div>
+
+                        <s:div style="display:flex; flex-direction:column; text-align:left;">
+                            <h:outputLabel value="#{messages['SalaryMovementProducer.quincena']}" styleClass="label"/>
+                            <h:selectOneMenu value="#{salaryMovementProducerDataModel.quincena}"
+                                             styleClass="input" style="width:150px;" tabindex="10">
+                                <f:selectItem itemValue="" itemLabel=""/>
+                                <f:selectItem itemValue="1" itemLabel="#{messages['Periodo.first']}"/>
+                                <f:selectItem itemValue="2" itemLabel="#{messages['Periodo.second']}"/>
+                                <f:converter converterId="javax.faces.Integer"/>
+                            </h:selectOneMenu>
+                        </s:div>
+
+                        <s:div style="display:flex; align-items:flex-end; gap:6px;">
+                            <a4j:commandButton action="#{salaryMovementProducerDataModel.search}"
+                                               reRender="salaryMovementProducerList, dataScroller, salaryTotalsPanel"
                                                styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
-                                               tabindex="6">
+                                               tabindex="11">
                                 <s:defaultAction/>
                             </a4j:commandButton>
-                        </s:decorate>
+                            <a4j:commandButton action="#{salaryMovementProducerDataModel.clearFilters}"
+                                               reRender="filterForm, salaryMovementProducerList, dataScroller"
+                                               styleClass="button" value="#{messages['Common.clear']}" id="clearButtonId"
+                                               tabindex="12"/>
+                        </s:div>
+
+                        <!-- Totalizadores de lo filtrado -->
+                        <s:div id="salaryTotalsPanel" style="text-align:left;">
+                            <h:panelGrid columns="2" cellpadding="2" styleClass="salaryTotals">
+                                <h:outputText value="#{messages['SalaryMovementProducer.totalAmount']}:" styleClass="label"/>
+                                <h:outputText value="#{salaryMovementProducerDataModel.totalAmount}" styleClass="right">
+                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                                <h:outputText value="#{messages['SalaryMovementProducer.totalSaldo']}:" styleClass="label"/>
+                                <h:outputText value="#{salaryMovementProducerDataModel.totalSaldo}" styleClass="right">
+                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </h:panelGrid>
+                        </s:div>
 
                     </s:div>
                 </h:panelGrid>
+                </s:div>
                 <rich:jQuery selector="#group" query="focus()" timing="onload"/>
             </rich:simpleTogglePanel>
 
