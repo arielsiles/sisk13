@@ -8,6 +8,7 @@ import com.encens.khipus.model.common.File;
 import com.encens.khipus.model.production.ProductionCollectionState;
 import com.encens.khipus.model.production.RawMaterialProducer;
 import com.encens.khipus.model.production.SalaryMovementProducer;
+import com.encens.khipus.model.production.SalaryMovementProducerState;
 import com.encens.khipus.model.production.TypeMovementProducer;
 import com.encens.khipus.service.production.RawMaterialProducerService;
 import com.encens.khipus.service.production.SalaryMovementProducerService;
@@ -107,8 +108,9 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
             salaryMovementProducer.setDate(this.startDate);
             salaryMovementProducer.setTypeMovementProducer(this.movementProducerType);
             salaryMovementProducer.setValor(this.amount);
+            salaryMovementProducer.setSaldo(this.amount);
             salaryMovementProducer.setDescription(this.description);
-            salaryMovementProducer.setState(ProductionCollectionState.PENDING);
+            salaryMovementProducer.setState(SalaryMovementProducerState.PENDIENTE);
 
             salaryMovementProducer.setRawMaterialProducer(producer);
             salaryMovementProducer.setProductiveZone(producer.getProductiveZone());
@@ -202,7 +204,7 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
     }
 
     public boolean isPending() {
-        return ProductionCollectionState.PENDING.equals(getInstance().getState());
+        return SalaryMovementProducerState.PENDIENTE.equals(getInstance().getState());
     }
 
     /** **/
@@ -374,7 +376,8 @@ public class SalaryMovementProducerAction extends GenericAction<SalaryMovementPr
                 smp.setRawMaterialProducer(producer);
                 smp.setDescription(getCellStringValue(row, 4));
                 smp.setValor(getCellDoubleValue(row, 5));
-                smp.setState(ProductionCollectionState.PENDING);
+                smp.setSaldo(getCellDoubleValue(row, 5));
+                smp.setState(SalaryMovementProducerState.PENDIENTE);
 
                 // TypeMovementProducer via em.getReference
                 String typeIdStr = getCellStringValue(row, 7);

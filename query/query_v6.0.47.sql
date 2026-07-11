@@ -134,3 +134,59 @@ WHERE tabla = 'funcionalidad';
 --   (idprecio_acopio_leche, preciohabil, preciodomingo, precioexcedentehabil, precioexcedentedomingo, fechaini, fechafin, estado)
 --   VALUES ((SELECT valor+1 FROM secuencia WHERE tabla='precio_acopio_leche'),
 --           5.00, 4.50, 4.00, 4.00, '2026-01-01', '2027-12-31', 'ENABLE');
+
+
+-- ============================================================================
+-- FASE 5: deuda de descuentos por productor (arrastre / carry-forward)
+--   Ver docs/acopio/deuda-descuentos-productor-v1.md
+-- ============================================================================
+
+-- 5.1) Saldo y estado del movimiento de descuento ---------------------------
+--   saldo = pendiente por cobrar (al crear = valor). El estado pasa a
+--   PENDIENTE (saldo>0) / PAGADO (saldo=0). Nuevo estado en la columna 'estado'.
+ALTER TABLE movimientosalarioproductor
+    ADD COLUMN saldo DECIMAL(16,2) NOT NULL DEFAULT 0;
+
+--   Corte de migracion: todo lo HASTA la 1ra quincena de Mayo 2026 (fecha <= 15/05/2026)
+--   se considera historico SALDADO (saldo 0, PAGADO). Lo posterior queda como deuda viva.
+UPDATE movimientosalarioproductor
+   SET saldo = 0, estado = 'PAGADO'
+ WHERE fecha <= '2026-05-15';
+
+UPDATE movimientosalarioproductor
+   SET saldo = valor, estado = 'PENDIENTE'
+ WHERE fecha > '2026-05-15';
+
+-- 5.2) Tabla de aplicaciones de descuento (trazabilidad + reversa) ----------
+CREATE TABLE IF NOT EXISTS aplicacion_descuento_productor (
+    idaplicacion_descuento_productor  BIGINT        NOT NULL,
+    idmovimientosalarioproductor      BIGINT        NOT NULL,
+    idregistropagomateriaprima        BIGINT        NOT NULL,
+    montoaplicado                     DECIMAL(16,2) NOT NULL,
+    fecha                             DATE          NOT NULL,
+    idcompania                        BIGINT        NOT NULL,
+    PRIMARY KEY (idaplicacion_descuento_productor),
+    CONSTRAINT fk_aplicdesc_movimiento
+        FOREIGN KEY (idmovimientosalarioproductor)
+        REFERENCES movimientosalarioproductor (idmovimientosalarioproductor),
+    CONSTRAINT fk_aplicdesc_registro
+        FOREIGN KEY (idregistropagomateriaprima)
+        REFERENCES registropagomateriaprima (idregistropagomateriaprima)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Secuencia de la tabla (TableGenerator)
+INSERT INTO secuencia (tabla, valor)
+    SELECT 'aplicacion_descuento_productor', 0 FROM dual
+    WHERE NOT EXISTS (SELECT 1 FROM secuencia WHERE tabla = 'aplicacion_descuento_productor');
+
+-- 5.3) Referencia al asiento contable en la planilla (para anular al revertir) ----
+--   Guarda el id del comprobante (sf_tmpenc) generado al contabilizar. Null si no lo esta.
+ALTER TABLE planillapagomateriaprima
+    ADD COLUMN idcomprobante BIGINT NULL;
+
+-- 5.4) Planillas historicas hasta el corte se marcan CONTABILIZADO (cerradas) -------
+--   Consistente con el corte de movimientos (fecha <= 15/05/2026 -> PAGADO). Asi el guard
+--   de orden no las considera pendientes y no bloquean regenerar desde la 2da quincena.
+--   Las quincenas POSTERIORES (2da may, jun...) quedan con su estado y se pueden borrar/regenerar.
+UPDATE planillapagomateriaprima SET estado = 'CONTABILIZADO'
+ WHERE fechafin <= '2026-05-15';

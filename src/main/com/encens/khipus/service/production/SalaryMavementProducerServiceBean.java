@@ -345,8 +345,9 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
 
         SalaryMovementProducer salaryMovementProducer = new SalaryMovementProducer();
         salaryMovementProducer.setDate(customerOrder.getOrderDate());
-        salaryMovementProducer.setState(ProductionCollectionState.PENDING);
+        salaryMovementProducer.setState(SalaryMovementProducerState.PENDIENTE);
         salaryMovementProducer.setValor(customerOrder.getTotalAmount());
+        salaryMovementProducer.setSaldo(customerOrder.getTotalAmount());
         salaryMovementProducer.setCompany(producer.getCompany());
         salaryMovementProducer.setProductiveZone(producer.getProductiveZone());
         salaryMovementProducer.setRawMaterialProducer(producer);
@@ -509,6 +510,74 @@ public class SalaryMavementProducerServiceBean extends ExtendedGenericServiceBea
         }
 
         return query.getResultList();
+    }
+
+    /** Tipos de descuento (movimiento por productor) que ARRASTRAN deuda. */
+    private static final java.util.List<String> CARRY_TYPES = java.util.Arrays.asList(
+            "VETERINARIO", "CREDITO", "CONCENTRADOS", "YOGURT", "TACHOS", "OTROS EGRESOS");
+
+    /** Descuento prioritario que NO arrastra, pero se aplica por movimiento (con trazabilidad)
+     *  para que el saldo baje y quede PAGADO solo si realmente se cobro. */
+    private static final java.util.List<String> COMMISSION_TYPES = java.util.Arrays.asList("COMISION BANCO");
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<Long, List<SalaryMovementProducer>> preloadCommissionMovements(Date startDate, Date endDate, ProductiveZone productiveZone) {
+        // Solo los de la quincena (no arrastra), con saldo>0, por productor y en orden FIFO.
+        List<SalaryMovementProducer> list = getEntityManager().createQuery(
+                "select m from SalaryMovementProducer m " +
+                " join fetch m.typeMovementProducer t " +
+                " where m.saldo > 0 " +
+                " and m.date between :startDate and :endDate " +
+                " and m.productiveZone = :productiveZone " +
+                " and t.name in (:types) " +
+                " order by m.rawMaterialProducer.id asc, m.date asc, m.id asc")
+                .setParameter("startDate", startDate, TemporalType.DATE)
+                .setParameter("endDate", endDate, TemporalType.DATE)
+                .setParameter("productiveZone", productiveZone)
+                .setParameter("types", COMMISSION_TYPES)
+                .getResultList();
+
+        Map<Long, List<SalaryMovementProducer>> result = new java.util.HashMap<Long, List<SalaryMovementProducer>>();
+        for (SalaryMovementProducer m : list) {
+            Long producerId = m.getRawMaterialProducer().getId();
+            List<SalaryMovementProducer> l = result.get(producerId);
+            if (l == null) {
+                l = new ArrayList<SalaryMovementProducer>();
+                result.put(producerId, l);
+            }
+            l.add(m);
+        }
+        return result;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<Long, List<SalaryMovementProducer>> preloadCarryMovements(Date endDate, ProductiveZone productiveZone) {
+        List<SalaryMovementProducer> list = getEntityManager().createQuery(
+                "select m from SalaryMovementProducer m " +
+                " join fetch m.typeMovementProducer t " +
+                " where m.saldo > 0 " +
+                " and m.date <= :endDate " +
+                " and m.productiveZone = :productiveZone " +
+                " and t.name in (:types) " +
+                " order by m.rawMaterialProducer.id asc, m.date asc, m.id asc")
+                .setParameter("endDate", endDate, TemporalType.DATE)
+                .setParameter("productiveZone", productiveZone)
+                .setParameter("types", CARRY_TYPES)
+                .getResultList();
+
+        Map<Long, List<SalaryMovementProducer>> result = new java.util.HashMap<Long, List<SalaryMovementProducer>>();
+        for (SalaryMovementProducer m : list) {
+            Long producerId = m.getRawMaterialProducer().getId();
+            List<SalaryMovementProducer> l = result.get(producerId);
+            if (l == null) {
+                l = new ArrayList<SalaryMovementProducer>();
+                result.put(producerId, l);
+            }
+            l.add(m);
+        }
+        return result;
     }
 
     @Override

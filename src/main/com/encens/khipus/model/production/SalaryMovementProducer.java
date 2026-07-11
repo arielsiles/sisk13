@@ -62,9 +62,14 @@ public class SalaryMovementProducer implements com.encens.khipus.model.BaseModel
     @Column(name = "valor",columnDefinition = "DECIMAL(16,2)", nullable = false)
     private double valor;
 
+    /** Saldo pendiente por cobrar de este movimiento. Al crear = valor. Se reduce
+     *  al contabilizar la planilla que lo cobra; en 0 el movimiento queda PAGADO. */
+    @Column(name = "saldo", columnDefinition = "DECIMAL(16,2)", nullable = false)
+    private double saldo;
+
     @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProductionCollectionState state = ProductionCollectionState.PENDING;
+    private SalaryMovementProducerState state = SalaryMovementProducerState.PENDIENTE;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "idzonaproductiva", nullable = true, updatable = false, insertable = true)
@@ -138,11 +143,19 @@ public class SalaryMovementProducer implements com.encens.khipus.model.BaseModel
         this.productiveZone = productiveZone;
     }
 
-    public ProductionCollectionState getState() {
+    public SalaryMovementProducerState getState() {
         return state;
     }
 
-    public void setState(ProductionCollectionState state) {
+    public void setState(SalaryMovementProducerState state) {
         this.state = state;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
     }
 }

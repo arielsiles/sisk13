@@ -60,6 +60,15 @@ public interface RawMaterialPayRollService extends GenericService {
 
     List<RawMaterialPayRoll> findAll(Date startDate, Date endDate, MetaProduct metaProduct);
 
+    /** Planillas del periodo (solo por fechas, cualquier estado). Para detectar el estado del periodo. */
+    List<RawMaterialPayRoll> findAllInDates(Date startDate, Date endDate);
+
+    /** Estado de la planilla del periodo (query escalar: refleja la BD sin caché de entidades). */
+    StatePayRoll findPeriodState(Date startDate, Date endDate);
+
+    /** Fecha fin de la ultima planilla CONTABILIZADO (null si no hay). Para sugerir la proxima quincena. */
+    Date getLastAccountedEndDate();
+
     List<RawMaterialPayRoll> findAll();
 
     boolean verifDayColected(Calendar date_aux, ProductiveZone zone);
@@ -71,6 +80,24 @@ public interface RawMaterialPayRollService extends GenericService {
     public void approvedNoteRejection(Calendar startDate, Calendar endDate);
 
     void approvedDiscounts(Calendar startDate, Calendar endDate, ProductiveZone productiveZone);
+
+    /** Commit de la deuda al contabilizar: reduce saldo de los movimientos por sus aplicaciones. */
+    void commitDiscountDebts(Date startDate, Date endDate, MetaProduct metaProduct);
+
+    /** Reversa de la deuda al anular/revertir: restaura saldo de los movimientos. */
+    void revertDiscountDebts(Date startDate, Date endDate, MetaProduct metaProduct);
+
+    /** Cambia el estado de todas las planillas del periodo/producto. */
+    void setPayRollsState(Date startDate, Date endDate, MetaProduct metaProduct, StatePayRoll state);
+
+    /** Guarda (o limpia con null) el id del comprobante en las planillas del periodo. */
+    void setPayRollsVoucherId(Date startDate, Date endDate, MetaProduct metaProduct, Long voucherId);
+
+    /** Id del comprobante contabilizado del periodo (null si no hay). */
+    Long findAccountingVoucherId(Date startDate, Date endDate, MetaProduct metaProduct);
+
+    /** Hay una quincena anterior (motor nuevo) sin contabilizar (guard de orden). */
+    boolean hasPriorUncontabilized(Date startDate, MetaProduct metaProduct);
 
     void approvedDiscountsGAB(Calendar startDate, Calendar endDate, ProductiveZone productiveZone);
 

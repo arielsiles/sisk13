@@ -2,6 +2,7 @@ package com.encens.khipus.action.production;
 
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.production.SalaryMovementProducer;
+import com.encens.khipus.model.production.SalaryMovementProducerState;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
@@ -27,11 +28,13 @@ public class SalaryMovementProducerDataModel extends QueryDataModel<Long, Salary
     private String firstName;
     private String lastName;
     private String maidenName;
+    private SalaryMovementProducerState state;
 
     private static final String[] RESTRICTIONS = {
             "salaryMovementProducer.date >= #{salaryMovementProducerDataModel.startDate}",
             "salaryMovementProducer.date <= #{salaryMovementProducerDataModel.endDate}",
             "salaryMovementProducer.typeMovementProducer = #{salaryMovementProducerDataModel.criteria.typeMovementProducer}",
+            "salaryMovementProducer.state = #{salaryMovementProducerDataModel.state}",
             "upper(rawMaterialProducer.firstName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.firstName})), '%')",
             "upper(rawMaterialProducer.lastName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.lastName})), '%')",
             "upper(rawMaterialProducer.maidenName) like concat(concat('%',upper(#{salaryMovementProducerDataModel.maidenName})), '%')"
@@ -103,5 +106,18 @@ public class SalaryMovementProducerDataModel extends QueryDataModel<Long, Salary
 
     public void setMaidenName(String maidenName) {
         this.maidenName = maidenName;
+    }
+
+    public SalaryMovementProducerState getState() {
+        return state;
+    }
+
+    public void setState(SalaryMovementProducerState state) {
+        this.state = state;
+    }
+
+    /** Valores para el combo del filtro por estado (PENDIENTE / PAGADO). */
+    public SalaryMovementProducerState[] getStates() {
+        return SalaryMovementProducerState.values();
     }
 }

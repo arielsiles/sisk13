@@ -90,9 +90,7 @@
                       styleClass="button"
                       propagation="none" rendered="#{s:hasPermission('RAWMATERIALPAYROLL','CREATE')}"/>
 
-            <s:button value="#{messages['RawMaterialPayRoll.approve']}" action="#{rawMaterialPayRollAction.startNewApprove}"
-                      styleClass="button"
-                      propagation="none" rendered="#{s:hasPermission('RAWMATERIALPAYROLL','CREATE')}"/>
+            <!-- Aprobar/Contabilizar/Revertir ahora son botones dentro de la planilla (rawMaterialPayRoll.xhtml). -->
 
             <!-- <s:button value="#{messages['Common.new']}" action="#{rawMaterialPayRollAction.generateResumen}" styleClass="button"
             propagation="none" rendered="#{s:hasPermission('RAWMATERIALPAYROLL','VIEWRESUMENRAWMATERILPAYROLL')}" />

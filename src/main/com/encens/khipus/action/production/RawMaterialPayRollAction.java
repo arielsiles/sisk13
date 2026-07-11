@@ -78,9 +78,124 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     @In
     private MilkPriceConfigService milkPriceConfigService;
 
+    /** Contabilizacion (armado del asiento) y anulacion del comprobante. **/
+    @In
+    private com.encens.khipus.service.production.RawMaterialAccountingService rawMaterialAccountingService;
+    @In
+    private com.encens.khipus.service.accouting.VoucherAccoutingService voucherAccoutingService;
+
     @Override
     protected GenericService getService() {
         return rawMaterialPayRollService;
+    }
+
+    /** Fechas [inicio, fin] del periodo seleccionado (normalizadas a yyyy/MM/dd). */
+    private Date[] computePeriodDates() throws ParseException {
+        Calendar dateIni = Calendar.getInstance();
+        Calendar dateEnd = Calendar.getInstance();
+        dateIni.set(gestion.getYear(), month.getValue(), periodo.getInitDay());
+        dateEnd.set(gestion.getYear(), month.getValue(), periodo.getEndDay(month.getValue() + 1, gestion.getYear()));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        return new Date[]{
+                dateFormat.parse(dateFormat.format(dateIni.getTime())),
+                dateFormat.parse(dateFormat.format(dateEnd.getTime()))
+        };
+    }
+
+    /** Texto del periodo para la glosa del asiento (ej. "1RA QUINCENA MAYO 2026"). */
+    private String glossPeriodo() {
+        return periodo.getQuincenaLiteral() + month.getMonthLiteral().toUpperCase() + " " + gestion.getYear();
+    }
+
+    /** Estado de la planilla del periodo (para mostrar los botones): PENDING/APPROVED/CONTABILIZADO
+     *  o null si aun no hay planilla generada. */
+    public StatePayRoll getPeriodState() {
+        if (gestion == null) return null;
+        try {
+            Date[] d = computePeriodDates();
+            return rawMaterialPayRollService.findPeriodState(d[0], d[1]);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public boolean isGenerated() { return getPeriodState() != null; }
+    public boolean isPendingState() { return StatePayRoll.PENDING.equals(getPeriodState()); }
+    public boolean isApprovedState() { return StatePayRoll.APPROVED.equals(getPeriodState()); }
+    public boolean isAccountedState() { return StatePayRoll.CONTABILIZADO.equals(getPeriodState()); }
+
+    /** Clave i18n del estado de la planilla del periodo (para mostrarlo bajo el combo de Periodo). */
+    public String getPeriodStateKey() {
+        StatePayRoll s = getPeriodState();
+        if (StatePayRoll.PENDING.equals(s)) return "RawMaterialPayRoll.periodState.pending";
+        if (StatePayRoll.APPROVED.equals(s)) return "RawMaterialPayRoll.periodState.approved";
+        if (StatePayRoll.CONTABILIZADO.equals(s)) return "RawMaterialPayRoll.periodState.accounted";
+        return "RawMaterialPayRoll.periodState.none";
+    }
+
+    /** Aprobar planilla: bloquea sesiones/rechazos/GAB/reserva y pasa a APPROVED (gate para
+     *  contabilizar). El estado de los descuentos lo maneja el saldo al contabilizar. */
+    public String aprobar() {
+        try {
+            Date[] d = computePeriodDates();
+            MetaProduct meta = getInstance().getMetaProduct();
+            Calendar cIni = Calendar.getInstance(); cIni.setTime(d[0]);
+            Calendar cEnd = Calendar.getInstance(); cEnd.setTime(d[1]);
+            rawMaterialPayRollService.approvedSession(cIni, cEnd, null);
+            rawMaterialPayRollService.approvedNoteRejection(cIni, cEnd);
+            rawMaterialPayRollService.approvedDiscountsGAB(cIni, cEnd, null);
+            rawMaterialPayRollService.approvedReservProductor(cIni, cEnd);
+            rawMaterialPayRollService.setPayRollsState(d[0], d[1], meta, StatePayRoll.APPROVED);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "RawMaterialPayRoll.info.approved");
+        } catch (Exception ex) {
+            log.error("Error al aprobar", ex);
+            facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
+        }
+        return Outcome.REDISPLAY;
+    }
+
+    /** Contabilizar: genera el asiento, commitea la deuda (baja saldos) y cierra la quincena. */
+    public String contabilizar() {
+        try {
+            Date[] d = computePeriodDates();
+            MetaProduct meta = getInstance().getMetaProduct();
+            com.encens.khipus.model.finances.Voucher voucher =
+                    rawMaterialAccountingService.contabilizar(d[0], d[1], meta, glossPeriodo());
+            rawMaterialPayRollService.commitDiscountDebts(d[0], d[1], meta);
+            rawMaterialPayRollService.setPayRollsVoucherId(d[0], d[1], meta, voucher.getId());
+            rawMaterialPayRollService.setPayRollsState(d[0], d[1], meta, StatePayRoll.CONTABILIZADO);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "RawMaterialPayRoll.info.accounted");
+        } catch (Exception ex) {
+            log.error("Error al contabilizar", ex);
+            facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
+        }
+        return Outcome.REDISPLAY;
+    }
+
+    /** Revertir: anula el asiento, restaura los saldos de la deuda y reabre la quincena. */
+    public String revertir() {
+        try {
+            Date[] d = computePeriodDates();
+            MetaProduct meta = getInstance().getMetaProduct();
+            Long voucherId = rawMaterialPayRollService.findAccountingVoucherId(d[0], d[1], meta);
+            if (voucherId != null) {
+                com.encens.khipus.model.finances.Voucher voucher = voucherAccoutingService.getVoucher(voucherId);
+                if (voucher != null) {
+                    // annulVoucher solo persiste; el estado ANL lo debe fijar el caller (igual que
+                    // VoucherUpdateAction/VoucherCreateAction). Sin esto el asiento quedaba en PEN.
+                    voucher.setState(com.encens.khipus.model.finances.VoucherState.ANL.toString());
+                    voucherAccoutingService.annulVoucher(voucher);
+                }
+            }
+            rawMaterialPayRollService.revertDiscountDebts(d[0], d[1], meta);
+            rawMaterialPayRollService.setPayRollsVoucherId(d[0], d[1], meta, null);
+            rawMaterialPayRollService.setPayRollsState(d[0], d[1], meta, StatePayRoll.PENDING);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "RawMaterialPayRoll.info.reverted");
+        } catch (Exception ex) {
+            log.error("Error al revertir", ex);
+            facesMessages.addFromResourceBundle(ERROR, "Common.globalError.description");
+        }
+        return Outcome.REDISPLAY;
     }
 
     @Factory(value = "rawMaterialPayRoll", scope = ScopeType.STATELESS)
@@ -228,15 +343,19 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
                 return Outcome.FAIL;
             }
 
+            // Guard de orden: por el arrastre de deuda, no se puede generar esta quincena si
+            // hay una anterior (motor nuevo) sin contabilizar. Contabilizar/revertir/borrar esa antes.
+            if (rawMaterialPayRollService.hasPriorUncontabilized(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getMetaProduct())) {
+                facesMessages.addFromResourceBundle(WARN, "RawMaterialPayRoll.warn.priorUncontabilized");
+                return Outcome.REDISPLAY;
+            }
+
             List<DiscountProducer> discountProducers = rawMaterialPayRollService.findDiscountsProducerByDate(rawMaterialPayRoll.getEndDate());
             if (discountProducers.size() > 1) {
                 addDatesDuplicatesMessage();
                 return Outcome.REDISPLAY;
             }
             DiscountProducer discountProducer = discountProducers.isEmpty() ? null : discountProducers.get(0);
-
-            if (discountProducer == null || discountProducer.getReserve() == 0.0)
-                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "RawMaterialPayRoll.info.NoFoundReserve");
 
             List<ProductiveZone> productiveZones = productiveZoneService.findAllThatDoNotHaveCollectionForm(
                     rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
@@ -288,14 +407,16 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
 
                 // 3) EXCEDENTE por tipo de dia (solo si hay productores con restriccion vigente).
                 if (!restrictionCache.isEmpty()) {
-                    RawMaterialPayRoll excHabil = buildBasePayRoll(rawMaterialPayRoll, zone, priceConfig.getPriceWeekday());
+                    // El unitPrice de la planilla EXCEDENTE debe ser el precio de EXCEDENTE (no el
+                    // normal): es el que muestra el resumen y con el que cuadra litros x precio.
+                    RawMaterialPayRoll excHabil = buildBasePayRoll(rawMaterialPayRoll, zone, priceConfig.getExcessPriceWeekday());
                     excHabil.setDayType(DayType.HABIL);
                     rawMaterialPayRollService.generateExcessPayroll(excHabil, restrictionCache, 1, priceConfig.getExcessPriceWeekday());
                     if (!excHabil.getRawMaterialPayRecordList().isEmpty()) {
                         rawMaterialPayRollService.createAll(excHabil);
                     }
 
-                    RawMaterialPayRoll excDomingo = buildBasePayRoll(rawMaterialPayRoll, zone, priceConfig.getPriceSunday());
+                    RawMaterialPayRoll excDomingo = buildBasePayRoll(rawMaterialPayRoll, zone, priceConfig.getExcessPriceSunday());
                     excDomingo.setDayType(DayType.DOMINGO);
                     rawMaterialPayRollService.generateExcessPayroll(excDomingo, restrictionCache, 2, priceConfig.getExcessPriceSunday());
                     if (!excDomingo.getRawMaterialPayRecordList().isEmpty()) {
@@ -386,7 +507,8 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
             return Outcome.SUCCESS;
         }
         for (RawMaterialPayRoll payRoll : rawMaterialPayRolls) {
-            if(payRoll.getState().equals(StatePayRoll.APPROVED))
+            // Solo se bloquea el borrado si esta CONTABILIZADA (hay que Revertir primero).
+            if(payRoll.getState().equals(StatePayRoll.CONTABILIZADO))
             {
                 addErrorGeneratePayRollMessage(rawMaterialPayRoll.getStartDate(),rawMaterialPayRoll.getEndDate());
                 return Outcome.SUCCESS;
@@ -460,19 +582,7 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     }*/
 
     public Gestion getGestion() {
-        // Default solo si aun no hay seleccion (primer render): la gestion de la
-        // planilla si es existente, o la ultima gestion. Asi los precios vigentes
-        // se resuelven ya en la primera entrada, sin esperar a que el usuario
-        // cambie el combo.
-        if (gestion == null) {
-            if (getInstance().getId() != null && getInstance().getStartDate() != null) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(getInstance().getStartDate());
-                gestion = gestionService.getGestion(cal.get(Calendar.YEAR));
-            } else {
-                gestion = gestionService.getLastGestion();
-            }
-        }
+        if (gestion == null) applyDefaultPeriod();
         return gestion;
     }
 
@@ -481,15 +591,7 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     }
 
     public Month getMonth() {
-        if(getInstance().getId() != null)
-        {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(getInstance().getStartDate());
-            this.month = Month.getMonth(cal.getTime());
-        }
-        else
-           month = Month.getMonth(new Date());
-
+        if (month == null) applyDefaultPeriod();
         return month;
     }
 
@@ -498,28 +600,42 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
     }
 
     public Periodo getPeriodo() {
-        if(getInstance().getId() != null)
-        {
-            Calendar end = Calendar.getInstance();
-            end.setTime(getInstance().getEndDate());
-            if(end.get(Calendar.DAY_OF_MONTH) > 15)
-                this.periodo = Periodo.SECONDPERIODO;
-            else
-                this.periodo = Periodo.FIRSTPERIODO;
-        }else
-        {
-            Calendar end = Calendar.getInstance();
-            end.setTime(new Date());
-            if(end.get(Calendar.DAY_OF_MONTH) > 15)
-                this.periodo = Periodo.SECONDPERIODO;
-            else
-                this.periodo = Periodo.FIRSTPERIODO;
-        }
+        if (periodo == null) applyDefaultPeriod();
         return periodo;
     }
 
     public void setPeriodo(Periodo periodo) {
         this.periodo = periodo;
+    }
+
+    /**
+     * Default de gestion/mes/periodo en el primer render (solo setea los campos aun nulos,
+     * para no pisar la seleccion del usuario en los ajax posteriores):
+     *  - Planilla existente: se derivan de sus fechas.
+     *  - Nueva: la PROXIMA quincena a generar = el dia siguiente a la fecha fin de la
+     *    ultima planilla CONTABILIZADA (o la fecha actual si aun no hay ninguna).
+     */
+    private void applyDefaultPeriod() {
+        Calendar c = Calendar.getInstance();
+        if (getInstance().getId() != null && getInstance().getStartDate() != null) {
+            c.setTime(getInstance().getStartDate());
+        } else {
+            Date lastEnd = rawMaterialPayRollService.getLastAccountedEndDate();
+            if (lastEnd != null) {
+                c.setTime(lastEnd);
+                c.add(Calendar.DAY_OF_MONTH, 1); // inicio de la quincena siguiente
+            }
+        }
+        if (gestion == null) {
+            gestion = gestionService.getGestion(c.get(Calendar.YEAR));
+            if (gestion == null) gestion = gestionService.getLastGestion();
+        }
+        if (month == null) {
+            month = Month.getMonth(c.getTime());
+        }
+        if (periodo == null) {
+            periodo = (c.get(Calendar.DAY_OF_MONTH) > 15) ? Periodo.SECONDPERIODO : Periodo.FIRSTPERIODO;
+        }
     }
 
     public List<GestionPayroll> getGestionPayrollList() {
@@ -621,12 +737,15 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         return payRoll;
     }
 
+    /** Aviso (no error): la planilla SI se genera. Solo advierte que ese productor
+     *  quedo con liquido negativo (sus descuentos superan lo ganado), para revisarlo. */
     private void warnNegativeLiquid(RawMaterialPayRoll payRoll, ProductiveZone zone) {
         for (RawMaterialPayRecord rec : payRoll.getRawMaterialPayRecordList()) {
             if (rec.getLiquidPayable() < 0) {
                 String producerName = rec.getRawMaterialProducerDiscount().getRawMaterialProducer().getFullName();
-                facesMessages.add(StatusMessage.Severity.ERROR,
-                        "Liquido pagable negativo: " + producerName + " (" + zone.getFullName() + ") = " + rec.getLiquidPayable() + " Bs");
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                        "RawMaterialPayRoll.warn.negativeLiquid",
+                        producerName, zone.getFullName(), rec.getLiquidPayable());
             }
         }
     }

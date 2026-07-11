@@ -260,11 +260,14 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         System.out.println("Fecha Inicio: " + DateUtils.format(startDate, "dd/MM/yyyy"));
         System.out.println("Fecha Fin: " + DateUtils.format(endDate, "dd/MM/yyyy"));
 
-        discounts = rawMaterialPayRollService.getDiscounts(startDate, endDate, zone, metaProduct);
-        summaryTotal = rawMaterialPayRollService.getSumaryTotal(startDate, endDate, zone, metaProduct);
+        // Bloque QUINCENA (dias habiles): unico con diferencia, descuentos, retencion,
+        // IT/IUE, reserva y GA. Domingos y excedentes son planillas puras.
+        discounts = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
+                PayRollType.NORMAL, DayType.HABIL);
 
         Double totalMoneyCollected = discounts.mount;
-        Double totalDifferencesMoney = rawMaterialPayRollService.getSumAdjustmentFromRecords(startDate, endDate, metaProduct);
+        Double totalDifferencesMoney = rawMaterialPayRollService.getSumAdjustmentFromRecords(startDate, endDate, metaProduct,
+                PayRollType.NORMAL, DayType.HABIL);
         Double diffTotal = (discounts.unitPrice != 0) ? totalDifferencesMoney / discounts.unitPrice : 0.0;
         Double balanceWeightTotal = discounts.collected + diffTotal;
         Double totalMoneyBalance = totalMoneyCollected + totalDifferencesMoney;
@@ -282,6 +285,17 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         iue = discounts.retention * porcentageIUE;
         it = discounts.retention - iue;
         Double totalLiquid = discounts.liquid;
+
+        // Bloques puros DOMINGOS y EXCEDENTES: solo leche cruda (debe) / acreedores
+        // productores (haber) por su liquido; sin retencion ni descuentos.
+        RawMaterialPayRollServiceBean.Discounts domingos = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
+                PayRollType.NORMAL, DayType.DOMINGO);
+        RawMaterialPayRollServiceBean.Discounts excedenteQuincena = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
+                PayRollType.EXCEDENTE, DayType.HABIL);
+        RawMaterialPayRollServiceBean.Discounts excedenteDomingo = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
+                PayRollType.EXCEDENTE, DayType.DOMINGO);
+        Double domingoLiquid = domingos.liquid;
+        Double excedenteLiquid = excedenteQuincena.liquid + excedenteDomingo.liquid;
 
 
         System.out.println(".......PARA CONTABILIZAR......");
@@ -318,6 +332,7 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         voucherDebit.setExchangeAmount(BigDecimal.ONE);
         voucherDebit.setDebitMe(BigDecimal.ZERO);
         voucherDebit.setCreditMe(BigDecimal.ZERO);
+        voucherDebit.setGloss("ACOPIO QUINCENA (HABILES)");
         voucher.addVoucherDetail(voucherDebit);
 
         if (discounts.commission > 0){
@@ -367,6 +382,7 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
             voucherCredt4.setDebitMe(BigDecimal.ZERO);
             voucherCredt4.setCreditMe(BigDecimal.ZERO);
             voucherCredt4.setProviderCode(Constants.PROVIDER_CODE_PRODUCTORES);
+            voucherCredt4.setGloss("LIQUIDO QUINCENA (HABILES)");
             voucher.addVoucherDetail(voucherCredt4);
         }
 
@@ -491,6 +507,58 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
             voucherCredt6.setDebitMe(BigDecimal.ZERO);
             voucherCredt6.setCreditMe(BigDecimal.ZERO);
             voucher.addVoucherDetail(voucherCredt6);
+        }
+
+        // ===== BLOQUE DOMINGOS (puro): Debe leche cruda / Haber acreedores productores =====
+        if (domingoLiquid > 0){
+            VoucherDetail domingoDebit = new VoucherDetail();
+            domingoDebit.setAccount(Constants.ACCOUNT_LECHECRUDA);
+            domingoDebit.setDebit(BigDecimalUtil.toBigDecimal(domingoLiquid));
+            domingoDebit.setCredit(BigDecimal.ZERO);
+            domingoDebit.setCurrency(FinancesCurrencyType.P);
+            domingoDebit.setExchangeAmount(BigDecimal.ONE);
+            domingoDebit.setDebitMe(BigDecimal.ZERO);
+            domingoDebit.setCreditMe(BigDecimal.ZERO);
+            domingoDebit.setGloss("ACOPIO DOMINGOS");
+            voucher.addVoucherDetail(domingoDebit);
+
+            VoucherDetail domingoCredit = new VoucherDetail();
+            domingoCredit.setAccount(Constants.ACCOUNT_ACREEDORES_BIENESSERVICIOS);
+            domingoCredit.setDebit(BigDecimal.ZERO);
+            domingoCredit.setCredit(BigDecimalUtil.toBigDecimal(domingoLiquid));
+            domingoCredit.setCurrency(FinancesCurrencyType.P);
+            domingoCredit.setExchangeAmount(BigDecimal.ONE);
+            domingoCredit.setDebitMe(BigDecimal.ZERO);
+            domingoCredit.setCreditMe(BigDecimal.ZERO);
+            domingoCredit.setProviderCode(Constants.PROVIDER_CODE_PRODUCTORES);
+            domingoCredit.setGloss("LIQUIDO DOMINGOS");
+            voucher.addVoucherDetail(domingoCredit);
+        }
+
+        // ===== BLOQUE EXCEDENTES (puro): Debe leche cruda / Haber acreedores productores =====
+        if (excedenteLiquid > 0){
+            VoucherDetail excedenteDebit = new VoucherDetail();
+            excedenteDebit.setAccount(Constants.ACCOUNT_LECHECRUDA);
+            excedenteDebit.setDebit(BigDecimalUtil.toBigDecimal(excedenteLiquid));
+            excedenteDebit.setCredit(BigDecimal.ZERO);
+            excedenteDebit.setCurrency(FinancesCurrencyType.P);
+            excedenteDebit.setExchangeAmount(BigDecimal.ONE);
+            excedenteDebit.setDebitMe(BigDecimal.ZERO);
+            excedenteDebit.setCreditMe(BigDecimal.ZERO);
+            excedenteDebit.setGloss("ACOPIO EXCEDENTES");
+            voucher.addVoucherDetail(excedenteDebit);
+
+            VoucherDetail excedenteCredit = new VoucherDetail();
+            excedenteCredit.setAccount(Constants.ACCOUNT_ACREEDORES_BIENESSERVICIOS);
+            excedenteCredit.setDebit(BigDecimal.ZERO);
+            excedenteCredit.setCredit(BigDecimalUtil.toBigDecimal(excedenteLiquid));
+            excedenteCredit.setCurrency(FinancesCurrencyType.P);
+            excedenteCredit.setExchangeAmount(BigDecimal.ONE);
+            excedenteCredit.setDebitMe(BigDecimal.ZERO);
+            excedenteCredit.setCreditMe(BigDecimal.ZERO);
+            excedenteCredit.setProviderCode(Constants.PROVIDER_CODE_PRODUCTORES);
+            excedenteCredit.setGloss("LIQUIDO EXCEDENTES");
+            voucher.addVoucherDetail(excedenteCredit);
         }
 
         voucherAccoutingService.saveVoucher(voucher);

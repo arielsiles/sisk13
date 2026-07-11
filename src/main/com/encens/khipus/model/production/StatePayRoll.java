@@ -9,7 +9,8 @@ package com.encens.khipus.model.production;
  */
 public enum StatePayRoll {
     PENDING("PENDING", "PENDING"),
-    APPROVED("APPROVED", "APPROVED");
+    APPROVED("APPROVED", "APPROVED"),
+    CONTABILIZADO("CONTABILIZADO", "CONTABILIZADO");
     //EXECUTED("EXECUTED", "EXECUTED");
     private String value;
     private String state;

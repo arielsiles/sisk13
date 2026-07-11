@@ -197,6 +197,13 @@ import java.util.List;
                 query = " select " +
                         " rawMaterialPayRoll " +
                         " from RawMaterialPayRoll rawMaterialPayRoll "
+        ),
+        @NamedQuery(name = "RawMaterialPayRoll.getMaterialPayRollInDatesAllStates",
+                query = " select " +
+                        " rawMaterialPayRoll " +
+                        " from RawMaterialPayRoll rawMaterialPayRoll " +
+                        " where rawMaterialPayRoll.startDate = :startDate " +
+                        " and rawMaterialPayRoll.endDate = :endDate "
         )
 })
 
@@ -247,6 +254,11 @@ public class RawMaterialPayRoll implements BaseModel {
     @Column(name = "tipodia", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
     private DayType dayType = DayType.NINGUNO;
+
+    /** Id del comprobante contable (sf_tmpenc) generado al contabilizar. Se guarda para
+     *  poder ANULAR el asiento al revertir. Null mientras no este contabilizada. */
+    @Column(name = "idcomprobante", nullable = true)
+    private Long accountingVoucherId;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -368,6 +380,14 @@ public class RawMaterialPayRoll implements BaseModel {
 
     public void setDayType(DayType dayType) {
         this.dayType = dayType;
+    }
+
+    public Long getAccountingVoucherId() {
+        return accountingVoucherId;
+    }
+
+    public void setAccountingVoucherId(Long accountingVoucherId) {
+        this.accountingVoucherId = accountingVoucherId;
     }
 
     public long getVersion() {

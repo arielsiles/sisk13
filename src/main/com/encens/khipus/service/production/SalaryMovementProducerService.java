@@ -36,6 +36,17 @@ public interface SalaryMovementProducerService extends GenericService {
     /** @Claude OPT-4: Firma batch para pre-cargar descuentos de todos los productores de una zona **/
     Map<Long, RawMaterialProducerDiscount> prepareDiscountsBatch(Date startDate, Date endDate, ProductiveZone productiveZone);
 
+    /**
+     * Movimientos que ARRASTRAN deuda (veterinario, credito, concentrados, yogurt, tachos,
+     * otros egresos) con saldo pendiente (&gt;0) y fecha &lt;= endDate, por zona, agrupados por
+     * productor y ordenados FIFO (mas antiguo primero). Base del cobro con tope/arrastre.
+     */
+    Map<Long, List<SalaryMovementProducer>> preloadCarryMovements(Date endDate, ProductiveZone productiveZone);
+
+    /** Movimientos de COMISION BANCO de la quincena (saldo>0), por productor y FIFO. Se aplican
+     *  con trazabilidad (aplicacion) para que el saldo baje y quede PAGADO solo si se cobro. */
+    Map<Long, List<SalaryMovementProducer>> preloadCommissionMovements(Date startDate, Date endDate, ProductiveZone productiveZone);
+
     void importSalaryMovements(List<SalaryMovementProducer> list);
 
 }

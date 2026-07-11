@@ -35,6 +35,12 @@ public class RawMaterialPayRecord {
     @JoinColumn(name = "idplanillapagomateriaprima", nullable = false, updatable = false, insertable = true)
     private RawMaterialPayRoll rawMaterialPayRoll;
 
+    /** Aplicaciones de descuento (cuanto se cobro de cada movimiento en este registro).
+     *  Trazabilidad + reversa. Cascada: se persisten/borran junto al registro. */
+    @OneToMany(mappedBy = "rawMaterialPayRecord", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+    private java.util.List<DiscountApplication> discountApplications = new java.util.ArrayList<DiscountApplication>();
+
     @Column(name = "cantidadtotal", columnDefinition = "DECIMAL(24,2)" ,nullable = false)
     private double totalAmount = 0.0;
 
@@ -143,6 +149,14 @@ public class RawMaterialPayRecord {
 
     public void setRawMaterialPayRoll(RawMaterialPayRoll rawMaterialPayRoll) {
         this.rawMaterialPayRoll = rawMaterialPayRoll;
+    }
+
+    public java.util.List<DiscountApplication> getDiscountApplications() {
+        return discountApplications;
+    }
+
+    public void setDiscountApplications(java.util.List<DiscountApplication> discountApplications) {
+        this.discountApplications = discountApplications;
     }
 
     public double getLiquidPayable() {

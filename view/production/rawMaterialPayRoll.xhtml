@@ -86,7 +86,7 @@
                                    label="#{gestion.year}"
                                    hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
-                    <a4j:support event="onchange" reRender="priceConfigPanel" ajaxSingle="true"
+                    <a4j:support event="onchange" reRender="priceConfigPanel,lifecycleButtons,periodStatePanel" ajaxSingle="true"
                                  process="gestion,month,periodo"/>
                 </h:selectOneMenu>
             </s:decorate>
@@ -102,7 +102,7 @@
                                    label="#{messages[month.resourceKey]}"
                                    hideNoSelectionLabel="false"/>
                     <s:convertEnum/>
-                    <a4j:support event="onchange" reRender="priceConfigPanel" ajaxSingle="true"
+                    <a4j:support event="onchange" reRender="priceConfigPanel,lifecycleButtons,periodStatePanel" ajaxSingle="true"
                                  process="gestion,month,periodo"/>
                 </h:selectOneMenu>
             </s:decorate>
@@ -117,9 +117,18 @@
                                    label="#{messages[periodos.resourceKey]}"
                                    hideNoSelectionLabel="false"/>
                     <s:convertEnum/>
-                    <a4j:support event="onchange" reRender="priceConfigPanel" ajaxSingle="true"
+                    <a4j:support event="onchange" reRender="priceConfigPanel,lifecycleButtons,periodStatePanel" ajaxSingle="true"
                                  process="gestion,month,periodo"/>
                 </h:selectOneMenu>
+            </s:decorate>
+
+            <!-- Estado de la planilla del periodo seleccionado (se refresca al cambiar el combo). -->
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['RawMaterialPayRoll.periodState']}</ui:define>
+                <a4j:outputPanel id="periodStatePanel" layout="block">
+                    <h:outputText value="#{messages[rawMaterialPayRollAction.periodStateKey]}"
+                                  style="font-weight:bold;"/>
+                </a4j:outputPanel>
             </s:decorate>
 
         </s:div>
@@ -139,10 +148,9 @@
 
             <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['RawMaterialPayRoll.taxRate']}</ui:define>
-                <h:inputText value="#{rawMaterialPayRoll.taxRate}" required="true" disabled="true"
-                             readonly="#{rawMaterialPayRollAction.readonly}">
+                <h:outputText value="#{rawMaterialPayRoll.taxRate}" style="font-weight:bold;">
                     <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
-                </h:inputText>
+                </h:outputText>
             </s:decorate>
 
             <!-- Precios que se aplicaran al generar (config global vigente para el periodo). -->
@@ -179,27 +187,48 @@
 
     </h:panelGrid>
 
+    <a4j:outputPanel id="lifecycleButtons" layout="block">
     <div class="buttons">
+        <!-- Generar: aun no hay planilla del periodo -->
         <a4j:commandButton reRender="formPanel"
-                           rendered="#{!rawMaterialPayRollAction.managed and !rawMaterialPayRollAction.readonly}"
+                           rendered="#{!rawMaterialPayRollAction.managed and !rawMaterialPayRollAction.generated}"
                            value="#{messages['RawMaterialPayRoll.generatePayroll']}"
                            action="#{rawMaterialPayRollAction.generate}"
                            styleClass="button"/>
 
+        <!-- Aprobar: estado PENDING -->
         <a4j:commandButton reRender="formPanel"
-                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.readonly}"
-                           value="#{messages['RawMaterialPayRoll.redefinePayroll']}"
-                           action="#{rawMaterialPayRollAction.redefine}"
+                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.pendingState}"
+                           value="#{messages['RawMaterialPayRoll.approvePayroll']}"
+                           action="#{rawMaterialPayRollAction.aprobar}"
                            styleClass="button"/>
 
+        <!-- Contabilizar: estado APPROVED (con confirmacion) -->
         <a4j:commandButton
-                rendered="#{!rawMaterialPayRollAction.managed and !rawMaterialPayRollAction.readonly and rawMaterialPayRollAction.delete }"
+                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.approvedState}"
+                           value="#{messages['RawMaterialPayRoll.accountPayroll']}"
+                           styleClass="button">
+            <rich:componentControl for="accountConfirmation" event="onclick" disableDefault="true" operation="show"/>
+        </a4j:commandButton>
+
+        <!-- Revertir: estado CONTABILIZADO (con confirmacion) -->
+        <a4j:commandButton
+                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.accountedState}"
+                           value="#{messages['RawMaterialPayRoll.revertPayroll']}"
+                           styleClass="button">
+            <rich:componentControl for="revertConfirmation" event="onclick" disableDefault="true" operation="show"/>
+        </a4j:commandButton>
+
+        <!-- Borrar: PENDING o APPROVED (no contabilizado) -->
+        <a4j:commandButton
+                rendered="#{!rawMaterialPayRollAction.managed and (rawMaterialPayRollAction.pendingState or rawMaterialPayRollAction.approvedState)}"
                 value="#{messages['RawMaterialPayRoll.deleteAllPayroll']}"
                 styleClass="button">
             <rich:componentControl for="deleteAllConfirmation" event="onclick" disableDefault="true"
                                    operation="show"/>
         </a4j:commandButton>
     </div>
+    </a4j:outputPanel>
 
 </rich:panel>
 
@@ -238,6 +267,32 @@
         <a4j:commandButton action="#{rawMaterialPayRollAction.deleteAll}"
                            value="#{messages['Common.delete']}" immediate="true"
                            styleClass="button"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate template="/include/modalDialog.xhtml">
+    <ui:param name="dialogId" value="accountConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['RawMaterialPayRoll.accountPayroll']}</ui:define>
+    <ui:define name="dialogContent">
+        <p><h:outputText value="#{messages['RawMaterialPayRoll.account.confirmation']}"/></p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{rawMaterialPayRollAction.contabilizar}" reRender="formPanel"
+                           value="#{messages['Common.accept']}" styleClass="button"
+                           oncomplete="Richfaces.hideModalPanel('accountConfirmation');"/>
+    </ui:define>
+</s:decorate>
+
+<s:decorate template="/include/modalDialog.xhtml">
+    <ui:param name="dialogId" value="revertConfirmation"/>
+    <ui:define name="dialogTitle">#{messages['RawMaterialPayRoll.revertPayroll']}</ui:define>
+    <ui:define name="dialogContent">
+        <p><h:outputText value="#{messages['RawMaterialPayRoll.revert.confirmation']}"/></p>
+    </ui:define>
+    <ui:define name="dialogOption">
+        <a4j:commandButton action="#{rawMaterialPayRollAction.revertir}" reRender="formPanel"
+                           value="#{messages['Common.accept']}" styleClass="button"
+                           oncomplete="Richfaces.hideModalPanel('revertConfirmation');"/>
     </ui:define>
 </s:decorate>
 

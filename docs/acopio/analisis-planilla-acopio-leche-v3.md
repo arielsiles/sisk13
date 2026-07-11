@@ -171,6 +171,17 @@ Aquí sólo el delta relevante:
   - Ahora recibe `restrictionCache`. Construye `CappedCollection capped = buildCappedCollection(payRoll, restrictionCache, dayFilter)`.
   - La reserva usa `totalWeightFortnightGAB = calculateCollectedAmountBetweenDates(...) - capped.totalExcess` (resta el excedente de la base).
   - `createMapOfProducers(...)` itera **`capped.normalByProducer`** (paga sólo la leche ≤ cupo).
+  - **Ajuste de pesaje = PESADA − ACOPIO** (no `pesada − recibida`). El ajuste correcto es la
+    diferencia entre la **balanza** (`registroacopio.cantidadpesada`, vía `createMapOfDifferencesWeights`
+    que ahora acumula la pesada por día) y el **acopio por productor** (`acopiomateriaprima`, = `capped`
+    normal + excedente). Se calcula en `createMapOfProducers`:
+    `totalDifference = Σ pesada − (Σ normalByProducer + totalExcess) × precio`, y se prorratea por la
+    participación **normal** del productor.
+    - **Sin domingos**: se usa `dayFilter=1` (la pesada y el acopio son solo hábiles).
+    - **Sin excedentes**: el excedente está en la pesada **y** en el acopio, por lo que **se cancela**
+      (`(pesada−exc) − (acopio−exc) = pesada − acopio`). No se escala ni se resta aparte.
+    - La `recibida` (`registroacopio.cantidadrecibida`) **no** es el acopio; usarla inflaba el ajuste.
+      En domingos `recibida = acopio`, por eso el ajuste de domingos **no cambia**; solo cambia el hábil.
 - `dayFilter`: `1` = sin domingos (hábiles), `2` = sólo domingos. (El `0`=todos ya no se usa en la
   generación; `shouldIncludeDate` sigue igual.)
 
@@ -278,8 +289,18 @@ Dos líneas de compañía desde `CompanyConfiguration`: `getTitle()` (COOPERATIV
 - El ratio IT/IUE (`iue/taxRate`) es constante entre tipos (todas heredan `it/iue/taxRate`), así que
   `getTotalsRawMaterialPayRoll(...)` sigue devolviéndolo correcto.
 
-> ⚠ **`accountingPeriod()` (botón "Contabilizar") NO fue ajustado**: sigue usando `getDiscounts`
-> **sin filtrar** (mezcla los 4 tipos). **No contabilizar** hasta ajustarlo (ver §15).
+### Contabilización (`accountingPeriod`, botón "Contabilizar")
+Genera el comprobante contable de la quincena, **por bloques** (mismas cuentas, líneas separadas):
+- **QUINCENA (hábiles)**: estructura completa —
+  Debe `LECHE CRUDA` (`ACCOUNT_LECHECRUDA`) = bruto (mount+dif); Haber `Acreedores por bienes y
+  servicios` (`ACCOUNT_ACREEDORES_BIENESSERVICIOS`, provider `PRODUCTORES`) = líquido; `IT/IUE Retenido`;
+  `Fondos en custodia` (comisión, crédito, alcohol, concentrados, tachos, otros, reserva, GA);
+  `Clientes Productores` (veterinario) y `Clientes` (yogurt) por productor.
+- **DOMINGOS** (puro): Debe `LECHE CRUDA` + Haber `Acreedores Productores` = líquido domingos (glosa "ACOPIO/LIQUIDO DOMINGOS").
+- **EXCEDENTES** (puro): Debe `LECHE CRUDA` + Haber `Acreedores Productores` = líquido excedentes (hábil+domingo) (glosa "ACOPIO/LIQUIDO EXCEDENTES").
+- Cada bloque se calcula con `getDiscounts(...,tipo,tipodia)`; domingos/excedentes **sin retención ni
+  descuentos** (pagos puros) → agregan **debe = haber**, no alteran el cuadre de hábiles.
+- Se usa el campo `VoucherDetail.gloss` para distinguir las líneas (misma cuenta, líneas separadas).
 
 ---
 
@@ -318,12 +339,11 @@ resumen. **Interno sin cambios**: enum `DayType.HABIL`, columna `tipodia='HABIL'
 ## 15. Pendientes y puntos de riesgo
 
 **Pendientes conocidos:**
-1. **Contabilización** (`accountingPeriod`, botón "Contabilizar" del resumen): sigue mezclando los 4
-   tipos. Debe ajustarse para reflejar hábiles + domingos + excedentes correctamente (definir cuentas
-   contables de domingos/excedentes). **No usar hasta entonces.**
-2. **Override de precio NORMAL por productor**: no soportado (sólo excedente). Requeriría precio
+1. **Override de precio NORMAL por productor**: no soportado (sólo excedente). Requeriría precio
    por-registro.
-3. jrxml de excedentes / resumen: revisar anchos/posiciones si al imprimir queda apretado.
+2. jrxml de excedentes / resumen: revisar anchos/posiciones si al imprimir queda apretado.
+3. La contabilización asume que domingos/excedentes se pagan **sin retención** (como el motor y las
+   boletas). Si en el futuro se decidiera retener IT/IUE sobre ellos, sería un cambio de motor + asiento.
 
 **Puntos de riesgo heredados de v2 (siguen vigentes):** alcohol sin filtro de tipo, mezcla de
 redondeos SYMMETRIC/HALF_UP, base de reserva = peso de balanza, `taxRate` hardcoded (`it=0.3,iue=0.5`),

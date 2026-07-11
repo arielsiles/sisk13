@@ -171,10 +171,20 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         Map<Long, Aux> map = createMapOfProducers(rawMaterialPayRoll, differences, totalReservaGAB, discountProducer, producerTaxCache, capped, dayFilter);
         Double alcoholByGAB = (dayFilter == 2) ? 0.0 : salaryMovementGABService.getAlcoholBayGAB(rawMaterialPayRoll.getProductiveZone(), rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate());
 
-        /** @Claude OPT-4: Pre-carga batch de descuentos por zona en vez de por productor **/
+        /** Descuentos por productor. Comision e ingresos por quincena (no arrastran);
+         *  los que arrastran (veterinario, credito, concentrados, yogurt, tachos, otros
+         *  egresos) se leen por saldo>0 y fecha<=fin y se cobran con orden/tope: el liquido
+         *  nunca es negativo y lo no cobrado queda como saldo (arrastra). **/
         Map<Long, RawMaterialProducerDiscount> discountsBatch = (dayFilter == 2)
                 ? new HashMap<Long, RawMaterialProducerDiscount>()
                 : salaryMovementProducerService.prepareDiscountsBatch(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getProductiveZone());
+        Map<Long, List<SalaryMovementProducer>> carryBatch = (dayFilter == 2)
+                ? new HashMap<Long, List<SalaryMovementProducer>>()
+                : salaryMovementProducerService.preloadCarryMovements(rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getProductiveZone());
+        // Comision banco: se aplica por movimiento (con aplicacion) para que baje su saldo.
+        Map<Long, List<SalaryMovementProducer>> commissionBatch = (dayFilter == 2)
+                ? new HashMap<Long, List<SalaryMovementProducer>>()
+                : salaryMovementProducerService.preloadCommissionMovements(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getProductiveZone());
 
         Double totalAmountCollected = 0.0;
         Double totalPayCollected = 0.0;
@@ -191,37 +201,27 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         Double totalReserve = 0.0;
         Double totalGA = 0.0;
         Double totalOtherDiscount = 0.0;
-        Double auxcollectedAmount = 0.0;
-        Double auxadjustmentAmount = 0.0;
-        Double auxearnedMoney = 0.0;
-        Double auxwithholdingTax = 0.0;
-        Double auxcollectedTotalMoney = 0.0;
-        Double alcoholDiff = 0.0;
         for (Aux aux : map.values()) {
             RawMaterialPayRecord record = new RawMaterialPayRecord();
-            auxcollectedAmount = aux.collectedAmount;
-            record.setTotalAmount(RoundUtil.getRoundValue(auxcollectedAmount, 2, RoundUtil.RoundMode.SYMMETRIC));
-            auxadjustmentAmount = aux.adjustmentAmount;
-            record.setProductiveZoneAdjustment(RoundUtil.getRoundValue(auxadjustmentAmount, 2, RoundUtil.RoundMode.SYMMETRIC));
-            auxearnedMoney = aux.earnedMoney;
-            record.setEarnedMoney(RoundUtil.getRoundValue(auxearnedMoney, 2, RoundUtil.RoundMode.SYMMETRIC));
-            auxearnedMoney = aux.earnedMoney;
-            auxcollectedTotalMoney = aux.collectedTotalMoney;
-            record.setTotalPayCollected(RoundUtil.getRoundValue(rawMaterialPayRoll.getUnitPrice() * auxcollectedAmount, 2, RoundUtil.RoundMode.SYMMETRIC));
+            record.setTotalAmount(RoundUtil.getRoundValue(aux.collectedAmount, 2, RoundUtil.RoundMode.SYMMETRIC));
+            record.setProductiveZoneAdjustment(RoundUtil.getRoundValue(aux.adjustmentAmount, 2, RoundUtil.RoundMode.SYMMETRIC));
+            double earned = RoundUtil.getRoundValue(aux.earnedMoney, 2, RoundUtil.RoundMode.SYMMETRIC);
+            record.setEarnedMoney(earned);
+            record.setTotalPayCollected(RoundUtil.getRoundValue(rawMaterialPayRoll.getUnitPrice() * aux.collectedAmount, 2, RoundUtil.RoundMode.SYMMETRIC));
 
-            /** @Claude OPT-3: Usa cache pre-cargado de ProducerTax en vez de lazy loading **/
+            /** @Claude OPT-3: cache pre-cargado de ProducerTax **/
             ProducerTax producerTax = producerTaxCache.get(aux.producer.getId());
-            String codTaxLicence = producerTax != null ? producerTax.getFormNumber(): null;
-            Date taxStartDate = producerTax != null ? producerTax.getGestionTax().getStartDate():null;
-            Date taxEndDate = producerTax != null ? producerTax.getGestionTax().getEndDate():null;
+            String codTaxLicence = producerTax != null ? producerTax.getFormNumber() : null;
+            Date taxStartDate = producerTax != null ? producerTax.getGestionTax().getStartDate() : null;
+            Date taxEndDate = producerTax != null ? producerTax.getGestionTax().getEndDate() : null;
             if (isValidLicence(codTaxLicence, taxStartDate, taxEndDate)) {
                 record.setTaxLicense(codTaxLicence);
                 record.setExpirationDateTaxLicence(taxStartDate);
                 record.setStartDateTaxLicence(taxEndDate);
             }
 
-            /** @Claude OPT-4: Usa descuentos pre-cargados por zona en vez de query individual **/
             RawMaterialProducerDiscount discount = discountsBatch.get(aux.producer.getId());
+            double otherIncoming = 0.0;
             if (discount == null) {
                 discount = new RawMaterialProducerDiscount();
                 discount.setConcentrated(0.0);
@@ -232,26 +232,32 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 discount.setCans(0.0);
                 discount.setOtherDiscount(0.0);
                 discount.setOtherIncoming(0.0);
+            } else {
+                otherIncoming = discount.getOtherIncoming();
             }
             discount.setRawMaterialProducer(aux.producer);
-            alcoholDiff += ((alcoholByGAB * (aux.procentaje)) - RoundUtil.getRoundValue(alcoholByGAB * (aux.procentaje), 2, RoundUtil.RoundMode.SYMMETRIC));
-            discount.setAlcohol(RoundUtil.getRoundValue(alcoholByGAB * (aux.procentaje), 2, RoundUtil.RoundMode.SYMMETRIC));
-            auxwithholdingTax = aux.withholdingTax;
-            discount.setWithholdingTax(RoundUtil.getRoundValue(auxwithholdingTax, 2, RoundUtil.RoundMode.SYMMETRIC));
             discount.setRawMaterialPayRecord(record);
             record.setRawMaterialProducerDiscount(discount);
             record.setDiscountReserve(aux.reserveDiscount);
-            record.setDiscountGA(RoundUtil.getRoundValue(aux.discountGA, 2, RoundUtil.RoundMode.SYMMETRIC));
-
             rawMaterialPayRoll.getRawMaterialPayRecordList().add(record);
             record.setRawMaterialPayRoll(rawMaterialPayRoll);
-            totalAmountCollected += auxcollectedAmount;
-            totalAdjustment += auxadjustmentAmount;
-            totalPayCollected += auxcollectedTotalMoney;
-            totalRetention += auxwithholdingTax;
+
+            double retention = RoundUtil.getRoundValue(aux.withholdingTax, 2, RoundUtil.RoundMode.SYMMETRIC);
+            double alcohol = RoundUtil.getRoundValue(alcoholByGAB * aux.procentaje, 2, RoundUtil.RoundMode.SYMMETRIC);
+            double ga = RoundUtil.getRoundValue(aux.discountGA, 2, RoundUtil.RoundMode.SYMMETRIC);
+
+            // Reparto ordenado con tope y arrastre (setea campos aplicados + aplicaciones).
+            applyCappedDiscounts(rawMaterialPayRoll, record, discount, earned, retention,
+                    commissionBatch.get(aux.producer.getId()), alcohol, ga,
+                    RoundUtil.getRoundValue(otherIncoming, 2, RoundUtil.RoundMode.SYMMETRIC),
+                    carryBatch.get(aux.producer.getId()));
+
+            totalAmountCollected += aux.collectedAmount;
+            totalAdjustment += aux.adjustmentAmount;
+            totalPayCollected += aux.collectedTotalMoney;
             totalReserve += aux.reserveDiscount;
             totalGA += record.getDiscountGA();
-
+            totalRetention += discount.getWithholdingTax();
             totalCredit += discount.getCredit();
             totalAlcohol += discount.getAlcohol();
             totalConcentrated += discount.getConcentrated();
@@ -261,12 +267,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             totalCans += discount.getCans();
             totalOtherDiscount += discount.getOtherDiscount();
             totalIncome += discount.getOtherIncoming();
-
-            /** @Claude OPT-5: Eliminado findById+update redundante - DiscountReserve se persiste directamente en applyProrations **/
-
         }
-        alcoholDiff = RoundUtil.getRoundValue(alcoholDiff, 2, RoundUtil.RoundMode.SYMMETRIC);
-        totalAlcohol += alcoholDiff;
         totalAmountCollected = RoundUtil.getRoundValue(totalAmountCollected, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalPayCollected = RoundUtil.getRoundValue(totalPayCollected, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalRetention = RoundUtil.getRoundValue(totalRetention, 2, RoundUtil.RoundMode.SYMMETRIC);
@@ -282,11 +283,6 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         totalAdjustment = RoundUtil.getRoundValue(totalAdjustment, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalIncome = RoundUtil.getRoundValue(totalIncome, 2, RoundUtil.RoundMode.SYMMETRIC);
         totalGA = RoundUtil.getRoundValue(totalGA, 2, RoundUtil.RoundMode.SYMMETRIC);
-
-        if (alcoholDiff != 0) {
-            Double aux = rawMaterialPayRoll.getRawMaterialPayRecordList().get(0).getRawMaterialProducerDiscount().getAlcohol();
-            rawMaterialPayRoll.getRawMaterialPayRecordList().get(0).getRawMaterialProducerDiscount().setAlcohol(aux + alcoholDiff);
-        }
 
         calculateLiquidPayable(rawMaterialPayRoll);
         rawMaterialPayRoll.setTotalCollectedByGAB(totalAmountCollected);
@@ -305,6 +301,90 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         rawMaterialPayRoll.setTotalGA(totalGA);
         rawMaterialPayRoll.setTotalCommission(totalCommission);
         return rawMaterialPayRoll;
+    }
+
+    /**
+     * Reparte los descuentos de un productor con ORDEN de prioridad y TOPE: el liquido nunca
+     * es negativo. Orden: retencion IT/IUE -> comision banco -> GA -> alcohol (prioridad, NO
+     * arrastran); luego los movimientos por productor (veterinario, credito, concentrados,
+     * yogurt, tachos, otros egresos) FIFO -> lo no cobrado queda como saldo (arrastra) y se
+     * registra la aplicacion (trazabilidad). Setea los campos aplicados (capados); el saldo
+     * del movimiento NO se toca aca (se commitea al contabilizar).
+     */
+    private void applyCappedDiscounts(RawMaterialPayRoll payRoll, RawMaterialPayRecord record,
+                                      RawMaterialProducerDiscount discount, double earned, double retention,
+                                      List<SalaryMovementProducer> commissionMovements, double alcohol, double ga, double otherIncoming,
+                                      List<SalaryMovementProducer> carryMovements) {
+
+        double available = RoundUtil.getRoundValue(earned + otherIncoming, 2, RoundUtil.RoundMode.SYMMETRIC);
+
+        // 1) Retencion IT/IUE (calculada, no es movimiento -> sin aplicacion).
+        double retApplied = Math.min(retention, Math.max(0.0, available));
+        available = RoundUtil.getRoundValue(available - retApplied, 2, RoundUtil.RoundMode.SYMMETRIC);
+
+        // 2) Comision banco: prioridad, NO arrastra, PERO se aplica por movimiento y se registra
+        //    su aplicacion -> al contabilizar baja el saldo y queda PAGADO solo si se cobro.
+        double comApplied = 0.0;
+        if (commissionMovements != null) {
+            for (SalaryMovementProducer m : commissionMovements) {
+                if (available <= 0.0) break;
+                double ap = RoundUtil.getRoundValue(Math.min(m.getSaldo(), available), 2, RoundUtil.RoundMode.SYMMETRIC);
+                if (ap <= 0.0) continue;
+                available = RoundUtil.getRoundValue(available - ap, 2, RoundUtil.RoundMode.SYMMETRIC);
+                comApplied = RoundUtil.getRoundValue(comApplied + ap, 2, RoundUtil.RoundMode.SYMMETRIC);
+                addDiscountApplication(payRoll, record, m, ap);
+            }
+        }
+
+        // 3) GA y 4) Alcohol (calculados, no son movimiento -> sin aplicacion).
+        double gaApplied = Math.min(ga, Math.max(0.0, available));
+        available = RoundUtil.getRoundValue(available - gaApplied, 2, RoundUtil.RoundMode.SYMMETRIC);
+        double alcApplied = Math.min(alcohol, Math.max(0.0, available));
+        available = RoundUtil.getRoundValue(available - alcApplied, 2, RoundUtil.RoundMode.SYMMETRIC);
+
+        // 5) Movimientos que ARRASTRAN (FIFO). Lo no cobrado queda como saldo y arrastra.
+        double vet = 0.0, credit = 0.0, conc = 0.0, yog = 0.0, cans = 0.0, other = 0.0;
+        if (carryMovements != null) {
+            for (SalaryMovementProducer m : carryMovements) {
+                if (available <= 0.0) break;
+                double ap = RoundUtil.getRoundValue(Math.min(m.getSaldo(), available), 2, RoundUtil.RoundMode.SYMMETRIC);
+                if (ap <= 0.0) continue;
+                available = RoundUtil.getRoundValue(available - ap, 2, RoundUtil.RoundMode.SYMMETRIC);
+                addDiscountApplication(payRoll, record, m, ap);
+
+                String t = m.getTypeMovementProducer().getName();
+                if ("VETERINARIO".equals(t)) vet += ap;
+                else if ("CREDITO".equals(t)) credit += ap;
+                else if ("CONCENTRADOS".equals(t)) conc += ap;
+                else if ("YOGURT".equals(t)) yog += ap;
+                else if ("TACHOS".equals(t)) cans += ap;
+                else if ("OTROS EGRESOS".equals(t)) other += ap;
+            }
+        }
+
+        discount.setWithholdingTax(RoundUtil.getRoundValue(retApplied, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setCommission(RoundUtil.getRoundValue(comApplied, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setAlcohol(RoundUtil.getRoundValue(alcApplied, 2, RoundUtil.RoundMode.SYMMETRIC));
+        record.setDiscountGA(RoundUtil.getRoundValue(gaApplied, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setVeterinary(RoundUtil.getRoundValue(vet, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setCredit(RoundUtil.getRoundValue(credit, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setConcentrated(RoundUtil.getRoundValue(conc, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setYogurt(RoundUtil.getRoundValue(yog, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setCans(RoundUtil.getRoundValue(cans, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setOtherDiscount(RoundUtil.getRoundValue(other, 2, RoundUtil.RoundMode.SYMMETRIC));
+        discount.setOtherIncoming(RoundUtil.getRoundValue(otherIncoming, 2, RoundUtil.RoundMode.SYMMETRIC));
+    }
+
+    /** Registra la aplicacion de un movimiento en un registro (trazabilidad + reversa). El saldo del
+     *  movimiento NO se toca aca: se commitea al contabilizar (company la pone CompanyListener). */
+    private void addDiscountApplication(RawMaterialPayRoll payRoll, RawMaterialPayRecord record,
+                                        SalaryMovementProducer m, double amount) {
+        DiscountApplication app = new DiscountApplication();
+        app.setSalaryMovementProducer(m);
+        app.setRawMaterialPayRecord(record);
+        app.setAppliedAmount(amount);
+        app.setDate(payRoll.getEndDate());
+        record.getDiscountApplications().add(app);
     }
 
     @Override
@@ -572,7 +652,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " inner join RawMaterialPayRoll.productiveZone productiveZone " +
                 " where rawMaterialPayRoll.startDate =:fechaIni" +
                 " and rawMaterialPayRoll.endDate =:fechaFin" +
-                " and rawMaterialPayRecord.liquidPayable > 0" +
+                " and rawMaterialPayRecord.liquidPayable >= 0" +
                 " and rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL" +
                 " and rawMaterialPayRoll.dayType = com.encens.khipus.model.production.DayType.HABIL" +
                 " and rawMaterialPayRoll.metaProduct =:metaProduct";
@@ -621,7 +701,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " inner join RawMaterialPayRoll.productiveZone productiveZone " +
                 " where rawMaterialPayRoll.startDate >= :fechaIni" +
                 " and rawMaterialPayRoll.endDate <= :fechaFin" +
-                " and rawMaterialPayRecord.liquidPayable > 0" +
+                " and rawMaterialPayRecord.liquidPayable >= 0" +
                 " and rawMaterialPayRoll.metaProduct =:metaProduct";*/
 
         String query= "SELECT " +
@@ -654,7 +734,7 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
                 " inner join RawMaterialPayRoll.productiveZone productiveZone " +
                 " where rawMaterialPayRoll.startDate >= :fechaIni" +
                 " and rawMaterialPayRoll.endDate <= :fechaFin" +
-                " and rawMaterialPayRecord.liquidPayable > 0" +
+                " and rawMaterialPayRecord.liquidPayable >= 0" +
                 " and rawMaterialPayRoll.type = com.encens.khipus.model.production.PayRollType.NORMAL" +
                 " and rawMaterialPayRoll.dayType = com.encens.khipus.model.production.DayType.HABIL" +
                 " and rawMaterialPayRoll.metaProduct =:metaProduct " +
@@ -867,10 +947,11 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             Double weightedAmount = (Double) obj[2];
             /*Double diffs =  RoundUtil.getRoundValue((receivedAmount.doubleValue() * rawMaterialPayRoll.getUnitPrice()),2, RoundUtil.RoundMode.SYMMETRIC) -
                             RoundUtil.getRoundValue((weightedAmount.doubleValue() * rawMaterialPayRoll.getUnitPrice()),2, RoundUtil.RoundMode.SYMMETRIC);*/
-            Double diffs = weightedAmount.doubleValue() * rawMaterialPayRoll.getUnitPrice() - receivedAmount.doubleValue() * rawMaterialPayRoll.getUnitPrice();
-
-            //Double diffs = (receivedAmount.doubleValue() * rawMaterialPayRoll.getUnitPrice()) - (weightedAmount.doubleValue() * rawMaterialPayRoll.getUnitPrice());
-            differences.put(date, diffs);
+            // Guarda la PESADA (balanza) en dinero por dia (acumulada). El ajuste correcto es
+            // pesada - ACOPIO (no pesada - recibida): se arma en createMapOfProducers.
+            Double pesadaMoney = weightedAmount.doubleValue() * rawMaterialPayRoll.getUnitPrice();
+            Double prevPesada = differences.get(date);
+            differences.put(date, (prevPesada == null ? 0.0 : prevPesada) + pesadaMoney);
         }
         return differences;
     }
@@ -1069,8 +1150,21 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
             totalMoneyCollectedByGab += earned;
         }
 
+        // Ajuste de pesaje = PESADA (balanza) - ACOPIO (por productor). Ambos por dias HABILES
+        // (dayFilter). El excedente se cancela: esta tanto en la pesada como en el acopio, asi que
+        // (pesada - exc) - (acopio - exc) = pesada - acopio. Por eso el ajuste de la planilla
+        // NORMAL/HABIL no toma en cuenta ni domingos (dayFilter) ni excedentes.
+        //   differences = Σ pesada (dinero);  acopioTotal = (normal + excedente) * precio.
+        double acopioTotalLiters = capped.totalExcess;
+        for (Double v : capped.normalByProducer.values()) {
+            if (v != null) acopioTotalLiters += v;
+        }
+        double totalDifference = RoundUtil.getRoundValue(
+                getDiffMoneyTotalGab(differences) - acopioTotalLiters * rawMaterialPayRoll.getUnitPrice(),
+                2, RoundUtil.RoundMode.SYMMETRIC);
+
         /** @Claude OPT-7: Consolidacion de prorrateos en una sola iteracion **/
-        applyProrations(map, rawMaterialPayRoll, totalMoneyCollectedByGab, getDiffMoneyTotalGab(differences), totalReservaGAB, discountProducer);
+        applyProrations(map, rawMaterialPayRoll, totalMoneyCollectedByGab, totalDifference, totalReservaGAB, discountProducer);
 
         // R7. Excluir productores sin acopio: no generar registros ni aplicar descuentos
         Iterator<Aux> it = map.values().iterator();
@@ -1632,6 +1726,37 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
     }
 
     @Override
+    public List<RawMaterialPayRoll> findAllInDates(Date startDate, Date endDate) {
+        return getEntityManager().createNamedQuery("RawMaterialPayRoll.getMaterialPayRollInDatesAllStates")
+                .setParameter("startDate", startDate, TemporalType.DATE)
+                .setParameter("endDate", endDate, TemporalType.DATE)
+                .getResultList();
+    }
+
+    @Override
+    public StatePayRoll findPeriodState(Date startDate, Date endDate) {
+        // Query escalar (select p.state): devuelve el valor de la BD, no la entidad cacheada.
+        // Asi el estado se refresca aunque un UPDATE masivo (aprobar/contabilizar/revertir) no
+        // haya tocado las instancias del contexto de persistencia.
+        List<StatePayRoll> list = getEntityManager().createQuery(
+                "select p.state from RawMaterialPayRoll p " +
+                " where p.startDate = :startDate and p.endDate = :endDate")
+                .setParameter("startDate", startDate, TemporalType.DATE)
+                .setParameter("endDate", endDate, TemporalType.DATE)
+                .setMaxResults(1)
+                .getResultList();
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    @Override
+    public Date getLastAccountedEndDate() {
+        List<Date> result = getEntityManager().createQuery(
+                "select max(p.endDate) from RawMaterialPayRoll p where p.state = 'CONTABILIZADO'")
+                .getResultList();
+        return (result.isEmpty()) ? null : result.get(0);
+    }
+
+    @Override
     public List<RawMaterialPayRoll> findAllPayRollesByGAB(Date startDate, Date endDate, ProductiveZone productiveZone) {
         List<RawMaterialPayRoll> rawMaterialPayRolls;
         if(productiveZone != null) {
@@ -1661,21 +1786,155 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
 
     @Override
     public void approvedDiscounts(Calendar startDate, Calendar endDate, ProductiveZone productiveZone) {
-        if(productiveZone != null) {
-            getEntityManager().createQuery("update SalaryMovementProducer salaryMovementProducer set salaryMovementProducer.state = 'APPROVED'" +
-                    " where salaryMovementProducer.date between :startDate and :endDate " +
-                    " and salaryMovementProducer.productiveZone = :productiveZone")
-                    .setParameter("startDate",startDate,TemporalType.DATE)
-                    .setParameter("endDate", endDate, TemporalType.DATE)
-                    .setParameter("productiveZone", productiveZone)
-                    .executeUpdate();
-        }else{
-            getEntityManager().createQuery("update SalaryMovementProducer salaryMovementProducer set salaryMovementProducer.state = 'APPROVED'" +
-                    " where salaryMovementProducer.date between :startDate and :endDate ")
-                    .setParameter("startDate", startDate, TemporalType.DATE)
-                    .setParameter("endDate", endDate, TemporalType.DATE)
+        // El estado de los movimientos de descuento ahora lo determina su SALDO: se marcan
+        // PAGADO al CONTABILIZAR la planilla que los cobra (no al aprobar). Por eso aprobar
+        // ya no toca el estado del movimiento. Se conserva el metodo (lo llama el flujo de
+        // aprobacion) pero sin efecto sobre SalaryMovementProducer.
+    }
+
+    /**
+     * COMMIT de la deuda al CONTABILIZAR: por cada aplicacion de descuento del periodo, reduce
+     * el saldo del movimiento y lo marca PAGADO si llega a 0. Es el punto donde el cobro se
+     * hace efectivo. Solo aplica a las planillas del periodo/producto (las aplicaciones cuelgan
+     * de los registros NORMAL/HABIL, que son las unicas que cobran descuentos).
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void commitDiscountDebts(Date startDate, Date endDate, MetaProduct metaProduct) {
+        List<DiscountApplication> apps = getEntityManager().createQuery(
+                "select a from DiscountApplication a " +
+                " join fetch a.salaryMovementProducer m " +
+                " where a.rawMaterialPayRecord.rawMaterialPayRoll.startDate = :start " +
+                " and a.rawMaterialPayRecord.rawMaterialPayRoll.endDate = :end " +
+                " and a.rawMaterialPayRecord.rawMaterialPayRoll.metaProduct = :meta")
+                .setParameter("start", startDate, TemporalType.DATE)
+                .setParameter("end", endDate, TemporalType.DATE)
+                .setParameter("meta", metaProduct)
+                .getResultList();
+
+        // Un movimiento puede cobrarse en varios registros: acumular lo aplicado por movimiento.
+        Map<Long, Double> appliedByMovement = new HashMap<Long, Double>();
+        Map<Long, SalaryMovementProducer> movements = new HashMap<Long, SalaryMovementProducer>();
+        for (DiscountApplication a : apps) {
+            SalaryMovementProducer m = a.getSalaryMovementProducer();
+            movements.put(m.getId(), m);
+            Double acc = appliedByMovement.get(m.getId());
+            appliedByMovement.put(m.getId(), (acc == null ? 0.0 : acc) + a.getAppliedAmount());
+        }
+        // UPDATE masivo: se persiste sin depender del flush (la conversacion es flushMode MANUAL,
+        // por eso el merge no bastaba). Mismo patron que setPayRollsState.
+        for (Map.Entry<Long, Double> e : appliedByMovement.entrySet()) {
+            SalaryMovementProducer m = movements.get(e.getKey());
+            double nuevo = RoundUtil.getRoundValue(m.getSaldo() - e.getValue(), 2, RoundUtil.RoundMode.SYMMETRIC);
+            if (nuevo < 0) nuevo = 0.0;
+            SalaryMovementProducerState st = (nuevo <= 0.0)
+                    ? SalaryMovementProducerState.PAGADO : SalaryMovementProducerState.PENDIENTE;
+            getEntityManager().createQuery(
+                    "update SalaryMovementProducer m set m.saldo = :saldo, m.state = :st where m = :mov")
+                    .setParameter("saldo", nuevo)
+                    .setParameter("st", st)
+                    .setParameter("mov", m)
                     .executeUpdate();
         }
+    }
+
+    /**
+     * REVERSA de la deuda al ANULAR/REVERTIR: por cada aplicacion del periodo, suma de vuelta
+     * lo cobrado al saldo del movimiento y lo deja PENDIENTE. Restaura el estado previo a la
+     * contabilizacion (sin duplicar ni perder).
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void revertDiscountDebts(Date startDate, Date endDate, MetaProduct metaProduct) {
+        List<DiscountApplication> apps = getEntityManager().createQuery(
+                "select a from DiscountApplication a " +
+                " join fetch a.salaryMovementProducer m " +
+                " where a.rawMaterialPayRecord.rawMaterialPayRoll.startDate = :start " +
+                " and a.rawMaterialPayRecord.rawMaterialPayRoll.endDate = :end " +
+                " and a.rawMaterialPayRecord.rawMaterialPayRoll.metaProduct = :meta")
+                .setParameter("start", startDate, TemporalType.DATE)
+                .setParameter("end", endDate, TemporalType.DATE)
+                .setParameter("meta", metaProduct)
+                .getResultList();
+        // Acumular lo aplicado por movimiento (uno pudo cobrarse en varios registros).
+        Map<Long, Double> appliedByMovement = new HashMap<Long, Double>();
+        Map<Long, SalaryMovementProducer> movements = new HashMap<Long, SalaryMovementProducer>();
+        for (DiscountApplication a : apps) {
+            SalaryMovementProducer m = a.getSalaryMovementProducer();
+            movements.put(m.getId(), m);
+            Double acc = appliedByMovement.get(m.getId());
+            appliedByMovement.put(m.getId(), (acc == null ? 0.0 : acc) + a.getAppliedAmount());
+        }
+        // UPDATE masivo (se persiste sin depender del flush). Suma de vuelta y deja PENDIENTE.
+        for (Map.Entry<Long, Double> e : appliedByMovement.entrySet()) {
+            SalaryMovementProducer m = movements.get(e.getKey());
+            double nuevo = RoundUtil.getRoundValue(m.getSaldo() + e.getValue(), 2, RoundUtil.RoundMode.SYMMETRIC);
+            getEntityManager().createQuery(
+                    "update SalaryMovementProducer m set m.saldo = :saldo, m.state = :st where m = :mov")
+                    .setParameter("saldo", nuevo)
+                    .setParameter("st", SalaryMovementProducerState.PENDIENTE)
+                    .setParameter("mov", m)
+                    .executeUpdate();
+        }
+    }
+
+    /** Cambia el estado de todas las planillas del periodo/producto (PENDING/APPROVED/CONTABILIZADO). */
+    @Override
+    public void setPayRollsState(Date startDate, Date endDate, MetaProduct metaProduct, StatePayRoll state) {
+        getEntityManager().createQuery(
+                "update RawMaterialPayRoll p set p.state = :state " +
+                " where p.startDate = :start and p.endDate = :end and p.metaProduct = :meta")
+                .setParameter("state", state)
+                .setParameter("start", startDate, TemporalType.DATE)
+                .setParameter("end", endDate, TemporalType.DATE)
+                .setParameter("meta", metaProduct)
+                .executeUpdate();
+    }
+
+    /** Guarda (o limpia con null) el id del comprobante en todas las planillas del periodo. */
+    @Override
+    public void setPayRollsVoucherId(Date startDate, Date endDate, MetaProduct metaProduct, Long voucherId) {
+        getEntityManager().createQuery(
+                "update RawMaterialPayRoll p set p.accountingVoucherId = :vid " +
+                " where p.startDate = :start and p.endDate = :end and p.metaProduct = :meta")
+                .setParameter("vid", voucherId)
+                .setParameter("start", startDate, TemporalType.DATE)
+                .setParameter("end", endDate, TemporalType.DATE)
+                .setParameter("meta", metaProduct)
+                .executeUpdate();
+    }
+
+    /**
+     * Hay una quincena ANTERIOR (con acopio ya generado por el motor nuevo, tipodia != NINGUNO)
+     * que NO esta contabilizada. Sirve de guard: no generar N+1 si N no se cerro, para no
+     * descuadrar el arrastre de deuda.
+     */
+    @Override
+    public boolean hasPriorUncontabilized(Date startDate, MetaProduct metaProduct) {
+        Long count = (Long) getEntityManager().createQuery(
+                "select count(p) from RawMaterialPayRoll p " +
+                " where p.metaProduct = :meta and p.startDate < :start " +
+                " and p.dayType <> com.encens.khipus.model.production.DayType.NINGUNO " +
+                " and p.state <> com.encens.khipus.model.production.StatePayRoll.CONTABILIZADO")
+                .setParameter("meta", metaProduct)
+                .setParameter("start", startDate, TemporalType.DATE)
+                .getSingleResult();
+        return count != null && count > 0;
+    }
+
+    /** Id del comprobante contabilizado del periodo (null si no hay). */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Long findAccountingVoucherId(Date startDate, Date endDate, MetaProduct metaProduct) {
+        List<Long> ids = getEntityManager().createQuery(
+                "select p.accountingVoucherId from RawMaterialPayRoll p " +
+                " where p.startDate = :start and p.endDate = :end and p.metaProduct = :meta " +
+                " and p.accountingVoucherId is not null")
+                .setParameter("start", startDate, TemporalType.DATE)
+                .setParameter("end", endDate, TemporalType.DATE)
+                .setParameter("meta", metaProduct)
+                .getResultList();
+        return ids.isEmpty() ? null : ids.get(0);
     }
 
     @Override
