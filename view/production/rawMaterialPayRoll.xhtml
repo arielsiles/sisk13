@@ -189,39 +189,39 @@
 
     <a4j:outputPanel id="lifecycleButtons" layout="block">
     <div class="buttons">
-        <!-- Generar: aun no hay planilla del periodo -->
+        <!-- Generar: aun no hay planilla del periodo. Permiso: RAWMATERIALPAYROLLGENERATE/CREATE -->
         <a4j:commandButton reRender="formPanel"
-                           rendered="#{!rawMaterialPayRollAction.managed and !rawMaterialPayRollAction.generated}"
+                           rendered="#{!rawMaterialPayRollAction.managed and !rawMaterialPayRollAction.generated and s:hasPermission('RAWMATERIALPAYROLLGENERATE','CREATE')}"
                            value="#{messages['RawMaterialPayRoll.generatePayroll']}"
                            action="#{rawMaterialPayRollAction.generate}"
                            styleClass="button"/>
 
-        <!-- Aprobar: estado PENDING -->
+        <!-- Aprobar: estado PENDING. Permiso: RAWMATERIALPAYROLLAPPROVE/UPDATE -->
         <a4j:commandButton reRender="formPanel"
-                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.pendingState}"
+                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.pendingState and s:hasPermission('RAWMATERIALPAYROLLAPPROVE','UPDATE')}"
                            value="#{messages['RawMaterialPayRoll.approvePayroll']}"
                            action="#{rawMaterialPayRollAction.aprobar}"
                            styleClass="button"/>
 
-        <!-- Contabilizar: estado APPROVED (con confirmacion) -->
+        <!-- Contabilizar: estado APPROVED (con confirmacion). Permiso: RAWMATERIALPAYROLLACCOUNT/UPDATE -->
         <a4j:commandButton
-                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.approvedState}"
+                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.approvedState and s:hasPermission('RAWMATERIALPAYROLLACCOUNT','UPDATE')}"
                            value="#{messages['RawMaterialPayRoll.accountPayroll']}"
                            styleClass="button">
             <rich:componentControl for="accountConfirmation" event="onclick" disableDefault="true" operation="show"/>
         </a4j:commandButton>
 
-        <!-- Revertir: estado CONTABILIZADO (con confirmacion) -->
+        <!-- Revertir: estado CONTABILIZADO (con confirmacion). Permiso: RAWMATERIALPAYROLLREVERT/UPDATE -->
         <a4j:commandButton
-                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.accountedState}"
+                           rendered="#{!rawMaterialPayRollAction.managed and rawMaterialPayRollAction.accountedState and s:hasPermission('RAWMATERIALPAYROLLREVERT','UPDATE')}"
                            value="#{messages['RawMaterialPayRoll.revertPayroll']}"
                            styleClass="button">
             <rich:componentControl for="revertConfirmation" event="onclick" disableDefault="true" operation="show"/>
         </a4j:commandButton>
 
-        <!-- Borrar: PENDING o APPROVED (no contabilizado) -->
+        <!-- Borrar: PENDING o APPROVED (no contabilizado). Permiso: RAWMATERIALPAYROLLDELETE/DELETE -->
         <a4j:commandButton
-                rendered="#{!rawMaterialPayRollAction.managed and (rawMaterialPayRollAction.pendingState or rawMaterialPayRollAction.approvedState)}"
+                rendered="#{!rawMaterialPayRollAction.managed and (rawMaterialPayRollAction.pendingState or rawMaterialPayRollAction.approvedState) and s:hasPermission('RAWMATERIALPAYROLLDELETE','DELETE')}"
                 value="#{messages['RawMaterialPayRoll.deleteAllPayroll']}"
                 styleClass="button">
             <rich:componentControl for="deleteAllConfirmation" event="onclick" disableDefault="true"
