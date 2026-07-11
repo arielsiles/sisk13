@@ -1871,54 +1871,6 @@
                 propagation="none"/>
     </rich:menuItem>
 
-
-    <rich:menuGroup value="#{messages['menu.production.supplierPayments.reports']}"
-                    >
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       >
-
-            <s:link view="/production/reports/rawMaterialPaySummaryReport.xhtml"
-                    value="#{messages['menu.production.supplierPayments.reports.summary']}"
-                    propagation="begin"/>
-        </rich:menuItem>
-
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/production/reports/rawMaterialPayRollReport.xhtml"
-                    value="#{messages['menu.production.supplierPayments.reports.payRoll']}"
-                    propagation="begin"/>
-        </rich:menuItem>
-
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/production/reports/rawMaterialGeneralPayRollReport.xhtml"
-                    value="#{messages['menu.production.supplierPayments.reports.generalPayRoll']}"
-                    propagation="begin"/>
-        </rich:menuItem>
-
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/production/reports/voletasDePagoReport.xhtml"
-                    value="#{messages['menu.production.supplierPayments.reports.boletasPago']}"
-                    propagation="begin"/>
-        </rich:menuItem>
-
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/production/reports/generateUnisueldoFile.xhtml"
-                    value="#{messages['menu.production.supplierPayments.reports.generateUnisueldoFile']}"
-                    propagation="begin"/>
-        </rich:menuItem>
-
-        <!--Todo: el reporte de acopio solo-->
-        <!--<rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       >
-
-            <s:link view="/production/reports/rawMaterialCollectedByGABReport.xhtml"
-                    value="#{messages['menu.production.supplierPayments.reports.collectedReportByGAB']}"
-                    propagation="begin"/>
-        </rich:menuItem>-->
-
-    </rich:menuGroup>
-
 </rich:dropDownMenu>
 
 <!--<rich:dropDownMenu value="#{messages['menu.production.planification']}"
@@ -1995,6 +1947,43 @@
         </rich:menuItem>
 
     </rich:menuGroup>
+</rich:dropDownMenu>
+
+<!-- Reportes de Pago a productores promovido a menu de nivel superior (antes era
+     submenu dentro de "Pago a productores"). Mismo permiso que el modulo de pagos. -->
+<rich:dropDownMenu value="#{messages['menu.production.supplierPayments.reports']}"
+                   rendered="#{s:hasPermission('PAYMENTPRODUCERS','VIEW')}">
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/production/reports/rawMaterialPaySummaryReport.xhtml"
+                value="#{messages['menu.production.supplierPayments.reports.summary']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/production/reports/rawMaterialPayRollReport.xhtml"
+                value="#{messages['menu.production.supplierPayments.reports.payRoll']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/production/reports/rawMaterialGeneralPayRollReport.xhtml"
+                value="#{messages['menu.production.supplierPayments.reports.generalPayRoll']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/production/reports/voletasDePagoReport.xhtml"
+                value="#{messages['menu.production.supplierPayments.reports.boletasPago']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
+    <rich:menuItem submitMode="none" styleClass="main-menu-item">
+        <s:link view="/production/reports/generateUnisueldoFile.xhtml"
+                value="#{messages['menu.production.supplierPayments.reports.generateUnisueldoFile']}"
+                propagation="begin"/>
+    </rich:menuItem>
+
 </rich:dropDownMenu>
 
 

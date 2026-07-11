@@ -191,7 +191,9 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
 
         Double total = totalMoneyBalance + discounts.otherIncome;
         params.put("total_collected", df.format(discounts.collected));
-        params.put("diff_total", df.format(diffTotal));
+        // Diferencia: se muestran los LITROS aproximados (monto/precio), precedidos del simbolo
+        // U+2248 (aprox.) + espacio. Se quito el precio. Cast (char)0x2248: ASCII en el fuente.
+        params.put("diff_total", ((char) 0x2248) + " " + df.format(diffTotal));
         params.put("price_unit", df.format(discounts.unitPrice));
         params.put("total_money_collected", df.format(totalMoneyCollected));
         params.put("difference_money", df.format(totalDifferencesMoney));
@@ -226,12 +228,23 @@ public class RawMaterialPaySummaryReportAction extends GenericReportAction {
         params.put("total_differences", df.format(totalDiscount));
         params.put("liquid_pay", df.format(discounts.liquid));   // Liquido Habiles
 
-        // ===== BLOQUE DOMINGOS (planilla pura: litros x precio) =====
+        // ===== BLOQUE DOMINGOS (planilla pura: litros x precio, con su diferencia de pesaje) =====
+        //   Acopio Domingos = litros x precio (bruto = dom.mount). El Liquido (dom.liquid) ya
+        //   incluye el ajuste de pesaje de los domingos, por eso NO coincide con litros x precio.
+        //   Se expone la Diferencia = Liquido - Acopio para que en el reporte:
+        //       Acopio Domingos + Diferencia = Liquido Domingos (exacto, sin descuadres).
         RawMaterialPayRollServiceBean.Discounts dom = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
                 PayRollType.NORMAL, DayType.DOMINGO);
+        Double domMoneyCollected = dom.mount;                 // Acopio Domingos (bruto)
+        Double domDifferenceMoney = dom.liquid - dom.mount;   // Diferencia (para que Acopio + Dif = Liquido)
+        // Litros aprox. de la diferencia (monto/precio), mismo formato que quincena: "U+2248 <litros>".
+        Double domDifferenceLiters = (dom.unitPrice != 0) ? domDifferenceMoney / dom.unitPrice : 0.0;
         params.put("dom_litros", df.format(dom.collected));
         params.put("dom_pu", df.format(dom.unitPrice));
-        params.put("dom_total", df.format(dom.liquid));          // Liquido Domingos
+        params.put("dom_money_collected", df.format(domMoneyCollected));   // Acopio Domingos (bruto)
+        params.put("dom_difference", df.format(domDifferenceMoney));       // Diferencia domingos (monto)
+        params.put("dom_difference_liters", ((char) 0x2248) + " " + df.format(domDifferenceLiters)); // litros aprox.
+        params.put("dom_total", df.format(dom.liquid));          // Liquido Domingos (sin cambios)
 
         // ===== BLOQUE EXCEDENTES (puras: litros x precio de excedente) =====
         RawMaterialPayRollServiceBean.Discounts exQ = rawMaterialPayRollService.getDiscounts(startDate, endDate, metaProduct,
