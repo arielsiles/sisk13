@@ -107,6 +107,10 @@ public interface RawMaterialPayRollService extends GenericService {
     /** Hay una quincena anterior (motor nuevo) sin contabilizar (guard de orden). */
     boolean hasPriorUncontabilized(Date startDate, MetaProduct metaProduct);
 
+    /** Hay una quincena POSTERIOR generada (mismo metaProducto, cualquier estado). Para bloquear
+     *  revertir/borrar fuera de orden: por el arrastre de deuda, debe hacerse en orden inverso. */
+    boolean hasLaterPayroll(Date startDate, MetaProduct metaProduct);
+
     void approvedDiscountsGAB(Calendar startDate, Calendar endDate, ProductiveZone productiveZone);
 
     void approvedRawMaterialPayRoll(Calendar startDate, Calendar endDate, ProductiveZone productiveZone);

@@ -177,6 +177,12 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
         try {
             Date[] d = computePeriodDates();
             MetaProduct meta = getInstance().getMetaProduct();
+            // Regla rigida de orden: no se puede revertir esta quincena si existe una POSTERIOR
+            // generada (depende del saldo ya committeado de esta). Se revierte en orden inverso.
+            if (rawMaterialPayRollService.hasLaterPayroll(d[0], meta)) {
+                facesMessages.addFromResourceBundle(WARN, "RawMaterialPayRoll.warn.laterExistsRevert");
+                return Outcome.REDISPLAY;
+            }
             Long voucherId = rawMaterialPayRollService.findAccountingVoucherId(d[0], d[1], meta);
             if (voucherId != null) {
                 com.encens.khipus.model.finances.Voucher voucher = voucherAccoutingService.getVoucher(voucherId);
@@ -503,6 +509,14 @@ public class RawMaterialPayRollAction extends GenericAction<RawMaterialPayRoll> 
 
         rawMaterialPayRoll.setStartDate(dateFormat.parse(dateFormat.format(dateIni.getTime())));
         rawMaterialPayRoll.setEndDate(dateFormat.parse(dateFormat.format(dateEnd.getTime())));
+
+        // Regla rigida de orden: no se puede borrar esta quincena si existe una POSTERIOR generada
+        // (depende de esta por el arrastre de deuda). Se borra/revierte en orden inverso.
+        if (rawMaterialPayRollService.hasLaterPayroll(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getMetaProduct())) {
+            facesMessages.addFromResourceBundle(WARN, "RawMaterialPayRoll.warn.laterExistsDelete");
+            return Outcome.REDISPLAY;
+        }
+
         rawMaterialPayRollService.deleteReserveDiscount(rawMaterialPayRoll.getStartDate(),rawMaterialPayRoll.getEndDate());
 
         List<RawMaterialPayRoll> rawMaterialPayRolls = rawMaterialPayRollService.findAll(rawMaterialPayRoll.getStartDate(), rawMaterialPayRoll.getEndDate(), rawMaterialPayRoll.getMetaProduct());

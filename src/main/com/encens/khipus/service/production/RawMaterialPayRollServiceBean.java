@@ -1953,6 +1953,23 @@ public class RawMaterialPayRollServiceBean extends ExtendedGenericServiceBean im
         return count != null && count > 0;
     }
 
+    /**
+     * Hay una quincena POSTERIOR generada (mismo metaProducto, fecha de inicio mayor, cualquier
+     * estado y cualquier tipo de dia real). Se usa para NO revertir/borrar una quincena de la que
+     * depende una posterior por el arrastre de deuda: el ciclo debe recorrerse en orden inverso.
+     */
+    @Override
+    public boolean hasLaterPayroll(Date startDate, MetaProduct metaProduct) {
+        Long count = (Long) getEntityManager().createQuery(
+                "select count(p) from RawMaterialPayRoll p " +
+                " where p.metaProduct = :meta and p.startDate > :start " +
+                " and p.dayType <> com.encens.khipus.model.production.DayType.NINGUNO")
+                .setParameter("meta", metaProduct)
+                .setParameter("start", startDate, TemporalType.DATE)
+                .getSingleResult();
+        return count != null && count > 0;
+    }
+
     /** Id del comprobante contabilizado del periodo (null si no hay). */
     @Override
     @SuppressWarnings("unchecked")
