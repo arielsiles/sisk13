@@ -6,7 +6,10 @@
 <datasources>
     <local-tx-datasource>
         <jndi-name>khipusDatasource</jndi-name>
-        <connection-url>jdbc:mysql://10.0.0.100:3306/khipus</connection-url>
+        <!-- rewriteBatchedStatements=true: el driver reescribe los INSERT en lote como una
+             sola sentencia multi-fila (clave para que hibernate.jdbc.batch_size reduzca los
+             round-trips). Si la BD esta en esta misma maquina, evaluar apuntar a localhost. -->
+        <connection-url>jdbc:mysql://10.0.0.100:3306/khipus?rewriteBatchedStatements=true</connection-url>
         <driver-class>com.mysql.jdbc.Driver</driver-class>
         <user-name>root</user-name>
         <password>Mysql.13</password>
