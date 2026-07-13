@@ -146,3 +146,39 @@ git checkout perf/acopio-generacion-planilla   # (o dev_ilva, ya mergeado)
 git log --oneline --grep="acopio.*batching"    # ver el commit del avance
 ```
 Este documento (`docs/acopio/optimizacion-generacion-planilla.md`) tiene todo el contexto.
+
+---
+
+## 7. Estado del servidor y la configuración (dónde quedó cada cosa)
+
+Resumen de **qué está aplicado y dónde**, para no perder de vista el entorno al retomar.
+
+### En el repo (versionado, va en `dev_ilva` tras el merge)
+| Archivo | Cambio | Estado |
+|---|---|---|
+| `resources/META-INF/persistence-prod.xml` | `hibernate.jdbc.batch_size=50`, `order_inserts`, `order_updates` | ✅ commiteado |
+| `resources/META-INF/persistence-dev.xml` | idem | ✅ commiteado |
+| `resources/khipus-prod-ds.xml` | `?rewriteBatchedStatements=true` en la URL | ✅ commiteado |
+
+### Local, NO versionado (gitignored → solo en esta máquina)
+| Archivo | Cambio | Estado |
+|---|---|---|
+| `resources/khipus-dev-ds.xml` | `?rewriteBatchedStatements=true` en la URL | ⚠️ solo local, **no se commitea** |
+
+### Cambios de servidor (fuera del repo — hay que sostenerlos manualmente)
+| Dónde | Cambio | Estado / Ojo |
+|---|---|---|
+| **MySQL PROD** (`my.ini`, sección `[mysqld]`) | `innodb_flush_log_at_trx_commit = 2` | ✅ aplicado y **confirmado** (`SHOW VARIABLES` = 2). **Verificar que esté en el `my.ini`** (no solo `SET GLOBAL`) para que sobreviva a un reinicio. Reversible a `1` si se quiere durabilidad estricta. |
+| **MySQL LOCAL** | `innodb_flush_log_at_trx_commit` | Sin tocar (local ya es rápido; no hace falta). |
+
+### Estado del despliegue
+- **PROD** está corriendo el build de la rama `perf/acopio-generacion-planilla` (con batching):
+  fue el que se desplegó para medir los 6:25. Al mergear a `dev_ilva`, el código es el mismo;
+  si se redespliega desde `dev_ilva` (`ant clean explode`), el batching se mantiene.
+- El `rewriteBatchedStatements` de prod vive en `khipus-prod-ds.xml` (versionado) → se
+  redespliega solo. El de local vive en `khipus-dev-ds.xml` (gitignored) → ya está en la máquina.
+
+### Checklist al retomar
+1. Confirmar `innodb_flush_log_at_trx_commit=2` sigue activo en prod (`SHOW VARIABLES`).
+2. Confirmar que el build desplegado en prod tiene el batching (viene de `dev_ilva` ya mergeado).
+3. Ejecutar la medición de la **sección 4** (comparar `innodb_buffer_pool_size` local vs prod).
