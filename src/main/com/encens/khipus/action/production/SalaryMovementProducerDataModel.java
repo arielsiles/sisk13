@@ -91,31 +91,50 @@ public class SalaryMovementProducerDataModel extends QueryDataModel<Long, Salary
     }
 
     /**
-     * Inicio del periodo (anio/mes/quincena) como filtro independiente de las fechas.
-     * Retorna null si el periodo esta incompleto, para que la restriccion se omita.
+     * Inicio del periodo como filtro independiente de las fechas. Soporta seleccion PARCIAL:
+     *   - anio + mes + quincena -> primer dia de la quincena (1 o 16)
+     *   - anio + mes            -> primer dia del mes
+     *   - solo anio             -> 1 de enero
+     * Retorna null solo si no hay anio (sin anio no se puede acotar un rango).
      */
     public Date getPeriodStartDate() {
-        if (year == null || monthEnum == null || quincena == null) {
+        if (year == null) {
             return null;
         }
         Calendar cal = Calendar.getInstance();
         cal.clear();
-        cal.set(year, monthEnum.getValue(), (quincena == 2 ? 16 : 1), 0, 0, 0);
+        if (monthEnum == null) {
+            cal.set(year, Calendar.JANUARY, 1, 0, 0, 0);
+        } else if (quincena == null) {
+            cal.set(year, monthEnum.getValue(), 1, 0, 0, 0);
+        } else {
+            cal.set(year, monthEnum.getValue(), (quincena == 2 ? 16 : 1), 0, 0, 0);
+        }
         return cal.getTime();
     }
 
-    /** Fin del periodo (anio/mes/quincena) como filtro independiente de las fechas. */
+    /**
+     * Fin del periodo como filtro independiente de las fechas. Soporta seleccion PARCIAL:
+     *   - anio + mes + quincena -> ultimo dia de la quincena (15 o fin de mes)
+     *   - anio + mes            -> ultimo dia del mes
+     *   - solo anio             -> 31 de diciembre
+     */
     public Date getPeriodEndDate() {
-        if (year == null || monthEnum == null || quincena == null) {
+        if (year == null) {
             return null;
         }
         Calendar cal = Calendar.getInstance();
         cal.clear();
-        cal.set(year, monthEnum.getValue(), 1, 0, 0, 0);
-        if (quincena == 2) {
+        if (monthEnum == null) {
+            cal.set(year, Calendar.DECEMBER, 31, 0, 0, 0);
+        } else if (quincena == null) {
+            cal.set(year, monthEnum.getValue(), 1, 0, 0, 0);
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        } else if (quincena == 2) {
+            cal.set(year, monthEnum.getValue(), 1, 0, 0, 0);
             cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
         } else {
-            cal.set(Calendar.DAY_OF_MONTH, 15);
+            cal.set(year, monthEnum.getValue(), 15, 0, 0, 0);
         }
         return cal.getTime();
     }
@@ -157,8 +176,18 @@ public class SalaryMovementProducerDataModel extends QueryDataModel<Long, Salary
         if (getCriteria() != null) {
             getCriteria().setTypeMovementProducer(null);
         }
-        applyDefaultPeriod();
+        // Limpiar TODO: tambien el periodo (anio/mes/quincena). Antes se re-seleccionaba el
+        // periodo por defecto, por eso quedaban marcados.
+        this.year = null;
+        this.monthEnum = null;
+        this.quincena = null;
+        // Refresca lista/paginador y luego deja los TOTALES en blanco: no se recalculan hasta
+        // la proxima busqueda explicita (search() marca totalsDirty=true, por eso se limpian
+        // despues de llamarlo).
         search();
+        this.totalAmount = null;
+        this.totalSaldo = null;
+        this.totalsDirty = false;
     }
 
     @Override
