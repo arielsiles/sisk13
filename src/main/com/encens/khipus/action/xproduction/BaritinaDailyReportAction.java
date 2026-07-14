@@ -2,8 +2,12 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.production.ProductiveZone;
+import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.*;
+import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.service.xproduction.BaritinaDailyReportService;
+import com.encens.khipus.service.xproduction.WarehouseBalanceRow;
+import com.encens.khipus.service.xproduction.XProductionBalanceService;
 import com.encens.khipus.service.xproduction.XProductionBaritinaService;
 import com.encens.khipus.util.BigDecimalUtil;
 import org.apache.poi.hssf.usermodel.*;
@@ -49,6 +53,10 @@ public class BaritinaDailyReportAction {
     private BaritinaDailyReportService baritinaDailyReportService;
     @In
     private XProductionBaritinaService xproductionBaritinaService;
+    @In
+    private XProductionBalanceService xproductionBalanceService;
+    @In
+    private ProductItemService productItemService;
     @In
     private FacesMessages facesMessages;
 
@@ -106,7 +114,6 @@ public class BaritinaDailyReportAction {
             for (int d = 1; d <= lastDayNum; d++) days[d] = new DayData();
             Map<Long, ProductiveZone> zoneById = new LinkedHashMap<Long, ProductiveZone>();
 
-            BigDecimal beforeUsoTn = BigDecimal.ZERO;
             BigDecimal beforePtTn = BigDecimal.ZERO;
 
             for (XProduction p : allOrders) {
@@ -114,7 +121,6 @@ public class BaritinaDailyReportAction {
                 BigDecimal ptTn = tn(sumPt(p));
                 if (p.getInitDate() == null) continue;
                 if (p.getInitDate().before(firstDay)) {
-                    beforeUsoTn = BigDecimalUtil.sum(beforeUsoTn, usoTn, 6);
                     beforePtTn = BigDecimalUtil.sum(beforePtTn, ptTn, 6);
                     continue;
                 }
@@ -159,9 +165,11 @@ public class BaritinaDailyReportAction {
                 }
             }
 
-            // 5. Saldos iniciales (computados de lo anterior al mes)
-            BigDecimal openMpTn = BigDecimalUtil.subtract(
-                    tn(baritinaDailyReportService.sumAcopioBefore(mpCodArt, firstDay)), beforeUsoTn, 6);
+            // 5. Saldos iniciales
+            // Saldo anterior de MP: se toma del mismo calculo que la pantalla "Saldos de
+            // Almacen" (XProductionBalanceService) para el articulo MP de la linea, al ultimo
+            // dia del mes anterior (firstDay - 1), convertido KG -> TN. El PT mantiene su calculo.
+            BigDecimal openMpTn = mpBalanceBeforeTn(mpCodArt, firstDay);
             BigDecimal openProdTn = BigDecimalUtil.subtract(
                     beforePtTn, tn(baritinaDailyReportService.sumDispatchBefore(productCodArts, firstDay)), 6);
 
@@ -322,6 +330,29 @@ public class BaritinaDailyReportAction {
             }
         }
         return null;
+    }
+
+    /**
+     * Saldo anterior de MP en TN: balance del articulo MP segun XProductionBalanceService
+     * (mismo criterio que la pantalla "Saldos de Almacen") al ultimo dia del mes anterior
+     * (firstDay - 1). El balance viene en la unidad del articulo (KG) y se convierte a TN.
+     */
+    private BigDecimal mpBalanceBeforeTn(String mpCod, Date firstDay) {
+        if (mpCod == null) return BigDecimal.ZERO;
+        ProductItem mp = productItemService.findProductItemByCode(mpCod);
+        if (mp == null) return BigDecimal.ZERO;
+        Calendar c = Calendar.getInstance();
+        c.setTime(firstDay);
+        c.add(Calendar.DAY_OF_MONTH, -1);
+        Date cutoff = c.getTime();
+        List<WarehouseBalanceRow> balances = xproductionBalanceService.computeBalances(
+                mp.getCompanyNumber(), mp.getWarehouseCode(), cutoff);
+        for (WarehouseBalanceRow row : balances) {
+            if (mpCod.equals(row.getProductItemCode())) {
+                return tn(row.getBalance());
+            }
+        }
+        return BigDecimal.ZERO;
     }
 
     /** cod_art distintos de los productos terminados de las ordenes. */

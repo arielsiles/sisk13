@@ -46,7 +46,7 @@ public class BaritinaDailyReportServiceBean implements BaritinaDailyReportServic
     public List<Object[]> sumAcopioByDay(String codArt, Date from, Date to) {
         if (codArt == null || from == null || to == null) return Collections.emptyList();
         Query q = em.createQuery(
-                "select c.date, sum(c.netWeight) from CollectMaterial c " +
+                "select c.date, sum(c.balanceWeight) from CollectMaterial c " +
                 "where c.metaProduct.productItemCode = :cod " +
                 "  and c.date >= :from and c.date < :to " +
                 "  and c.state in (:apr, :conta) " +
@@ -63,7 +63,7 @@ public class BaritinaDailyReportServiceBean implements BaritinaDailyReportServic
     public BigDecimal sumAcopioBefore(String codArt, Date before) {
         if (codArt == null || before == null) return BigDecimal.ZERO;
         Object r = em.createQuery(
-                "select sum(c.netWeight) from CollectMaterial c " +
+                "select sum(c.balanceWeight) from CollectMaterial c " +
                 "where c.metaProduct.productItemCode = :cod " +
                 "  and c.date < :before and c.state in (:apr, :conta)")
                 .setParameter("cod", codArt)

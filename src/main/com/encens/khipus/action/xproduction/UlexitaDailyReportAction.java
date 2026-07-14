@@ -4,7 +4,11 @@ import com.encens.khipus.model.xproduction.ProductionLine;
 import com.encens.khipus.model.xproduction.XProduction;
 import com.encens.khipus.model.xproduction.XProductionUlexita;
 import com.encens.khipus.model.xproduction.XSupply;
+import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.service.xproduction.BaritinaDailyReportService;
+import com.encens.khipus.service.xproduction.WarehouseBalanceRow;
+import com.encens.khipus.service.xproduction.XProductionBalanceService;
 import com.encens.khipus.service.xproduction.XProductionUlexitaCalc;
 import com.encens.khipus.service.xproduction.XProductionUlexitaService;
 import com.encens.khipus.util.BigDecimalUtil;
@@ -52,6 +56,10 @@ public class UlexitaDailyReportAction {
     private XProductionUlexitaService xproductionUlexitaService;
     @In
     private BaritinaDailyReportService baritinaDailyReportService;
+    @In
+    private XProductionBalanceService xproductionBalanceService;
+    @In
+    private ProductItemService productItemService;
     @In
     private FacesMessages facesMessages;
 
@@ -127,12 +135,10 @@ public class UlexitaDailyReportAction {
 
             // Ordenes del periodo agrupadas por dia + sumas previas para saldos iniciales
             Map<Integer, List<XProduction>> ordersByDay = new HashMap<Integer, List<XProduction>>();
-            BigDecimal usoBeforeTn = BigDecimal.ZERO;
             BigDecimal ptBuenoBeforeTn = BigDecimal.ZERO;
             for (XProduction p : allOrders) {
                 if (p.getInitDate() == null) continue;
                 if (p.getInitDate().before(firstDay)) {
-                    usoBeforeTn = BigDecimalUtil.sum(usoBeforeTn, tn(usoMpQty(p, mpCod)), 6);
                     XProductionUlexita u = xproductionUlexitaService.findByProduction(p);
                     XProductionUlexitaCalc calc = new XProductionUlexitaCalc(
                             p, u, p.getProductionLine(), p.getSupplyList(), p.getProductionProductList());
@@ -152,8 +158,11 @@ public class UlexitaDailyReportAction {
             Map<Integer, BigDecimal> ingresoByDay = bucketByDay(baritinaDailyReportService.sumAcopioByDay(mpCod, firstDay, nextMonth));
             Map<Integer, BigDecimal> despachoByDay = bucketByDay(baritinaDailyReportService.dispatchRows(ptCods, firstDay, nextMonth));
 
-            // Saldos iniciales (estilo BARITINA)
-            BigDecimal ulexDisp = BigDecimalUtil.subtract(tn(baritinaDailyReportService.sumAcopioBefore(mpCod, firstDay)), usoBeforeTn, 6);
+            // Saldo anterior de ULEX DISPONIBLE: se toma del mismo calculo que la pantalla
+            // "Saldos de Almacen" (XProductionBalanceService) para el articulo MP principal,
+            // al ultimo dia del mes anterior (firstDay - 1). Asi la columna arranca del mismo
+            // saldo que muestra Saldos. El PT (saldoPt) mantiene su calculo previo.
+            BigDecimal ulexDisp = ulexBalanceBeforeTn(mpCod, firstDay);
             BigDecimal saldoPt = BigDecimalUtil.subtract(ptBuenoBeforeTn, tn(baritinaDailyReportService.sumDispatchBefore(ptCods, firstDay)), 6);
 
             HSSFWorkbook wb = new HSSFWorkbook();
@@ -391,16 +400,28 @@ public class UlexitaDailyReportAction {
         return set;
     }
 
-    /** Consumo de MP (KG) de la orden: suma de insumos cuyo cod_art = mpCod. */
-    private BigDecimal usoMpQty(XProduction p, String mpCod) {
-        BigDecimal q = BigDecimal.ZERO;
-        if (mpCod == null) return q;
-        for (XSupply sup : p.getSupplyList()) {
-            if (mpCod.equals(sup.getProductItemCode()) && sup.getQuantity() != null) {
-                q = BigDecimalUtil.sum(q, sup.getQuantity(), 6);
+    /**
+     * Saldo anterior de ULEX DISPONIBLE en TN: balance del articulo MP principal segun
+     * XProductionBalanceService (mismo criterio que la pantalla "Saldos de Almacen") al
+     * ultimo dia del mes anterior (firstDay - 1). El balance viene en la unidad del
+     * articulo (KG para ULEXITA) y se convierte a TN.
+     */
+    private BigDecimal ulexBalanceBeforeTn(String mpCod, Date firstDay) {
+        if (mpCod == null) return BigDecimal.ZERO;
+        ProductItem mp = productItemService.findProductItemByCode(mpCod);
+        if (mp == null) return BigDecimal.ZERO;
+        Calendar c = Calendar.getInstance();
+        c.setTime(firstDay);
+        c.add(Calendar.DAY_OF_MONTH, -1);
+        Date cutoff = c.getTime();
+        List<WarehouseBalanceRow> balances = xproductionBalanceService.computeBalances(
+                mp.getCompanyNumber(), mp.getWarehouseCode(), cutoff);
+        for (WarehouseBalanceRow row : balances) {
+            if (mpCod.equals(row.getProductItemCode())) {
+                return tn(row.getBalance());
             }
         }
-        return q;
+        return BigDecimal.ZERO;
     }
 
     // ------------------------------------------------------------------ helpers
