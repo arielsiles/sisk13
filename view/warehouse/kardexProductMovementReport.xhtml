@@ -135,7 +135,8 @@
 
                         <rich:column styleClass="center">
                             <h:outputText value="#{row.date}">
-                                <f:convertDateTime pattern="#{messages['patterns.date']}"/>
+                                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                   timeZone="#{sessionUser.timeZone}"/>
                             </h:outputText>
                         </rich:column>
                         <rich:column styleClass="center" style="white-space:nowrap;"><h:outputText value="#{row.code}"/></rich:column>

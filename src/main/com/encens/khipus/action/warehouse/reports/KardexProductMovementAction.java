@@ -303,8 +303,12 @@ public class KardexProductMovementAction extends GenericReportAction {
         Collections.sort(datas, new Comparator<CollectionData>() {
             @Override
             public int compare(CollectionData o1, CollectionData o2) {
-                //return o1.getDate().toString().compareTo(o2.getDate().toString());
-                return o1.getDate().compareTo(o2.getDate());
+                int byDate = o1.getDate().compareTo(o2.getDate());
+                if (byDate != 0) {
+                    return byDate;
+                }
+                // Mismo dia: entradas ("E") antes que salidas ("S").
+                return o1.getMovementType().compareTo(o2.getMovementType());
             }
         });
 
@@ -316,22 +320,23 @@ public class KardexProductMovementAction extends GenericReportAction {
         return beanCollection;
     }
 
+    /**
+     * Normaliza la fecha del movimiento a las 00:00 del dia registrado (hora local).
+     * Antes se le forzaba una hora artificial (01:00 a las entradas, 23:00 a las salidas)
+     * solo para ordenar; al renderizarse la vista en otra zona horaria (UTC), esa hora
+     * de 23:00 en horario de Bolivia (GMT-4) cruzaba a la medianoche y mostraba la fecha
+     * corrida un dia. El orden "entradas antes que salidas" ahora se resuelve en el
+     * comparador (ver calculateCollectionData). El parametro movementType se conserva
+     * por compatibilidad con las llamadas existentes.
+     */
     private Date formatearFecha(Date fechaOriginal, String movementType){
-
-        // Añadir horas, minutos y segundos
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(fechaOriginal);
-        if ( movementType.equals("E")){
-            calendar.set(Calendar.HOUR_OF_DAY, 1);
-            calendar.set(Calendar.MINUTE, 1);
-            calendar.set(Calendar.SECOND, 1);
-        } else {
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-        }
-        Date fechaHora = calendar.getTime();
-        return fechaHora;
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
     }
 
     /** Convierte un valor en TN a la unidad del articulo (KG = x1000; otra unidad = se asume TN). */
