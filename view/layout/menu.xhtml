@@ -900,6 +900,12 @@
 
             </rich:dropDownMenu>
 
+            <s:link view="/warehouse/kardexProductMovementReport.xhtml"
+                    value="#{messages['menu.production.kardexArticulos']}"
+                    styleClass="tab-cell"
+                    rendered="#{s:hasPermission('XPRODUCTION_KARDEX','VIEW')}"
+                    propagation="none"/>
+
             <s:link view="/xproduction/warehouseBalance.xhtml"
                     value="#{messages['menu.xproduction.balance']}"
                     styleClass="tab-cell"

@@ -1,0 +1,27 @@
+-- ============================================================================
+-- query_v6.0.109_terdemol.sql
+-- ============================================================================
+-- Permiso propio para "Kardex Articulos" en el menu Produccion (xproduction).
+--
+-- Contexto:
+--   El "Kardex Articulos" ya existia en el tab "Acopio MP", apuntando al reporte
+--   /warehouse/kardexProductMovementReport.xhtml y gateado por el permiso
+--   'PRODUCT_MOVEMENT_REPORT' (funcionalidad 294, modulo finances=5).
+--
+--   Se agrega el mismo reporte al tab "Produccion" (xproduction), pero con un
+--   permiso INDEPENDIENTE para poder controlarlo por separado del de Acopio
+--   (los roles de produccion no son los mismos que los de acopio/inventarios).
+--
+-- Detalle:
+--   Bitmask permiso: VIEW=1, CREATE=2, UPDATE=4, DELETE=8. CRUD completo = 15.
+--   idmodulo = 11 (xproduction), igual que XPRODUCTION_BALANCE y demas.
+--   Funcionalidad de solo visualizacion de menu: VIEW(1).
+--   Columnas (orden fisico): (idfuncionalidad, codigo, descripcion,
+--                             idmodulo, permiso, nombrerecurso, idcompania).
+--
+-- NOTA (migracion): NO se auto-asigna a ningun rol. Tras aplicar este script
+--       hay que habilitarlo por rol desde Administracion > Permisos; hasta
+--       entonces la opcion queda oculta para todos.
+-- ----------------------------------------------------------------------------
+
+insert into funcionalidad values (502, 'XPRODUCTION_KARDEX', 'Kardex Articulos (Produccion)', 11, 1, 'Functionality.xproduction.kardexArticulos', 1);
