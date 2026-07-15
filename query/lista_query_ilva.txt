@@ -83,3 +83,4 @@ query_v6.0.42.sql
 query_v6.0.47.sql
 query_v6.0.48.sql
 query_views.sql
+ultima version: v6.0.49 - 14/07/2026
