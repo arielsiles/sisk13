@@ -2,7 +2,6 @@ package com.encens.khipus.model.finances;
 
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.CompanyNumberListener;
-import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.exception.finances.CompanyAccountNotConfiguredException;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.common.File;
@@ -14,6 +13,7 @@ import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
+import org.hibernate.validator.Email;
 import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
@@ -34,7 +34,7 @@ import static com.encens.khipus.model.usertype.StringBooleanUserType.*;
         @NamedQuery(name = "CompanyConfiguration.findByCompany", query = "select c from CompanyConfiguration c")
 })
 @Entity
-@EntityListeners({CompanyListener.class, CompanyNumberListener.class, UpperCaseStringListener.class})
+@EntityListeners({CompanyListener.class, CompanyNumberListener.class})
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @Table(name = "configuracion", schema = Constants.FINANCES_SCHEMA)
 public class CompanyConfiguration {
@@ -563,6 +563,11 @@ public class CompanyConfiguration {
     @Column(name = "hrsdialaboral", precision = 10, scale = 2, nullable = false)
     @NotNull
     private BigDecimal hrsWorkingDay;
+
+    @Column(name = "email_unisueldo")
+    @Email
+    @Length(max = 100)
+    private String unisueldoEmail;
 
     @Column(name = "tipo_doc_caja")
     private String cashBoxDocumentTypeCode;
@@ -1389,6 +1394,14 @@ public class CompanyConfiguration {
         this.hrsWorkingDay = hrsWorkingDay;
     }
 
+    public String getUnisueldoEmail() {
+        return unisueldoEmail;
+    }
+
+    public void setUnisueldoEmail(String unisueldoEmail) {
+        this.unisueldoEmail = unisueldoEmail;
+    }
+
     public String getCashBoxDocumentTypeCode() {
         return cashBoxDocumentTypeCode;
     }
@@ -2168,7 +2181,11 @@ public class CompanyConfiguration {
     }
 
     public void setPaymentDocumentOC(String paymentDocumentOC) {
-        this.paymentDocumentOC = paymentDocumentOC;
+        // Codigo de tipo de documento contable: alimenta getNextSeq() para la
+        // numeracion de comprobantes, que resuelve por tipo. Se normaliza a
+        // mayusculas para no depender del collation de la BD (antes lo hacia el
+        // UpperCaseStringListener, que se quito de esta entidad).
+        this.paymentDocumentOC = paymentDocumentOC != null ? paymentDocumentOC.toUpperCase() : null;
     }
 
     public CashAccount getAccountPayableSupplier() {
@@ -2337,7 +2354,9 @@ public class CompanyConfiguration {
     }
 
     public void setDocumentFixedAssetOC(String documentFixedAssetOC) {
-        this.documentFixedAssetOC = documentFixedAssetOC;
+        // Ver nota en setPaymentDocumentOC: codigo de tipo de documento usado en
+        // getNextSeq(); se mantiene en mayusculas por seguridad de la numeracion.
+        this.documentFixedAssetOC = documentFixedAssetOC != null ? documentFixedAssetOC.toUpperCase() : null;
     }
 
     public CashAccount getLossCashAccount() {

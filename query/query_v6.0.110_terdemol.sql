@@ -139,3 +139,14 @@ UPDATE derechoacceso SET permiso = 5 WHERE idfuncionalidad = 503 AND idrol = 1 A
 --     FROM funcionalidad f
 --     LEFT JOIN derechoacceso da ON da.idfuncionalidad = f.idfuncionalidad
 --    WHERE f.codigo = 'COMPANYSETTING';
+
+-- 6) Email UNISUELDO configurable -------------------------------------------
+--    El correo que va en el archivo UNISUELDO v2 (planilla de gerentes) estaba
+--    hardcodeado en PayrollBankUnisueldo2ReportAction. Se mueve a `configuracion`
+--    para que sea administrable desde la pantalla, tab "Recursos humanos".
+--    Se inicializa con el valor que estaba en el codigo para no cambiar el
+--    comportamiento de las bases existentes.
+
+ALTER TABLE configuracion ADD COLUMN email_unisueldo VARCHAR(100) DEFAULT NULL AFTER hrsdialaboral;
+
+UPDATE configuracion SET email_unisueldo = 'juana.pozo@ilvabolivia.com' WHERE email_unisueldo IS NULL;

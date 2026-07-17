@@ -1200,6 +1200,12 @@
                 </h:selectOneMenu>
                 <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultDocumentType.col']}"/>
             </s:decorate>
+            <s:decorate id="unisueldoEmailField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.unisueldoEmail']}</ui:define>
+                <h:inputText id="unisueldoEmail" value="#{companySettingAction.instance.unisueldoEmail}"
+                             maxlength="100" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.unisueldoEmail.col']}"/>
+            </s:decorate>
         </app:fieldset>
         <app:fieldset id="evaluationUrlsFieldset" title="#{messages['CompanyConfiguration.fieldset.evaluationUrls']}">
             <s:decorate id="scheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">

@@ -119,7 +119,7 @@ public class PayrollBankUnisueldo2ReportAction extends GenericReportAction {
         String year         = DateUtils.getCurrentYear(generatedPayroll.getGestionPayroll().getInitDate()).toString();
         String gloss  = MessageUtils.getMessage("ManagersPayroll.paymentUnisueldo") + " " + month + " " + year;
         String payrollType = "H";
-        String email = "juana.pozo@ilvabolivia.com";
+        String email = companyConfiguration.getUnisueldoEmail();
 
         Integer quantity = managersPayrollService.getManagersPayrollToUnisueldo(generatedPayroll).size();
         BigDecimal sumLiquid = managersPayrollSummaryService.sumLiquidByPaymentType(generatedPayroll.getId(), PaymentType.PAYMENT_BANK_ACCOUNT);

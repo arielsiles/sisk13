@@ -144,7 +144,8 @@ public class CompanySettingErrors {
             "studentScheduleEvaluationRedirectURL",
             "teacherScheduleEvaluationRedirectURL",
             "careerManagerScheduleEvaluationRedirectURL",
-            "autoEvaluationScheduleEvaluationRedirectURL")));
+            "autoEvaluationScheduleEvaluationRedirectURL",
+            "unisueldoEmail")));
         TAB_FIELDS.put("users", new HashSet<String>(Arrays.asList(
             "defaultSystemUserNumber",
             "defaultAccountancyUser",
