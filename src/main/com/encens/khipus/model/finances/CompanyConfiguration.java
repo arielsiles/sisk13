@@ -4,6 +4,7 @@ import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.common.File;
 import com.encens.khipus.model.contacts.Salutation;
 import com.encens.khipus.model.customers.DocumentType;
 import com.encens.khipus.model.employees.Charge;
@@ -35,6 +36,13 @@ import static com.encens.khipus.model.usertype.StringBooleanUserType.*;
 @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
 @Table(name = "configuracion", schema = Constants.FINANCES_SCHEMA)
 public class CompanyConfiguration {
+    /* Cotas de reescalado de los logos. El alto es el limite real de renderizado;
+       el ancho es holgado para no deformar logos apaisados. */
+    public static final int HEADER_LOGO_MAX_WIDTH = 200;
+    public static final int HEADER_LOGO_MAX_HEIGHT = 50;
+    public static final int LOGIN_LOGO_MAX_WIDTH = 300;
+    public static final int LOGIN_LOGO_MAX_HEIGHT = 300;
+
     @Id
     @Column(name = "no_cia", nullable = false, updatable = false)
     private String companyNumber;
@@ -123,12 +131,20 @@ public class CompanyConfiguration {
     })
     private CashAccount balanceExchangeRateAccount;
 
+    @Column(name = "iue_ret", length = 20)
+    @Length(max = 20)
+    private String iueRetentionCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "iue_ret", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount iueRetention;
+
+    @Column(name = "it_ret", length = 20)
+    @Length(max = 20)
+    private String itRetentionCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -137,12 +153,20 @@ public class CompanyConfiguration {
     })
     private CashAccount itRetention;
 
+    @Column(name = "ctacostpt", length = 20)
+    @Length(max = 20)
+    private String ctaCostPTCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "ctacostpt", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaCostPT;
+
+    @Column(name = "ctaalmpt", length = 20)
+    @Length(max = 20)
+    private String ctaAlmPTCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -151,12 +175,20 @@ public class CompanyConfiguration {
     })
     private CashAccount ctaAlmPT;
 
+    @Column(name = "ctaalmptag", length = 20)
+    @Length(max = 20)
+    private String ctaAlmPTAGCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "ctaalmptag", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaAlmPTAG;
+
+    @Column(name = "ctacostpv", length = 20)
+    @Length(max = 20)
+    private String ctaCostPVCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -165,12 +197,38 @@ public class CompanyConfiguration {
     })
     private CashAccount ctaCostPV;
 
+    @Column(name = "ctaalmpv", length = 20)
+    @Length(max = 20)
+    private String ctaAlmPVCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "ctaalmpv", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount ctaAlmPV;
+
+    @Column(name = "ctaMerma", length = 20)
+    @Length(max = 20)
+    private String wasteAccountCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaMerma", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount wasteAccount;
+
+    @Column(name = "ctaProm", length = 20)
+    @Length(max = 20)
+    private String averageAccountCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaProm", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount averageAccount;
 
     @Column(name = "ctaantprovme", length = 20, nullable = false)
     @Length(max = 20)
@@ -400,12 +458,20 @@ public class CompanyConfiguration {
     @NotNull
     private FinanceUser defaultPayableFinanceUser;
 
+    @Column(name = "pagoctabcomn", length = 20)
+    @Length(max = 20)
+    private String nationalBankAccountForPaymentCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "pagoctabcomn", referencedColumnName = "cta_bco", nullable = false, updatable = false, insertable = false)
     })
     private FinancesBankAccount nationalBankAccountForPayment;
+
+    @Column(name = "pagoctabcome", length = 20)
+    @Length(max = 20)
+    private String foreignBankAccountForPaymentCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -550,12 +616,20 @@ public class CompanyConfiguration {
     @Length(max = 8)
     private String costCenterCode;
 
+    @Column(name = "ctamermabaj", length = 20)
+    @Length(max = 20)
+    private String lowAccountCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "ctamermabaj", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount lowAccount;
+
+    @Column(name = "ctareproc", length = 20)
+    @Length(max = 20)
+    private String reworkAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -564,6 +638,9 @@ public class CompanyConfiguration {
     })
     private CashAccount reworkAccount;
 
+    @Column(name = "ct_cajaahorro", length = 20)
+    @Length(max = 20)
+    private String savingsBankAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -572,12 +649,20 @@ public class CompanyConfiguration {
     })
     private CashAccount SavingsBankAccount;
 
+    @Column(name = "ct_cajaveter", length = 20)
+    @Length(max = 20)
+    private String veterinaryCashAccountCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "ct_cajaveter", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount VeterinaryCashAccount;
+
+    @Column(name = "CAJAgRAL1MN", length = 20)
+    @Length(max = 20)
+    private String generalCashAccountNationalCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -586,12 +671,20 @@ public class CompanyConfiguration {
     })
     private CashAccount generalCashAccountNational;
 
+    @Column(name = "i_pvig_pf_mn", length = 20)
+    @Length(max = 20)
+    private String fixedTermInterestNationalCurrencyCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "i_pvig_pf_mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount fixedTermInterestNationalCurrency;
+
+    @Column(name = "ctaprovaf", length = 20)
+    @Length(max = 20)
+    private String fixedAssetProvidersAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -600,12 +693,20 @@ public class CompanyConfiguration {
     })
     private CashAccount fixedAssetProvidersAccount;
 
+    @Column(name = "ctag_it", length = 20)
+    @Length(max = 20)
+    private String transactionTaxExpenseCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "ctag_it", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount transactionTaxExpense;
+
+    @Column(name = "ctap_debfisiva", length = 20)
+    @Length(max = 20)
+    private String fiscalDebitLiabilityCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -614,6 +715,10 @@ public class CompanyConfiguration {
     })
     private CashAccount fiscalDebitLiability;
 
+    @Column(name = "ctap_itxpagar", length = 20)
+    @Length(max = 20)
+    private String transactionTaxPayableCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
@@ -621,12 +726,20 @@ public class CompanyConfiguration {
     })
     private CashAccount transactionTaxPayable;
 
+    @Column(name = "ctai_ventapri", length = 20)
+    @Length(max = 20)
+    private String primarySaleProductCode;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "ctai_ventapri", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount primarySaleProduct;
+
+    @Column(name = "ctai_ventasec", length = 20)
+    @Length(max = 20)
+    private String secondarySaleProductCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -637,6 +750,10 @@ public class CompanyConfiguration {
 
     @Column(name = "distparam")
     private BigDecimal dealerParameter;
+
+    @Column(name = "ctacomision", length = 20)
+    @Length(max = 20)
+    private String commissionSalesCashAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
@@ -651,12 +768,20 @@ public class CompanyConfiguration {
     @Column(name = "af_fin_oc")
     private String documentFixedAssetOC;
 
+    @Column(name = "cxp_provmn", length = 20)
+    @Length(max = 20)
+    private String accountPayableSupplierCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "cxp_provmn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount accountPayableSupplier;
+
+    @Column(name = "cta_pat01", length = 20)
+    @Length(max = 20)
+    private String accountBalanceSheet1Code;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -665,12 +790,20 @@ public class CompanyConfiguration {
     })
     private CashAccount accountBalanceSheet1;
 
+    @Column(name = "cta_pat02", length = 20)
+    @Length(max = 20)
+    private String accountBalanceSheet2Code;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "cta_pat02", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount accountBalanceSheet2;
+
+    @Column(name = "cta_pat03", length = 20)
+    @Length(max = 20)
+    private String accountBalanceSheet3Code;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -679,12 +812,20 @@ public class CompanyConfiguration {
     })
     private CashAccount accountBalanceSheet3;
 
+    @Column(name = "cta_pat04", length = 20)
+    @Length(max = 20)
+    private String accountBalanceSheet4Code;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "cta_pat04", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount accountBalanceSheet4;
+
+    @Column(name = "cta_pat05", length = 20)
+    @Length(max = 20)
+    private String accountBalanceSheet5Code;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -693,6 +834,10 @@ public class CompanyConfiguration {
     })
     private CashAccount accountBalanceSheet5;
 
+    @Column(name = "cxp_iva", length = 20)
+    @Length(max = 20)
+    private String accountPayableIVACode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
@@ -700,12 +845,20 @@ public class CompanyConfiguration {
     })
     private CashAccount accountPayableIVA;
 
+    @Column(name = "cxp_regalia", length = 20)
+    @Length(max = 20)
+    private String accountRegaliaCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "cxp_regalia", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount accountRegalia;
+
+    @Column(name = "cxp_cns", length = 20)
+    @Length(max = 20)
+    private String accountRetentionCNSCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -717,12 +870,20 @@ public class CompanyConfiguration {
     @Column(name = "ret_cns", nullable = true)
     private BigDecimal retentionCNSValue;
 
+    @Column(name = "res_perdida", length = 20)
+    @Length(max = 20)
+    private String lossCashAccountCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "res_perdida", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount lossCashAccount;
+
+    @Column(name = "res_utilidad", length = 20)
+    @Length(max = 20)
+    private String profitCashAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
@@ -731,12 +892,32 @@ public class CompanyConfiguration {
     })
     private CashAccount profitCashAccount;
 
+    @Column(name = "oc_pagodefault", length = 20)
+    @Length(max = 20)
+    private String defaultAccountPurchaseOrderCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
             @JoinColumn(name = "oc_pagodefault", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount defaultAccountPurchaseOrder;
+
+    /**
+     * Logo mostrado en la cabecera, encima del menu principal. Se reescala a
+     * {@link #HEADER_LOGO_MAX_WIDTH}x{@link #HEADER_LOGO_MAX_HEIGHT} al guardar.
+     */
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "idlogocabecera", referencedColumnName = "idarchivo")
+    private File headerLogo;
+
+    /**
+     * Logo mostrado en la pagina de login. Se sirve de forma anonima a traves de
+     * companyLogoHolder, por lo que no depende de currentCompany.
+     */
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "idlogologin", referencedColumnName = "idarchivo")
+    private File loginLogo;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", unique = true, nullable = false, updatable = false, insertable = true)
@@ -980,6 +1161,15 @@ public class CompanyConfiguration {
 
     public void setNationalBankAccountForPayment(FinancesBankAccount nationalBankAccountForPayment) {
         this.nationalBankAccountForPayment = nationalBankAccountForPayment;
+        setNationalBankAccountForPaymentCode(this.nationalBankAccountForPayment != null ? this.nationalBankAccountForPayment.getAccountNumber() : null);
+    }
+
+    public String getNationalBankAccountForPaymentCode() {
+        return nationalBankAccountForPaymentCode;
+    }
+
+    public void setNationalBankAccountForPaymentCode(String nationalBankAccountForPaymentCode) {
+        this.nationalBankAccountForPaymentCode = nationalBankAccountForPaymentCode;
     }
 
     public FinancesBankAccount getForeignBankAccountForPayment() {
@@ -988,6 +1178,15 @@ public class CompanyConfiguration {
 
     public void setForeignBankAccountForPayment(FinancesBankAccount foreignBankAccountForPayment) {
         this.foreignBankAccountForPayment = foreignBankAccountForPayment;
+        setForeignBankAccountForPaymentCode(this.foreignBankAccountForPayment != null ? this.foreignBankAccountForPayment.getAccountNumber() : null);
+    }
+
+    public String getForeignBankAccountForPaymentCode() {
+        return foreignBankAccountForPaymentCode;
+    }
+
+    public void setForeignBankAccountForPaymentCode(String foreignBankAccountForPaymentCode) {
+        this.foreignBankAccountForPaymentCode = foreignBankAccountForPaymentCode;
     }
 
     public Charge getDefaultProfessorsCharge() {
@@ -1058,6 +1257,7 @@ public class CompanyConfiguration {
 
     public void setFixedAssetInTransitAccount(CashAccount fixedAssetInTransitAccount) {
         this.fixedAssetInTransitAccount = fixedAssetInTransitAccount;
+        setFixedAssetInTransitAccountCode(this.fixedAssetInTransitAccount != null ? this.fixedAssetInTransitAccount.getAccountCode() : null);
     }
 
     public String getFixedAssetInTransitAccountCode() {
@@ -1276,9 +1476,7 @@ public class CompanyConfiguration {
 
     public void setDepositInTransitForeignCurrencyAccount(CashAccount depositInTransitForeignCurrencyAccount) {
         this.depositInTransitForeignCurrencyAccount = depositInTransitForeignCurrencyAccount;
-        if (null != depositInTransitForeignCurrencyAccount) {
-            depositInTransitForeignCurrencyAccountCode = depositInTransitForeignCurrencyAccount.getAccountCode();
-        }
+        setDepositInTransitForeignCurrencyAccountCode(this.depositInTransitForeignCurrencyAccount != null ? this.depositInTransitForeignCurrencyAccount.getAccountCode() : null);
     }
 
     public CashAccount getDepositInTransitNationalCurrencyAccount() {
@@ -1287,9 +1485,7 @@ public class CompanyConfiguration {
 
     public void setDepositInTransitNationalCurrencyAccount(CashAccount depositInTransitNationalCurrencyAccount) {
         this.depositInTransitNationalCurrencyAccount = depositInTransitNationalCurrencyAccount;
-        if (null != depositInTransitNationalCurrencyAccount) {
-            depositInTransitNationalCurrencyAccountCode = depositInTransitNationalCurrencyAccount.getAccountCode();
-        }
+        setDepositInTransitNationalCurrencyAccountCode(this.depositInTransitNationalCurrencyAccount != null ? this.depositInTransitNationalCurrencyAccount.getAccountCode() : null);
     }
 
     public String getDepositInTransitForeignCurrencyAccountCode() {
@@ -1322,6 +1518,7 @@ public class CompanyConfiguration {
 
     public void setWarehouseNationalCurrencyTransientAccount1(CashAccount warehouseNationalCurrencyTransientAccount1) {
         this.warehouseNationalCurrencyTransientAccount1 = warehouseNationalCurrencyTransientAccount1;
+        setWarehouseNationalCurrencyTransientAccount1Code(this.warehouseNationalCurrencyTransientAccount1 != null ? this.warehouseNationalCurrencyTransientAccount1.getAccountCode() : null);
     }
 
     @Override
@@ -1348,6 +1545,7 @@ public class CompanyConfiguration {
 
     public void setWarehouseNationalCurrencyTransientAccount2(CashAccount warehouseNationalCurrencyTransientAccount2) {
         this.warehouseNationalCurrencyTransientAccount2 = warehouseNationalCurrencyTransientAccount2;
+        setWarehouseNationalCurrencyTransientAccount2Code(this.warehouseNationalCurrencyTransientAccount2 != null ? this.warehouseNationalCurrencyTransientAccount2.getAccountCode() : null);
     }
 
     public FinanceUser getDefaultAccountancyUserProduction() {
@@ -1388,6 +1586,15 @@ public class CompanyConfiguration {
 
     public void setItRetention(CashAccount itRetention) {
         this.itRetention = itRetention;
+        setItRetentionCode(this.itRetention != null ? this.itRetention.getAccountCode() : null);
+    }
+
+    public String getItRetentionCode() {
+        return itRetentionCode;
+    }
+
+    public void setItRetentionCode(String itRetentionCode) {
+        this.itRetentionCode = itRetentionCode;
     }
 
     public CashAccount getIueRetention() {
@@ -1396,6 +1603,15 @@ public class CompanyConfiguration {
 
     public void setIueRetention(CashAccount iueRetention) {
         this.iueRetention = iueRetention;
+        setIueRetentionCode(this.iueRetention != null ? this.iueRetention.getAccountCode() : null);
+    }
+
+    public String getIueRetentionCode() {
+        return iueRetentionCode;
+    }
+
+    public void setIueRetentionCode(String iueRetentionCode) {
+        this.iueRetentionCode = iueRetentionCode;
     }
 
     public CashAccount getCtaCostPT() {
@@ -1404,6 +1620,15 @@ public class CompanyConfiguration {
 
     public void setCtaCostPT(CashAccount ctaCostPT) {
         this.ctaCostPT = ctaCostPT;
+        setCtaCostPTCode(this.ctaCostPT != null ? this.ctaCostPT.getAccountCode() : null);
+    }
+
+    public String getCtaCostPTCode() {
+        return ctaCostPTCode;
+    }
+
+    public void setCtaCostPTCode(String ctaCostPTCode) {
+        this.ctaCostPTCode = ctaCostPTCode;
     }
 
     public CashAccount getCtaAlmPT() {
@@ -1412,6 +1637,15 @@ public class CompanyConfiguration {
 
     public void setCtaAlmPT(CashAccount ctaAlmPT) {
         this.ctaAlmPT = ctaAlmPT;
+        setCtaAlmPTCode(this.ctaAlmPT != null ? this.ctaAlmPT.getAccountCode() : null);
+    }
+
+    public String getCtaAlmPTCode() {
+        return ctaAlmPTCode;
+    }
+
+    public void setCtaAlmPTCode(String ctaAlmPTCode) {
+        this.ctaAlmPTCode = ctaAlmPTCode;
     }
 
     public CashAccount getCtaCostPV() {
@@ -1420,6 +1654,15 @@ public class CompanyConfiguration {
 
     public void setCtaCostPV(CashAccount ctaCostPV) {
         this.ctaCostPV = ctaCostPV;
+        setCtaCostPVCode(this.ctaCostPV != null ? this.ctaCostPV.getAccountCode() : null);
+    }
+
+    public String getCtaCostPVCode() {
+        return ctaCostPVCode;
+    }
+
+    public void setCtaCostPVCode(String ctaCostPVCode) {
+        this.ctaCostPVCode = ctaCostPVCode;
     }
 
     public CashAccount getCtaAlmPV() {
@@ -1428,6 +1671,15 @@ public class CompanyConfiguration {
 
     public void setCtaAlmPV(CashAccount ctaAlmPV) {
         this.ctaAlmPV = ctaAlmPV;
+        setCtaAlmPVCode(this.ctaAlmPV != null ? this.ctaAlmPV.getAccountCode() : null);
+    }
+
+    public String getCtaAlmPVCode() {
+        return ctaAlmPVCode;
+    }
+
+    public void setCtaAlmPVCode(String ctaAlmPVCode) {
+        this.ctaAlmPVCode = ctaAlmPVCode;
     }
 
     public CashAccount getLowAccount() {
@@ -1436,6 +1688,15 @@ public class CompanyConfiguration {
 
     public void setLowAccount(CashAccount lowAccount) {
         this.lowAccount = lowAccount;
+        setLowAccountCode(this.lowAccount != null ? this.lowAccount.getAccountCode() : null);
+    }
+
+    public String getLowAccountCode() {
+        return lowAccountCode;
+    }
+
+    public void setLowAccountCode(String lowAccountCode) {
+        this.lowAccountCode = lowAccountCode;
     }
 
     public CashAccount getReworkAccount() {
@@ -1444,6 +1705,15 @@ public class CompanyConfiguration {
 
     public void setReworkAccount(CashAccount reworkAccount) {
         this.reworkAccount = reworkAccount;
+        setReworkAccountCode(this.reworkAccount != null ? this.reworkAccount.getAccountCode() : null);
+    }
+
+    public String getReworkAccountCode() {
+        return reworkAccountCode;
+    }
+
+    public void setReworkAccountCode(String reworkAccountCode) {
+        this.reworkAccountCode = reworkAccountCode;
     }
 
     public CashAccount getSavingsBankAccount() {
@@ -1452,6 +1722,15 @@ public class CompanyConfiguration {
 
     public void setSavingsBankAccount(CashAccount savingsBankAccount) {
         SavingsBankAccount = savingsBankAccount;
+        setSavingsBankAccountCode(SavingsBankAccount != null ? SavingsBankAccount.getAccountCode() : null);
+    }
+
+    public String getSavingsBankAccountCode() {
+        return savingsBankAccountCode;
+    }
+
+    public void setSavingsBankAccountCode(String savingsBankAccountCode) {
+        this.savingsBankAccountCode = savingsBankAccountCode;
     }
 
     public CashAccount getVeterinaryCashAccount() {
@@ -1460,6 +1739,15 @@ public class CompanyConfiguration {
 
     public void setVeterinaryCashAccount(CashAccount veterinaryCashAccount) {
         VeterinaryCashAccount = veterinaryCashAccount;
+        setVeterinaryCashAccountCode(VeterinaryCashAccount != null ? VeterinaryCashAccount.getAccountCode() : null);
+    }
+
+    public String getVeterinaryCashAccountCode() {
+        return veterinaryCashAccountCode;
+    }
+
+    public void setVeterinaryCashAccountCode(String veterinaryCashAccountCode) {
+        this.veterinaryCashAccountCode = veterinaryCashAccountCode;
     }
 
     public CashAccount getGeneralCashAccountNational() {
@@ -1468,6 +1756,15 @@ public class CompanyConfiguration {
 
     public void setGeneralCashAccountNational(CashAccount generalCashAccountNational) {
         this.generalCashAccountNational = generalCashAccountNational;
+        setGeneralCashAccountNationalCode(this.generalCashAccountNational != null ? this.generalCashAccountNational.getAccountCode() : null);
+    }
+
+    public String getGeneralCashAccountNationalCode() {
+        return generalCashAccountNationalCode;
+    }
+
+    public void setGeneralCashAccountNationalCode(String generalCashAccountNationalCode) {
+        this.generalCashAccountNationalCode = generalCashAccountNationalCode;
     }
 
     public String getTitle() {
@@ -1492,6 +1789,15 @@ public class CompanyConfiguration {
 
     public void setFixedTermInterestNationalCurrency(CashAccount fixedTermInterestNationalCurrency) {
         this.fixedTermInterestNationalCurrency = fixedTermInterestNationalCurrency;
+        setFixedTermInterestNationalCurrencyCode(this.fixedTermInterestNationalCurrency != null ? this.fixedTermInterestNationalCurrency.getAccountCode() : null);
+    }
+
+    public String getFixedTermInterestNationalCurrencyCode() {
+        return fixedTermInterestNationalCurrencyCode;
+    }
+
+    public void setFixedTermInterestNationalCurrencyCode(String fixedTermInterestNationalCurrencyCode) {
+        this.fixedTermInterestNationalCurrencyCode = fixedTermInterestNationalCurrencyCode;
     }
 
     public String getCompanyName() {
@@ -1524,6 +1830,15 @@ public class CompanyConfiguration {
 
     public void setFixedAssetProvidersAccount(CashAccount fixedAssetProvidersAccount) {
         this.fixedAssetProvidersAccount = fixedAssetProvidersAccount;
+        setFixedAssetProvidersAccountCode(this.fixedAssetProvidersAccount != null ? this.fixedAssetProvidersAccount.getAccountCode() : null);
+    }
+
+    public String getFixedAssetProvidersAccountCode() {
+        return fixedAssetProvidersAccountCode;
+    }
+
+    public void setFixedAssetProvidersAccountCode(String fixedAssetProvidersAccountCode) {
+        this.fixedAssetProvidersAccountCode = fixedAssetProvidersAccountCode;
     }
 
     public CashAccount getFiscalDebitLiability() {
@@ -1532,6 +1847,15 @@ public class CompanyConfiguration {
 
     public void setFiscalDebitLiability(CashAccount fiscalDebitLiability) {
         this.fiscalDebitLiability = fiscalDebitLiability;
+        setFiscalDebitLiabilityCode(this.fiscalDebitLiability != null ? this.fiscalDebitLiability.getAccountCode() : null);
+    }
+
+    public String getFiscalDebitLiabilityCode() {
+        return fiscalDebitLiabilityCode;
+    }
+
+    public void setFiscalDebitLiabilityCode(String fiscalDebitLiabilityCode) {
+        this.fiscalDebitLiabilityCode = fiscalDebitLiabilityCode;
     }
 
     public CashAccount getTransactionTaxPayable() {
@@ -1540,6 +1864,15 @@ public class CompanyConfiguration {
 
     public void setTransactionTaxPayable(CashAccount transactionTaxPayable) {
         this.transactionTaxPayable = transactionTaxPayable;
+        setTransactionTaxPayableCode(this.transactionTaxPayable != null ? this.transactionTaxPayable.getAccountCode() : null);
+    }
+
+    public String getTransactionTaxPayableCode() {
+        return transactionTaxPayableCode;
+    }
+
+    public void setTransactionTaxPayableCode(String transactionTaxPayableCode) {
+        this.transactionTaxPayableCode = transactionTaxPayableCode;
     }
 
     public CashAccount getPrimarySaleProduct() {
@@ -1548,6 +1881,15 @@ public class CompanyConfiguration {
 
     public void setPrimarySaleProduct(CashAccount primarySaleProduct) {
         this.primarySaleProduct = primarySaleProduct;
+        setPrimarySaleProductCode(this.primarySaleProduct != null ? this.primarySaleProduct.getAccountCode() : null);
+    }
+
+    public String getPrimarySaleProductCode() {
+        return primarySaleProductCode;
+    }
+
+    public void setPrimarySaleProductCode(String primarySaleProductCode) {
+        this.primarySaleProductCode = primarySaleProductCode;
     }
 
     public CashAccount getSecondarySaleProduct() {
@@ -1556,6 +1898,15 @@ public class CompanyConfiguration {
 
     public void setSecondarySaleProduct(CashAccount secondarySaleProduct) {
         this.secondarySaleProduct = secondarySaleProduct;
+        setSecondarySaleProductCode(this.secondarySaleProduct != null ? this.secondarySaleProduct.getAccountCode() : null);
+    }
+
+    public String getSecondarySaleProductCode() {
+        return secondarySaleProductCode;
+    }
+
+    public void setSecondarySaleProductCode(String secondarySaleProductCode) {
+        this.secondarySaleProductCode = secondarySaleProductCode;
     }
 
     public CashAccount getTransactionTaxExpense() {
@@ -1564,6 +1915,15 @@ public class CompanyConfiguration {
 
     public void setTransactionTaxExpense(CashAccount transactionTaxExpense) {
         this.transactionTaxExpense = transactionTaxExpense;
+        setTransactionTaxExpenseCode(this.transactionTaxExpense != null ? this.transactionTaxExpense.getAccountCode() : null);
+    }
+
+    public String getTransactionTaxExpenseCode() {
+        return transactionTaxExpenseCode;
+    }
+
+    public void setTransactionTaxExpenseCode(String transactionTaxExpenseCode) {
+        this.transactionTaxExpenseCode = transactionTaxExpenseCode;
     }
 
     public BigDecimal getDealerParameter() {
@@ -1580,6 +1940,15 @@ public class CompanyConfiguration {
 
     public void setCommissionSalesCashAccount(CashAccount commissionSalesCashAccount) {
         this.commissionSalesCashAccount = commissionSalesCashAccount;
+        setCommissionSalesCashAccountCode(this.commissionSalesCashAccount != null ? this.commissionSalesCashAccount.getAccountCode() : null);
+    }
+
+    public String getCommissionSalesCashAccountCode() {
+        return commissionSalesCashAccountCode;
+    }
+
+    public void setCommissionSalesCashAccountCode(String commissionSalesCashAccountCode) {
+        this.commissionSalesCashAccountCode = commissionSalesCashAccountCode;
     }
 
     public BigDecimal getIvaTaxValue() {
@@ -1612,6 +1981,49 @@ public class CompanyConfiguration {
 
     public void setCtaAlmPTAG(CashAccount ctaAlmPTAG) {
         this.ctaAlmPTAG = ctaAlmPTAG;
+        setCtaAlmPTAGCode(this.ctaAlmPTAG != null ? this.ctaAlmPTAG.getAccountCode() : null);
+    }
+
+    public String getCtaAlmPTAGCode() {
+        return ctaAlmPTAGCode;
+    }
+
+    public void setCtaAlmPTAGCode(String ctaAlmPTAGCode) {
+        this.ctaAlmPTAGCode = ctaAlmPTAGCode;
+    }
+
+    public CashAccount getWasteAccount() {
+        return wasteAccount;
+    }
+
+    public void setWasteAccount(CashAccount wasteAccount) {
+        this.wasteAccount = wasteAccount;
+        setWasteAccountCode(this.wasteAccount != null ? this.wasteAccount.getAccountCode() : null);
+    }
+
+    public String getWasteAccountCode() {
+        return wasteAccountCode;
+    }
+
+    public void setWasteAccountCode(String wasteAccountCode) {
+        this.wasteAccountCode = wasteAccountCode;
+    }
+
+    public CashAccount getAverageAccount() {
+        return averageAccount;
+    }
+
+    public void setAverageAccount(CashAccount averageAccount) {
+        this.averageAccount = averageAccount;
+        setAverageAccountCode(this.averageAccount != null ? this.averageAccount.getAccountCode() : null);
+    }
+
+    public String getAverageAccountCode() {
+        return averageAccountCode;
+    }
+
+    public void setAverageAccountCode(String averageAccountCode) {
+        this.averageAccountCode = averageAccountCode;
     }
 
     public String getCreatebillURL() {
@@ -1780,6 +2192,15 @@ public class CompanyConfiguration {
 
     public void setAccountPayableSupplier(CashAccount accountPayableSupplier) {
         this.accountPayableSupplier = accountPayableSupplier;
+        setAccountPayableSupplierCode(this.accountPayableSupplier != null ? this.accountPayableSupplier.getAccountCode() : null);
+    }
+
+    public String getAccountPayableSupplierCode() {
+        return accountPayableSupplierCode;
+    }
+
+    public void setAccountPayableSupplierCode(String accountPayableSupplierCode) {
+        this.accountPayableSupplierCode = accountPayableSupplierCode;
     }
 
     public CashAccount getAccountBalanceSheet1() {
@@ -1788,6 +2209,15 @@ public class CompanyConfiguration {
 
     public void setAccountBalanceSheet1(CashAccount accountBalanceSheet1) {
         this.accountBalanceSheet1 = accountBalanceSheet1;
+        setAccountBalanceSheet1Code(this.accountBalanceSheet1 != null ? this.accountBalanceSheet1.getAccountCode() : null);
+    }
+
+    public String getAccountBalanceSheet1Code() {
+        return accountBalanceSheet1Code;
+    }
+
+    public void setAccountBalanceSheet1Code(String accountBalanceSheet1Code) {
+        this.accountBalanceSheet1Code = accountBalanceSheet1Code;
     }
 
     public CashAccount getAccountBalanceSheet2() {
@@ -1796,6 +2226,15 @@ public class CompanyConfiguration {
 
     public void setAccountBalanceSheet2(CashAccount accountBalanceSheet2) {
         this.accountBalanceSheet2 = accountBalanceSheet2;
+        setAccountBalanceSheet2Code(this.accountBalanceSheet2 != null ? this.accountBalanceSheet2.getAccountCode() : null);
+    }
+
+    public String getAccountBalanceSheet2Code() {
+        return accountBalanceSheet2Code;
+    }
+
+    public void setAccountBalanceSheet2Code(String accountBalanceSheet2Code) {
+        this.accountBalanceSheet2Code = accountBalanceSheet2Code;
     }
 
     public CashAccount getAccountBalanceSheet3() {
@@ -1804,6 +2243,15 @@ public class CompanyConfiguration {
 
     public void setAccountBalanceSheet3(CashAccount accountBalanceSheet3) {
         this.accountBalanceSheet3 = accountBalanceSheet3;
+        setAccountBalanceSheet3Code(this.accountBalanceSheet3 != null ? this.accountBalanceSheet3.getAccountCode() : null);
+    }
+
+    public String getAccountBalanceSheet3Code() {
+        return accountBalanceSheet3Code;
+    }
+
+    public void setAccountBalanceSheet3Code(String accountBalanceSheet3Code) {
+        this.accountBalanceSheet3Code = accountBalanceSheet3Code;
     }
 
     public CashAccount getAccountBalanceSheet4() {
@@ -1812,6 +2260,15 @@ public class CompanyConfiguration {
 
     public void setAccountBalanceSheet4(CashAccount accountBalanceSheet4) {
         this.accountBalanceSheet4 = accountBalanceSheet4;
+        setAccountBalanceSheet4Code(this.accountBalanceSheet4 != null ? this.accountBalanceSheet4.getAccountCode() : null);
+    }
+
+    public String getAccountBalanceSheet4Code() {
+        return accountBalanceSheet4Code;
+    }
+
+    public void setAccountBalanceSheet4Code(String accountBalanceSheet4Code) {
+        this.accountBalanceSheet4Code = accountBalanceSheet4Code;
     }
 
     public CashAccount getAccountBalanceSheet5() {
@@ -1820,6 +2277,15 @@ public class CompanyConfiguration {
 
     public void setAccountBalanceSheet5(CashAccount accountBalanceSheet5) {
         this.accountBalanceSheet5 = accountBalanceSheet5;
+        setAccountBalanceSheet5Code(this.accountBalanceSheet5 != null ? this.accountBalanceSheet5.getAccountCode() : null);
+    }
+
+    public String getAccountBalanceSheet5Code() {
+        return accountBalanceSheet5Code;
+    }
+
+    public void setAccountBalanceSheet5Code(String accountBalanceSheet5Code) {
+        this.accountBalanceSheet5Code = accountBalanceSheet5Code;
     }
 
     public CashAccount getAccountPayableIVA() {
@@ -1828,6 +2294,15 @@ public class CompanyConfiguration {
 
     public void setAccountPayableIVA(CashAccount accountPayableIVA) {
         this.accountPayableIVA = accountPayableIVA;
+        setAccountPayableIVACode(this.accountPayableIVA != null ? this.accountPayableIVA.getAccountCode() : null);
+    }
+
+    public String getAccountPayableIVACode() {
+        return accountPayableIVACode;
+    }
+
+    public void setAccountPayableIVACode(String accountPayableIVACode) {
+        this.accountPayableIVACode = accountPayableIVACode;
     }
 
     public CashAccount getAccountRegalia() {
@@ -1836,6 +2311,15 @@ public class CompanyConfiguration {
 
     public void setAccountRegalia(CashAccount accountRegalia) {
         this.accountRegalia = accountRegalia;
+        setAccountRegaliaCode(this.accountRegalia != null ? this.accountRegalia.getAccountCode() : null);
+    }
+
+    public String getAccountRegaliaCode() {
+        return accountRegaliaCode;
+    }
+
+    public void setAccountRegaliaCode(String accountRegaliaCode) {
+        this.accountRegaliaCode = accountRegaliaCode;
     }
 
     public CashAccount getAccountRetentionCNS() {
@@ -1844,6 +2328,15 @@ public class CompanyConfiguration {
 
     public void setAccountRetentionCNS(CashAccount accountRetentionCNS) {
         this.accountRetentionCNS = accountRetentionCNS;
+        setAccountRetentionCNSCode(this.accountRetentionCNS != null ? this.accountRetentionCNS.getAccountCode() : null);
+    }
+
+    public String getAccountRetentionCNSCode() {
+        return accountRetentionCNSCode;
+    }
+
+    public void setAccountRetentionCNSCode(String accountRetentionCNSCode) {
+        this.accountRetentionCNSCode = accountRetentionCNSCode;
     }
 
     public BigDecimal getRetentionCNSValue() {
@@ -1868,6 +2361,15 @@ public class CompanyConfiguration {
 
     public void setLossCashAccount(CashAccount lossCashAccount) {
         this.lossCashAccount = lossCashAccount;
+        setLossCashAccountCode(this.lossCashAccount != null ? this.lossCashAccount.getAccountCode() : null);
+    }
+
+    public String getLossCashAccountCode() {
+        return lossCashAccountCode;
+    }
+
+    public void setLossCashAccountCode(String lossCashAccountCode) {
+        this.lossCashAccountCode = lossCashAccountCode;
     }
 
     public CashAccount getProfitCashAccount() {
@@ -1876,6 +2378,15 @@ public class CompanyConfiguration {
 
     public void setProfitCashAccount(CashAccount profitCashAccount) {
         this.profitCashAccount = profitCashAccount;
+        setProfitCashAccountCode(this.profitCashAccount != null ? this.profitCashAccount.getAccountCode() : null);
+    }
+
+    public String getProfitCashAccountCode() {
+        return profitCashAccountCode;
+    }
+
+    public void setProfitCashAccountCode(String profitCashAccountCode) {
+        this.profitCashAccountCode = profitCashAccountCode;
     }
 
     public CashAccount getDefaultAccountPurchaseOrder() {
@@ -1884,5 +2395,31 @@ public class CompanyConfiguration {
 
     public void setDefaultAccountPurchaseOrder(CashAccount defaultAccountPurchaseOrder) {
         this.defaultAccountPurchaseOrder = defaultAccountPurchaseOrder;
+        setDefaultAccountPurchaseOrderCode(this.defaultAccountPurchaseOrder != null ? this.defaultAccountPurchaseOrder.getAccountCode() : null);
     }
+
+    public String getDefaultAccountPurchaseOrderCode() {
+        return defaultAccountPurchaseOrderCode;
+    }
+
+    public void setDefaultAccountPurchaseOrderCode(String defaultAccountPurchaseOrderCode) {
+        this.defaultAccountPurchaseOrderCode = defaultAccountPurchaseOrderCode;
+    }
+
+    public File getHeaderLogo() {
+        return headerLogo;
+    }
+
+    public void setHeaderLogo(File headerLogo) {
+        this.headerLogo = headerLogo;
+    }
+
+    public File getLoginLogo() {
+        return loginLogo;
+    }
+
+    public void setLoginLogo(File loginLogo) {
+        this.loginLogo = loginLogo;
+    }
+
 }

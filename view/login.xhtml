@@ -11,10 +11,13 @@
     <ui:define name="body">
         <h:form id="loginForm">
 
-            <div style="margin:5px; text-align:center">
-                <!--<h:graphicImage value="/img/cisclogo.jpg" style="border:0;vertical-align:middle;"/>-->
-                <h:graphicImage value="/img/logo-terdemol.jpg" style="border:0;vertical-align:middle;"/>
-            </div>
+            <s:fragment rendered="#{not empty companyLogoHolder.loginLogoDataUri}">
+                <div style="margin:5px; text-align:center">
+                    <img src="#{companyLogoHolder.loginLogoDataUri}"
+                         alt="#{messages['CompanyConfiguration.loginLogo']}"
+                         style="border:0;vertical-align:middle;max-width:300px;max-height:300px;"/>
+                </div>
+            </s:fragment>
 
             <!--<div class="right" style="margin:2px;">
                 <h:outputLink value="public/registerMark">

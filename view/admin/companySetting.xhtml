@@ -12,12 +12,12 @@
     #{messages['Company.settings']}
 </ui:define>
 
-<ui:param name="bodyWidth" value="60%"/>
+<ui:param name="bodyWidth" value="75%"/>
 
 <ui:param name="selectedTab" value="admin"/>
 <ui:define name="body">
 
-<h:form id="userSettingForm">
+<h:form id="userSettingForm" enctype="multipart/form-data">
 
 <div class="buttons">
     <h:commandButton action="#{companySettingAction.saveChanges}"
@@ -32,249 +32,1208 @@
 <f:facet name="header">
     #{messages['Company.settings']}
 </f:facet>
-<rich:tabPanel switchType="ajax">
-<rich:tab label="#{messages['Company.companyConfiguration']}">
-<app:fieldset id="managementFieldSet"
-              title="#{messages['CompanyConfiguration.fieldset.management']}">
-    <s:decorate id="exchangeRateBalanceCostCenterField" template="/include/inputField.xhtml"
-                styleClass="formRow">
-        <ui:define
-                name="label">#{messages['CompanyConfiguration.exchangeRateBalanceCostCenter']}</ui:define>
-        <app:quickSearch id="quickSearchCostCenterField"
-                         textValue="companySetting.exchangeRateBalanceCostCenter.code"
-                         value="#{companySetting.exchangeRateBalanceCostCenter}"
-                         searchField="code"
-                         reRender="exchangeRateBalanceCostCenterField"
-                         tabindex="1"/>
-        <app:selectPopUp id="exchangeRateBalanceCostCenter"
-                         required="true"
-                         textValue="#{companySetting.exchangeRateBalanceCostCenter.fullName}"
-                         value="#{companySetting.exchangeRateBalanceCostCenter}"
-                         clearAction="companySettingAction.clearExchangeRateBalanceCostCenter()"
-                         searchModalPanel="costCenterListModalPanel"
-                         dataModel="#{costCenterDataModel}"
-                         reRender="exchangeRateBalanceCostCenterField"
-                         hotKeySelect="alt+1"/>
-    </s:decorate>
-    <s:div id="defaultAccountancyUserDiv">
-        <s:decorate id="defaultAccountancyUserId"
-                    template="/include/inputField.xhtml"
-                    styleClass="formRow">
-            <ui:define name="label">#{messages['CompanyConfiguration.defaultAccountancyUser']}</ui:define>
+<!-- switchType=client y no ajax: el form es multipart por los logos, y un submit
+     ajax al cambiar de tab no transporta el multipart, con lo que se perderia el
+     archivo elegido. Con client no hay submit hasta Guardar y todos los tabs
+     viajan juntos. -->
+<rich:tabPanel switchType="client">
 
-            <app:selectPopUp id="financeUserSelectPopup"
-                             textValue="#{companySetting.defaultAccountancyUser.name}"
-                             value="#{companySetting.defaultAccountancyUser}"
-                             clearAction="companySettingAction.cleanDefaultAccountancyUser()"
-                             searchModalPanel="accountancyFinanceUserListModalPanel"
-                             dataModel="#{financeUserDataModel}"
-                             reRender="defaultAccountancyUserDiv"
-                             hotKeySelect="alt+2"
-                             required="true"
-                             tabindex="2"/>
-        </s:decorate>
-    </s:div>
-    <s:div id="depositInTransitFCCashAccountDiv">
-        <s:decorate id="depositInTransitFCCashAccountField"
-                    template="/include/inputField.xhtml"
-                    styleClass="formRow">
-            <ui:param name="required" value="true"/>
-            <ui:define
-                    name="label">#{messages['CompanyConfiguration.depositInTransitForeignCurrencyAccount']}</ui:define>
-            <app:selectPopUp id="depositInTransitFCCashAccount"
-                             required="true"
-                             textValue="#{companySetting.depositInTransitForeignCurrencyAccount.fullName}"
-                             value="#{companySetting.depositInTransitForeignCurrencyAccount}"
-                             dataModel="#{cashAccountDataModel}"
-                             clearAction="companySettingAction.clearDepositInTransitForeignCurrencyAccount()"
-                             searchModalPanel="depositInTransitFCCashAccountListModalPanel"
-                             reRender="depositInTransitFCCashAccountField"
-                             hotKeySelect="alt+2"
-                             tabindex="17"/>
-        </s:decorate>
-    </s:div>
-    <s:div id="depositInTransitNCCashAccountDiv">
-        <s:decorate id="depositInTransitNCCashAccountField"
-                    template="/include/inputField.xhtml"
-                    styleClass="formRow">
-            <ui:param name="required" value="true"/>
-            <ui:define
-                    name="label">#{messages['CompanyConfiguration.depositInTransitNationalCurrencyAccount']}</ui:define>
-            <app:selectPopUp id="depositInTransitNCCashAccount"
-                             required="true"
-                             textValue="#{companySetting.depositInTransitNationalCurrencyAccount.fullName}"
-                             value="#{companySetting.depositInTransitNationalCurrencyAccount}"
-                             dataModel="#{cashAccountDataModel}"
-                             clearAction="companySettingAction.clearDepositInTransitNationalCurrencyAccount()"
-                             searchModalPanel="depositInTransitNCCashAccountListModalPanel"
-                             reRender="depositInTransitNCCashAccountField"
-                             hotKeySelect="alt+2"
-                             tabindex="17"/>
-        </s:decorate>
-    </s:div>
-
-</app:fieldset>
-<app:fieldset id="purchasesFieldset"
-              title="#{messages['CompanyConfiguration.fieldset.purchases']}">
-    <s:decorate id="purchaseOrderCodificationEnabledField"
-                template="/include/inputField.xhtml"
-                styleClass="formRow">
-        <ui:define name="label">
-            #{messages['CompanyConfiguration.purchaseOrderCodificationEnabled']}
-        </ui:define>
-        <h:selectBooleanCheckbox id="purchaseOrderCodificationEnabled"
-                                 value="#{companySettingAction.instance.purchaseOrderCodificationEnabled}"
-                                 tabindex="3"/>
-    </s:decorate>
-</app:fieldset>
-<app:fieldset id="tresuaryFieldset"
-              title="#{messages['CompanyConfiguration.fieldset.tresuary']}">
-    <s:decorate id="treasuryDocumentsAuthorizationEnabledField"
-                template="/include/inputField.xhtml"
-                styleClass="formRow">
-        <ui:define name="label">
-            #{messages['CompanyConfiguration.treasuryDocumentsAuthorizationEnabled']}
-        </ui:define>
-        <h:selectBooleanCheckbox id="treasuryDocumentsAuthorizationEnabled"
-                                 value="#{companySettingAction.instance.treasuryDocumentsAuthorizationEnabled}"
-                                 tabindex="4"/>
-    </s:decorate>
-    <s:div id="defaultTreasuryUserDiv">
-        <s:decorate id="treasuryFinanceUserId"
-                    template="/include/inputField.xhtml"
-                    styleClass="formRow">
-            <ui:define name="label">#{messages['CompanyConfiguration.defaultTreasuryUser']}</ui:define>
-
-            <app:selectPopUp id="financeUserSelectPopup"
-                             textValue="#{companySetting.defaultTreasuryUser.name}"
-                             value="#{companySetting.defaultTreasuryUser}"
-                             clearAction="companySettingAction.cleanDefaultTreasuryUser()"
-                             searchModalPanel="treasuryFinanceUserListModalPanel"
-                             dataModel="#{financeUserDataModel}"
-                             reRender="defaultTreasuryUserDiv"
-                             required="true"
-                             hotKeySelect="alt+3"
-                             tabindex="5"/>
-        </s:decorate>
-    </s:div>
-
-</app:fieldset>
-<app:fieldset id="payablesFieldset"
-              title="#{messages['CompanyConfiguration.fieldset.payables']}">
-    <s:decorate id="payablesDocumentsAuthorizationEnabledField"
-                template="/include/inputField.xhtml"
-                styleClass="formRow">
-        <ui:define name="label">
-            #{messages['CompanyConfiguration.payablesDocumentsAuthorizationEnabled']}
-        </ui:define>
-        <h:selectBooleanCheckbox id="payablesDocumentsAuthorizationEnabled"
-                                 value="#{companySettingAction.instance.payablesDocumentsAuthorizationEnabled}"
-                                 tabindex="6"/>
-    </s:decorate>
-    <s:div id="defaultPayableUserDiv">
-        <s:decorate id="payableFinanceUserId"
-                    template="/include/inputField.xhtml"
-                    styleClass="formRow">
-            <ui:define name="label">#{messages['CompanyConfiguration.defaultPayableUser']}</ui:define>
-
-            <app:selectPopUp id="financeUserSelectPopup"
-                             textValue="#{companySetting.defaultPayableFinanceUser.name}"
-                             value="#{companySetting.defaultPayableFinanceUser}"
-                             clearAction="companySettingAction.cleanDefaultPayableUser()"
-                             searchModalPanel="payableFinanceUserListModalPanel"
-                             dataModel="#{financeUserDataModel}"
-                             reRender="defaultPayableUserDiv"
-                             required="true"
-                             hotKeySelect="alt+4"
-                             tabindex="7"/>
-        </s:decorate>
-    </s:div>
-</app:fieldset>
-<app:fieldset id="employeesFieldset"
-              title="#{messages['CompanyConfiguration.fieldset.employees']}">
-    <s:decorate id="employeesContractAuthorizationEnabledField"
-                template="/include/inputField.xhtml"
-                styleClass="formRow">
-        <ui:define name="label">
-            #{messages['CompanyConfiguration.employeesContractAuthorizationEnabledField']}
-        </ui:define>
-        <h:selectBooleanCheckbox id="employeesContractAuthorizationEnabled"
-                                 value="#{companySettingAction.instance.contractModificationAuthorization}"
-                                 tabindex="8"/>
-    </s:decorate>
-    <s:decorate id="hrsWorkingDayField"
-                template="/include/inputField.xhtml"
-                styleClass="formRow">
-        <ui:define name="label">#{messages['CompanyConfiguration.hrsWorkingDay']}</ui:define>
-        <h:inputText id="hrsWorkingDay"
-                     value="#{companySettingAction.instance.hrsWorkingDay}"
-                     required="true"
-                     maxlength="20"
-                     styleClass="inputNumberMedium"
-                     tabindex="9">
-            <app:realNumberConverter forId="hrsWorkingDay"/>
-        </h:inputText>
-    </s:decorate>
-
-    <s:decorate id="jobCategoryDLHField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define
-                name="label">#{messages['CompanyConfiguration.synchronization.jobCategoryDLH']}</ui:define>
-        <h:selectOneMenu id="jobCategoryDLH" value="#{companySettingAction.instance.jobCategoryDLH}"
-                         styleClass="input"
-                         required="true" tabindex="10">
-            <s:selectItems value="#{jobCategoryList}" var="jobCategory"
-                           label="#{jobCategory.name}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-    <s:decorate id="jobCategoryDTHField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define
-                name="label">#{messages['CompanyConfiguration.synchronization.jobCategoryDTH']}</ui:define>
-        <h:selectOneMenu id="jobCategoryDTH" value="#{companySettingAction.instance.jobCategoryDTH}"
-                         styleClass="input"
-                         required="true" tabindex="11">
-            <s:selectItems value="#{jobCategoryList}" var="jobCategory"
-                           label="#{jobCategory.name}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-
-    <s:decorate id="salaryTypeDLHField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define
-                name="label">#{messages['CompanyConfiguration.synchronization.kindOfSalaryDLH']}</ui:define>
-        <h:selectOneMenu id="kindOfSalaryDLH"
-                         value="#{companySettingAction.instance.kindOfSalaryDLH}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="12">
-            <s:selectItems value="#{kindOfSalaryList}" var="kindOfSalary"
-                           label="#{kindOfSalary.type}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-    <s:decorate id="salaryTypeDTHField" template="/include/inputField.xhtml" styleClass="formRow">
-        <ui:define
-                name="label">#{messages['CompanyConfiguration.synchronization.kindOfSalaryDTH']}</ui:define>
-        <h:selectOneMenu id="kindOfSalaryDTH"
-                         value="#{companySettingAction.instance.kindOfSalaryDTH}"
-                         styleClass="input"
-                         required="true"
-                         tabindex="13">
-            <s:selectItems value="#{kindOfSalaryList}" var="kindOfSalary"
-                           label="#{kindOfSalary.type}"
-                           noSelectionLabel=""
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-    </s:decorate>
-</app:fieldset>
+<rich:tab label="#{messages['CompanyConfiguration.tab.company']}">
+        <app:fieldset id="companyIdentityFieldset" title="#{messages['CompanyConfiguration.fieldset.identity']}">
+            <s:decorate id="companyNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.companyNumber']}</ui:define>
+                <h:outputText id="companyNumber" value="#{companySettingAction.instance.companyNumber}"/>
+            </s:decorate>
+            <s:decorate id="versionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.version']}</ui:define>
+                <h:outputText id="version" value="#{companySettingAction.instance.version}"/>
+            </s:decorate>
+            <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.title']}</ui:define>
+                <h:inputText id="title" value="#{companySettingAction.instance.title}"
+                             maxlength="100" styleClass="input"/>
+            </s:decorate>
+            <s:decorate id="subTitleField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.subTitle']}</ui:define>
+                <h:inputText id="subTitle" value="#{companySettingAction.instance.subTitle}"
+                             maxlength="100" styleClass="input"/>
+            </s:decorate>
+            <s:decorate id="companyNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.companyName']}</ui:define>
+                <h:inputText id="companyName" value="#{companySettingAction.instance.companyName}"
+                             maxlength="100" styleClass="input"/>
+            </s:decorate>
+            <s:decorate id="systemNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.systemName']}</ui:define>
+                <h:inputText id="systemName" value="#{companySettingAction.instance.systemName}"
+                             maxlength="100" styleClass="input"/>
+            </s:decorate>
+            <s:decorate id="locationNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.locationName']}</ui:define>
+                <h:inputText id="locationName" value="#{companySettingAction.instance.locationName}"
+                             maxlength="100" styleClass="input"/>
+            </s:decorate>
+            <s:decorate id="companyField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.company']}</ui:define>
+                <h:outputText id="company" value="#{companySettingAction.instance.company.login}"/>
+            </s:decorate>
+            <s:div id="exchangeRateBalanceCostCenterDiv">
+                <s:decorate id="exchangeRateBalanceCostCenterField" template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.exchangeRateBalanceCostCenter']}</ui:define>
+                    <app:quickSearch id="quickSearchCostCenterField"
+                                     textValue="companySettingAction.instance.exchangeRateBalanceCostCenter.code"
+                                     value="#{companySettingAction.instance.exchangeRateBalanceCostCenter}"
+                                     searchField="code"
+                                     reRender="exchangeRateBalanceCostCenterDiv"/>
+                    <app:selectPopUp id="exchangeRateBalanceCostCenter"
+                                     textValue="#{companySettingAction.instance.exchangeRateBalanceCostCenter.fullName}"
+                                     value="#{companySettingAction.instance.exchangeRateBalanceCostCenter}"
+                                     clearAction="companySettingAction.clearExchangeRateBalanceCostCenter()"
+                                     searchModalPanel="costCenterListModalPanel"
+                                     dataModel="#{costCenterDataModel}"
+                                     reRender="exchangeRateBalanceCostCenterDiv"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+            </s:div>
+        </app:fieldset>
+        <app:fieldset id="logosFieldset" title="#{messages['CompanyConfiguration.fieldset.logos']}">
+            <s:div id="headerLogoDiv">
+                <s:decorate id="headerLogoField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.headerLogo']}</ui:define>
+                    <s:fileUpload id="headerLogo" styleClass="input"
+                                  accept="image/*"
+                                  data="#{companySettingAction.headerLogoHolder.value}"
+                                  fileName="#{companySettingAction.headerLogoHolder.name}"
+                                  fileSize="#{companySettingAction.headerLogoHolder.size}"
+                                  contentType="#{companySettingAction.headerLogoHolder.contentType}"/>
+                    <h:outputText value="#{messages['CompanyConfiguration.logo.headerHint']}"
+                                  styleClass="helpText"/>
+                </s:decorate>
+                <s:decorate id="headerLogoPreviewField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{not empty companySettingAction.headerLogoDataUri}">
+                    <ui:define name="label">#{messages['CompanyConfiguration.logo.current']}</ui:define>
+                    <img src="#{companySettingAction.headerLogoDataUri}"
+                         alt="#{messages['CompanyConfiguration.headerLogo']}"
+                         style="max-width: 200px; max-height: 50px; border: 1px solid #ccc;"/>
+                    <a4j:commandLink id="removeHeaderLogo"
+                                     action="#{companySettingAction.removeHeaderLogo}"
+                                     reRender="headerLogoDiv"
+                                     title="#{messages['Common.clear']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+            </s:div>
+            <s:div id="loginLogoDiv">
+                <s:decorate id="loginLogoField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.loginLogo']}</ui:define>
+                    <s:fileUpload id="loginLogo" styleClass="input"
+                                  accept="image/*"
+                                  data="#{companySettingAction.loginLogoHolder.value}"
+                                  fileName="#{companySettingAction.loginLogoHolder.name}"
+                                  fileSize="#{companySettingAction.loginLogoHolder.size}"
+                                  contentType="#{companySettingAction.loginLogoHolder.contentType}"/>
+                    <h:outputText value="#{messages['CompanyConfiguration.logo.loginHint']}"
+                                  styleClass="helpText"/>
+                </s:decorate>
+                <s:decorate id="loginLogoPreviewField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{not empty companySettingAction.loginLogoDataUri}">
+                    <ui:define name="label">#{messages['CompanyConfiguration.logo.current']}</ui:define>
+                    <img src="#{companySettingAction.loginLogoDataUri}"
+                         alt="#{messages['CompanyConfiguration.loginLogo']}"
+                         style="max-width: 300px; max-height: 300px; border: 1px solid #ccc;"/>
+                    <a4j:commandLink id="removeLoginLogo"
+                                     action="#{companySettingAction.removeLoginLogo}"
+                                     reRender="loginLogoDiv"
+                                     title="#{messages['Common.clear']}">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </s:decorate>
+            </s:div>
+        </app:fieldset>
 </rich:tab>
+
+<rich:tab label="#{messages['CompanyConfiguration.tab.accounts']}">
+        <app:fieldset id="cashAccountsFieldset" title="#{messages['CompanyConfiguration.fieldset.cashAccounts']}">
+            <s:div id="balanceExchangeRateAccountDiv">
+                <s:decorate id="balanceExchangeRateAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.balanceExchangeRateAccount']}</ui:define>
+                    <app:selectPopUp id="balanceExchangeRateAccount"
+                                     textValue="#{companySettingAction.instance.balanceExchangeRateAccount.fullName}"
+                                     value="#{companySettingAction.instance.balanceExchangeRateAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('balanceExchangeRateAccount')"
+                                     clearAction="companySettingAction.clearAccount('balanceExchangeRateAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="balanceExchangeRateAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="adjustmentForInflationAccountDiv">
+                <s:decorate id="adjustmentForInflationAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.adjustmentForInflationAccount']}</ui:define>
+                    <app:selectPopUp id="adjustmentForInflationAccount"
+                                     textValue="#{companySettingAction.instance.adjustmentForInflationAccount.fullName}"
+                                     value="#{companySettingAction.instance.adjustmentForInflationAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('adjustmentForInflationAccount')"
+                                     clearAction="companySettingAction.clearAccount('adjustmentForInflationAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="adjustmentForInflationAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="advancePaymentForeignCurrencyAccountDiv">
+                <s:decorate id="advancePaymentForeignCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.advancePaymentForeignCurrencyAccount']}</ui:define>
+                    <app:selectPopUp id="advancePaymentForeignCurrencyAccount"
+                                     textValue="#{companySettingAction.instance.advancePaymentForeignCurrencyAccount.fullName}"
+                                     value="#{companySettingAction.instance.advancePaymentForeignCurrencyAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('advancePaymentForeignCurrencyAccount')"
+                                     clearAction="companySettingAction.clearAccount('advancePaymentForeignCurrencyAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="advancePaymentForeignCurrencyAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="advancePaymentNationalCurrencyAccountDiv">
+                <s:decorate id="advancePaymentNationalCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.advancePaymentNationalCurrencyAccount']}</ui:define>
+                    <app:selectPopUp id="advancePaymentNationalCurrencyAccount"
+                                     textValue="#{companySettingAction.instance.advancePaymentNationalCurrencyAccount.fullName}"
+                                     value="#{companySettingAction.instance.advancePaymentNationalCurrencyAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('advancePaymentNationalCurrencyAccount')"
+                                     clearAction="companySettingAction.clearAccount('advancePaymentNationalCurrencyAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="advancePaymentNationalCurrencyAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="depositInTransitForeignCurrencyAccountDiv">
+                <s:decorate id="depositInTransitForeignCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.depositInTransitForeignCurrencyAccount']}</ui:define>
+                    <app:selectPopUp id="depositInTransitForeignCurrencyAccount"
+                                     textValue="#{companySettingAction.instance.depositInTransitForeignCurrencyAccount.fullName}"
+                                     value="#{companySettingAction.instance.depositInTransitForeignCurrencyAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('depositInTransitForeignCurrencyAccount')"
+                                     clearAction="companySettingAction.clearAccount('depositInTransitForeignCurrencyAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="depositInTransitForeignCurrencyAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="depositInTransitNationalCurrencyAccountDiv">
+                <s:decorate id="depositInTransitNationalCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.depositInTransitNationalCurrencyAccount']}</ui:define>
+                    <app:selectPopUp id="depositInTransitNationalCurrencyAccount"
+                                     textValue="#{companySettingAction.instance.depositInTransitNationalCurrencyAccount.fullName}"
+                                     value="#{companySettingAction.instance.depositInTransitNationalCurrencyAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('depositInTransitNationalCurrencyAccount')"
+                                     clearAction="companySettingAction.clearAccount('depositInTransitNationalCurrencyAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="depositInTransitNationalCurrencyAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="fixedAssetInTransitAccountDiv">
+                <s:decorate id="fixedAssetInTransitAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.fixedAssetInTransitAccount']}</ui:define>
+                    <app:selectPopUp id="fixedAssetInTransitAccount"
+                                     textValue="#{companySettingAction.instance.fixedAssetInTransitAccount.fullName}"
+                                     value="#{companySettingAction.instance.fixedAssetInTransitAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('fixedAssetInTransitAccount')"
+                                     clearAction="companySettingAction.clearAccount('fixedAssetInTransitAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="fixedAssetInTransitAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="foreignCurrencyVATFiscalCreditAccountDiv">
+                <s:decorate id="foreignCurrencyVATFiscalCreditAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.foreignCurrencyVATFiscalCreditAccount']}</ui:define>
+                    <app:selectPopUp id="foreignCurrencyVATFiscalCreditAccount"
+                                     textValue="#{companySettingAction.instance.foreignCurrencyVATFiscalCreditAccount.fullName}"
+                                     value="#{companySettingAction.instance.foreignCurrencyVATFiscalCreditAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('foreignCurrencyVATFiscalCreditAccount')"
+                                     clearAction="companySettingAction.clearAccount('foreignCurrencyVATFiscalCreditAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="foreignCurrencyVATFiscalCreditAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="nationalCurrencyVATFiscalCreditAccountDiv">
+                <s:decorate id="nationalCurrencyVATFiscalCreditAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.nationalCurrencyVATFiscalCreditAccount']}</ui:define>
+                    <app:selectPopUp id="nationalCurrencyVATFiscalCreditAccount"
+                                     textValue="#{companySettingAction.instance.nationalCurrencyVATFiscalCreditAccount.fullName}"
+                                     value="#{companySettingAction.instance.nationalCurrencyVATFiscalCreditAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('nationalCurrencyVATFiscalCreditAccount')"
+                                     clearAction="companySettingAction.clearAccount('nationalCurrencyVATFiscalCreditAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="nationalCurrencyVATFiscalCreditAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="nationalCurrencyVATFiscalCreditTransientAccountDiv">
+                <s:decorate id="nationalCurrencyVATFiscalCreditTransientAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.nationalCurrencyVATFiscalCreditTransientAccount']}</ui:define>
+                    <app:selectPopUp id="nationalCurrencyVATFiscalCreditTransientAccount"
+                                     textValue="#{companySettingAction.instance.nationalCurrencyVATFiscalCreditTransientAccount.fullName}"
+                                     value="#{companySettingAction.instance.nationalCurrencyVATFiscalCreditTransientAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('nationalCurrencyVATFiscalCreditTransientAccount')"
+                                     clearAction="companySettingAction.clearAccount('nationalCurrencyVATFiscalCreditTransientAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="nationalCurrencyVATFiscalCreditTransientAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="provisionByTangibleFixedAssetObsolescenceAccountDiv">
+                <s:decorate id="provisionByTangibleFixedAssetObsolescenceAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.provisionByTangibleFixedAssetObsolescenceAccount']}</ui:define>
+                    <app:selectPopUp id="provisionByTangibleFixedAssetObsolescenceAccount"
+                                     textValue="#{companySettingAction.instance.provisionByTangibleFixedAssetObsolescenceAccount.fullName}"
+                                     value="#{companySettingAction.instance.provisionByTangibleFixedAssetObsolescenceAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('provisionByTangibleFixedAssetObsolescenceAccount')"
+                                     clearAction="companySettingAction.clearAccount('provisionByTangibleFixedAssetObsolescenceAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="provisionByTangibleFixedAssetObsolescenceAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="warehouseForeignCurrencyAccountDiv">
+                <s:decorate id="warehouseForeignCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.warehouseForeignCurrencyAccount']}</ui:define>
+                    <app:selectPopUp id="warehouseForeignCurrencyAccount"
+                                     textValue="#{companySettingAction.instance.warehouseForeignCurrencyAccount.fullName}"
+                                     value="#{companySettingAction.instance.warehouseForeignCurrencyAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('warehouseForeignCurrencyAccount')"
+                                     clearAction="companySettingAction.clearAccount('warehouseForeignCurrencyAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="warehouseForeignCurrencyAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="warehouseNationalCurrencyAccountDiv">
+                <s:decorate id="warehouseNationalCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.warehouseNationalCurrencyAccount']}</ui:define>
+                    <app:selectPopUp id="warehouseNationalCurrencyAccount"
+                                     textValue="#{companySettingAction.instance.warehouseNationalCurrencyAccount.fullName}"
+                                     value="#{companySettingAction.instance.warehouseNationalCurrencyAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('warehouseNationalCurrencyAccount')"
+                                     clearAction="companySettingAction.clearAccount('warehouseNationalCurrencyAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="warehouseNationalCurrencyAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="warehouseForeignCurrencyTransientAccountDiv">
+                <s:decorate id="warehouseForeignCurrencyTransientAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.warehouseForeignCurrencyTransientAccount']}</ui:define>
+                    <app:selectPopUp id="warehouseForeignCurrencyTransientAccount"
+                                     textValue="#{companySettingAction.instance.warehouseForeignCurrencyTransientAccount.fullName}"
+                                     value="#{companySettingAction.instance.warehouseForeignCurrencyTransientAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('warehouseForeignCurrencyTransientAccount')"
+                                     clearAction="companySettingAction.clearAccount('warehouseForeignCurrencyTransientAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="warehouseForeignCurrencyTransientAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="warehouseNationalCurrencyTransientAccountDiv">
+                <s:decorate id="warehouseNationalCurrencyTransientAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount']}</ui:define>
+                    <app:selectPopUp id="warehouseNationalCurrencyTransientAccount"
+                                     textValue="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount.fullName}"
+                                     value="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('warehouseNationalCurrencyTransientAccount')"
+                                     clearAction="companySettingAction.clearAccount('warehouseNationalCurrencyTransientAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="warehouseNationalCurrencyTransientAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="warehouseNationalCurrencyTransientAccount1Div">
+                <s:decorate id="warehouseNationalCurrencyTransientAccount1Field" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount1']}</ui:define>
+                    <app:selectPopUp id="warehouseNationalCurrencyTransientAccount1"
+                                     textValue="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount1.fullName}"
+                                     value="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount1}"
+                                     selectAction="companySettingAction.prepareAccountSelection('warehouseNationalCurrencyTransientAccount1')"
+                                     clearAction="companySettingAction.clearAccount('warehouseNationalCurrencyTransientAccount1')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="warehouseNationalCurrencyTransientAccount1Div"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="warehouseNationalCurrencyTransientAccount2Div">
+                <s:decorate id="warehouseNationalCurrencyTransientAccount2Field" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount2']}</ui:define>
+                    <app:selectPopUp id="warehouseNationalCurrencyTransientAccount2"
+                                     textValue="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount2.fullName}"
+                                     value="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount2}"
+                                     selectAction="companySettingAction.prepareAccountSelection('warehouseNationalCurrencyTransientAccount2')"
+                                     clearAction="companySettingAction.clearAccount('warehouseNationalCurrencyTransientAccount2')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="warehouseNationalCurrencyTransientAccount2Div"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="iueRetentionDiv">
+                <s:decorate id="iueRetentionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.iueRetention']}</ui:define>
+                    <app:selectPopUp id="iueRetention"
+                                     textValue="#{companySettingAction.instance.iueRetention.fullName}"
+                                     value="#{companySettingAction.instance.iueRetention}"
+                                     selectAction="companySettingAction.prepareAccountSelection('iueRetention')"
+                                     clearAction="companySettingAction.clearAccount('iueRetention')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="iueRetentionDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="itRetentionDiv">
+                <s:decorate id="itRetentionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.itRetention']}</ui:define>
+                    <app:selectPopUp id="itRetention"
+                                     textValue="#{companySettingAction.instance.itRetention.fullName}"
+                                     value="#{companySettingAction.instance.itRetention}"
+                                     selectAction="companySettingAction.prepareAccountSelection('itRetention')"
+                                     clearAction="companySettingAction.clearAccount('itRetention')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="itRetentionDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="ctaCostPTDiv">
+                <s:decorate id="ctaCostPTField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.ctaCostPT']}</ui:define>
+                    <app:selectPopUp id="ctaCostPT"
+                                     textValue="#{companySettingAction.instance.ctaCostPT.fullName}"
+                                     value="#{companySettingAction.instance.ctaCostPT}"
+                                     selectAction="companySettingAction.prepareAccountSelection('ctaCostPT')"
+                                     clearAction="companySettingAction.clearAccount('ctaCostPT')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="ctaCostPTDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="ctaAlmPTDiv">
+                <s:decorate id="ctaAlmPTField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.ctaAlmPT']}</ui:define>
+                    <app:selectPopUp id="ctaAlmPT"
+                                     textValue="#{companySettingAction.instance.ctaAlmPT.fullName}"
+                                     value="#{companySettingAction.instance.ctaAlmPT}"
+                                     selectAction="companySettingAction.prepareAccountSelection('ctaAlmPT')"
+                                     clearAction="companySettingAction.clearAccount('ctaAlmPT')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="ctaAlmPTDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="ctaAlmPTAGDiv">
+                <s:decorate id="ctaAlmPTAGField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.ctaAlmPTAG']}</ui:define>
+                    <app:selectPopUp id="ctaAlmPTAG"
+                                     textValue="#{companySettingAction.instance.ctaAlmPTAG.fullName}"
+                                     value="#{companySettingAction.instance.ctaAlmPTAG}"
+                                     selectAction="companySettingAction.prepareAccountSelection('ctaAlmPTAG')"
+                                     clearAction="companySettingAction.clearAccount('ctaAlmPTAG')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="ctaAlmPTAGDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="ctaCostPVDiv">
+                <s:decorate id="ctaCostPVField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.ctaCostPV']}</ui:define>
+                    <app:selectPopUp id="ctaCostPV"
+                                     textValue="#{companySettingAction.instance.ctaCostPV.fullName}"
+                                     value="#{companySettingAction.instance.ctaCostPV}"
+                                     selectAction="companySettingAction.prepareAccountSelection('ctaCostPV')"
+                                     clearAction="companySettingAction.clearAccount('ctaCostPV')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="ctaCostPVDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="ctaAlmPVDiv">
+                <s:decorate id="ctaAlmPVField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.ctaAlmPV']}</ui:define>
+                    <app:selectPopUp id="ctaAlmPV"
+                                     textValue="#{companySettingAction.instance.ctaAlmPV.fullName}"
+                                     value="#{companySettingAction.instance.ctaAlmPV}"
+                                     selectAction="companySettingAction.prepareAccountSelection('ctaAlmPV')"
+                                     clearAction="companySettingAction.clearAccount('ctaAlmPV')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="ctaAlmPVDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="wasteAccountDiv">
+                <s:decorate id="wasteAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.wasteAccount']}</ui:define>
+                    <app:selectPopUp id="wasteAccount"
+                                     textValue="#{companySettingAction.instance.wasteAccount.fullName}"
+                                     value="#{companySettingAction.instance.wasteAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('wasteAccount')"
+                                     clearAction="companySettingAction.clearAccount('wasteAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="wasteAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="averageAccountDiv">
+                <s:decorate id="averageAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.averageAccount']}</ui:define>
+                    <app:selectPopUp id="averageAccount"
+                                     textValue="#{companySettingAction.instance.averageAccount.fullName}"
+                                     value="#{companySettingAction.instance.averageAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('averageAccount')"
+                                     clearAction="companySettingAction.clearAccount('averageAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="averageAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="lowAccountDiv">
+                <s:decorate id="lowAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.lowAccount']}</ui:define>
+                    <app:selectPopUp id="lowAccount"
+                                     textValue="#{companySettingAction.instance.lowAccount.fullName}"
+                                     value="#{companySettingAction.instance.lowAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('lowAccount')"
+                                     clearAction="companySettingAction.clearAccount('lowAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="lowAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="reworkAccountDiv">
+                <s:decorate id="reworkAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.reworkAccount']}</ui:define>
+                    <app:selectPopUp id="reworkAccount"
+                                     textValue="#{companySettingAction.instance.reworkAccount.fullName}"
+                                     value="#{companySettingAction.instance.reworkAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('reworkAccount')"
+                                     clearAction="companySettingAction.clearAccount('reworkAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="reworkAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="savingsBankAccountDiv">
+                <s:decorate id="savingsBankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.savingsBankAccount']}</ui:define>
+                    <app:selectPopUp id="savingsBankAccount"
+                                     textValue="#{companySettingAction.instance.savingsBankAccount.fullName}"
+                                     value="#{companySettingAction.instance.savingsBankAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('savingsBankAccount')"
+                                     clearAction="companySettingAction.clearAccount('savingsBankAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="savingsBankAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="veterinaryCashAccountDiv">
+                <s:decorate id="veterinaryCashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.veterinaryCashAccount']}</ui:define>
+                    <app:selectPopUp id="veterinaryCashAccount"
+                                     textValue="#{companySettingAction.instance.veterinaryCashAccount.fullName}"
+                                     value="#{companySettingAction.instance.veterinaryCashAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('veterinaryCashAccount')"
+                                     clearAction="companySettingAction.clearAccount('veterinaryCashAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="veterinaryCashAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="generalCashAccountNationalDiv">
+                <s:decorate id="generalCashAccountNationalField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.generalCashAccountNational']}</ui:define>
+                    <app:selectPopUp id="generalCashAccountNational"
+                                     textValue="#{companySettingAction.instance.generalCashAccountNational.fullName}"
+                                     value="#{companySettingAction.instance.generalCashAccountNational}"
+                                     selectAction="companySettingAction.prepareAccountSelection('generalCashAccountNational')"
+                                     clearAction="companySettingAction.clearAccount('generalCashAccountNational')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="generalCashAccountNationalDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="fixedTermInterestNationalCurrencyDiv">
+                <s:decorate id="fixedTermInterestNationalCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.fixedTermInterestNationalCurrency']}</ui:define>
+                    <app:selectPopUp id="fixedTermInterestNationalCurrency"
+                                     textValue="#{companySettingAction.instance.fixedTermInterestNationalCurrency.fullName}"
+                                     value="#{companySettingAction.instance.fixedTermInterestNationalCurrency}"
+                                     selectAction="companySettingAction.prepareAccountSelection('fixedTermInterestNationalCurrency')"
+                                     clearAction="companySettingAction.clearAccount('fixedTermInterestNationalCurrency')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="fixedTermInterestNationalCurrencyDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="fixedAssetProvidersAccountDiv">
+                <s:decorate id="fixedAssetProvidersAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.fixedAssetProvidersAccount']}</ui:define>
+                    <app:selectPopUp id="fixedAssetProvidersAccount"
+                                     textValue="#{companySettingAction.instance.fixedAssetProvidersAccount.fullName}"
+                                     value="#{companySettingAction.instance.fixedAssetProvidersAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('fixedAssetProvidersAccount')"
+                                     clearAction="companySettingAction.clearAccount('fixedAssetProvidersAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="fixedAssetProvidersAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="transactionTaxExpenseDiv">
+                <s:decorate id="transactionTaxExpenseField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.transactionTaxExpense']}</ui:define>
+                    <app:selectPopUp id="transactionTaxExpense"
+                                     textValue="#{companySettingAction.instance.transactionTaxExpense.fullName}"
+                                     value="#{companySettingAction.instance.transactionTaxExpense}"
+                                     selectAction="companySettingAction.prepareAccountSelection('transactionTaxExpense')"
+                                     clearAction="companySettingAction.clearAccount('transactionTaxExpense')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="transactionTaxExpenseDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="fiscalDebitLiabilityDiv">
+                <s:decorate id="fiscalDebitLiabilityField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.fiscalDebitLiability']}</ui:define>
+                    <app:selectPopUp id="fiscalDebitLiability"
+                                     textValue="#{companySettingAction.instance.fiscalDebitLiability.fullName}"
+                                     value="#{companySettingAction.instance.fiscalDebitLiability}"
+                                     selectAction="companySettingAction.prepareAccountSelection('fiscalDebitLiability')"
+                                     clearAction="companySettingAction.clearAccount('fiscalDebitLiability')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="fiscalDebitLiabilityDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="transactionTaxPayableDiv">
+                <s:decorate id="transactionTaxPayableField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.transactionTaxPayable']}</ui:define>
+                    <app:selectPopUp id="transactionTaxPayable"
+                                     textValue="#{companySettingAction.instance.transactionTaxPayable.fullName}"
+                                     value="#{companySettingAction.instance.transactionTaxPayable}"
+                                     selectAction="companySettingAction.prepareAccountSelection('transactionTaxPayable')"
+                                     clearAction="companySettingAction.clearAccount('transactionTaxPayable')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="transactionTaxPayableDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="primarySaleProductDiv">
+                <s:decorate id="primarySaleProductField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.primarySaleProduct']}</ui:define>
+                    <app:selectPopUp id="primarySaleProduct"
+                                     textValue="#{companySettingAction.instance.primarySaleProduct.fullName}"
+                                     value="#{companySettingAction.instance.primarySaleProduct}"
+                                     selectAction="companySettingAction.prepareAccountSelection('primarySaleProduct')"
+                                     clearAction="companySettingAction.clearAccount('primarySaleProduct')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="primarySaleProductDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="secondarySaleProductDiv">
+                <s:decorate id="secondarySaleProductField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.secondarySaleProduct']}</ui:define>
+                    <app:selectPopUp id="secondarySaleProduct"
+                                     textValue="#{companySettingAction.instance.secondarySaleProduct.fullName}"
+                                     value="#{companySettingAction.instance.secondarySaleProduct}"
+                                     selectAction="companySettingAction.prepareAccountSelection('secondarySaleProduct')"
+                                     clearAction="companySettingAction.clearAccount('secondarySaleProduct')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="secondarySaleProductDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="commissionSalesCashAccountDiv">
+                <s:decorate id="commissionSalesCashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.commissionSalesCashAccount']}</ui:define>
+                    <app:selectPopUp id="commissionSalesCashAccount"
+                                     textValue="#{companySettingAction.instance.commissionSalesCashAccount.fullName}"
+                                     value="#{companySettingAction.instance.commissionSalesCashAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('commissionSalesCashAccount')"
+                                     clearAction="companySettingAction.clearAccount('commissionSalesCashAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="commissionSalesCashAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountPayableSupplierDiv">
+                <s:decorate id="accountPayableSupplierField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountPayableSupplier']}</ui:define>
+                    <app:selectPopUp id="accountPayableSupplier"
+                                     textValue="#{companySettingAction.instance.accountPayableSupplier.fullName}"
+                                     value="#{companySettingAction.instance.accountPayableSupplier}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountPayableSupplier')"
+                                     clearAction="companySettingAction.clearAccount('accountPayableSupplier')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountPayableSupplierDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountPayableIVADiv">
+                <s:decorate id="accountPayableIVAField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountPayableIVA']}</ui:define>
+                    <app:selectPopUp id="accountPayableIVA"
+                                     textValue="#{companySettingAction.instance.accountPayableIVA.fullName}"
+                                     value="#{companySettingAction.instance.accountPayableIVA}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountPayableIVA')"
+                                     clearAction="companySettingAction.clearAccount('accountPayableIVA')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountPayableIVADiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountRegaliaDiv">
+                <s:decorate id="accountRegaliaField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountRegalia']}</ui:define>
+                    <app:selectPopUp id="accountRegalia"
+                                     textValue="#{companySettingAction.instance.accountRegalia.fullName}"
+                                     value="#{companySettingAction.instance.accountRegalia}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountRegalia')"
+                                     clearAction="companySettingAction.clearAccount('accountRegalia')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountRegaliaDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountRetentionCNSDiv">
+                <s:decorate id="accountRetentionCNSField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountRetentionCNS']}</ui:define>
+                    <app:selectPopUp id="accountRetentionCNS"
+                                     textValue="#{companySettingAction.instance.accountRetentionCNS.fullName}"
+                                     value="#{companySettingAction.instance.accountRetentionCNS}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountRetentionCNS')"
+                                     clearAction="companySettingAction.clearAccount('accountRetentionCNS')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountRetentionCNSDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountBalanceSheet1Div">
+                <s:decorate id="accountBalanceSheet1Field" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet1']}</ui:define>
+                    <app:selectPopUp id="accountBalanceSheet1"
+                                     textValue="#{companySettingAction.instance.accountBalanceSheet1.fullName}"
+                                     value="#{companySettingAction.instance.accountBalanceSheet1}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet1')"
+                                     clearAction="companySettingAction.clearAccount('accountBalanceSheet1')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountBalanceSheet1Div"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountBalanceSheet2Div">
+                <s:decorate id="accountBalanceSheet2Field" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet2']}</ui:define>
+                    <app:selectPopUp id="accountBalanceSheet2"
+                                     textValue="#{companySettingAction.instance.accountBalanceSheet2.fullName}"
+                                     value="#{companySettingAction.instance.accountBalanceSheet2}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet2')"
+                                     clearAction="companySettingAction.clearAccount('accountBalanceSheet2')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountBalanceSheet2Div"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountBalanceSheet3Div">
+                <s:decorate id="accountBalanceSheet3Field" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet3']}</ui:define>
+                    <app:selectPopUp id="accountBalanceSheet3"
+                                     textValue="#{companySettingAction.instance.accountBalanceSheet3.fullName}"
+                                     value="#{companySettingAction.instance.accountBalanceSheet3}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet3')"
+                                     clearAction="companySettingAction.clearAccount('accountBalanceSheet3')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountBalanceSheet3Div"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountBalanceSheet4Div">
+                <s:decorate id="accountBalanceSheet4Field" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet4']}</ui:define>
+                    <app:selectPopUp id="accountBalanceSheet4"
+                                     textValue="#{companySettingAction.instance.accountBalanceSheet4.fullName}"
+                                     value="#{companySettingAction.instance.accountBalanceSheet4}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet4')"
+                                     clearAction="companySettingAction.clearAccount('accountBalanceSheet4')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountBalanceSheet4Div"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="accountBalanceSheet5Div">
+                <s:decorate id="accountBalanceSheet5Field" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet5']}</ui:define>
+                    <app:selectPopUp id="accountBalanceSheet5"
+                                     textValue="#{companySettingAction.instance.accountBalanceSheet5.fullName}"
+                                     value="#{companySettingAction.instance.accountBalanceSheet5}"
+                                     selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet5')"
+                                     clearAction="companySettingAction.clearAccount('accountBalanceSheet5')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="accountBalanceSheet5Div"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="lossCashAccountDiv">
+                <s:decorate id="lossCashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.lossCashAccount']}</ui:define>
+                    <app:selectPopUp id="lossCashAccount"
+                                     textValue="#{companySettingAction.instance.lossCashAccount.fullName}"
+                                     value="#{companySettingAction.instance.lossCashAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('lossCashAccount')"
+                                     clearAction="companySettingAction.clearAccount('lossCashAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="lossCashAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="profitCashAccountDiv">
+                <s:decorate id="profitCashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.profitCashAccount']}</ui:define>
+                    <app:selectPopUp id="profitCashAccount"
+                                     textValue="#{companySettingAction.instance.profitCashAccount.fullName}"
+                                     value="#{companySettingAction.instance.profitCashAccount}"
+                                     selectAction="companySettingAction.prepareAccountSelection('profitCashAccount')"
+                                     clearAction="companySettingAction.clearAccount('profitCashAccount')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="profitCashAccountDiv"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="defaultAccountPurchaseOrderDiv">
+                <s:decorate id="defaultAccountPurchaseOrderField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.defaultAccountPurchaseOrder']}</ui:define>
+                    <app:selectPopUp id="defaultAccountPurchaseOrder"
+                                     textValue="#{companySettingAction.instance.defaultAccountPurchaseOrder.fullName}"
+                                     value="#{companySettingAction.instance.defaultAccountPurchaseOrder}"
+                                     selectAction="companySettingAction.prepareAccountSelection('defaultAccountPurchaseOrder')"
+                                     clearAction="companySettingAction.clearAccount('defaultAccountPurchaseOrder')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="defaultAccountPurchaseOrderDiv"/>
+                </s:decorate>
+            </s:div>
+        </app:fieldset>
+        <app:fieldset id="bankAccountsFieldset" title="#{messages['CompanyConfiguration.fieldset.bankAccounts']}">
+            <s:decorate id="nationalBankAccountForPaymentField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.nationalBankAccountForPayment']}</ui:define>
+                <h:selectOneMenu id="nationalBankAccountForPayment" value="#{companySettingAction.instance.nationalBankAccountForPayment}" styleClass="input">
+                    <s:selectItems value="#{financesBankAccountList}" var="financesBankAccountItem" label="#{financesBankAccountItem.description}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="foreignBankAccountForPaymentField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.foreignBankAccountForPayment']}</ui:define>
+                <h:selectOneMenu id="foreignBankAccountForPayment" value="#{companySettingAction.instance.foreignBankAccountForPayment}" styleClass="input">
+                    <s:selectItems value="#{financesBankAccountList}" var="financesBankAccountItem" label="#{financesBankAccountItem.description}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </app:fieldset>
+</rich:tab>
+
+<rich:tab label="#{messages['CompanyConfiguration.tab.taxes']}">
+        <app:fieldset id="taxesFieldset" title="#{messages['CompanyConfiguration.fieldset.taxes']}">
+            <s:decorate id="itField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.it']}</ui:define>
+                <h:inputText id="it" value="#{companySettingAction.instance.it}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="it"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="iueField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.iue']}</ui:define>
+                <h:inputText id="iue" value="#{companySettingAction.instance.iue}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="iue"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="ivaTaxValueField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.ivaTaxValue']}</ui:define>
+                <h:inputText id="ivaTaxValue" value="#{companySettingAction.instance.ivaTaxValue}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="ivaTaxValue"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="netValueField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.netValue']}</ui:define>
+                <h:inputText id="netValue" value="#{companySettingAction.instance.netValue}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="netValue"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="itTaxValueField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.itTaxValue']}</ui:define>
+                <h:inputText id="itTaxValue" value="#{companySettingAction.instance.itTaxValue}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="itTaxValue"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="retentionCNSValueField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.retentionCNSValue']}</ui:define>
+                <h:inputText id="retentionCNSValue" value="#{companySettingAction.instance.retentionCNSValue}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="retentionCNSValue"/>
+                </h:inputText>
+            </s:decorate>
+        </app:fieldset>
+</rich:tab>
+
+<rich:tab label="#{messages['CompanyConfiguration.tab.billing']}">
+        <app:fieldset id="billingLegendsFieldset" title="#{messages['CompanyConfiguration.fieldset.billingLegends']}">
+            <s:decorate id="oneLegendField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.oneLegend']}</ui:define>
+                <h:inputText id="oneLegend" value="#{companySettingAction.instance.oneLegend}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="onlineLegendField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.onlineLegend']}</ui:define>
+                <h:inputText id="onlineLegend" value="#{companySettingAction.instance.onlineLegend}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="offlineLegendField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.offlineLegend']}</ui:define>
+                <h:inputText id="offlineLegend" value="#{companySettingAction.instance.offlineLegend}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="invoiceAnnulDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.invoiceAnnulDate']}</ui:define>
+                <rich:calendar id="invoiceAnnulDate" value="#{companySettingAction.instance.invoiceAnnulDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"/>
+            </s:decorate>
+        </app:fieldset>
+        <app:fieldset id="billingUrlsFieldset" title="#{messages['CompanyConfiguration.fieldset.billingUrls']}">
+            <s:decorate id="measureUnitsURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.measureUnitsURL']}</ui:define>
+                <h:inputText id="measureUnitsURL" value="#{companySettingAction.instance.measureUnitsURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="productsAndServicesURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.productsAndServicesURL']}</ui:define>
+                <h:inputText id="productsAndServicesURL" value="#{companySettingAction.instance.productsAndServicesURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="activitiesURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.activitiesURL']}</ui:define>
+                <h:inputText id="activitiesURL" value="#{companySettingAction.instance.activitiesURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="nitVerificationURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.nitVerificationURL']}</ui:define>
+                <h:inputText id="nitVerificationURL" value="#{companySettingAction.instance.nitVerificationURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="validateOfflineBillPackagesURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.validateOfflineBillPackagesURL']}</ui:define>
+                <h:inputText id="validateOfflineBillPackagesURL" value="#{companySettingAction.instance.validateOfflineBillPackagesURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="processOfflineBillPackagesURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.processOfflineBillPackagesURL']}</ui:define>
+                <h:inputText id="processOfflineBillPackagesURL" value="#{companySettingAction.instance.processOfflineBillPackagesURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="prepareOfflineBillPackagesURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.prepareOfflineBillPackagesURL']}</ui:define>
+                <h:inputText id="prepareOfflineBillPackagesURL" value="#{companySettingAction.instance.prepareOfflineBillPackagesURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="onlineModeURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.onlineModeURL']}</ui:define>
+                <h:inputText id="onlineModeURL" value="#{companySettingAction.instance.onlineModeURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="offlineModeURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.offlineModeURL']}</ui:define>
+                <h:inputText id="offlineModeURL" value="#{companySettingAction.instance.offlineModeURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="significantEventURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.significantEventURL']}</ui:define>
+                <h:inputText id="significantEventURL" value="#{companySettingAction.instance.significantEventURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="checkBillingModeURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.checkBillingModeURL']}</ui:define>
+                <h:inputText id="checkBillingModeURL" value="#{companySettingAction.instance.checkBillingModeURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="createbillURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.createbillURL']}</ui:define>
+                <h:inputText id="createbillURL" value="#{companySettingAction.instance.createbillURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="cancelbillURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.cancelbillURL']}</ui:define>
+                <h:inputText id="cancelbillURL" value="#{companySettingAction.instance.cancelbillURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="qrcodeURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.qrcodeURL']}</ui:define>
+                <h:inputText id="qrcodeURL" value="#{companySettingAction.instance.qrcodeURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="connectionTestURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.connectionTestURL']}</ui:define>
+                <h:inputText id="connectionTestURL" value="#{companySettingAction.instance.connectionTestURL}"
+                             maxlength="300" styleClass="inputLong"/>
+            </s:decorate>
+        </app:fieldset>
+</rich:tab>
+
+<rich:tab label="#{messages['CompanyConfiguration.tab.employees']}">
+        <app:fieldset id="employeesFieldset" title="#{messages['CompanyConfiguration.fieldset.employees']}">
+            <s:decorate id="hrsWorkingDayField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.hrsWorkingDay']}</ui:define>
+                <h:inputText id="hrsWorkingDay" value="#{companySettingAction.instance.hrsWorkingDay}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="hrsWorkingDay"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="basicBasedChristmasPayrollField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.basicBasedChristmasPayroll']}</ui:define>
+                <h:selectBooleanCheckbox id="basicBasedChristmasPayroll" value="#{companySettingAction.instance.basicBasedChristmasPayroll}"/>
+            </s:decorate>
+            <s:decorate id="contractModificationAuthorizationField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.contractModificationAuthorization']}</ui:define>
+                <h:selectBooleanCheckbox id="contractModificationAuthorization" value="#{companySettingAction.instance.contractModificationAuthorization}"/>
+            </s:decorate>
+            <s:decorate id="contractModificationCodeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.contractModificationCode']}</ui:define>
+                <h:selectBooleanCheckbox id="contractModificationCode" value="#{companySettingAction.instance.contractModificationCode}"/>
+            </s:decorate>
+            <s:decorate id="retentionForLoanAndAdvanceField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.retentionForLoanAndAdvance']}</ui:define>
+                <h:selectBooleanCheckbox id="retentionForLoanAndAdvance" value="#{companySettingAction.instance.retentionForLoanAndAdvance}"/>
+            </s:decorate>
+            <s:decorate id="jobCategoryDLHField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.jobCategoryDLH']}</ui:define>
+                <h:selectOneMenu id="jobCategoryDLH" value="#{companySettingAction.instance.jobCategoryDLH}" styleClass="input">
+                    <s:selectItems value="#{jobCategoryList}" var="jobCategory" label="#{jobCategory.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="jobCategoryDTHField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.jobCategoryDTH']}</ui:define>
+                <h:selectOneMenu id="jobCategoryDTH" value="#{companySettingAction.instance.jobCategoryDTH}" styleClass="input">
+                    <s:selectItems value="#{jobCategoryList}" var="jobCategory" label="#{jobCategory.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="kindOfSalaryDLHField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.kindOfSalaryDLH']}</ui:define>
+                <h:selectOneMenu id="kindOfSalaryDLH" value="#{companySettingAction.instance.kindOfSalaryDLH}" styleClass="input">
+                    <s:selectItems value="#{kindOfSalaryList}" var="kindOfSalary" label="#{kindOfSalary.type}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="kindOfSalaryDTHField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.kindOfSalaryDTH']}</ui:define>
+                <h:selectOneMenu id="kindOfSalaryDTH" value="#{companySettingAction.instance.kindOfSalaryDTH}" styleClass="input">
+                    <s:selectItems value="#{kindOfSalaryList}" var="kindOfSalary" label="#{kindOfSalary.type}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="defaultProfessorsChargeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.defaultProfessorsCharge']}</ui:define>
+                <h:selectOneMenu id="defaultProfessorsCharge" value="#{companySettingAction.instance.defaultProfessorsCharge}" styleClass="input">
+                    <s:selectItems value="#{chargeList}" var="chargeItem" label="#{chargeItem.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="defaultSalutationForManField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.defaultSalutationForMan']}</ui:define>
+                <h:selectOneMenu id="defaultSalutationForMan" value="#{companySettingAction.instance.defaultSalutationForMan}" styleClass="input">
+                    <s:selectItems value="#{salutationList}" var="salutationItem" label="#{salutationItem.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="defaultSalutationForWomanField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.defaultSalutationForWoman']}</ui:define>
+                <h:selectOneMenu id="defaultSalutationForWoman" value="#{companySettingAction.instance.defaultSalutationForWoman}" styleClass="input">
+                    <s:selectItems value="#{salutationList}" var="salutationItem" label="#{salutationItem.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="defaultDocumentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.defaultDocumentType']}</ui:define>
+                <h:selectOneMenu id="defaultDocumentType" value="#{companySettingAction.instance.defaultDocumentType}" styleClass="input">
+                    <s:selectItems value="#{documentTypeList}" var="documentTypeItem" label="#{documentTypeItem.name}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+        </app:fieldset>
+        <app:fieldset id="evaluationUrlsFieldset" title="#{messages['CompanyConfiguration.fieldset.evaluationUrls']}">
+            <s:decorate id="scheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.scheduleEvaluationRedirectURL']}</ui:define>
+                <h:inputText id="scheduleEvaluationRedirectURL" value="#{companySettingAction.instance.scheduleEvaluationRedirectURL}"
+                             maxlength="255" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="studentScheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.studentScheduleEvaluationRedirectURL']}</ui:define>
+                <h:inputText id="studentScheduleEvaluationRedirectURL" value="#{companySettingAction.instance.studentScheduleEvaluationRedirectURL}"
+                             maxlength="255" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="teacherScheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.teacherScheduleEvaluationRedirectURL']}</ui:define>
+                <h:inputText id="teacherScheduleEvaluationRedirectURL" value="#{companySettingAction.instance.teacherScheduleEvaluationRedirectURL}"
+                             maxlength="255" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="careerManagerScheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.careerManagerScheduleEvaluationRedirectURL']}</ui:define>
+                <h:inputText id="careerManagerScheduleEvaluationRedirectURL" value="#{companySettingAction.instance.careerManagerScheduleEvaluationRedirectURL}"
+                             maxlength="255" styleClass="inputLong"/>
+            </s:decorate>
+            <s:decorate id="autoEvaluationScheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.autoEvaluationScheduleEvaluationRedirectURL']}</ui:define>
+                <h:inputText id="autoEvaluationScheduleEvaluationRedirectURL" value="#{companySettingAction.instance.autoEvaluationScheduleEvaluationRedirectURL}"
+                             maxlength="255" styleClass="inputLong"/>
+            </s:decorate>
+        </app:fieldset>
+</rich:tab>
+
+<rich:tab label="#{messages['CompanyConfiguration.tab.users']}">
+        <app:fieldset id="usersFieldset" title="#{messages['CompanyConfiguration.fieldset.users']}">
+            <s:decorate id="defaultSystemUserNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.defaultSystemUserNumber']}</ui:define>
+                <h:inputText id="defaultSystemUserNumber" value="#{companySettingAction.instance.defaultSystemUserNumber}"
+                             maxlength="4" styleClass="inputSmall"/>
+            </s:decorate>
+            <s:div id="defaultAccountancyUserDiv">
+                <s:decorate id="defaultAccountancyUserField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.defaultAccountancyUser']}</ui:define>
+                    <app:selectPopUp id="defaultAccountancyUser"
+                                     textValue="#{companySettingAction.instance.defaultAccountancyUser.name}"
+                                     value="#{companySettingAction.instance.defaultAccountancyUser}"
+                                     clearAction="companySettingAction.clearFinanceUser('defaultAccountancyUser')"
+                                     searchModalPanel="accountancyFinanceUserListModalPanel"
+                                     dataModel="#{financeUserDataModel}"
+                                     reRender="defaultAccountancyUserDiv"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="defaultAccountancyUserProductionDiv">
+                <s:decorate id="defaultAccountancyUserProductionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.defaultAccountancyUserProduction']}</ui:define>
+                    <app:selectPopUp id="defaultAccountancyUserProduction"
+                                     textValue="#{companySettingAction.instance.defaultAccountancyUserProduction.name}"
+                                     value="#{companySettingAction.instance.defaultAccountancyUserProduction}"
+                                     clearAction="companySettingAction.clearFinanceUser('defaultAccountancyUserProduction')"
+                                     searchModalPanel="productionFinanceUserListModalPanel"
+                                     dataModel="#{financeUserDataModel}"
+                                     reRender="defaultAccountancyUserProductionDiv"
+                                     hotKeySelect="alt+3"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="defaultTreasuryUserDiv">
+                <s:decorate id="defaultTreasuryUserField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.defaultTreasuryUser']}</ui:define>
+                    <app:selectPopUp id="defaultTreasuryUser"
+                                     textValue="#{companySettingAction.instance.defaultTreasuryUser.name}"
+                                     value="#{companySettingAction.instance.defaultTreasuryUser}"
+                                     clearAction="companySettingAction.clearFinanceUser('defaultTreasuryUser')"
+                                     searchModalPanel="treasuryFinanceUserListModalPanel"
+                                     dataModel="#{financeUserDataModel}"
+                                     reRender="defaultTreasuryUserDiv"
+                                     hotKeySelect="alt+4"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="defaultPayableFinanceUserDiv">
+                <s:decorate id="defaultPayableFinanceUserField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.defaultPayableFinanceUser']}</ui:define>
+                    <app:selectPopUp id="defaultPayableFinanceUser"
+                                     textValue="#{companySettingAction.instance.defaultPayableFinanceUser.name}"
+                                     value="#{companySettingAction.instance.defaultPayableFinanceUser}"
+                                     clearAction="companySettingAction.clearFinanceUser('defaultPayableFinanceUser')"
+                                     searchModalPanel="payableFinanceUserListModalPanel"
+                                     dataModel="#{financeUserDataModel}"
+                                     reRender="defaultPayableFinanceUserDiv"
+                                     hotKeySelect="alt+5"/>
+                </s:decorate>
+            </s:div>
+            <s:decorate id="defaultPurchaseOrderRemakePaymentUserNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.defaultPurchaseOrderRemakePaymentUserNumber']}</ui:define>
+                <h:inputText id="defaultPurchaseOrderRemakePaymentUserNumber" value="#{companySettingAction.instance.defaultPurchaseOrderRemakePaymentUserNumber}"
+                             maxlength="4" styleClass="inputSmall"/>
+            </s:decorate>
+            <s:decorate id="defaultPurchaseOrderRemakeYearField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.defaultPurchaseOrderRemakeYear']}</ui:define>
+                <h:inputText id="defaultPurchaseOrderRemakeYear" value="#{companySettingAction.instance.defaultPurchaseOrderRemakeYear}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                </h:inputText>
+            </s:decorate>
+        </app:fieldset>
+</rich:tab>
+
+<rich:tab label="#{messages['CompanyConfiguration.tab.parameters']}">
+        <app:fieldset id="parametersFieldset" title="#{messages['CompanyConfiguration.fieldset.parameters']}">
+            <s:decorate id="purchaseOrderCodificationEnabledField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.purchaseOrderCodificationEnabled']}</ui:define>
+                <h:selectBooleanCheckbox id="purchaseOrderCodificationEnabled" value="#{companySettingAction.instance.purchaseOrderCodificationEnabled}"/>
+            </s:decorate>
+            <s:decorate id="treasuryDocumentsAuthorizationEnabledField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.treasuryDocumentsAuthorizationEnabled']}</ui:define>
+                <h:selectBooleanCheckbox id="treasuryDocumentsAuthorizationEnabled" value="#{companySettingAction.instance.treasuryDocumentsAuthorizationEnabled}"/>
+            </s:decorate>
+            <s:decorate id="payablesDocumentsAuthorizationEnabledField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.payablesDocumentsAuthorizationEnabled']}</ui:define>
+                <h:selectBooleanCheckbox id="payablesDocumentsAuthorizationEnabled" value="#{companySettingAction.instance.payablesDocumentsAuthorizationEnabled}"/>
+            </s:decorate>
+            <s:decorate id="dispatchInventoryControlField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.dispatchInventoryControl']}</ui:define>
+                <h:selectBooleanCheckbox id="dispatchInventoryControl" value="#{companySettingAction.instance.dispatchInventoryControl}"/>
+            </s:decorate>
+            <s:decorate id="dealerParameterField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.dealerParameter']}</ui:define>
+                <h:inputText id="dealerParameter" value="#{companySettingAction.instance.dealerParameter}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="dealerParameter"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="unitPriceMilkField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.unitPriceMilk']}</ui:define>
+                <h:inputText id="unitPriceMilk" value="#{companySettingAction.instance.unitPriceMilk}"
+                             maxlength="20" styleClass="inputNumberMedium">
+                    <app:realNumberConverter forId="unitPriceMilk"/>
+                </h:inputText>
+            </s:decorate>
+            <s:decorate id="cashBoxDocumentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.cashBoxDocumentType']}</ui:define>
+                <h:selectOneMenu id="cashBoxDocumentType" value="#{companySettingAction.instance.cashBoxDocumentType}" styleClass="input">
+                    <s:selectItems value="#{payableDocumentTypeList}" var="payableDocumentTypeItem" label="#{payableDocumentTypeItem.description}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+            <s:decorate id="paymentDocumentOCField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.paymentDocumentOC']}</ui:define>
+                <h:inputText id="paymentDocumentOC" value="#{companySettingAction.instance.paymentDocumentOC}"
+                             maxlength="5" styleClass="inputSmall"/>
+            </s:decorate>
+            <s:decorate id="documentFixedAssetOCField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.documentFixedAssetOC']}</ui:define>
+                <h:inputText id="documentFixedAssetOC" value="#{companySettingAction.instance.documentFixedAssetOC}"
+                             maxlength="5" styleClass="inputSmall"/>
+            </s:decorate>
+        </app:fieldset>
+</rich:tab>
+
 </rich:tabPanel>
 </rich:panel>
 
@@ -282,12 +1241,27 @@
     <h:commandButton action="#{companySettingAction.saveChanges}"
                      value="#{messages['Common.save']}"
                      styleClass="button"
-                     tabindex="14"
                      rendered="#{s:hasPermission('COMPANYSETTING','UPDATE')}">
     </h:commandButton>
 </div>
 
 </h:form>
+
+<s:div id="cashAccountListModalPanelDiv">
+    <s:decorate id="cashAccountListModalPanelContainer"
+                template="/finances/cashAccountListModalPanel.xhtml">
+        <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+        <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                               action="#{companySettingAction.assignSelectedAccount(cashAccountItem)}"
+                               image="/img/active.gif"
+                               styleClass="select-image-middle"
+                               reRender="#{companySettingAction.accountTargetDivId}"
+                               oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+</s:div>
 <s:div id="costCenterListModalPanelDiv">
     <s:decorate id="costCenterListModalPanelContainer" template="/finances/costCenterListModalPanel.xhtml">
         <ui:param name="containerId" value="costCenterListModalPanelContainer"/>
@@ -298,18 +1272,17 @@
                                image="/img/active.gif"
                                styleClass="select-image"
                                immediate="true"
-                               reRender="exchangeRateBalanceCostCenterField"
+                               reRender="exchangeRateBalanceCostCenterDiv"
                                oncomplete="Richfaces.hideModalPanel('costCenterListModalPanel');"/>
         </ui:define>
     </s:decorate>
 </s:div>
-<s:decorate id="accountancyFinanceUserListModalPanelContainer"
-            template="/finances/financeUserListModalPanel.xhtml">
+<s:decorate id="accountancyFinanceUserListModalPanelContainer" template="/finances/financeUserListModalPanel.xhtml">
     <ui:param name="containerId" value="accountancyFinanceUserListModalPanelContainer"/>
     <ui:param name="dialogId" value="accountancyFinanceUserListModalPanel"/>
     <ui:define name="assignButton">
         <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
-                           action="#{companySettingAction.assignDefaultAccountancyUser(financeUserItem)}"
+                           action="#{companySettingAction.assignFinanceUser('defaultAccountancyUser', financeUserItem)}"
                            image="/img/active.gif"
                            styleClass="select-image"
                            immediate="true"
@@ -317,13 +1290,25 @@
                            oncomplete="Richfaces.hideModalPanel('accountancyFinanceUserListModalPanel');"/>
     </ui:define>
 </s:decorate>
-<s:decorate id="treasuryFinanceUserListModalPanelContainer"
-            template="/finances/financeUserListModalPanel.xhtml">
+<s:decorate id="productionFinanceUserListModalPanelContainer" template="/finances/financeUserListModalPanel.xhtml">
+    <ui:param name="containerId" value="productionFinanceUserListModalPanelContainer"/>
+    <ui:param name="dialogId" value="productionFinanceUserListModalPanel"/>
+    <ui:define name="assignButton">
+        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                           action="#{companySettingAction.assignFinanceUser('defaultAccountancyUserProduction', financeUserItem)}"
+                           image="/img/active.gif"
+                           styleClass="select-image"
+                           immediate="true"
+                           reRender="defaultAccountancyUserProductionDiv"
+                           oncomplete="Richfaces.hideModalPanel('productionFinanceUserListModalPanel');"/>
+    </ui:define>
+</s:decorate>
+<s:decorate id="treasuryFinanceUserListModalPanelContainer" template="/finances/financeUserListModalPanel.xhtml">
     <ui:param name="containerId" value="treasuryFinanceUserListModalPanelContainer"/>
     <ui:param name="dialogId" value="treasuryFinanceUserListModalPanel"/>
     <ui:define name="assignButton">
         <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
-                           action="#{companySettingAction.assignDefaultTreasuryUser(financeUserItem)}"
+                           action="#{companySettingAction.assignFinanceUser('defaultTreasuryUser', financeUserItem)}"
                            image="/img/active.gif"
                            styleClass="select-image"
                            immediate="true"
@@ -331,46 +1316,18 @@
                            oncomplete="Richfaces.hideModalPanel('treasuryFinanceUserListModalPanel');"/>
     </ui:define>
 </s:decorate>
-<s:decorate id="payableFinanceUserListModalPanelContainer"
-            template="/finances/financeUserListModalPanel.xhtml">
+<s:decorate id="payableFinanceUserListModalPanelContainer" template="/finances/financeUserListModalPanel.xhtml">
     <ui:param name="containerId" value="payableFinanceUserListModalPanelContainer"/>
     <ui:param name="dialogId" value="payableFinanceUserListModalPanel"/>
     <ui:define name="assignButton">
         <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
-                           action="#{companySettingAction.assignDefaultPayableUser(financeUserItem)}"
+                           action="#{companySettingAction.assignFinanceUser('defaultPayableFinanceUser', financeUserItem)}"
                            image="/img/active.gif"
                            styleClass="select-image"
                            immediate="true"
-                           reRender="defaultPayableUserDiv"
+                           reRender="defaultPayableFinanceUserDiv"
                            oncomplete="Richfaces.hideModalPanel('payableFinanceUserListModalPanel');"/>
-    </ui:define>
-</s:decorate>
-<s:decorate id="depositInTransitFCCashAccountListModalPanelContainer"
-            template="/finances/cashAccountListModalPanel.xhtml">
-    <ui:param name="containerId" value="depositInTransitFCCashAccountListModalPanelContainer"/>
-    <ui:param name="dialogId" value="depositInTransitFCCashAccountListModalPanel"/>
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton"
-                           action="#{companySettingAction.assignDepositInTransitForeignCurrencyAccount(cashAccountItem)}"
-                           image="/img/active.gif"
-                           styleClass="select-image-middle"
-                           reRender="depositInTransitFCCashAccountDiv"
-                           oncomplete="Richfaces.hideModalPanel('depositInTransitFCCashAccountListModalPanel');"/>
-    </ui:define>
-</s:decorate>
-<s:decorate id="depositInTransitNCCashAccountListModalPanelContainer"
-            template="/finances/cashAccountListModalPanel.xhtml">
-    <ui:param name="containerId" value="depositInTransitNCCashAccountListModalPanelContainer"/>
-    <ui:param name="dialogId" value="depositInTransitNCCashAccountListModalPanel"/>
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton"
-                           action="#{companySettingAction.assignDepositInTransitNationalCurrencyAccount(cashAccountItem)}"
-                           image="/img/active.gif"
-                           styleClass="select-image-middle"
-                           reRender="depositInTransitNCCashAccountDiv"
-                           oncomplete="Richfaces.hideModalPanel('depositInTransitNCCashAccountListModalPanel');"/>
     </ui:define>
 </s:decorate>
 </ui:define>
 </ui:composition>
-

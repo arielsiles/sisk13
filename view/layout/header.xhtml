@@ -5,7 +5,11 @@
      xmlns:a4j="http://richfaces.org/a4j"
      id="header">
     <div id="left">
-        <h:graphicImage url="/img/logo-TERDEMOL.png"/>
+        <s:fragment rendered="#{not empty companyLogoHolder.headerLogoDataUri}">
+            <img src="#{companyLogoHolder.headerLogoDataUri}"
+                 alt="#{messages['CompanyConfiguration.headerLogo']}"
+                 style="max-width: 200px; max-height: 50px; vertical-align: middle;"/>
+        </s:fragment>
         <a4j:status layout="block" startStyleClass="startAjax"
                     onstart="this.style.top = jQuery(window).scrollTop()+'px';">
             <f:facet name="start">

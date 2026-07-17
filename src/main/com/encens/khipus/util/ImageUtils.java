@@ -72,4 +72,59 @@ public final class ImageUtils {
         }
         return result;
     }
+
+    /**
+     * Reduce la imagen para que entre en la caja {@code maxWidth}x{@code maxHeight}
+     * preservando el ratio, y la recodifica como PNG.
+     * <p>
+     * A diferencia de {@link #resizeAndCompress(byte[], int)}, acota tambien el alto
+     * y conserva el canal alfa: un logo PNG con fondo transparente sigue siendo
+     * transparente. Nunca agranda: si ya entra en la caja, solo recodifica.
+     *
+     * @param bytes     bytes crudos de la imagen subida.
+     * @param maxWidth  ancho maximo en pixeles.
+     * @param maxHeight alto maximo en pixeles.
+     * @return bytes PNG redimensionado.
+     * @throws IOException si la imagen no es legible.
+     */
+    public static byte[] resizeToFit(byte[] bytes, int maxWidth, int maxHeight) throws IOException {
+        if (bytes == null || bytes.length == 0) {
+            return bytes;
+        }
+        BufferedImage src = ImageIO.read(new ByteArrayInputStream(bytes));
+        if (src == null) {
+            throw new IOException("Formato de imagen no soportado");
+        }
+        int w = src.getWidth();
+        int h = src.getHeight();
+        double scale = Math.min(1.0d, Math.min((double) maxWidth / (double) w,
+                (double) maxHeight / (double) h));
+        int targetW = Math.max(1, (int) Math.round(w * scale));
+        int targetH = Math.max(1, (int) Math.round(h * scale));
+
+        BufferedImage dst = new BufferedImage(targetW, targetH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = dst.createGraphics();
+        try {
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING,
+                    RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g.drawImage(src, 0, 0, targetW, targetH, null);
+        } finally {
+            g.dispose();
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
+        if (!ImageIO.write(dst, "png", out)) {
+            throw new IOException("No se pudo codificar la imagen como PNG");
+        }
+        byte[] result = out.toByteArray();
+        if (log.isDebugEnabled()) {
+            log.debug("resizeToFit: " + w + "x" + h + " (" + bytes.length
+                    + " bytes) -> " + targetW + "x" + targetH + " (" + result.length + " bytes)");
+        }
+        return result;
+    }
 }

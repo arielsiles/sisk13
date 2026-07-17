@@ -3573,8 +3573,8 @@
     s:hasPermission('BUSINESSUNIT','VIEW') or
     s:hasPermission('BUSINESSUNITTYPE','VIEW') or
     s:hasPermission('COMPANYSETTING','VIEW')}">
-    <h:panelGrid columns="6" cellpadding="0" cellspacing="0" border="0"
-                 columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
+    <h:panelGrid columns="7" cellpadding="0" cellspacing="0" border="0"
+                 columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
         <s:link view="/admin/roleList.xhtml"
                 value="#{messages['Role.list']}"
                 rendered="#{s:hasPermission('ROLE','VIEW')}"
@@ -3595,6 +3595,11 @@
                 rendered="#{s:hasPermission('ADMINISTRATIVENOTIFICATION','VIEW')}"
                 styleClass="tab-cell"
                 propagation="none"/>
+        <s:link action="#{companySettingAction.loadCompanySettings()}"
+                view="/admin/companySetting.xhtml"
+                value="#{messages['menu.admin.company']}"
+                rendered="#{s:hasPermission('COMPANYSETTING','VIEW')}"
+                styleClass="tab-cell"/>
         <rich:dropDownMenu value="#{messages['menu.admin.reports']}"
                            rendered="#{s:hasPermission('USERROLEREPORT','VIEW')}">
             <rich:menuItem submitMode="none"
@@ -3608,7 +3613,7 @@
         <rich:dropDownMenu value="#{messages['menu.admin.configuration']}"
                            rendered="#{s:hasPermission('BUSINESSUNITTYPE','VIEW') or
                     s:hasPermission('BUSINESSUNIT','VIEW') or
-                    s:hasPermission('COMPANYSETTING','VIEW')}">
+                    s:hasPermission('BRANCHOFFICE','VIEW')}">
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
                            rendered="#{s:hasPermission('BUSINESSUNITTYPE','VIEW')}">
@@ -3622,14 +3627,6 @@
                 <s:link view="/admin/businessUnitList.xhtml"
                         value="#{messages['menu.admin.institution.businessUnit']}"
                         propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{s:hasPermission('COMPANYSETTING','VIEW')}">
-                <s:link action="#{companySettingAction.loadCompanySettings()}"
-                        view="/admin/companySetting.xhtml"
-                        value="#{messages['Functionality.admin.companySetting']}">
-                </s:link>
             </rich:menuItem>
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
