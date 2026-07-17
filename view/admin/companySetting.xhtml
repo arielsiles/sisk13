@@ -19,6 +19,12 @@
 
 <h:form id="userSettingForm" enctype="multipart/form-data">
 
+<!-- Los mensajes globales (ej. "actualizado correctamente") los muestra el
+     template via /include/messages.xhtml; no se agrega otro aca para no
+     duplicarlos. Los errores de validacion de campo se ven de dos formas: el
+     tab culpable queda marcado en rojo (companySettingErrors) y el detalle
+     aparece junto al campo dentro de ese tab. -->
+
 <div class="buttons">
     <h:commandButton action="#{companySettingAction.saveChanges}"
                      value="#{messages['Common.save']}"
@@ -38,44 +44,53 @@
      viajan juntos. -->
 <rich:tabPanel switchType="client">
 
-<rich:tab label="#{messages['CompanyConfiguration.tab.company']}">
+<rich:tab label="#{companySettingErrors.isInError('company') ? messages['CompanyConfiguration.tab.errorMarker'] : ''}#{messages['CompanyConfiguration.tab.company']}"
+          labelClass="#{companySettingErrors.isInError('company') ? 'tabInError' : ''}">
         <app:fieldset id="companyIdentityFieldset" title="#{messages['CompanyConfiguration.fieldset.identity']}">
             <s:decorate id="companyNumberField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.companyNumber']}</ui:define>
                 <h:outputText id="companyNumber" value="#{companySettingAction.instance.companyNumber}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.companyNumber.col']}"/>
             </s:decorate>
             <s:decorate id="versionField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.version']}</ui:define>
                 <h:outputText id="version" value="#{companySettingAction.instance.version}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.version.col']}"/>
             </s:decorate>
             <s:decorate id="titleField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.title']}</ui:define>
                 <h:inputText id="title" value="#{companySettingAction.instance.title}"
                              maxlength="100" styleClass="input"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.title.col']}"/>
             </s:decorate>
             <s:decorate id="subTitleField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.subTitle']}</ui:define>
                 <h:inputText id="subTitle" value="#{companySettingAction.instance.subTitle}"
                              maxlength="100" styleClass="input"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.subTitle.col']}"/>
             </s:decorate>
             <s:decorate id="companyNameField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.companyName']}</ui:define>
                 <h:inputText id="companyName" value="#{companySettingAction.instance.companyName}"
                              maxlength="100" styleClass="input"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.companyName.col']}"/>
             </s:decorate>
             <s:decorate id="systemNameField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.systemName']}</ui:define>
                 <h:inputText id="systemName" value="#{companySettingAction.instance.systemName}"
                              maxlength="100" styleClass="input"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.systemName.col']}"/>
             </s:decorate>
             <s:decorate id="locationNameField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.locationName']}</ui:define>
                 <h:inputText id="locationName" value="#{companySettingAction.instance.locationName}"
                              maxlength="100" styleClass="input"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.locationName.col']}"/>
             </s:decorate>
             <s:decorate id="companyField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.company']}</ui:define>
                 <h:outputText id="company" value="#{companySettingAction.instance.company.login}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.company.col']}"/>
             </s:decorate>
             <s:div id="exchangeRateBalanceCostCenterDiv">
                 <s:decorate id="exchangeRateBalanceCostCenterField" template="/include/inputField.xhtml"
@@ -94,71 +109,85 @@
                                      dataModel="#{costCenterDataModel}"
                                      reRender="exchangeRateBalanceCostCenterDiv"
                                      hotKeySelect="alt+1"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.exchangeRateBalanceCostCenter.col']}"/>
                 </s:decorate>
             </s:div>
         </app:fieldset>
         <app:fieldset id="logosFieldset" title="#{messages['CompanyConfiguration.fieldset.logos']}">
-            <s:div id="headerLogoDiv">
-                <s:decorate id="headerLogoField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['CompanyConfiguration.headerLogo']}</ui:define>
+            <!-- Un bloque por logo: primero se ve el logo actual (o el aviso de que
+                 no hay), despues el selector, y la ayuda de formato al pie en gris.
+                 Los nombres de columna no se muestran: aca no aportan nada.
+                 El preview va por data-URI y no por s:graphicImage, cuyo resource
+                 servlet no es confiable en estas pantallas de edicion. -->
+            <s:div id="headerLogoDiv" styleClass="logoBlock">
+                <div class="logoTitle">#{messages['CompanyConfiguration.headerLogo']}</div>
+
+                <s:fragment rendered="#{not empty companySettingAction.headerLogoDataUri}">
+                    <div class="logoPreview">
+                        <img src="#{companySettingAction.headerLogoDataUri}"
+                             alt="#{messages['CompanyConfiguration.headerLogo']}"
+                             style="max-width:200px; max-height:50px; vertical-align:middle;"/>
+                    </div>
+                    <a4j:commandLink id="removeHeaderLogo"
+                                     action="#{companySettingAction.removeHeaderLogo}"
+                                     reRender="headerLogoDiv"
+                                     value="#{messages['CompanyConfiguration.logo.remove']}"
+                                     styleClass="logoRemove"/>
+                </s:fragment>
+                <s:fragment rendered="#{empty companySettingAction.headerLogoDataUri}">
+                    <div class="logoEmpty">#{messages['CompanyConfiguration.logo.none']}</div>
+                </s:fragment>
+
+                <div class="logoUpload">
                     <s:fileUpload id="headerLogo" styleClass="input"
-                                  accept="image/*"
+                                  accept="image/png,image/jpeg"
                                   data="#{companySettingAction.headerLogoHolder.value}"
                                   fileName="#{companySettingAction.headerLogoHolder.name}"
                                   fileSize="#{companySettingAction.headerLogoHolder.size}"
                                   contentType="#{companySettingAction.headerLogoHolder.contentType}"/>
-                    <h:outputText value="#{messages['CompanyConfiguration.logo.headerHint']}"
-                                  styleClass="helpText"/>
-                </s:decorate>
-                <s:decorate id="headerLogoPreviewField" template="/include/inputField.xhtml" styleClass="formRow"
-                            rendered="#{not empty companySettingAction.headerLogoDataUri}">
-                    <ui:define name="label">#{messages['CompanyConfiguration.logo.current']}</ui:define>
-                    <img src="#{companySettingAction.headerLogoDataUri}"
-                         alt="#{messages['CompanyConfiguration.headerLogo']}"
-                         style="max-width: 200px; max-height: 50px; border: 1px solid #ccc;"/>
-                    <a4j:commandLink id="removeHeaderLogo"
-                                     action="#{companySettingAction.removeHeaderLogo}"
-                                     reRender="headerLogoDiv"
-                                     title="#{messages['Common.clear']}">
-                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                    </a4j:commandLink>
-                </s:decorate>
+                </div>
+                <div class="logoHint">#{messages['CompanyConfiguration.logo.headerHint']}</div>
             </s:div>
-            <s:div id="loginLogoDiv">
-                <s:decorate id="loginLogoField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['CompanyConfiguration.loginLogo']}</ui:define>
+
+            <s:div id="loginLogoDiv" styleClass="logoBlock">
+                <div class="logoTitle">#{messages['CompanyConfiguration.loginLogo']}</div>
+
+                <s:fragment rendered="#{not empty companySettingAction.loginLogoDataUri}">
+                    <div class="logoPreview">
+                        <img src="#{companySettingAction.loginLogoDataUri}"
+                             alt="#{messages['CompanyConfiguration.loginLogo']}"
+                             style="max-width:300px; max-height:300px; vertical-align:middle;"/>
+                    </div>
+                    <a4j:commandLink id="removeLoginLogo"
+                                     action="#{companySettingAction.removeLoginLogo}"
+                                     reRender="loginLogoDiv"
+                                     value="#{messages['CompanyConfiguration.logo.remove']}"
+                                     styleClass="logoRemove"/>
+                </s:fragment>
+                <s:fragment rendered="#{empty companySettingAction.loginLogoDataUri}">
+                    <div class="logoEmpty">#{messages['CompanyConfiguration.logo.none']}</div>
+                </s:fragment>
+
+                <div class="logoUpload">
                     <s:fileUpload id="loginLogo" styleClass="input"
-                                  accept="image/*"
+                                  accept="image/png,image/jpeg"
                                   data="#{companySettingAction.loginLogoHolder.value}"
                                   fileName="#{companySettingAction.loginLogoHolder.name}"
                                   fileSize="#{companySettingAction.loginLogoHolder.size}"
                                   contentType="#{companySettingAction.loginLogoHolder.contentType}"/>
-                    <h:outputText value="#{messages['CompanyConfiguration.logo.loginHint']}"
-                                  styleClass="helpText"/>
-                </s:decorate>
-                <s:decorate id="loginLogoPreviewField" template="/include/inputField.xhtml" styleClass="formRow"
-                            rendered="#{not empty companySettingAction.loginLogoDataUri}">
-                    <ui:define name="label">#{messages['CompanyConfiguration.logo.current']}</ui:define>
-                    <img src="#{companySettingAction.loginLogoDataUri}"
-                         alt="#{messages['CompanyConfiguration.loginLogo']}"
-                         style="max-width: 300px; max-height: 300px; border: 1px solid #ccc;"/>
-                    <a4j:commandLink id="removeLoginLogo"
-                                     action="#{companySettingAction.removeLoginLogo}"
-                                     reRender="loginLogoDiv"
-                                     title="#{messages['Common.clear']}">
-                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                    </a4j:commandLink>
-                </s:decorate>
+                </div>
+                <div class="logoHint">#{messages['CompanyConfiguration.logo.loginHint']}</div>
             </s:div>
         </app:fieldset>
 </rich:tab>
 
-<rich:tab label="#{messages['CompanyConfiguration.tab.accounts']}">
+<rich:tab label="#{companySettingErrors.isInError('accounts') ? messages['CompanyConfiguration.tab.errorMarker'] : ''}#{messages['CompanyConfiguration.tab.accounts']}"
+          labelClass="#{companySettingErrors.isInError('accounts') ? 'tabInError' : ''}">
         <app:fieldset id="cashAccountsFieldset" title="#{messages['CompanyConfiguration.fieldset.cashAccounts']}">
             <s:div id="balanceExchangeRateAccountDiv">
                 <s:decorate id="balanceExchangeRateAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.balanceExchangeRateAccount']}</ui:define>
-                    <app:selectPopUp id="balanceExchangeRateAccount"
+                    <app:selectPopUp styleClass="input350" id="balanceExchangeRateAccount"
                                      textValue="#{companySettingAction.instance.balanceExchangeRateAccount.fullName}"
                                      value="#{companySettingAction.instance.balanceExchangeRateAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('balanceExchangeRateAccount')"
@@ -166,12 +195,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="balanceExchangeRateAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.balanceExchangeRateAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="adjustmentForInflationAccountDiv">
                 <s:decorate id="adjustmentForInflationAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.adjustmentForInflationAccount']}</ui:define>
-                    <app:selectPopUp id="adjustmentForInflationAccount"
+                    <app:selectPopUp styleClass="input350" id="adjustmentForInflationAccount"
                                      textValue="#{companySettingAction.instance.adjustmentForInflationAccount.fullName}"
                                      value="#{companySettingAction.instance.adjustmentForInflationAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('adjustmentForInflationAccount')"
@@ -179,12 +209,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="adjustmentForInflationAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.adjustmentForInflationAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="advancePaymentForeignCurrencyAccountDiv">
                 <s:decorate id="advancePaymentForeignCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.advancePaymentForeignCurrencyAccount']}</ui:define>
-                    <app:selectPopUp id="advancePaymentForeignCurrencyAccount"
+                    <app:selectPopUp styleClass="input350" id="advancePaymentForeignCurrencyAccount"
                                      textValue="#{companySettingAction.instance.advancePaymentForeignCurrencyAccount.fullName}"
                                      value="#{companySettingAction.instance.advancePaymentForeignCurrencyAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('advancePaymentForeignCurrencyAccount')"
@@ -192,12 +223,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="advancePaymentForeignCurrencyAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.advancePaymentForeignCurrencyAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="advancePaymentNationalCurrencyAccountDiv">
                 <s:decorate id="advancePaymentNationalCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.advancePaymentNationalCurrencyAccount']}</ui:define>
-                    <app:selectPopUp id="advancePaymentNationalCurrencyAccount"
+                    <app:selectPopUp styleClass="input350" id="advancePaymentNationalCurrencyAccount"
                                      textValue="#{companySettingAction.instance.advancePaymentNationalCurrencyAccount.fullName}"
                                      value="#{companySettingAction.instance.advancePaymentNationalCurrencyAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('advancePaymentNationalCurrencyAccount')"
@@ -205,12 +237,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="advancePaymentNationalCurrencyAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.advancePaymentNationalCurrencyAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="depositInTransitForeignCurrencyAccountDiv">
                 <s:decorate id="depositInTransitForeignCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.depositInTransitForeignCurrencyAccount']}</ui:define>
-                    <app:selectPopUp id="depositInTransitForeignCurrencyAccount"
+                    <app:selectPopUp styleClass="input350" id="depositInTransitForeignCurrencyAccount"
                                      textValue="#{companySettingAction.instance.depositInTransitForeignCurrencyAccount.fullName}"
                                      value="#{companySettingAction.instance.depositInTransitForeignCurrencyAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('depositInTransitForeignCurrencyAccount')"
@@ -218,12 +251,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="depositInTransitForeignCurrencyAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.depositInTransitForeignCurrencyAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="depositInTransitNationalCurrencyAccountDiv">
                 <s:decorate id="depositInTransitNationalCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.depositInTransitNationalCurrencyAccount']}</ui:define>
-                    <app:selectPopUp id="depositInTransitNationalCurrencyAccount"
+                    <app:selectPopUp styleClass="input350" id="depositInTransitNationalCurrencyAccount"
                                      textValue="#{companySettingAction.instance.depositInTransitNationalCurrencyAccount.fullName}"
                                      value="#{companySettingAction.instance.depositInTransitNationalCurrencyAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('depositInTransitNationalCurrencyAccount')"
@@ -231,12 +265,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="depositInTransitNationalCurrencyAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.depositInTransitNationalCurrencyAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="fixedAssetInTransitAccountDiv">
                 <s:decorate id="fixedAssetInTransitAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fixedAssetInTransitAccount']}</ui:define>
-                    <app:selectPopUp id="fixedAssetInTransitAccount"
+                    <app:selectPopUp styleClass="input350" id="fixedAssetInTransitAccount"
                                      textValue="#{companySettingAction.instance.fixedAssetInTransitAccount.fullName}"
                                      value="#{companySettingAction.instance.fixedAssetInTransitAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('fixedAssetInTransitAccount')"
@@ -244,12 +279,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="fixedAssetInTransitAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedAssetInTransitAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="foreignCurrencyVATFiscalCreditAccountDiv">
                 <s:decorate id="foreignCurrencyVATFiscalCreditAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.foreignCurrencyVATFiscalCreditAccount']}</ui:define>
-                    <app:selectPopUp id="foreignCurrencyVATFiscalCreditAccount"
+                    <app:selectPopUp styleClass="input350" id="foreignCurrencyVATFiscalCreditAccount"
                                      textValue="#{companySettingAction.instance.foreignCurrencyVATFiscalCreditAccount.fullName}"
                                      value="#{companySettingAction.instance.foreignCurrencyVATFiscalCreditAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('foreignCurrencyVATFiscalCreditAccount')"
@@ -257,12 +293,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="foreignCurrencyVATFiscalCreditAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.foreignCurrencyVATFiscalCreditAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="nationalCurrencyVATFiscalCreditAccountDiv">
                 <s:decorate id="nationalCurrencyVATFiscalCreditAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.nationalCurrencyVATFiscalCreditAccount']}</ui:define>
-                    <app:selectPopUp id="nationalCurrencyVATFiscalCreditAccount"
+                    <app:selectPopUp styleClass="input350" id="nationalCurrencyVATFiscalCreditAccount"
                                      textValue="#{companySettingAction.instance.nationalCurrencyVATFiscalCreditAccount.fullName}"
                                      value="#{companySettingAction.instance.nationalCurrencyVATFiscalCreditAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('nationalCurrencyVATFiscalCreditAccount')"
@@ -270,12 +307,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="nationalCurrencyVATFiscalCreditAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.nationalCurrencyVATFiscalCreditAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="nationalCurrencyVATFiscalCreditTransientAccountDiv">
                 <s:decorate id="nationalCurrencyVATFiscalCreditTransientAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.nationalCurrencyVATFiscalCreditTransientAccount']}</ui:define>
-                    <app:selectPopUp id="nationalCurrencyVATFiscalCreditTransientAccount"
+                    <app:selectPopUp styleClass="input350" id="nationalCurrencyVATFiscalCreditTransientAccount"
                                      textValue="#{companySettingAction.instance.nationalCurrencyVATFiscalCreditTransientAccount.fullName}"
                                      value="#{companySettingAction.instance.nationalCurrencyVATFiscalCreditTransientAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('nationalCurrencyVATFiscalCreditTransientAccount')"
@@ -283,12 +321,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="nationalCurrencyVATFiscalCreditTransientAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.nationalCurrencyVATFiscalCreditTransientAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="provisionByTangibleFixedAssetObsolescenceAccountDiv">
                 <s:decorate id="provisionByTangibleFixedAssetObsolescenceAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.provisionByTangibleFixedAssetObsolescenceAccount']}</ui:define>
-                    <app:selectPopUp id="provisionByTangibleFixedAssetObsolescenceAccount"
+                    <app:selectPopUp styleClass="input350" id="provisionByTangibleFixedAssetObsolescenceAccount"
                                      textValue="#{companySettingAction.instance.provisionByTangibleFixedAssetObsolescenceAccount.fullName}"
                                      value="#{companySettingAction.instance.provisionByTangibleFixedAssetObsolescenceAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('provisionByTangibleFixedAssetObsolescenceAccount')"
@@ -296,12 +335,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="provisionByTangibleFixedAssetObsolescenceAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.provisionByTangibleFixedAssetObsolescenceAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="warehouseForeignCurrencyAccountDiv">
                 <s:decorate id="warehouseForeignCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.warehouseForeignCurrencyAccount']}</ui:define>
-                    <app:selectPopUp id="warehouseForeignCurrencyAccount"
+                    <app:selectPopUp styleClass="input350" id="warehouseForeignCurrencyAccount"
                                      textValue="#{companySettingAction.instance.warehouseForeignCurrencyAccount.fullName}"
                                      value="#{companySettingAction.instance.warehouseForeignCurrencyAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('warehouseForeignCurrencyAccount')"
@@ -309,12 +349,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="warehouseForeignCurrencyAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.warehouseForeignCurrencyAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="warehouseNationalCurrencyAccountDiv">
                 <s:decorate id="warehouseNationalCurrencyAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.warehouseNationalCurrencyAccount']}</ui:define>
-                    <app:selectPopUp id="warehouseNationalCurrencyAccount"
+                    <app:selectPopUp styleClass="input350" id="warehouseNationalCurrencyAccount"
                                      textValue="#{companySettingAction.instance.warehouseNationalCurrencyAccount.fullName}"
                                      value="#{companySettingAction.instance.warehouseNationalCurrencyAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('warehouseNationalCurrencyAccount')"
@@ -322,12 +363,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="warehouseNationalCurrencyAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.warehouseNationalCurrencyAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="warehouseForeignCurrencyTransientAccountDiv">
                 <s:decorate id="warehouseForeignCurrencyTransientAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.warehouseForeignCurrencyTransientAccount']}</ui:define>
-                    <app:selectPopUp id="warehouseForeignCurrencyTransientAccount"
+                    <app:selectPopUp styleClass="input350" id="warehouseForeignCurrencyTransientAccount"
                                      textValue="#{companySettingAction.instance.warehouseForeignCurrencyTransientAccount.fullName}"
                                      value="#{companySettingAction.instance.warehouseForeignCurrencyTransientAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('warehouseForeignCurrencyTransientAccount')"
@@ -335,12 +377,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="warehouseForeignCurrencyTransientAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.warehouseForeignCurrencyTransientAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="warehouseNationalCurrencyTransientAccountDiv">
                 <s:decorate id="warehouseNationalCurrencyTransientAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount']}</ui:define>
-                    <app:selectPopUp id="warehouseNationalCurrencyTransientAccount"
+                    <app:selectPopUp styleClass="input350" id="warehouseNationalCurrencyTransientAccount"
                                      textValue="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount.fullName}"
                                      value="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('warehouseNationalCurrencyTransientAccount')"
@@ -348,12 +391,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="warehouseNationalCurrencyTransientAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="warehouseNationalCurrencyTransientAccount1Div">
                 <s:decorate id="warehouseNationalCurrencyTransientAccount1Field" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount1']}</ui:define>
-                    <app:selectPopUp id="warehouseNationalCurrencyTransientAccount1"
+                    <app:selectPopUp styleClass="input350" id="warehouseNationalCurrencyTransientAccount1"
                                      textValue="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount1.fullName}"
                                      value="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount1}"
                                      selectAction="companySettingAction.prepareAccountSelection('warehouseNationalCurrencyTransientAccount1')"
@@ -361,12 +405,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="warehouseNationalCurrencyTransientAccount1Div"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount1.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="warehouseNationalCurrencyTransientAccount2Div">
                 <s:decorate id="warehouseNationalCurrencyTransientAccount2Field" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount2']}</ui:define>
-                    <app:selectPopUp id="warehouseNationalCurrencyTransientAccount2"
+                    <app:selectPopUp styleClass="input350" id="warehouseNationalCurrencyTransientAccount2"
                                      textValue="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount2.fullName}"
                                      value="#{companySettingAction.instance.warehouseNationalCurrencyTransientAccount2}"
                                      selectAction="companySettingAction.prepareAccountSelection('warehouseNationalCurrencyTransientAccount2')"
@@ -374,12 +419,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="warehouseNationalCurrencyTransientAccount2Div"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.warehouseNationalCurrencyTransientAccount2.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="iueRetentionDiv">
                 <s:decorate id="iueRetentionField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.iueRetention']}</ui:define>
-                    <app:selectPopUp id="iueRetention"
+                    <app:selectPopUp styleClass="input350" id="iueRetention"
                                      textValue="#{companySettingAction.instance.iueRetention.fullName}"
                                      value="#{companySettingAction.instance.iueRetention}"
                                      selectAction="companySettingAction.prepareAccountSelection('iueRetention')"
@@ -387,12 +433,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="iueRetentionDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.iueRetention.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="itRetentionDiv">
                 <s:decorate id="itRetentionField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.itRetention']}</ui:define>
-                    <app:selectPopUp id="itRetention"
+                    <app:selectPopUp styleClass="input350" id="itRetention"
                                      textValue="#{companySettingAction.instance.itRetention.fullName}"
                                      value="#{companySettingAction.instance.itRetention}"
                                      selectAction="companySettingAction.prepareAccountSelection('itRetention')"
@@ -400,12 +447,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="itRetentionDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.itRetention.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="ctaCostPTDiv">
                 <s:decorate id="ctaCostPTField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.ctaCostPT']}</ui:define>
-                    <app:selectPopUp id="ctaCostPT"
+                    <app:selectPopUp styleClass="input350" id="ctaCostPT"
                                      textValue="#{companySettingAction.instance.ctaCostPT.fullName}"
                                      value="#{companySettingAction.instance.ctaCostPT}"
                                      selectAction="companySettingAction.prepareAccountSelection('ctaCostPT')"
@@ -413,12 +461,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="ctaCostPTDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.ctaCostPT.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="ctaAlmPTDiv">
                 <s:decorate id="ctaAlmPTField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.ctaAlmPT']}</ui:define>
-                    <app:selectPopUp id="ctaAlmPT"
+                    <app:selectPopUp styleClass="input350" id="ctaAlmPT"
                                      textValue="#{companySettingAction.instance.ctaAlmPT.fullName}"
                                      value="#{companySettingAction.instance.ctaAlmPT}"
                                      selectAction="companySettingAction.prepareAccountSelection('ctaAlmPT')"
@@ -426,12 +475,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="ctaAlmPTDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.ctaAlmPT.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="ctaAlmPTAGDiv">
                 <s:decorate id="ctaAlmPTAGField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.ctaAlmPTAG']}</ui:define>
-                    <app:selectPopUp id="ctaAlmPTAG"
+                    <app:selectPopUp styleClass="input350" id="ctaAlmPTAG"
                                      textValue="#{companySettingAction.instance.ctaAlmPTAG.fullName}"
                                      value="#{companySettingAction.instance.ctaAlmPTAG}"
                                      selectAction="companySettingAction.prepareAccountSelection('ctaAlmPTAG')"
@@ -439,12 +489,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="ctaAlmPTAGDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.ctaAlmPTAG.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="ctaCostPVDiv">
                 <s:decorate id="ctaCostPVField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.ctaCostPV']}</ui:define>
-                    <app:selectPopUp id="ctaCostPV"
+                    <app:selectPopUp styleClass="input350" id="ctaCostPV"
                                      textValue="#{companySettingAction.instance.ctaCostPV.fullName}"
                                      value="#{companySettingAction.instance.ctaCostPV}"
                                      selectAction="companySettingAction.prepareAccountSelection('ctaCostPV')"
@@ -452,12 +503,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="ctaCostPVDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.ctaCostPV.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="ctaAlmPVDiv">
                 <s:decorate id="ctaAlmPVField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.ctaAlmPV']}</ui:define>
-                    <app:selectPopUp id="ctaAlmPV"
+                    <app:selectPopUp styleClass="input350" id="ctaAlmPV"
                                      textValue="#{companySettingAction.instance.ctaAlmPV.fullName}"
                                      value="#{companySettingAction.instance.ctaAlmPV}"
                                      selectAction="companySettingAction.prepareAccountSelection('ctaAlmPV')"
@@ -465,12 +517,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="ctaAlmPVDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.ctaAlmPV.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="wasteAccountDiv">
                 <s:decorate id="wasteAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.wasteAccount']}</ui:define>
-                    <app:selectPopUp id="wasteAccount"
+                    <app:selectPopUp styleClass="input350" id="wasteAccount"
                                      textValue="#{companySettingAction.instance.wasteAccount.fullName}"
                                      value="#{companySettingAction.instance.wasteAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('wasteAccount')"
@@ -478,12 +531,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="wasteAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.wasteAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="averageAccountDiv">
                 <s:decorate id="averageAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.averageAccount']}</ui:define>
-                    <app:selectPopUp id="averageAccount"
+                    <app:selectPopUp styleClass="input350" id="averageAccount"
                                      textValue="#{companySettingAction.instance.averageAccount.fullName}"
                                      value="#{companySettingAction.instance.averageAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('averageAccount')"
@@ -491,12 +545,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="averageAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.averageAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="lowAccountDiv">
                 <s:decorate id="lowAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.lowAccount']}</ui:define>
-                    <app:selectPopUp id="lowAccount"
+                    <app:selectPopUp styleClass="input350" id="lowAccount"
                                      textValue="#{companySettingAction.instance.lowAccount.fullName}"
                                      value="#{companySettingAction.instance.lowAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('lowAccount')"
@@ -504,12 +559,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="lowAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.lowAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="reworkAccountDiv">
                 <s:decorate id="reworkAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.reworkAccount']}</ui:define>
-                    <app:selectPopUp id="reworkAccount"
+                    <app:selectPopUp styleClass="input350" id="reworkAccount"
                                      textValue="#{companySettingAction.instance.reworkAccount.fullName}"
                                      value="#{companySettingAction.instance.reworkAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('reworkAccount')"
@@ -517,12 +573,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="reworkAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.reworkAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="savingsBankAccountDiv">
                 <s:decorate id="savingsBankAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.savingsBankAccount']}</ui:define>
-                    <app:selectPopUp id="savingsBankAccount"
+                    <app:selectPopUp styleClass="input350" id="savingsBankAccount"
                                      textValue="#{companySettingAction.instance.savingsBankAccount.fullName}"
                                      value="#{companySettingAction.instance.savingsBankAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('savingsBankAccount')"
@@ -535,7 +592,7 @@
             <s:div id="veterinaryCashAccountDiv">
                 <s:decorate id="veterinaryCashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.veterinaryCashAccount']}</ui:define>
-                    <app:selectPopUp id="veterinaryCashAccount"
+                    <app:selectPopUp styleClass="input350" id="veterinaryCashAccount"
                                      textValue="#{companySettingAction.instance.veterinaryCashAccount.fullName}"
                                      value="#{companySettingAction.instance.veterinaryCashAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('veterinaryCashAccount')"
@@ -548,7 +605,7 @@
             <s:div id="generalCashAccountNationalDiv">
                 <s:decorate id="generalCashAccountNationalField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.generalCashAccountNational']}</ui:define>
-                    <app:selectPopUp id="generalCashAccountNational"
+                    <app:selectPopUp styleClass="input350" id="generalCashAccountNational"
                                      textValue="#{companySettingAction.instance.generalCashAccountNational.fullName}"
                                      value="#{companySettingAction.instance.generalCashAccountNational}"
                                      selectAction="companySettingAction.prepareAccountSelection('generalCashAccountNational')"
@@ -556,12 +613,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="generalCashAccountNationalDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.generalCashAccountNational.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="fixedTermInterestNationalCurrencyDiv">
                 <s:decorate id="fixedTermInterestNationalCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fixedTermInterestNationalCurrency']}</ui:define>
-                    <app:selectPopUp id="fixedTermInterestNationalCurrency"
+                    <app:selectPopUp styleClass="input350" id="fixedTermInterestNationalCurrency"
                                      textValue="#{companySettingAction.instance.fixedTermInterestNationalCurrency.fullName}"
                                      value="#{companySettingAction.instance.fixedTermInterestNationalCurrency}"
                                      selectAction="companySettingAction.prepareAccountSelection('fixedTermInterestNationalCurrency')"
@@ -569,12 +627,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="fixedTermInterestNationalCurrencyDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermInterestNationalCurrency.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="fixedAssetProvidersAccountDiv">
                 <s:decorate id="fixedAssetProvidersAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fixedAssetProvidersAccount']}</ui:define>
-                    <app:selectPopUp id="fixedAssetProvidersAccount"
+                    <app:selectPopUp styleClass="input350" id="fixedAssetProvidersAccount"
                                      textValue="#{companySettingAction.instance.fixedAssetProvidersAccount.fullName}"
                                      value="#{companySettingAction.instance.fixedAssetProvidersAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('fixedAssetProvidersAccount')"
@@ -582,12 +641,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="fixedAssetProvidersAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedAssetProvidersAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="transactionTaxExpenseDiv">
                 <s:decorate id="transactionTaxExpenseField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.transactionTaxExpense']}</ui:define>
-                    <app:selectPopUp id="transactionTaxExpense"
+                    <app:selectPopUp styleClass="input350" id="transactionTaxExpense"
                                      textValue="#{companySettingAction.instance.transactionTaxExpense.fullName}"
                                      value="#{companySettingAction.instance.transactionTaxExpense}"
                                      selectAction="companySettingAction.prepareAccountSelection('transactionTaxExpense')"
@@ -595,12 +655,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="transactionTaxExpenseDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.transactionTaxExpense.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="fiscalDebitLiabilityDiv">
                 <s:decorate id="fiscalDebitLiabilityField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fiscalDebitLiability']}</ui:define>
-                    <app:selectPopUp id="fiscalDebitLiability"
+                    <app:selectPopUp styleClass="input350" id="fiscalDebitLiability"
                                      textValue="#{companySettingAction.instance.fiscalDebitLiability.fullName}"
                                      value="#{companySettingAction.instance.fiscalDebitLiability}"
                                      selectAction="companySettingAction.prepareAccountSelection('fiscalDebitLiability')"
@@ -608,12 +669,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="fiscalDebitLiabilityDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fiscalDebitLiability.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="transactionTaxPayableDiv">
                 <s:decorate id="transactionTaxPayableField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.transactionTaxPayable']}</ui:define>
-                    <app:selectPopUp id="transactionTaxPayable"
+                    <app:selectPopUp styleClass="input350" id="transactionTaxPayable"
                                      textValue="#{companySettingAction.instance.transactionTaxPayable.fullName}"
                                      value="#{companySettingAction.instance.transactionTaxPayable}"
                                      selectAction="companySettingAction.prepareAccountSelection('transactionTaxPayable')"
@@ -621,12 +683,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="transactionTaxPayableDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.transactionTaxPayable.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="primarySaleProductDiv">
                 <s:decorate id="primarySaleProductField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.primarySaleProduct']}</ui:define>
-                    <app:selectPopUp id="primarySaleProduct"
+                    <app:selectPopUp styleClass="input350" id="primarySaleProduct"
                                      textValue="#{companySettingAction.instance.primarySaleProduct.fullName}"
                                      value="#{companySettingAction.instance.primarySaleProduct}"
                                      selectAction="companySettingAction.prepareAccountSelection('primarySaleProduct')"
@@ -634,12 +697,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="primarySaleProductDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.primarySaleProduct.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="secondarySaleProductDiv">
                 <s:decorate id="secondarySaleProductField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.secondarySaleProduct']}</ui:define>
-                    <app:selectPopUp id="secondarySaleProduct"
+                    <app:selectPopUp styleClass="input350" id="secondarySaleProduct"
                                      textValue="#{companySettingAction.instance.secondarySaleProduct.fullName}"
                                      value="#{companySettingAction.instance.secondarySaleProduct}"
                                      selectAction="companySettingAction.prepareAccountSelection('secondarySaleProduct')"
@@ -647,12 +711,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="secondarySaleProductDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.secondarySaleProduct.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="commissionSalesCashAccountDiv">
                 <s:decorate id="commissionSalesCashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.commissionSalesCashAccount']}</ui:define>
-                    <app:selectPopUp id="commissionSalesCashAccount"
+                    <app:selectPopUp styleClass="input350" id="commissionSalesCashAccount"
                                      textValue="#{companySettingAction.instance.commissionSalesCashAccount.fullName}"
                                      value="#{companySettingAction.instance.commissionSalesCashAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('commissionSalesCashAccount')"
@@ -660,12 +725,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="commissionSalesCashAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.commissionSalesCashAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountPayableSupplierDiv">
                 <s:decorate id="accountPayableSupplierField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountPayableSupplier']}</ui:define>
-                    <app:selectPopUp id="accountPayableSupplier"
+                    <app:selectPopUp styleClass="input350" id="accountPayableSupplier"
                                      textValue="#{companySettingAction.instance.accountPayableSupplier.fullName}"
                                      value="#{companySettingAction.instance.accountPayableSupplier}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountPayableSupplier')"
@@ -673,12 +739,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountPayableSupplierDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountPayableSupplier.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountPayableIVADiv">
                 <s:decorate id="accountPayableIVAField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountPayableIVA']}</ui:define>
-                    <app:selectPopUp id="accountPayableIVA"
+                    <app:selectPopUp styleClass="input350" id="accountPayableIVA"
                                      textValue="#{companySettingAction.instance.accountPayableIVA.fullName}"
                                      value="#{companySettingAction.instance.accountPayableIVA}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountPayableIVA')"
@@ -686,12 +753,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountPayableIVADiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountPayableIVA.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountRegaliaDiv">
                 <s:decorate id="accountRegaliaField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountRegalia']}</ui:define>
-                    <app:selectPopUp id="accountRegalia"
+                    <app:selectPopUp styleClass="input350" id="accountRegalia"
                                      textValue="#{companySettingAction.instance.accountRegalia.fullName}"
                                      value="#{companySettingAction.instance.accountRegalia}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountRegalia')"
@@ -699,12 +767,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountRegaliaDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountRegalia.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountRetentionCNSDiv">
                 <s:decorate id="accountRetentionCNSField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountRetentionCNS']}</ui:define>
-                    <app:selectPopUp id="accountRetentionCNS"
+                    <app:selectPopUp styleClass="input350" id="accountRetentionCNS"
                                      textValue="#{companySettingAction.instance.accountRetentionCNS.fullName}"
                                      value="#{companySettingAction.instance.accountRetentionCNS}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountRetentionCNS')"
@@ -712,12 +781,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountRetentionCNSDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountRetentionCNS.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountBalanceSheet1Div">
                 <s:decorate id="accountBalanceSheet1Field" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet1']}</ui:define>
-                    <app:selectPopUp id="accountBalanceSheet1"
+                    <app:selectPopUp styleClass="input350" id="accountBalanceSheet1"
                                      textValue="#{companySettingAction.instance.accountBalanceSheet1.fullName}"
                                      value="#{companySettingAction.instance.accountBalanceSheet1}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet1')"
@@ -725,12 +795,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountBalanceSheet1Div"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountBalanceSheet1.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountBalanceSheet2Div">
                 <s:decorate id="accountBalanceSheet2Field" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet2']}</ui:define>
-                    <app:selectPopUp id="accountBalanceSheet2"
+                    <app:selectPopUp styleClass="input350" id="accountBalanceSheet2"
                                      textValue="#{companySettingAction.instance.accountBalanceSheet2.fullName}"
                                      value="#{companySettingAction.instance.accountBalanceSheet2}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet2')"
@@ -738,12 +809,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountBalanceSheet2Div"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountBalanceSheet2.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountBalanceSheet3Div">
                 <s:decorate id="accountBalanceSheet3Field" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet3']}</ui:define>
-                    <app:selectPopUp id="accountBalanceSheet3"
+                    <app:selectPopUp styleClass="input350" id="accountBalanceSheet3"
                                      textValue="#{companySettingAction.instance.accountBalanceSheet3.fullName}"
                                      value="#{companySettingAction.instance.accountBalanceSheet3}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet3')"
@@ -751,12 +823,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountBalanceSheet3Div"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountBalanceSheet3.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountBalanceSheet4Div">
                 <s:decorate id="accountBalanceSheet4Field" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet4']}</ui:define>
-                    <app:selectPopUp id="accountBalanceSheet4"
+                    <app:selectPopUp styleClass="input350" id="accountBalanceSheet4"
                                      textValue="#{companySettingAction.instance.accountBalanceSheet4.fullName}"
                                      value="#{companySettingAction.instance.accountBalanceSheet4}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet4')"
@@ -764,12 +837,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountBalanceSheet4Div"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountBalanceSheet4.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="accountBalanceSheet5Div">
                 <s:decorate id="accountBalanceSheet5Field" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.accountBalanceSheet5']}</ui:define>
-                    <app:selectPopUp id="accountBalanceSheet5"
+                    <app:selectPopUp styleClass="input350" id="accountBalanceSheet5"
                                      textValue="#{companySettingAction.instance.accountBalanceSheet5.fullName}"
                                      value="#{companySettingAction.instance.accountBalanceSheet5}"
                                      selectAction="companySettingAction.prepareAccountSelection('accountBalanceSheet5')"
@@ -777,12 +851,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="accountBalanceSheet5Div"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.accountBalanceSheet5.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="lossCashAccountDiv">
                 <s:decorate id="lossCashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.lossCashAccount']}</ui:define>
-                    <app:selectPopUp id="lossCashAccount"
+                    <app:selectPopUp styleClass="input350" id="lossCashAccount"
                                      textValue="#{companySettingAction.instance.lossCashAccount.fullName}"
                                      value="#{companySettingAction.instance.lossCashAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('lossCashAccount')"
@@ -790,12 +865,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="lossCashAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.lossCashAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="profitCashAccountDiv">
                 <s:decorate id="profitCashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.profitCashAccount']}</ui:define>
-                    <app:selectPopUp id="profitCashAccount"
+                    <app:selectPopUp styleClass="input350" id="profitCashAccount"
                                      textValue="#{companySettingAction.instance.profitCashAccount.fullName}"
                                      value="#{companySettingAction.instance.profitCashAccount}"
                                      selectAction="companySettingAction.prepareAccountSelection('profitCashAccount')"
@@ -803,12 +879,13 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="profitCashAccountDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.profitCashAccount.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="defaultAccountPurchaseOrderDiv">
                 <s:decorate id="defaultAccountPurchaseOrderField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.defaultAccountPurchaseOrder']}</ui:define>
-                    <app:selectPopUp id="defaultAccountPurchaseOrder"
+                    <app:selectPopUp styleClass="input350" id="defaultAccountPurchaseOrder"
                                      textValue="#{companySettingAction.instance.defaultAccountPurchaseOrder.fullName}"
                                      value="#{companySettingAction.instance.defaultAccountPurchaseOrder}"
                                      selectAction="companySettingAction.prepareAccountSelection('defaultAccountPurchaseOrder')"
@@ -816,30 +893,34 @@
                                      searchModalPanel="cashAccountListModalPanel"
                                      dataModel="#{cashAccountDataModel}"
                                      reRender="defaultAccountPurchaseOrderDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultAccountPurchaseOrder.col']}"/>
                 </s:decorate>
             </s:div>
         </app:fieldset>
         <app:fieldset id="bankAccountsFieldset" title="#{messages['CompanyConfiguration.fieldset.bankAccounts']}">
             <s:decorate id="nationalBankAccountForPaymentField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.nationalBankAccountForPayment']}</ui:define>
-                <h:selectOneMenu id="nationalBankAccountForPayment" value="#{companySettingAction.instance.nationalBankAccountForPayment}" styleClass="input">
+                <h:selectOneMenu id="nationalBankAccountForPayment" value="#{companySettingAction.instance.nationalBankAccountForPayment}" styleClass="input350">
                     <s:selectItems value="#{financesBankAccountList}" var="financesBankAccountItem" label="#{financesBankAccountItem.description}"
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.nationalBankAccountForPayment.col']}"/>
             </s:decorate>
             <s:decorate id="foreignBankAccountForPaymentField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.foreignBankAccountForPayment']}</ui:define>
-                <h:selectOneMenu id="foreignBankAccountForPayment" value="#{companySettingAction.instance.foreignBankAccountForPayment}" styleClass="input">
+                <h:selectOneMenu id="foreignBankAccountForPayment" value="#{companySettingAction.instance.foreignBankAccountForPayment}" styleClass="input350">
                     <s:selectItems value="#{financesBankAccountList}" var="financesBankAccountItem" label="#{financesBankAccountItem.description}"
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.foreignBankAccountForPayment.col']}"/>
             </s:decorate>
         </app:fieldset>
 </rich:tab>
 
-<rich:tab label="#{messages['CompanyConfiguration.tab.taxes']}">
+<rich:tab label="#{companySettingErrors.isInError('taxes') ? messages['CompanyConfiguration.tab.errorMarker'] : ''}#{messages['CompanyConfiguration.tab.taxes']}"
+          labelClass="#{companySettingErrors.isInError('taxes') ? 'tabInError' : ''}">
         <app:fieldset id="taxesFieldset" title="#{messages['CompanyConfiguration.fieldset.taxes']}">
             <s:decorate id="itField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.it']}</ui:define>
@@ -861,6 +942,7 @@
                              maxlength="20" styleClass="inputNumberMedium">
                     <app:realNumberConverter forId="ivaTaxValue"/>
                 </h:inputText>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.ivaTaxValue.col']}"/>
             </s:decorate>
             <s:decorate id="netValueField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.netValue']}</ui:define>
@@ -868,6 +950,7 @@
                              maxlength="20" styleClass="inputNumberMedium">
                     <app:realNumberConverter forId="netValue"/>
                 </h:inputText>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.netValue.col']}"/>
             </s:decorate>
             <s:decorate id="itTaxValueField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.itTaxValue']}</ui:define>
@@ -875,121 +958,147 @@
                              maxlength="20" styleClass="inputNumberMedium">
                     <app:realNumberConverter forId="itTaxValue"/>
                 </h:inputText>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.itTaxValue.col']}"/>
             </s:decorate>
             <s:decorate id="retentionCNSValueField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.retentionCNSValue']}</ui:define>
                 <h:inputText id="retentionCNSValue" value="#{companySettingAction.instance.retentionCNSValue}"
                              maxlength="20" styleClass="inputNumberMedium">
-                    <app:realNumberConverter forId="retentionCNSValue"/>
+                    <!-- ret_cns es decimal(5,3): 3 decimales, no 2. Sin este pattern
+                         se toma el default 'patterns.decimalNumber' (#,##0.00) y se
+                         rechaza un valor valido como 0,018. -->
+                    <app:realNumberConverter forId="retentionCNSValue" pattern="#,##0.000"/>
                 </h:inputText>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.retentionCNSValue.col']}"/>
             </s:decorate>
         </app:fieldset>
 </rich:tab>
 
-<rich:tab label="#{messages['CompanyConfiguration.tab.billing']}">
+<rich:tab label="#{companySettingErrors.isInError('billing') ? messages['CompanyConfiguration.tab.errorMarker'] : ''}#{messages['CompanyConfiguration.tab.billing']}"
+          labelClass="#{companySettingErrors.isInError('billing') ? 'tabInError' : ''}">
         <app:fieldset id="billingLegendsFieldset" title="#{messages['CompanyConfiguration.fieldset.billingLegends']}">
             <s:decorate id="oneLegendField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.oneLegend']}</ui:define>
                 <h:inputText id="oneLegend" value="#{companySettingAction.instance.oneLegend}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.oneLegend.col']}"/>
             </s:decorate>
             <s:decorate id="onlineLegendField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.onlineLegend']}</ui:define>
                 <h:inputText id="onlineLegend" value="#{companySettingAction.instance.onlineLegend}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.onlineLegend.col']}"/>
             </s:decorate>
             <s:decorate id="offlineLegendField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.offlineLegend']}</ui:define>
                 <h:inputText id="offlineLegend" value="#{companySettingAction.instance.offlineLegend}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.offlineLegend.col']}"/>
             </s:decorate>
             <s:decorate id="invoiceAnnulDateField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.invoiceAnnulDate']}</ui:define>
                 <rich:calendar id="invoiceAnnulDate" value="#{companySettingAction.instance.invoiceAnnulDate}"
                                datePattern="#{messages['patterns.date']}"
                                enableManualInput="true"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.invoiceAnnulDate.col']}"/>
             </s:decorate>
         </app:fieldset>
         <app:fieldset id="billingUrlsFieldset" title="#{messages['CompanyConfiguration.fieldset.billingUrls']}">
             <s:decorate id="measureUnitsURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.measureUnitsURL']}</ui:define>
                 <h:inputText id="measureUnitsURL" value="#{companySettingAction.instance.measureUnitsURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.measureUnitsURL.col']}"/>
             </s:decorate>
             <s:decorate id="productsAndServicesURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.productsAndServicesURL']}</ui:define>
                 <h:inputText id="productsAndServicesURL" value="#{companySettingAction.instance.productsAndServicesURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.productsAndServicesURL.col']}"/>
             </s:decorate>
             <s:decorate id="activitiesURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.activitiesURL']}</ui:define>
                 <h:inputText id="activitiesURL" value="#{companySettingAction.instance.activitiesURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.activitiesURL.col']}"/>
             </s:decorate>
             <s:decorate id="nitVerificationURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.nitVerificationURL']}</ui:define>
                 <h:inputText id="nitVerificationURL" value="#{companySettingAction.instance.nitVerificationURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.nitVerificationURL.col']}"/>
             </s:decorate>
             <s:decorate id="validateOfflineBillPackagesURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.validateOfflineBillPackagesURL']}</ui:define>
                 <h:inputText id="validateOfflineBillPackagesURL" value="#{companySettingAction.instance.validateOfflineBillPackagesURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.validateOfflineBillPackagesURL.col']}"/>
             </s:decorate>
             <s:decorate id="processOfflineBillPackagesURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.processOfflineBillPackagesURL']}</ui:define>
                 <h:inputText id="processOfflineBillPackagesURL" value="#{companySettingAction.instance.processOfflineBillPackagesURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.processOfflineBillPackagesURL.col']}"/>
             </s:decorate>
             <s:decorate id="prepareOfflineBillPackagesURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.prepareOfflineBillPackagesURL']}</ui:define>
                 <h:inputText id="prepareOfflineBillPackagesURL" value="#{companySettingAction.instance.prepareOfflineBillPackagesURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.prepareOfflineBillPackagesURL.col']}"/>
             </s:decorate>
             <s:decorate id="onlineModeURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.onlineModeURL']}</ui:define>
                 <h:inputText id="onlineModeURL" value="#{companySettingAction.instance.onlineModeURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.onlineModeURL.col']}"/>
             </s:decorate>
             <s:decorate id="offlineModeURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.offlineModeURL']}</ui:define>
                 <h:inputText id="offlineModeURL" value="#{companySettingAction.instance.offlineModeURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.offlineModeURL.col']}"/>
             </s:decorate>
             <s:decorate id="significantEventURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.significantEventURL']}</ui:define>
                 <h:inputText id="significantEventURL" value="#{companySettingAction.instance.significantEventURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.significantEventURL.col']}"/>
             </s:decorate>
             <s:decorate id="checkBillingModeURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.checkBillingModeURL']}</ui:define>
                 <h:inputText id="checkBillingModeURL" value="#{companySettingAction.instance.checkBillingModeURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.checkBillingModeURL.col']}"/>
             </s:decorate>
             <s:decorate id="createbillURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.createbillURL']}</ui:define>
                 <h:inputText id="createbillURL" value="#{companySettingAction.instance.createbillURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.createbillURL.col']}"/>
             </s:decorate>
             <s:decorate id="cancelbillURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.cancelbillURL']}</ui:define>
                 <h:inputText id="cancelbillURL" value="#{companySettingAction.instance.cancelbillURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.cancelbillURL.col']}"/>
             </s:decorate>
             <s:decorate id="qrcodeURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.qrcodeURL']}</ui:define>
                 <h:inputText id="qrcodeURL" value="#{companySettingAction.instance.qrcodeURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.qrcodeURL.col']}"/>
             </s:decorate>
             <s:decorate id="connectionTestURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.connectionTestURL']}</ui:define>
                 <h:inputText id="connectionTestURL" value="#{companySettingAction.instance.connectionTestURL}"
-                             maxlength="300" styleClass="inputLong"/>
+                             maxlength="300" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.connectionTestURL.col']}"/>
             </s:decorate>
         </app:fieldset>
 </rich:tab>
 
-<rich:tab label="#{messages['CompanyConfiguration.tab.employees']}">
+<rich:tab label="#{companySettingErrors.isInError('employees') ? messages['CompanyConfiguration.tab.errorMarker'] : ''}#{messages['CompanyConfiguration.tab.employees']}"
+          labelClass="#{companySettingErrors.isInError('employees') ? 'tabInError' : ''}">
         <app:fieldset id="employeesFieldset" title="#{messages['CompanyConfiguration.fieldset.employees']}">
             <s:decorate id="hrsWorkingDayField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.hrsWorkingDay']}</ui:define>
@@ -997,22 +1106,27 @@
                              maxlength="20" styleClass="inputNumberMedium">
                     <app:realNumberConverter forId="hrsWorkingDay"/>
                 </h:inputText>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.hrsWorkingDay.col']}"/>
             </s:decorate>
             <s:decorate id="basicBasedChristmasPayrollField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.basicBasedChristmasPayroll']}</ui:define>
                 <h:selectBooleanCheckbox id="basicBasedChristmasPayroll" value="#{companySettingAction.instance.basicBasedChristmasPayroll}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.basicBasedChristmasPayroll.col']}"/>
             </s:decorate>
             <s:decorate id="contractModificationAuthorizationField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.contractModificationAuthorization']}</ui:define>
                 <h:selectBooleanCheckbox id="contractModificationAuthorization" value="#{companySettingAction.instance.contractModificationAuthorization}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.contractModificationAuthorization.col']}"/>
             </s:decorate>
             <s:decorate id="contractModificationCodeField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.contractModificationCode']}</ui:define>
                 <h:selectBooleanCheckbox id="contractModificationCode" value="#{companySettingAction.instance.contractModificationCode}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.contractModificationCode.col']}"/>
             </s:decorate>
             <s:decorate id="retentionForLoanAndAdvanceField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.retentionForLoanAndAdvance']}</ui:define>
                 <h:selectBooleanCheckbox id="retentionForLoanAndAdvance" value="#{companySettingAction.instance.retentionForLoanAndAdvance}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.retentionForLoanAndAdvance.col']}"/>
             </s:decorate>
             <s:decorate id="jobCategoryDLHField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.jobCategoryDLH']}</ui:define>
@@ -1021,6 +1135,7 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.jobCategoryDLH.col']}"/>
             </s:decorate>
             <s:decorate id="jobCategoryDTHField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.jobCategoryDTH']}</ui:define>
@@ -1029,6 +1144,7 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.jobCategoryDTH.col']}"/>
             </s:decorate>
             <s:decorate id="kindOfSalaryDLHField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.kindOfSalaryDLH']}</ui:define>
@@ -1037,6 +1153,7 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.kindOfSalaryDLH.col']}"/>
             </s:decorate>
             <s:decorate id="kindOfSalaryDTHField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.kindOfSalaryDTH']}</ui:define>
@@ -1045,6 +1162,7 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.kindOfSalaryDTH.col']}"/>
             </s:decorate>
             <s:decorate id="defaultProfessorsChargeField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.defaultProfessorsCharge']}</ui:define>
@@ -1053,6 +1171,7 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultProfessorsCharge.col']}"/>
             </s:decorate>
             <s:decorate id="defaultSalutationForManField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.defaultSalutationForMan']}</ui:define>
@@ -1061,6 +1180,7 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultSalutationForMan.col']}"/>
             </s:decorate>
             <s:decorate id="defaultSalutationForWomanField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.defaultSalutationForWoman']}</ui:define>
@@ -1069,6 +1189,7 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultSalutationForWoman.col']}"/>
             </s:decorate>
             <s:decorate id="defaultDocumentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.defaultDocumentType']}</ui:define>
@@ -1077,43 +1198,51 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultDocumentType.col']}"/>
             </s:decorate>
         </app:fieldset>
         <app:fieldset id="evaluationUrlsFieldset" title="#{messages['CompanyConfiguration.fieldset.evaluationUrls']}">
             <s:decorate id="scheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.scheduleEvaluationRedirectURL']}</ui:define>
                 <h:inputText id="scheduleEvaluationRedirectURL" value="#{companySettingAction.instance.scheduleEvaluationRedirectURL}"
-                             maxlength="255" styleClass="inputLong"/>
+                             maxlength="255" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.scheduleEvaluationRedirectURL.col']}"/>
             </s:decorate>
             <s:decorate id="studentScheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.studentScheduleEvaluationRedirectURL']}</ui:define>
                 <h:inputText id="studentScheduleEvaluationRedirectURL" value="#{companySettingAction.instance.studentScheduleEvaluationRedirectURL}"
-                             maxlength="255" styleClass="inputLong"/>
+                             maxlength="255" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.studentScheduleEvaluationRedirectURL.col']}"/>
             </s:decorate>
             <s:decorate id="teacherScheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.teacherScheduleEvaluationRedirectURL']}</ui:define>
                 <h:inputText id="teacherScheduleEvaluationRedirectURL" value="#{companySettingAction.instance.teacherScheduleEvaluationRedirectURL}"
-                             maxlength="255" styleClass="inputLong"/>
+                             maxlength="255" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.teacherScheduleEvaluationRedirectURL.col']}"/>
             </s:decorate>
             <s:decorate id="careerManagerScheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.careerManagerScheduleEvaluationRedirectURL']}</ui:define>
                 <h:inputText id="careerManagerScheduleEvaluationRedirectURL" value="#{companySettingAction.instance.careerManagerScheduleEvaluationRedirectURL}"
-                             maxlength="255" styleClass="inputLong"/>
+                             maxlength="255" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.careerManagerScheduleEvaluationRedirectURL.col']}"/>
             </s:decorate>
             <s:decorate id="autoEvaluationScheduleEvaluationRedirectURLField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.autoEvaluationScheduleEvaluationRedirectURL']}</ui:define>
                 <h:inputText id="autoEvaluationScheduleEvaluationRedirectURL" value="#{companySettingAction.instance.autoEvaluationScheduleEvaluationRedirectURL}"
-                             maxlength="255" styleClass="inputLong"/>
+                             maxlength="255" styleClass="input350"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.autoEvaluationScheduleEvaluationRedirectURL.col']}"/>
             </s:decorate>
         </app:fieldset>
 </rich:tab>
 
-<rich:tab label="#{messages['CompanyConfiguration.tab.users']}">
+<rich:tab label="#{companySettingErrors.isInError('users') ? messages['CompanyConfiguration.tab.errorMarker'] : ''}#{messages['CompanyConfiguration.tab.users']}"
+          labelClass="#{companySettingErrors.isInError('users') ? 'tabInError' : ''}">
         <app:fieldset id="usersFieldset" title="#{messages['CompanyConfiguration.fieldset.users']}">
             <s:decorate id="defaultSystemUserNumberField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.defaultSystemUserNumber']}</ui:define>
                 <h:inputText id="defaultSystemUserNumber" value="#{companySettingAction.instance.defaultSystemUserNumber}"
                              maxlength="4" styleClass="inputSmall"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultSystemUserNumber.col']}"/>
             </s:decorate>
             <s:div id="defaultAccountancyUserDiv">
                 <s:decorate id="defaultAccountancyUserField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -1126,6 +1255,7 @@
                                      dataModel="#{financeUserDataModel}"
                                      reRender="defaultAccountancyUserDiv"
                                      hotKeySelect="alt+2"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultAccountancyUser.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="defaultAccountancyUserProductionDiv">
@@ -1139,6 +1269,7 @@
                                      dataModel="#{financeUserDataModel}"
                                      reRender="defaultAccountancyUserProductionDiv"
                                      hotKeySelect="alt+3"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultAccountancyUserProduction.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="defaultTreasuryUserDiv">
@@ -1152,6 +1283,7 @@
                                      dataModel="#{financeUserDataModel}"
                                      reRender="defaultTreasuryUserDiv"
                                      hotKeySelect="alt+4"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultTreasuryUser.col']}"/>
                 </s:decorate>
             </s:div>
             <s:div id="defaultPayableFinanceUserDiv">
@@ -1165,27 +1297,32 @@
                                      dataModel="#{financeUserDataModel}"
                                      reRender="defaultPayableFinanceUserDiv"
                                      hotKeySelect="alt+5"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultPayableFinanceUser.col']}"/>
                 </s:decorate>
             </s:div>
             <s:decorate id="defaultPurchaseOrderRemakePaymentUserNumberField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.defaultPurchaseOrderRemakePaymentUserNumber']}</ui:define>
                 <h:inputText id="defaultPurchaseOrderRemakePaymentUserNumber" value="#{companySettingAction.instance.defaultPurchaseOrderRemakePaymentUserNumber}"
                              maxlength="4" styleClass="inputSmall"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultPurchaseOrderRemakePaymentUserNumber.col']}"/>
             </s:decorate>
             <s:decorate id="defaultPurchaseOrderRemakeYearField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.defaultPurchaseOrderRemakeYear']}</ui:define>
                 <h:inputText id="defaultPurchaseOrderRemakeYear" value="#{companySettingAction.instance.defaultPurchaseOrderRemakeYear}"
                              maxlength="20" styleClass="inputNumberMedium">
                 </h:inputText>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.defaultPurchaseOrderRemakeYear.col']}"/>
             </s:decorate>
         </app:fieldset>
 </rich:tab>
 
-<rich:tab label="#{messages['CompanyConfiguration.tab.parameters']}">
+<rich:tab label="#{companySettingErrors.isInError('parameters') ? messages['CompanyConfiguration.tab.errorMarker'] : ''}#{messages['CompanyConfiguration.tab.parameters']}"
+          labelClass="#{companySettingErrors.isInError('parameters') ? 'tabInError' : ''}">
         <app:fieldset id="parametersFieldset" title="#{messages['CompanyConfiguration.fieldset.parameters']}">
             <s:decorate id="purchaseOrderCodificationEnabledField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.purchaseOrderCodificationEnabled']}</ui:define>
                 <h:selectBooleanCheckbox id="purchaseOrderCodificationEnabled" value="#{companySettingAction.instance.purchaseOrderCodificationEnabled}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.purchaseOrderCodificationEnabled.col']}"/>
             </s:decorate>
             <s:decorate id="treasuryDocumentsAuthorizationEnabledField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.treasuryDocumentsAuthorizationEnabled']}</ui:define>
@@ -1205,6 +1342,7 @@
                              maxlength="20" styleClass="inputNumberMedium">
                     <app:realNumberConverter forId="dealerParameter"/>
                 </h:inputText>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.dealerParameter.col']}"/>
             </s:decorate>
             <s:decorate id="unitPriceMilkField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.unitPriceMilk']}</ui:define>
@@ -1220,16 +1358,19 @@
                                    noSelectionLabel="" hideNoSelectionLabel="false"/>
                     <s:convertEntity/>
                 </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.cashBoxDocumentType.col']}"/>
             </s:decorate>
             <s:decorate id="paymentDocumentOCField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.paymentDocumentOC']}</ui:define>
                 <h:inputText id="paymentDocumentOC" value="#{companySettingAction.instance.paymentDocumentOC}"
                              maxlength="5" styleClass="inputSmall"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.paymentDocumentOC.col']}"/>
             </s:decorate>
             <s:decorate id="documentFixedAssetOCField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.documentFixedAssetOC']}</ui:define>
                 <h:inputText id="documentFixedAssetOC" value="#{companySettingAction.instance.documentFixedAssetOC}"
                              maxlength="5" styleClass="inputSmall"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.documentFixedAssetOC.col']}"/>
             </s:decorate>
         </app:fieldset>
 </rich:tab>

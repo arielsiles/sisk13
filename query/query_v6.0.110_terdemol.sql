@@ -110,3 +110,32 @@ UPDATE configuracion SET ctaCostPV       = NULL WHERE ctaCostPV       = '5100080
 --   UNION ALL SELECT 'ctaCostPV', c.ctaCostPV FROM configuracion c
 --    WHERE c.ctaCostPV IS NOT NULL
 --      AND NOT EXISTS (SELECT 1 FROM arcgms a WHERE a.no_cia=c.no_cia AND a.cuenta=c.ctaCostPV);
+
+-- 5) Correccion del permiso: 3 -> 5 ------------------------------------------
+--    Los INSERT de los puntos 2 y 3 se sembraron con permiso = 3, que es
+--    VIEW(1)+CREATE(2) -- NO VIEW+UPDATE. El bitmask es VIEW=1, CREATE=2,
+--    UPDATE=4, DELETE=8, asi que VIEW+UPDATE es 5, no 3.
+--
+--    Efecto del error: el boton Guardar de la pantalla depende de
+--    s:hasPermission('COMPANYSETTING','UPDATE'), y AppIdentity evalua
+--    permissionCode == (permissionCode & asignado) -> 4 == (4 & 3) -> 4 == 0 ->
+--    false. La pantalla abria en modo consulta, sin forma de guardar. En la
+--    pantalla de Roles se ve igual: Ver y Crear con checkbox, Actualizar y
+--    Eliminar vacios.
+--
+--    Los INSERT de arriba ya quedaron corregidos a 5 para bases nuevas; estos
+--    UPDATE arreglan las bases donde el script ya se ejecuto con el valor malo.
+--    Son condicionales (AND permiso = 3), asi que en una base nueva no hacen nada.
+--
+--    Tras aplicarlos hay que CERRAR SESION y volver a entrar: el mapa de permisos
+--    se arma en el login (UserServiceBean.getPermissions).
+
+UPDATE funcionalidad SET permiso = 5 WHERE codigo = 'COMPANYSETTING' AND permiso = 3;
+UPDATE derechoacceso SET permiso = 5 WHERE idfuncionalidad = 503 AND idrol = 1 AND permiso = 3;
+
+-- Verificacion: ambas columnas deben quedar en 5.
+--   SELECT f.idfuncionalidad, f.codigo, f.permiso AS disponibles,
+--          da.idrol, da.permiso AS otorgado
+--     FROM funcionalidad f
+--     LEFT JOIN derechoacceso da ON da.idfuncionalidad = f.idfuncionalidad
+--    WHERE f.codigo = 'COMPANYSETTING';

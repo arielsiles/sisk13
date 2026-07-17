@@ -38,9 +38,19 @@
 
     <page view-id="/admin/companySetting.xhtml" login-required="true">
         <end-conversation/>
+        <!-- Al guardar se vuelve a la MISMA pantalla, no al home: es una pantalla de
+             configuracion de ~123 campos en 7 tabs, y mandar al inicio obligaba a
+             navegar de nuevo hasta aca por cada ajuste.
+             Se usa <redirect> y no un simple REDISPLAY a proposito: el redirect da
+             un limite de transaccion limpio y, combinado con el <end-conversation/>
+             de arriba, hace que companySettingAction se recree y su @Create
+             loadCompanySettings recargue la fila desde la base. Asi lo que queda en
+             pantalla es lo que realmente se guardo, no el estado en memoria.
+             Los FacesMessages de Seam sobreviven al redirect, asi que el aviso de
+             "actualizado correctamente" se sigue viendo. -->
         <navigation from-action="#{companySettingAction.saveChanges}">
             <rule if-outcome="Success">
-                <redirect view-id="/home.xhtml"/>
+                <redirect view-id="/admin/companySetting.xhtml"/>
             </rule>
         </navigation>
     </page>

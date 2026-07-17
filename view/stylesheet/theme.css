@@ -1167,3 +1167,66 @@ input[type="text"].disabledInput {
 .label-blue {
     color: #0d47a1;
 }
+/* Bloques de logo de "Preferencias de compania" */
+.logoBlock {
+    display: inline-block;
+    vertical-align: top;
+    margin: 6px 24px 12px 0;
+    padding: 10px;
+    border: 1px solid #dcdcdc;
+    background: #fbfbfb;
+    min-width: 330px;
+}
+
+.logoTitle {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.logoPreview {
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+.logoEmpty {
+    color: #888;
+    font-style: italic;
+    padding: 12px 0;
+}
+
+.logoRemove {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.logoUpload {
+    margin: 6px 0 4px 0;
+}
+
+.logoHint {
+    color: #777;
+    font-size: 0.85em;
+    max-width: 330px;
+}
+
+/* Tab con errores de validacion en "Preferencias de compania" */
+.tabInError {
+    color: #c00 !important;
+    font-weight: bold;
+}
+
+/* Ancho ampliado para cuentas y URLs en "Preferencias de compania" */
+.input350 {
+    width: 350px;
+}
+
+/* Nombre de columna a la derecha del input (texto informativo tecnico) */
+.colHint {
+    color: #999;
+    font-size: 0.85em;
+    margin-left: 8px;
+    white-space: nowrap;
+}
