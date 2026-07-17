@@ -3,6 +3,7 @@ package com.encens.khipus.model.finances;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.model.UpperCaseStringListener;
+import com.encens.khipus.exception.finances.CompanyAccountNotConfiguredException;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.common.File;
 import com.encens.khipus.model.contacts.Salutation;
@@ -17,6 +18,7 @@ import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -119,9 +121,8 @@ public class CompanyConfiguration {
     @Column(name = "url_ping")
     private String connectionTestURL;
 
-    @Column(name = "ctadiftipcam", length = 20, nullable = false)
+    @Column(name = "ctadiftipcam", length = 20)
     @Length(max = 20)
-    @NotNull
     private String balanceExchangeRateAccountCode;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -230,9 +231,8 @@ public class CompanyConfiguration {
     })
     private CashAccount averageAccount;
 
-    @Column(name = "ctaantprovme", length = 20, nullable = false)
+    @Column(name = "ctaantprovme", length = 20)
     @Length(max = 20)
-    @NotNull
     private String advancePaymentForeignCurrencyAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -242,9 +242,8 @@ public class CompanyConfiguration {
     })
     private CashAccount advancePaymentForeignCurrencyAccount;
 
-    @Column(name = "ctaantprovmn", length = 20, nullable = false)
+    @Column(name = "ctaantprovmn", length = 20)
     @Length(max = 20)
-    @NotNull
     private String advancePaymentNationalCurrencyAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -261,9 +260,8 @@ public class CompanyConfiguration {
     })
     private CashAccount depositInTransitForeignCurrencyAccount;
 
-    @Column(name = "ctadeptrame", length = 20, nullable = false)
+    @Column(name = "ctadeptrame", length = 20)
     @Length(max = 20)
-    @NotNull
     private String depositInTransitForeignCurrencyAccountCode;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -273,14 +271,12 @@ public class CompanyConfiguration {
     })
     private CashAccount depositInTransitNationalCurrencyAccount;
 
-    @Column(name = "ctadeptramn", length = 20, nullable = false)
+    @Column(name = "ctadeptramn", length = 20)
     @Length(max = 20)
-    @NotNull
     private String depositInTransitNationalCurrencyAccountCode;
 
-    @Column(name = "ctaalmme", length = 20, nullable = false)
+    @Column(name = "ctaalmme", length = 20)
     @Length(max = 20)
-    @NotNull
     private String warehouseForeignCurrencyAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -290,9 +286,8 @@ public class CompanyConfiguration {
     })
     private CashAccount warehouseForeignCurrencyAccount;
 
-    @Column(name = "ctaalmmn", length = 20, nullable = false)
+    @Column(name = "ctaalmmn", length = 20)
     @Length(max = 20)
-    @NotNull
     private String warehouseNationalCurrencyAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -302,9 +297,8 @@ public class CompanyConfiguration {
     })
     private CashAccount warehouseNationalCurrencyAccount;
 
-    @Column(name = "ctatransalmme", length = 20, nullable = false)
+    @Column(name = "ctatransalmme", length = 20)
     @Length(max = 20)
-    @NotNull
     private String warehouseForeignCurrencyTransientAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -314,9 +308,8 @@ public class CompanyConfiguration {
     })
     private CashAccount warehouseForeignCurrencyTransientAccount;
 
-    @Column(name = "ctatransalmmn", length = 20, nullable = false)
+    @Column(name = "ctatransalmmn", length = 20)
     @Length(max = 20)
-    @NotNull
     private String warehouseNationalCurrencyTransientAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -326,9 +319,8 @@ public class CompanyConfiguration {
     })
     private CashAccount warehouseNationalCurrencyTransientAccount;
 
-    @Column(name = "ctatransalm1mn", length = 20, nullable = false)
+    @Column(name = "ctatransalm1mn", length = 20)
     @Length(max = 20)
-    @NotNull
     private String warehouseNationalCurrencyTransientAccount1Code;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -338,9 +330,8 @@ public class CompanyConfiguration {
     })
     private CashAccount warehouseNationalCurrencyTransientAccount1;
 
-    @Column(name = "ctatransalm2mn", length = 20, nullable = false)
+    @Column(name = "ctatransalm2mn", length = 20)
     @Length(max = 20)
-    @NotNull
     private String warehouseNationalCurrencyTransientAccount2Code;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -357,9 +348,8 @@ public class CompanyConfiguration {
     })
     private CashAccount adjustmentForInflationAccount;
 
-    @Column(name = "ctaaitb", length = 20, nullable = false)
+    @Column(name = "ctaaitb", length = 20)
     @Length(max = 20)
-    @NotNull
     private String adjustmentForInflationAccountCode;
 
     /* account for iva fiscal credit (VAT=value-added tax) foreign currency*/
@@ -370,9 +360,8 @@ public class CompanyConfiguration {
     })
     private CashAccount foreignCurrencyVATFiscalCreditAccount;
 
-    @Column(name = "ctaivacrefime", length = 20, nullable = false)
+    @Column(name = "ctaivacrefime", length = 20)
     @Length(max = 20)
-    @NotNull
     private String foreignCurrencyVATFiscalCreditAccountCode;
 
     /* account for iva fiscal credit (VAT=value-added tax) national currency*/
@@ -383,9 +372,8 @@ public class CompanyConfiguration {
     })
     private CashAccount nationalCurrencyVATFiscalCreditAccount;
 
-    @Column(name = "ctaivacrefimn", length = 20, nullable = false)
+    @Column(name = "ctaivacrefimn", length = 20)
     @Length(max = 20)
-    @NotNull
     private String nationalCurrencyVATFiscalCreditAccountCode;
 
     /* account for iva fiscal credit (VAT=value-added tax) national currency*/
@@ -396,9 +384,8 @@ public class CompanyConfiguration {
     })
     private CashAccount nationalCurrencyVATFiscalCreditTransientAccount;
 
-    @Column(name = "ctaivacrefitrmn", length = 20, nullable = false)
+    @Column(name = "ctaivacrefitrmn", length = 20)
     @Length(max = 20)
-    @NotNull
     private String nationalCurrencyVATFiscalCreditTransientAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -408,9 +395,8 @@ public class CompanyConfiguration {
     })
     private CashAccount provisionByTangibleFixedAssetObsolescenceAccount;
 
-    @Column(name = "ctaprovobu", length = 20, nullable = false)
+    @Column(name = "ctaprovobu", length = 20)
     @Length(max = 20)
-    @NotNull
     private String provisionByTangibleFixedAssetObsolescenceAccountCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -420,9 +406,8 @@ public class CompanyConfiguration {
     })
     private CashAccount fixedAssetInTransitAccount;
 
-    @Column(name = "ctaafet", length = 20, nullable = false)
+    @Column(name = "ctaafet", length = 20)
     @Length(max = 20)
-    @NotNull
     private String fixedAssetInTransitAccountCode;
 
     @Column(name = "no_usr_sis", length = 4, nullable = false)
@@ -2422,4 +2407,388 @@ public class CompanyConfiguration {
         this.loginLogo = loginLogo;
     }
 
+    /* ===================== Cuentas requeridas ===================== */
+
+    /**
+     * Valida que una cuenta de la configuracion este realmente utilizable.
+     * Cubre los dos modos de falla que traia esta tabla, y que hasta ahora
+     * llegaban al usuario como un NullPointerException o como un
+     * EntityNotFoundException salido de un proxy de Hibernate, sin decir que
+     * cuenta faltaba:
+     * <ol>
+     * <li>la columna esta en NULL;</li>
+     * <li>la columna tiene un codigo que ya no existe en el plan de cuentas
+     * (arcgms). Como la asociacion es LAZY, ahi Hibernate devuelve un proxy y
+     * solo explota al tocarlo; por eso se fuerza la carga aca.</li>
+     * </ol>
+     */
+    private static CashAccount requireAccount(CashAccount account, String columnName, String labelKey) {
+        if (account == null) {
+            throw new CompanyAccountNotConfiguredException(columnName, labelKey);
+        }
+        try {
+            account.getAccountCode(); // fuerza la inicializacion del proxy lazy
+        } catch (EntityNotFoundException e) {
+            throw new CompanyAccountNotConfiguredException(columnName, labelKey);
+        }
+        return account;
+    }
+
+    /**
+     * @return la cuenta de la columna <code>ctadiftipcam</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireBalanceExchangeRateAccount() {
+        return requireAccount(getBalanceExchangeRateAccount(), "ctadiftipcam", "CompanyConfiguration.balanceExchangeRateAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaaitb</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAdjustmentForInflationAccount() {
+        return requireAccount(getAdjustmentForInflationAccount(), "ctaaitb", "CompanyConfiguration.adjustmentForInflationAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaantprovme</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAdvancePaymentForeignCurrencyAccount() {
+        return requireAccount(getAdvancePaymentForeignCurrencyAccount(), "ctaantprovme", "CompanyConfiguration.advancePaymentForeignCurrencyAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaantprovmn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAdvancePaymentNationalCurrencyAccount() {
+        return requireAccount(getAdvancePaymentNationalCurrencyAccount(), "ctaantprovmn", "CompanyConfiguration.advancePaymentNationalCurrencyAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctadeptrame</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireDepositInTransitForeignCurrencyAccount() {
+        return requireAccount(getDepositInTransitForeignCurrencyAccount(), "ctadeptrame", "CompanyConfiguration.depositInTransitForeignCurrencyAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctadeptramn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireDepositInTransitNationalCurrencyAccount() {
+        return requireAccount(getDepositInTransitNationalCurrencyAccount(), "ctadeptramn", "CompanyConfiguration.depositInTransitNationalCurrencyAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaafet</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireFixedAssetInTransitAccount() {
+        return requireAccount(getFixedAssetInTransitAccount(), "ctaafet", "CompanyConfiguration.fixedAssetInTransitAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaivacrefime</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireForeignCurrencyVATFiscalCreditAccount() {
+        return requireAccount(getForeignCurrencyVATFiscalCreditAccount(), "ctaivacrefime", "CompanyConfiguration.foreignCurrencyVATFiscalCreditAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaivacrefimn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireNationalCurrencyVATFiscalCreditAccount() {
+        return requireAccount(getNationalCurrencyVATFiscalCreditAccount(), "ctaivacrefimn", "CompanyConfiguration.nationalCurrencyVATFiscalCreditAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaivacrefitrmn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireNationalCurrencyVATFiscalCreditTransientAccount() {
+        return requireAccount(getNationalCurrencyVATFiscalCreditTransientAccount(), "ctaivacrefitrmn", "CompanyConfiguration.nationalCurrencyVATFiscalCreditTransientAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaprovobu</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireProvisionByTangibleFixedAssetObsolescenceAccount() {
+        return requireAccount(getProvisionByTangibleFixedAssetObsolescenceAccount(), "ctaprovobu", "CompanyConfiguration.provisionByTangibleFixedAssetObsolescenceAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaalmme</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireWarehouseForeignCurrencyAccount() {
+        return requireAccount(getWarehouseForeignCurrencyAccount(), "ctaalmme", "CompanyConfiguration.warehouseForeignCurrencyAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaalmmn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireWarehouseNationalCurrencyAccount() {
+        return requireAccount(getWarehouseNationalCurrencyAccount(), "ctaalmmn", "CompanyConfiguration.warehouseNationalCurrencyAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctatransalmme</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireWarehouseForeignCurrencyTransientAccount() {
+        return requireAccount(getWarehouseForeignCurrencyTransientAccount(), "ctatransalmme", "CompanyConfiguration.warehouseForeignCurrencyTransientAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctatransalmmn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireWarehouseNationalCurrencyTransientAccount() {
+        return requireAccount(getWarehouseNationalCurrencyTransientAccount(), "ctatransalmmn", "CompanyConfiguration.warehouseNationalCurrencyTransientAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctatransalm1mn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireWarehouseNationalCurrencyTransientAccount1() {
+        return requireAccount(getWarehouseNationalCurrencyTransientAccount1(), "ctatransalm1mn", "CompanyConfiguration.warehouseNationalCurrencyTransientAccount1");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctatransalm2mn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireWarehouseNationalCurrencyTransientAccount2() {
+        return requireAccount(getWarehouseNationalCurrencyTransientAccount2(), "ctatransalm2mn", "CompanyConfiguration.warehouseNationalCurrencyTransientAccount2");
+    }
+    /**
+     * @return la cuenta de la columna <code>iue_ret</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireIueRetention() {
+        return requireAccount(getIueRetention(), "iue_ret", "CompanyConfiguration.iueRetention");
+    }
+    /**
+     * @return la cuenta de la columna <code>it_ret</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireItRetention() {
+        return requireAccount(getItRetention(), "it_ret", "CompanyConfiguration.itRetention");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctacostpt</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireCtaCostPT() {
+        return requireAccount(getCtaCostPT(), "ctacostpt", "CompanyConfiguration.ctaCostPT");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaalmpt</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireCtaAlmPT() {
+        return requireAccount(getCtaAlmPT(), "ctaalmpt", "CompanyConfiguration.ctaAlmPT");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaalmptag</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireCtaAlmPTAG() {
+        return requireAccount(getCtaAlmPTAG(), "ctaalmptag", "CompanyConfiguration.ctaAlmPTAG");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctacostpv</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireCtaCostPV() {
+        return requireAccount(getCtaCostPV(), "ctacostpv", "CompanyConfiguration.ctaCostPV");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaalmpv</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireCtaAlmPV() {
+        return requireAccount(getCtaAlmPV(), "ctaalmpv", "CompanyConfiguration.ctaAlmPV");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaMerma</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireWasteAccount() {
+        return requireAccount(getWasteAccount(), "ctaMerma", "CompanyConfiguration.wasteAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaProm</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAverageAccount() {
+        return requireAccount(getAverageAccount(), "ctaProm", "CompanyConfiguration.averageAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctamermabaj</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireLowAccount() {
+        return requireAccount(getLowAccount(), "ctamermabaj", "CompanyConfiguration.lowAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctareproc</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireReworkAccount() {
+        return requireAccount(getReworkAccount(), "ctareproc", "CompanyConfiguration.reworkAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ct_cajaahorro</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireSavingsBankAccount() {
+        return requireAccount(getSavingsBankAccount(), "ct_cajaahorro", "CompanyConfiguration.savingsBankAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ct_cajaveter</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireVeterinaryCashAccount() {
+        return requireAccount(getVeterinaryCashAccount(), "ct_cajaveter", "CompanyConfiguration.veterinaryCashAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>cajagral1mn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireGeneralCashAccountNational() {
+        return requireAccount(getGeneralCashAccountNational(), "cajagral1mn", "CompanyConfiguration.generalCashAccountNational");
+    }
+    /**
+     * @return la cuenta de la columna <code>i_pvig_pf_mn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireFixedTermInterestNationalCurrency() {
+        return requireAccount(getFixedTermInterestNationalCurrency(), "i_pvig_pf_mn", "CompanyConfiguration.fixedTermInterestNationalCurrency");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaprovaf</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireFixedAssetProvidersAccount() {
+        return requireAccount(getFixedAssetProvidersAccount(), "ctaprovaf", "CompanyConfiguration.fixedAssetProvidersAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaG_it</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireTransactionTaxExpense() {
+        return requireAccount(getTransactionTaxExpense(), "ctaG_it", "CompanyConfiguration.transactionTaxExpense");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaP_debFisIva</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireFiscalDebitLiability() {
+        return requireAccount(getFiscalDebitLiability(), "ctaP_debFisIva", "CompanyConfiguration.fiscalDebitLiability");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaP_itxpagar</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireTransactionTaxPayable() {
+        return requireAccount(getTransactionTaxPayable(), "ctaP_itxpagar", "CompanyConfiguration.transactionTaxPayable");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaI_ventapri</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requirePrimarySaleProduct() {
+        return requireAccount(getPrimarySaleProduct(), "ctaI_ventapri", "CompanyConfiguration.primarySaleProduct");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctaI_ventasec</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireSecondarySaleProduct() {
+        return requireAccount(getSecondarySaleProduct(), "ctaI_ventasec", "CompanyConfiguration.secondarySaleProduct");
+    }
+    /**
+     * @return la cuenta de la columna <code>ctacomision</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireCommissionSalesCashAccount() {
+        return requireAccount(getCommissionSalesCashAccount(), "ctacomision", "CompanyConfiguration.commissionSalesCashAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>cxp_provmn</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountPayableSupplier() {
+        return requireAccount(getAccountPayableSupplier(), "cxp_provmn", "CompanyConfiguration.accountPayableSupplier");
+    }
+    /**
+     * @return la cuenta de la columna <code>cxp_iva</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountPayableIVA() {
+        return requireAccount(getAccountPayableIVA(), "cxp_iva", "CompanyConfiguration.accountPayableIVA");
+    }
+    /**
+     * @return la cuenta de la columna <code>cxp_regalia</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountRegalia() {
+        return requireAccount(getAccountRegalia(), "cxp_regalia", "CompanyConfiguration.accountRegalia");
+    }
+    /**
+     * @return la cuenta de la columna <code>cxp_cns</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountRetentionCNS() {
+        return requireAccount(getAccountRetentionCNS(), "cxp_cns", "CompanyConfiguration.accountRetentionCNS");
+    }
+    /**
+     * @return la cuenta de la columna <code>cta_pat01</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountBalanceSheet1() {
+        return requireAccount(getAccountBalanceSheet1(), "cta_pat01", "CompanyConfiguration.accountBalanceSheet1");
+    }
+    /**
+     * @return la cuenta de la columna <code>cta_pat02</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountBalanceSheet2() {
+        return requireAccount(getAccountBalanceSheet2(), "cta_pat02", "CompanyConfiguration.accountBalanceSheet2");
+    }
+    /**
+     * @return la cuenta de la columna <code>cta_pat03</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountBalanceSheet3() {
+        return requireAccount(getAccountBalanceSheet3(), "cta_pat03", "CompanyConfiguration.accountBalanceSheet3");
+    }
+    /**
+     * @return la cuenta de la columna <code>cta_pat04</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountBalanceSheet4() {
+        return requireAccount(getAccountBalanceSheet4(), "cta_pat04", "CompanyConfiguration.accountBalanceSheet4");
+    }
+    /**
+     * @return la cuenta de la columna <code>cta_pat05</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireAccountBalanceSheet5() {
+        return requireAccount(getAccountBalanceSheet5(), "cta_pat05", "CompanyConfiguration.accountBalanceSheet5");
+    }
+    /**
+     * @return la cuenta de la columna <code>res_perdida</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireLossCashAccount() {
+        return requireAccount(getLossCashAccount(), "res_perdida", "CompanyConfiguration.lossCashAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>res_utilidad</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireProfitCashAccount() {
+        return requireAccount(getProfitCashAccount(), "res_utilidad", "CompanyConfiguration.profitCashAccount");
+    }
+    /**
+     * @return la cuenta de la columna <code>oc_pagodefault</code>.
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireDefaultAccountPurchaseOrder() {
+        return requireAccount(getDefaultAccountPurchaseOrder(), "oc_pagodefault", "CompanyConfiguration.defaultAccountPurchaseOrder");
+    }
 }

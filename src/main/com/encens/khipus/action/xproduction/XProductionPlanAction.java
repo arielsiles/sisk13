@@ -254,7 +254,7 @@ public class XProductionPlanAction extends GenericAction<XProductionPlan> {
 
                     DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
                             production.getCode().toString(),
-                            companyConfiguration.getCtaAlmPT(),
+                            companyConfiguration.requireCtaAlmPT(),
                             productionCost,
                             BigDecimal.ZERO,
                             product.getProductItemCode(),

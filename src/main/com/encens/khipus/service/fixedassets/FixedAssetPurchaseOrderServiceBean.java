@@ -566,7 +566,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                 VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                    companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(),
                     purchaseDocument.getIva(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE);
@@ -621,7 +621,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
                     //purchaseOrder.getProvider().getPayableAccount(),
-                    companyConfiguration.getFixedAssetProvidersAccount(),
+                    companyConfiguration.requireFixedAssetProvidersAccount(),
                     totalCreditAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE,
@@ -684,14 +684,14 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getFixedAssetInTransitAccount(),
+                    companyConfiguration.requireFixedAssetInTransitAccount(),
                     BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT_COMPLEMENT),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getNationalCurrencyVATFiscalCreditTransientAccount(),
+                    companyConfiguration.requireNationalCurrencyVATFiscalCreditTransientAccount(),
                     BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -699,7 +699,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getFixedAssetInTransitAccount(),
+                    companyConfiguration.requireFixedAssetInTransitAccount(),
                     purchaseOrder.getTotalAmount(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -709,7 +709,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getAdvancePaymentNationalCurrencyAccount(),
+                    companyConfiguration.requireAdvancePaymentNationalCurrencyAccount(),
                     sumAdvancePaymentAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -730,7 +730,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -738,7 +738,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount.abs(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -792,7 +792,7 @@ public class FixedAssetPurchaseOrderServiceBean extends PurchaseOrderServiceBean
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getFixedAssetProvidersAccount(),
+                    companyConfiguration.requireFixedAssetProvidersAccount(),
                     balanceAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE,

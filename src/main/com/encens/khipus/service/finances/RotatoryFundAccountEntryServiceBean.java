@@ -110,7 +110,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
                 voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                         executorUnitCode,
                         companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                        companyConfiguration.getBalanceExchangeRateAccount(),
+                        companyConfiguration.requireBalanceExchangeRateAccount(),
                         balanceAmount,
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -118,7 +118,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                         executorUnitCode,
                         companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                        companyConfiguration.getBalanceExchangeRateAccount(),
+                        companyConfiguration.requireBalanceExchangeRateAccount(),
                         balanceAmount.abs(),
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -196,7 +196,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
                     VoucherDetailBuilder.newDebitVoucherDetail(
                             null,
                             null,
-                            companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                            companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(),
                             collectionDocument.getIva(),
                             FinancesCurrencyType.P,
                             Constants.BASE_CURRENCY_EXCHANGE_RATE)
@@ -377,7 +377,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -385,7 +385,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount.abs(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -454,7 +454,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
                 voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                         rotatoryFund.getBusinessUnit().getExecutorUnitCode(),
                         companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                        companyConfiguration.getBalanceExchangeRateAccount(),
+                        companyConfiguration.requireBalanceExchangeRateAccount(),
                         balanceAmount,
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -462,7 +462,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                         rotatoryFund.getBusinessUnit().getExecutorUnitCode(),
                         companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                        companyConfiguration.getBalanceExchangeRateAccount(),
+                        companyConfiguration.requireBalanceExchangeRateAccount(),
                         balanceAmount.abs(),
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -515,7 +515,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     rotatoryFund.getBusinessUnit().getExecutorUnitCode(),
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -523,7 +523,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     rotatoryFund.getBusinessUnit().getExecutorUnitCode(),
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount.abs(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -592,7 +592,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     rotatoryFund.getBusinessUnit().getExecutorUnitCode(),
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -600,7 +600,7 @@ public class RotatoryFundAccountEntryServiceBean extends GenericServiceBean impl
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     rotatoryFund.getBusinessUnit().getExecutorUnitCode(),
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount.abs(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));

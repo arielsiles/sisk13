@@ -110,11 +110,11 @@ public class BalanceSheet3ReportAction extends GenericReportAction {
 
         /** PATRIMONIO **/
 
-        Double capital_social       = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet1().getAccountCode()).doubleValue();
-        Double capital_aportes      = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet2().getAccountCode()).doubleValue();
-        Double capital_ajustes      = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet3().getAccountCode()).doubleValue();
-        Double capital_reservas     = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet4().getAccountCode()).doubleValue();
-        Double capital_acumulados   = voucherAccoutingService.totalCapital(start, end, companyConfiguration.getAccountBalanceSheet5().getAccountCode()).doubleValue();
+        Double capital_social       = voucherAccoutingService.totalCapital(start, end, companyConfiguration.requireAccountBalanceSheet1().getAccountCode()).doubleValue();
+        Double capital_aportes      = voucherAccoutingService.totalCapital(start, end, companyConfiguration.requireAccountBalanceSheet2().getAccountCode()).doubleValue();
+        Double capital_ajustes      = voucherAccoutingService.totalCapital(start, end, companyConfiguration.requireAccountBalanceSheet3().getAccountCode()).doubleValue();
+        Double capital_reservas     = voucherAccoutingService.totalCapital(start, end, companyConfiguration.requireAccountBalanceSheet4().getAccountCode()).doubleValue();
+        Double capital_acumulados   = voucherAccoutingService.totalCapital(start, end, companyConfiguration.requireAccountBalanceSheet5().getAccountCode()).doubleValue();
 
         Double perdidasExcedentes       = voucherAccoutingService.perdidasExcedentesPeriodo(start, end).doubleValue(); // Perdidas/Excedentes Anterior
         Double totalPerdidasExcedentes  = perdidasExcedentes + totalResults;

@@ -179,26 +179,26 @@ public class AccountingCreditSaleAction extends GenericAction {
                 cashBox.getType().getCashAccountReceivable(), receivableValue, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail debitCommision = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                companyConfiguration.getCommissionSalesCashAccount(), netCommissionValue, FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.requireCommissionSalesCashAccount(), netCommissionValue, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail debitFiscalCreditIVACommision = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(), discountIVA, FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(), discountIVA, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail debitTaxTransaction = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                companyConfiguration.getNationalCurrencyVATFiscalCreditTransientAccount(), itTaxValue, FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.requireNationalCurrencyVATFiscalCreditTransientAccount(), itTaxValue, FinancesCurrencyType.D, BigDecimal.ONE);
 
         /** Credits **/
         VoucherDetail creditPrimarySaleProduct = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
                 cashBox.getType().getCashAccountIncome(), saleProductTotal, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail creditDebitFiscal = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                companyConfiguration.getFiscalDebitLiability(), debFiscalValue, FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.requireFiscalDebitLiability(), debFiscalValue, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail creditItTaxForPaying = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                companyConfiguration.getTransactionTaxPayable(), itTaxValue, FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.requireTransactionTaxPayable(), itTaxValue, FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail creditFiscalCreditIVACommision = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(), discountIVA, FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(), discountIVA, FinancesCurrencyType.D, BigDecimal.ONE);
 
 
         debitReceivable.setClient(customerOrder.getClient());
@@ -245,14 +245,14 @@ public class AccountingCreditSaleAction extends GenericAction {
                 cashBox.getType().getCashAccountReceivable(), BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail debitTransactionTax = VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                companyConfiguration.getTransactionTaxExpense(),
+                companyConfiguration.requireTransactionTaxExpense(),
                 BigDecimalUtil.multiply(BigDecimalUtil.toBigDecimal(customerOrder.getTotalAmount()), Constants.IT_RETENTION_B), FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail creditTransactionTax = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                companyConfiguration.getTransactionTaxPayable(), debitTransactionTax.getDebit(), FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.requireTransactionTaxPayable(), debitTransactionTax.getDebit(), FinancesCurrencyType.D, BigDecimal.ONE);
 
         VoucherDetail creditFiscalDebitIVA = VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                companyConfiguration.getFiscalDebitLiability(), BigDecimalUtil.toBigDecimal(customerOrder.getTax()), FinancesCurrencyType.D, BigDecimal.ONE);
+                companyConfiguration.requireFiscalDebitLiability(), BigDecimalUtil.toBigDecimal(customerOrder.getTax()), FinancesCurrencyType.D, BigDecimal.ONE);
 
         BigDecimal amount = BigDecimalUtil.sum(debitReceivable.getDebit(), debitTransactionTax.getDebit());
         amount = BigDecimalUtil.subtract(amount, creditTransactionTax.getCredit(), creditFiscalDebitIVA.getCredit());

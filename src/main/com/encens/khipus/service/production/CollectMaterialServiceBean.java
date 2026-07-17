@@ -153,13 +153,13 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             /** CF **/
             if (colMat.getHasInvoice()){
                 VoucherDetail voucherDetailCF = VoucherDetailBuilder.newDebitVoucherDetail(
-                        null, null, companyConfiguration.getAccountPayableIVA(), taxCreditFiscal, FinancesCurrencyType.P, BigDecimal.ONE);
+                        null, null, companyConfiguration.requireAccountPayableIVA(), taxCreditFiscal, FinancesCurrencyType.P, BigDecimal.ONE);
                 voucher.getDetails().add(voucherDetailCF);
             }
 
             /** --Haber-- **/
             VoucherDetail supplierAccountOutput = VoucherDetailBuilder.newCreditVoucherDetail(
-                    null, null, companyConfiguration.getAccountPayableSupplier(), BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE);
+                    null, null, companyConfiguration.requireAccountPayableSupplier(), BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE);
 
 
             supplierAccountOutput.setProviderCode(financesEntity.getId().toString());
@@ -170,7 +170,7 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             if (colMat.getHasInvoice()) {
                 regaliaValue = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(colMat.getMetaProduct().getRegalia(), BigDecimalUtil.ONE_HUNDRED));
                 VoucherDetail regaliaAccount = VoucherDetailBuilder.newCreditVoucherDetail(
-                        null, null, companyConfiguration.getAccountRegalia(), regaliaValue, FinancesCurrencyType.P, BigDecimal.ONE);
+                        null, null, companyConfiguration.requireAccountRegalia(), regaliaValue, FinancesCurrencyType.P, BigDecimal.ONE);
                 supplierDetailCashAcounts.add(regaliaAccount);
             }
 
@@ -179,7 +179,7 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             if (!colMat.getProductiveZone().getHasCNS()){
                 retentionCNSValue = BigDecimalUtil.multiply(totalAmount, companyConfiguration.getRetentionCNSValue());
                 VoucherDetail retentionCNSAccount = VoucherDetailBuilder.newCreditVoucherDetail(
-                        null, null, companyConfiguration.getAccountRetentionCNS(), retentionCNSValue, FinancesCurrencyType.P, BigDecimal.ONE);
+                        null, null, companyConfiguration.requireAccountRetentionCNS(), retentionCNSValue, FinancesCurrencyType.P, BigDecimal.ONE);
                 supplierDetailCashAcounts.add(retentionCNSAccount);
             }
 
@@ -245,13 +245,13 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             // CF
             if (colMat.getHasInvoice()){
                 VoucherDetail voucherDetailCF = VoucherDetailBuilder.newDebitVoucherDetail(
-                        null, null, companyConfiguration.getAccountPayableIVA(), taxCreditFiscal, FinancesCurrencyType.P, BigDecimal.ONE);
+                        null, null, companyConfiguration.requireAccountPayableIVA(), taxCreditFiscal, FinancesCurrencyType.P, BigDecimal.ONE);
                 voucher.getDetails().add(voucherDetailCF);
             }
 
             // --Haber--
             VoucherDetail supplierAccountOutput = VoucherDetailBuilder.newCreditVoucherDetail(
-                    null, null, companyConfiguration.getAccountPayableSupplier(), BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE);
+                    null, null, companyConfiguration.requireAccountPayableSupplier(), BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE);
 
 
             supplierAccountOutput.setProviderCode(financesEntity.getId().toString());
@@ -262,7 +262,7 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             if (colMat.getHasInvoice()) {
                 regaliaValue = BigDecimalUtil.multiply(totalAmount, BigDecimalUtil.divide(colMat.getMetaProduct().getRegalia(), BigDecimalUtil.ONE_HUNDRED));
                 VoucherDetail regaliaAccount = VoucherDetailBuilder.newCreditVoucherDetail(
-                        null, null, companyConfiguration.getAccountRegalia(), regaliaValue, FinancesCurrencyType.P, BigDecimal.ONE);
+                        null, null, companyConfiguration.requireAccountRegalia(), regaliaValue, FinancesCurrencyType.P, BigDecimal.ONE);
                 supplierDetailCashAcounts.add(regaliaAccount);
             }
 
@@ -271,7 +271,7 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             if (!colMat.getProductiveZone().getHasCNS()){
                 retentionCNSValue = BigDecimalUtil.multiply(totalAmount, companyConfiguration.getRetentionCNSValue());
                 VoucherDetail retentionCNSAccount = VoucherDetailBuilder.newCreditVoucherDetail(
-                        null, null, companyConfiguration.getAccountRetentionCNS(), retentionCNSValue, FinancesCurrencyType.P, BigDecimal.ONE);
+                        null, null, companyConfiguration.requireAccountRetentionCNS(), retentionCNSValue, FinancesCurrencyType.P, BigDecimal.ONE);
                 supplierDetailCashAcounts.add(retentionCNSAccount);
             }
 

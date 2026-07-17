@@ -314,7 +314,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             em.joinTransaction();
 
             CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-            CashAccount adjustmentForInflationCashAccount = companyConfiguration.getAdjustmentForInflationAccount();
+            CashAccount adjustmentForInflationCashAccount = companyConfiguration.requireAdjustmentForInflationAccount();
             /*depreciate*/
             if (actualFixedAssetList != null && actualFixedAssetList.size() > 0) {
                 /* set 30 seconds per actual fixed Asset*/
@@ -828,7 +828,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
             em.joinTransaction();
 
             CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-            CashAccount provisionByTangibleFixedAssetObsolescenceCashAccount = companyConfiguration.getProvisionByTangibleFixedAssetObsolescenceAccount();
+            CashAccount provisionByTangibleFixedAssetObsolescenceCashAccount = companyConfiguration.requireProvisionByTangibleFixedAssetObsolescenceAccount();
             fixedAsset.setState(FixedAssetState.BAJ);
             fixedAsset.setEndDate(new Date());
             getEntityManager().merge(fixedAsset);
@@ -1404,7 +1404,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                 voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                         executorUnitCode,
                         companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                        companyConfiguration.getBalanceExchangeRateAccount(),
+                        companyConfiguration.requireBalanceExchangeRateAccount(),
                         balanceAmount,
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -1412,7 +1412,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                         executorUnitCode,
                         companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                        companyConfiguration.getBalanceExchangeRateAccount(),
+                        companyConfiguration.requireBalanceExchangeRateAccount(),
                         balanceAmount.abs(),
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -1497,7 +1497,7 @@ public class FixedAssetServiceBean extends GenericServiceBean implements FixedAs
         voucherForGeneration.addVoucherDetail(
                 VoucherDetailBuilder.newCreditVoucherDetail(
                         fixedAsset.getBusinessUnit().getExecutorUnitCode(), fixedAsset.getCostCenterCode(),
-                        companyConfiguration.getFixedAssetInTransitAccount(),
+                        companyConfiguration.requireFixedAssetInTransitAccount(),
                         fixedAsset.getBsOriginalValue(), FinancesCurrencyType.P, BigDecimal.ONE));
         //voucherService.create(voucherForGeneration);
         voucherAccoutingService.saveVoucher(voucherForGeneration);

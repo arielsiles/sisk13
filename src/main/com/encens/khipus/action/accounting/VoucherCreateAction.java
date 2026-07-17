@@ -324,14 +324,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             VoucherDetail voucherDetail = new VoucherDetail();
             voucherDetail.setDebit(BigDecimalUtil.subtract(totalDebit, totalCredit, 2));
             voucherDetail.setCredit(BigDecimal.ZERO);
-            voucherDetail.setAccount(companyConfiguration.getLossCashAccount().getAccountCode());
+            voucherDetail.setAccount(companyConfiguration.requireLossCashAccount().getAccountCode());
             voucher.getDetails().add(voucherDetail);
         }
         if (totalCredit.compareTo(totalDebit) > 0){ /** Utilidades **/
             VoucherDetail voucherDetail = new VoucherDetail();
             voucherDetail.setDebit(BigDecimal.ZERO);
             voucherDetail.setCredit(BigDecimalUtil.subtract(totalCredit, totalDebit, 2));
-            voucherDetail.setAccount(companyConfiguration.getProfitCashAccount().getAccountCode());
+            voucherDetail.setAccount(companyConfiguration.requireProfitCashAccount().getAccountCode());
 
             voucher.getDetails().add(voucherDetail);
         }

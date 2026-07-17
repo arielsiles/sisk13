@@ -55,3 +55,58 @@ insert into funcionalidad values (503, 'COMPANYSETTING', 'Preferencias de compan
 
 insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo)
 values (503, 1, 5, 1, 2);
+
+-- 4) Limpiar cuentas contables colgadas --------------------------------------
+--    Estas 4 columnas apuntan a cuentas que NO existen en el plan de cuentas
+--    (arcgms). Verificado sobre terdemol:
+--
+--      ctaivacrefitrmn = 5340120000  -> no existe
+--      ctaG_it         = 5340130000  -> no existe
+--      ctaCostPT       = 5100080100  -> no existe
+--      ctaCostPV       = 5100080100  -> no existe
+--
+--    En la familia 53401* existen 5340100000/5340100100/5340110000/5340110100 y
+--    luego salta a 5340140000: las cuentas ...12... y ...13... fueron eliminadas
+--    o renumeradas del plan y nadie actualizo configuracion. De 5100080* no
+--    existe ninguna.
+--
+--    Como la asociacion es @ManyToOne LAZY, Hibernate devolvia un proxy y recien
+--    explotaba al tocarlo, con un EntityNotFoundException que no decia que cuenta
+--    era. Eso rompia /admin/companySetting.xhtml al renderizar y, mas grave,
+--    tambien los flujos contables que las consumen:
+--      VoucherAccoutingServiceBean (costo de ventas), AccountingCreditSaleAction,
+--      FinanceAccountingDocumentServiceBean, FixedAssetPurchaseOrderServiceBean,
+--      WarehouseAccountEntryServiceBean.
+--
+--    Se dejan en NULL: es un valor honesto ("no configurado") en vez de un codigo
+--    que miente. A partir de ahora, cualquier flujo que necesite una de estas
+--    cuentas y la encuentre en NULL (o apuntando a una cuenta inexistente) corta
+--    con CompanyAccountNotConfiguredException, y la pantalla muestra que columna
+--    exacta hay que configurar en Preferencias de compania, en vez de un
+--    NullPointerException.
+--
+--    Para dejarlas operativas hay que cargarles la cuenta correcta desde
+--    Administracion > Preferencias de compania > Cuentas contables.
+--
+--    NOTA: se quito @NotNull/nullable=false de los 17 codigos de cuenta de la
+--    entidad para que NULL sea un estado valido y guardable (ctaivacrefitrmn era
+--    uno de ellos: sin ese cambio la pantalla no habria podido guardar).
+
+UPDATE configuracion SET ctaivacrefitrmn = NULL WHERE ctaivacrefitrmn = '5340120000';
+UPDATE configuracion SET ctaG_it         = NULL WHERE ctaG_it         = '5340130000';
+UPDATE configuracion SET ctaCostPT       = NULL WHERE ctaCostPT       = '5100080100';
+UPDATE configuracion SET ctaCostPV       = NULL WHERE ctaCostPV       = '5100080100';
+
+-- Verificacion: no debe devolver ninguna fila.
+--   SELECT 'ctaivacrefitrmn' col, c.ctaivacrefitrmn val FROM configuracion c
+--    WHERE c.ctaivacrefitrmn IS NOT NULL
+--      AND NOT EXISTS (SELECT 1 FROM arcgms a WHERE a.no_cia=c.no_cia AND a.cuenta=c.ctaivacrefitrmn)
+--   UNION ALL SELECT 'ctaG_it', c.ctaG_it FROM configuracion c
+--    WHERE c.ctaG_it IS NOT NULL
+--      AND NOT EXISTS (SELECT 1 FROM arcgms a WHERE a.no_cia=c.no_cia AND a.cuenta=c.ctaG_it)
+--   UNION ALL SELECT 'ctaCostPT', c.ctaCostPT FROM configuracion c
+--    WHERE c.ctaCostPT IS NOT NULL
+--      AND NOT EXISTS (SELECT 1 FROM arcgms a WHERE a.no_cia=c.no_cia AND a.cuenta=c.ctaCostPT)
+--   UNION ALL SELECT 'ctaCostPV', c.ctaCostPV FROM configuracion c
+--    WHERE c.ctaCostPV IS NOT NULL
+--      AND NOT EXISTS (SELECT 1 FROM arcgms a WHERE a.no_cia=c.no_cia AND a.cuenta=c.ctaCostPV);

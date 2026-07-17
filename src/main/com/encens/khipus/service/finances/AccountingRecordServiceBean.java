@@ -258,7 +258,7 @@ public class AccountingRecordServiceBean implements AccountingRecordService {
         if (AccountingRecordResult.SUCCESS.equals(accountingRecordResult)) {
             try {
                 CompanyConfiguration companyConfiguration = genericService.findById(CompanyConfiguration.class, Constants.defaultCompanyNumber);
-                CashAccount balanceExchangeRateAccount = companyConfiguration.getBalanceExchangeRateAccount();
+                CashAccount balanceExchangeRateAccount = companyConfiguration.requireBalanceExchangeRateAccount();
                 CostCenter balanceExchangeRateCostCenter = companyConfiguration.getExchangeRateBalanceCostCenter();
 
                 userTransaction.setTransactionTimeout(payrollGenerationIdList.size() * 60);

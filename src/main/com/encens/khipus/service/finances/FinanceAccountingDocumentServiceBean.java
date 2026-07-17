@@ -129,7 +129,7 @@ public class FinanceAccountingDocumentServiceBean extends GenericServiceBean imp
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                         purchaseOrder.getExecutorUnit().getExecutorUnitCode(),
                         purchaseOrder.getCostCenterCode(),
-                        companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                        companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(),
                         amount,
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -137,7 +137,7 @@ public class FinanceAccountingDocumentServiceBean extends GenericServiceBean imp
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     purchaseOrder.getExecutorUnit().getExecutorUnitCode(),
                     purchaseOrder.getCostCenterCode(),
-                    companyConfiguration.getNationalCurrencyVATFiscalCreditTransientAccount(),
+                    companyConfiguration.requireNationalCurrencyVATFiscalCreditTransientAccount(),
                     amount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));

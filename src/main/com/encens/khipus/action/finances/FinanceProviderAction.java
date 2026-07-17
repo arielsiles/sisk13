@@ -81,7 +81,7 @@ public class FinanceProviderAction extends GenericAction<Provider> {
         if (validate(getInstance())) {
             try {
                 CompanyConfiguration companyConfiguration = getCompanyConfiguration();
-                getInstance().setPayableAccountCode(companyConfiguration.getAccountPayableSupplier().getAccountCode());
+                getInstance().setPayableAccountCode(companyConfiguration.requireAccountPayableSupplier().getAccountCode());
                 financeProviderService.createProvider(getInstance(), findModuleProviderType());
                 elEvaluator.evaluateMethodBinding(getPostCreateAction());
                 Manager.instance().endConversation(true);

@@ -107,8 +107,8 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             HashMap<String, BigDecimal> unitCostMilkProducts = voucherAccoutingService.getUnitCost_milkProducts(startDate, endDate);
             CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
 
-            String ctaAlmPT   = companyConfiguration.getCtaAlmPT().getAccountCode();
-            String ctaAlmPTAG = companyConfiguration.getCtaAlmPTAG().getAccountCode();
+            String ctaAlmPT   = companyConfiguration.requireCtaAlmPT().getAccountCode();
+            String ctaAlmPTAG = companyConfiguration.requireCtaAlmPTAG().getAccountCode();
 
             Voucher voucher = new Voucher();
             voucher.setDate(endDate);
@@ -205,7 +205,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
         voucher.setDocumentType(Constants.SA_VOUCHER_DOCTYPE);
         voucher.setGloss("BAJA DE PRODUCTO, " + warehouseVoucher.getInventoryMovementList().get(0).getDescription());
 
-        VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getLowAccount().getAccountCode(), BigDecimal.ZERO, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,null, null);
+        VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.requireLowAccount().getAccountCode(), BigDecimal.ZERO, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,null, null);
         voucher.getDetails().add(voucherDetailDebit);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -327,7 +327,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
                         BigDecimal unitCost = unitCostMilkProducts.get(movementDetail.getProductItemCode());
                         BigDecimal amount = BigDecimalUtil.multiply(movementDetail.getQuantity(), unitCost, 2);
 
-                        VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+                        VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.requireCtaAlmPT().getAccountCode(),
                                 BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE, movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
                         voucher.getDetails().add(voucherDetailCredit);
@@ -340,7 +340,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
                         BigDecimal unitCost = unitCostMilkProducts.get(articleCode);
                         BigDecimal amount = BigDecimalUtil.multiply(quantity, unitCost, 2);
 
-                        VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+                        VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.requireCtaAlmPT().getAccountCode(),
                                 amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
                                 movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
@@ -379,7 +379,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
                                                             amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
                                                             null, null);
 
-            VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+            VoucherDetail voucherDetailCredit = new VoucherDetail(companyConfiguration.requireCtaAlmPT().getAccountCode(),
                     BigDecimal.ZERO, amount, FinancesCurrencyType.P, BigDecimal.ONE,
                     movementDetail.getProductItemCode(), movementDetail.getQuantity());
 
@@ -394,7 +394,7 @@ public class WarehouseVoucherAction extends GenericAction<WarehouseVoucher> {
             //System.out.println("=====> origVoucher: " + origVoucher.getId() + " - " + origVoucher.getDocumentType() + "-" + origVoucher.getDocumentNumber() + " - " + origVoucher.getDetails().size());
             BigDecimal amount = origVoucher.getDetails().get(0).getDebit();
 
-            VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.getCtaAlmPT().getAccountCode(),
+            VoucherDetail voucherDetailDebit = new VoucherDetail(companyConfiguration.requireCtaAlmPT().getAccountCode(),
                     amount, BigDecimal.ZERO, FinancesCurrencyType.P, BigDecimal.ONE,
                     movementDetail.getProductItemCode(), movementDetail.getQuantity());
 

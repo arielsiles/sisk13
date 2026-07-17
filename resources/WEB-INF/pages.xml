@@ -93,4 +93,15 @@
         </redirect>
     </exception>
 
+    <!-- Cuenta contable de la tabla configuracion sin configurar (NULL o apuntando
+         a una cuenta inexistente). El mensaje nombra la columna concreta que hay
+         que cargar en Preferencias de compania; sin esto el usuario solo veia un
+         NullPointerException o un EntityNotFoundException de un proxy de Hibernate. -->
+    <exception class="com.encens.khipus.exception.finances.CompanyAccountNotConfiguredException">
+        <end-conversation/>
+        <redirect view-id="/error/exception.xhtml">
+            <message severity="error">#{companyAccountNotConfiguredMessage.getMessage(org.jboss.seam.caughtException)}</message>
+        </redirect>
+    </exception>
+
 </pages>

@@ -1374,7 +1374,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         VoucherDetail voucherDebit = new VoucherDetail();
         voucher.addVoucherDetail(voucherDebit);
-        voucherDebit.setAccount(companyConfiguration.getCtaCostPV().getAccountCode());
+        voucherDebit.setAccount(companyConfiguration.requireCtaCostPV().getAccountCode());
         voucherDebit.setDebit(totalCost);
         voucherDebit.setCredit(BigDecimal.ZERO);
         voucherDebit.setCurrency(FinancesCurrencyType.P);
@@ -1397,7 +1397,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                     totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
 
                     VoucherDetail voucherCredit = new VoucherDetail();
-                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPV().getAccountCode());
+                    voucherCredit.setAccount(companyConfiguration.requireCtaAlmPV().getAccountCode());
                     voucherCredit.setDebit(BigDecimal.ZERO);
                     voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
 
@@ -1439,7 +1439,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         }
         System.out.println("----------END SALES---------");
 
-        createVoucherDetailForCostOfSales(sales, voucher, companyConfiguration.getCtaCostPT().getAccountCode(), startDate, endDate);
+        createVoucherDetailForCostOfSales(sales, voucher, companyConfiguration.requireCtaCostPT().getAccountCode(), startDate, endDate);
 
 
     }
@@ -1534,7 +1534,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                     BigDecimal cost = BigDecimalUtil.multiply(quantity, unitCost, 6);
                     System.out.println("=============Create-CV=============> COD_ART: " + codArt + " - unitCost: " + unitCost + " - Cost: " + cost);
                     VoucherDetail voucherCredit = new VoucherDetail();
-                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPT().getAccountCode());
+                    voucherCredit.setAccount(companyConfiguration.requireCtaAlmPT().getAccountCode());
                     voucherCredit.setDebit(BigDecimal.ZERO);
                     voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
                     voucherCredit.setProductItemCode(codArt);
@@ -1630,7 +1630,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         VoucherDetail voucherDebit = new VoucherDetail();
         voucher.addVoucherDetail(voucherDebit);
-        voucherDebit.setAccount(companyConfiguration.getCtaCostPV().getAccountCode());
+        voucherDebit.setAccount(companyConfiguration.requireCtaCostPV().getAccountCode());
         voucherDebit.setDebit(totalCost);
         voucherDebit.setCredit(BigDecimal.ZERO);
         voucherDebit.setCurrency(FinancesCurrencyType.P);
@@ -1653,7 +1653,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                     totalCost = BigDecimalUtil.sum(totalCost, cost, 2);
 
                     VoucherDetail voucherCredit = new VoucherDetail();
-                    voucherCredit.setAccount(companyConfiguration.getCtaAlmPV().getAccountCode());
+                    voucherCredit.setAccount(companyConfiguration.requireCtaAlmPV().getAccountCode());
                     voucherCredit.setDebit(BigDecimal.ZERO);
                     voucherCredit.setCredit(BigDecimalUtil.roundBigDecimal(cost,2));
 
@@ -1893,8 +1893,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
 
         /** DAIRY_PRODUCT **/
-        CashAccount ctaCost = companyConfiguration.getCtaCostPT();
-        CashAccount ctaAlm  = companyConfiguration.getCtaAlmPT();
+        CashAccount ctaCost = companyConfiguration.requireCtaCostPT();
+        CashAccount ctaAlm  = companyConfiguration.requireCtaAlmPT();
         String produtTypeMessage = MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey());
 
         try {
@@ -1907,8 +1907,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }
 
             if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
-                ctaCost = companyConfiguration.getCtaCostPV();
-                ctaAlm  = companyConfiguration.getCtaAlmPV();
+                ctaCost = companyConfiguration.requireCtaCostPV();
+                ctaAlm  = companyConfiguration.requireCtaAlmPV();
                 sales = em.createNamedQuery("VentaDirecta.findByDatesForCostsVet")
                         .setParameter("startDate", startDate)
                         .setParameter("endDate", endDate)
@@ -1952,8 +1952,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
 
         /** DAIRY_PRODUCT **/
-        CashAccount ctaCost = companyConfiguration.getCtaCostPT();
-        CashAccount ctaAlm  = companyConfiguration.getCtaAlmPT();
+        CashAccount ctaCost = companyConfiguration.requireCtaCostPT();
+        CashAccount ctaAlm  = companyConfiguration.requireCtaAlmPT();
         String produtTypeMessage = MessageUtils.getMessage(ProductSaleType.DAIRY_PRODUCT.getResourceKey());
 
         List<Object[]> salesList = new ArrayList<Object[]>();
@@ -1975,8 +1975,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }
 
             if (ProductSaleType.VETERINARY_PRODUCT.equals(productSaleType)){
-                ctaCost = companyConfiguration.getCtaCostPV();
-                ctaAlm  = companyConfiguration.getCtaAlmPV();
+                ctaCost = companyConfiguration.requireCtaCostPV();
+                ctaAlm  = companyConfiguration.requireCtaAlmPV();
 
                 salesList = em.createNativeQuery("select a.cod_art, sum(a.cantidad), (sum(a.cantidad) * a.cu) " +
                         "from articulos_pedido a " +
@@ -2137,13 +2137,13 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             Double amount2 = calculateCashTransferAmountFromCustomerOrder(iDate.getCurrent(), iDate.getCurrent());
             if (amount > 0){
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                        companyConfiguration.getSavingsBankAccount(),
+                        companyConfiguration.requireSavingsBankAccount(),
                         BigDecimalUtil.toBigDecimal(amount),
                         FinancesCurrencyType.P, null));
             }
             if (amount2 > 0){
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                        companyConfiguration.getSavingsBankAccount(),
+                        companyConfiguration.requireSavingsBankAccount(),
                         BigDecimalUtil.toBigDecimal(amount2),
                         FinancesCurrencyType.P, null));
             }
@@ -2151,7 +2151,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         }
 
         voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                companyConfiguration.getVeterinaryCashAccount(),
+                companyConfiguration.requireVeterinaryCashAccount(),
                 BigDecimalUtil.toBigDecimal(transferAmount),
                 FinancesCurrencyType.P, null));
 
@@ -2175,12 +2175,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             voucher.setDocumentType(Constants.CT_VOUCHER_DOCTYPE);
 
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(null, null,
-                    companyConfiguration.getSavingsBankAccount(),
+                    companyConfiguration.requireSavingsBankAccount(),
                     BigDecimalUtil.toBigDecimal(transferAmount),
                     FinancesCurrencyType.P, null));
 
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(null, null,
-                    companyConfiguration.getVeterinaryCashAccount(),
+                    companyConfiguration.requireVeterinaryCashAccount(),
                     BigDecimalUtil.toBigDecimal(transferAmount),
                     FinancesCurrencyType.P, null));
 

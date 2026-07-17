@@ -99,8 +99,8 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         CashAccount payCashAccount = null;
         if (PurchaseOrderPaymentKind.ADVANCE_PAYMENT.equals(purchaseOrderPayment.getPurchaseOrderPaymentKind())) {
             payCashAccount = FinancesCurrencyType.D.equals(purchaseOrderPayment.getPayCurrency()) ?
-                                companyConfiguration.getAdvancePaymentForeignCurrencyAccount() :
-                                companyConfiguration.getAdvancePaymentNationalCurrencyAccount();
+                                companyConfiguration.requireAdvancePaymentForeignCurrencyAccount() :
+                                companyConfiguration.requireAdvancePaymentNationalCurrencyAccount();
         } else
             if (PurchaseOrderPaymentKind.LIQUIDATION_PAYMENT.equals(purchaseOrderPayment.getPurchaseOrderPaymentKind())) {
                 payCashAccount = purchaseOrderPayment.getPurchaseOrder().getProvider().getPayableAccount();
@@ -231,7 +231,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                         executorUnitCode,
                         companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                        companyConfiguration.getBalanceExchangeRateAccount(),
+                        companyConfiguration.requireBalanceExchangeRateAccount(),
                         balanceAmount,
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -240,7 +240,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                            companyConfiguration.getBalanceExchangeRateAccount(),
+                            companyConfiguration.requireBalanceExchangeRateAccount(),
                             balanceAmount.abs(),
                             FinancesCurrencyType.P,
                             BigDecimal.ONE));
@@ -297,14 +297,14 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                    companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                     BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT_COMPLEMENT),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getNationalCurrencyVATFiscalCreditTransientAccount(),
+                    companyConfiguration.requireNationalCurrencyVATFiscalCreditTransientAccount(),
                     BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -312,7 +312,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                    companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                     purchaseOrder.getTotalAmount(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -324,7 +324,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getAdvancePaymentNationalCurrencyAccount(),
+                    companyConfiguration.requireAdvancePaymentNationalCurrencyAccount(),
                     sumAdvancePaymentAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -348,7 +348,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -356,7 +356,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount.abs(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -401,14 +401,14 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                         executorUnitCode,
                         costCenterCode,
-                        companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                        companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                         BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT_COMPLEMENT),
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
                 voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                         executorUnitCode,
                         costCenterCode,
-                        companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                        companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(),
                         BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT),
                         FinancesCurrencyType.P,
                         BigDecimal.ONE));
@@ -416,14 +416,14 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                    companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                     BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT_COMPLEMENT),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getNationalCurrencyVATFiscalCreditTransientAccount(),
+                    companyConfiguration.requireNationalCurrencyVATFiscalCreditTransientAccount(),
                     BigDecimalUtil.multiply(purchaseOrder.getTotalAmount(), Constants.VAT),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -432,7 +432,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                    companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                     purchaseOrder.getTotalAmount(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -444,7 +444,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnitCode,
                     costCenterCode,
-                    companyConfiguration.getAdvancePaymentNationalCurrencyAccount(),
+                    companyConfiguration.requireAdvancePaymentNationalCurrencyAccount(),
                     sumAdvancePaymentAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -482,7 +482,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount,
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -490,7 +490,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                     executorUnitCode,
                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                    companyConfiguration.getBalanceExchangeRateAccount(),
+                    companyConfiguration.requireBalanceExchangeRateAccount(),
                     balanceAmount.abs(),
                     FinancesCurrencyType.P,
                     BigDecimal.ONE));
@@ -550,7 +550,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                         VoucherDetail voucherDetail = VoucherDetailBuilder.newDebitVoucherDetail(
                                 executorUnitCode,
                                 costCenterCode,
-                                companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                                companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(),
                                 purchaseDocument.getIva(),
                                 FinancesCurrencyType.P,
                                 BigDecimal.ONE);
@@ -586,12 +586,12 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                 voucherDetail = VoucherDetailBuilder.newCreditVoucherDetail(
                         executorUnitCode,
                         costCenterCode,
-                        companyConfiguration.getDefaultAccountPurchaseOrder(),
+                        companyConfiguration.requireDefaultAccountPurchaseOrder(),
                         totalCreditAmount,
                         purchaseOrder.getProvider().getPayableAccount().getCurrency(),
                         financesExchangeRateService.getExchangeRateByCurrencyType(purchaseOrder.getProvider().getPayableAccount().getCurrency(), BigDecimal.ONE));
 
-                purchaseOrderPayment.setCashBoxCashAccount(companyConfiguration.getGeneralCashAccountNational());
+                purchaseOrderPayment.setCashBoxCashAccount(companyConfiguration.requireGeneralCashAccountNational());
                 purchaseOrderPayment.setSourceAmount(totalCreditAmount);
                 purchaseOrderPayment.setPayAmount(totalCreditAmount);
                 purchaseOrderPayment.setBeneficiaryName(purchaseOrder.getProvider().getEntity().getAcronym());
@@ -823,7 +823,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                            companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                             voucherAmountNationalAmount,
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -837,7 +837,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getIueRetention(),
+                            companyConfiguration.requireIueRetention(),
                             BigDecimalUtil.toBigDecimal(iueRetention),
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -847,7 +847,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getItRetention(),
+                            companyConfiguration.requireItRetention(),
                             BigDecimalUtil.toBigDecimal(itRetention),
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -873,7 +873,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                            companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                             BigDecimalUtil.toBigDecimal(goodsTansitValue),
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -883,7 +883,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                            companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(),
                             BigDecimalUtil.toBigDecimal(fiscalCreditIVA),
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -948,7 +948,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                             executorUnitCode,
                             companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                            companyConfiguration.getBalanceExchangeRateAccount(),
+                            companyConfiguration.requireBalanceExchangeRateAccount(),
                             balanceAmount,
                             FinancesCurrencyType.P,
                             BigDecimal.ONE));
@@ -956,7 +956,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                            companyConfiguration.getBalanceExchangeRateAccount(),
+                            companyConfiguration.requireBalanceExchangeRateAccount(),
                             balanceAmount.abs(),
                             FinancesCurrencyType.P,
                             BigDecimal.ONE));
@@ -1022,7 +1022,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                            companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                             voucherAmountNationalAmount,
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -1036,7 +1036,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getIueRetention(),
+                            companyConfiguration.requireIueRetention(),
                             BigDecimalUtil.toBigDecimal(iueRetention),
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -1046,7 +1046,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getItRetention(),
+                            companyConfiguration.requireItRetention(),
                             BigDecimalUtil.toBigDecimal(itRetention),
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -1072,7 +1072,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                            companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                             BigDecimalUtil.toBigDecimal(goodsTansitValue),
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -1082,7 +1082,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             costCenterCode,
-                            companyConfiguration.getNationalCurrencyVATFiscalCreditAccount(),
+                            companyConfiguration.requireNationalCurrencyVATFiscalCreditAccount(),
                             BigDecimalUtil.toBigDecimal(fiscalCreditIVA),
                             purchaseOrderPayment.getCashBoxCashAccount().getCurrency(),
                             bankExchangeRate));
@@ -1165,7 +1165,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                             executorUnitCode,
                             companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                            companyConfiguration.getBalanceExchangeRateAccount(),
+                            companyConfiguration.requireBalanceExchangeRateAccount(),
                             balanceAmount,
                             FinancesCurrencyType.P,
                             BigDecimal.ONE));
@@ -1173,7 +1173,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                            companyConfiguration.getBalanceExchangeRateAccount(),
+                            companyConfiguration.requireBalanceExchangeRateAccount(),
                             balanceAmount.abs(),
                             FinancesCurrencyType.P,
                             BigDecimal.ONE));
@@ -1305,7 +1305,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                             executorUnitCode,
                             companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                            companyConfiguration.getBalanceExchangeRateAccount(),
+                            companyConfiguration.requireBalanceExchangeRateAccount(),
                             balanceAmount,
                             FinancesCurrencyType.P,
                             BigDecimal.ONE));
@@ -1313,7 +1313,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
                     voucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                             executorUnitCode,
                             companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                            companyConfiguration.getBalanceExchangeRateAccount(),
+                            companyConfiguration.requireBalanceExchangeRateAccount(),
                             balanceAmount.abs(),
                             FinancesCurrencyType.P,
                             BigDecimal.ONE));
@@ -1663,7 +1663,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         /*voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                 executorUnit.getExecutorUnitCode(),
                 costCenterCode,
-                companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                 totalAmount,
                 FinancesCurrencyType.P,
                 BigDecimal.ONE));*/
@@ -1776,7 +1776,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                 executorUnit.getExecutorUnitCode(),
                 costCenterCode,
-                companyConfiguration.getWarehouseNationalCurrencyTransientAccount1(),
+                companyConfiguration.requireWarehouseNationalCurrencyTransientAccount1(),
                 voucherAmount,
                 FinancesCurrencyType.P,
                 BigDecimal.ONE));
@@ -1800,7 +1800,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         sourceVoucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                 warehouseVoucher.getExecutorUnit().getExecutorUnitCode(),
                 warehouseVoucher.getCostCenterCode(),
-                companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                 voucherAmount,
                 FinancesCurrencyType.P,
                 BigDecimal.ONE));
@@ -1823,7 +1823,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         targetVoucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                 warehouseVoucher.getTargetExecutorUnit().getExecutorUnitCode(),
                 warehouseVoucher.getTargetCostCenterCode(),
-                companyConfiguration.getWarehouseNationalCurrencyTransientAccount(),
+                companyConfiguration.requireWarehouseNationalCurrencyTransientAccount(),
                 voucherAmount,
                 FinancesCurrencyType.P,
                 BigDecimal.ONE));
@@ -1929,7 +1929,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
             /** Cuenta para Baja de productos **/
             if (warehouseVoucher.getDocumentType().getWarehouseVoucherType().equals(WarehouseVoucherType.B))
-                debitCashAccount = companyConfiguration.getLowAccount();
+                debitCashAccount = companyConfiguration.requireLowAccount();
 
             if (warehouseVoucher.getLowFlag()){
                 debitCashAccount = movementDetail.getProductItem().getSubGroup().getGroup().getLowCashAccount();
@@ -1937,7 +1937,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
             /** Cuenta para reprocesos **/
             if (warehouseVoucher.getDocumentType().getWarehouseVoucherType().equals(WarehouseVoucherType.W))
-                debitCashAccount = companyConfiguration.getReworkAccount();
+                debitCashAccount = companyConfiguration.requireReworkAccount();
 
 
             System.out.println("======> aaaaa : " + movementDetail.getProductItem().getFullName() + " - " + detailAmount);
@@ -2017,7 +2017,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         if (BigDecimalUtil.isPositive(total)) {
 
-            System.out.println(">>>>>>>>>>>>>>>>>>>>> CUENTA CONTABLE: " + companyConfiguration.getWarehouseNationalCurrencyTransientAccount2().getFullName());
+            System.out.println(">>>>>>>>>>>>>>>>>>>>> CUENTA CONTABLE: " + companyConfiguration.requireWarehouseNationalCurrencyTransientAccount2().getFullName());
             voucherForGeneration.setUserNumber(companyConfigurationService.findDefaultAccountancyUserNumber());
             voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                     executorUnit.getExecutorUnitCode(),

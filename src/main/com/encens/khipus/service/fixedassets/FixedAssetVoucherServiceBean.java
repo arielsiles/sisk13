@@ -828,7 +828,7 @@ public class FixedAssetVoucherServiceBean extends GenericServiceBean implements 
                             bankVsOriginalValueVoucher.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
                                     fixedAsset.getBusinessUnit().getExecutorUnitCode(),
                                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                                    companyConfiguration.getBalanceExchangeRateAccount(),
+                                    companyConfiguration.requireBalanceExchangeRateAccount(),
                                     balanceAmount,
                                     FinancesCurrencyType.P,
                                     BigDecimal.ONE));
@@ -836,7 +836,7 @@ public class FixedAssetVoucherServiceBean extends GenericServiceBean implements 
                             bankVsOriginalValueVoucher.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
                                     fixedAsset.getBusinessUnit().getExecutorUnitCode(),
                                     companyConfiguration.getExchangeRateBalanceCostCenter().getCode(),
-                                    companyConfiguration.getBalanceExchangeRateAccount(),
+                                    companyConfiguration.requireBalanceExchangeRateAccount(),
                                     balanceAmount.abs(),
                                     FinancesCurrencyType.P,
                                     BigDecimal.ONE));
@@ -924,7 +924,7 @@ public class FixedAssetVoucherServiceBean extends GenericServiceBean implements 
                     VoucherDetailBuilder.newCreditVoucherDetail(
                             fixedAsset.getBusinessUnit().getExecutorUnitCode(),
                             fixedAsset.getCostCenterCode(),
-                            companyConfiguration.getFixedAssetInTransitAccount(),
+                            companyConfiguration.requireFixedAssetInTransitAccount(),
                             fixedAsset.getBsOriginalValue(),
                             FinancesCurrencyType.P, BigDecimal.ONE));
         }
@@ -985,10 +985,10 @@ public class FixedAssetVoucherServiceBean extends GenericServiceBean implements 
                     VoucherDetailBuilder.newCreditVoucherDetail(
                             fixedAsset.getBusinessUnit().getExecutorUnitCode(),
                             fixedAsset.getCostCenterCode(),
-                            companyConfiguration.getFixedAssetInTransitAccount(),
+                            companyConfiguration.requireFixedAssetInTransitAccount(),
                             fixedAssetMovement.getBsAmount(),
-                            companyConfiguration.getFixedAssetInTransitAccount().getCurrency(),
-                            getCurrentExchangeRate(companyConfiguration.getFixedAssetInTransitAccount().getCurrency(), susExchangeRate, ufvExchangeRate)));
+                            companyConfiguration.requireFixedAssetInTransitAccount().getCurrency(),
+                            getCurrentExchangeRate(companyConfiguration.requireFixedAssetInTransitAccount().getCurrency(), susExchangeRate, ufvExchangeRate)));
 
             fixedAssetMovement.setTransactionNumber(improvementVoucher.getTransactionNumber());
             fixedAssetMovement.setState(FixedAssetMovementState.APR);

@@ -76,8 +76,8 @@ public class ProvisionInterestReceivableAction extends GenericAction {
         currentCreditProductsNationalCurrency.setAccount(this.cashAccount.getAccountCode());
 
         VoucherDetail fixedTermInterestNationalCurrency = new VoucherDetail();
-        fixedTermInterestNationalCurrency.setCashAccount(companyConfiguration.getFixedTermInterestNationalCurrency());
-        fixedTermInterestNationalCurrency.setAccount(companyConfiguration.getFixedTermInterestNationalCurrency().getAccountCode());
+        fixedTermInterestNationalCurrency.setCashAccount(companyConfiguration.requireFixedTermInterestNationalCurrency());
+        fixedTermInterestNationalCurrency.setAccount(companyConfiguration.requireFixedTermInterestNationalCurrency().getAccountCode());
 
         if (interestProvision.doubleValue() > 0){
             currentCreditProductsNationalCurrency.setDebit(interestProvision);

@@ -249,7 +249,7 @@ public class ProductionPlanAction extends GenericAction<ProductionPlan> {
 
                     DataVoucherDetail dataVoucherDetail = new DataVoucherDetail(
                             production.getCode().toString(),
-                            companyConfiguration.getCtaAlmPT(),
+                            companyConfiguration.requireCtaAlmPT(),
                             productionCost,
                             BigDecimal.ZERO,
                             product.getProductItemCode(),
