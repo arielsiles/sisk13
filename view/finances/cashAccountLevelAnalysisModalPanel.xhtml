@@ -1,0 +1,202 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <!-- ================= Modal de resultados del analisis ================= -->
+    <rich:modalPanel id="cashAccountLevelAnalysisModal" width="920" height="560"
+                     zindex="2000" autosized="false" resizeable="false">
+        <f:facet name="header">
+            <h:outputText value="#{messages['CashAccount.levelAnalysis.title']}"/>
+        </f:facet>
+        <f:facet name="controls">
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLevelAnalysisLink"
+                            onclick="Richfaces.hideModalPanel('cashAccountLevelAnalysisModal')"/>
+        </f:facet>
+
+        <h:form id="cashAccountLevelAnalysisForm">
+            <a4j:outputPanel id="levelAnalysisData" layout="block">
+
+                <h:messages globalOnly="true" styleClass="message" showDetail="false" showSummary="true"/>
+
+                <!-- Resumen -->
+                <h:panelGroup rendered="#{cashAccountLevelAnalysisAction.analyzed}">
+                    <h:panelGrid columns="2" cellpadding="2" styleClass="formRow">
+                        <h:outputText value="#{messages['CashAccount.levelAnalysis.rootErrors']}:"/>
+                        <h:outputText value="#{cashAccountLevelAnalysisAction.rootErrorCount}"/>
+                        <h:outputText value="#{messages['CashAccount.levelAnalysis.level3Errors']}:"/>
+                        <h:outputText value="#{cashAccountLevelAnalysisAction.level3ErrorCount}"/>
+                        <h:outputText value="#{messages['CashAccount.levelAnalysis.formatErrors']}:"/>
+                        <h:outputText value="#{cashAccountLevelAnalysisAction.formatErrorCount}"/>
+                        <h:outputText value="#{messages['CashAccount.levelAnalysis.requiresReview']}:"
+                                      style="#{cashAccountLevelAnalysisAction.requiresReviewCount > 0 ? 'color:#cc0000;font-weight:bold;' : ''}"/>
+                        <h:outputText value="#{cashAccountLevelAnalysisAction.requiresReviewCount}"
+                                      style="#{cashAccountLevelAnalysisAction.requiresReviewCount > 0 ? 'color:#cc0000;font-weight:bold;' : ''}"/>
+                    </h:panelGrid>
+                </h:panelGroup>
+
+                <!-- Sin errores -->
+                <h:panelGroup rendered="#{cashAccountLevelAnalysisAction.analyzed
+                                          and cashAccountLevelAnalysisAction.rootErrorCount == 0
+                                          and cashAccountLevelAnalysisAction.level3ErrorCount == 0
+                                          and cashAccountLevelAnalysisAction.formatErrorCount == 0}">
+                    <br/>
+                    <h:outputText value="#{messages['CashAccount.levelAnalysis.noErrors']}"
+                                  styleClass="message"/>
+                </h:panelGroup>
+
+                <!-- Contenedor con scroll para todas las secciones de error.
+                     El pie (botones) queda fuera de este div, siempre visible. -->
+                <div style="max-height:360px;overflow:auto;">
+
+                    <!-- Errores de formato (longitud <> 10, no se corrigen) -->
+                    <h:panelGroup rendered="#{cashAccountLevelAnalysisAction.formatErrorCount > 0}">
+                        <h:outputText value="#{messages['CashAccount.levelAnalysis.formatErrors']}"
+                                      style="font-weight:bold;color:#cc0000;"/>
+                        <rich:dataTable value="#{cashAccountLevelAnalysisAction.formatErrors}" var="err"
+                                        width="100%" columnsWidth="8%, 20%, 47%, 10%, 15%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['CashAccount.levelAnalysis.company']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.account']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.description']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.level']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.levelAnalysis.length']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column styleClass="center"><h:outputText value="#{err.companyNumber}"/></rich:column>
+                            <rich:column styleClass="center"><h:outputText value="#{err.accountCode}"/></rich:column>
+                            <rich:column><h:outputText value="#{err.description}"/></rich:column>
+                            <rich:column styleClass="center"><h:outputText value="#{err.accountLevel}"/></rich:column>
+                            <rich:column styleClass="center"><h:outputText value="#{err.currentValue}"/></rich:column>
+                        </rich:dataTable>
+                        <br/>
+                    </h:panelGroup>
+
+                    <!-- Errores de cuenta raiz -->
+                    <h:panelGroup rendered="#{cashAccountLevelAnalysisAction.rootErrorCount > 0}">
+                        <h:outputText value="#{messages['CashAccount.levelAnalysis.rootErrors']}"
+                                      style="font-weight:bold;"/>
+                        <rich:dataTable value="#{cashAccountLevelAnalysisAction.rootErrors}" var="err"
+                                        width="100%" columnsWidth="8%, 18%, 40%, 9%, 12%, 13%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['CashAccount.levelAnalysis.company']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.account']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.description']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.level']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.levelAnalysis.currentValue']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.levelAnalysis.correctValue']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column styleClass="center"><h:outputText value="#{err.companyNumber}"/></rich:column>
+                            <rich:column styleClass="center"><h:outputText value="#{err.accountCode}"/></rich:column>
+                            <rich:column><h:outputText value="#{err.description}"/></rich:column>
+                            <rich:column styleClass="center"><h:outputText value="#{err.accountLevel}"/></rich:column>
+                            <rich:column styleClass="center"><h:outputText value="#{err.currentValue}"/></rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{err.correctValue}"
+                                              style="#{err.targetExists ? '' : 'color:#cc0000;font-weight:bold;'}"/>
+                            </rich:column>
+                        </rich:dataTable>
+                        <br/>
+                    </h:panelGroup>
+
+                    <!-- Errores de nivel 3 -->
+                    <h:panelGroup rendered="#{cashAccountLevelAnalysisAction.level3ErrorCount > 0}">
+                        <h:outputText value="#{messages['CashAccount.levelAnalysis.level3Errors']}"
+                                      style="font-weight:bold;"/>
+                        <rich:dataTable value="#{cashAccountLevelAnalysisAction.level3Errors}" var="err"
+                                        width="100%" columnsWidth="8%, 18%, 40%, 9%, 12%, 13%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['CashAccount.levelAnalysis.company']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.account']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.description']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.level']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.levelAnalysis.currentValue']}</rich:column>
+                                    <rich:column>#{messages['CashAccount.levelAnalysis.correctValue']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+                            <rich:column styleClass="center"><h:outputText value="#{err.companyNumber}"/></rich:column>
+                            <rich:column styleClass="center"><h:outputText value="#{err.accountCode}"/></rich:column>
+                            <rich:column><h:outputText value="#{err.description}"/></rich:column>
+                            <rich:column styleClass="center"><h:outputText value="#{err.accountLevel}"/></rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{err.currentValue}"
+                                              rendered="#{not empty err.currentValue}"/>
+                                <h:outputText value="#{messages['CashAccount.levelAnalysis.emptyValue']}"
+                                              rendered="#{empty err.currentValue}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{err.correctValue}"
+                                              rendered="#{not empty err.correctValue}"
+                                              style="#{err.targetExists ? '' : 'color:#cc0000;font-weight:bold;'}"/>
+                                <h:outputText value="#{messages['CashAccount.levelAnalysis.emptyValue']}"
+                                              rendered="#{empty err.correctValue}"/>
+                            </rich:column>
+                        </rich:dataTable>
+                    </h:panelGroup>
+
+                </div>
+
+                <!-- Pie: siempre visible (fuera del scroll) -->
+                <div class="buttons" style="margin-top:10px;">
+                    <a4j:commandButton value="#{messages['CashAccount.levelAnalysis.fixAll']}"
+                                       styleClass="button"
+                                       rendered="#{s:hasPermission('CASHACCOUNTLEVEL','UPDATE')}"
+                                       disabled="#{!cashAccountLevelAnalysisAction.hasCorrectableErrors}"
+                                       reRender="cashAccountLevelConfirmData"
+                                       oncomplete="Richfaces.showModalPanel('cashAccountLevelConfirmModal')"/>
+                    <a4j:commandButton value="#{messages['Common.close']}"
+                                       styleClass="button"
+                                       onclick="Richfaces.hideModalPanel('cashAccountLevelAnalysisModal'); return false;"/>
+                </div>
+
+            </a4j:outputPanel>
+        </h:form>
+    </rich:modalPanel>
+
+    <!-- ==================== Modal de confirmacion ==================== -->
+    <rich:modalPanel id="cashAccountLevelConfirmModal" width="420" height="170"
+                     zindex="2100" autosized="true" resizeable="false">
+        <f:facet name="header">
+            <h:outputText value="#{messages['Common.confirmation']}"/>
+        </f:facet>
+        <h:form id="cashAccountLevelConfirmForm">
+            <a4j:outputPanel id="cashAccountLevelConfirmData" layout="block">
+                <h:outputText value="#{messages['CashAccount.levelAnalysis.confirm']}"/>
+                <br/><br/>
+                <h:outputText value="#{messages['CashAccount.levelAnalysis.toFix']}:" style="font-weight:bold;"/>
+                <h:panelGrid columns="2" cellpadding="2" style="margin-top:4px;">
+                    <h:outputText value="#{messages['CashAccount.levelAnalysis.rootColumn']}:"/>
+                    <h:outputText value="#{cashAccountLevelAnalysisAction.rootCorrectableCount}"/>
+                    <h:outputText value="#{messages['CashAccount.levelAnalysis.level3Column']}:"/>
+                    <h:outputText value="#{cashAccountLevelAnalysisAction.level3CorrectableCount}"/>
+                </h:panelGrid>
+                <h:panelGroup rendered="#{cashAccountLevelAnalysisAction.requiresReviewCount > 0}">
+                    <br/>
+                    <h:outputFormat value="#{messages['CashAccount.levelAnalysis.reviewWarn']}"
+                                    style="color:#cc0000;">
+                        <f:param value="#{cashAccountLevelAnalysisAction.requiresReviewCount}"/>
+                    </h:outputFormat>
+                </h:panelGroup>
+            </a4j:outputPanel>
+            <br/>
+            <div class="buttons">
+                <a4j:commandButton value="#{messages['Common.accept']}"
+                                   styleClass="button"
+                                   action="#{cashAccountLevelAnalysisAction.fixAll}"
+                                   reRender="levelAnalysisData, cashAccountListSearch:cashAccountList"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountLevelConfirmModal')"/>
+                <a4j:commandButton value="#{messages['Common.cancel']}"
+                                   styleClass="button"
+                                   onclick="Richfaces.hideModalPanel('cashAccountLevelConfirmModal'); return false;"/>
+            </div>
+        </h:form>
+    </rich:modalPanel>
+
+</ui:composition>

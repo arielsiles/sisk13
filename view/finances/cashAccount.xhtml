@@ -72,7 +72,14 @@
                              styleClass="input"
                              required="true"
                              maxlength="10"
+                             readonly="#{cashAccountAction.managed}"
                              tabindex="1"/>
+                <a4j:commandButton value="#{messages['CashAccount.rename.button']}"
+                                   styleClass="button"
+                                   rendered="#{cashAccountAction.managed and s:hasPermission('ACCOUNTINGPLAN','UPDATE')}"
+                                   action="#{cashAccountAction.prepareRename}"
+                                   reRender="renameAccountData"
+                                   oncomplete="Richfaces.showModalPanel('renameAccountModal')"/>
             </s:decorate>
 
             <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -275,6 +282,70 @@
 </s:decorate>
 
 
+
+<rich:modalPanel id="renameAccountModal" width="480" autosized="true" zindex="2500" resizeable="false">
+    <f:facet name="header">
+        <h:outputText value="#{messages['CashAccount.rename.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeRenameLink"
+                        onclick="Richfaces.hideModalPanel('renameAccountModal')"/>
+    </f:facet>
+    <h:form id="renameAccountForm">
+        <a4j:outputPanel id="renameAccountData" layout="block" style="padding:16px 18px;min-width:430px;">
+
+            <h:panelGroup rendered="#{not empty cashAccountAction.renameMessage and cashAccountAction.renameError}">
+                <div style="padding:10px 12px;margin-bottom:14px;border-left:4px solid #c0392b;background:#fdecea;">
+                    <h:outputText value="#{cashAccountAction.renameMessage}" style="color:#922b21;font-weight:bold;"/>
+                </div>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not empty cashAccountAction.renameMessage and !cashAccountAction.renameError}">
+                <div style="padding:10px 12px;margin-bottom:14px;border-left:4px solid #27ae60;background:#eafaf1;">
+                    <h:outputText value="#{cashAccountAction.renameMessage}" style="color:#1e8449;font-weight:bold;"/>
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{!cashAccountAction.renamed}">
+                <h:panelGrid columns="2" cellpadding="5" cellspacing="0">
+                    <h:outputText value="#{messages['CashAccount.rename.current']}:"/>
+                    <h:outputText value="#{cashAccount.accountCode}" style="font-weight:bold;"/>
+                    <h:outputText value="#{messages['CashAccount.rename.newCode']}:"/>
+                    <h:inputText value="#{cashAccountAction.newAccountCode}" maxlength="10" styleClass="input"/>
+                </h:panelGrid>
+
+                <h:panelGroup rendered="#{not empty cashAccountAction.references}">
+                    <div style="margin-top:14px;">
+                        <h:outputText value="#{messages['CashAccount.rename.inUseList']}"
+                                      style="color:#922b21;font-weight:bold;"/>
+                        <div style="max-height:150px;overflow:auto;margin-top:6px;padding:6px 10px;border:1px solid #e6c9c5;background:#fffafa;">
+                            <h:dataTable value="#{cashAccountAction.references}" var="ref" width="100%">
+                                <h:column><h:outputText value="#{ref}" style="color:#922b21;"/></h:column>
+                            </h:dataTable>
+                        </div>
+                    </div>
+                </h:panelGroup>
+
+                <div class="buttons" style="margin-top:18px;text-align:right;">
+                    <a4j:commandButton value="#{messages['CashAccount.rename.confirm']}"
+                                       styleClass="button"
+                                       action="#{cashAccountAction.renameAccount}"
+                                       reRender="renameAccountData, productItemForm"/>
+                    <a4j:commandButton value="#{messages['Common.cancel']}"
+                                       styleClass="button"
+                                       onclick="Richfaces.hideModalPanel('renameAccountModal'); return false;"/>
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{cashAccountAction.renamed}">
+                <div class="buttons" style="margin-top:4px;text-align:right;">
+                    <a4j:commandButton value="#{messages['Common.close']}"
+                                       styleClass="button"
+                                       onclick="Richfaces.hideModalPanel('renameAccountModal'); return false;"/>
+                </div>
+            </h:panelGroup>
+        </a4j:outputPanel>
+    </h:form>
+</rich:modalPanel>
 
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#name" query="focus()" timing="onload"/>

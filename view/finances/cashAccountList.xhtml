@@ -86,6 +86,14 @@
                                  value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
                 </h:commandButton>
 
+                <a4j:commandButton action="#{cashAccountLevelAnalysisAction.analyze}"
+                                   styleClass="button"
+                                   value="#{messages['CashAccount.levelAnalysis.analyze']}"
+                                   id="analyzeLevelsButtonId"
+                                   rendered="#{s:hasPermission('CASHACCOUNTLEVEL','VIEW')}"
+                                   reRender="levelAnalysisData"
+                                   oncomplete="Richfaces.showModalPanel('cashAccountLevelAnalysisModal')"/>
+
                 <s:button value="#{messages['Common.new']}"
                           view="/finances/cashAccount.xhtml"
                           styleClass="button"
@@ -141,6 +149,8 @@
             </div>-->
 
         </h:form>
+
+        <ui:include src="/finances/cashAccountLevelAnalysisModalPanel.xhtml"/>
 
     </ui:define>
 </ui:composition>
