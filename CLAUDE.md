@@ -61,6 +61,11 @@ src/main/com/encens/khipus/
 > (ULEXITA, BARITINA, General), templates y costeo están documentados en
 > `docs/xproduction_ordenes_calculos.md`.
 
+> **Plan de Cuentas (`arcgms`):** estructura del código por niveles, reglas de
+> `cta_raiz`/`cta_niv3`, validaciones del alta, renumeración, integridad referencial
+> (claves foráneas) y trampas de JSF/RichFaces del módulo están documentados en
+> `docs/Contabilidad/plan_de_cuentas.md`. Leerlo antes de tocar cuentas contables.
+
 ### Configuration Files
 - **Database**: `resources/khipus-{profile}-ds.xml`
 - **Persistence**: `resources/META-INF/persistence-{profile}.xml`
