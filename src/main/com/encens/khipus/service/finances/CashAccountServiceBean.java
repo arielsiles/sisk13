@@ -14,7 +14,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -102,6 +104,9 @@ public class CashAccountServiceBean implements CashAccountService {
             return (CashAccount) em.createNamedQuery("CashAccount.findByAccountCode")
                     .setParameter("accountCode", accountCode).getSingleResult();
         } catch (EntityNotFoundException e) {
+        } catch (NoResultException e) {
+            // getSingleResult() lanza NoResultException, no EntityNotFoundException:
+            // sin este catch el metodo propagaba en vez de devolver null.
         }
         return null;
     }
@@ -324,6 +329,27 @@ public class CashAccountServiceBean implements CashAccountService {
                 .setParameter("code", accountCode)
                 .getSingleResult();
         return count != null && count.intValue() > 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<String> findMissingAccountCodes(Collection<String> accountCodes) {
+        List<String> missing = new ArrayList<String>();
+        if (accountCodes == null || accountCodes.isEmpty()) {
+            return missing;
+        }
+        Set<String> distinct = new LinkedHashSet<String>(accountCodes);
+        List<String> found = em.createQuery(
+                "select ca.accountCode from CashAccount ca where ca.accountCode in :codes")
+                .setParameter("codes", distinct)
+                .getResultList();
+        Set<String> existing = new HashSet<String>(found);
+        for (String code : distinct) {
+            if (!existing.contains(code)) {
+                missing.add(code);
+            }
+        }
+        return missing;
     }
 
     @SuppressWarnings("unchecked")

@@ -70,16 +70,63 @@
                 <h:inputText id="account"
                              value="#{cashAccount.accountCode}"
                              styleClass="input"
+                             style="width:160px;font-family:'Consolas','Courier New',monospace;font-size:18px;font-weight:bold;letter-spacing:3px;"
                              required="true"
                              maxlength="10"
                              readonly="#{cashAccountAction.managed}"
-                             tabindex="1"/>
+                             tabindex="1">
+                    <!-- ajaxSingle: sin esto se validaria todo el formulario y los
+                         campos required aun vacios impedirian ejecutar la accion. -->
+                    <a4j:support event="onblur"
+                                 ajaxSingle="true"
+                                 rendered="#{!cashAccountAction.managed}"
+                                 action="#{cashAccountAction.analyzeAccountCode}"
+                                 reRender="accountCodeFeedback, stateField, currencyField, accountLevelsField,
+                                           activeAccountField, movementField, itemAccountField, itemLevel3AccountField"/>
+                </h:inputText>
+
                 <a4j:commandButton value="#{messages['CashAccount.rename.button']}"
                                    styleClass="button"
-                                   rendered="#{cashAccountAction.managed and s:hasPermission('ACCOUNTINGPLAN','UPDATE')}"
+                                   rendered="#{cashAccountAction.managed and s:hasPermission('CASHACCOUNTRENAME','UPDATE')}"
                                    action="#{cashAccountAction.prepareRename}"
                                    reRender="renameAccountData"
                                    oncomplete="Richfaces.showModalPanel('renameAccountModal')"/>
+
+                <!-- Bloque propio debajo del input. El ancho va acotado porque
+                     .entry .data es un table-cell flotante: su ancho lo dicta el
+                     contenido y un texto largo desarma la fila del formulario. -->
+                <a4j:outputPanel id="accountCodeFeedback" layout="block" style="max-width:440px;">
+
+                    <h:panelGroup rendered="#{not empty cashAccountAction.accountSegments}">
+                        <table cellpadding="0" cellspacing="4"
+                               style="border-collapse:separate;margin-top:6px;">
+                            <tr>
+                                <ui:repeat value="#{cashAccountAction.accountSegments}" var="segment">
+                                    <td style="text-align:center;padding:3px 8px;border:1px solid #bdc3c7;background:#f4f6f7;
+                                               font-family:'Consolas','Courier New',monospace;font-size:15px;font-weight:bold;letter-spacing:2px;">
+                                        #{segment}
+                                    </td>
+                                </ui:repeat>
+                            </tr>
+                            <tr>
+                                <ui:repeat value="#{cashAccountAction.accountSegmentLabels}" var="levelLabel">
+                                    <td style="text-align:center;font-size:10px;color:#7f8c8d;">#{levelLabel}</td>
+                                </ui:repeat>
+                            </tr>
+                        </table>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{not empty cashAccountAction.accountCodeMessage and cashAccountAction.accountCodeError}">
+                        <div style="margin-top:6px;color:#c0392b;font-weight:bold;">
+                            <h:outputText value="#{cashAccountAction.accountCodeMessage}"/>
+                        </div>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{not empty cashAccountAction.accountCodeMessage and !cashAccountAction.accountCodeError}">
+                        <div style="margin-top:6px;color:#1e8449;font-weight:bold;">
+                            <h:outputText value="#{cashAccountAction.accountCodeMessage}"/>
+                        </div>
+                    </h:panelGroup>
+                </a4j:outputPanel>
             </s:decorate>
 
             <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">

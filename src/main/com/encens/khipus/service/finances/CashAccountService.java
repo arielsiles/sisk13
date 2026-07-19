@@ -5,6 +5,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CashAccountType;
 
 import javax.ejb.Local;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -57,6 +58,12 @@ public interface CashAccountService {
      * Devuelve true si el codigo de cuenta ya existe en cualquier compania.
      */
     boolean accountCodeExists(String accountCode);
+
+    /**
+     * De los codigos recibidos, devuelve los que NO existen en arcgms.
+     * Lista vacia = todos validos.
+     */
+    List<String> findMissingAccountCodes(Collection<String> accountCodes);
 
     /**
      * Busca todas las tablas donde el codigo de cuenta esta referenciado (por

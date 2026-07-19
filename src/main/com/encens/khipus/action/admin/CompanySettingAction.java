@@ -9,6 +9,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.FinanceUser;
+import com.encens.khipus.service.finances.CashAccountService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.ImageUtils;
 import org.jboss.seam.ScopeType;
@@ -17,9 +18,16 @@ import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.core.Conversation;
 import org.jboss.seam.international.StatusMessage;
 
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Base64;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * CompanySettingAction
@@ -52,6 +60,9 @@ public class CompanySettingAction extends GenericAction<CompanyConfiguration> {
     @In
     private CompanyConfigurationService companyConfigurationService;
 
+    @In
+    private CashAccountService cashAccountService;
+
     @In(create = true)
     private CompanyLogoHolder companyLogoHolder;
 
@@ -81,6 +92,9 @@ public class CompanySettingAction extends GenericAction<CompanyConfiguration> {
         if (!applyLogos()) {
             return Outcome.REDISPLAY;
         }
+        if (!validateAccountCodes()) {
+            return Outcome.REDISPLAY;
+        }
         String outcome;
         if (isManaged()) {
             outcome = update();
@@ -97,6 +111,93 @@ public class CompanySettingAction extends GenericAction<CompanyConfiguration> {
             companyLogoHolder.invalidate();
         }
         return outcome;
+    }
+
+    /* =============== Validacion de cuentas contables =============== */
+
+    /**
+     * Verifica que todo codigo de cuenta configurado exista en arcgms.
+     *
+     * Desde query_v6.0.113 hay FK sobre las 51 columnas de cuenta. Sin esta
+     * validacion, un codigo inexistente hace que MySQL rechace el UPDATE y
+     * GenericServiceBean traduce cualquier PersistenceException a
+     * EntryDuplicatedException, con lo que la pantalla diria "registro
+     * duplicado" -- que no le dice nada al usuario. Aqui se nombra la cuenta.
+     *
+     * Los campos se descubren por reflexion sobre las asociaciones CashAccount
+     * y su @JoinColumn(referencedColumnName="cuenta"), asi que una cuenta nueva
+     * queda cubierta sin tocar este metodo.
+     */
+    private boolean validateAccountCodes() {
+        Set<String> codes = new LinkedHashSet<String>();
+        for (Field field : CompanyConfiguration.class.getDeclaredFields()) {
+            if (!CashAccount.class.equals(field.getType())) {
+                continue;
+            }
+            String column = accountColumnOf(field);
+            if (column == null) {
+                continue;
+            }
+            String code = accountCodeValueOf(column);
+            if (code != null && code.trim().length() > 0) {
+                codes.add(code.trim());
+            }
+        }
+
+        List<String> missing = cashAccountService.findMissingAccountCodes(codes);
+        if (missing.isEmpty()) {
+            return true;
+        }
+
+        StringBuilder list = new StringBuilder();
+        for (String code : missing) {
+            if (list.length() > 0) {
+                list.append(", ");
+            }
+            list.append(code);
+        }
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                "CompanyConfiguration.account.notFound", list.toString());
+        return false;
+    }
+
+    /**
+     * Nombre de la columna que guarda el codigo de cuenta de una asociacion.
+     */
+    private String accountColumnOf(Field field) {
+        JoinColumns joinColumns = field.getAnnotation(JoinColumns.class);
+        if (joinColumns == null) {
+            return null;
+        }
+        for (JoinColumn joinColumn : joinColumns.value()) {
+            if ("cuenta".equals(joinColumn.referencedColumnName())) {
+                return joinColumn.name();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Valor del campo String mapeado a esa columna (el par *Code de la asociacion).
+     */
+    private String accountCodeValueOf(String column) {
+        for (Field field : CompanyConfiguration.class.getDeclaredFields()) {
+            if (!String.class.equals(field.getType())) {
+                continue;
+            }
+            Column annotation = field.getAnnotation(Column.class);
+            if (annotation == null || !column.equalsIgnoreCase(annotation.name())) {
+                continue;
+            }
+            try {
+                field.setAccessible(true);
+                return (String) field.get(getInstance());
+            } catch (Exception e) {
+                log.error("No se pudo leer el codigo de cuenta de la columna '" + column + "'", e);
+                return null;
+            }
+        }
+        return null;
     }
 
     /* =============== Logos =============== */
