@@ -1690,12 +1690,11 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         String transactionNumber = financesPkGeneratorService.getNextNoTransTmpenc();
 
-        Long id_tmpenc = financesPkGeneratorService.newId_sf_tmpenc();
+        /** El id_tmpenc lo asigna Hibernate al persistir (@GeneratedValue TABLE) **/
         String docNumber = financesPkGeneratorService.getNextNoTransByDocumentType("TR");
 
 
         System.out.println("-------------------------------> transactionNumber: " + transactionNumber);
-        System.out.println("-------------------------------> newId_sf_tmpenc: " + id_tmpenc);
 
         voucherForGeneration.setTransactionNumber(transactionNumber);
         voucherForGeneration.setDocumentNumber(docNumber);
@@ -1722,7 +1721,6 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         /** **/
         Voucher voucher = voucherForGeneration;
-        voucher.setId(id_tmpenc);
 
         System.out.println("-------- VOUCHER ENCABEZADO -------");
         System.out.println("ID: " + voucher.getId());
@@ -1737,7 +1735,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
 
         System.out.println("-------- VOUCHER DETAILS -------");
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
-            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            /** id_tmpdet asignado por Hibernate al persistir (@GeneratedValue TABLE) **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
 

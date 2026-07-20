@@ -35,14 +35,20 @@ import java.util.List;
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         pkColumnValue = "sf_tmpenc",
         initialValue = 1,
-        allocationSize = 2)
+        allocationSize = 1)
 
 @Entity
 @EntityListeners({CompanyNumberListener.class})
 @Table(name = "sf_tmpenc", schema = Constants.FINANCES_SCHEMA)
 public class Voucher implements BaseModel{
 
-    //@GeneratedValue(strategy = GenerationType.TABLE, generator = "Voucher.tableGenerator")
+    /**
+     * El id_tmpenc lo genera Hibernate via @TableGenerator sobre la tabla 'secuencia'
+     * (mismo mecanismo que el resto del sistema). Reemplaza la asignacion manual con la
+     * funcion almacenada newId_sf_tmpenc(), que no era segura ante concurrencia.
+     * allocationSize=1 => una lectura por id con compare-and-swap, sin saltos de numeracion.
+     */
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Voucher.tableGenerator")
     @Id
     @Column(name = "id_tmpenc", nullable = false)
     private Long id;

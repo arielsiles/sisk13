@@ -71,8 +71,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
     public void saveVoucher(Voucher voucher){
 
-        Long id = financesPkGeneratorService.newId_sf_tmpenc();
-        voucher.setId(id);
+        /** El id_tmpenc lo asigna Hibernate al persistir (@GeneratedValue TABLE sobre 'secuencia') **/
 
         if (voucher.getTransactionNumber() == null){
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
@@ -97,7 +96,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         System.out.println("-------- VOUCHER DETAILS -------");
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
-            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            /** El id_tmpdet lo asigna Hibernate al persistir (@GeneratedValue TABLE) **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
             em.persist(voucherDetail);
@@ -175,7 +174,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
 
             if(voucherDetail.getTransactionNumber() == null){
-                voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+                /** id_tmpdet asignado por Hibernate al persistir **/
                 voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
                 voucherDetail.setVoucher(voucher);
 
@@ -221,7 +220,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
 
 
-            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            /** id_tmpdet asignado por Hibernate al persistir **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
 
@@ -263,7 +262,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
 
         for (VoucherDetail voucherDetail : voucherDetailList){
-            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            /** id_tmpdet asignado por Hibernate al persistir **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
 

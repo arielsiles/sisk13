@@ -31,7 +31,11 @@ import java.util.UUID;
 @Table(name = "sf_tmpdet", schema = Constants.FINANCES_SCHEMA)
 public class VoucherDetail implements BaseModel {
 
-    /*@GeneratedValue(strategy = GenerationType.TABLE, generator = "VoucherDetail.tableGenerator")*/
+    /**
+     * El id_tmpdet lo genera Hibernate via @TableGenerator sobre 'secuencia', reemplazando
+     * la asignacion manual con newId_sf_tmpdet(). Ver nota en Voucher.id.
+     */
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "VoucherDetail.tableGenerator")
     @Id
     @Column(name = "id_tmpdet", nullable = true)
     private Long id;
