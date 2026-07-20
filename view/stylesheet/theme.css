@@ -1072,6 +1072,38 @@ input.bigText {
 
 }
 
+.row-order-cell {
+    width: 26px;
+    padding: 0 2px !important;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.row-order {
+    display: inline-block;
+    line-height: 8px;
+}
+
+.row-order-link {
+    display: block;
+    font-size: 9px;
+    line-height: 9px;
+    color: #9aa0a6;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a.row-order-link:hover {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.row-order-link-disabled {
+    color: #dadce0;
+    cursor: default;
+}
+
 .select-image-middle {
     cursor: pointer;
     border: 0px;

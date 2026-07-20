@@ -26,6 +26,7 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -185,6 +186,14 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }else{
                 em.merge(voucherDetail);
                 em.merge(voucher);
+                em.flush();
+            }
+        }
+
+        /** Persiste las facturas editadas en la grilla de Documento de compra **/
+        for (PurchaseDocument purchaseDocument : voucher.getPurchaseList()) {
+            if (purchaseDocument.getId() != null) {
+                em.merge(purchaseDocument);
                 em.flush();
             }
         }
@@ -408,6 +417,41 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             return null;
         }
         return purchaseDocumentList;
+    }
+
+    /**
+     * Indica si ya existe una factura registrada con el mismo NIT, numero y fecha.
+     * Se ignoran las facturas anuladas y, si se indica, la propia factura que se esta editando.
+     */
+    @Override
+    public boolean existsPurchaseDocument(String nit, String number, Date date, Long excludedId) {
+
+        if (nit == null || number == null || date == null) {
+            return false;
+        }
+
+        StringBuilder jpql = new StringBuilder(
+                "select count(purchaseDocument) from PurchaseDocument purchaseDocument " +
+                " where purchaseDocument.nit = :nit " +
+                "   and purchaseDocument.number = :number " +
+                "   and purchaseDocument.date = :date " +
+                "   and purchaseDocument.state <> :nullifiedState ");
+
+        if (excludedId != null) {
+            jpql.append(" and purchaseDocument.id <> :excludedId ");
+        }
+
+        Query query = em.createQuery(jpql.toString())
+                .setParameter("nit", nit)
+                .setParameter("number", number)
+                .setParameter("date", date)
+                .setParameter("nullifiedState", PurchaseDocumentState.NULLIFIED);
+
+        if (excludedId != null) {
+            query.setParameter("excludedId", excludedId);
+        }
+
+        return ((Long) query.getSingleResult()) > 0;
     }
 
     @Override

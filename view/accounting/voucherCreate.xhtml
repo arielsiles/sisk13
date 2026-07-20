@@ -364,6 +364,7 @@
             <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                 <thead class="rich-table-thead">
                 <tr class="rich-table-header">
+                    <th class="rich-table-headercell row-order-cell"></th>
                     <th class="rich-table-headercell">#{messages['Voucher.accountDescription']}</th>
                     <th class="rich-table-headercell">#{messages['Voucher.debit']}</th>
                     <th class="rich-table-headercell">#{messages['Voucher.credit']}</th>
@@ -387,6 +388,35 @@
                     <c:set var="creditMeInputFieldId" value="creditMeInputField_#{row.index}"/>
 
                     <tr class="rich-table-row">
+                        <td class="rich-table-cell row-order-cell">
+                            <s:div styleClass="row-order" rendered="#{voucherCreateAction.pending}">
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.moveUp']}"
+                                                 action="#{voucherCreateAction.moveVoucherDetailUp(voucherDetail)}"
+                                                 ajaxSingle="true"
+                                                 styleClass="row-order-link"
+                                                 rendered="#{!voucherCreateAction.isFirstVoucherDetail(voucherDetail)}"
+                                                 reRender="movementDetailListPanel">
+                                    <h:outputText value="&#9650;" escape="false"/>
+                                </a4j:commandLink>
+                                <h:outputText value="&#9650;" escape="false"
+                                              styleClass="row-order-link row-order-link-disabled"
+                                              rendered="#{voucherCreateAction.isFirstVoucherDetail(voucherDetail)}"/>
+
+                                <a4j:commandLink immediate="true"
+                                                 title="#{messages['Common.moveDown']}"
+                                                 action="#{voucherCreateAction.moveVoucherDetailDown(voucherDetail)}"
+                                                 ajaxSingle="true"
+                                                 styleClass="row-order-link"
+                                                 rendered="#{!voucherCreateAction.isLastVoucherDetail(voucherDetail)}"
+                                                 reRender="movementDetailListPanel">
+                                    <h:outputText value="&#9660;" escape="false"/>
+                                </a4j:commandLink>
+                                <h:outputText value="&#9660;" escape="false"
+                                              styleClass="row-order-link row-order-link-disabled"
+                                              rendered="#{voucherCreateAction.isLastVoucherDetail(voucherDetail)}"/>
+                            </s:div>
+                        </td>
                         <td class="rich-table-cell">
                             <h:outputText value="#{voucherDetail.fullCashAccount}"/>
                         </td>
@@ -487,6 +517,7 @@
                 </c:forEach>
 
                 <tr class="rich-table-row">
+                    <td class="rich-table-cell row-order-cell"></td>
                     <td class="rich-table-cell center">-</td>
                     <td class="rich-table-cell center">
                         <s:div id="totalDebit">

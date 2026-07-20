@@ -28,6 +28,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     List<PurchaseDocument> getPurchaseDcumentList(Voucher voucher);
 
+    boolean existsPurchaseDocument(String nit, String number, Date date, Long excludedId);
+
     List<VoucherDetail> getVoucherDetailList(String transactionNumber);
 
     List<VoucherDetail> getDetailsByDates(String account, Date startDate, Date endDate);
