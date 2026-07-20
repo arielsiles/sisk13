@@ -5,9 +5,14 @@ import com.encens.khipus.model.finances.FinancesBankAccount;
 /**
  * BankingMovementSync
  *
+ * OBSOLETO: importacion de extractos bancarios. Funcionalidad antigua, actualmente
+ * SIN USO. Se difiere su revision/retiro a una etapa posterior.
+ *
  * @author
  * @version 2.9
+ * @deprecated funcionalidad antigua sin uso; pendiente de retiro en otra etapa.
  */
+@Deprecated
 public class BankingMovementSync {
     private FinancesBankAccount bankAccount;
     private String columnSeparator = "|";

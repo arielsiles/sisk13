@@ -25,6 +25,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.math.BigDecimal;
@@ -79,7 +80,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         System.out.println("---> voucher.getDocumentNumber(): " + voucher.getDocumentNumber());
         if (voucher.getDocumentNumber() == null){
-            voucher.setDocumentNumber(financesPkGeneratorService.getNextNoTransByDocumentType(voucher.getDocumentType()));
+            voucher.setDocumentNumber(financesPkGeneratorService.getNextDocumentNumberByType(voucher.getDocumentType()));
         }
 
         System.out.println("-------- VOUCHER ENCABEZADO -------");
@@ -197,8 +198,46 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }
         }
 
-        em.merge(voucher);
+        /**
+         * Se fuerza el incremento de la version del encabezado (version del agregado),
+         * asi un cambio solo en los detalles tambien avanza la version del asiento y el
+         * bloqueo optimista detecta la edicion concurrente. El lock ademas verifica que
+         * la version en memoria coincida con la de BD (si no, lanza OptimisticLockException).
+         */
+        Voucher managedVoucher = em.merge(voucher);
+        em.lock(managedVoucher, LockModeType.WRITE);
         em.flush();
+    }
+
+    @Override
+    public Long getPersistedVersion(Long id) {
+        try {
+            return (Long) em.createQuery("select voucher.version from Voucher voucher where voucher.id = :id")
+                    .setParameter("id", id)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Voucher refreshVoucher(Long id) {
+        Voucher voucher = em.find(Voucher.class, id);
+        if (voucher != null) {
+            em.refresh(voucher);
+        }
+        return voucher;
+    }
+
+    @Override
+    public List<VoucherDetail> refreshVoucherDetailList(Voucher voucher) {
+        List<VoucherDetail> list = getVoucherDetailList(voucher);
+        if (list != null) {
+            for (VoucherDetail voucherDetail : list) {
+                em.refresh(voucherDetail);
+            }
+        }
+        return list;
     }
 
     public void simpleUpdateVoucher(Voucher voucher){
@@ -423,9 +462,9 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
      * Se ignoran las facturas anuladas y, si se indica, la propia factura que se esta editando.
      */
     @Override
-    public boolean existsPurchaseDocument(String nit, String number, Date date, Long excludedId) {
+    public boolean existsPurchaseDocument(String nit, String number, Date date, BigDecimal amount, Long excludedId) {
 
-        if (nit == null || number == null || date == null) {
+        if (nit == null || number == null || date == null || amount == null) {
             return false;
         }
 
@@ -434,6 +473,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 " where purchaseDocument.nit = :nit " +
                 "   and purchaseDocument.number = :number " +
                 "   and purchaseDocument.date = :date " +
+                "   and purchaseDocument.amount = :amount " +
                 "   and purchaseDocument.state <> :nullifiedState ");
 
         if (excludedId != null) {
@@ -444,6 +484,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 .setParameter("nit", nit)
                 .setParameter("number", number)
                 .setParameter("date", date)
+                .setParameter("amount", amount)
                 .setParameter("nullifiedState", PurchaseDocumentState.NULLIFIED);
 
         if (excludedId != null) {

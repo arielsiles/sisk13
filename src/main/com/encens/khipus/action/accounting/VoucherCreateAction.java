@@ -32,8 +32,13 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 import org.jboss.seam.transaction.Transaction;
+import org.hibernate.StaleObjectStateException;
+
+import javax.ejb.EJBException;
+import javax.persistence.OptimisticLockException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -214,7 +219,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             return false;
         }
 
-        if (getTotalsDebit().compareTo(getTotalsCredit()) != 0) {
+        /**
+         * Se compara a 2 decimales (precision de la moneda, igual que lo mostrado en
+         * pantalla). Asi ruido de sub-centimos no genera un falso descuadre cuando el
+         * debe y el haber ya son iguales en lo visible.
+         */
+        BigDecimal totalDebit = getTotalsDebit().setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalCredit = getTotalsCredit().setScale(2, RoundingMode.HALF_UP);
+
+        if (totalDebit.compareTo(totalCredit) != 0) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Voucher.message.incorrectAccountingEntry");
             return false;
         }
@@ -251,29 +264,30 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         String nit = document.getNit();
         String number = document.getNumber();
         Date date = document.getDate();
+        BigDecimal amount = document.getAmount();
 
         /** Fila aun incompleta: no se puede evaluar todavia **/
-        if (nit == null || number == null || date == null) {
+        if (nit == null || number == null || date == null || amount == null) {
             return false;
         }
 
-        String key = invoiceKey(nit, number, date);
+        String key = invoiceKey(nit, number, date, amount);
 
         for (PurchaseDocument other : purchaseDocumentList) {
             if (other == document) {
                 continue;
             }
-            if (other.getNit() != null && other.getNumber() != null && other.getDate() != null
-                    && key.equals(invoiceKey(other.getNit(), other.getNumber(), other.getDate()))) {
+            if (other.getNit() != null && other.getNumber() != null && other.getDate() != null && other.getAmount() != null
+                    && key.equals(invoiceKey(other.getNit(), other.getNumber(), other.getDate(), other.getAmount()))) {
                 return true;
             }
         }
 
-        return voucherAccoutingService.existsPurchaseDocument(nit, number, date, document.getId());
+        return voucherAccoutingService.existsPurchaseDocument(nit, number, date, amount, document.getId());
     }
 
-    private String invoiceKey(String nit, String number, Date date) {
-        return nit + "|" + number + "|" + date.getTime();
+    private String invoiceKey(String nit, String number, Date date, BigDecimal amount) {
+        return nit + "|" + number + "|" + date.getTime() + "|" + amount.stripTrailingZeros().toPlainString();
     }
 
     private void addDuplicatedInvoiceMessage(String nit, String number, Date date) {
@@ -347,12 +361,70 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         voucher.setDocumentNumber(null);
     }
 
+    /**
+     * Determina si la excepcion (o su causa, ya venga envuelta en EJBException) es un
+     * conflicto de bloqueo optimista de @Version (edicion concurrente del asiento).
+     */
+    private boolean isOptimisticLock(Throwable e) {
+        Throwable t = e;
+        while (t != null) {
+            if (t instanceof OptimisticLockException || t instanceof StaleObjectStateException) {
+                return true;
+            }
+            if (t instanceof EJBException && ((EJBException) t).getCausedByException() != null) {
+                t = ((EJBException) t).getCausedByException();
+            } else {
+                t = t.getCause();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Otro usuario modifico el asiento entre que se abrio y se guardo. Se recargan los
+     * datos frescos desde la base y se avisa, sin pisar el cambio del otro usuario.
+     */
+    private String handleVoucherConcurrency(Exception cause) {
+        if (cause != null) {
+            log.info("Edicion concurrente del asiento contable: " + cause);
+        }
+        try {
+            Voucher fresh = voucherAccoutingService.refreshVoucher(voucher.getId());
+            if (fresh != null) {
+                setVoucher(fresh);
+                setInstance(fresh);
+                setVoucherDetails(voucherAccoutingService.refreshVoucherDetailList(fresh));
+                setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(fresh));
+            }
+        } catch (Exception e) {
+            log.warn("No se pudo recargar el asiento tras el conflicto de concurrencia", e);
+        }
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.concurrency");
+        return Outcome.REDISPLAY;
+    }
+
+    /**
+     * Compara la version del asiento en memoria contra la persistida en BD (lectura
+     * fresca). Si difieren, otro usuario ya lo modifico: hay que recargar y no pisar.
+     */
+    private boolean isVoucherStale() {
+        if (voucher == null || voucher.getId() == null) {
+            return false;
+        }
+        Long persistedVersion = voucherAccoutingService.getPersistedVersion(voucher.getId());
+        return persistedVersion != null && persistedVersion.longValue() != voucher.getVersion();
+    }
+
     @Override
     public String update(){
 
         if (!isPending()) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Voucher.message.notPending");
             return Outcome.REDISPLAY;
+        }
+
+        if (isVoucherStale()) {
+            return handleVoucherConcurrency(null);
         }
 
         if (!validateVoucherBalance()) {
@@ -372,6 +444,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             voucherAccoutingService.updateVoucher(getInstance());
 
         }catch (Exception e){
+            if (isOptimisticLock(e)) {
+                return handleVoucherConcurrency(e);
+            }
             log.error("No se pudo actualizar el asiento contable", e);
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "Voucher.message.updateError");
             return Outcome.REDISPLAY;
@@ -644,9 +719,20 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             return Outcome.REDISPLAY;
         }
 
+        if (isVoucherStale()) {
+            return handleVoucherConcurrency(null);
+        }
+
         voucher.setState(VoucherState.ANL.toString());
-        voucherAccoutingService.annulVoucher(voucher);
-        voucherAccoutingService.annulInvoicesInVoucher(voucher);
+        try {
+            voucherAccoutingService.annulVoucher(voucher);
+            voucherAccoutingService.annulInvoicesInVoucher(voucher);
+        } catch (Exception e) {
+            if (isOptimisticLock(e)) {
+                return handleVoucherConcurrency(e);
+            }
+            throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+        }
 
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.annulAccountingEntry");
         return ANNUL_OUTCOME;
@@ -666,6 +752,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             return Outcome.REDISPLAY;
         }
 
+        if (isVoucherStale()) {
+            return handleVoucherConcurrency(null);
+        }
+
         if (!validateVoucherBalance()) {
             return Outcome.REDISPLAY;
         }
@@ -675,8 +765,15 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         if (voucher.getNumber() != null)
             voucher.setDocumentNumber(voucher.getNumber());
 
-        voucherAccoutingService.approveVoucher(voucher);
-        voucherAccoutingService.approveInvoicesVoucher(voucher);
+        try {
+            voucherAccoutingService.approveVoucher(voucher);
+            voucherAccoutingService.approveInvoicesVoucher(voucher);
+        } catch (Exception e) {
+            if (isOptimisticLock(e)) {
+                return handleVoucherConcurrency(e);
+            }
+            throw e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
+        }
 
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,"Voucher.message.approveAccountingEntry");
         return APPROVED_OUTCOME;
@@ -1288,10 +1385,50 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     }
 
+    /**
+     * Elimina una fila de factura (Documento de compra). Sirve tambien cuando la factura
+     * quedo "huerfana" (p.ej. bloqueada por duplicada): en ese caso no tiene linea de
+     * credito fiscal asociada ni esta persistida, y antes no habia forma de quitarla.
+     *  - Si tiene linea de credito fiscal asociada, se quita esa linea (que a su vez
+     *    elimina la factura y su registro en BD).
+     *  - Si esta suelta, se quita de la lista y solo se borra de BD si ya estaba persistida.
+     */
+    /**
+     * Libera el proveedor (R.Social) de una fila de factura para volver a elegirlo.
+     * Una vez seleccionado, la fila muestra el proveedor bloqueado; con esto se puede
+     * cambiar sin riesgo de perder la referencia por un caracter de mas.
+     */
+    public void clearPurchaseDocumentProvider(PurchaseDocument purchaseDocument) {
+        if (purchaseDocument != null) {
+            purchaseDocument.setFinancesEntity(null);
+            purchaseDocument.setFinancesEntityFullName(null);
+            purchaseDocument.setName(null);
+            purchaseDocument.setNit(null);
+        }
+    }
+
     public void removePurchaseDocument(PurchaseDocument purchaseDocument){
+        if (purchaseDocument == null) {
+            return;
+        }
+
+        VoucherDetail linkedDetail = null;
+        for (VoucherDetail voucherDetail : voucherDetails) {
+            if (purchaseDocument == voucherDetail.getPurchaseDocument()) {
+                linkedDetail = voucherDetail;
+                break;
+            }
+        }
+
+        if (linkedDetail != null) {
+            removeVoucherDetail(linkedDetail);
+            return;
+        }
+
         purchaseDocumentList.remove(purchaseDocument);
-        //VoucherDetail voucherDetail = purchaseDocumentService.getVoucherDetail(purchaseDocument);
-        purchaseDocumentService.removeDocument(purchaseDocument);
+        if (purchaseDocument.getId() != null) {
+            purchaseDocumentService.removeDocument(purchaseDocument);
+        }
     }
 
     public boolean incomplete(PurchaseDocument purchaseDocument){

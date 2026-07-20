@@ -596,46 +596,51 @@
                         <td class="rich-table-cell center">
                             <s:div id="#{field01Id}">
 
-                                <h:inputText id="#{fieldInput01Id}" value="#{purchaseDocument.date}" alt="dd/MM/yyyy" styleClass="inputSmall" required="true">
-                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field01Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput01Id}" styleClass="errors" style="display:block;" rendered="true"/>
-
-                                <!--<rich:calendar id="#{fieldInput01Id}"
-                                               inputClass="input80"
+                                <rich:calendar id="#{fieldInput01Id}"
+                                               value="#{purchaseDocument.date}"
+                                               datePattern="#{messages['patterns.date']}"
+                                               inputClass="inputSmall"
                                                enableManualInput="true"
                                                popup="true"
-                                               value="#{purchaseDocument.date}"
-                                               required="true"
-                                               ajaxSingle="true"
-                                               datePattern="#{messages['patterns.date']}">
-                                    <a4j:support event="onchanged" reRender="#{field01Id}"/>
-                                    <a4j:support event="oninputchange" reRender="#{field01Id}"/>
-                                </rich:calendar>-->
+                                               required="true">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </rich:calendar>
+                                <h:message for="#{fieldInput01Id}" styleClass="errors" style="display:block;" rendered="true"/>
 
                             </s:div>
                         </td>
 
                         <td class="rich-table-cell center">
-                            <c:if test="#{!voucherCreateAction.managed or purchaseDocument.financesEntity == null}">
-                                <app:suggestionBox id="#{fieldInput02Id}"
-                                                   value="#{purchaseDocument.financesEntityFullName}"
-                                                   entity="#{purchaseDocument.financesEntity}"
-                                                   styleClass="input"
-                                                   entityAlias="financesEntity"
-                                                   searchField="fullName"
-                                                   searchCompoundFields="financesEntity.id, financesEntity.acronym"
-                                                   searchCompoundCondition="concat(concat(financesEntity.nitNumber,' - '),financesEntity.acronym)"
-                                                   updateFocusOnSelect="true">
-                                    <ui:define name="columns">
-                                        <h:column><h:outputText value="#{entityItem.fullName}"/></h:column>
-                                    </ui:define>
-                                </app:suggestionBox>
-                            </c:if>
-                            <c:if test="#{voucherCreateAction.managed and purchaseDocument.financesEntity != null}">
-                                <h:outputText value="#{purchaseDocument.fullName}"/>
-                            </c:if>
+                            <s:div id="#{field02Id}">
+                                <c:if test="#{purchaseDocument.financesEntity == null}">
+                                    <app:suggestionBox id="#{fieldInput02Id}"
+                                                       value="#{purchaseDocument.financesEntityFullName}"
+                                                       entity="#{purchaseDocument.financesEntity}"
+                                                       styleClass="input"
+                                                       entityAlias="financesEntity"
+                                                       searchField="fullName"
+                                                       searchCompoundFields="financesEntity.id, financesEntity.acronym"
+                                                       searchCompoundCondition="concat(concat(financesEntity.nitNumber,' - '),financesEntity.acronym)"
+                                                       reRender="#{field02Id}"
+                                                       updateFocusOnSelect="true">
+                                        <ui:define name="columns">
+                                            <h:column><h:outputText value="#{entityItem.fullName}"/></h:column>
+                                        </ui:define>
+                                    </app:suggestionBox>
+                                </c:if>
+                                <c:if test="#{purchaseDocument.financesEntity != null}">
+                                    <h:outputText value="#{empty purchaseDocument.financesEntityFullName ? purchaseDocument.fullName : purchaseDocument.financesEntityFullName}"/>
+                                    <a4j:commandLink action="#{voucherCreateAction.clearPurchaseDocumentProvider(purchaseDocument)}"
+                                                     rendered="#{voucherCreateAction.pending}"
+                                                     title="#{messages['Common.remove']}"
+                                                     immediate="true"
+                                                     ajaxSingle="true"
+                                                     reRender="#{field02Id}">
+                                        <rich:spacer width="4"/>
+                                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                    </a4j:commandLink>
+                                </c:if>
+                            </s:div>
                         </td>
 
                         <td class="rich-table-cell center">
@@ -751,13 +756,14 @@
                                     </a4j:commandButton>
                                 </c:if>-->
 
-                                    <!--<a4j:commandLink immediate="true"
+                                    <a4j:commandLink immediate="true"
                                                      title="#{messages['Common.remove']}"
                                                      action="#{voucherCreateAction.removePurchaseDocument(purchaseDocument)}"
                                                      ajaxSingle="true"
-                                                     reRender="invoiceDetailListPanel">
+                                                     rendered="#{voucherCreateAction.pending}"
+                                                     reRender="movementDetailListPanel, invoiceDetailListPanel, itemAccountField">
                                         <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                                    </a4j:commandLink>-->
+                                    </a4j:commandLink>
                             </s:div>
                         </td>
 

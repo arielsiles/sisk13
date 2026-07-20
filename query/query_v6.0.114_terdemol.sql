@@ -1,87 +1,165 @@
 -- ============================================================================
--- v6.0.114 :: Asientos contables - id_tmpenc / id_tmpdet generados por JPA
+-- v6.0.114 :: Asientos contables - secuencias (id, no_trans, no_doc) por JPA
 -- ============================================================================
 --
---  IMPORTANTE: hibernate.hbm2ddl.auto = validate. Ejecutar este script
---  JUSTO ANTES del deploy del nuevo codigo, con el sistema DETENIDO (sin
---  usuarios creando asientos), porque ajusta los contadores de secuencia.
+--  Ejecutar JUSTO ANTES del deploy del nuevo codigo, con el sistema DETENIDO.
 --
---  CONTEXTO
---  --------
---  Antes: el id de sf_tmpenc (id_tmpenc) y de sf_tmpdet (id_tmpdet) se asignaba
---  a mano llamando a las funciones almacenadas newId_sf_tmpenc() /
---  newId_sf_tmpdet(). Esas funciones NO son seguras ante concurrencia
---  (leen el valor y lo actualizan en dos pasos sin bloqueo), por lo que dos
---  usuarios simultaneos podian obtener el mismo id.
+--  Migra la generacion de correlativos de asientos de las funciones almacenadas
+--  a Hibernate. Las funciones NO se eliminan: quedan como respaldo.
 --
---  Ahora: el id lo genera Hibernate via @TableGenerator sobre la tabla
---  'secuencia' (el mismo mecanismo que usan las otras ~333 entidades del
---  sistema), con compare-and-swap y reintento. Es seguro entre modulos,
---  usuarios y sedes.
---
---  POR QUE ESTE AJUSTE (+1)
---  ------------------------
---  Las dos mecanicas interpretan la columna 'valor' de forma distinta:
---    * La funcion:  valor = ULTIMO id ya usado.  Devuelve valor+1.
---    * Hibernate:   valor = PROXIMO id a asignar. Devuelve valor, luego +1.
---  Es una diferencia de 1. Si no se ajusta, el primer asiento que se guarde
---  con el nuevo codigo intentaria reusar el ultimo id ya existente y chocaria
---  con la clave primaria. Por eso se incrementa 'valor' en 1, una sola vez.
---
---  Las funciones almacenadas NO se eliminan: quedan definidas en la base como
---  respaldo hasta confirmar la migracion. Simplemente el codigo de asientos
---  ya no las llama.
---
---  ROLLBACK (si se revierte el codigo al esquema anterior):
---    UPDATE terdemol.secuencia SET valor = valor - 1
---     WHERE tabla IN ('sf_tmpenc','sf_tmpdet');
---  (y volver a la version anterior de Voucher.java / VoucherDetail.java /
---   VoucherAccoutingServiceBean.java / WarehouseAccountEntryServiceBean.java)
+--  IMPORTANTE: setear @company_id con la compania de esta base (la del login,
+--  currentCompany.id) tomandola de la tabla 'compania'. Puede ser cualquier id
+--  (1, 8, 10, ...). Todo el script usa esta variable; no hay valores fijos.
 -- ----------------------------------------------------------------------------
 
--- 0) DIAGNOSTICO (ejecutar y REVISAR antes de continuar) --------------------
---    Debe devolver exactamente una fila por cada tabla, y valor >= al maximo
---    id realmente usado. Si aparece 'REVISAR: valor < max' NO continuar:
---    corregir el valor manualmente a max_id antes de aplicar el paso 1.
-
-SELECT s.tabla,
-       COUNT(*)                         AS filas_en_secuencia,
-       MAX(s.valor)                     AS valor_actual,
-       (SELECT MAX(e.id_tmpenc) FROM terdemol.sf_tmpenc e) AS max_id_encabezado,
-       (SELECT MAX(d.id_tmpdet) FROM terdemol.sf_tmpdet d) AS max_id_detalle
-  FROM terdemol.secuencia s
- WHERE s.tabla IN ('sf_tmpenc','sf_tmpdet')
- GROUP BY s.tabla;
-
---    Verificacion de coherencia (no debe devolver ninguna fila):
-SELECT 'sf_tmpenc' AS tabla, s.valor, m.max_id
-  FROM terdemol.secuencia s
-  JOIN (SELECT MAX(id_tmpenc) AS max_id FROM terdemol.sf_tmpenc) m
- WHERE s.tabla = 'sf_tmpenc' AND s.valor < m.max_id
-UNION ALL
-SELECT 'sf_tmpdet' AS tabla, s.valor, m.max_id
-  FROM terdemol.secuencia s
-  JOIN (SELECT MAX(id_tmpdet) AS max_id FROM terdemol.sf_tmpdet) m
- WHERE s.tabla = 'sf_tmpdet' AND s.valor < m.max_id;
-
---    Verificacion de fila unica (no debe haber duplicados de 'tabla';
---    'secuencia' no tiene indice unico). Si devuelve conteo > 1, consolidar
---    a una sola fila antes de continuar:
-SELECT tabla, COUNT(*) AS veces
-  FROM terdemol.secuencia
- WHERE tabla IN ('sf_tmpenc','sf_tmpdet')
- GROUP BY tabla
-HAVING COUNT(*) > 1;
+SET @company_id := 1;   -- <<< AJUSTAR al id real de la compania (ver tabla compania)
 
 
--- 1) AJUSTE (+1) -- aplicar SOLO si el diagnostico anterior salio limpio ----
-UPDATE terdemol.secuencia
+-- ----------------------------------------------------------------------------
+-- A) id_tmpenc / id_tmpdet  ->  @TableGenerator sobre 'secuencia'
+-- ----------------------------------------------------------------------------
+--  El id de sf_tmpenc / sf_tmpdet pasa a generarse con @TableGenerator de
+--  Hibernate en vez de newId_sf_tmpenc()/newId_sf_tmpdet().
+--
+--  Ajuste (+1): el generador entrega 'valor' y luego lo incrementa, mientras la
+--  funcion entregaba 'valor+1'. Sin este ajuste el primer asiento reutilizaria el
+--  ultimo id existente y chocaria con la clave primaria.
+--
+--  ROLLBACK: UPDATE secuencia SET valor = valor - 1 WHERE tabla IN ('sf_tmpenc','sf_tmpdet');
+
+UPDATE secuencia
    SET valor = valor + 1
- WHERE tabla IN ('sf_tmpenc','sf_tmpdet');
+ WHERE tabla IN ('sf_tmpenc', 'sf_tmpdet');
 
 
--- 2) VERIFICACION FINAL ------------------------------------------------------
---    'valor' debe quedar en max_id + 1 para ambas tablas.
-SELECT s.tabla, s.valor AS proximo_id
-  FROM terdemol.secuencia s
- WHERE s.tabla IN ('sf_tmpenc','sf_tmpdet');
+-- ----------------------------------------------------------------------------
+-- B) no_trans / no_doc  ->  '_sequence' por compania (idcompania + version)
+-- ----------------------------------------------------------------------------
+--  Evoluciona '_sequence' al estilo de 'gensecuencia': se le agrega la compania
+--  (idcompania, FK a compania) y el control optimista (version). La clave pasa a
+--  ser (seq_name, idcompania). no_trans y no_doc de asientos se generan desde
+--  Hibernate (entidad FinancesSequence) por compania real.
+--
+--  Las filas actuales de '_sequence' CONSERVAN su seq_val; solo se les asigna la
+--  compania (no hay seeding de valores). Todos los correlativos que antes daba
+--  getNextSeq (asientos, VALE, ventas) ahora se generan por JPA (FinancesSequence),
+--  que siempre informa idcompania: por eso la columna NO necesita DEFAULT.
+--
+--  ROLLBACK:
+--    ALTER TABLE _sequence DROP FOREIGN KEY fk_sequence_compania;
+--    ALTER TABLE _sequence DROP PRIMARY KEY, ADD PRIMARY KEY (seq_name);
+--    ALTER TABLE _sequence DROP COLUMN idcompania, DROP COLUMN version;
+
+-- B.1) Agregar columnas y asignar la compania a las filas existentes.
+--      seq_val se amplia a BIGINT: al mapear '_sequence' como entidad JPA
+--      (FinancesSequence.value = long), Hibernate valida el tipo y 'int' no cuadraria.
+ALTER TABLE _sequence
+    MODIFY COLUMN seq_val  BIGINT NOT NULL,
+    ADD COLUMN    idcompania BIGINT NULL,
+    ADD COLUMN    version    BIGINT NOT NULL DEFAULT 0;
+
+UPDATE _sequence SET idcompania = @company_id WHERE idcompania IS NULL;
+
+-- B.2) idcompania obligatoria. Sin DEFAULT: el unico escritor de '_sequence' es la
+--      entidad JPA FinancesSequence, que siempre informa idcompania.
+ALTER TABLE _sequence
+    MODIFY COLUMN idcompania BIGINT NOT NULL;
+
+-- B.3) Clave por (seq_name, idcompania)
+ALTER TABLE _sequence
+    DROP PRIMARY KEY,
+    ADD PRIMARY KEY (seq_name, idcompania);
+
+-- B.4) Integridad referencial con compania
+ALTER TABLE _sequence
+    ADD CONSTRAINT fk_sequence_compania
+        FOREIGN KEY (idcompania) REFERENCES compania (idcompania);
+
+
+-- ----------------------------------------------------------------------------
+-- C) sf_tmpenc: idcompania (FK a compania) -> asiento ligado a la entidad Company
+-- ----------------------------------------------------------------------------
+--  Se agrega la compania real al asiento (Voucher @ManyToOne Company), reemplazando
+--  al no_cia legacy (que se mantiene por compatibilidad). Las filas existentes se
+--  asignan a @company_id. La estampa CompanyListener con la compania de la sesion.
+--
+--  ROLLBACK:
+--    ALTER TABLE sf_tmpenc DROP FOREIGN KEY fk_sf_tmpenc_compania;
+--    ALTER TABLE sf_tmpenc DROP COLUMN idcompania;
+
+ALTER TABLE sf_tmpenc
+    ADD COLUMN idcompania BIGINT NULL;
+
+UPDATE sf_tmpenc SET idcompania = @company_id WHERE idcompania IS NULL;
+
+ALTER TABLE sf_tmpenc
+    MODIFY COLUMN idcompania BIGINT NOT NULL;
+
+ALTER TABLE sf_tmpenc
+    ADD CONSTRAINT fk_sf_tmpenc_compania
+        FOREIGN KEY (idcompania) REFERENCES compania (idcompania);
+
+
+-- ----------------------------------------------------------------------------
+-- D) sf_tmpdet: idcompania (FK a compania) -> detalle del asiento con Company
+-- ----------------------------------------------------------------------------
+--  Igual que el encabezado: el detalle (VoucherDetail @ManyToOne Company) lleva la
+--  compania real. Las filas existentes se asignan a @company_id; la estampa
+--  CompanyListener al persistir.
+--
+--  ROLLBACK:
+--    ALTER TABLE sf_tmpdet DROP FOREIGN KEY fk_sf_tmpdet_compania;
+--    ALTER TABLE sf_tmpdet DROP COLUMN idcompania;
+
+ALTER TABLE sf_tmpdet
+    ADD COLUMN idcompania BIGINT NULL;
+
+UPDATE sf_tmpdet SET idcompania = @company_id WHERE idcompania IS NULL;
+
+ALTER TABLE sf_tmpdet
+    MODIFY COLUMN idcompania BIGINT NOT NULL;
+
+ALTER TABLE sf_tmpdet
+    ADD CONSTRAINT fk_sf_tmpdet_compania
+        FOREIGN KEY (idcompania) REFERENCES compania (idcompania);
+
+
+-- ----------------------------------------------------------------------------
+-- E) sf_tmpenc: version -> bloqueo optimista (convencion de la arquitectura)
+-- ----------------------------------------------------------------------------
+--  Control de concurrencia de EDICION: dos usuarios editando/aprobando el mismo
+--  asiento ya no se pisan en silencio; el segundo recibe OptimisticLockException.
+--  DEFAULT 0 deja las filas existentes consistentes.
+--
+--  ROLLBACK: ALTER TABLE sf_tmpenc DROP COLUMN version;
+
+ALTER TABLE sf_tmpenc
+    ADD COLUMN version BIGINT NOT NULL DEFAULT 0;
+
+
+-- ----------------------------------------------------------------------------
+-- F) sf_tmpdet: version -> bloqueo optimista
+-- ----------------------------------------------------------------------------
+--  ROLLBACK: ALTER TABLE sf_tmpdet DROP COLUMN version;
+
+ALTER TABLE sf_tmpdet
+    ADD COLUMN version BIGINT NOT NULL DEFAULT 0;
+
+
+-- ----------------------------------------------------------------------------
+-- G) LIMPIEZA de funciones almacenadas (EJECUTAR SOLO DESPUES DE VALIDAR)
+-- ----------------------------------------------------------------------------
+--  Tras esta migracion, la generacion de ids y correlativos de asientos, vales y
+--  ventas pasa a Hibernate/JPA. Estas funciones quedan SIN llamadores. Se conservan
+--  como respaldo; descomentar y ejecutar recien cuando la migracion este validada
+--  en marcha.
+--
+-- DROP FUNCTION IF EXISTS getNextSeq;         -- asientos/vales/ventas -> FinancesSequence
+-- DROP FUNCTION IF EXISTS newId_sf_tmpenc;    -- id_tmpenc -> @TableGenerator
+-- DROP FUNCTION IF EXISTS newId_sf_tmpdet;    -- id_tmpdet -> @TableGenerator
+-- DROP FUNCTION IF EXISTS next_tmpenc;        -- sin uso (solo llamadores comentados)
+-- DROP FUNCTION IF EXISTS sigte_trans;        -- sin uso
+--
+--  NO borrar (siguen en uso, otra etapa):
+--    sigte_conci                  -> conciliacion (PayableDocumentServiceBean)
+--    newId_inv_inventario_detalle -> PK detalle de inventario (ApprovalWarehouseVoucher)

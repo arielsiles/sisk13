@@ -1691,7 +1691,7 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
         String transactionNumber = financesPkGeneratorService.getNextNoTransTmpenc();
 
         /** El id_tmpenc lo asigna Hibernate al persistir (@GeneratedValue TABLE) **/
-        String docNumber = financesPkGeneratorService.getNextNoTransByDocumentType("TR");
+        String docNumber = financesPkGeneratorService.getNextDocumentNumberByType("TR");
 
 
         System.out.println("-------------------------------> transactionNumber: " + transactionNumber);

@@ -20,9 +20,14 @@ import java.util.*;
 /**
  * BankingMovementSyncAction
  *
+ * OBSOLETO: importacion de extractos bancarios. Funcionalidad antigua, actualmente
+ * SIN USO. Se difiere su revision/retiro a una etapa posterior.
+ *
  * @author
  * @version 2.9
+ * @deprecated funcionalidad antigua sin uso; pendiente de retiro en otra etapa.
  */
+@Deprecated
 @Name("bankingMovementSyncAction")
 @Scope(ScopeType.CONVERSATION)
 public class BankingMovementSyncAction extends GenericAction<BankingMovementSync> {
