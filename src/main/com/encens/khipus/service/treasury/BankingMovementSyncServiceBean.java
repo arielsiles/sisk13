@@ -28,9 +28,14 @@ import java.util.Map;
 /**
  * BankingMovementSyncServiceBean
  *
+ * OBSOLETO: importacion de extractos bancarios. Funcionalidad antigua, actualmente
+ * SIN USO. Se difiere su revision/retiro a una etapa posterior.
+ *
  * @author
  * @version 2.10
+ * @deprecated funcionalidad antigua sin uso; pendiente de retiro en otra etapa.
  */
+@Deprecated
 @Name("bankingMovementSyncService")
 @Stateless
 @AutoCreate

@@ -22,9 +22,15 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * OBSOLETO: aprobacion MASIVA de asientos por rango de fechas. Funcionalidad antigua,
+ * SIN USO. Ademas NO valida el cuadre por asiento (aprueba en bloque), por lo que no
+ * debe reactivarse sin agregar esa validacion. Se difiere su retiro a otra etapa.
+ *
  * @author
  * @version 3.0
+ * @deprecated aprobacion masiva antigua sin uso; no valida cuadre. Pendiente de retiro.
  */
+@Deprecated
 @Name("voucherEntriesApproveAction")
 @Scope(ScopeType.CONVERSATION)
 public class VoucherEntriesApproveAction extends GenericAction<Voucher> {

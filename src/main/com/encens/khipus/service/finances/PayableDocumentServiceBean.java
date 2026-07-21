@@ -289,7 +289,8 @@ public class PayableDocumentServiceBean extends GenericServiceBean implements Pa
                                                     PayableDocumentType cashBoxDocumentType) throws EntryDuplicatedException, ConcurrencyException {
         PayableDocument payableDocument = findByAccountingMovement(cashBoxAccountingMovement);
         if (ValidatorUtil.isBlankOrNull(purchaseOrderPayment.getTransactionNumber())) {
-            purchaseOrderPayment.setTransactionNumber(financesPkGeneratorService.executeFunction(FinancesPkGeneratorService.NativeFunction.TRANSACTION_NUMBER));
+            /** VALE por JPA (FinancesSequence, por compania), antes getNextSeq('VALE'). **/
+            purchaseOrderPayment.setTransactionNumber(financesPkGeneratorService.getNextPK());
             update(purchaseOrderPayment);
         }
         if (null == payableDocument) {

@@ -28,6 +28,8 @@ public interface VoucherAccoutingService extends GenericService {
 
     List<PurchaseDocument> getPurchaseDcumentList(Voucher voucher);
 
+    boolean existsPurchaseDocument(String nit, String number, Date date, BigDecimal amount, Long excludedId);
+
     List<VoucherDetail> getVoucherDetailList(String transactionNumber);
 
     List<VoucherDetail> getDetailsByDates(String account, Date startDate, Date endDate);
@@ -35,6 +37,15 @@ public interface VoucherAccoutingService extends GenericService {
     public Voucher getVoucher(String transactionNumber);
 
     public Voucher getVoucher(Long id);
+
+    /** Version actualmente persistida en BD (lectura fresca, sin cache del PC). **/
+    Long getPersistedVersion(Long id);
+
+    /** Recarga el asiento desde BD forzando refresh (evita el cache del PC extendido). **/
+    Voucher refreshVoucher(Long id);
+
+    /** Recarga los detalles del asiento forzando refresh de cada uno. **/
+    List<VoucherDetail> refreshVoucherDetailList(Voucher voucher);
 
     void saveVoucher(Voucher voucher);
 

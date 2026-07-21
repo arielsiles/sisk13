@@ -38,6 +38,8 @@ public interface FinancesPkGeneratorService extends GenericService {
 
     String getNextNoTransByDocumentType(String DocumentType);
 
+    String getNextDocumentNumberByType(String documentType);
+
     String executeFunction(NativeFunction nativeFunction);
 
     /*Integer newId_sf_tmpenc();

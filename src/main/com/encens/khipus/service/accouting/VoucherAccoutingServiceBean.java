@@ -25,7 +25,9 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -70,8 +72,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
     public void saveVoucher(Voucher voucher){
 
-        Long id = financesPkGeneratorService.newId_sf_tmpenc();
-        voucher.setId(id);
+        /** El id_tmpenc lo asigna Hibernate al persistir (@GeneratedValue TABLE sobre 'secuencia') **/
 
         if (voucher.getTransactionNumber() == null){
             voucher.setTransactionNumber(financesPkGeneratorService.getNextNoTransTmpenc());
@@ -79,7 +80,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         System.out.println("---> voucher.getDocumentNumber(): " + voucher.getDocumentNumber());
         if (voucher.getDocumentNumber() == null){
-            voucher.setDocumentNumber(financesPkGeneratorService.getNextNoTransByDocumentType(voucher.getDocumentType()));
+            voucher.setDocumentNumber(financesPkGeneratorService.getNextDocumentNumberByType(voucher.getDocumentType()));
         }
 
         System.out.println("-------- VOUCHER ENCABEZADO -------");
@@ -95,10 +96,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         em.flush();
 
         System.out.println("-------- VOUCHER DETAILS -------");
+        int order = 0;
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
-            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            /** El id_tmpdet lo asigna Hibernate al persistir (@GeneratedValue TABLE) **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
+            voucherDetail.setOrderNumber(order++);
             em.persist(voucherDetail);
             em.flush();
         }
@@ -171,10 +174,14 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             em.flush();
         }*/
 
+        int order = 0;
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
 
+            /** Se guarda el orden de la linea segun su posicion actual en la lista. **/
+            voucherDetail.setOrderNumber(order++);
+
             if(voucherDetail.getTransactionNumber() == null){
-                voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+                /** id_tmpdet asignado por Hibernate al persistir **/
                 voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
                 voucherDetail.setVoucher(voucher);
 
@@ -189,8 +196,54 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }
         }
 
-        em.merge(voucher);
+        /** Persiste las facturas editadas en la grilla de Documento de compra **/
+        for (PurchaseDocument purchaseDocument : voucher.getPurchaseList()) {
+            if (purchaseDocument.getId() != null) {
+                em.merge(purchaseDocument);
+                em.flush();
+            }
+        }
+
+        /**
+         * Se fuerza el incremento de la version del encabezado (version del agregado),
+         * asi un cambio solo en los detalles tambien avanza la version del asiento y el
+         * bloqueo optimista detecta la edicion concurrente. El lock ademas verifica que
+         * la version en memoria coincida con la de BD (si no, lanza OptimisticLockException).
+         */
+        Voucher managedVoucher = em.merge(voucher);
+        em.lock(managedVoucher, LockModeType.WRITE);
         em.flush();
+    }
+
+    @Override
+    public Long getPersistedVersion(Long id) {
+        try {
+            return (Long) em.createQuery("select voucher.version from Voucher voucher where voucher.id = :id")
+                    .setParameter("id", id)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Voucher refreshVoucher(Long id) {
+        Voucher voucher = em.find(Voucher.class, id);
+        if (voucher != null) {
+            em.refresh(voucher);
+        }
+        return voucher;
+    }
+
+    @Override
+    public List<VoucherDetail> refreshVoucherDetailList(Voucher voucher) {
+        List<VoucherDetail> list = getVoucherDetailList(voucher);
+        if (list != null) {
+            for (VoucherDetail voucherDetail : list) {
+                em.refresh(voucherDetail);
+            }
+        }
+        return list;
     }
 
     public void simpleUpdateVoucher(Voucher voucher){
@@ -212,7 +265,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
 
 
-            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            /** id_tmpdet asignado por Hibernate al persistir **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
 
@@ -254,7 +307,7 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
 
         for (VoucherDetail voucherDetail : voucherDetailList){
-            voucherDetail.setId(financesPkGeneratorService.newId_sf_tmpdet());
+            /** id_tmpdet asignado por Hibernate al persistir **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
 
@@ -342,7 +395,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         try {
             voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
-                    " where voucherDetail.transactionNumber = :transactionNumber ")
+                    " where voucherDetail.transactionNumber = :transactionNumber " +
+                    " order by voucherDetail.orderNumber, voucherDetail.id ")
                     .setParameter("transactionNumber", transactionNumber)
                     .getResultList();
             /*voucherDetails = (List<VoucherDetail>) em.createNativeQuery("select * from sf_tmpdet where no_trans = :transactionNumber")
@@ -383,7 +437,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         try {
             voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
-                    " where voucherDetail.voucher = :voucher ")
+                    " where voucherDetail.voucher = :voucher " +
+                    " order by voucherDetail.orderNumber, voucherDetail.id ")
                     .setParameter("voucher", voucher)
                     .getResultList();
             /*voucherDetails = (List<VoucherDetail>) em.createNativeQuery("select * from sf_tmpdet where no_trans = :transactionNumber")
@@ -408,6 +463,43 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             return null;
         }
         return purchaseDocumentList;
+    }
+
+    /**
+     * Indica si ya existe una factura registrada con el mismo NIT, numero y fecha.
+     * Se ignoran las facturas anuladas y, si se indica, la propia factura que se esta editando.
+     */
+    @Override
+    public boolean existsPurchaseDocument(String nit, String number, Date date, BigDecimal amount, Long excludedId) {
+
+        if (nit == null || number == null || date == null || amount == null) {
+            return false;
+        }
+
+        StringBuilder jpql = new StringBuilder(
+                "select count(purchaseDocument) from PurchaseDocument purchaseDocument " +
+                " where purchaseDocument.nit = :nit " +
+                "   and purchaseDocument.number = :number " +
+                "   and purchaseDocument.date = :date " +
+                "   and purchaseDocument.amount = :amount " +
+                "   and purchaseDocument.state <> :nullifiedState ");
+
+        if (excludedId != null) {
+            jpql.append(" and purchaseDocument.id <> :excludedId ");
+        }
+
+        Query query = em.createQuery(jpql.toString())
+                .setParameter("nit", nit)
+                .setParameter("number", number)
+                .setParameter("date", date)
+                .setParameter("amount", amount)
+                .setParameter("nullifiedState", PurchaseDocumentState.NULLIFIED);
+
+        if (excludedId != null) {
+            query.setParameter("excludedId", excludedId);
+        }
+
+        return ((Long) query.getSingleResult()) > 0;
     }
 
     @Override

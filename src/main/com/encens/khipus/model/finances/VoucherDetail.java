@@ -1,7 +1,9 @@
 package com.encens.khipus.model.finances;
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.UpperCaseStringListener;
+import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.customers.*;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.warehouse.ProductItem;
@@ -27,11 +29,15 @@ import java.util.UUID;
         initialValue = 1,
         allocationSize = 1)
 @Entity
-@EntityListeners(UpperCaseStringListener.class)
+@EntityListeners({UpperCaseStringListener.class, CompanyListener.class})
 @Table(name = "sf_tmpdet", schema = Constants.FINANCES_SCHEMA)
 public class VoucherDetail implements BaseModel {
 
-    /*@GeneratedValue(strategy = GenerationType.TABLE, generator = "VoucherDetail.tableGenerator")*/
+    /**
+     * El id_tmpdet lo genera Hibernate via @TableGenerator sobre 'secuencia', reemplazando
+     * la asignacion manual con newId_sf_tmpdet(). Ver nota en Voucher.id.
+     */
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "VoucherDetail.tableGenerator")
     @Id
     @Column(name = "id_tmpdet", nullable = true)
     private Long id;
@@ -47,6 +53,29 @@ public class VoucherDetail implements BaseModel {
     @Column(name = "no_cia", updatable = false, length = 2)
     @Length(max = 2)
     private String companyNumber = "01";
+
+    /**
+     * Compania real del detalle del asiento (entidad Company). La estampa
+     * CompanyListener con la compania de la sesion al persistir. Reemplaza al no_cia
+     * legacy (que se mantiene por compatibilidad).
+     */
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
+    private Company company;
+
+    /**
+     * Control de concurrencia optimista (convencion de la arquitectura). Ver Voucher.version.
+     */
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
+
+    /**
+     * Orden de la linea dentro del asiento. Persiste el reordenamiento (flechas) para que
+     * se conserve al recargar/guardar. Se asigna segun la posicion en la lista al guardar.
+     */
+    @Column(name = "nro_orden")
+    private Integer orderNumber;
 
     @Column(name = "cod_uni", updatable = true)
     private String businessUnitCode;
@@ -232,6 +261,30 @@ public class VoucherDetail implements BaseModel {
 
     public void setCompanyNumber(String companyNumber) {
         this.companyNumber = companyNumber;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
+
+    public Integer getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(Integer orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
     public String getBusinessUnitCode() {

@@ -1,7 +1,9 @@
 package com.encens.khipus.model.finances;
 
 import com.encens.khipus.model.BaseModel;
+import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.CompanyNumberListener;
+import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.customers.Movement;
 import com.encens.khipus.model.purchases.PurchaseDocument;
 import com.encens.khipus.model.usertype.IntegerBooleanUserType;
@@ -35,14 +37,20 @@ import java.util.List;
         valueColumnName = com.encens.khipus.util.Constants.SEQUENCE_TABLE_VALUE_COLUMN_NAME,
         pkColumnValue = "sf_tmpenc",
         initialValue = 1,
-        allocationSize = 2)
+        allocationSize = 1)
 
 @Entity
-@EntityListeners({CompanyNumberListener.class})
+@EntityListeners({CompanyNumberListener.class, CompanyListener.class})
 @Table(name = "sf_tmpenc", schema = Constants.FINANCES_SCHEMA)
 public class Voucher implements BaseModel{
 
-    //@GeneratedValue(strategy = GenerationType.TABLE, generator = "Voucher.tableGenerator")
+    /**
+     * El id_tmpenc lo genera Hibernate via @TableGenerator sobre la tabla 'secuencia'
+     * (mismo mecanismo que el resto del sistema). Reemplaza la asignacion manual con la
+     * funcion almacenada newId_sf_tmpenc(), que no era segura ante concurrencia.
+     * allocationSize=1 => una lectura por id con compare-and-swap, sin saltos de numeracion.
+     */
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Voucher.tableGenerator")
     @Id
     @Column(name = "id_tmpenc", nullable = false)
     private Long id;
@@ -54,6 +62,15 @@ public class Voucher implements BaseModel{
     @Column(name = "no_cia", updatable = false, length = 20)
     @Length(max = 20)
     private String companyNumber = "01";
+
+    /**
+     * Compania real del asiento (entidad Company). La estampa CompanyListener con la
+     * compania de la sesion al persistir. Reemplaza al no_cia legacy (que se mantiene
+     * por compatibilidad con la integracion anterior).
+     */
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
+    private Company company;
 
     @Column(name = "formulario", updatable = true, length = 30)
     @Length(max = 30)
@@ -224,6 +241,15 @@ public class Voucher implements BaseModel{
     @Column(name = "updated_by")
     private String updatedBy;
 
+    /**
+     * Control de concurrencia optimista (convencion de la arquitectura, ~278 entidades).
+     * Detecta ediciones simultaneas del mismo asiento: el segundo guardado recibe
+     * OptimisticLockException en vez de pisar en silencio.
+     */
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = new Date();
@@ -269,6 +295,14 @@ public class Voucher implements BaseModel{
 
     public void setCompanyNumber(String companyNumber) {
         this.companyNumber = companyNumber;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 
     public String getForm() {
@@ -626,6 +660,14 @@ public class Voucher implements BaseModel{
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 
     public String userAudit() {
