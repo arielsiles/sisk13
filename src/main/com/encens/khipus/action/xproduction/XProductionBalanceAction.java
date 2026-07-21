@@ -9,6 +9,7 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,14 @@ public class XProductionBalanceAction {
     @In(create = true)
     private XProductionBalanceService xproductionBalanceService;
 
+    /**
+     * Contexto de persistencia de la conversacion. Se limpia al inicio de refresh() para
+     * recalcular los saldos frescos del DB (mismo tratamiento que el Kardex), de modo que
+     * ambos reportes cuadren siempre y no muestren un snapshot/cache viejo.
+     */
+    @In
+    private EntityManager entityManager;
+
     private Warehouse selectedWarehouse;
     /** Fecha de corte: los saldos se calculan hasta esta fecha. Por defecto, la fecha actual. */
     private Date balanceDate = new Date();
@@ -37,6 +46,10 @@ public class XProductionBalanceAction {
 
     /** Recalcula los saldos del almacen seleccionado desde el origen de los movimientos. */
     public void refresh() {
+        // Refresca el contexto de persistencia de la conversacion antes de recalcular, para no
+        // arrastrar un snapshot/cache L1 viejo (mismo criterio que el Kardex). Asi Saldos y
+        // Kardex siempre cuadran ante cambios hechos en otra sesion.
+        entityManager.clear();
         if (selectedWarehouse == null) {
             balanceList = new ArrayList<WarehouseBalanceRow>();
             return;

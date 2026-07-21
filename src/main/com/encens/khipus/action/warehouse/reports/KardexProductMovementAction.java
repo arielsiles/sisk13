@@ -36,6 +36,7 @@ import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
 
 import javax.faces.context.FacesContext;
+import javax.persistence.EntityManager;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -86,6 +87,13 @@ public class KardexProductMovementAction extends GenericReportAction {
 
     @In
     private XProductionService xproductionService;
+
+    /**
+     * Contexto de persistencia de la conversacion. Se limpia al inicio de cada
+     * generacion del reporte (ver computeReport) para no arrastrar un snapshot viejo.
+     */
+    @In
+    private EntityManager entityManager;
 
     @Create
     public void init() {
@@ -144,6 +152,12 @@ public class KardexProductMovementAction extends GenericReportAction {
      * Usada por la vista en pantalla, el PDF y el Excel para que siempre coincidan.
      */
     public List<CollectionData> computeReport() {
+        // Refresca el contexto de persistencia de la conversacion antes de leer. El em de
+        // conversacion (a diferencia de listEntityManager, scope EVENT) vive entre requests
+        // y su cache L1 puede retener estado viejo: si otra sesion crea/re-aprueba una orden
+        // o vale, el reporte seguia mostrando el dato "congelado" hasta re-loguear. Al limpiar,
+        // todas las fuentes (inv_movdet, xpr_producto, acopio, etc.) se releen frescas del DB.
+        entityManager.clear();
         List<CollectionData> datas = new ArrayList<CollectionData>(calculateCollectionData());
 
         previousAmount = BigDecimal.ZERO;
