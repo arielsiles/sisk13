@@ -62,7 +62,7 @@
                         id="productItemList"
                         rows="#{sessionUser.rowsPerPage}"
                         width="100%"
-                        columnsWidth="5%, 8%, 42%, 30%, 15%">
+                        columnsWidth="5%, 10%, 55%, 30%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column styleClass="center">
@@ -92,8 +92,6 @@
                         </app:commandSortHeader>
                     </rich:column>
 
-                    <rich:column>#{messages['Inventory.physicalBalance']}</rich:column>
-
                 </rich:columnGroup>
             </f:facet>
             <rich:column styleClass="center">
@@ -113,12 +111,6 @@
 
             <rich:column>
                 <h:outputText value="#{inventoryItem.productItem.warehouse.fullName}"/>
-            </rich:column>
-
-            <rich:column styleClass="right">
-                <h:outputText value="#{inventoryItem.unitaryBalance}">
-                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
-                </h:outputText>
             </rich:column>
         </rich:dataTable>
 

@@ -22,6 +22,7 @@ import com.encens.khipus.model.warehouse.DispatchState;
 import com.encens.khipus.model.warehouse.DispatchStockImpact;
 import com.encens.khipus.model.warehouse.DocumentTypePK;
 import com.encens.khipus.model.warehouse.InventoryMovement;
+import com.encens.khipus.model.warehouse.InventoryMovementPK;
 import com.encens.khipus.model.warehouse.InventoryPackaging;
 import com.encens.khipus.model.warehouse.MovementDetail;
 import com.encens.khipus.model.warehouse.MovementDetailType;
@@ -287,9 +288,12 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
         InventoryMovement inv = new InventoryMovement();
         inv.setCreationDate(new Date());
         inv.setMovementDate(dispatch.getDispatchDate());
+        // La descripcion (inv_mov.descri, la que muestra el Kardex) usa el CODIGO del
+        // cliente, no el nombre: los despachos son de Producto Terminado y no deben
+        // exponer el nombre del cliente (misma politica que el Certificado y el form).
         String desc = MessageUtils.getMessage("WarehouseDispatch.gloss.movement",
                 dispatch.getDeliveryOrderNumber(),
-                dispatch.getClient() != null ? dispatch.getClient().getFullName() : "",
+                dispatch.getClient() != null ? dispatch.getClient().getCodigo() : "",
                 dispatch.getSalesLotCode());
         inv.setDescription(desc);
 
@@ -329,6 +333,44 @@ public class DispatchVoucherServiceBean implements DispatchVoucherService {
         warehouseService.saveWarehouseVoucher(vale, inv, details, under, over, withoutWarnings);
         approvalWarehouseVoucherService.approveWarehouseVoucher(
                 vale.getId(), buildGloss(dispatch), under, over, withoutWarnings);
+
+        // 7.b) Re-fechar el vale a la fecha de CARGUIO/DESPACHO (dispatchDate).
+        //   El motor de aprobacion compartido (approveWarehouseVoucher) fecha el
+        //   movimiento aprobado y sus detalles con la fecha de aprobacion (mes-proceso
+        //   actual), NO con la del despacho. Como el despacho suele aprobarse mucho
+        //   despues del carguio, eso desfasa inv_movdet.fecha respecto de inv_vales.fecha
+        //   y descuadra Saldos de Almacen (lee el detalle) vs Kardex (lee la cabecera).
+        //   Correccion ACOTADA a ESTE vale: NO se toca el motor compartido (lo usan OC,
+        //   recepciones, transferencias, etc.); solo se re-fecha el inv_mov APROBADO y sus
+        //   inv_movdet de este despacho. Nota: con isDispatchInventoryControl desactivado
+        //   (etapa actual) el vale no toca stock/costo/historial mensual, por lo que basta
+        //   con re-fechar inv_mov/inv_movdet.
+        Date dispatchDate = dispatch.getDispatchDate();
+        String valeCompanyNumber = vale.getId().getCompanyNumber();
+        String valeTransactionNumber = vale.getId().getTransactionNumber();
+
+        InventoryMovement approvedMovement = em.find(InventoryMovement.class,
+                new InventoryMovementPK(valeCompanyNumber, valeTransactionNumber,
+                        WarehouseVoucherState.APR.name()));
+        if (approvedMovement != null) {
+            approvedMovement.setMovementDate(dispatchDate);
+            em.merge(approvedMovement);
+        }
+
+        for (Object row : em.createQuery(
+                "select md from MovementDetail md " +
+                        "where md.companyNumber = :companyNumber " +
+                        "and md.transactionNumber = :transactionNumber " +
+                        "and md.state = :state")
+                .setParameter("companyNumber", valeCompanyNumber)
+                .setParameter("transactionNumber", valeTransactionNumber)
+                .setParameter("state", WarehouseVoucherState.APR)
+                .getResultList()) {
+            MovementDetail approvedDetail = (MovementDetail) row;
+            approvedDetail.setMovementDetailDate(dispatchDate);
+            em.merge(approvedDetail);
+        }
+        em.flush();
 
         // 8) Enlazar vale al despacho y persistir
         dispatch.setWarehouseVoucher(vale);
