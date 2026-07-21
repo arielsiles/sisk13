@@ -147,6 +147,20 @@ ALTER TABLE sf_tmpdet
 
 
 -- ----------------------------------------------------------------------------
+-- H) sf_tmpdet: nro_orden -> conservar el reordenamiento de lineas del asiento
+-- ----------------------------------------------------------------------------
+--  Las flechas de reordenamiento ahora se persisten. Al guardar, cada linea recibe
+--  nro_orden segun su posicion en la lista. Las filas existentes quedan en NULL: la
+--  carga ordena "por nro_orden, luego id_tmpdet", asi los asientos viejos conservan
+--  su orden actual (por id) hasta que se vuelvan a guardar.
+--
+--  ROLLBACK: ALTER TABLE sf_tmpdet DROP COLUMN nro_orden;
+
+ALTER TABLE sf_tmpdet
+    ADD COLUMN nro_orden INT NULL;
+
+
+-- ----------------------------------------------------------------------------
 -- G) LIMPIEZA de funciones almacenadas (EJECUTAR SOLO DESPUES DE VALIDAR)
 -- ----------------------------------------------------------------------------
 --  Tras esta migracion, la generacion de ids y correlativos de asientos, vales y

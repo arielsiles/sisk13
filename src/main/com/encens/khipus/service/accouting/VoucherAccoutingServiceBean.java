@@ -96,10 +96,12 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         em.flush();
 
         System.out.println("-------- VOUCHER DETAILS -------");
+        int order = 0;
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
             /** El id_tmpdet lo asigna Hibernate al persistir (@GeneratedValue TABLE) **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
+            voucherDetail.setOrderNumber(order++);
             em.persist(voucherDetail);
             em.flush();
         }
@@ -172,7 +174,11 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             em.flush();
         }*/
 
+        int order = 0;
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
+
+            /** Se guarda el orden de la linea segun su posicion actual en la lista. **/
+            voucherDetail.setOrderNumber(order++);
 
             if(voucherDetail.getTransactionNumber() == null){
                 /** id_tmpdet asignado por Hibernate al persistir **/
@@ -389,7 +395,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         try {
             voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
-                    " where voucherDetail.transactionNumber = :transactionNumber ")
+                    " where voucherDetail.transactionNumber = :transactionNumber " +
+                    " order by voucherDetail.orderNumber, voucherDetail.id ")
                     .setParameter("transactionNumber", transactionNumber)
                     .getResultList();
             /*voucherDetails = (List<VoucherDetail>) em.createNativeQuery("select * from sf_tmpdet where no_trans = :transactionNumber")
@@ -430,7 +437,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
         try {
             voucherDetails = (List<VoucherDetail>) em.createQuery("select voucherDetail from VoucherDetail voucherDetail " +
-                    " where voucherDetail.voucher = :voucher ")
+                    " where voucherDetail.voucher = :voucher " +
+                    " order by voucherDetail.orderNumber, voucherDetail.id ")
                     .setParameter("voucher", voucher)
                     .getResultList();
             /*voucherDetails = (List<VoucherDetail>) em.createNativeQuery("select * from sf_tmpdet where no_trans = :transactionNumber")

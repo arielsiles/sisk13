@@ -60,7 +60,8 @@ public class VoucherReportAction extends GenericReportAction {
         restrictions = new String[]{
                 "voucher.id=#{voucherReportAction.voucherId}"
         };
-        //sortProperty = "name";
+        /** Conserva en el reporte el mismo orden de lineas que en pantalla (reordenamiento). **/
+        sortProperty = "voucherDetail.orderNumber, voucherDetail.id";
     }
 
     @Override

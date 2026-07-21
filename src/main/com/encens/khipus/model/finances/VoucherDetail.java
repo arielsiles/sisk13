@@ -70,6 +70,13 @@ public class VoucherDetail implements BaseModel {
     @Column(name = "version", nullable = false)
     private long version;
 
+    /**
+     * Orden de la linea dentro del asiento. Persiste el reordenamiento (flechas) para que
+     * se conserve al recargar/guardar. Se asigna segun la posicion en la lista al guardar.
+     */
+    @Column(name = "nro_orden")
+    private Integer orderNumber;
+
     @Column(name = "cod_uni", updatable = true)
     private String businessUnitCode;
 
@@ -270,6 +277,14 @@ public class VoucherDetail implements BaseModel {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public Integer getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(Integer orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
     public String getBusinessUnitCode() {

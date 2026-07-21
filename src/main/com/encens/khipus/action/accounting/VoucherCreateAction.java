@@ -762,9 +762,6 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
         voucher.setState(VoucherState.APR.toString());
 
-        if (voucher.getNumber() != null)
-            voucher.setDocumentNumber(voucher.getNumber());
-
         try {
             voucherAccoutingService.approveVoucher(voucher);
             voucherAccoutingService.approveInvoicesVoucher(voucher);

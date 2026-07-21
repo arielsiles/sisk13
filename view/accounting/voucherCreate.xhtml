@@ -60,7 +60,7 @@
 
     <h:commandButton action="#{voucherCreateAction.generateReport(voucherCreateAction.voucher)}"
                      styleClass="button"
-                     rendered="#{voucherCreateAction.managed}"
+                     rendered="#{voucherCreateAction.approved}"
                      value="#{messages['Voucher.report.generateReport']}" id="generateButtonId"
                      tabindex="4" />
 
@@ -118,10 +118,6 @@
                            required="true">
             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
             </rich:calendar>
-
-            <rich:spacer width="5" />
-
-            <h:inputText id="number" value="#{voucherCreateAction.voucher.number}" styleClass="inputTiny" />
 
         </s:decorate>
 
