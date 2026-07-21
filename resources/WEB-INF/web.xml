@@ -10,6 +10,18 @@
         <param-value>com.sun.facelets.FaceletViewHandler</param-value>
     </context-param>
 
+    <!--
+        Al reiniciar el servidor se pierde el estado de las vistas en sesion. El
+        a4j:poll del panel de notificaciones (iframe del template) pega contra una
+        vista expirada y lanzaba ViewExpiredException apenas se entraba. Con esto,
+        ante una vista expirada en un request ajax, RichFaces hace que el cliente
+        recargue la pagina (obtiene una vista fresca) en vez de mostrar el error.
+    -->
+    <context-param>
+        <param-name>org.ajax4jsf.handleViewExpiredOnClient</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
     <!-- FLech -->
     <!--<context-param>
         <param-name>org.richfaces.SKIN</param-name>
