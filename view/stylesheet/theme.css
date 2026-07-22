@@ -48,7 +48,7 @@ body {
 }
 
 .body {
-    padding: 10px 20px 20px 20px;
+    padding: 4px 20px 20px 20px;
 
 }
 
@@ -107,6 +107,46 @@ ul {
 .rich-messages-marker img {
     padding-right: 4px;
     margin-right: 4px;
+}
+
+/* Banda reservada para mensajes globales (rich:messages globalOnly del template).
+   Objetivo: que un mensaje de 1 renglon aparezca SIN desplazar el contenido hacia
+   abajo, reutilizando el espacio que ya existe hoy (no aumentar). Para lograrlo se
+   COMPACTA el propio banner (icono 16px, sin padding vertical, 1 linea) para que su
+   alto natural sea <= el alto reservado; asi un mensaje normal cabe en la banda y no
+   la hace crecer. Solo un mensaje realmente largo (multilinea) la expande (empuja).
+   Todo scoped: no modifica .message/.messageInfo/... usadas en otras vistas. */
+.app-msgband {
+    display: flex;
+    align-items: center;
+    min-height: 18px;
+    box-sizing: border-box;
+    line-height: 1.1;
+}
+/* Colapsa TODA la estructura interna que el skin glassX mete alrededor del
+   rich:messages (tabla/spans/caja con padding). Scoped con !important: solo afecta
+   dentro de .app-msgband, no a las clases de mensaje usadas en otras vistas. */
+.app-msgband * {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-spacing: 0 !important;
+    background: transparent !important;
+    vertical-align: middle !important;
+    line-height: 1.1 !important;
+}
+/* Solo separacion horizontal del texto del mensaje. */
+.app-msgband .message,
+.app-msgband .messageInfo,
+.app-msgband .messageError,
+.app-msgband .messageWarm {
+    padding: 0 8px !important;
+}
+/* Icono en su tamano intrinseco (16px), sin ocupar alto extra. */
+.app-msgband img {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 4px !important;
 }
 
 .errors {

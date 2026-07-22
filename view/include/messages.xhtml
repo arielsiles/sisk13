@@ -4,7 +4,10 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:rich="http://richfaces.org/rich"
                 xmlns:s="http://jboss.com/products/seam/taglib">
-    <div>
+    <!-- Banda reservada para mensajes globales (app-msgband): reserva el alto del gap
+         actual para que un mensaje de 1 renglon NO desplace el contenido; solo crece si
+         el mensaje excede. El <br/> se elimino: el espaciado se controla por CSS. -->
+    <div class="app-msgband">
         <rich:messages globalOnly="true" styleClass="message" errorClass="messageError" infoClass="messageInfo"
                        warnClass="messageWarm">
             <f:facet name="errorMarker">
@@ -17,7 +20,6 @@
                 <h:graphicImage value="/img/warnIcon.gif"/>
             </f:facet>
         </rich:messages>
-        <br/>
     </div>
 </ui:composition>
 
