@@ -100,33 +100,25 @@
             <s:convertEntity/>
         </h:selectOneMenu>
 
-        <!-- Tipo de Pago (filtro nuevo): payConditions -->
-        <h:selectOneMenu id="payConditions"
-                         value="#{warehousePurchaseOrderDataModel.payConditions}"
-                         styleClass="app-filterbar__select"
-                         tabindex="9">
-            <s:selectItems value="#{payConditionsList.resultList}"
-                           var="payConditions"
-                           label="#{payConditions.fullName}"
-                           noSelectionLabel="#{messages['PurchaseOrder.payConditionsShort']}"
-                           hideNoSelectionLabel="false"/>
-            <s:convertEntity/>
-        </h:selectOneMenu>
-
         <!-- Proveedor: se mantiene el popup de busqueda (selectPopUp), estilizado como
              input de la barra y con placeholder "Proveedor". Su reRender apunta a
              providerField para no re-renderizar toda la barra. -->
-        <a4j:outputPanel id="providerField" layout="inline">
+        <a4j:outputPanel id="providerField" layout="inline" styleClass="app-provider-inline">
             <app:selectPopUp id="provider"
                              required="false"
                              styleClass="app-filterbar__input app-ph-provider"
-                             textValue="#{warehousePurchaseOrderDataModel.provider.fullName}"
+                             selectImage="/img/search-line.svg"
+                             clearImage="/img/x-line.svg"
+                             renderedSelectLink="#{empty warehousePurchaseOrderDataModel.provider}"
+                             renderedClearLink="#{not empty warehousePurchaseOrderDataModel.provider}"
+                             clearOncomplete="poApplyPlaceholders();"
+                             textValue="#{warehousePurchaseOrderDataModel.provider.entity.acronym}"
                              value="#{warehousePurchaseOrderDataModel.provider}"
                              clearAction="warehousePurchaseOrderDataModel.cleanProvider()"
                              searchModalPanel="providerListModalPanel"
                              dataModel="#{providerDataModel}"
                              reRender="providerField"
-                             tabindex="10">
+                             tabindex="9">
                 <ui:define name="dataModelStaticProperties">
                     <f:setPropertyActionListener
                             value="#{enumerationUtil.getEnumValue('com.encens.khipus.model.finances.FinancesEntityState','VIG')}"
@@ -134,6 +126,19 @@
                 </ui:define>
             </app:selectPopUp>
         </a4j:outputPanel>
+
+        <!-- Tipo de Pago (filtro nuevo): payConditions -->
+        <h:selectOneMenu id="payConditions"
+                         value="#{warehousePurchaseOrderDataModel.payConditions}"
+                         styleClass="app-filterbar__select"
+                         tabindex="10">
+            <s:selectItems value="#{payConditionsList.resultList}"
+                           var="payConditions"
+                           label="#{payConditions.fullName}"
+                           noSelectionLabel="#{messages['PurchaseOrder.payConditionsShort']}"
+                           hideNoSelectionLabel="false"/>
+            <s:convertEntity/>
+        </h:selectOneMenu>
 
         <a4j:commandLink action="#{warehousePurchaseOrderFilterHolder.searchAndSave}"
                          reRender="purchaseOrderList, dataScroller"

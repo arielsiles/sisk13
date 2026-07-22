@@ -81,7 +81,7 @@
                                  ajaxSingle="true"
                                  immediate="true"
                                  title="#{hotKeySelect} #{messages['Common.choose']}">
-                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    <h:graphicImage value="#{not empty selectImage ? selectImage : '/img/search.jpg'}" styleClass="select-image-middle"/>
                     <f:attribute name="entityManagerName" value="#{entityManagerName}"/>
                     <f:attribute name="dataModelObject" value="#{dataModel}"/>
                     <ui:insert name="criteriaValues"/>
@@ -113,11 +113,12 @@
                 <a4j:commandLink id="#{clearLinkId}"
                                  action="#{elEvaluator.evaluateMethodBinding(clearAction)}"
                                  reRender="#{not empty reRender ? reRender : id}"
+                                 oncomplete="#{clearOncomplete}"
                                  rendered="#{(not empty renderedClearLink ? renderedClearLink : true)}"
                                  ajaxSingle="true"
                                  immediate="true"
                                  title="#{messages['Common.clear']}">
-                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    <h:graphicImage value="#{not empty clearImage ? clearImage : '/img/clear.jpg'}" styleClass="select-image-middle"/>
                 </a4j:commandLink>
 
                 <h:inputHidden id="hidden_#{id}"

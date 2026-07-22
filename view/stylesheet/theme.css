@@ -1380,6 +1380,26 @@ input[type="text"].disabledInput {
     padding: 0;
 }
 
+/* Proveedor (selectPopUp) como "input con accion adentro": el icono (lupa/goma) se
+   superpone al borde derecho del input y alterna segun haya o no seleccion. Scoped:
+   solo afecta al contenedor con esta clase, no a otros selectPopUp del sistema. */
+.app-provider-inline {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+.app-provider-inline .app-filterbar__input {
+    padding-right: 26px;
+}
+.app-provider-inline .select-image-middle {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    margin: 0;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
 .app-filterbar__input {
     width: 200px;
 }
