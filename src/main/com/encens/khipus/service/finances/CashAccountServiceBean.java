@@ -340,7 +340,7 @@ public class CashAccountServiceBean implements CashAccountService {
         }
         Set<String> distinct = new LinkedHashSet<String>(accountCodes);
         List<String> found = em.createQuery(
-                "select ca.accountCode from CashAccount ca where ca.accountCode in :codes")
+                "select ca.accountCode from CashAccount ca where ca.accountCode in (:codes)")
                 .setParameter("codes", distinct)
                 .getResultList();
         Set<String> existing = new HashSet<String>(found);
