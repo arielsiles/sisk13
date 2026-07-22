@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Name("purchaseDocumentDataModel")
 @Scope(ScopeType.PAGE)
-@Restrict("#{s:hasPermission('PURCHASEDOCUMENT','VIEW')}")
+@Restrict("#{s:hasPermission('PURCHASEBOOKREPORT','VIEW')}")
 public class PurchaseDocumentDataModel extends QueryDataModel<Long, PurchaseDocument> {
 
     private Date startDate;
