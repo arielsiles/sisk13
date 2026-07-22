@@ -89,16 +89,18 @@ public class UlexitaDailyReportAction {
     private static final int COL_PT_A        = 16;  // Q
     private static final int COL_PT_B        = 17;  // R
     private static final int COL_PT_BUENO    = 18;  // S
-    private static final int COL_DESPACHO    = 19;  // T  (NUEVA)
-    private static final int COL_SALDO       = 20;  // U  (NUEVA: saldo PT)
-    private static final int COL_REPROC_OUT  = 21;  // V
-    private static final int COL_KPM_BENT    = 22;  // W
-    private static final int COL_KPM_MERMA   = 23;  // X
-    private static final int COL_KPA         = 24;  // Y
-    private static final int COL_MERMA       = 25;  // Z
-    private static final int COL_MERMA_PCT   = 26;  // AA
-    private static final int COL_OBS         = 27;  // AB
-    private static final int LAST_COL        = 27;
+    private static final int COL_DESPACHO_A  = 19;  // T  (DESPACHO A)
+    private static final int COL_DESPACHO_B  = 20;  // U  (DESPACHO B)
+    private static final int COL_SALDO_A     = 21;  // V  (SALDO A)
+    private static final int COL_SALDO_B     = 22;  // W  (SALDO B)
+    private static final int COL_REPROC_OUT  = 23;  // X
+    private static final int COL_KPM_BENT    = 24;  // Y
+    private static final int COL_KPM_MERMA   = 25;  // Z
+    private static final int COL_KPA         = 26;  // AA
+    private static final int COL_MERMA       = 27;  // AB
+    private static final int COL_MERMA_PCT   = 28;  // AC
+    private static final int COL_OBS         = 29;  // AD
+    private static final int LAST_COL        = 29;
 
     private static final int HEADER_ROW1     = 3;
     private static final int HEADER_ROW2     = 4;
@@ -154,16 +156,23 @@ public class UlexitaDailyReportAction {
                 list.add(p);
             }
 
-            // Acopio (INGRESO) y Despacho por dia
+            // Acopio (INGRESO) por dia y Despacho por dia separado por producto A / B.
+            // dispatchRows acepta una coleccion de codigos: se llama con {A} y con {B} por
+            // separado (sin tocar el servicio) para tener DESPACHO A y DESPACHO B.
+            String codPtA = productionLine.getCodArtPtA();
+            String codPtB = productionLine.getCodArtPtB();
             Map<Integer, BigDecimal> ingresoByDay = bucketByDay(baritinaDailyReportService.sumAcopioByDay(mpCod, firstDay, nextMonth));
-            Map<Integer, BigDecimal> despachoByDay = bucketByDay(baritinaDailyReportService.dispatchRows(ptCods, firstDay, nextMonth));
+            Map<Integer, BigDecimal> despachoAByDay = bucketByDay(baritinaDailyReportService.dispatchRows(codes(codPtA), firstDay, nextMonth));
+            Map<Integer, BigDecimal> despachoBByDay = bucketByDay(baritinaDailyReportService.dispatchRows(codes(codPtB), firstDay, nextMonth));
 
-            // Saldo anterior de ULEX DISPONIBLE: se toma del mismo calculo que la pantalla
-            // "Saldos de Almacen" (XProductionBalanceService) para el articulo MP principal,
-            // al ultimo dia del mes anterior (firstDay - 1). Asi la columna arranca del mismo
-            // saldo que muestra Saldos. El PT (saldoPt) mantiene su calculo previo.
+            // Saldo anterior de ULEX DISPONIBLE (col E): balance del MP principal segun
+            // "Saldos de Almacen" (XProductionBalanceService) al ultimo dia del mes anterior.
             BigDecimal ulexDisp = ulexBalanceBeforeTn(mpCod, firstDay);
-            BigDecimal saldoPt = BigDecimalUtil.subtract(ptBuenoBeforeTn, tn(baritinaDailyReportService.sumDispatchBefore(ptCods, firstDay)), 6);
+            // SALDO ANT. de PT por tipo (A y B): tambien desde "Saldos de Almacen"
+            // (warehouseBalance) al ultimo dia del mes anterior, en TN.
+            Map<String, BigDecimal> ptSaldoAnt = balancesBeforeTn(Arrays.asList(codPtA, codPtB), firstDay);
+            BigDecimal saldoA = nz(ptSaldoAnt.get(codPtA));
+            BigDecimal saldoB = nz(ptSaldoAnt.get(codPtB));
 
             HSSFWorkbook wb = new HSSFWorkbook();
             HSSFSheet sheet = wb.createSheet("ULEXITA " + month + "-" + year);
@@ -179,7 +188,8 @@ public class UlexitaDailyReportAction {
             sheet.addMergedRegion(new CellRangeAddress(SALDO_ROW, SALDO_ROW, COL_FECHA, COL_DIA));
             for (int col = COL_INGRESO; col <= LAST_COL; col++) setText(rs, col, null, s.body);
             setNumber(rs, COL_ULEX_DISP, ulexDisp, s.body);
-            setNumber(rs, COL_SALDO, saldoPt, s.body);
+            setNumber(rs, COL_SALDO_A, saldoA, s.body);
+            setNumber(rs, COL_SALDO_B, saldoB, s.body);
             setText(rs, COL_OBS, null, s.obsLeft);
 
             BigDecimal[] totals = new BigDecimal[LAST_COL + 1];
@@ -192,20 +202,22 @@ public class UlexitaDailyReportAction {
                 dayCal.set(year, month - 1, d);
                 Date date = dayCal.getTime();
 
-                BigDecimal ingreso = tn(ingresoByDay.get(d));   // acopio KG -> TN
-                BigDecimal despacho = tn(despachoByDay.get(d)); // despacho KG -> TN
+                BigDecimal ingreso = tn(ingresoByDay.get(d));      // acopio KG -> TN
+                BigDecimal despachoA = tn(despachoAByDay.get(d));  // despacho A KG -> TN
+                BigDecimal despachoB = tn(despachoBByDay.get(d));  // despacho B KG -> TN
                 // ULEX DISP = saldo_ant + INGRESO - CONSUMO.
                 // El INGRESO (acopio) se suma una vez por dia; el CONSUMO se resta por orden.
                 ulexDisp = BigDecimalUtil.sum(ulexDisp, ingreso, 6);
 
                 List<XProduction> dayOrders = ordersByDay.get(d);
                 if (dayOrders == null || dayOrders.isEmpty()) {
-                    // Dia sin orden: fila en blanco con saldos arrastrados
-                    saldoPt = BigDecimalUtil.subtract(saldoPt, despacho, 6);
+                    // Dia sin orden: fila en blanco con saldos arrastrados (por tipo)
+                    saldoA = BigDecimalUtil.subtract(saldoA, despachoA, 6);
+                    saldoB = BigDecimalUtil.subtract(saldoB, despachoB, 6);
                     HSSFRow row = sheet.createRow(rowIdx++);
-                    writeFlowCells(row, s, fmt.format(date), dayLetter(date), ingreso, ulexDisp, despacho, saldoPt, null);
+                    writeFlowCells(row, s, fmt.format(date), dayLetter(date), ingreso, ulexDisp, despachoA, despachoB, saldoA, saldoB, null);
                     blankProcessCells(row, s);
-                    addTotals(totals, ingreso, despacho, null, null);
+                    addTotals(totals, ingreso, despachoA, despachoB, null, null);
                 } else {
                     boolean first = true;
                     for (XProduction p : dayOrders) {
@@ -213,17 +225,20 @@ public class UlexitaDailyReportAction {
                         XProductionUlexitaCalc calc = new XProductionUlexitaCalc(
                                 p, u, p.getProductionLine(), p.getSupplyList(), p.getProductionProductList());
                         BigDecimal rowIngreso = first ? ingreso : BigDecimal.ZERO;
-                        BigDecimal rowDespacho = first ? despacho : BigDecimal.ZERO;
+                        BigDecimal rowDespachoA = first ? despachoA : BigDecimal.ZERO;
+                        BigDecimal rowDespachoB = first ? despachoB : BigDecimal.ZERO;
                         // Restar el CONSUMO de la orden al ULEX DISPONIBLE
                         BigDecimal consumo = (p.isApproved() && u != null && u.getConsumoMpCalcSnap() != null)
                                 ? u.getConsumoMpCalcSnap() : calc.getConsumoMpCalc();
                         ulexDisp = BigDecimalUtil.subtract(ulexDisp, nz(consumo), 6);
-                        saldoPt = BigDecimalUtil.subtract(BigDecimalUtil.sum(saldoPt, nz(calc.getPtTotalBueno()), 6), rowDespacho, 6);
+                        // SALDO por tipo = SALDO ANT + PRODUCTO(tipo) - DESPACHO(tipo)
+                        saldoA = BigDecimalUtil.subtract(BigDecimalUtil.sum(saldoA, nz(calc.getPtA()), 6), rowDespachoA, 6);
+                        saldoB = BigDecimalUtil.subtract(BigDecimalUtil.sum(saldoB, nz(calc.getPtB()), 6), rowDespachoB, 6);
 
                         HSSFRow row = sheet.createRow(rowIdx++);
-                        writeFlowCells(row, s, fmt.format(date), dayLetter(date), rowIngreso, ulexDisp, rowDespacho, saldoPt, p.getObservation());
+                        writeFlowCells(row, s, fmt.format(date), dayLetter(date), rowIngreso, ulexDisp, rowDespachoA, rowDespachoB, saldoA, saldoB, p.getObservation());
                         writeProcessCells(row, s, p, u, calc);
-                        addTotals(totals, rowIngreso, rowDespacho, u, calc);
+                        addTotals(totals, rowIngreso, rowDespachoA, rowDespachoB, u, calc);
                         first = false;
                     }
                 }
@@ -239,7 +254,8 @@ public class UlexitaDailyReportAction {
                 else setText(rt, col, null, s.totals);
             }
             setNumber(rt, COL_ULEX_DISP, ulexDisp, s.totals); // ultimo saldo
-            setNumber(rt, COL_SALDO, saldoPt, s.totals);      // ultimo saldo
+            setNumber(rt, COL_SALDO_A, saldoA, s.totals);     // ultimo saldo A
+            setNumber(rt, COL_SALDO_B, saldoB, s.totals);     // ultimo saldo B
 
             for (int i = 0; i <= LAST_COL; i++) sheet.setColumnWidth(i, columnWidthFor(i));
 
@@ -280,8 +296,6 @@ public class UlexitaDailyReportAction {
         putHeader(sheet, rh1, rh2, COL_LEY_PT,      "Ley PT",                             s.header);
         putHeader(sheet, rh1, rh2, COL_GRANULADO,   "PRODUCTO GRANULADO (TN)",            s.header);
         putHeader(sheet, rh1, rh2, COL_PT_BUENO,    "PT TOTAL BUENO (TN)",                s.header);
-        putHeader(sheet, rh1, rh2, COL_DESPACHO,    "DESPACHO (TN)",                      s.header);
-        putHeader(sheet, rh1, rh2, COL_SALDO,       "SALDO (TN)",                         s.header);
         putHeader(sheet, rh1, rh2, COL_REPROC_OUT,  "REPROCESO final (TN)",               s.header);
         putHeader(sheet, rh1, rh2, COL_KPM_BENT,    "Kpm bentonita",                      s.header);
         putHeader(sheet, rh1, rh2, COL_KPM_MERMA,   "Kpm merma",                          s.header);
@@ -304,6 +318,20 @@ public class UlexitaDailyReportAction {
         setText(rh2, COL_PT_A, "A", s.header);
         setText(rh2, COL_PT_B, "B", s.header);
 
+        // DESPACHO (TN): row1 mergeado A-B, row2 separadas A/B (mismo patron que PRODUCTO)
+        setText(rh1, COL_DESPACHO_A, "DESPACHO (TN)", s.header);
+        setText(rh1, COL_DESPACHO_B, null, s.header);
+        sheet.addMergedRegion(new CellRangeAddress(HEADER_ROW1, HEADER_ROW1, COL_DESPACHO_A, COL_DESPACHO_B));
+        setText(rh2, COL_DESPACHO_A, "A", s.header);
+        setText(rh2, COL_DESPACHO_B, "B", s.header);
+
+        // SALDOS (TN): row1 mergeado A-B, row2 separadas A/B
+        setText(rh1, COL_SALDO_A, "SALDOS (TN)", s.header);
+        setText(rh1, COL_SALDO_B, null, s.header);
+        sheet.addMergedRegion(new CellRangeAddress(HEADER_ROW1, HEADER_ROW1, COL_SALDO_A, COL_SALDO_B));
+        setText(rh2, COL_SALDO_A, "A", s.header);
+        setText(rh2, COL_SALDO_B, "B", s.header);
+
         sheet.createFreezePane(0, DATA_START_ROW);
     }
 
@@ -319,13 +347,16 @@ public class UlexitaDailyReportAction {
     /** Celdas comunes (flujos de MP/PT, fecha, dia, observaciones). */
     private void writeFlowCells(HSSFRow row, Styles s, String fecha, String dia,
                                 BigDecimal ingreso, BigDecimal ulexDisp,
-                                BigDecimal despacho, BigDecimal saldoPt, String obs) {
+                                BigDecimal despachoA, BigDecimal despachoB,
+                                BigDecimal saldoA, BigDecimal saldoB, String obs) {
         setText(row, COL_FECHA, fecha, s.body);
         setText(row, COL_DIA, dia, s.bodyCenter);
         if (!isZero(ingreso)) setNumber(row, COL_INGRESO, ingreso, s.body); else setText(row, COL_INGRESO, null, s.body);
         setNumber(row, COL_ULEX_DISP, ulexDisp, s.body);
-        if (!isZero(despacho)) setNumber(row, COL_DESPACHO, despacho, s.body); else setText(row, COL_DESPACHO, null, s.body);
-        setNumber(row, COL_SALDO, saldoPt, s.body);
+        if (!isZero(despachoA)) setNumber(row, COL_DESPACHO_A, despachoA, s.body); else setText(row, COL_DESPACHO_A, null, s.body);
+        if (!isZero(despachoB)) setNumber(row, COL_DESPACHO_B, despachoB, s.body); else setText(row, COL_DESPACHO_B, null, s.body);
+        setNumber(row, COL_SALDO_A, saldoA, s.body);
+        setNumber(row, COL_SALDO_B, saldoB, s.body);
         setText(row, COL_OBS, obs, s.obsLeft);
     }
 
@@ -361,10 +392,12 @@ public class UlexitaDailyReportAction {
         for (int col = COL_REPROC_OUT; col <= COL_MERMA_PCT; col++) setText(row, col, null, s.body);
     }
 
-    private void addTotals(BigDecimal[] totals, BigDecimal ingreso, BigDecimal despacho,
+    private void addTotals(BigDecimal[] totals, BigDecimal ingreso,
+                           BigDecimal despachoA, BigDecimal despachoB,
                            XProductionUlexita u, XProductionUlexitaCalc calc) {
         addToTotals(totals, COL_INGRESO, ingreso);
-        addToTotals(totals, COL_DESPACHO, despacho);
+        addToTotals(totals, COL_DESPACHO_A, despachoA);
+        addToTotals(totals, COL_DESPACHO_B, despachoB);
         if (calc == null) return;
         addToTotals(totals, COL_CONSUMO,    calc.getConsumoMpCalc());
         addToTotals(totals, COL_DILUYENTE,  calc.getDiluyenteTotal());
@@ -424,6 +457,39 @@ public class UlexitaDailyReportAction {
         return BigDecimal.ZERO;
     }
 
+    /**
+     * Saldos de PT por tipo (A/B) en TN al ultimo dia del mes anterior (firstDay - 1),
+     * desde "Saldos de Almacen" (XProductionBalanceService, mismo criterio que la pantalla
+     * warehouseBalance). A y B comparten almacen (PT), asi que se calcula el balance del
+     * almacen una sola vez y se extraen ambos codigos. Devuelve un mapa cod -> saldo TN.
+     */
+    private Map<String, BigDecimal> balancesBeforeTn(List<String> cods, Date firstDay) {
+        Map<String, BigDecimal> result = new HashMap<String, BigDecimal>();
+        String ref = null;
+        for (String cod : cods) { if (cod != null) { ref = cod; break; } }
+        if (ref == null) return result;
+        ProductItem pi = productItemService.findProductItemByCode(ref);
+        if (pi == null) return result;
+        Calendar c = Calendar.getInstance();
+        c.setTime(firstDay);
+        c.add(Calendar.DAY_OF_MONTH, -1);
+        List<WarehouseBalanceRow> balances = xproductionBalanceService.computeBalances(
+                pi.getCompanyNumber(), pi.getWarehouseCode(), c.getTime());
+        for (WarehouseBalanceRow row : balances) {
+            for (String cod : cods) {
+                if (cod != null && cod.equals(row.getProductItemCode())) {
+                    result.put(cod, tn(row.getBalance()));
+                }
+            }
+        }
+        return result;
+    }
+
+    /** Coleccion de un solo codigo (o vacia si es null) para pasar a dispatchRows. */
+    private static Collection<String> codes(String cod) {
+        return cod == null ? Collections.<String>emptyList() : Collections.singletonList(cod);
+    }
+
     // ------------------------------------------------------------------ helpers
 
     private static BigDecimal tn(BigDecimal kg) {
@@ -463,12 +529,14 @@ public class UlexitaDailyReportAction {
             case COL_OBS:         return pxWidth(370); // OBSERVACIONES
             case COL_LEY_RECALC:  return pxWidth(82);  // Ley MP recalculada
             case COL_GRANULADO:   return pxWidth(92);  // PRODUCTO GRANULADO (TN)
-            case COL_SALDO:       return pxWidth(78);  // SALDO (TN)
+            case COL_DESPACHO_A:
+            case COL_DESPACHO_B:
+            case COL_SALDO_A:
+            case COL_SALDO_B:     return pxWidth(72);  // DESPACHO / SALDOS A|B
             case COL_REPROC_OUT:  return pxWidth(86);  // REPROCESO final (TN)
             case COL_INGRESO:
             case COL_ULEX_DISP:
-            case COL_CONSUMO:
-            case COL_DESPACHO:    return 3328;
+            case COL_CONSUMO:     return 3328;
             default:              return 2800;
         }
     }

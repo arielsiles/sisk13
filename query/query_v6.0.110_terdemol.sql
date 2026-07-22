@@ -53,8 +53,7 @@ insert into funcionalidad values (503, 'COMPANYSETTING', 'Preferencias de compan
 
 -- 3) Otorgar el permiso al rol Administrador (idrol = 1) ---------------------
 
-insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo)
-values (503, 1, 5, 1, 2);
+-- insert into derechoacceso (idfuncionalidad, idrol, permiso, idcompania, idmodulo) values (503, 1, 5, 1, 2);
 
 -- 4) Limpiar cuentas contables colgadas --------------------------------------
 --    Estas 4 columnas apuntan a cuentas que NO existen en el plan de cuentas
@@ -131,7 +130,7 @@ UPDATE configuracion SET ctaCostPV       = NULL WHERE ctaCostPV       = '5100080
 --    se arma en el login (UserServiceBean.getPermissions).
 
 UPDATE funcionalidad SET permiso = 5 WHERE codigo = 'COMPANYSETTING' AND permiso = 3;
-UPDATE derechoacceso SET permiso = 5 WHERE idfuncionalidad = 503 AND idrol = 1 AND permiso = 3;
+-- UPDATE derechoacceso SET permiso = 5 WHERE idfuncionalidad = 503 AND idrol = 1 AND permiso = 3;
 
 -- Verificacion: ambas columnas deben quedar en 5.
 --   SELECT f.idfuncionalidad, f.codigo, f.permiso AS disponibles,

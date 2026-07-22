@@ -43,3 +43,18 @@ DELETE FROM inv_vales  WHERE no_cia = @cia AND no_trans IN (@no_trans_s, @no_tra
 COMMIT;
 -- Si algo esta mal:  ROLLBACK;
 -- ============================================================================
+
+
+-- ============================================================================
+-- Elimina el vale de ajuste REC (BENTONITA PROCESADA, 24/03/2026) por su marca.
+START TRANSACTION;
+SET @no_vale := 'AJ-PT-E-20260324';
+SET @cia      := (SELECT no_cia  FROM inv_vales WHERE no_vale=@no_vale LIMIT 1);
+SET @no_trans := (SELECT no_trans FROM inv_vales WHERE no_vale=@no_vale LIMIT 1);
+SELECT @cia AS no_cia, @no_trans AS no_trans;
+DELETE FROM inv_movdet WHERE no_cia=@cia AND no_trans=@no_trans;
+DELETE FROM inv_mov    WHERE no_cia=@cia AND no_trans=@no_trans;
+DELETE FROM inv_vales  WHERE no_cia=@cia AND no_trans=@no_trans;
+COMMIT;
+-- ROLLBACK si algo esta mal.
+-- ============================================================================
