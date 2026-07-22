@@ -249,3 +249,36 @@ WHERE v.cod_doc = 'DSP' AND d.fecha <> v.fecha;
 COMMIT;
 -- Si algo esta mal:  ROLLBACK;
 -- ============================================================================
+
+
+-- ============================================================================
+-- Vale de ajuste REC (recepcion/entrada) BENTONITA PROCESADA (1573), almacen 3, 24/03/2026. Simple, sin temporales; idempotente por no_vale.
+START TRANSACTION;
+
+SET @cia:='01', @alm:='3', @fecha:='2026-03-24', @cod_art:='1573', @cant:=72633.00, @costo:=0.205148,
+    @no_vale:='AJ-PT-E-20260324', @gloss:='Ajuste recepcion BENTONITA PROCESADA 24/03/2026',
+    @idun:=2, @no_usr:='ADM', @creado_por:='admin';
+SET @cod_cc := (SELECT cod_cc FROM inv_vales WHERE cod_alm=@alm AND cod_cc IS NOT NULL ORDER BY CAST(no_trans AS UNSIGNED) DESC LIMIT 1);
+SET @crear := (SELECT IF(COUNT(*)=0,1,0) FROM inv_vales WHERE no_vale=@no_vale);
+SET @no_trans := (SELECT GREATEST(COALESCE((SELECT seq_val FROM _sequence WHERE seq_name='VALE'),0), COALESCE((SELECT MAX(CAST(no_trans AS UNSIGNED)) FROM inv_vales),0))+1);
+SET @movdet_next := (SELECT GREATEST(COALESCE((SELECT valor FROM secuencia WHERE tabla='inv_movdet'),1), COALESCE((SELECT MAX(id_inv_movdet) FROM inv_movdet),0)+1));
+
+INSERT INTO inv_vales (no_cia,no_trans,cod_doc,no_vale,fecha,estado,cod_cc,cod_alm,idunidadnegocio,baja,fechacreacion,created_at,created_by,version)
+SELECT @cia,@no_trans,'REC',@no_vale,@fecha,'APR',@cod_cc,@alm,@idun,0,NOW(),NOW(),@creado_por,0 FROM (SELECT 1) x WHERE @crear=1;
+
+INSERT INTO inv_mov (no_cia,no_trans,estado,fecha_mov,fecha_cre,descri,no_usr,tipo_compro,version)
+SELECT @cia,@no_trans,'APR',@fecha,@fecha,@gloss,@no_usr,'E',0 FROM (SELECT 1) x WHERE @crear=1;
+
+INSERT INTO inv_movdet (id_inv_movdet,no_cia,no_trans,estado,cod_alm,cod_art,tipo_mov,cantidad,cod_med,cuenta_art,costounitario,monto,fecha,idunidadnegocio,version)
+SELECT @movdet_next,@cia,@no_trans,'APR',@alm,@cod_art,'E',@cant,a.cod_med,a.cuenta_art,@costo,ROUND(@cant*@costo,6),@fecha,@idun,0
+FROM inv_articulos a WHERE a.no_cia=@cia AND a.cod_art=@cod_art AND @crear=1;
+
+UPDATE _sequence SET seq_val=@no_trans WHERE seq_name='VALE' AND @crear=1;
+UPDATE secuencia SET valor=@movdet_next+1 WHERE tabla='inv_movdet' AND @crear=1;
+
+SELECT d.no_trans,d.cod_art,a.descri,d.tipo_mov,d.cantidad,d.costounitario,d.monto,d.estado,d.fecha
+FROM inv_movdet d JOIN inv_articulos a ON a.no_cia=d.no_cia AND a.cod_art=d.cod_art WHERE d.no_cia=@cia AND d.no_trans=@no_trans;
+
+COMMIT;
+-- ROLLBACK si algo esta mal.
+-- ============================================================================
