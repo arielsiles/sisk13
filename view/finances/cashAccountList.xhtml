@@ -94,7 +94,7 @@
             </div>
 
             <rich:dataTable value="#{cashAccountDataModel}" var="cashAccountItem" id="cashAccountList"
-                            rows="#{sessionUser.rowsPerPage20}" width="100%" columnsWidth="10%, 10%, 50%, 5%, 10%, 10%, 5%">
+                            rows="#{cashAccountDataModel.pageSize}" width="100%" columnsWidth="10%, 10%, 50%, 5%, 10%, 10%, 5%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>#{messages['CashAccount.type']}</rich:column>
@@ -133,7 +133,7 @@
                 </rich:column>
 
             </rich:dataTable>
-            <app:dataScroller id="dataScroller" for="cashAccountList" dataModel="#{cashAccountDataModel}"/>
+            <app:dataScroller id="dataScroller" for="cashAccountList" dataModel="#{cashAccountDataModel}" showPageSize="true"/>
 
 
             <!--<div class="buttons">

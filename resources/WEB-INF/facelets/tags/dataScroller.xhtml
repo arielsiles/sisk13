@@ -13,11 +13,30 @@
                       style="font-size:9pt"/>
         <h:panelGrid columns="2" columnClasses="datascroller-left, datascroller-right" width="100%"
                      styleClass="datascroller" cellpadding="0" cellspacing="0" rendered="#{dataModel.rowCount > 0}">
-            <h:outputFormat value="#{messages['component.dataPaginator.summary']}" id="#{id}_PanelInfo"
-                            style="font-size:9pt" styleClass="left">
-                <f:param value="#{dataModel.rangeRowsString}"/>
-                <f:param value="#{dataModel.rowCountString}"/>
-            </h:outputFormat>
+            <h:panelGroup styleClass="left">
+                <h:outputFormat value="#{messages['component.dataPaginator.summary']}" id="#{id}_PanelInfo"
+                                style="font-size:9pt">
+                    <f:param value="#{dataModel.rangeRowsString}"/>
+                    <f:param value="#{dataModel.rowCountString}"/>
+                </h:outputFormat>
+                <!-- Combo de filas por pagina: opt-in, solo se muestra si la vista pasa
+                     showPageSize="true" y bindea rows="#{dataModel.pageSize}". Las demas
+                     vistas que usan este tag no lo renderizan (quedan intactas). -->
+                <h:panelGroup rendered="#{not empty showPageSize and showPageSize}"
+                              style="margin-left:12px;">
+                    <h:selectOneMenu value="#{dataModel.pageSize}" styleClass="app-pagesize">
+                        <f:converter converterId="javax.faces.Integer"/>
+                        <f:selectItem itemValue="10" itemLabel="10"/>
+                        <f:selectItem itemValue="20" itemLabel="20"/>
+                        <f:selectItem itemValue="30" itemLabel="30"/>
+                        <f:selectItem itemValue="40" itemLabel="40"/>
+                        <f:selectItem itemValue="50" itemLabel="50"/>
+                        <f:selectItem itemValue="100" itemLabel="100"/>
+                        <a4j:support event="onchange" action="#{dataModel.updatePageSize}"
+                                     reRender="#{for}, #{id}"/>
+                    </h:selectOneMenu>
+                </h:panelGroup>
+            </h:panelGroup>
             <rich:datascroller renderIfSinglePage="false" for="#{for}" align="right" ajaxSingle="false" maxPages="10"
                                page="#{dataModel.page}" reRender="#{id}_PanelInfo, #{id}" style="font-size:9pt"/>
         </h:panelGrid>

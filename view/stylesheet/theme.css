@@ -1388,6 +1388,24 @@ input[type="text"].disabledInput {
     margin-left: auto !important;
 }
 
+/* Combo de filas por pagina (junto al paginador, minimalista). */
+.app-pagesize {
+    height: 20px;
+    box-sizing: border-box;
+    padding: 0 4px;
+    border: 1px solid #C3BBB6;
+    border-radius: 3px;
+    background: #fff;
+    color: #616161;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 9pt;
+    vertical-align: middle;
+    outline: none;
+}
+.app-pagesize:focus {
+    border-color: #578BB8;
+}
+
 .app-filterbar__input:focus,
 .app-filterbar__select:focus {
     border-color: #578BB8;

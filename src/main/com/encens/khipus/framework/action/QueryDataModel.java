@@ -53,6 +53,9 @@ public abstract class QueryDataModel<ID, T extends BaseModel> extends Serializab
     protected boolean sortAsc = true;
     private int page = 1;
 
+    /** Filas por pagina seleccionables (usado solo por vistas que lo activan). */
+    private Integer pageSize = 20;
+
     private Class<T> entityClass;
     private Class<ID> idClass;
     //TODO: improve this, entityQuery does not require to be serialized , it must be transient, but making it transient gives unexpected results when searching
@@ -343,6 +346,24 @@ public abstract class QueryDataModel<ID, T extends BaseModel> extends Serializab
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    /**
+     * Se invoca al cambiar el tamano de pagina desde el combo: fuerza recalcular el
+     * conteo/paginador (rowCount) y vuelve a la pagina 1 para no quedar en una pagina
+     * inexistente al agrandar el tamano.
+     */
+    public void updatePageSize() {
+        update();
+        setPage(1);
     }
 
     protected EntityManager getEntityManager() {
