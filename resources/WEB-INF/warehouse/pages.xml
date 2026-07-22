@@ -260,6 +260,11 @@
 
     <page view-id="/warehouse/warehousePurchaseOrderList.xhtml">
         <end-conversation/>
+        <!-- Al entrar a la lista (GET: acceso inicial o volver de una OC) se restauran los
+             filtros guardados en sesion (holder dedicado) o se aplica el rango por defecto,
+             y se re-consulta con datos frescos. on-postback="false": no corre en
+             postbacks (Buscar/paginacion) para no romper el paginador. -->
+        <action execute="#{warehousePurchaseOrderFilterHolder.restoreAndSearch}" on-postback="false"/>
         <navigation from-action="#{warehousePurchaseOrderAction.select(purchaseOrderItem)}">
             <rule>
                 <redirect view-id="/warehouse/warehousePurchaseOrder.xhtml"/>

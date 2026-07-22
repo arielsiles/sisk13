@@ -1364,6 +1364,22 @@ input[type="text"].disabledInput {
     transition: border-color .15s, box-shadow .15s;
 }
 
+/* Variante centrada de la barra de filtros. row-gap reducido para juntar las dos
+   filas (mantiene el column-gap horizontal de 6px de .app-filterbar). */
+.app-filterbar--center {
+    justify-content: center;
+    row-gap: 3px;
+}
+
+/* Salto de fila explicito dentro de una barra flex (para controlar que va en cada
+   fila en lugar de dejar el wrap automatico). */
+.app-filterbar__break {
+    flex-basis: 100%;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
 .app-filterbar__input {
     width: 200px;
 }

@@ -5,6 +5,7 @@ import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.CollectionDocumentType;
 import com.encens.khipus.model.finances.CostCenter;
 import com.encens.khipus.model.finances.Provider;
+import com.encens.khipus.model.purchases.PayConditions;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.util.ListEntityManagerName;
@@ -36,6 +37,7 @@ public class WarehousePurchaseOrderDataModel extends QueryDataModel<Long, Purcha
             "warehousePurchaseOrder.costCenter = #{warehousePurchaseOrderDataModel.costCenter}",
             "warehousePurchaseOrder.provider = #{warehousePurchaseOrderDataModel.provider}",
             "warehousePurchaseOrder.warehouse = #{warehousePurchaseOrderDataModel.warehouse}",
+            "warehousePurchaseOrder.payConditions = #{warehousePurchaseOrderDataModel.payConditions}",
             "warehousePurchaseOrder.date >= #{warehousePurchaseOrderDataModel.startDate}",
             "warehousePurchaseOrder.date <= #{warehousePurchaseOrderDataModel.endDate}",
             "warehousePurchaseOrder.executorUnit = #{warehousePurchaseOrderDataModel.criteria.executorUnit}",
@@ -50,6 +52,7 @@ public class WarehousePurchaseOrderDataModel extends QueryDataModel<Long, Purcha
     private Provider provider;
     private Warehouse warehouse;
     private CollectionDocumentType documentType;
+    private PayConditions payConditions;
 
     @Create
     public void init() {
@@ -141,6 +144,14 @@ public class WarehousePurchaseOrderDataModel extends QueryDataModel<Long, Purcha
         this.documentType = documentType;
     }
 
+    public PayConditions getPayConditions() {
+        return payConditions;
+    }
+
+    public void setPayConditions(PayConditions payConditions) {
+        this.payConditions = payConditions;
+    }
+
     @Override
     public void clear() {
         setStartDate(null);
@@ -150,6 +161,7 @@ public class WarehousePurchaseOrderDataModel extends QueryDataModel<Long, Purcha
         setProvider(null);
         setWarehouse(null);
         setDocumentType(null);
+        setPayConditions(null);
         super.clear();
         update();
         search();
