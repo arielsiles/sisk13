@@ -95,17 +95,91 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
         em.persist(voucher);
         em.flush();
 
-        System.out.println("-------- VOUCHER DETAILS -------");
         int order = 0;
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
             /** El id_tmpdet lo asigna Hibernate al persistir (@GeneratedValue TABLE) **/
             voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
             voucherDetail.setVoucher(voucher);
             voucherDetail.setOrderNumber(order++);
-            em.persist(voucherDetail);
-            em.flush();
+
+            PurchaseDocument invoice = voucherDetail.getPurchaseDocument();
+            if (invoice != null) {
+                /** Linea de credito fiscal: se persiste la factura junto al detalle. **/
+                persistFiscalCreditInvoice(invoice, voucher, voucherDetail);
+            } else {
+                em.persist(voucherDetail);
+                em.flush();
+            }
         }
 
+    }
+
+    /**
+     * Persiste una factura de credito fiscal y su linea contable en la MISMA transaccion,
+     * enlazando las tres claves foraneas cruzadas:
+     *   - documentocompra.idtmpenc  -> asiento
+     *   - sf_tmpdet.iddocumentocompra -> factura
+     *   - documentocompra.id_tmpdet  -> linea de credito fiscal
+     * El orden respeta la dependencia de FKs: primero la factura (sin id_tmpdet), luego el
+     * detalle (que ya referencia la factura) y por ultimo se cierra el enlace factura->detalle.
+     */
+    private void persistFiscalCreditInvoice(PurchaseDocument invoice, Voucher voucher, VoucherDetail voucherDetail) {
+        try {
+            invoice.setVoucher(voucher);
+            invoice.setType(CollectionDocumentType.INVOICE);
+            /** createDocumentSimple deja la factura PENDING y calcula IVA/monto neto. **/
+            purchaseDocumentService.createDocumentSimple(invoice);
+        } catch (Exception e) {
+            /** Se propaga para que la transaccion completa se revierta (no dejar huerfanos). **/
+            throw new RuntimeException("No se pudo registrar la factura del asiento contable", e);
+        }
+
+        em.persist(voucherDetail);
+        em.flush();
+
+        invoice.setVoucherDetailFiscalCredit(voucherDetail);
+        em.merge(invoice);
+        em.flush();
+    }
+
+    /**
+     * Elimina las lineas contables marcadas para baja durante la edicion (y su factura de
+     * credito fiscal, si la tienen). Se borra la factura antes que la linea, en la misma
+     * unidad de trabajo, para respetar las claves foraneas cruzadas entre documentocompra
+     * y sf_tmpdet.
+     */
+    private void removeDeferredVoucherDetails(List<VoucherDetail> detailsToRemove) {
+        if (detailsToRemove == null) {
+            return;
+        }
+        for (VoucherDetail detail : detailsToRemove) {
+            if (detail == null || detail.getId() == null) {
+                continue;
+            }
+            PurchaseDocument invoice = detail.getPurchaseDocument();
+            if (invoice != null && invoice.getId() != null) {
+                PurchaseDocument managedInvoice = em.contains(invoice) ? invoice : em.merge(invoice);
+                em.remove(managedInvoice);
+            }
+            VoucherDetail managedDetail = em.contains(detail) ? detail : em.merge(detail);
+            em.remove(managedDetail);
+            em.flush();
+        }
+    }
+
+    /** Elimina las facturas marcadas para baja que no tienen linea contable asociada. */
+    private void removeDeferredPurchaseDocuments(List<PurchaseDocument> invoicesToRemove) {
+        if (invoicesToRemove == null) {
+            return;
+        }
+        for (PurchaseDocument invoice : invoicesToRemove) {
+            if (invoice == null || invoice.getId() == null) {
+                continue;
+            }
+            PurchaseDocument managedInvoice = em.contains(invoice) ? invoice : em.merge(invoice);
+            em.remove(managedInvoice);
+            em.flush();
+        }
     }
 
     public void updatePurchaseDocumentIfExist(Voucher voucher){
@@ -165,14 +239,14 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     @TransactionAttribute(REQUIRES_NEW)
     public void updateVoucher(Voucher voucher) {
 
-        /** For VoucherDetail **/
-        List<VoucherDetail> voucherDetailsDB = getVoucherDetailList(voucher);
-
-        /*for (VoucherDetail voucherDetail : voucherDetailsDB) {
-            em.merge(voucherDetail);
-            em.remove(voucherDetail);
-            em.flush();
-        }*/
+        /**
+         * Bajas diferidas de la edicion: se eliminan aqui, dentro de la MISMA transaccion
+         * del Actualizar, para que agregar/editar/borrar sea todo atomico. Si algo falla,
+         * la transaccion se revierte y no queda nada a medias. Se borra primero la factura y
+         * luego su linea contable (respeta las FKs cruzadas documentocompra <-> sf_tmpdet).
+         */
+        removeDeferredVoucherDetails(voucher.getDetailsToRemove());
+        removeDeferredPurchaseDocuments(voucher.getPurchaseDocumentsToRemove());
 
         int order = 0;
         for (VoucherDetail voucherDetail : voucher.getDetails()) {
@@ -185,9 +259,18 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
                 voucherDetail.setTransactionNumber(voucher.getTransactionNumber());
                 voucherDetail.setVoucher(voucher);
 
-                em.persist(voucherDetail);
-                em.merge(voucher);
-                em.flush();
+                PurchaseDocument invoice = voucherDetail.getPurchaseDocument();
+                if (invoice != null && invoice.getId() == null) {
+                    /** Factura nueva agregada durante la edicion: se persiste junto al
+                        detalle, en esta misma transaccion (sin escrituras anticipadas). **/
+                    persistFiscalCreditInvoice(invoice, voucher, voucherDetail);
+                    em.merge(voucher);
+                    em.flush();
+                } else {
+                    em.persist(voucherDetail);
+                    em.merge(voucher);
+                    em.flush();
+                }
 
             }else{
                 em.merge(voucherDetail);
@@ -196,7 +279,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }
         }
 
-        /** Persiste las facturas editadas en la grilla de Documento de compra **/
+        /** Persiste las facturas ya existentes editadas (monto, proveedor, etc.). El
+            recalculo de la linea de credito fiscal ya viaja en el detalle correspondiente. **/
         for (PurchaseDocument purchaseDocument : voucher.getPurchaseList()) {
             if (purchaseDocument.getId() != null) {
                 em.merge(purchaseDocument);

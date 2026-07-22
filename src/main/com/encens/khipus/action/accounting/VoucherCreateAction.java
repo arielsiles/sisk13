@@ -73,6 +73,23 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     //private PurchaseDocument purchaseDocument;
     private List<PurchaseDocument> purchaseDocumentList = new ArrayList<PurchaseDocument>();
 
+    /** Factura que se esta cargando o editando en el modal. Vive solo en memoria hasta
+        que se Guarda/Actualiza el asiento; nada se escribe en BD antes de eso. */
+    private PurchaseDocument invoiceInEdit;
+    /** true: se edita una factura ya cargada; false: alta de una factura nueva. */
+    private boolean invoiceEditing = false;
+    /** Cuenta de Credito Fiscal con la que se genera la linea contable de la factura. */
+    private CashAccount fiscalCreditAccount;
+    /** Resultado de la ultima operacion del modal, para cerrarlo solo si fue exitosa. */
+    private boolean invoiceOperationSucceeded = false;
+    /** Factura seleccionada para eliminar (se confirma en un modal antes de quitarla). */
+    private PurchaseDocument invoiceToRemove;
+
+    /** Bajas diferidas al editar un asiento ya guardado: lo persistido que se quita en
+        pantalla NO se borra de la BD hasta pulsar Actualizar (todo en una transaccion). */
+    private List<VoucherDetail> voucherDetailsToRemove = new ArrayList<VoucherDetail>();
+    private List<PurchaseDocument> purchaseDocumentsToRemove = new ArrayList<PurchaseDocument>();
+
     private Integer quantity;
     private BigDecimal amountDeposit;
     private BigDecimal contribution;
@@ -144,6 +161,9 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         this.docType = voucherService.getDocType(voucher.getDocumentType());
         setVoucherDetails(voucherAccoutingService.getVoucherDetailList(voucher));
         setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(voucher));
+        /** Se abre una edicion limpia: sin bajas pendientes de una sesion anterior. */
+        voucherDetailsToRemove.clear();
+        purchaseDocumentsToRemove.clear();
         return outCome;
     }
 
@@ -177,22 +197,14 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
         try {
 
-            /** For Create Invoice **/
-            for (PurchaseDocument purchaseDocument : purchaseDocumentList){
-                //purchaseDocument.setVoucher(voucher);
-                purchaseDocument.setNetAmount(purchaseDocument.getAmount());
-                purchaseDocument.setType(CollectionDocumentType.INVOICE);
-                purchaseDocumentService.createDocumentSimple(purchaseDocument);
-            }
-
+            /**
+             * Guardado atomico: el asiento, sus detalles y las facturas de credito fiscal
+             * se persisten dentro de una unica transaccion. Cada factura se escribe junto
+             * a su linea de credito fiscal (misma unidad de trabajo), asi nunca queda una
+             * factura sin asiento ni un asiento referenciando una factura inexistente.
+             */
             voucherAccoutingService.saveVoucher(voucher);
             setInstance(voucher);
-
-            for (PurchaseDocument purchaseDocument : purchaseDocumentList){
-                voucherAccoutingService.updateVoucher(voucher, purchaseDocument);
-            }
-
-            voucherAccoutingService.updatePurchaseDocumentIfExist(voucher);
 
             setOp(OP_UPDATE);
             return Outcome.SUCCESS;
@@ -395,6 +407,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
                 setInstance(fresh);
                 setVoucherDetails(voucherAccoutingService.refreshVoucherDetailList(fresh));
                 setPurchaseDocumentList(voucherAccoutingService.getPurchaseDcumentList(fresh));
+                /** Se recargo el estado real: las bajas pendientes apuntaban a la vista
+                    vieja y ya no aplican. Se descartan para no borrar filas equivocadas. */
+                voucherDetailsToRemove.clear();
+                purchaseDocumentsToRemove.clear();
             }
         } catch (Exception e) {
             log.warn("No se pudo recargar el asiento tras el conflicto de concurrencia", e);
@@ -441,7 +457,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             getInstance().setDetails(getVoucherDetails());
             getInstance().setPurchaseList(getPurchaseDocumentList());
+            getInstance().setDetailsToRemove(voucherDetailsToRemove);
+            getInstance().setPurchaseDocumentsToRemove(purchaseDocumentsToRemove);
             voucherAccoutingService.updateVoucher(getInstance());
+
+            /** Actualizacion exitosa: las bajas ya se aplicaron en la transaccion. */
+            voucherDetailsToRemove.clear();
+            purchaseDocumentsToRemove.clear();
 
         }catch (Exception e){
             if (isOptimisticLock(e)) {
@@ -828,77 +850,203 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         if (account != null){
             //if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
             if (account.getAllowIva().equals(Boolean.TRUE)){
+                /** Cuenta con IVA (Credito Fiscal): en vez de agregar una fila editable,
+                    se abre el modal para registrar la factura. */
                 setFiscalCredit(true);
-                PurchaseDocument purchaseDocument = new PurchaseDocument();
-                purchaseDocument.setControlCode("0");
-                purchaseDocument.setExempt(BigDecimal.ZERO);
-                purchaseDocument.setRates(BigDecimal.ZERO);
-                purchaseDocument.setNoTaxCredit(BigDecimal.ZERO);
-                purchaseDocument.setDiscounts(BigDecimal.ZERO);
-                purchaseDocumentList.add(purchaseDocument);
-
+                openNewInvoice();
             }else {
                 assignInputVoucherDetail();
             }
         }
     }
 
-    public boolean isRegistered(PurchaseDocument purchaseDocument){
+    /**
+     * Prepara el modal para registrar una factura NUEVA de credito fiscal. La cuenta CF
+     * es la del boton pulsado ({@code this.account}). Solo inicializa datos en memoria;
+     * la factura y su linea contable se agregan recien al Aceptar el modal.
+     */
+    public void openNewInvoice(){
+        this.fiscalCreditAccount = this.account;
+        this.invoiceEditing = false;
+        this.invoiceOperationSucceeded = false;
 
-        System.out.println("----> Registered: " + purchaseDocument.getVoucher());
-        System.out.println("----> Registered: " + purchaseDocument.getId());
-
-        return true;
-
+        PurchaseDocument invoice = new PurchaseDocument();
+        invoice.setDate(voucher != null ? voucher.getDate() : null);
+        invoice.setControlCode("0");
+        invoice.setAmount(BigDecimal.ZERO);
+        invoice.setExempt(BigDecimal.ZERO);
+        invoice.setRates(BigDecimal.ZERO);
+        invoice.setNoTaxCredit(BigDecimal.ZERO);
+        invoice.setDiscounts(BigDecimal.ZERO);
+        this.invoiceInEdit = invoice;
     }
 
-    public void addFiscalCreditCashAccount(PurchaseDocument purchaseDocument){
-        try {
+    /**
+     * Abre el modal para editar una factura ya cargada. Se edita el mismo objeto en
+     * memoria; al Aceptar se recalcula su linea de credito fiscal. No toca la BD.
+     */
+    public void editInvoice(PurchaseDocument purchaseDocument){
+        this.invoiceEditing = true;
+        this.invoiceOperationSucceeded = false;
+        this.invoiceInEdit = purchaseDocument;
 
-        System.out.println("----> PurchaseDocument: " + purchaseDocument.getName() + " - " + purchaseDocument.getNit());
-        System.out.println("----> getFinancesEntity(): " + purchaseDocument.getFinancesEntity());
-        System.out.println("----> nit: " + purchaseDocument.getFinancesEntity().getNitNumber());
-        System.out.println("----> name: " + purchaseDocument.getFinancesEntity().getAcronym());
+        /** El nombre a mostrar es transient: se reconstruye para facturas cargadas de BD. */
+        if (purchaseDocument != null && purchaseDocument.getFinancesEntity() != null
+                && (purchaseDocument.getFinancesEntityFullName() == null
+                    || purchaseDocument.getFinancesEntityFullName().trim().isEmpty())) {
+            purchaseDocument.setFinancesEntityFullName(purchaseDocument.getFinancesEntity().getFullName());
+        }
 
-            purchaseDocument.setName(purchaseDocument.getFinancesEntity().getAcronym());
-            purchaseDocument.setNit(purchaseDocument.getFinancesEntity().getNitNumber());
+        VoucherDetail linked = findFiscalCreditDetail(purchaseDocument);
+        this.fiscalCreditAccount = (linked != null && linked.getCashAccount() != null)
+                ? linked.getCashAccount() : this.account;
+    }
 
-            /** Se avisa al momento de agregar, no recien al guardar **/
-            if (isDuplicatedInvoice(purchaseDocument)) {
-                addDuplicatedInvoiceMessage(purchaseDocument.getNit(),
-                                            purchaseDocument.getNumber(),
-                                            purchaseDocument.getDate());
+    /**
+     * Acepta la factura del modal. Valida los datos, calcula el credito fiscal (13%) y
+     * actualiza la lista de facturas y su linea contable EN MEMORIA. No escribe en la
+     * base de datos: todo se persiste de forma atomica al Guardar/Actualizar el asiento.
+     */
+    public void confirmInvoice(){
+        invoiceOperationSucceeded = false;
+
+        if (invoiceInEdit == null){
+            return;
+        }
+
+        /** Razon social y NIT se toman de la entidad seleccionada. */
+        if (invoiceInEdit.getFinancesEntity() != null){
+            invoiceInEdit.setName(invoiceInEdit.getFinancesEntity().getAcronym());
+            invoiceInEdit.setNit(invoiceInEdit.getFinancesEntity().getNitNumber());
+        }
+
+        if (invoiceInEdit.getFinancesEntity() == null
+                || invoiceInEdit.getNumber() == null || invoiceInEdit.getNumber().trim().isEmpty()
+                || invoiceInEdit.getDate() == null
+                || invoiceInEdit.getAmount() == null){
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.invoiceIncomplete");
+            return;
+        }
+
+        if (isDuplicatedInvoice(invoiceInEdit)){
+            addDuplicatedInvoiceMessage(invoiceInEdit.getNit(),
+                                        invoiceInEdit.getNumber(),
+                                        invoiceInEdit.getDate());
+            return;
+        }
+
+        /**
+         * Se calculan y guardan el importe neto (base para credito fiscal) y el IVA sobre
+         * la misma factura, de modo que la tabla los muestre ya en memoria (antes de
+         * guardar). Coincide con lo que recalcula createDocumentSimple al persistir.
+         */
+        BigDecimal fiscalCredit = applyInvoiceTotals(invoiceInEdit);
+
+        if (invoiceEditing){
+            /** Se recalcula la linea de credito fiscal ya asociada a la factura. */
+            VoucherDetail linked = findFiscalCreditDetail(invoiceInEdit);
+            if (linked != null){
+                linked.setDebit(fiscalCredit);
+            }
+        }else{
+            if (fiscalCreditAccount == null){
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
                 return;
             }
-
-            BigDecimal discounts = BigDecimalUtil.sum(purchaseDocument.getRates(), purchaseDocument.getNoTaxCredit(), purchaseDocument.getExempt(), purchaseDocument.getDiscounts());
-
-            BigDecimal fiscalCredit = BigDecimalUtil.multiply(BigDecimalUtil.subtract(purchaseDocument.getAmount(), discounts, 2), BigDecimalUtil.toBigDecimal(0.13),2 );
-
             VoucherDetail voucherDetail = new VoucherDetail();
-            voucherDetail.setCashAccount(this.account);
-            voucherDetail.setAccount(this.account.getAccountCode());
+            voucherDetail.setCashAccount(fiscalCreditAccount);
+            voucherDetail.setAccount(fiscalCreditAccount.getAccountCode());
             voucherDetail.setClient(this.client);
             voucherDetail.setProvider(this.provider);
-
-            if (this.provider != null)
+            if (this.provider != null){
                 voucherDetail.setProviderCode(this.provider.getProviderCode());
-
-            if (this.voucher != null)
+            }
+            if (this.voucher != null){
                 voucherDetail.setVoucher(voucher);
-
+            }
             voucherDetail.setDebit(fiscalCredit);
-            voucherDetail.setCredit(this.credit);
-            voucherDetail.setPurchaseDocument(purchaseDocument);
-
-            if (this.voucher.getTransactionNumber() != null) /** Crea PurchaseDocument al editar el asiento **/
-                voucherAccoutingService.createPurchaseDocumentVoucher(voucherDetail);
+            voucherDetail.setCredit(BigDecimal.ZERO);
+            voucherDetail.setPurchaseDocument(invoiceInEdit);
 
             voucherDetails.add(voucherDetail);
-            clearAll();
-        } catch (NullPointerException e) {
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
+            purchaseDocumentList.add(invoiceInEdit);
         }
+
+        invoiceOperationSucceeded = true;
+        invoiceInEdit = null;
+        invoiceEditing = false;
+        fiscalCreditAccount = null;
+        clearAll();
+    }
+
+    /**
+     * Calcula y aplica sobre la factura el importe neto (base de credito fiscal) y el IVA.
+     *   importe neto = importe - (excento + tasas + sin CF + descuentos)
+     *   IVA          = importe neto * VAT (13%)
+     * Devuelve el IVA, que es el debito de la linea de credito fiscal. Es el mismo criterio
+     * que aplica createDocumentSimple al persistir, para que pantalla y BD coincidan.
+     */
+    /**
+     * Asigna el proveedor (FinancesEntity) elegido en el modal de busqueda a la factura en
+     * edicion y actualiza NIT y Razon Social para mostrarlos debajo. Se llama cada vez que
+     * se selecciona un proveedor, asi los dos campos reflejan siempre el ultimo elegido.
+     */
+    public void assignInvoiceFinancesEntity(FinancesEntity financesEntity){
+        if (invoiceInEdit == null || financesEntity == null){
+            return;
+        }
+        invoiceInEdit.setFinancesEntity(financesEntity);
+        invoiceInEdit.setName(financesEntity.getAcronym());
+        invoiceInEdit.setNit(financesEntity.getNitNumber());
+        invoiceInEdit.setFinancesEntityFullName(financesEntity.getFullName());
+    }
+
+    /** Limpia el proveedor de la factura en edicion (y su NIT / Razon Social). */
+    public void clearInvoiceFinancesEntity(){
+        if (invoiceInEdit == null){
+            return;
+        }
+        invoiceInEdit.setFinancesEntity(null);
+        invoiceInEdit.setName(null);
+        invoiceInEdit.setNit(null);
+        invoiceInEdit.setFinancesEntityFullName(null);
+    }
+
+    private BigDecimal applyInvoiceTotals(PurchaseDocument purchaseDocument){
+        BigDecimal deductions = BigDecimalUtil.sum(purchaseDocument.getExempt(),
+                                                   purchaseDocument.getRates(),
+                                                   purchaseDocument.getNoTaxCredit(),
+                                                   purchaseDocument.getDiscounts());
+        BigDecimal netAmount = BigDecimalUtil.subtract(purchaseDocument.getAmount(), deductions, 2);
+        BigDecimal iva = BigDecimalUtil.multiply(netAmount, Constants.VAT, 2);
+
+        purchaseDocument.setNetAmount(netAmount);
+        purchaseDocument.setIva(iva);
+        return iva;
+    }
+
+    /**
+     * Ubica la linea contable de credito fiscal asociada a una factura. Compara por
+     * referencia (facturas nuevas en memoria) y por id (facturas cargadas de la BD, donde
+     * la factura de la lista y la del detalle pueden ser instancias distintas).
+     */
+    private VoucherDetail findFiscalCreditDetail(PurchaseDocument purchaseDocument){
+        if (purchaseDocument == null){
+            return null;
+        }
+        for (VoucherDetail voucherDetail : voucherDetails){
+            PurchaseDocument linked = voucherDetail.getPurchaseDocument();
+            if (linked == null){
+                continue;
+            }
+            if (linked == purchaseDocument){
+                return voucherDetail;
+            }
+            if (linked.getId() != null && linked.getId().equals(purchaseDocument.getId())){
+                return voucherDetail;
+            }
+        }
+        return null;
     }
 
 
@@ -1345,41 +1493,81 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         return voucherDetails.indexOf(voucherDetail) == voucherDetails.size() - 1;
     }
 
+    /**
+     * Quita una linea contable del asiento y, si tiene factura asociada, tambien la
+     * factura. La eliminacion en BD solo ocurre para lo que ya estaba persistido (id no
+     * nulo); lo que solo existe en memoria (asiento nuevo o factura recien cargada) se
+     * quita sin tocar la base de datos.
+     */
     public void removeVoucherDetail(VoucherDetail voucherDetail) {
-        System.out.println("---> " + voucherDetail.getCashAccount().getDescription() + " - " + voucherDetail.getDebit() + " - " + voucherDetail.getCredit());
         voucherDetails.remove(voucherDetail);
 
-        if (voucherDetail.getPurchaseDocument() != null) {
-            System.out.println("----> eliminando: " + voucherDetail.getPurchaseDocument().getFullName());
-            purchaseDocumentList.remove(voucherDetail.getPurchaseDocument());
-            purchaseDocumentService.removeDocument(voucherDetail.getPurchaseDocument());
+        PurchaseDocument invoice = voucherDetail.getPurchaseDocument();
+        if (invoice != null) {
+            removeInvoiceFromList(invoice);
         }
 
-        voucherAccoutingService.removeVoucherDetail(voucherDetail);
+        /**
+         * Bajas diferidas: si la linea ya estaba persistida (edicion de un asiento guardado)
+         * NO se borra ahora; se marca y se elimina recien al Actualizar, en la misma
+         * transaccion. La factura asociada viaja con el detalle (getPurchaseDocument) y se
+         * borra junto a el, respetando las claves foraneas cruzadas. Si la linea solo existe
+         * en memoria (asiento nuevo o recien cargada), se descarta sin tocar la BD.
+         */
+        if (voucherDetail.getId() != null) {
+            voucherDetailsToRemove.add(voucherDetail);
+        }
+    }
 
-        /*if (voucherDetail.getCashAccount().getAccountCode().equals(Constants.CASHACCOUNT_FISCAL_CREDIT)){
+    /**
+     * Completa el Debe de la fila indicada con el monto que falta para cuadrar el asiento
+     * (Debe total = Haber total). Se usa en la ultima fila para cerrar el asiento en un clic.
+     */
+    public void completeDebit(VoucherDetail voucherDetail) {
+        if (voucherDetail == null) {
+            return;
+        }
+        BigDecimal current = voucherDetail.getDebit() != null ? voucherDetail.getDebit() : BigDecimal.ZERO;
+        BigDecimal otherDebit = getTotalsDebit().subtract(current);
+        BigDecimal needed = getTotalsCredit().subtract(otherDebit);
+        if (needed.compareTo(BigDecimal.ZERO) < 0) {
+            needed = BigDecimal.ZERO;
+        }
+        voucherDetail.setDebit(needed.setScale(2, RoundingMode.HALF_UP));
+    }
 
-            for (int i=0 ; i<purchaseDocumentList.size() ; i++){
+    /**
+     * Completa el Haber de la fila indicada con el monto que falta para cuadrar el asiento
+     * (Haber total = Debe total).
+     */
+    public void completeCredit(VoucherDetail voucherDetail) {
+        if (voucherDetail == null) {
+            return;
+        }
+        BigDecimal current = voucherDetail.getCredit() != null ? voucherDetail.getCredit() : BigDecimal.ZERO;
+        BigDecimal otherCredit = getTotalsCredit().subtract(current);
+        BigDecimal needed = getTotalsDebit().subtract(otherCredit);
+        if (needed.compareTo(BigDecimal.ZERO) < 0) {
+            needed = BigDecimal.ZERO;
+        }
+        voucherDetail.setCredit(needed.setScale(2, RoundingMode.HALF_UP));
+    }
 
-                PurchaseDocument pd = purchaseDocumentList.get(i);
-
-                if (    voucherDetail.getPurchaseDocument().getNit().equals(pd.getNit()) &&
-                        voucherDetail.getPurchaseDocument().getNumber().equals(pd.getNumber()) &&
-                        voucherDetail.getPurchaseDocument().getName().equals(pd.getName()) &&
-                        voucherDetail.getPurchaseDocument().getDate().equals(pd.getDate()) &&
-                        voucherDetail.getPurchaseDocument().getAmount().equals(pd.getAmount())
-                        ){
-                            purchaseDocumentList.remove(i);
+    /** Quita una factura de la lista, por referencia y por id (instancias distintas). */
+    private void removeInvoiceFromList(PurchaseDocument invoice) {
+        if (invoice == null) {
+            return;
+        }
+        purchaseDocumentList.remove(invoice);
+        if (invoice.getId() != null) {
+            Iterator<PurchaseDocument> iterator = purchaseDocumentList.iterator();
+            while (iterator.hasNext()) {
+                PurchaseDocument other = iterator.next();
+                if (invoice.getId().equals(other.getId())) {
+                    iterator.remove();
                 }
             }
-
-            purchaseDocumentList.remove(voucherDetail.getPurchaseDocument());
-            purchaseDocumentService.removeDocument(voucherDetail.getPurchaseDocument());
-
-            System.out.println("------> Eliminando SIZE: " + purchaseDocumentList.size());
-        }*/
-
-
+        }
     }
 
     /**
@@ -1409,22 +1597,29 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             return;
         }
 
-        VoucherDetail linkedDetail = null;
-        for (VoucherDetail voucherDetail : voucherDetails) {
-            if (purchaseDocument == voucherDetail.getPurchaseDocument()) {
-                linkedDetail = voucherDetail;
-                break;
-            }
-        }
-
+        VoucherDetail linkedDetail = findFiscalCreditDetail(purchaseDocument);
         if (linkedDetail != null) {
             removeVoucherDetail(linkedDetail);
             return;
         }
 
-        purchaseDocumentList.remove(purchaseDocument);
+        /** Factura sin linea contable asociada. Diferida igual que los detalles. */
+        removeInvoiceFromList(purchaseDocument);
         if (purchaseDocument.getId() != null) {
-            purchaseDocumentService.removeDocument(purchaseDocument);
+            purchaseDocumentsToRemove.add(purchaseDocument);
+        }
+    }
+
+    /** Marca la factura a eliminar; la confirmacion se hace en un modal antes de quitarla. */
+    public void prepareRemoveInvoice(PurchaseDocument purchaseDocument){
+        this.invoiceToRemove = purchaseDocument;
+    }
+
+    /** Elimina la factura previamente seleccionada (tras confirmar en el modal). */
+    public void removeSelectedInvoice(){
+        if (invoiceToRemove != null){
+            removePurchaseDocument(invoiceToRemove);
+            invoiceToRemove = null;
         }
     }
 
@@ -1743,6 +1938,26 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void setPurchaseDocumentList(List<PurchaseDocument> purchaseDocumentList) {
         this.purchaseDocumentList = purchaseDocumentList;
+    }
+
+    public PurchaseDocument getInvoiceInEdit() {
+        return invoiceInEdit;
+    }
+
+    public void setInvoiceInEdit(PurchaseDocument invoiceInEdit) {
+        this.invoiceInEdit = invoiceInEdit;
+    }
+
+    public boolean isInvoiceEditing() {
+        return invoiceEditing;
+    }
+
+    public boolean isInvoiceOperationSucceeded() {
+        return invoiceOperationSucceeded;
+    }
+
+    public PurchaseDocument getInvoiceToRemove() {
+        return invoiceToRemove;
     }
 
     public BigDecimal getAmountDeposit() {

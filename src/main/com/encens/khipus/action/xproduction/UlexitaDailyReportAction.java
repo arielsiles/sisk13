@@ -139,17 +139,21 @@ public class UlexitaDailyReportAction {
             Map<Integer, List<XProduction>> ordersByDay = new HashMap<Integer, List<XProduction>>();
             BigDecimal ptBuenoBeforeTn = BigDecimal.ZERO;
             for (XProduction p : allOrders) {
-                if (p.getInitDate() == null) continue;
-                if (p.getInitDate().before(firstDay)) {
+                // Ubicar la orden por la fecha del PLAN de produccion (mismo criterio que el
+                // Kardex de Articulos), NO por initDate: un turno que arranca pasada la
+                // medianoche tiene initDate en el dia calendario siguiente al de su plan.
+                Date od = orderDate(p);
+                if (od == null) continue;
+                if (od.before(firstDay)) {
                     XProductionUlexita u = xproductionUlexitaService.findByProduction(p);
                     XProductionUlexitaCalc calc = new XProductionUlexitaCalc(
                             p, u, p.getProductionLine(), p.getSupplyList(), p.getProductionProductList());
                     ptBuenoBeforeTn = BigDecimalUtil.sum(ptBuenoBeforeTn, nz(calc.getPtTotalBueno()), 6);
                     continue;
                 }
-                if (!p.getInitDate().before(nextMonth)) continue;
+                if (!od.before(nextMonth)) continue;
                 Calendar dc = Calendar.getInstance();
-                dc.setTime(p.getInitDate());
+                dc.setTime(od);
                 int day = dc.get(Calendar.DAY_OF_MONTH);
                 List<XProduction> list = ordersByDay.get(day);
                 if (list == null) { list = new ArrayList<XProduction>(); ordersByDay.put(day, list); }
@@ -431,6 +435,19 @@ public class UlexitaDailyReportAction {
             }
         }
         return set;
+    }
+
+    /**
+     * Fecha con la que el reporte ubica una orden en el dia: la del PLAN de produccion
+     * (mismo criterio que el Kardex de Articulos, que fecha el consumo de MP por
+     * production.productionPlan.date). Si la orden no tiene plan, cae a initDate. Asi un
+     * turno que arranca pasada la medianoche cae en el dia de su plan, no en el siguiente.
+     */
+    private static Date orderDate(XProduction p) {
+        if (p.getProductionPlan() != null && p.getProductionPlan().getDate() != null) {
+            return p.getProductionPlan().getDate();
+        }
+        return p.getInitDate();
     }
 
     /**
