@@ -8,6 +8,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +38,22 @@ public class VoucherDataModel extends QueryDataModel<Long, Voucher> {
     public void init() {
         sortProperty = "voucher.date, voucher.id";
         sortAsc = false;
+        initDefaultDateRange();
+    }
+
+    /**
+     * Rango de fechas por defecto: del 1 de enero del anio actual a la fecha actual.
+     */
+    private void initDefaultDateRange() {
+        Calendar cal = Calendar.getInstance();
+        endDate = cal.getTime();
+        cal.set(Calendar.MONTH, Calendar.JANUARY);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        startDate = cal.getTime();
     }
 
     @Override

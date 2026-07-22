@@ -1373,8 +1373,19 @@ input[type="text"].disabledInput {
     width: 110px;
 }
 
+/* Campo de fecha (dd/mm/aaaa) compacto (usado por rich:calendar via inputClass). */
+.app-filterbar__input--date {
+    width: 92px;
+}
+
 .app-filterbar__select {
     min-width: 150px;
+}
+
+/* Boton "Nuevo" dentro de la barra de filtros: se empuja al extremo derecho.
+   !important porque .app-btn-primary fija margin:0 !important (para el skin). */
+.app-filterbar .app-btn-primary {
+    margin-left: auto !important;
 }
 
 .app-filterbar__input:focus,

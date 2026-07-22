@@ -8,6 +8,11 @@
 
     <page view-id="/accounting/voucherList.xhtml">
         <end-conversation/>
+        <!-- Al entrar a la lista (navegacion GET: acceso inicial o redirect al Cancelar/volver
+             de un asiento) re-consulta con los filtros de sesion retenidos, para mostrar datos
+             frescos (el asiento pudo cambiar) y no lo cacheado. on-postback="false": NO corre en
+             postbacks (paginacion/Buscar), asi no rompe el paginador reseteando a pagina 1. -->
+        <action execute="#{voucherAction.restoreFiltersAndSearch}" on-postback="false"/>
         <navigation from-action="#{voucherAction.create}">
             <rule if-outcome="Success">
                 <redirect view-id="/accounting/voucherList.xhtml"/>

@@ -15,6 +15,7 @@ import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.VoucherBuilder;
+import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 
@@ -104,6 +105,32 @@ public class VoucherAction extends GenericAction<Voucher> {
         voucherDataModel.getCriteria().setDocumentNumber(documentNumber);
 
         voucherDataModel.search();
+    }
+
+    /**
+     * Page-action al entrar a la lista (acceso inicial o redirect al Cancelar/volver de
+     * un asiento). voucherAction es CONVERSATION y se recrea al volver, por lo que sus
+     * campos (docType, documentNumber, gloss) quedan vacios aunque el filtro real siga
+     * en voucherDataModel.criteria (sesion). Aqui se restauran esos controles desde el
+     * criteria retenido y se re-consulta con datos frescos (el asiento pudo cambiar).
+     */
+    public void restoreFiltersAndSearch() {
+        // En el primer ingreso el datamodel aun no existe en sesion y @In lo inyecta
+        // null; se obtiene/crea explicitamente para evitar NPE en el page-action.
+        VoucherDataModel model = (VoucherDataModel) Component.getInstance("voucherDataModel", true);
+        if (model == null) {
+            return;
+        }
+        Voucher criteria = model.getCriteria();
+        if (criteria != null) {
+            String docTypeName = criteria.getDocumentType();
+            if (docTypeName != null && !"".equals(docTypeName)) {
+                docType = voucherService.getDocType(docTypeName);
+            }
+            documentNumber = criteria.getDocumentNumber();
+            gloss = criteria.getGloss();
+        }
+        model.updateAndSearch();
     }
 
     public void searchBook() {
