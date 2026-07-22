@@ -295,6 +295,12 @@
         <session-timeout>60</session-timeout>
     </session-config>
 
+    <!-- Asegura el MIME correcto para iconos SVG (versiones viejas de Tomcat/JBoss no lo mapean) -->
+    <mime-mapping>
+        <extension>svg</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>

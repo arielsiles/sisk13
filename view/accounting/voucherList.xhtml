@@ -189,14 +189,14 @@
     <rich:column styleClass="left">
         <!--<h:commandLink value="#{messages['Common.select']}" immediate="true" action="#{voucherUpdateAction.select(voucherItem)}">-->
         <h:commandLink action="#{voucherCreateAction.select(voucherItem)}" immediate="true">
-            <h:graphicImage value="/img/edit.gif" styleClass="select-image" title="#{messages['Common.edit']}"/>
+            <h:graphicImage value="/img/edit-line.svg" styleClass="select-image" title="#{messages['Common.edit']}"/>
             <s:conversationPropagation value="none"/>
         </h:commandLink>
         &#160;
         <h:commandLink action="#{voucherCreateAction.generateReport(voucherItem)}"
                        immediate="true"
                        rendered="#{voucherItem.approved}">
-            <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image"
+            <h:graphicImage value="/img/pdf-line.svg" styleClass="select-image"
                             title="#{messages['Voucher.report.generateReport']}"/>
         </h:commandLink>
         &#160;
@@ -206,7 +206,7 @@
                          immediate="true"
                          oncomplete="Richfaces.showModalPanel('voucherViewModalPanel');"
                          reRender="voucherViewModalPanel">
-            <h:graphicImage value="/img/ver16.png" styleClass="select-image" title="Ver documento"/>
+            <h:graphicImage value="/img/eye-line.svg" styleClass="select-image" title="#{messages['Voucher.viewDocument']}"/>
         </a4j:commandLink>
         &#160;
         <!--<h:graphicImage value="/img/user3c.png" styleClass="select-image" title="#{voucherItem.userAudit()}" rendered="#{voucherItem.createdBy != null}"/>-->

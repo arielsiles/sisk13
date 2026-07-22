@@ -1117,6 +1117,29 @@ a.row-order-link:hover {
     vertical-align: middle;
 }
 
+/* Resaltado de fila al pasar el mouse (tablas de cuentas y facturas del asiento) */
+.hoverable-rows tbody tr:hover td {
+    background-color: #eaf2fb;
+}
+
+/* Espacio fijo reservado a la derecha del Debe/Haber para el boton "=" (Completar).
+   Se reserva en todas las filas (vacio en las que no llevan boton) para que las cajas
+   de texto queden alineadas entre si. Se mantiene al minimo para no ensanchar la columna. */
+.complete-balance-slot {
+    display: inline-block;
+    width: 16px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.complete-balance-icon {
+    cursor: pointer;
+    border: 0;
+    vertical-align: middle;
+    width: 14px;
+    height: 14px;
+}
+
 .panel-tree {
     overflow: scroll;
     width: 400px;

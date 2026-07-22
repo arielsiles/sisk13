@@ -1,0 +1,233 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+<!--
+  Modal para registrar/editar una factura de Credito Fiscal desde el asiento contable.
+  Trabaja solo en memoria: al Aceptar agrega/actualiza la factura y su linea contable en
+  las listas del asiento (voucherCreateAction). Nada se escribe en la base de datos hasta
+  Guardar/Actualizar el asiento (guardado atomico).
+-->
+
+<rich:modalPanel id="voucherPurchaseDocumentModalPanel"
+                 width="560"
+                 autosized="true"
+                 resizeable="false"
+                 zindex="2000">
+    <f:facet name="header">
+        <h:outputText value="#{messages['PurchaseDocument.modal.title.edit']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" styleClass="select-image" id="voucherInvoiceModalCloseIcon"/>
+    </f:facet>
+
+    <h:form id="voucherPurchaseDocumentModalForm">
+
+        <a4j:outputPanel id="voucherInvoiceModalMessages" ajaxRendered="true">
+            <h:messages styleClass="errors" globalOnly="true"/>
+        </a4j:outputPanel>
+
+        <rich:panel id="voucherInvoiceModalPanel">
+
+            <app:fieldset id="voucherInvoiceGeneralFieldset"
+                          title="#{messages['PurchaseDocument.modal.section.general']}">
+
+                <s:decorate id="voucherInvoiceProviderField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.provider']}</ui:define>
+                    <app:selectPopUp id="voucherInvoiceProvider"
+                                     required="true"
+                                     textValue="#{voucherCreateAction.invoiceInEdit.financesEntity.acronym}"
+                                     value="#{voucherCreateAction.invoiceInEdit.financesEntity}"
+                                     clearAction="#{voucherCreateAction.clearInvoiceFinancesEntity()}"
+                                     searchModalPanel="financesEntityListModalPanel"
+                                     dataModel="#{financesEntityDataModel}"
+                                     reRender="voucherInvoiceProviderField, voucherInvoiceNitField, voucherInvoiceNameField"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceNitField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.nit']}</ui:define>
+                    <h:outputText value="#{voucherCreateAction.invoiceInEdit.financesEntity.nitNumber}"/>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceNameField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.name']}</ui:define>
+                    <h:panelGroup layout="block" style="width:330px; white-space:normal; word-wrap:break-word;">
+                        <h:outputText value="#{voucherCreateAction.invoiceInEdit.financesEntity.acronym}"/>
+                    </h:panelGroup>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceNumberField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.number']}</ui:define>
+                    <h:inputText id="voucherInvoiceNumber"
+                                 value="#{voucherCreateAction.invoiceInEdit.number}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="1"/>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceAuthorizationField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.authorizationCode']}</ui:define>
+                    <h:inputText id="voucherInvoiceAuthorization"
+                                 value="#{voucherCreateAction.invoiceInEdit.authorizationNumber}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="2"/>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceDateField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.date']}</ui:define>
+                    <rich:calendar id="voucherInvoiceDate"
+                                   value="#{voucherCreateAction.invoiceInEdit.date}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   inputClass="input"
+                                   enableManualInput="true"
+                                   required="true"
+                                   tabindex="3">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}"
+                                           type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceAmountField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.totalAmount']}</ui:define>
+                    <h:inputText id="voucherInvoiceAmount"
+                                 value="#{voucherCreateAction.invoiceInEdit.amount}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="4">
+                        <app:realNumberConverter minimum="0"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="voucherInvoiceAmount"/>
+                    </h:inputText>
+                </s:decorate>
+
+            </app:fieldset>
+
+            <app:fieldset id="voucherInvoiceFiscalFieldset"
+                          title="#{messages['PurchaseDocument.modal.section.invoice']}">
+
+                <s:decorate id="voucherInvoiceControlCodeField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.controlCode']}</ui:define>
+                    <h:inputText id="voucherInvoiceControlCode"
+                                 value="#{voucherCreateAction.invoiceInEdit.controlCode}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="5"/>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceExemptField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.exempt']}</ui:define>
+                    <h:inputText id="voucherInvoiceExempt"
+                                 value="#{voucherCreateAction.invoiceInEdit.exempt}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="6">
+                        <app:realNumberConverter minimum="0"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="voucherInvoiceExempt"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceRatesField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.rates']}</ui:define>
+                    <h:inputText id="voucherInvoiceRates"
+                                 value="#{voucherCreateAction.invoiceInEdit.rates}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="7">
+                        <app:realNumberConverter minimum="0"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="voucherInvoiceRates"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceNoTaxCreditField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.noTaxCredit']}</ui:define>
+                    <h:inputText id="voucherInvoiceNoTaxCredit"
+                                 value="#{voucherCreateAction.invoiceInEdit.noTaxCredit}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="8">
+                        <app:realNumberConverter minimum="0"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="voucherInvoiceNoTaxCredit"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="voucherInvoiceDiscountsField"
+                            template="/include/inputField.xhtml"
+                            styleClass="formRow">
+                    <ui:define name="label">#{messages['PurchaseDocument.discounts']}</ui:define>
+                    <h:inputText id="voucherInvoiceDiscounts"
+                                 value="#{voucherCreateAction.invoiceInEdit.discounts}"
+                                 required="true"
+                                 styleClass="input right"
+                                 tabindex="9">
+                        <app:realNumberConverter minimum="0"
+                                                 pattern="#{messages['patterns.decimalNumber']}"
+                                                 forId="voucherInvoiceDiscounts"/>
+                    </h:inputText>
+                </s:decorate>
+
+            </app:fieldset>
+
+        </rich:panel>
+
+        <div class="buttonsRight">
+            <a4j:commandButton id="voucherInvoiceAcceptButton"
+                               action="#{voucherCreateAction.confirmInvoice}"
+                               value="#{messages['Common.accept']}"
+                               styleClass="button"
+                               reRender=":warehouseVoucherForm, voucherPurchaseDocumentModalForm"
+                               data="#{voucherCreateAction.invoiceOperationSucceeded}"
+                               oncomplete="if (data === true) { Richfaces.hideModalPanel('voucherPurchaseDocumentModalPanel'); }"/>
+
+            <h:commandButton id="voucherInvoiceCancelButton"
+                             value="#{messages['Common.cancel']}"
+                             styleClass="button"
+                             immediate="true">
+                <rich:componentControl for="voucherPurchaseDocumentModalPanel"
+                                       event="onclick"
+                                       disableDefault="true"
+                                       operation="hide"/>
+            </h:commandButton>
+        </div>
+
+        <rich:componentControl for="voucherPurchaseDocumentModalPanel"
+                               attachTo="voucherInvoiceModalCloseIcon"
+                               event="onclick"
+                               operation="hide"/>
+
+    </h:form>
+</rich:modalPanel>
+
+</ui:composition>

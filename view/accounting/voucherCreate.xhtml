@@ -187,7 +187,8 @@
                                    rendered="#{voucherCreateAction.pending}"
                                    styleClass="button"
                                    immediate="true"
-                                   reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField" />
+                                   reRender="invoiceDetailListPanel,movementDetailListPanel,itemAccountField,clientField, providerField, :voucherPurchaseDocumentModalForm"
+                                   oncomplete="if (#{cashAccount.allowIva == true}) { Richfaces.showModalPanel('voucherPurchaseDocumentModalPanel'); }"/>
             </c:forEach>
         </s:decorate>
 
@@ -357,7 +358,7 @@
     <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
         <s:div id="movementDetailListPanel">
 
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table hoverable-rows">
                 <thead class="rich-table-thead">
                 <tr class="rich-table-header">
                     <th class="rich-table-headercell row-order-cell"></th>
@@ -433,6 +434,14 @@
                                                  reRender="movementDetailListPanel"
                                                  actionListener="#{voucherCreateAction.convertToForeignCurrency(voucherDetail)}"/>
                                 </h:inputText>
+                                <h:panelGroup styleClass="complete-balance-slot">
+                                    <a4j:commandLink rendered="#{voucherCreateAction.isLastVoucherDetail(voucherDetail) and voucherCreateAction.pending}"
+                                                     title="#{messages['Voucher.completeDebit']}"
+                                                     action="#{voucherCreateAction.completeDebit(voucherDetail)}"
+                                                     reRender="movementDetailListPanel">
+                                        <h:graphicImage value="/img/equals-line.svg" styleClass="complete-balance-icon" title="#{messages['Voucher.completeDebit']}"/>
+                                    </a4j:commandLink>
+                                </h:panelGroup>
                                 <h:message for="#{debitInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
                             </s:div>
                         </td>
@@ -453,6 +462,14 @@
                                                  reRender="movementDetailListPanel"
                                                  actionListener="#{voucherCreateAction.convertToForeignCurrency(voucherDetail)}"/>
                                 </h:inputText>
+                                <h:panelGroup styleClass="complete-balance-slot">
+                                    <a4j:commandLink rendered="#{voucherCreateAction.isLastVoucherDetail(voucherDetail) and voucherCreateAction.pending}"
+                                                     title="#{messages['Voucher.completeCredit']}"
+                                                     action="#{voucherCreateAction.completeCredit(voucherDetail)}"
+                                                     reRender="movementDetailListPanel">
+                                        <h:graphicImage value="/img/equals-line.svg" styleClass="complete-balance-icon" title="#{messages['Voucher.completeCredit']}"/>
+                                    </a4j:commandLink>
+                                </h:panelGroup>
                                 <h:message for="#{creditInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
                             </s:div>
                         </td>
@@ -506,7 +523,7 @@
                                              ajaxSingle="true"
                                              rendered="#{voucherCreateAction.pending}"
                                              reRender="movementDetailListPanel, invoiceDetailListPanel">
-                                <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                                <h:graphicImage value="/img/trash-line.svg" styleClass="select-image-middle" title="#{messages['Common.remove']}"/>
                             </a4j:commandLink>
                         </td>
                     </tr>
@@ -540,227 +557,89 @@
 <rich:tabPanel switchType="ajax" selectedTab="purchaseDocumentTab">
     <rich:tab name="purchaseDocumentTab" label="#{messages['Voucher.tab.title']}" ajaxSingle="true">
         <s:div id="invoiceDetailListPanel">
-            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table hoverable-rows" style="table-layout:fixed;">
+                <colgroup>
+                    <col style="width:9%"/>
+                    <col style="width:10%"/>
+                    <col style="width:25%"/>
+                    <col style="width:9%"/>
+                    <col style="width:14%"/>
+                    <col style="width:9%"/>
+                    <col style="width:9%"/>
+                    <col style="width:7%"/>
+                    <col style="width:8%"/>
+                </colgroup>
                 <thead class="rich-table-thead">
                 <tr class="rich-table-header">
-                    <th class="rich-table-headercell">Fecha</th>
-                    <th class="rich-table-headercell">R.Social</th>
-                    <!--<th class="rich-table-headercell">Nit</th>-->
-                    <th class="rich-table-headercell">N.Fact</th>
-                    <th class="rich-table-headercell">Auto</th>
-                    <th class="rich-table-headercell">Monto</th>
-                    <th class="rich-table-headercell">C.Control</th>
-                    <th class="rich-table-headercell">Excento</th>
-                    <th class="rich-table-headercell">Tasas</th>
-                    <th class="rich-table-headercell">Sin CF</th>
-                    <th class="rich-table-headercell">Descuentos</th>
-                    <th class="rich-table-headercell">Accion</th>
-
+                    <th class="rich-table-headercell">#{messages['Voucher.invoice.column.date']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.invoice.column.nit']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.invoice.column.name']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.invoice.column.number']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.invoice.column.authorization']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.invoice.column.subtotal']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.invoice.column.netAmount']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.invoice.column.iva']}</th>
+                    <th class="rich-table-headercell">#{messages['Common.action']}</th>
                 </tr>
                 </thead>
 
                 <c:forEach var="purchaseDocument" items="#{voucherCreateAction.purchaseDocumentList}" varStatus="row">
-                    <c:set var="field01Id" value="field01_#{row.index}"/>
-                    <c:set var="field02Id" value="field02_#{row.index}"/>
-                    <c:set var="field03Id" value="field03_#{row.index}"/>
-                    <c:set var="field04Id" value="field04_#{row.index}"/>
-                    <c:set var="field05Id" value="field05_#{row.index}"/>
-                    <c:set var="field06Id" value="field06_#{row.index}"/>
-                    <c:set var="field07Id" value="field07_#{row.index}"/>
-                    <c:set var="field08Id" value="field08_#{row.index}"/>
-                    <c:set var="field09Id" value="field09_#{row.index}"/>
-                    <c:set var="field10Id" value="field10_#{row.index}"/>
-                    <c:set var="field11Id" value="field11_#{row.index}"/>
-                    <c:set var="field12Id" value="field12_#{row.index}"/>
-
-                    <c:set var="fieldInput01Id" value="fieldInput01_#{row.index}"/>
-                    <c:set var="fieldInput02Id" value="fieldInput02_#{row.index}"/>
-                    <c:set var="fieldInput03Id" value="fieldInput03_#{row.index}"/>
-                    <c:set var="fieldInput04Id" value="fieldInput04_#{row.index}"/>
-                    <c:set var="fieldInput05Id" value="fieldInput05_#{row.index}"/>
-                    <c:set var="fieldInput06Id" value="fieldInput06_#{row.index}"/>
-                    <c:set var="fieldInput07Id" value="fieldInput07_#{row.index}"/>
-                    <c:set var="fieldInput08Id" value="fieldInput08_#{row.index}"/>
-                    <c:set var="fieldInput09Id" value="fieldInput09_#{row.index}"/>
-                    <c:set var="fieldInput10Id" value="fieldInput10_#{row.index}"/>
-                    <c:set var="fieldInput11Id" value="fieldInput11_#{row.index}"/>
-                    <c:set var="fieldInput12Id" value="fieldInput12_#{row.index}"/>
-
 
                     <tr class="rich-table-row">
 
                         <td class="rich-table-cell center">
-                            <s:div id="#{field01Id}">
-
-                                <rich:calendar id="#{fieldInput01Id}"
-                                               value="#{purchaseDocument.date}"
-                                               datePattern="#{messages['patterns.date']}"
-                                               inputClass="inputSmall"
-                                               enableManualInput="true"
-                                               popup="true"
-                                               required="true">
-                                    <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                                </rich:calendar>
-                                <h:message for="#{fieldInput01Id}" styleClass="errors" style="display:block;" rendered="true"/>
-
-                            </s:div>
+                            <h:outputText value="#{purchaseDocument.date}">
+                                <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
+                            </h:outputText>
                         </td>
 
                         <td class="rich-table-cell center">
-                            <s:div id="#{field02Id}">
-                                <c:if test="#{purchaseDocument.financesEntity == null}">
-                                    <app:suggestionBox id="#{fieldInput02Id}"
-                                                       value="#{purchaseDocument.financesEntityFullName}"
-                                                       entity="#{purchaseDocument.financesEntity}"
-                                                       styleClass="input"
-                                                       entityAlias="financesEntity"
-                                                       searchField="fullName"
-                                                       searchCompoundFields="financesEntity.id, financesEntity.acronym"
-                                                       searchCompoundCondition="concat(concat(financesEntity.nitNumber,' - '),financesEntity.acronym)"
-                                                       reRender="#{field02Id}"
-                                                       updateFocusOnSelect="true">
-                                        <ui:define name="columns">
-                                            <h:column><h:outputText value="#{entityItem.fullName}"/></h:column>
-                                        </ui:define>
-                                    </app:suggestionBox>
-                                </c:if>
-                                <c:if test="#{purchaseDocument.financesEntity != null}">
-                                    <h:outputText value="#{empty purchaseDocument.financesEntityFullName ? purchaseDocument.fullName : purchaseDocument.financesEntityFullName}"/>
-                                    <a4j:commandLink action="#{voucherCreateAction.clearPurchaseDocumentProvider(purchaseDocument)}"
-                                                     rendered="#{voucherCreateAction.pending}"
-                                                     title="#{messages['Common.remove']}"
-                                                     immediate="true"
-                                                     ajaxSingle="true"
-                                                     reRender="#{field02Id}">
-                                        <rich:spacer width="4"/>
-                                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                                    </a4j:commandLink>
-                                </c:if>
-                            </s:div>
+                            <h:outputText value="#{purchaseDocument.nit}"/>
+                        </td>
+
+                        <td class="rich-table-cell" style="white-space:normal; word-wrap:break-word;">
+                            <h:outputText value="#{empty purchaseDocument.name ? purchaseDocument.financesEntityFullName : purchaseDocument.name}"/>
                         </td>
 
                         <td class="rich-table-cell center">
-                            <s:div id="#{field04Id}">
-                                <h:inputText id="#{fieldInput04Id}" value="#{purchaseDocument.number}" styleClass="inputSmall" required="true">
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field04Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput04Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
+                            <h:outputText value="#{purchaseDocument.number}"/>
+                        </td>
+
+                        <td class="rich-table-cell center" style="white-space:normal; word-break:break-all; overflow:hidden;">
+                            <h:outputText value="#{purchaseDocument.authorizationNumber}"/>
+                        </td>
+
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{purchaseDocument.amount}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                        </td>
+
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{purchaseDocument.netAmount}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                        </td>
+
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{purchaseDocument.iva}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
                         </td>
 
                         <td class="rich-table-cell center">
-                            <s:div id="#{field05Id}">
-                                <h:inputText id="#{fieldInput05Id}" value="#{purchaseDocument.authorizationNumber}" styleClass="input105" required="true">
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field05Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput05Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{field06Id}">
-                                <h:inputText id="#{fieldInput06Id}" value="#{purchaseDocument.amount}" styleClass="inputSmall right" required="true">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
-                                                             forId="#{fieldInput06Id}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field06Id}, totalInvoice"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput06Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{field07Id}">
-                                <h:inputText id="#{fieldInput07Id}" value="#{purchaseDocument.controlCode}" styleClass="input100" required="true">
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field07Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput07Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{field08Id}">
-                                <h:inputText id="#{fieldInput08Id}" value="#{purchaseDocument.exempt}" styleClass="inputTiny" required="true">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
-                                                             forId="#{fieldInput08Id}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field08Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput08Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{field09Id}">
-                                <h:inputText id="#{fieldInput09Id}" value="#{purchaseDocument.rates}" styleClass="inputTiny" required="true">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
-                                                             forId="#{fieldInput09Id}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field09Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput09Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{field10Id}">
-                                <h:inputText id="#{fieldInput10Id}" value="#{purchaseDocument.noTaxCredit}" styleClass="inputTiny" required="true">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
-                                                             forId="#{fieldInput10Id}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field10Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput10Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{field11Id}">
-                                <h:inputText id="#{fieldInput11Id}" value="#{purchaseDocument.discounts}" styleClass="inputTiny" required="true">
-                                    <app:realNumberConverter minimum="0"
-                                                             pattern="#{messages['patterns.decimalNumber']}"
-                                                             forId="#{fieldInput11Id}"/>
-                                    <a4j:support event="onblur" ajaxSingle="true" reRender="#{field11Id}"/>
-                                </h:inputText>
-                                <h:message for="#{fieldInput11Id}" styleClass="errors" style="display:block;" rendered="true"/>
-                            </s:div>
-                        </td>
-
-
-
-                        <td class="rich-table-cell center">
-                            <s:div id="#{field12Id}">
-
-                                    <a4j:commandButton
-                                            action="#{voucherCreateAction.addFiscalCreditCashAccount(purchaseDocument)}"
-                                            value=" + "
-                                            styleClass="button"
-                                            immediate="true"
-                                            ajaxSingle="true"
-                                            reRender="movementDetailListPanel,itemAccountField,invoiceDetailListPanel,#{field01Id},#{fieldInput01Id},#{field06Id},#{fieldInput06Id}">
-                                    </a4j:commandButton>
-
-                                <!--<c:if test="#{purchaseDocument.financesEntity == null}">
-                                    <a4j:commandButton
-                                                       action="#{voucherCreateAction.addFiscalCreditCashAccount(purchaseDocument)}"
-                                                       value=" + "
-                                                       styleClass="button"
-                                                       rendered="#{voucherCreateAction.isRegistered(purchaseDocument)}"
-                                                       immediate="true"
-                                                       ajaxSingle="true"
-                                                       reRender="movementDetailListPanel,itemAccountField,invoiceDetailListPanel,#{field01Id},#{fieldInput01Id},#{field06Id},#{fieldInput06Id}">
-                                    </a4j:commandButton>
-                                </c:if>-->
-
-                                    <a4j:commandLink immediate="true"
-                                                     title="#{messages['Common.remove']}"
-                                                     action="#{voucherCreateAction.removePurchaseDocument(purchaseDocument)}"
-                                                     ajaxSingle="true"
-                                                     rendered="#{voucherCreateAction.pending}"
-                                                     reRender="movementDetailListPanel, invoiceDetailListPanel, itemAccountField">
-                                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                                    </a4j:commandLink>
-                            </s:div>
+                            <a4j:commandLink title="#{messages['Common.edit']}"
+                                             action="#{voucherCreateAction.editInvoice(purchaseDocument)}"
+                                             immediate="true"
+                                             ajaxSingle="true"
+                                             rendered="#{voucherCreateAction.pending}"
+                                             reRender=":voucherPurchaseDocumentModalForm"
+                                             oncomplete="Richfaces.showModalPanel('voucherPurchaseDocumentModalPanel');">
+                                <h:graphicImage value="/img/edit-line.svg" styleClass="select-image-middle" title="#{messages['Common.edit']}"/>
+                            </a4j:commandLink>
+                            <rich:spacer width="8"/>
+                            <a4j:commandLink title="#{messages['Common.remove']}"
+                                             action="#{voucherCreateAction.prepareRemoveInvoice(purchaseDocument)}"
+                                             immediate="true"
+                                             ajaxSingle="true"
+                                             rendered="#{voucherCreateAction.pending}"
+                                             oncomplete="Richfaces.showModalPanel('removeInvoiceConfirmation');">
+                                <h:graphicImage value="/img/trash-line.svg" styleClass="select-image-middle" title="#{messages['Common.remove']}"/>
+                            </a4j:commandLink>
                         </td>
 
                     </tr>
@@ -771,14 +650,12 @@
                     <td class="rich-table-cell center"></td>
                     <td class="rich-table-cell center"></td>
                     <td class="rich-table-cell center"></td>
-                    <td class="rich-table-cell center">
+                    <td class="rich-table-cell center"></td>
+                    <td class="rich-table-cell right">
                         <s:div id="totalInvoice">
                             <h:outputText value="#{voucherCreateAction.totalInvoice}"><f:convertNumber   pattern="#,##0.00"  /></h:outputText>
                         </s:div>
                     </td>
-                    <td class="rich-table-cell center"></td>
-                    <td class="rich-table-cell center"></td>
-                    <td class="rich-table-cell center"></td>
                     <td class="rich-table-cell center"></td>
                     <td class="rich-table-cell center"></td>
                     <td class="rich-table-cell center"></td>
@@ -922,6 +799,50 @@
                                tabindex="1000"/>
         </ui:define>
     </s:decorate>
+
+    <!-- Modal para registrar/editar la factura de credito fiscal -->
+    <ui:include src="/accounting/voucherPurchaseDocumentModal.xhtml"/>
+
+    <!-- Modal de busqueda de proveedor (FinancesEntity) para el modal de factura.
+         Se declara al nivel raiz de la pagina (fuera de los forms/modales) por el
+         problema de modales anidados de RichFaces 3.x. -->
+    <s:decorate id="voucherFinancesEntityListModalPanelContainer"
+                template="/finances/financesEntityListModalPanel.xhtml">
+        <ui:param name="containerId" value="voucherFinancesEntityListModalPanelContainer"/>
+        <ui:param name="dialogId" value="financesEntityListModalPanel"/>
+        <ui:define name="assignButton">
+            <a4j:commandButton id="assignButton"
+                               title="#{messages['Common.choose']}"
+                               action="#{voucherCreateAction.assignInvoiceFinancesEntity(instance)}"
+                               image="/img/active.gif"
+                               styleClass="select-image"
+                               immediate="true"
+                               reRender="voucherInvoiceProviderField, voucherInvoiceNitField, voucherInvoiceNameField"
+                               oncomplete="Richfaces.hideModalPanel('financesEntityListModalPanel');"/>
+        </ui:define>
+    </s:decorate>
+
+    <!-- Confirmacion de eliminacion de una factura (quita la factura y su cuenta contable) -->
+    <s:div id="removeInvoiceConfirmationPanel">
+        <s:decorate template="/include/modalDialog.xhtml">
+            <ui:param name="dialogId" value="removeInvoiceConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Voucher.invoice.remove.title']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputText value="#{messages['Voucher.invoice.remove.confirmation']}"/>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{voucherCreateAction.removeSelectedInvoice}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"
+                                   reRender=":warehouseVoucherForm"
+                                   oncomplete="Richfaces.hideModalPanel('removeInvoiceConfirmation');"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+    </s:div>
 
 <!--Set selector Id to enable focus-->
 <rich:jQuery selector="#documentTypeSearch" query="focus()" timing="onload"/>

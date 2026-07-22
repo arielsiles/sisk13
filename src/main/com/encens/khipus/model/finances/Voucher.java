@@ -227,6 +227,16 @@ public class Voucher implements BaseModel{
     @Transient
     private List<PurchaseDocument> purchaseList = new ArrayList<PurchaseDocument>(0);
 
+    /** Bajas diferidas de la edicion: detalles ya persistidos que se quitaron en pantalla
+        y deben eliminarse recien al Actualizar, dentro de la misma transaccion. */
+    @Transient
+    private List<VoucherDetail> detailsToRemove = new ArrayList<VoucherDetail>(0);
+
+    /** Facturas ya persistidas quitadas en pantalla (sin linea contable asociada) que se
+        eliminan al Actualizar, en la misma transaccion. */
+    @Transient
+    private List<PurchaseDocument> purchaseDocumentsToRemove = new ArrayList<PurchaseDocument>(0);
+
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -596,6 +606,22 @@ public class Voucher implements BaseModel{
 
     public void setPurchaseList(List<PurchaseDocument> purchaseList) {
         this.purchaseList = purchaseList;
+    }
+
+    public List<VoucherDetail> getDetailsToRemove() {
+        return detailsToRemove;
+    }
+
+    public void setDetailsToRemove(List<VoucherDetail> detailsToRemove) {
+        this.detailsToRemove = detailsToRemove;
+    }
+
+    public List<PurchaseDocument> getPurchaseDocumentsToRemove() {
+        return purchaseDocumentsToRemove;
+    }
+
+    public void setPurchaseDocumentsToRemove(List<PurchaseDocument> purchaseDocumentsToRemove) {
+        this.purchaseDocumentsToRemove = purchaseDocumentsToRemove;
     }
 
     public String getFullDocument(){
