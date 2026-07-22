@@ -15,93 +15,86 @@
     <ui:define name="body">
         <h:form id="cashAccountListSearch">
 
-            <rich:simpleTogglePanel label="#{messages['CashAccount.search']}" switchType="client">
-                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
-                             columnClasses="width50percent,width50percent">
+            <!-- Barra de filtros reusable (app-filterbar): una sola linea, placeholders estilo Odoo.
+                 Se conservan todos los criterios: Codigo, Descripcion, Tipo y Cta. Movimiento. -->
+            <div class="app-filterbar">
+                <h:inputText id="accountCode" value="#{cashAccountDataModel.criteria.accountCode}" maxlength="20"
+                             styleClass="app-filterbar__input app-filterbar__input--code app-ph-code" tabindex="1"/>
 
-                    <s:div id="leftPanel">
-                        <s:decorate id="accountCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['CashAccount.accountCode']}</ui:define>
-                            <h:inputText id="accountCode" value="#{cashAccountDataModel.criteria.accountCode}" maxlength="20"
-                                         styleClass="input"
-                                         tabindex="2001"/>
-                        </s:decorate>
+                <h:inputText id="description" value="#{cashAccountDataModel.criteria.description}" maxlength="100"
+                             styleClass="app-filterbar__input app-ph-desc" tabindex="2"/>
 
-                        <!--<s:decorate id="activeAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['CashAccount.activeAccounts']}</ui:define>
-                            <h:selectBooleanCheckbox id="activeAccount" value="#{cashAccountDataModel.active}"
-                                                     tabindex="2003"/>
-                        </s:decorate>-->
+                <h:selectOneMenu id="type"
+                                 value="#{cashAccountDataModel.cashAccountType}"
+                                 styleClass="app-filterbar__select"
+                                 required="false"
+                                 tabindex="3">
+                    <s:selectItems value="#{cashAccountTypes}"
+                                   var="element"
+                                   label="#{messages[element.resourceKey]}"
+                                   noSelectionLabel="#{messages['CashAccount.type']}"
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
 
-                        <s:decorate id="movementField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['CashAccount.movement']}</ui:define>
-                            <h:selectBooleanCheckbox id="movement" value="#{cashAccountDataModel.movementAccount}"
-                                                     tabindex="2005"/>
-                        </s:decorate>
-                    </s:div>
+                <label class="app-filterbar__check">
+                    <h:selectBooleanCheckbox id="movement" value="#{cashAccountDataModel.movementAccount}"
+                                             tabindex="4"/>
+                    #{messages['CashAccount.movementShort']}
+                </label>
 
-                    <s:div id="rightPanel">
-                        <s:decorate id="desciptionField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['CashAccount.description']}</ui:define>
-                            <h:inputText id="description" value="#{cashAccountDataModel.criteria.description}" maxlength="100"
-                                         styleClass="input"
-                                         tabindex="2002"/>
-                        </s:decorate>
+                <a4j:commandLink action="#{cashAccountDataModel.search}"
+                                 reRender="cashAccountList, dataScroller"
+                                 styleClass="app-iconbtn"
+                                 title="#{messages['Common.search']}"
+                                 id="searchButtonId"
+                                 tabindex="5">
+                    <h:graphicImage value="/img/search-line.svg" alt="#{messages['Common.search']}"/>
+                    <s:defaultAction/>
+                </a4j:commandLink>
+            </div>
 
-                        <s:decorate id="typeField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['CashAccount.type']}</ui:define>
-                            <h:selectOneMenu id="type"
-                                             value="#{cashAccountDataModel.cashAccountType}"
-                                             styleClass="input"
-                                             required="false"
-                                             tabindex="3">
-                                <s:selectItems value="#{cashAccountTypes}"
-                                               var="element"
-                                               label="#{messages[element.resourceKey]}"
-                                               noSelectionLabel=""
-                                               hideNoSelectionLabel="false"/>
-                                <s:convertEnum/>
-                            </h:selectOneMenu>
-                        </s:decorate>
+            <!-- Placeholders (JSF 1.2 no propaga el atributo placeholder): se aplican por clase marcador.
+                 El texto proviene de las claves i18n, no esta hardcodeado. -->
+            <script type="text/javascript">
+                (function () {
+                    function ph(sel, t) {
+                        var e = document.querySelector(sel);
+                        if (e) { e.setAttribute("placeholder", t); }
+                    }
+                    ph(".app-ph-code", "#{messages['CashAccount.accountCode']}");
+                    ph(".app-ph-desc", "#{messages['CashAccount.description']}");
+                })();
+            </script>
 
-                        <s:decorate id="searchButtonField" template="/include/inputField.xhtml" styleClass="formRow">
-                            <a4j:commandButton action="#{cashAccountDataModel.search}"
-                                               reRender="cashAccountList, dataScroller"
-                                               styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
-                                               tabindex="2004">
-                                <s:defaultAction/>
-                            </a4j:commandButton>
-                        </s:decorate>
-                    </s:div>
+            <!-- Toolbar de acciones (app-toolbar): fila compacta a la derecha.
+                 Orden: Analizar niveles, Exportar y Nuevo (Nuevo siempre el ultimo, extremo derecho). -->
+            <div class="app-toolbar">
+                <a4j:commandLink action="#{cashAccountLevelAnalysisAction.analyze}"
+                                 styleClass="app-iconbtn"
+                                 title="#{messages['CashAccount.levelAnalysis.analyze']}"
+                                 id="analyzeLevelsButtonId"
+                                 rendered="#{s:hasPermission('CASHACCOUNTLEVEL','VIEW')}"
+                                 reRender="levelAnalysisData"
+                                 oncomplete="Richfaces.showModalPanel('cashAccountLevelAnalysisModal')">
+                    <h:graphicImage value="/img/levels-line.svg" alt="#{messages['CashAccount.levelAnalysis.analyze']}"/>
+                </a4j:commandLink>
 
-                </h:panelGrid>
-            </rich:simpleTogglePanel>
-
-            <!--rendered="#{s:hasPermission('PRODUCTITEM','CREATE')}"-->
-
-            <div class="buttons">
-
-                <h:commandButton action="#{cashAccountReportAction.generateReport}"
-                                 styleClass="button"
-                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
-                </h:commandButton>
-
-                <a4j:commandButton action="#{cashAccountLevelAnalysisAction.analyze}"
-                                   styleClass="button"
-                                   value="#{messages['CashAccount.levelAnalysis.analyze']}"
-                                   id="analyzeLevelsButtonId"
-                                   rendered="#{s:hasPermission('CASHACCOUNTLEVEL','VIEW')}"
-                                   reRender="levelAnalysisData"
-                                   oncomplete="Richfaces.showModalPanel('cashAccountLevelAnalysisModal')"/>
+                <h:commandLink action="#{cashAccountReportAction.generateReport}"
+                               styleClass="app-iconbtn app-iconbtn--excel"
+                               title="#{messages['Common.export']}"
+                               id="generateButtonId">
+                    <h:graphicImage value="/img/excel-line.svg" alt="#{messages['Common.export']}"/>
+                </h:commandLink>
 
                 <s:button value="#{messages['Common.new']}"
                           view="/finances/cashAccount.xhtml"
-                          styleClass="button"
+                          styleClass="app-btn-primary"
                           propagation="begin"/>
             </div>
 
             <rich:dataTable value="#{cashAccountDataModel}" var="cashAccountItem" id="cashAccountList"
-                            rows="#{sessionUser.rowsPerPage15}" width="100%" columnsWidth="10%, 10%, 50%, 5%, 10%, 10%, 5%">
+                            rows="#{sessionUser.rowsPerPage20}" width="100%" columnsWidth="10%, 10%, 50%, 5%, 10%, 10%, 5%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>#{messages['CashAccount.type']}</rich:column>

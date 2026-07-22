@@ -1285,3 +1285,159 @@ input[type="text"].disabledInput {
     margin-left: 8px;
     white-space: nowrap;
 }
+
+/* =========================================================================
+   UI - componentes reusables (design layer de la app) (barra de filtros / toolbar / iconos)
+   Diseno de referencia: view/finances/cashAccountList.xhtml
+   Reutilizable en cualquier vista de lista aplicando estas clases.
+   ========================================================================= */
+
+/* Tipografia base del sistema (Verdana ~11px) para que no desencaje con el resto. */
+
+/* Barra de filtros: una sola linea, discreta, sin caja pesada. */
+.app-filterbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    background: #fff;
+    border: 1px solid #e3e3e0;
+    border-radius: 3px;
+    font-family: Verdana, Arial, sans-serif;
+}
+
+/* Inputs y selects dentro de la barra: compactos, borde del sistema. */
+.app-filterbar__input,
+.app-filterbar__select {
+    height: 26px;
+    box-sizing: border-box;
+    padding: 2px 6px;
+    border: 1px solid #C3BBB6;
+    border-radius: 3px;
+    background: #fff;
+    color: #616161;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+.app-filterbar__input {
+    width: 200px;
+}
+
+/* Codigo: cabe ~10 digitos, no necesita ancho completo. */
+.app-filterbar__input--code {
+    width: 110px;
+}
+
+.app-filterbar__select {
+    min-width: 150px;
+}
+
+.app-filterbar__input:focus,
+.app-filterbar__select:focus {
+    border-color: #578BB8;
+    box-shadow: 0 0 0 2px rgba(87, 139, 184, .15);
+}
+
+.app-filterbar__input::-webkit-input-placeholder { color: #a7a29c; }
+.app-filterbar__input::-moz-placeholder { color: #a7a29c; }
+.app-filterbar__input:-ms-input-placeholder { color: #a7a29c; }
+
+/* Checkbox con su label corto en linea (no admite placeholder). */
+.app-filterbar__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    color: #616161;
+    white-space: nowrap;
+}
+
+.app-filterbar__check input {
+    margin: 0;
+    vertical-align: middle;
+}
+
+/* Toolbar de acciones sobre la tabla: fila compacta alineada a la derecha. */
+.app-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin: 4px 0;
+}
+
+/* Boton icon-only con tooltip (title). Se renderiza como <a> (commandLink). */
+.app-iconbtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 22px;
+    box-sizing: border-box;
+    border: 1px solid #C3BBB6;
+    border-radius: 3px;
+    background: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    vertical-align: middle;
+    transition: background .15s, border-color .15s;
+}
+
+.app-iconbtn:hover {
+    background: #f2f4f7;
+    border-color: #a9bccf;
+}
+
+.app-iconbtn img {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border: 0;
+}
+
+.app-iconbtn--excel:hover {
+    background: #eef7f0;
+    border-color: #8dc4a2;
+}
+
+/* Boton primario reutilizable (accion destacada tipo "Nuevo"). Clase NUEVA:
+   no toca .button / input.button que usan el resto de las vistas.
+   s:button se renderiza como <input type="button">.
+   En REPOSO conserva el aspecto ORIGINAL del boton del sistema (skin glassX): no se
+   fuerza color; solo se bloquea la GEOMETRIA con !important para que RichFaces
+   CONTROL_SKINNING no lo redimensione al cargar (evita el flicker). Al pasar el mouse
+   cambia al azul del sistema #578BB8. */
+.app-btn-primary {
+    display: inline-block !important;
+    height: 22px !important;
+    line-height: 20px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 8px !important;
+    border-radius: 3px !important;
+    font-family: Verdana, Arial, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: normal !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    transition: background .15s, border-color .15s, color .15s;
+}
+
+.app-btn-primary:hover {
+    background: #578BB8 !important;
+    background-image: none !important;
+    border: 1px solid #578BB8 !important;
+    color: #fff !important;
+    text-shadow: none !important;
+    text-decoration: none;
+}
