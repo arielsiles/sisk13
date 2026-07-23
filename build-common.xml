@@ -8,9 +8,10 @@
     <property name="app.name" value="KHIPUS"/>
     <property name="app.version" value="6.0.116"/>
     <property environment="env"/>
-    <!-- Numero de build: BUILD_NUMBER del entorno (CI) o "local" si no existe,
-         para que el footer nunca muestre el token literal -->
-    <condition property="app.build" value="${env.BUILD_NUMBER}" else="local">
+    <!-- Numero de build: BUILD_NUMBER del entorno (CI) si existe; si no, la fecha y
+         hora del release (se fija en el target init con <tstamp>). La primera
+         definicion gana: con CI, esta gana y init no la pisa. -->
+    <condition property="app.build" value="${env.BUILD_NUMBER}">
         <isset property="env.BUILD_NUMBER"/>
     </condition>
 
@@ -66,6 +67,12 @@
             classname ="org.codehaus.groovy.ant.Groovyc"
             classpathref="build.classpath"/> --><!-- really only the groovy jar is necessary --><!---->
         <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${lib.dir}/ant-contrib-1.0b2.jar"/>
+        <!-- Numero de build = fecha y hora del release en formato numerico
+             (yyyyMMddHHmm), si no vino BUILD_NUMBER de CI -->
+        <tstamp>
+            <format property="build.timestamp" pattern="yyyyMMddHHmm"/>
+        </tstamp>
+        <property name="app.build" value="${build.timestamp}"/>
         <mkdir dir="${jar.dir}"/>
         <mkdir dir="${ear.dir}"/>
         <mkdir dir="${war.dir}"/>
