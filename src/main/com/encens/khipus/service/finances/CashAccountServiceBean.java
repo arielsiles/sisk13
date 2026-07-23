@@ -77,7 +77,6 @@ public class CashAccountServiceBean implements CashAccountService {
             {"inv_movdet", "cuenta_art"},
             {"inv_tipodocs", "ctacosto", "ctracuentamn"},
             {"inv_vales", "contracuenta", "cta_gasto"},
-            {"pagoacopiomp", "cuentacaja"},
             {"pagofondorota", "cuentaajuste", "cuentacaja"},
             {"pagoordencompra", "cuentacaja", "cuentarendir"},
             {"registrocontable", "cuentaxpagar"},

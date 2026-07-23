@@ -120,10 +120,6 @@
     <factory name="xproductionCategoryList" value="#{xproductionCategoryQuery}"/>
     <framework:entity-query name="xproductionCategoryQuery" ejbql="select p from XProductionCategory p"/>
 
-    <factory name="xrawMaterialDiscountTList" value="#{xrawMaterialDiscountTQuery}"/>
-    <framework:entity-query name="xrawMaterialDiscountTQuery"
-                            ejbql="select rawMaterialDiscountT from RawMaterialDiscountT rawMaterialDiscountT"/>
-
     <factory name="productionLineList" value="#{productionLineQuery}"/>
     <framework:entity-query name="productionLineQuery"
                             ejbql="select o from ProductionLine o order by o.name ASC"/>
@@ -142,15 +138,6 @@
                             ejbql="select o from ProductionGroup o order by o.name ASC"/>
 
     <!--Enumerations-->
-
-    <factory name="xrawMaterialPaymentTypeEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialPaymentType')}"/>
-
-    <factory name="xrawMaterialPaymentStateEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialPaymentState')}"/>
-
-    <factory name="xrawMaterialDiscountTypeEnum"
-             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.production.RawMaterialDiscountType')}"/>
 
     <factory name="productionShiftTypesEnum"
              value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.ProductionShiftType')}"/>

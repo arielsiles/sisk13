@@ -839,11 +839,6 @@
                 rendered="#{s:hasPermission('ZONEINSPECTION','VIEW')}"
                 propagation="none"/>
 
-        <s:link view="/production/rawMaterialPaymentRequestList.xhtml" styleClass="tab-cell"
-                value="#{messages['menu.production.configuration.rawMaterialPaymentRequest']}"
-                rendered="#{s:hasPermission('RAWMATERIALPAYMENTREQUEST','VIEW')}"
-                propagation="none"/>
-
         <s:link view="/production/metaProductList.xhtml" styleClass="tab-cell"
                 value="#{messages['menu.production.configuration.metaProductProduction']}"
                 rendered="#{s:hasPermission('METAPRODUCT','VIEW')}"
@@ -3367,13 +3362,6 @@
                        styleClass="main-menu-item" rendered="#{s:hasPermission('METAPRODUCT','VIEW')}">
             <s:link view="/production/metaProductList.xhtml"
                     value="#{messages['menu.production.configuration.metaProductProduction']}"
-                    propagation="none"/>
-        </rich:menuItem>
-
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item" rendered="#{s:hasPermission('RAWMATERIALPAYMENTREQUEST','VIEW')}">
-            <s:link view="/production/rawMaterialPaymentRequestList.xhtml"
-                    value="#{messages['menu.production.configuration.rawMaterialPaymentRequest']}"
                     propagation="none"/>
         </rich:menuItem>
 
