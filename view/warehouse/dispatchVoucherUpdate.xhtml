@@ -892,6 +892,9 @@
             rendered="#{isDraft}">
     <ui:param name="containerId" value="productItemsByWarehouseListModalPanelContainer"/>
     <ui:param name="dialogId" value="productItemsByWarehouseListModalPanel"/>
+    <!-- Despachos usa el almacen de Productos Terminados, cuyo saldo consolidado
+         (inv_inventario.saldo_uni) no es confiable: se oculta la columna Saldo fisico. -->
+    <ui:param name="showPhysicalBalance" value="false"/>
     <ui:define name="addButton">
         <a4j:commandButton id="addButton"
                            immediate="true" ajaxSingle="true"

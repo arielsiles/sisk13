@@ -6,6 +6,7 @@
                  xmlns:f="http://java.sun.com/jsf/core"
                  xmlns:s="http://jboss.com/products/seam/taglib"
                  xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:c="http://java.sun.com/jstl/core"
                  xmlns:app="http://encens.com/products/khipus/facelets"
                  id="#{dialogId}"
                  onshow="jQuery('##{containerId}\\\\:productItemByWarehouseListForm\\\\:nameField\\\\:name').focus();">
@@ -15,6 +16,11 @@
     <f:facet name="controls">
         <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
     </f:facet>
+    <!-- Columna "Saldo fisico" (Inventory.unitaryBalance): visible por defecto en todas
+         las pantallas consumidoras (vales, produccion, formulacion, plan). Las paginas
+         donde el saldo consolidado no es confiable (Despachos: almacen de Productos
+         Terminados) la ocultan pasando <ui:param name="showPhysicalBalance" value="false"/>. -->
+    <c:set var="showPhysicalBalanceColumn" value="#{empty showPhysicalBalance or showPhysicalBalance}"/>
     <h:form id="productItemByWarehouseListForm">
         <rich:simpleTogglePanel label="#{messages['ProductItem.search']}" switchType="client">
             <h:panelGrid columns="2"
@@ -62,7 +68,7 @@
                         id="productItemList"
                         rows="#{sessionUser.rowsPerPage}"
                         width="100%"
-                        columnsWidth="5%, 10%, 55%, 30%">
+                        columnsWidth="#{showPhysicalBalanceColumn ? '5%, 8%, 42%, 30%, 15%' : '5%, 10%, 55%, 30%'}">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column styleClass="center">
@@ -92,6 +98,8 @@
                         </app:commandSortHeader>
                     </rich:column>
 
+                    <rich:column rendered="#{showPhysicalBalanceColumn}">#{messages['Inventory.physicalBalance']}</rich:column>
+
                 </rich:columnGroup>
             </f:facet>
             <rich:column styleClass="center">
@@ -111,6 +119,12 @@
 
             <rich:column>
                 <h:outputText value="#{inventoryItem.productItem.warehouse.fullName}"/>
+            </rich:column>
+
+            <rich:column styleClass="right" rendered="#{showPhysicalBalanceColumn}">
+                <h:outputText value="#{inventoryItem.unitaryBalance}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
             </rich:column>
         </rich:dataTable>
 
