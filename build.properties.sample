@@ -3,9 +3,14 @@
 jboss.home=D:/appserver/jboss-5.1.0.GA
 profile=dev
 #The following 5 properties define whether the login form must be filled up with a custom username or not.
+#(solo aplica a DESARROLLO; en los builds de produccion el autofill de usuario/contrasena se ignora siempre)
 replaceLogin=true
 username=root
 password=khipus.pwd
 companyLogin=efestia
 embeddedLoginScript=#{rich:element('username')}.value='${username}';#{rich:element('password')}.value='${password}';#{rich:element('companyLogin')}.value='${companyLogin}';
 
+#Cliente ACTIVO: guia los builds de produccion (usa build-prod-<cliente>.properties). Override puntual: -Dclient=
+client=terdemol
+#Schema MySQL LOCAL para desarrollo: se inyecta en Constants.java solo al compilar y el fuente se restaura (git limpio)
+devDbSchema=terdemol

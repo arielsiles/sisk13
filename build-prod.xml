@@ -1,74 +1,319 @@
 <?xml version="1.0"?>
-<!--Build used for development-->
+<!--
+  Build de PRODUCCION (multi-cliente).
+
+  El cliente activo se define en build.properties (configuracion base local de la maquina):
+      client=terdemol
+
+  Uso:
+      ant -f build-prod.xml dist              -> ear de prod del cliente activo (build.properties)
+      ant -f build-prod.xml dist-release      -> dist + copia a la carpeta de release del cliente (para llevar a produccion)
+      ant -f build-prod.xml deploy            -> empaqueta y despliega el ear en el JBoss (jboss.home)
+      ant -f build-prod.xml -Dclient=ilva ... -> override puntual del cliente sin editar build.properties
+
+  Cada cliente tiene su archivo build-prod-<cliente>.properties (ver build-prod-client.properties.sample)
+  con su schema de BD y su carpeta de release. El schema se inyecta en Constants.java solo durante la
+  compilacion y el fuente se restaura SIEMPRE al terminar (exito o error): git queda limpio.
+
+  Blindajes automaticos (no requieren editar nada a mano):
+    - replaceLogin/username/password de build.properties se IGNORAN en prod (primera definicion gana).
+    - debug se fuerza a false.
+    - verify-prod-ear valida el artefacto final y ROMPE el build si detecta autofill de login,
+      jboss-seam-debug.jar, flags de desarrollo en web.xml o footer sin version.
+-->
 <project name="KHIPUS-PROD" default="dist" basedir=".">
-    <!-- Give user a chance to override without editing this file or typing -D -->
+
+    <!-- Blindaje: en Ant la PRIMERA definicion de una propiedad gana. Al fijarlas aqui,
+         los valores de desarrollo de build.properties (replaceLogin=true, credenciales)
+         quedan ignorados en todo build de produccion. -->
+    <property name="replaceLogin" value="false"/>
+    <property name="debug" value="false"/>
 
     <property name="profile" value="prod"/>
+
+    <!-- Base de las carpetas de release (la subcarpeta por cliente viene del properties del cliente) -->
+    <property name="release.dir" value="D:/appserver/release"/>
+
+    <property name="src.backup.dir" value="${basedir}/build/prod-src-backup"/>
+
     <import file="build-common.xml"/>
 
+    <!-- Cliente a construir: viene de build.properties (client=<cliente>, la configuracion
+         base de la maquina) o de un override puntual -Dclient=<cliente>. Sin prompts.
+         El import ya cargo build.properties, por eso ${client} se resuelve aqui. -->
+    <property file="${basedir}/build-prod-${client}.properties"/>
 
-    <!--<target name="dist" depends="clean,jar,war,ear"-->
-    <target name="dist" depends="clear-profile-artifacts,war-applet"
-            description="Package the archives">
-
-        <antcall target="replacejava"/>
-        <antcall target="stage"/>
-        <antcall target="replaceview"/>
-
-        <jar jarfile="${dist.dir}/${project.name}.jar" basedir="${jar.dir}"/>
-        <jar jarfile="${dist.dir}/${project.name}.war" basedir="${war.dir}"/>
-        <jar jarfile="${dist.dir}/${project.name}.ear">
-            <fileset dir="${ear.dir}">
-                <exclude name="${project.name}_jar/**"/>
-                <exclude name="${project.name}_war/**"/>
-            </fileset>
-            <fileset dir="${dist.dir}">
-                <include name="${project.name}.jar"/>
-                <include name="${project.name}.war"/>
-            </fileset>
-        </jar>
+    <!-- ============================================================
+         Validacion de configuracion: fail-fast con mensaje claro
+         ============================================================ -->
+    <target name="check-prod-config">
+        <pathconvert property="available.clients" pathsep=", ">
+            <fileset dir="${basedir}" includes="build-prod-*.properties"/>
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="build-prod-*.properties" to="*"/>
+            </chainedmapper>
+        </pathconvert>
+        <fail unless="client">
+            Falta definir el cliente activo: agrega client=&lt;cliente&gt; en build.properties.
+            Clientes disponibles: ${available.clients}
+        </fail>
+        <fail unless="dbSchema">
+            El cliente activo '${client}' (definido en build.properties) no tiene archivo
+            build-prod-${client}.properties o le falta la propiedad dbSchema.
+            Clientes disponibles: ${available.clients}
+            (crear a partir de build-prod-client.properties.sample)
+        </fail>
+        <fail unless="clientReleaseName">
+            No existe (o esta incompleto) build-prod-${client}.properties: falta la propiedad clientReleaseName.
+        </fail>
+        <fail unless="clientCompanyLogin">
+            No existe (o esta incompleto) build-prod-${client}.properties: falta la propiedad clientCompanyLogin.
+        </fail>
+        <echo>=========================================================</echo>
+        <echo> Build de PRODUCCION</echo>
+        <echo>   Cliente : ${client} (${clientReleaseName})</echo>
+        <echo>   Schema  : ${dbSchema}</echo>
+        <echo>   Compania: ${clientCompanyLogin}</echo>
+        <echo>   Version : ${app.version} (build ${app.build})</echo>
+        <echo>=========================================================</echo>
     </target>
 
-    <target name="replacejava" description="replace in java clases (before compiling)">
+    <!-- ============================================================
+         dist: pipeline completo, autosuficiente y en orden correcto.
+         Constants.java se restaura SIEMPRE (finally), incluso si el
+         build falla a mitad de camino.
+         ============================================================ -->
+    <target name="dist" depends="check-prod-config,init"
+            description="Package the archives (produccion, cliente ${client})">
 
-        <replaceregexp
-                description="Replaces the finances schema for production only (it changes the src before compiling)">
-            <regexp pattern="(public.*static.*final.*String.*KHIPUS_SCHEMA.*=.*&quot;).*(&quot;;)"/>
-            <substitution expression="\1${mainSchema}\2"/>
-            <fileset dir="${src.main.dir}">
-                <include name="**/com/encens/khipus/util/Constants.java"/>
-            </fileset>
-        </replaceregexp>
+        <!-- Si un build anterior quedo interrumpido, recuperar el fuente ANTES de limpiar -->
+        <antcall target="restore-sources"/>
 
-        <replaceregexp
-                description="Replaces the finances schema for production only (it changes the src before compiling)">
-            <regexp pattern="(public.*static.*final.*String.*FINANCES_SCHEMA.*=.*&quot;).*(&quot;;)"/>
-            <substitution expression="\1${financesSchema}\2"/>
-            <fileset dir="${src.main.dir}">
-                <include name="**/com/encens/khipus/util/Constants.java"/>
-            </fileset>
-        </replaceregexp>
+        <antcall target="clean"/>
 
-        <replaceregexp
-                description="Replaces the cashbox schema for production only (it changes the src before compiling)">
-            <regexp pattern="(public.*static.*final.*String.*CASHBOX_SCHEMA.*=.*&quot;).*(&quot;;)"/>
-            <substitution expression="\1${cashBoxSchema}\2"/>
-            <fileset dir="${src.main.dir}">
-                <include name="**/com/encens/khipus/util/Constants.java"/>
-            </fileset>
-        </replaceregexp>
+        <trycatch property="dist.failure">
+            <try>
+                <antcall target="replacejava"/>
+                <antcall target="stage"/>
+                <!-- Applet de impresion legado: NO viaja en produccion desde hace tiempo
+                     (los ear desplegados no lo incluyen) y su keystore esta invalido.
+                     Se puede reactivar con -Dwith.applet=true una vez reparado el keystore. -->
+                <if>
+                    <isset property="with.applet"/>
+                    <then>
+                        <antcall target="war-applet"/>
+                    </then>
+                    <else>
+                        <echo>war-applet omitido (legado; activar con -Dwith.applet=true)</echo>
+                    </else>
+                </if>
+                <antcall target="replaceview"/>
 
-        <replaceregexp
-                description="Replaces the cashbox schema for production only (it changes the src before compiling)">
-            <regexp pattern="(public.*static.*final.*String.*ACADEMIC_SCHEMA.*=.*&quot;).*(&quot;;)"/>
-            <substitution expression="\1${academicSchema}\2"/>
-            <fileset dir="${src.main.dir}">
-                <include name="**/com/encens/khipus/util/Constants.java"/>
-            </fileset>
-        </replaceregexp>
+                <jar jarfile="${dist.dir}/${project.name}.jar" basedir="${jar.dir}"/>
+                <jar jarfile="${dist.dir}/${project.name}.war" basedir="${war.dir}"/>
+                <jar jarfile="${dist.dir}/${project.name}.ear">
+                    <fileset dir="${ear.dir}">
+                        <exclude name="${project.name}_jar/**"/>
+                        <exclude name="${project.name}_war/**"/>
+                    </fileset>
+                    <fileset dir="${dist.dir}">
+                        <include name="${project.name}.jar"/>
+                        <include name="${project.name}.war"/>
+                    </fileset>
+                </jar>
+
+                <antcall target="verify-prod-ear"/>
+            </try>
+            <catch>
+                <!-- ant-contrib 1.0b2 NO relanza la excepcion cuando hay finally:
+                     sin este catch el build reportaria SUCCESSFUL con un ear a medias -->
+                <antcall target="restore-sources"/>
+                <fail message="Build de produccion FALLO (fuentes restaurados): ${dist.failure}"/>
+            </catch>
+            <finally>
+                <antcall target="restore-sources"/>
+            </finally>
+        </trycatch>
+
+        <echo>OK: ${dist.dir}/${project.name}.ear generado y verificado (cliente ${client}, schema ${dbSchema})</echo>
     </target>
 
+    <!-- ============================================================
+         dist-release: dist + copia automatica a la carpeta de release
+         del cliente: ${release.dir}/${clientReleaseName}/v${app.version}
+         ============================================================ -->
+    <target name="dist-release" depends="dist"
+            description="dist + copiar el ear a la carpeta de release del cliente">
+        <property name="release.target.dir" value="${release.dir}/${clientReleaseName}/v${app.version}"/>
+        <mkdir dir="${release.target.dir}"/>
+        <copy todir="${release.target.dir}" file="${dist.dir}/${project.name}.ear" overwrite="true"/>
+        <echo>Release listo: ${release.target.dir}/${project.name}.ear</echo>
+    </target>
+
+    <!-- ============================================================
+         replacejava: respalda Constants.java e inyecta el schema del
+         cliente en las 4 constantes *_SCHEMA (hoy comparten valor).
+         ============================================================ -->
+    <target name="replacejava" description="Inyecta el schema del cliente en Constants.java (con respaldo previo)">
+        <mkdir dir="${src.backup.dir}"/>
+        <copy file="${constants.java}" todir="${src.backup.dir}" overwrite="true"/>
+
+        <replaceregexp byline="true"
+                       description="Reemplaza el valor de las constantes *_SCHEMA por el schema del cliente">
+            <regexp pattern="(public.*static.*final.*String.*(KHIPUS|FINANCES|CASHBOX|ACADEMIC)_SCHEMA.*=.*&quot;).*(&quot;;)"/>
+            <substitution expression="\1${dbSchema}\3"/>
+            <fileset dir="${src.main.dir}">
+                <include name="**/com/encens/khipus/util/Constants.java"/>
+            </fileset>
+        </replaceregexp>
+
+        <!-- Verificacion inmediata: si el reemplazo no dejo el schema esperado, abortar -->
+        <fail message="replacejava fallo: Constants.java no contiene el schema esperado &quot;${dbSchema}&quot;">
+            <condition>
+                <not>
+                    <resourcecontains resource="${constants.java}" substring="&quot;${dbSchema}&quot;"/>
+                </not>
+            </condition>
+        </fail>
+        <echo>Constants.java: schema del cliente aplicado (${dbSchema})</echo>
+    </target>
+
+    <!-- ============================================================
+         restore-sources: devuelve Constants.java a su estado original.
+         Es un no-op si no hay respaldo pendiente.
+         ============================================================ -->
+    <target name="restore-sources">
+        <if>
+            <available file="${src.backup.dir}/Constants.java"/>
+            <then>
+                <copy file="${src.backup.dir}/Constants.java" tofile="${constants.java}" overwrite="true"/>
+                <delete dir="${src.backup.dir}"/>
+                <echo>Constants.java restaurado (working tree limpio)</echo>
+            </then>
+        </if>
+    </target>
+
+    <!-- ============================================================
+         verify-prod-ear: candado de seguridad. Rompe el build si el
+         artefacto quedo con configuracion de desarrollo.
+         ============================================================ -->
+    <target name="verify-prod-ear" description="Valida que el ear generado sea apto para produccion">
+
+        <fail message="verify-prod-ear: no se genero ${dist.dir}/${project.name}.ear">
+            <condition>
+                <not>
+                    <available file="${dist.dir}/${project.name}.ear"/>
+                </not>
+            </condition>
+        </fail>
+
+        <!-- 1a. Login SIN autofill de credenciales: ninguna referencia JS a usuario/contrasena
+             (el login.xhtml base no contiene rich:element; solo la inyeccion lo agrega) -->
+        <fail message="INSEGURO: login.xhtml contiene autofill de usuario/contrasena (replaceLogin se aplico en prod)">
+            <condition>
+                <or>
+                    <resourcecontains resource="${war.dir}/login.xhtml" substring="rich:element('username')"/>
+                    <resourcecontains resource="${war.dir}/login.xhtml" substring="rich:element('password')"/>
+                </or>
+            </condition>
+        </fail>
+
+        <!-- 1b. Login CON la compania del cliente pre-llenada -->
+        <fail message="INCORRECTO: login.xhtml no tiene pre-llenada la compania del cliente (${clientCompanyLogin})">
+            <condition>
+                <not>
+                    <resourcecontains resource="${war.dir}/login.xhtml"
+                                      substring="rich:element('companyLogin')}.value='${clientCompanyLogin}'"/>
+                </not>
+            </condition>
+        </fail>
+
+        <!-- 2. Sin jboss-seam-debug.jar (expone /debug.seam) -->
+        <fail message="INSEGURO: jboss-seam-debug.jar quedo incluido en el war (debug de Seam expuesto)">
+            <condition>
+                <available file="${war.dir}/WEB-INF/lib/jboss-seam-debug.jar"/>
+            </condition>
+        </fail>
+
+        <!-- 3. Seam debug apagado en components.properties -->
+        <fail message="INSEGURO: components.properties tiene debug=true">
+            <condition>
+                <resourcecontains resource="${war.dir}/WEB-INF/classes/components.properties" substring="debug=true"/>
+            </condition>
+        </fail>
+
+        <!-- 4. web.xml endurecido por replaceview -->
+        <loadfile property="verify.web.xml" srcFile="${war.dir}/WEB-INF/web.xml"/>
+        <fail message="INSEGURO: web.xml no tiene facelets.DEVELOPMENT=false">
+            <condition>
+                <not>
+                    <matches string="${verify.web.xml}"
+                             pattern="facelets\.DEVELOPMENT&lt;/param-name>\s*&lt;param-value>false&lt;/param-value>"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="INCORRECTO: web.xml no tiene facelets.REFRESH_PERIOD=-1 (cache de vistas de produccion)">
+            <condition>
+                <not>
+                    <matches string="${verify.web.xml}"
+                             pattern="facelets\.REFRESH_PERIOD&lt;/param-name>\s*&lt;param-value>-1&lt;/param-value>"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="INCORRECTO: web.xml no tiene javax.faces.STATE_SAVING_METHOD=server">
+            <condition>
+                <not>
+                    <matches string="${verify.web.xml}"
+                             pattern="STATE_SAVING_METHOD&lt;/param-name>\s*&lt;param-value>server&lt;/param-value>"/>
+                </not>
+            </condition>
+        </fail>
+
+        <!-- 5. Footer con version real (token reemplazado) -->
+        <fail message="INCORRECTO: el footer aun contiene el token @@APPNAME_VERSION@@ (replaceview no corrio)">
+            <condition>
+                <resourcecontains resource="${war.dir}/layout/footer.xhtml" substring="@@APPNAME_VERSION@@"/>
+            </condition>
+        </fail>
+
+        <echo>verify-prod-ear: OK - artefacto apto para produccion</echo>
+    </target>
+
+    <!-- ============================================================
+         deploy (override): probar el ear de PRODUCCION en el JBoss
+         local. NO copia datasource (produccion tiene el suyo propio;
+         el JBoss local conserva el suyo apuntando a la BD local).
+         ============================================================ -->
+    <!-- ============================================================
+         deploy: empaqueta el ear de produccion (con el schema real del
+         cliente activo, segun la config base) y lo despliega en el JBoss
+         definido en jboss.home. Su naturaleza: empaquetar + desplegar.
+         No toca el datasource (el servidor tiene el suyo). El schema
+         SIEMPRE sale de la config; lo que se construye es lo que corre.
+         ============================================================ -->
+    <target name="deploy" depends="dist"
+            description="Empaqueta el ear de produccion y lo despliega en el JBoss (jboss.home)">
+        <fail unless="jboss.home">jboss.home not set</fail>
+        <copy todir="${deploy.dir}" file="${dist.dir}/${project.name}.ear" overwrite="true"/>
+        <echo>Ear desplegado en ${deploy.dir} (cliente ${client}, schema ${dbSchema}, datasource intacto)</echo>
+    </target>
+
+    <!-- undeploy (override): solo retira el ear; nunca borra el datasource local -->
+    <target name="undeploy" description="Retira el ear del JBoss local (conserva el datasource)">
+        <delete file="${deploy.dir}/${project.name}.ear" failonerror="no"/>
+    </target>
+
+    <!-- ============================================================
+         replaceview: endurecimiento del war para produccion
+         (version en footer, debug off, state server, facelets prod)
+         ============================================================ -->
     <target name="replaceview" description="replaces texts related to war files (after compiling)">
+        <!-- Login de produccion: pre-llenar SOLO la compania del cliente
+             (usuario y contrasena jamas; verify-prod-ear lo garantiza) -->
+        <replace file="${war.dir}/login.xhtml" token="//defaultScript"
+                 value="#{rich:element('companyLogin')}.value='${clientCompanyLogin}';"/>
+
         <replaceregexp match="@@APPNAME_VERSION@@" replace="${app.name} (Version: ${app.version} Build: #${app.build})">
             <fileset dir="${war.dir}">
                 <include name="**/footer.xhtml"/>
@@ -122,18 +367,6 @@
                 <include name="**/dataintegration.xml"/>
             </fileset>
         </replaceregexp>
-
-        <!--
-        Enable this if cache must be invalidated for resources url. e.g. scripts/common.js?@build@
-        <replaceregexp match="@build@" replace="${app.build}" flags="g">
-            <fileset dir="${war.dir}">
-                <include name="**/*.*"/>
-                <exclude name="**/*.jar"/>
-                <exclude name="**/*.gif"/>
-                <exclude name="**/*.jpg"/>
-                <exclude name="**/*.png"/>
-            </fileset>
-        </replaceregexp>-->
     </target>
 
 </project>

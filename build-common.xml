@@ -8,7 +8,11 @@
     <property name="app.name" value="KHIPUS"/>
     <property name="app.version" value="6.0.116"/>
     <property environment="env"/>
-    <property name="app.build" value="${env.BUILD_NUMBER}"/>
+    <!-- Numero de build: BUILD_NUMBER del entorno (CI) o "local" si no existe,
+         para que el footer nunca muestre el token literal -->
+    <condition property="app.build" value="${env.BUILD_NUMBER}" else="local">
+        <isset property="env.BUILD_NUMBER"/>
+    </condition>
 
     <!-- set global properties for this build -->
     <property name="project.name" value="khipus"/>
@@ -36,6 +40,11 @@
     <property name="javac.debug" value="true"/>
     <property name="javac.deprecation" value="false"/>
     <property name="debug" value="false"/>
+
+    <!-- Inyeccion de schema en Constants.java (dev usa devDbSchema de build.properties;
+         prod usa dbSchema del build-prod-<cliente>.properties via build-prod.xml) -->
+    <property name="constants.java" value="${basedir}/src/main/com/encens/khipus/util/Constants.java"/>
+    <property name="src.backup.dev.dir" value="${basedir}/build/dev-src-backup"/>
 
     <!--Properties for validating configuration files -->
     <property name="validate.resources.dir" value="${basedir}/exploded-archives"/>
@@ -116,13 +125,61 @@
     <target name="compile" depends="init"
             description="Compile the Java source code"
             unless="eclipse.running">
-        <javac classpathref="build.classpath"
-               destdir="${jar.dir}"
-               debug="${javac.debug}"
-               deprecation="${javac.deprecation}"
-               nowarn="on" encoding="UTF-8"
-               srcdir="${src.main.dir}"
-               includes="${project.package}"/>
+        <!-- Schema de DESARROLLO desde la configuracion base (build.properties: devDbSchema):
+             se inyecta en Constants.java solo durante la compilacion y el fuente se restaura
+             SIEMPRE al terminar (exito o error). Sin devDbSchema definido, compila tal cual
+             (comportamiento historico). Solo aplica al perfil dev; produccion inyecta su
+             schema en build-prod.xml (replacejava). -->
+        <if>
+            <and>
+                <equals arg1="${profile}" arg2="dev"/>
+                <isset property="devDbSchema"/>
+            </and>
+            <then>
+                <!-- recuperar un respaldo huerfano de una compilacion interrumpida -->
+                <antcall target="restore-dev-sources"/>
+                <mkdir dir="${src.backup.dev.dir}"/>
+                <copy file="${constants.java}" todir="${src.backup.dev.dir}" overwrite="true"/>
+                <replaceregexp byline="true">
+                    <regexp pattern="(public.*static.*final.*String.*(KHIPUS|FINANCES|CASHBOX|ACADEMIC)_SCHEMA.*=.*&quot;).*(&quot;;)"/>
+                    <substitution expression="\1${devDbSchema}\3"/>
+                    <fileset dir="${src.main.dir}">
+                        <include name="**/com/encens/khipus/util/Constants.java"/>
+                    </fileset>
+                </replaceregexp>
+                <echo>Constants.java: schema DEV aplicado (${devDbSchema})</echo>
+            </then>
+        </if>
+        <trycatch property="compile.failure">
+            <try>
+                <javac classpathref="build.classpath"
+                       destdir="${jar.dir}"
+                       debug="${javac.debug}"
+                       deprecation="${javac.deprecation}"
+                       nowarn="on" encoding="UTF-8"
+                       srcdir="${src.main.dir}"
+                       includes="${project.package}"/>
+            </try>
+            <catch>
+                <!-- ant-contrib 1.0b2 no relanza la excepcion cuando hay finally -->
+                <antcall target="restore-dev-sources"/>
+                <fail message="Compilacion FALLO (fuentes restaurados): ${compile.failure}"/>
+            </catch>
+            <finally>
+                <antcall target="restore-dev-sources"/>
+            </finally>
+        </trycatch>
+    </target>
+
+    <target name="restore-dev-sources">
+        <if>
+            <available file="${src.backup.dev.dir}/Constants.java"/>
+            <then>
+                <copy file="${src.backup.dev.dir}/Constants.java" tofile="${constants.java}" overwrite="true"/>
+                <delete dir="${src.backup.dev.dir}"/>
+                <echo>Constants.java restaurado (working tree limpio)</echo>
+            </then>
+        </if>
     </target>
 
     <target name="copyclasses" depends="init"
@@ -207,6 +264,19 @@
             <equals arg1="${replaceLogin}" arg2="true"/>
             <then>
                 <replace file="${war.dir}/login.xhtml" token="//defaultScript" value="${embeddedLoginScript}"/>
+            </then>
+        </if>
+        <!-- Footer en dev: version + perfil (en prod el token lo reemplaza
+             replaceview de build-prod.xml, que muestra solo la version) -->
+        <if>
+            <not><equals arg1="${profile}" arg2="prod"/></not>
+            <then>
+                <replaceregexp match="@@APPNAME_VERSION@@"
+                               replace="${app.name} (Version: ${app.version} - ${profile}) Build: #${app.build}">
+                    <fileset dir="${war.dir}">
+                        <include name="**/footer.xhtml"/>
+                    </fileset>
+                </replaceregexp>
             </then>
         </if>
     </target>
