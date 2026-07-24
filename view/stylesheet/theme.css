@@ -1167,7 +1167,7 @@ a.row-order-link:hover {
    de texto queden alineadas entre si. Se mantiene al minimo para no ensanchar la columna. */
 .complete-balance-slot {
     display: inline-block;
-    width: 16px;
+    width: 13px;
     text-align: center;
     vertical-align: middle;
 }
@@ -1176,8 +1176,8 @@ a.row-order-link:hover {
     cursor: pointer;
     border: 0;
     vertical-align: middle;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
 }
 
 .panel-tree {
