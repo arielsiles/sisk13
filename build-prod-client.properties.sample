@@ -16,3 +16,6 @@ clientReleaseName=
 
 # Compania que aparece pre-llenada en el login (solo la compania; usuario/contrasena nunca)
 clientCompanyLogin=
+
+# Skin RichFaces del cliente (se inyecta en web.xml al compilar). Conocidos: DEFAULT, glassX, darkX
+richfacesSkin=

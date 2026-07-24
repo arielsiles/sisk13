@@ -286,6 +286,13 @@
             </condition>
         </fail>
 
+        <!-- 6. Skin RichFaces resuelto (token reemplazado por el filterset) -->
+        <fail message="INCORRECTO: web.xml aun contiene el token @richfacesSkin@ (skin no inyectado)">
+            <condition>
+                <resourcecontains resource="${war.dir}/WEB-INF/web.xml" substring="@richfacesSkin@"/>
+            </condition>
+        </fail>
+
         <echo>verify-prod-ear: OK - artefacto apto para produccion</echo>
     </target>
 

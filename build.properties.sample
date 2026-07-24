@@ -14,3 +14,5 @@ embeddedLoginScript=#{rich:element('username')}.value='${username}';#{rich:eleme
 client=terdemol
 #Schema MySQL LOCAL para desarrollo: se inyecta en Constants.java solo al compilar y el fuente se restaura (git limpio)
 devDbSchema=terdemol
+#Skin RichFaces para DESARROLLO (se inyecta en web.xml al compilar). Conocidos: DEFAULT, glassX, darkX
+devRichfacesSkin=glassX

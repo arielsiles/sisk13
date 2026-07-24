@@ -100,8 +100,22 @@
             <filter token="seamEmfRef" value="${seamEmfRef}"/>
             <filter token="puJndiName" value="${puJndiName}"/>
         </filterset>
+        <!-- Skin RichFaces parametrizable por deploy (no por usuario):
+             PROD  -> richfacesSkin de build-prod-<cliente>.properties (ya cargado top-level).
+             DEV   -> devRichfacesSkin de build.properties.
+             Fallback -> glassX. Se resuelve aqui (en init), despues de cargar los
+             .properties, asi el valor del cliente en prod siempre gana. -->
+        <condition property="richfacesSkin" value="${devRichfacesSkin}">
+            <and>
+                <equals arg1="${profile}" arg2="dev"/>
+                <isset property="devRichfacesSkin"/>
+            </and>
+        </condition>
+        <property name="richfacesSkin" value="glassX"/>
+
         <filterset id="profile">
             <filter token="debug" value="${debug}"/>
+            <filter token="richfacesSkin" value="${richfacesSkin}"/>
         </filterset>
         <antcall target="init-rebel"/>
     </target>

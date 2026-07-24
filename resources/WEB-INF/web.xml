@@ -22,23 +22,14 @@
         <param-value>true</param-value>
     </context-param>
 
-    <!-- FLech -->
-    <!--<context-param>
-        <param-name>org.richfaces.SKIN</param-name>
-        <param-value>DEFAULT</param-value>
-    </context-param>-->
-
-    <!-- ilva, cisc -->
+    <!-- Skin RichFaces: parametrizable por DEPLOY (no por usuario). El valor lo
+         inyecta el build via el token @richfacesSkin@ desde la config del cliente
+         (build-prod-<cliente>.properties) o de dev (build.properties: devRichfacesSkin).
+         Skins conocidos: DEFAULT, glassX, darkX. -->
     <context-param>
         <param-name>org.richfaces.SKIN</param-name>
-        <param-value>glassX</param-value>
+        <param-value>@richfacesSkin@</param-value>
     </context-param>
-
-    <!-- ilvaa -->
-    <!--<context-param>
-        <param-name>org.richfaces.SKIN</param-name>
-        <param-value>darkX</param-value>
-    </context-param>-->
 
     <context-param>
         <param-name>org.ajax4jsf.COMPRESS_SCRIPT</param-name>
