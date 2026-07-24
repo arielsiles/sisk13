@@ -143,6 +143,7 @@
                                  textValue="#{voucherCreateAction.provider.fullName}"
                                  value="#{voucherCreateAction.provider}"
                                  clearAction="voucherCreateAction.clearProvider()"
+                                 selectAction="voucherCreateAction.prepareHeaderProvider()"
                                  searchModalPanel="providerListModalPanel"
                                  dataModel="#{providerDataModel}"
                                  reRender="providerField"
@@ -415,7 +416,29 @@
                             </s:div>
                         </td>
                         <td class="rich-table-cell">
-                            <h:outputText value="#{voucherDetail.fullCashAccount}"/>
+                            <h:panelGroup styleClass="row-provider-search" rendered="#{voucherCreateAction.pending}">
+                                <a4j:commandLink title="#{messages['Voucher.relateProvider']}"
+                                                 action="#{voucherCreateAction.openRowProvider(voucherDetail)}"
+                                                 immediate="true"
+                                                 ajaxSingle="true"
+                                                 oncomplete="Richfaces.showModalPanel('providerListModalPanel');">
+                                    <h:graphicImage value="/img/user-search-line.svg" styleClass="row-provider-icon" title="#{messages['Voucher.relateProvider']}"/>
+                                </a4j:commandLink>
+                            </h:panelGroup>
+                            <h:outputText value="#{voucherDetail.fullCashAccountWithoutProvider}"/>
+                            <h:panelGroup rendered="#{voucherDetail.provider != null}">
+                                <h:outputText value=" (#{voucherDetail.provider.providerCode}-#{voucherDetail.provider.entity.acronym}"/>
+                                <a4j:commandLink title="#{messages['Voucher.clearProvider']}"
+                                                 styleClass="row-provider-clear"
+                                                 rendered="#{voucherCreateAction.pending}"
+                                                 action="#{voucherCreateAction.clearRowProvider(voucherDetail)}"
+                                                 immediate="true"
+                                                 ajaxSingle="true"
+                                                 reRender="movementDetailListPanel">
+                                    <h:graphicImage value="/img/x-line.svg" styleClass="row-provider-x-icon" title="#{messages['Voucher.clearProvider']}"/>
+                                </a4j:commandLink>
+                                <h:outputText value=")"/>
+                            </h:panelGroup>
                         </td>
 
                         <td class="rich-table-cell center">
@@ -730,10 +753,10 @@
         <ui:define name="assignButton">
             <a4j:commandButton id="assignButton"
                                title="#{messages['Common.choose']}"
-                               action="#{voucherCreateAction.assignProvider(providerItem)}"
+                               action="#{voucherCreateAction.assignProviderSmart(providerItem)}"
                                image="/img/active.gif"
                                styleClass="select-image"
-                               reRender="providerField"
+                               reRender="providerField, movementDetailListPanel"
                                oncomplete="Richfaces.hideModalPanel('providerListModalPanel');"/>
         </ui:define>
     </s:decorate>

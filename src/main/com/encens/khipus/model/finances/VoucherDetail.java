@@ -453,6 +453,23 @@ public class VoucherDetail implements BaseModel {
         return fullCashAccount;
     }
 
+    /**
+     * Descripcion de la cuenta SIN el segmento del proveedor. Sirve para renderizar el
+     * proveedor aparte en la pantalla del asiento (con su boton de "quitar" dentro del
+     * parentesis). No altera getFullCashAccount(), que se sigue usando en otras vistas.
+     */
+    public String getFullCashAccountWithoutProvider() {
+        String full = getFullCashAccount();
+        if (provider != null) {
+            String segment = " (" + provider.getFullName() + ")";
+            int index = full.indexOf(segment);
+            if (index >= 0) {
+                full = full.substring(0, index) + full.substring(index + segment.length());
+            }
+        }
+        return full;
+    }
+
     public String getPayableAccountFullName() {
         if (payableAccountFullName == null && getAccount() != null) {
             payableAccountFullName = getCashAccount().getFullName();

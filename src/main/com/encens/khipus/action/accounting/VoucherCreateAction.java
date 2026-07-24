@@ -90,6 +90,10 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private List<VoucherDetail> voucherDetailsToRemove = new ArrayList<VoucherDetail>();
     private List<PurchaseDocument> purchaseDocumentsToRemove = new ArrayList<PurchaseDocument>();
 
+    /** Fila (linea contable) sobre la que se esta eligiendo proveedor. Si es null, la
+        seleccion aplica al proveedor del ENCABEZADO (comportamiento historico). */
+    private VoucherDetail voucherDetailForProvider;
+
     private Integer quantity;
     private BigDecimal amountDeposit;
     private BigDecimal contribution;
@@ -1643,10 +1647,42 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         setProvider(provider);
     }
 
-    public void assignProvider(Provider provider, int rowIndex) {
+    /**
+     * Prepara la seleccion de proveedor para el ENCABEZADO. Se dispara al abrir el modal
+     * desde el campo de proveedor del encabezado (selectAction), reseteando la fila objetivo
+     * para que la eleccion aplique al encabezado y no a una fila que quedo marcada antes.
+     */
+    public void prepareHeaderProvider() {
+        this.voucherDetailForProvider = null;
+    }
 
-        System.out.println("Provider: " + rowIndex + " - " + provider.getFullName());
-        //setProvider(provider);
+    /** Abre la seleccion de proveedor para una FILA (linea contable) especifica. */
+    public void openRowProvider(VoucherDetail voucherDetail) {
+        this.voucherDetailForProvider = voucherDetail;
+    }
+
+    /**
+     * Asigna el proveedor elegido: a la fila objetivo si hay una marcada, o al encabezado
+     * si no. La descripcion de la linea muestra el proveedor via getFullCashAccount().
+     */
+    public void assignProviderSmart(Provider provider) {
+        if (voucherDetailForProvider != null) {
+            if (provider != null) {
+                voucherDetailForProvider.setProvider(provider);
+                voucherDetailForProvider.setProviderCode(provider.getProviderCode());
+            }
+            voucherDetailForProvider = null;
+        } else {
+            setProvider(provider);
+        }
+    }
+
+    /** Quita el proveedor de una fila (linea contable). En memoria hasta Guardar/Actualizar. */
+    public void clearRowProvider(VoucherDetail voucherDetail) {
+        if (voucherDetail != null) {
+            voucherDetail.setProvider(null);
+            voucherDetail.setProviderCode(null);
+        }
     }
 
     /* todo */

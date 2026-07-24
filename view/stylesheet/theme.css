@@ -1162,6 +1162,36 @@ a.row-order-link:hover {
     background-color: #eaf2fb;
 }
 
+/* Acciones de proveedor por fila. La lupa (relacionar) va flotada a la derecha de la
+   celda; la "x" (quitar) va inline, justo despues del proveedor en la descripcion.
+   Iconos chicos para un aspecto minimalista. */
+.row-provider-search {
+    float: right;
+    white-space: nowrap;
+    margin-left: 8px;
+}
+
+.row-provider-clear {
+    margin-left: 0;
+}
+
+.row-provider-icon {
+    cursor: pointer;
+    border: 0;
+    vertical-align: middle;
+    width: 13px;
+    height: 13px;
+}
+
+/* La "x" de quitar proveedor: al alto de una mayuscula y alineada con el texto. */
+.row-provider-x-icon {
+    cursor: pointer;
+    border: 0;
+    vertical-align: middle;
+    width: 11px;
+    height: 11px;
+}
+
 /* Espacio fijo reservado a la derecha del Debe/Haber para el boton "=" (Completar).
    Se reserva en todas las filas (vacio en las que no llevan boton) para que las cajas
    de texto queden alineadas entre si. Se mantiene al minimo para no ensanchar la columna. */
