@@ -1,0 +1,3 @@
+# Los scripts de shell DEBEN conservar finales de linea Unix (LF), aunque se
+# editen/clonen en Windows. Si llegan al servidor Linux con CRLF, fallan.
+*.sh text eol=lf
