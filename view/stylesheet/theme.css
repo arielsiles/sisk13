@@ -1546,3 +1546,62 @@ input[type="text"].disabledInput {
     text-shadow: none !important;
     text-decoration: none;
 }
+
+/* ============================================================
+   Pantalla "Cambiar contraseña" (view/admin/userSettings.xhtml)
+   Sigue la linea de la app: usa rich:panel + skin nativo. Aqui solo
+   se agrega lo propio: panel centrado, ojo mostrar/ocultar, medidor
+   de fuerza fino y coincidencia en vivo. Scoped a .usr-pwd.
+   ============================================================ */
+
+/* panel centrado */
+.usr-pwd { width: 560px; margin: 0 auto; }
+
+/* columna de labels ancha y en una sola linea (si no, "Confirmar nueva
+   contraseña" salta a dos lineas con el 22% por defecto) */
+.usr-pwd .entry .label { width: 200px !important; white-space: nowrap; }
+
+/* linea de usuario bajo la cabecera del panel (con aire arriba) */
+.usr-pwd .pwd-user { margin: 14px 0 16px; font-size: 11px; color: #666; }
+
+/* aire despues del ultimo campo, antes del borde inferior del panel */
+.usr-pwd .pwd-space { height: 14px; }
+
+/* input + ojo integrado a la derecha */
+.usr-pwd .pwd-wrap { position: relative; display: inline-block; }
+.usr-pwd .pwd-wrap .input { padding-right: 26px !important; }
+.usr-pwd .pwd-eye {
+    position: absolute; top: 50%; right: 5px; margin-top: -9px;
+    width: 18px; height: 18px; line-height: 0;
+    cursor: pointer; color: #7f8fa4;
+}
+.usr-pwd .pwd-eye:hover { color: #578BB8; }
+.usr-pwd .pwd-eye svg { display: block; }
+.usr-pwd .pwd-eye .pwd-eye__off { display: none; }
+.usr-pwd .pwd-wrap.is-shown .pwd-eye__on  { display: none; }
+.usr-pwd .pwd-wrap.is-shown .pwd-eye__off { display: block; }
+
+/* pista de requisitos */
+.usr-pwd .pwd-hint { margin: 3px 0 0; font-size: 10px; color: #999; }
+
+/* medidor de fuerza (fino, discreto) */
+.usr-pwd .pwd-strength { margin: 5px 0 0; display: none; }
+.usr-pwd .pwd-strength.is-on { display: block; }
+.usr-pwd .pwd-strength__track {
+    display: inline-block; vertical-align: middle;
+    width: 120px; height: 4px; border-radius: 2px; background: #e4e4e4; overflow: hidden;
+}
+.usr-pwd .pwd-strength__bar { display: block; height: 100%; width: 0; border-radius: 2px; }
+.usr-pwd .pwd-strength__label { margin-left: 8px; font-size: 10px; vertical-align: middle; }
+.usr-pwd .pwd-strength.lvl-weak   .pwd-strength__bar { width: 33%;  background: #c0504d; }
+.usr-pwd .pwd-strength.lvl-medium .pwd-strength__bar { width: 66%;  background: #d9a441; }
+.usr-pwd .pwd-strength.lvl-strong .pwd-strength__bar { width: 100%; background: #6a9a5b; }
+.usr-pwd .pwd-strength.lvl-weak   .pwd-strength__label { color: #c0504d; }
+.usr-pwd .pwd-strength.lvl-medium .pwd-strength__label { color: #b07d1e; }
+.usr-pwd .pwd-strength.lvl-strong .pwd-strength__label { color: #567d47; }
+
+/* coincidencia en vivo */
+.usr-pwd .pwd-match { margin: 3px 0 0; font-size: 10px; display: none; }
+.usr-pwd .pwd-match.is-on { display: block; }
+.usr-pwd .pwd-match.ok { color: #567d47; }
+.usr-pwd .pwd-match.no { color: #c0504d; }

@@ -49,8 +49,13 @@ public class UserSettingsAction extends GenericAction<User> {
                     "User.error.invalid.previousPassword");
             return com.encens.khipus.framework.action.Outcome.REDISPLAY;
         }
-        currentUser.setPassword(Hash.instance().hash(temporalUser.getPassword()));
-        userService.update(currentUser);
+        // Cargar el usuario FRESCO (version actual de BD) en vez de mergear el
+        // currentUser de sesion, que puede estar desactualizado porque otra accion
+        // actualizo la fila (p.ej. preferencias del dashboard) -> OptimisticLockException.
+        User user = userService.findById(User.class, currentUser.getId());
+        user.setPassword(Hash.instance().hash(temporalUser.getPassword()));
+        userService.update(user);
+        currentUser.setPassword(user.getPassword()); // mantener coherente la copia de sesion
         addPasswordUpdatedMessage();
         return com.encens.khipus.framework.action.Outcome.SUCCESS;
     }

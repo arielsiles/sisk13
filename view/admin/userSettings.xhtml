@@ -12,76 +12,175 @@
         #{messages['User.settings']}
     </ui:define>
 
+    <ui:param name="bodyAlign" value="center"/>
     <ui:param name="bodyWidth" value="60%"/>
-
     <ui:param name="selectedTab" value="admin"/>
+
     <ui:define name="body">
 
-        <h:form id="userSettingForm">
+        <div class="usr-pwd">
+            <h:form id="userSettingForm">
 
-            <div class="buttons">
-                <h:commandButton action="#{userSettingsAction.changePassword}"
-                                 value="#{messages['Common.save']}"
-                                 styleClass="button">
-                    <s:defaultAction/>
-                </h:commandButton>
-            </div>
-            <h:outputText value="#{messages['User.title']}: " styleClass="bold"/>
-            <h:outputText value="#{currentUser.employee.fullName} (#{currentUser.username})"/>
+                <div class="buttons">
+                    <h:commandButton action="#{userSettingsAction.changePassword}"
+                                     value="#{messages['Common.save']}"
+                                     styleClass="button" tabindex="4">
+                        <s:defaultAction/>
+                    </h:commandButton>
+                    <s:button view="/home.xhtml"
+                              value="#{messages['Common.cancel']}"
+                              styleClass="button" tabindex="5"/>
+                </div>
 
-            <rich:tabPanel switchType="ajax">
-                <rich:tab label="#{messages['User.password']}">
+                <rich:panel id="pwdPanel">
+                    <f:facet name="header">#{messages['User.password.change']}</f:facet>
 
+                    <div class="pwd-user">
+                        <h:outputText value="#{messages['User.title']}: " styleClass="bold"/>
+                        <h:outputText value="#{currentUser.employee.fullName} (#{currentUser.username})"/>
+                    </div>
+
+                    <!-- Contraseña anterior -->
                     <s:decorate id="previousPasswordField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['User.previousPassword']}</ui:define>
-                        <h:inputSecret id="previousPassword"
-                                       value="#{userSettingsAction.temporalUser.previousPassword}"
-                                       required="true"
-                                       maxlength="40"
-                                       redisplay="true"
-                                       styleClass="input"
-                                       tabindex="3"/>
+                        <span class="pwd-wrap">
+                            <h:inputSecret id="previousPassword"
+                                           value="#{userSettingsAction.temporalUser.previousPassword}"
+                                           required="true" maxlength="200" redisplay="true"
+                                           styleClass="input js-pwd"
+                                           autocomplete="current-password" tabindex="1"/>
+                            <span class="pwd-eye" title="#{messages['User.password.show']}">
+                                <ui:include src="/admin/passwordEyeIcons.xhtml"/>
+                            </span>
+                        </span>
                     </s:decorate>
 
+                    <!-- Nueva contraseña -->
                     <s:decorate id="passwordField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['User.newPassword']}</ui:define>
-                        <h:inputSecret id="password"
-                                       value="#{userSettingsAction.temporalUser.password}"
-                                       required="true"
-                                       maxlength="40"
-                                       redisplay="true"
-                                       styleClass="input"
-                                       tabindex="3"/>
+                        <span class="pwd-wrap">
+                            <h:inputSecret id="password"
+                                           value="#{userSettingsAction.temporalUser.password}"
+                                           required="true" maxlength="200" redisplay="true"
+                                           styleClass="input js-pwd js-pwd-new"
+                                           autocomplete="new-password" tabindex="2"/>
+                            <span class="pwd-eye" title="#{messages['User.password.show']}">
+                                <ui:include src="/admin/passwordEyeIcons.xhtml"/>
+                            </span>
+                        </span>
+                        <div class="pwd-hint">#{messages['User.password.requirements']}</div>
+                        <div class="pwd-strength" id="pwdStrength">
+                            <span class="pwd-strength__track"><span class="pwd-strength__bar"></span></span>
+                            <span class="pwd-strength__label"></span>
+                        </div>
                     </s:decorate>
 
+                    <!-- Confirmar nueva contraseña -->
                     <s:decorate id="confirmPasswordField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['User.confirmNewPassword']}</ui:define>
-                        <h:inputSecret id="confirmPassword"
-                                       value="#{userSettingsAction.temporalUser.confirmPassword}"
-                                       required="true"
-                                       maxlength="40"
-                                       redisplay="true"
-                                       styleClass="input"
-                                       tabindex="4">
-                            <app:validateEqual forId="password" forLabel="#{messages['User.newPassword']}"/>
-                        </h:inputSecret>
+                        <span class="pwd-wrap">
+                            <h:inputSecret id="confirmPassword"
+                                           value="#{userSettingsAction.temporalUser.confirmPassword}"
+                                           required="true" maxlength="200" redisplay="true"
+                                           styleClass="input js-pwd js-pwd-confirm"
+                                           autocomplete="new-password" tabindex="3">
+                                <app:validateEqual forId="password" forLabel="#{messages['User.newPassword']}"/>
+                            </h:inputSecret>
+                            <span class="pwd-eye" title="#{messages['User.password.show']}">
+                                <ui:include src="/admin/passwordEyeIcons.xhtml"/>
+                            </span>
+                        </span>
+                        <div class="pwd-match" id="pwdMatch">
+                            <span class="pwd-match__text"></span>
+                        </div>
                     </s:decorate>
-                </rich:tab>
-            </rich:tabPanel>
 
+                    <div class="pwd-space"></div>
 
-            <div class="buttons">
-                <h:commandButton action="#{userSettingsAction.changePassword}"
-                                 value="#{messages['Common.save']}"
-                                 styleClass="button">
-                </h:commandButton>
-            </div>
+                </rich:panel>
+            </h:form>
+        </div>
 
-        </h:form>
+        <!-- Interactividad en VANILLA JS (RichFaces trae jQuery antiguo). i18n via messages. -->
+        <script type="text/javascript">
+            //<![CDATA[
+            (function () {
+                var i18n = {
+                    weak:   '#{messages['User.password.strength.weak']}',
+                    medium: '#{messages['User.password.strength.medium']}',
+                    strong: '#{messages['User.password.strength.strong']}',
+                    match:  '#{messages['User.password.match']}',
+                    noMatch:'#{messages['User.password.noMatch']}',
+                    show:   '#{messages['User.password.show']}',
+                    hide:   '#{messages['User.password.hide']}'
+                };
+                function hasCls(el, c){ return (' ' + el.className + ' ').indexOf(' ' + c + ' ') > -1; }
+                function init() {
+                    var root = document.querySelector('.usr-pwd');
+                    if (!root) { return; }
 
-        <rich:jQuery selector="#previousPassword" query="focus()" timing="onload"/>
+                    // Mostrar / ocultar contraseña
+                    var eyes = root.querySelectorAll('.pwd-eye');
+                    for (var i = 0; i < eyes.length; i++) {
+                        eyes[i].onclick = function () {
+                            var wrap = this.parentNode;              // .pwd-wrap
+                            var inp = wrap.querySelector('.js-pwd');
+                            if (hasCls(wrap, 'is-shown')) {
+                                wrap.className = wrap.className.replace(/\s*is-shown/, '');
+                                inp.type = 'password'; this.title = i18n.show;
+                            } else {
+                                wrap.className += ' is-shown';
+                                inp.type = 'text'; this.title = i18n.hide;
+                            }
+                        };
+                    }
 
+                    var newInp  = root.querySelector('.js-pwd-new');
+                    var confInp = root.querySelector('.js-pwd-confirm');
+                    var box = document.getElementById('pwdStrength');
+                    var lbl = box ? box.querySelector('.pwd-strength__label') : null;
+                    var mBox = document.getElementById('pwdMatch');
+                    var mTxt = mBox ? mBox.querySelector('.pwd-match__text') : null;
+
+                    function score(v) {
+                        var s = 0;
+                        if (v.length >= 6)  { s++; }
+                        if (v.length >= 10) { s++; }
+                        if (/[a-z]/.test(v) && /[A-Z]/.test(v)) { s++; }
+                        if (/[0-9]/.test(v)) { s++; }
+                        if (/[^A-Za-z0-9]/.test(v)) { s++; }
+                        return s;
+                    }
+                    function renderStrength() {
+                        if (!box) { return; }
+                        var v = newInp ? newInp.value : '';
+                        if (!v) { box.className = 'pwd-strength'; return; }
+                        var sc = score(v), lv, txt;
+                        if (sc <= 2)      { lv = 'lvl-weak';   txt = i18n.weak; }
+                        else if (sc === 3){ lv = 'lvl-medium'; txt = i18n.medium; }
+                        else              { lv = 'lvl-strong'; txt = i18n.strong; }
+                        box.className = 'pwd-strength is-on ' + lv;
+                        if (lbl) { lbl.innerHTML = txt; }
+                    }
+                    function renderMatch() {
+                        if (!mBox) { return; }
+                        var a = newInp ? newInp.value : '';
+                        var b = confInp ? confInp.value : '';
+                        if (!b) { mBox.className = 'pwd-match'; return; }
+                        if (a === b) { mBox.className = 'pwd-match is-on ok'; if (mTxt) { mTxt.innerHTML = '✓ ' + i18n.match; } }
+                        else         { mBox.className = 'pwd-match is-on no'; if (mTxt) { mTxt.innerHTML = '✗ ' + i18n.noMatch; } }
+                    }
+                    if (newInp)  { newInp.onkeyup  = function(){ renderStrength(); renderMatch(); }; newInp.oninput = newInp.onkeyup; }
+                    if (confInp) { confInp.onkeyup = renderMatch; confInp.oninput = renderMatch; }
+                    renderStrength(); renderMatch();  // reflejar valores tras un redisplay
+
+                    if (newInp) { try { root.querySelector('.js-pwd').focus(); } catch (e) {} }
+                }
+                if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+                else { init(); }
+            })();
+            //]]>
+        </script>
 
     </ui:define>
 </ui:composition>
-
