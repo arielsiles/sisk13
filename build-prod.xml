@@ -144,11 +144,20 @@
          del cliente: ${release.dir}/${clientReleaseName}/v${app.version}
          ============================================================ -->
     <target name="dist-release" depends="dist"
-            description="dist + copiar el ear a la carpeta de release del cliente">
+            description="dist + copiar el ear a la carpeta de release del cliente + zip para el servidor">
         <property name="release.target.dir" value="${release.dir}/${clientReleaseName}/v${app.version}"/>
         <mkdir dir="${release.target.dir}"/>
         <copy todir="${release.target.dir}" file="${dist.dir}/${project.name}.ear" overwrite="true"/>
-        <echo>Release listo: ${release.target.dir}/${project.name}.ear</echo>
+        <!-- Zip para subir al servidor. Estructura interna: v<version>/khipus.ear
+             (al hacer 'unzip vX.zip' en el servidor queda la carpeta vX/ con el ear). -->
+        <zip destfile="${release.dir}/${clientReleaseName}/v${app.version}.zip">
+            <zipfileset dir="${release.target.dir}" prefix="v${app.version}">
+                <include name="${project.name}.ear"/>
+            </zipfileset>
+        </zip>
+        <echo>Release listo:</echo>
+        <echo>  EAR: ${release.target.dir}/${project.name}.ear</echo>
+        <echo>  ZIP: ${release.dir}/${clientReleaseName}/v${app.version}.zip (para scp al servidor)</echo>
     </target>
 
     <!-- ============================================================

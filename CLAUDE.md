@@ -22,6 +22,12 @@ SISK13 (KHIPUS) is an enterprise-level Java EE integrated accounting system buil
 - **Run Tests**: `ant test`
 - **Test Reports**: Results in `build/test-build/`
 
+> **Compilación y despliegue (KHIPUS dev / KHIPUS-PROD prod):** el flujo completo
+> —targets por entorno, selección de cliente y schema (`build-prod-<cliente>.properties`),
+> blindajes de producción, y cómo generar el zip de release— está en
+> `docs/despliegue.md`. El despliegue del lado servidor (systemd, backup, rollback)
+> está en `scripts/deploy/README.md`. Compilar SIEMPRE con JDK 1.8.
+
 ## Architecture
 
 ### Technology Stack
