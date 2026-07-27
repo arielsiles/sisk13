@@ -67,7 +67,7 @@ public class VoucherDataModel extends QueryDataModel<Long, Voucher> {
     }
 
     public void filterByDocumentNumber(String documentNumber){
-        getCriteria().setDocumentType(documentNumber);
+        getCriteria().setDocumentNumber(documentNumber);
         updateAndSearch();
     }
 

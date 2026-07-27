@@ -125,7 +125,20 @@ public class VoucherAction extends GenericAction<Voucher> {
         if (criteria != null) {
             String docTypeName = criteria.getDocumentType();
             if (docTypeName != null && !"".equals(docTypeName)) {
-                docType = voucherService.getDocType(docTypeName);
+                // Resolver el DocType es solo cosmetico (reflejar el valor en el combo);
+                // el filtro real ya opera con LIKE sobre criteria.documentType. getDocType()
+                // usa getSingleResult(), que lanza NoResultException ("No entity found for
+                // query") si el filtro retenido en sesion no resuelve a exactamente una fila
+                // (tipo renombrado/eliminado, dato viejo, sesion previa a un deploy). Como
+                // voucherDataModel es SESSION, ese valor invalido reventaria CADA ingreso a
+                // la lista al correr en el preRender. Se protege (opcion 1) y, si no resuelve,
+                // se limpia el filtro para no dejar la sesion envenenada (opcion 3).
+                try {
+                    docType = voucherService.getDocType(docTypeName);
+                } catch (RuntimeException e) {
+                    docType = new DocType();
+                    criteria.setDocumentType("");
+                }
             }
             documentNumber = criteria.getDocumentNumber();
             gloss = criteria.getGloss();
