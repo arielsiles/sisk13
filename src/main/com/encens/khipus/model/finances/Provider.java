@@ -19,6 +19,7 @@ import java.util.List;
                 " from Provider p" +
                 " left join fetch p.entity" +
                 " left join fetch p.payableAccount" +
+                " left join fetch p.receivableAccount" +
                 " left join fetch p.providerClass" +
                 " where p.id=:providerId")
 })
@@ -53,6 +54,19 @@ public class Provider implements BaseModel {
             @JoinColumn(name = "ctaxpagar", referencedColumnName = "cuenta", nullable = false, insertable = false, updatable = false)
     })
     private CashAccount payableAccount;
+
+    @Column(name = "ctaxcobrar")
+    private String receivableAccountCode;
+
+    @Transient
+    private String receivableAccountFullName;
+
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "ctaxcobrar", referencedColumnName = "cuenta", nullable = false, insertable = false, updatable = false)
+    })
+    private CashAccount receivableAccount;
 
     @Column(name = "clase")
     private String providerClassCode;
@@ -154,5 +168,33 @@ public class Provider implements BaseModel {
 
     public void setPayableAccountFullName(String payableAccountFullName) {
         this.payableAccountFullName = payableAccountFullName;
+    }
+
+    public String getReceivableAccountCode() {
+        return receivableAccountCode;
+    }
+
+    public void setReceivableAccountCode(String receivableAccountCode) {
+        this.receivableAccountCode = receivableAccountCode;
+    }
+
+    public CashAccount getReceivableAccount() {
+        return receivableAccount;
+    }
+
+    public void setReceivableAccount(CashAccount receivableAccount) {
+        this.receivableAccount = receivableAccount;
+        setReceivableAccountCode(this.receivableAccount != null ? this.receivableAccount.getAccountCode() : null);
+    }
+
+    public String getReceivableAccountFullName() {
+        if (receivableAccountFullName == null && getReceivableAccount() != null) {
+            receivableAccountFullName = getReceivableAccount().getFullName();
+        }
+        return receivableAccountFullName;
+    }
+
+    public void setReceivableAccountFullName(String receivableAccountFullName) {
+        this.receivableAccountFullName = receivableAccountFullName;
     }
 }

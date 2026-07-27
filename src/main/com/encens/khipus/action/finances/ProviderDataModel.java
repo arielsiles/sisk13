@@ -32,6 +32,7 @@ public class ProviderDataModel extends QueryDataModel<ProviderPk, Provider> {
 
     private static final String[] RESTRICTIONS = {
             "lower(provider.providerCode) like concat(lower(#{providerDataModel.criteria.providerCode}), '%')",
+            "lower(entity.nitNumber) like concat(lower(#{providerDataModel.nit}), '%')",
             "lower(entity.acronym) like concat('%', concat(lower(#{providerDataModel.acronym}), '%'))",
             "provider in (" +
                     "select mp.provider " +
@@ -42,6 +43,7 @@ public class ProviderDataModel extends QueryDataModel<ProviderPk, Provider> {
     };
 
     private String acronym;
+    private String nit;
     private ModuleProviderType moduleProviderType;
     private FinancesEntityState financesEntityState;
 
@@ -61,6 +63,14 @@ public class ProviderDataModel extends QueryDataModel<ProviderPk, Provider> {
 
     public void setAcronym(String acronym) {
         this.acronym = acronym;
+    }
+
+    public String getNit() {
+        return nit;
+    }
+
+    public void setNit(String nit) {
+        this.nit = nit;
     }
 
     public ModuleProviderType getModuleProviderType() {

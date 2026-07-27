@@ -15,40 +15,78 @@
     <ui:param name="selectedTab" value="warehouses"/>
     <ui:define name="body">
         <h:form id="providerSearch">
-            <rich:simpleTogglePanel label="#{messages['Provider.search']}" switchType="client">
-                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
-                             columnClasses="width50percent, width50percent">
-                    <s:decorate id="providerCodeField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Provider.providerCode']}</ui:define>
-                        <h:inputText id="providerCode"
-                                     value="#{providerDataModel.criteria.providerCode}"
-                                     maxlength="6"
-                                     tabindex="1"
-                                     styleClass="input"/>
-                    </s:decorate>
-                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Provider.name']}</ui:define>
-                        <h:inputText id="acronym"
-                                     value="#{providerDataModel.acronym}"
-                                     tabindex="2"
-                                     styleClass="input"/>
-                        <a4j:commandButton action="#{providerDataModel.search}"
-                                           reRender="providerList, dataScroller"
-                                           styleClass="button"
-                                           value="#{messages['Common.search']}"
-                                           id="searchButtonId"
-                                           tabindex="3">
-                            <s:defaultAction/>
-                        </a4j:commandButton>
-                    </s:decorate>
-                </h:panelGrid>
-                <rich:jQuery selector="#providerCode" query="focus()" timing="onload"/>
-            </rich:simpleTogglePanel>
-            <rich:spacer height="15px"/>
+            <!-- Barra de filtros reusable (app-filterbar): una sola linea, placeholders estilo Odoo.
+                 Se conservan los filtros actuales: Codigo y Nombre. El boton Nuevo va en la misma
+                 linea, al extremo derecho. -->
+            <div class="app-filterbar">
+                <h:inputText id="providerCode"
+                             value="#{providerDataModel.criteria.providerCode}"
+                             styleClass="app-filterbar__input app-filterbar__input--code app-ph-code"
+                             maxlength="6"
+                             tabindex="1"/>
+
+                <h:inputText id="nit"
+                             value="#{providerDataModel.nit}"
+                             styleClass="app-filterbar__input app-filterbar__input--code app-ph-nit"
+                             maxlength="20"
+                             tabindex="2"/>
+
+                <h:inputText id="acronym"
+                             value="#{providerDataModel.acronym}"
+                             styleClass="app-filterbar__input app-ph-name"
+                             maxlength="150"
+                             tabindex="3"/>
+
+                <h:selectOneMenu id="state"
+                                 value="#{providerDataModel.financesEntityState}"
+                                 styleClass="app-filterbar__select"
+                                 tabindex="4">
+                    <s:selectItems value="#{financesEntityStateEnumList}"
+                                   var="financesEntityState"
+                                   label="#{messages[financesEntityState.resourceKey]}"
+                                   noSelectionLabel="#{messages['FinanceProvider.entity.state']}"
+                                   hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+
+                <a4j:commandLink action="#{providerDataModel.search}"
+                                 reRender="providerList, dataScroller"
+                                 styleClass="app-iconbtn"
+                                 title="#{messages['Common.search']}"
+                                 id="searchButtonId"
+                                 tabindex="5">
+                    <h:graphicImage value="/img/search-line.svg" alt="#{messages['Common.search']}"/>
+                    <s:defaultAction/>
+                </a4j:commandLink>
+
+                <s:button value="#{messages['Common.new']}"
+                          view="/warehouse/provider.xhtml"
+                          styleClass="app-btn-primary"
+                          rendered="#{s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"
+                          propagation="begin"/>
+            </div>
+
+            <!-- Placeholders (JSF 1.2 no propaga el atributo placeholder): se aplican por clase
+                 marcador. El texto proviene de las claves i18n, no esta hardcodeado. -->
+            <script type="text/javascript">
+                (function () {
+                    function ph(sel, t) {
+                        var e = document.querySelector(sel);
+                        if (e) { e.setAttribute("placeholder", t); }
+                    }
+                    ph(".app-ph-code", "#{messages['Provider.providerCode']}");
+                    ph(".app-ph-nit", "#{messages['Provider.nitNumber']}");
+                    ph(".app-ph-name", "#{messages['Provider.name']}");
+                })();
+            </script>
+
+            <!-- Separacion sutil (linea en blanco 5px) entre filtros y tabla, solo en esta vista. -->
+            <div style="height: 5px;"></div>
+
             <rich:dataTable value="#{providerDataModel}"
                             var="providerItem"
                             id="providerList"
-                            rows="#{sessionUser.rowsPerPage}"
+                            rows="#{providerDataModel.pageSize}"
                             width="100%"
                             columnsWidth="">
 
@@ -62,6 +100,9 @@
                             </app:commandSortHeader>
                         </rich:column>
                         <rich:column>
+                            #{messages['Provider.nitNumber']}
+                        </rich:column>
+                        <rich:column>
                             <app:commandSortHeader sortProperty="provider.entity"
                                                    dataModel="#{providerDataModel}"
                                                    reRender="providerList, dataScroller">
@@ -71,15 +112,11 @@
                         <rich:column styleClass="center">
                                 #{messages['Provider.cashAccount']}
                         </rich:column>
-                        <rich:column>
-                            <app:commandSortHeader sortProperty="providerClass.description"
-                                                   dataModel="#{providerDataModel}"
-                                                   reRender="providerList, dataScroller">
-                                #{messages['Provider.type']}
-                            </app:commandSortHeader>
+                        <rich:column styleClass="center">
+                            #{messages['FinanceProvider.entity.state']}
                         </rich:column>
                         <rich:column styleClass="center">
-                            #{messages['Common.select']}
+                            #{messages['Common.action']}
                         </rich:column>
                     </rich:columnGroup>
                 </f:facet>
@@ -88,26 +125,31 @@
                     <h:outputText value="#{providerItem.providerCode}"/>
                 </rich:column>
                 <rich:column>
+                    <h:outputText value="#{providerItem.entity.nitNumber}"/>
+                </rich:column>
+                <rich:column>
                     <h:outputText value="#{providerItem.entity.acronym}"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{providerItem.payableAccountCode}"/>
                 </rich:column>
-                <rich:column>
-                    <h:outputText value="#{providerItem.providerClass.description}"/>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[providerItem.entity.state.resourceKey]}"/>
                 </rich:column>
 
                 <rich:column styleClass="center">
-                    <h:commandLink value="#{messages['Common.select']}"
-                                   immediate="true"
+                    <h:commandLink immediate="true"
                                    action="#{providerAction.select(providerItem)}"
                                    rendered="#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}">
+                        <h:graphicImage value="/img/edit-line.svg" styleClass="select-image" title="#{messages['Common.edit']}"/>
                         <s:conversationPropagation value="none"/>
                     </h:commandLink>
                 </rich:column>
             </rich:dataTable>
 
-            <app:dataScroller id="dataScroller" for="providerList" dataModel="#{providerDataModel}"/>
+            <app:dataScroller id="dataScroller" for="providerList" dataModel="#{providerDataModel}" showPageSize="true"/>
+
+            <rich:jQuery selector="#providerCode" query="focus()" timing="onload"/>
         </h:form>
     </ui:define>
 

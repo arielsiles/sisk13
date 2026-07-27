@@ -19,22 +19,29 @@
             </c:otherwise>
         </c:choose>
     </ui:define>
-    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="bodyWidth" value="80%"/>
     <ui:param name="bodyAlign" value="center"/>
 
     <ui:param name="selectedTab" value="finances"/>
     <ui:define name="body">
         <h:form id="providerForm">
             <div class="buttons">
+                <h:commandButton action="#{providerAction.createProvider}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"/>
+
                 <h:commandButton action="#{providerAction.updateProvider}"
                                  value="#{messages['Common.save']}"
                                  styleClass="button"
                                  rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','UPDATE')}"/>
 
-                <h:commandButton action="#{provideAction.addProvideElement}"
-                                 value="#{messages['Provider.addProvideElement']}"
+                <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"/>
+                                 rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
 
                 <h:commandButton action="#{providerAction.cancel}"
                                  value="#{messages['Common.cancel']}"
@@ -58,8 +65,136 @@
                     <ui:param name="managed" value="#{providerAction.managed}"/>
                     <ui:param name="providerEntity" value="#{provider}"/>
                 </ui:include>
+            </rich:panel>
 
-                <app:fieldset id="moduleProviderTypeFieldset" title="#{messages['Provider.moduleProvider']}">
+            <!-- Datos especificos en tabs sutiles (capa app-tabs): Contabilidad, Articulos, Modulos.
+                 switchType=client: todos los tabs viajan en el submit (los campos de todos los tabs
+                 se validan/guardan juntos al Guardar). -->
+            <rich:tabPanel id="providerTabs"
+                           switchType="client"
+                           width="100%"
+                           styleClass="app-tabs"
+                           tabClass="app-tab"
+                           activeTabClass="app-tab-active"
+                           inactiveTabClass="app-tab-inactive"
+                           contentClass="app-tab-content">
+
+                <!-- Contabilidad: cuentas por pagar / por cobrar -->
+                <rich:tab name="accountingTab" label="#{messages['Provider.tab.accounting']}">
+                    <s:decorate id="payableAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:param name="required" value="true"/>
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['Provider.payableAccount']}"/>
+                        </ui:define>
+                        <app:selectPopUp id="payableAccount"
+                                         required="true"
+                                         styleClass="inputLarge"
+                                         textValue="#{provider.payableAccount.fullName}"
+                                         value="#{provider.payableAccount}"
+                                         clearAction="providerAction.clearPayableAccount()"
+                                         selectAction="providerAction.prepareAccountTarget('PAYABLE')"
+                                         searchModalPanel="cashAccountListModalPanel"
+                                         dataModel="#{cashAccountDataModel}"
+                                         reRender="payableAccountField, receivableAccountField"/>
+                    </s:decorate>
+
+                    <s:decorate id="receivableAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">
+                            <h:outputText value="#{messages['Provider.receivableAccount']}"/>
+                        </ui:define>
+                        <app:selectPopUp id="receivableAccount"
+                                         required="false"
+                                         styleClass="inputLarge"
+                                         textValue="#{provider.receivableAccount.fullName}"
+                                         value="#{provider.receivableAccount}"
+                                         clearAction="providerAction.clearReceivableAccount()"
+                                         selectAction="providerAction.prepareAccountTarget('RECEIVABLE')"
+                                         searchModalPanel="cashAccountListModalPanel"
+                                         dataModel="#{cashAccountDataModel}"
+                                         reRender="payableAccountField, receivableAccountField"/>
+                    </s:decorate>
+                </rich:tab>
+
+                <!-- Articulos: tabla "provee". Solo al editar; en alta, aviso. -->
+                <rich:tab name="articlesTab" label="#{messages['Provider.tab.articles']}">
+                    <c:choose>
+                        <c:when test="#{providerAction.managed}">
+                            <div class="buttons">
+                                <h:commandButton action="#{provideAction.addProvideElement}"
+                                                 value="#{messages['Provider.addProvideElement']}"
+                                                 styleClass="button"
+                                                 rendered="#{s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"/>
+                            </div>
+
+                            <rich:dataTable value="#{provideDataModel}"
+                                            var="provideItem"
+                                            id="provideList"
+                                            rows="#{sessionUser.rowsPerPage}"
+                                            width="100%"
+                                            columnsWidth="10%, 40%, 20%, 20%, 10%">
+                                <f:facet name="header">
+                                    <rich:columnGroup>
+                                        <rich:column>
+                                            #{messages['ProductItem.productItemCode']}
+                                        </rich:column>
+                                        <rich:column>
+                                            #{messages['Provide.productItem']}
+                                        </rich:column>
+                                        <rich:column>
+                                            #{messages['Provide.amount']}
+                                        </rich:column>
+                                        <rich:column>
+                                            #{messages['Provide.delivery']}
+                                        </rich:column>
+                                        <rich:column styleClass="center">
+                                            #{messages['Common.action']}
+                                        </rich:column>
+                                    </rich:columnGroup>
+                                </f:facet>
+
+                                <rich:column>
+                                    <h:outputText value="#{provideItem.productItem.productItemCode}"/>
+                                </rich:column>
+                                <rich:column>
+                                    <h:outputText value="#{provideItem.productItem.name}"/>
+                                </rich:column>
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{provideItem.groupAmount}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
+                                    </h:outputText>
+                                    &#160;
+                                    <h:outputFormat value="#{messages['Common.parenthesis']}">
+                                        <f:param value="#{provideItem.groupMeasureUnit.name}"/>
+                                    </h:outputFormat>
+                                </rich:column>
+                                <rich:column styleClass="right">
+                                    <h:outputText value="#{provideItem.delivery}">
+                                        <app:naturalNumberConverter/>
+                                    </h:outputText>
+                                    &#160;
+                                    <h:outputFormat value="#{messages['Common.parenthesis']}">
+                                        <f:param value="#{messages['Common.days']}"/>
+                                    </h:outputFormat>
+                                </rich:column>
+                                <rich:column styleClass="center">
+                                    <h:commandLink value="#{messages['Common.select']}"
+                                                   immediate="true"
+                                                   action="#{provideAction.select(provideItem)}"
+                                                   rendered="#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}"/>
+                                </rich:column>
+                            </rich:dataTable>
+                            <app:dataScroller id="dataScroller" for="provideList" dataModel="#{provideDataModel}"/>
+                        </c:when>
+                        <c:otherwise>
+                            <p class="app-tab-empty">
+                                <h:outputText value="#{messages['Provider.articles.saveFirst']}"/>
+                            </p>
+                        </c:otherwise>
+                    </c:choose>
+                </rich:tab>
+
+                <!-- Modulos: pickList de modulos del proveedor -->
+                <rich:tab name="modulesTab" label="#{messages['Provider.tab.modules']}">
                     <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Provider.moduleProvider']}</ui:define>
                         <rich:pickList id="moduleProviderTypes" value="#{providerAction.moduleProviderTypeList}"
@@ -70,20 +205,27 @@
                             <s:convertEnum/>
                         </rich:pickList>
                     </s:decorate>
-                </app:fieldset>
-            </rich:panel>
+                </rich:tab>
+            </rich:tabPanel>
 
             <div class="buttons">
+                <h:commandButton action="#{providerAction.createProvider}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"/>
+
                 <h:commandButton action="#{providerAction.updateProvider}"
                                  value="#{messages['Common.save']}"
                                  styleClass="button"
                                  rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','UPDATE')}"/>
 
-                <h:commandButton action="#{provideAction.addProvideElement}"
-                                 value="#{messages['Provider.addProvideElement']}"
+                <h:commandButton value="#{messages['Common.delete']}"
                                  styleClass="button"
-                                 rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','CREATE')}"
-                                 tabindex="1"/>
+                                 rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
 
                 <h:commandButton action="#{providerAction.cancel}"
                                  value="#{messages['Common.cancel']}"
@@ -91,67 +233,44 @@
                                  immediate="true"
                                  tabindex="2"/>
             </div>
-
-            <c:if test="#{providerAction.managed}">
-                <rich:dataTable value="#{provideDataModel}"
-                                var="provideItem"
-                                id="provideList"
-                                rows="#{sessionUser.rowsPerPage}"
-                                width="100%"
-                                columnsWidth="10%, 40%, 20%, 20%, 10%">
-                    <f:facet name="header">
-                        <rich:columnGroup>
-                            <rich:column>
-                                #{messages['ProductItem.productItemCode']}
-                            </rich:column>
-                            <rich:column>
-                                #{messages['Provide.productItem']}
-                            </rich:column>
-                            <rich:column>
-                                #{messages['Provide.amount']}
-                            </rich:column>
-                            <rich:column>
-                                #{messages['Provide.delivery']}
-                            </rich:column>
-                            <rich:column styleClass="center">
-                                #{messages['Common.action']}
-                            </rich:column>
-                        </rich:columnGroup>
-                    </f:facet>
-
-                    <rich:column>
-                        <h:outputText value="#{provideItem.productItem.productItemCode}"/>
-                    </rich:column>
-                    <rich:column>
-                        <h:outputText value="#{provideItem.productItem.name}"/>
-                    </rich:column>
-                    <rich:column styleClass="right">
-                        <h:outputText value="#{provideItem.groupAmount}">
-                            <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}"/>
-                        </h:outputText>
-                        &#160;
-                        <h:outputFormat value="#{messages['Common.parenthesis']}">
-                            <f:param value="#{provideItem.groupMeasureUnit.name}"/>
-                        </h:outputFormat>
-                    </rich:column>
-                    <rich:column styleClass="right">
-                        <h:outputText value="#{provideItem.delivery}">
-                            <app:naturalNumberConverter/>
-                        </h:outputText>
-                        &#160;
-                        <h:outputFormat value="#{messages['Common.parenthesis']}">
-                            <f:param value="#{messages['Common.days']}"/>
-                        </h:outputFormat>
-                    </rich:column>
-                    <rich:column styleClass="center">
-                        <h:commandLink value="#{messages['Common.select']}"
-                                       immediate="true"
-                                       action="#{provideAction.select(provideItem)}"
-                                       rendered="#{s:hasPermission('WAREHOUSEPROVIDERMAN','VIEW')}"/>
-                    </rich:column>
-                </rich:dataTable>
-                <app:dataScroller id="dataScroller" for="provideList" dataModel="#{provideDataModel}"/>
-            </c:if>
         </h:form>
+
+        <!-- Modal del plan de cuentas, reutilizado por Cuenta por pagar y por cobrar.
+             El destino se fija con providerAction.prepareAccountTarget (selectAction). -->
+        <s:div id="cashAccountListModalPanelDiv">
+            <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+                <ui:param name="hasWarehousePermission" value="true"/>
+                <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+                <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+                <ui:define name="assignButton">
+                    <a4j:commandButton id="assignButton"
+                                       action="#{providerAction.assignAccount(cashAccountItem)}"
+                                       image="/img/active.gif"
+                                       styleClass="select-image-middle"
+                                       reRender="payableAccountField, receivableAccountField"
+                                       oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+                </ui:define>
+            </s:decorate>
+        </s:div>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['Provider.delete.confirmation']}">
+                        <f:param value="#{provider.fullName}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{providerAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{providerAction.managed and s:hasPermission('WAREHOUSEPROVIDERMAN','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
     </ui:define>
 </ui:composition>

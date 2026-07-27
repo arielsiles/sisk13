@@ -1577,6 +1577,83 @@ input[type="text"].disabledInput {
     text-decoration: none;
 }
 
+/* -------------------------------------------------------------------------
+   Tabs sutiles (capa app-tabs). Se aplican via los hooks de rich:tabPanel
+   (tabClass / activeTabClass / inactiveTabClass / contentClass). Se neutraliza
+   el gradiente del skin (background-image:none) para un look plano tipo Odoo.
+   Scoped a .app-tabs: no afecta a otros rich:tabPanel del sistema.
+   ------------------------------------------------------------------------- */
+.app-tabs {
+    border-collapse: collapse;
+    margin-bottom: 6px;
+}
+
+/* Se apunta a las clases-hook (app-*) Y a las nativas de RichFaces
+   (rich-tab-*, dr-tbpnl-*): las nativas estan SIEMPRE presentes (alta y edicion),
+   asi el estilo se aplica de forma consistente en ambos modos. */
+.app-tabs td.app-tab,
+.app-tabs td.rich-tab-header,
+.app-tabs td.dr-tbpnl-tab {
+    background: #f4f5f7 !important;
+    background-image: none !important;
+    border: 1px solid #e3e3e0 !important;
+    border-bottom: 0 !important;
+    padding: 5px 14px !important;
+    font-family: Verdana, Arial, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: normal !important;
+    color: #6b6b6b !important;
+}
+
+.app-tabs td.app-tab-inactive,
+.app-tabs td.rich-tab-inactive,
+.app-tabs td.dr-tbpnl-tab-inactive {
+    cursor: pointer;
+}
+
+.app-tabs td.app-tab-inactive:hover,
+.app-tabs td.rich-tab-inactive:hover,
+.app-tabs td.dr-tbpnl-tab-inactive:hover {
+    background: #eef2f7 !important;
+    color: #34617f !important;
+}
+
+.app-tabs td.app-tab-active,
+.app-tabs td.rich-tab-active,
+.app-tabs td.dr-tbpnl-tab-active {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #34617f !important;
+    font-weight: bold !important;
+    border-top: 2px solid #578BB8 !important;
+    padding-top: 4px !important;
+}
+
+/* Linea base del encabezado, alineada con el borde del contenido. */
+.app-tabs td.dr-tbpnl-tabline-vis,
+.app-tabs td.dr-tbpnl-tabline-hidden,
+.app-tabs td.rich-tabhdr-side-cell,
+.app-tabs td.rich-tabhdr-side-border {
+    border-bottom: 1px solid #e3e3e0 !important;
+    background: transparent !important;
+    background-image: none !important;
+}
+
+.app-tabs td.app-tab-content,
+.app-tabs td.rich-tabpanel-content,
+.app-tabs td.dr-tbpnl-content {
+    border: 1px solid #e3e3e0 !important;
+    background: #ffffff !important;
+    padding: 14px !important;
+}
+
+/* Aviso cuando un tab no aplica todavia (ej. Articulos en alta). */
+.app-tab-empty {
+    color: #8a8a8a;
+    font-style: italic;
+    padding: 6px 2px;
+}
+
 /* ============================================================
    Pantalla "Cambiar contraseña" (view/admin/userSettings.xhtml)
    Sigue la linea de la app: usa rich:panel + skin nativo. Aqui solo
