@@ -6,7 +6,7 @@
 
     <property file="build-${profile}.properties"/>
     <property name="app.name" value="KHIPUS"/>
-    <property name="app.version" value="6.0.117"/>
+    <property name="app.version" value="6.0.118"/>
     <property environment="env"/>
     <!-- Numero de build: BUILD_NUMBER del entorno (CI) si existe; si no, la fecha y
          hora del release (se fija en el target init con <tstamp>). La primera

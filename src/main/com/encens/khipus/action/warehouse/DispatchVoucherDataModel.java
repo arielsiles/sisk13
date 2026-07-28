@@ -2,12 +2,14 @@ package com.encens.khipus.action.warehouse;
 
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.warehouse.WarehouseVoucherDispatch;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -31,14 +33,18 @@ public class DispatchVoucherDataModel extends QueryDataModel<Long, WarehouseVouc
             "dispatch.state = #{dispatchVoucherDataModel.criteria.state}",
             "dispatch.client = #{dispatchVoucherDataModel.criteria.client}",
             "dispatch.transportCompany = #{dispatchVoucherDataModel.criteria.transportCompany}",
-            "dispatch.dispatchDate >= #{dispatchVoucherDataModel.startDate}",
-            "dispatch.dispatchDate <= #{dispatchVoucherDataModel.endDate}"
+            "dispatch.dispatchDate >= #{dispatchVoucherDataModel.startDateFilter}",
+            "dispatch.dispatchDate <= #{dispatchVoucherDataModel.endDateFilter}"
     };
 
     @Create
     public void init() {
         sortProperty = "dispatch.dispatchDate";
         sortAsc = false;
+        // Rango por defecto: 01 de enero del anio actual hasta hoy. Al crearse el
+        // componente la lista ya arranca filtrada por ese rango.
+        startDate = DateUtils.firstDayOfYear(DateUtils.getCurrentYear(new Date()));
+        endDate = DateUtils.toDay();
     }
 
     /**
@@ -81,6 +87,29 @@ public class DispatchVoucherDataModel extends QueryDataModel<Long, WarehouseVouc
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    /**
+     * Valor normalizado de startDate para el filtro: 00:00:00 del dia elegido.
+     * Lo usan tanto las RESTRICTIONS de esta lista como el reporte Excel.
+     */
+    public Date getStartDateFilter() {
+        return DateUtils.removeTime(startDate);
+    }
+
+    /**
+     * Valor normalizado de endDate para el filtro: 23:59:59.999 del dia elegido.
+     * dispatchDate es TIMESTAMP; sin esto los despachos del propio dia "hasta"
+     * (con hora distinta de 00:00) quedarian fuera del rango.
+     */
+    public Date getEndDateFilter() {
+        if (endDate == null) {
+            return null;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(endDate);
+        DateUtils.toMaxHours(calendar);
+        return calendar.getTime();
     }
 
     public String getPlateFilter() {

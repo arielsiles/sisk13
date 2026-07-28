@@ -13,73 +13,97 @@
     <ui:define name="body">
         <h:form id="dispatchVoucherSearch">
 
-            <rich:simpleTogglePanel label="#{messages['Common.search']}" switchType="client">
-                <h:panelGrid columns="2"
-                             width="100%"
-                             cellpadding="0"
-                             cellspacing="0"
-                             border="0"
-                             columnClasses="width50percent,width50percent">
+            <!-- Barra de filtros reusable (app-filterbar): una sola linea, placeholders estilo Odoo.
+                 Se conservan todos los criterios: N Orden, Lote-Venta, Placa, Estado y rango de fechas. -->
+            <div class="app-filterbar">
+                <h:inputText id="orderNumber"
+                             value="#{dispatchVoucherDataModel.criteria.deliveryOrderNumber}"
+                             maxlength="10"
+                             styleClass="app-filterbar__input app-filterbar__input--code app-ph-order"
+                             tabindex="1"/>
 
-                    <s:decorate id="orderNumberFilter" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['WarehouseDispatch.deliveryOrderNumber']}</ui:define>
-                        <h:inputText id="orderNumber"
-                                     value="#{dispatchVoucherDataModel.criteria.deliveryOrderNumber}"
-                                     maxlength="10" tabindex="1" styleClass="input"/>
-                    </s:decorate>
+                <h:inputText id="lot" value="#{dispatchVoucherDataModel.criteria.salesLotCode}"
+                             maxlength="80"
+                             styleClass="app-filterbar__input app-ph-lot"
+                             tabindex="2"/>
 
-                    <s:decorate id="lotFilter" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['WarehouseDispatch.salesLotCode']}</ui:define>
-                        <h:inputText id="lot" value="#{dispatchVoucherDataModel.criteria.salesLotCode}"
-                                     maxlength="80" tabindex="2" styleClass="input"/>
-                    </s:decorate>
+                <h:inputText id="plate" value="#{dispatchVoucherDataModel.plateFilter}"
+                             maxlength="20"
+                             styleClass="app-filterbar__input app-filterbar__input--code app-ph-plate"
+                             tabindex="3"/>
 
-                    <s:decorate id="plateFilter" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['WarehouseDispatch.vehicle.plate']}</ui:define>
-                        <h:inputText id="plate" value="#{dispatchVoucherDataModel.plateFilter}"
-                                     maxlength="20" tabindex="3" styleClass="input"/>
-                    </s:decorate>
+                <h:selectOneMenu id="state" value="#{dispatchVoucherDataModel.criteria.state}"
+                                 styleClass="app-filterbar__select"
+                                 required="false"
+                                 tabindex="4">
+                    <f:selectItem itemValue="#{null}" itemLabel="#{messages['WarehouseDispatch.state']}"/>
+                    <f:selectItem itemValue="BORRADOR"   itemLabel="#{messages['WarehouseDispatch.state.BORRADOR']}"/>
+                    <f:selectItem itemValue="APROBADO"   itemLabel="#{messages['WarehouseDispatch.state.APROBADO']}"/>
+                    <f:selectItem itemValue="FINALIZADO" itemLabel="#{messages['WarehouseDispatch.state.FINALIZADO']}"/>
+                    <f:selectItem itemValue="ANULADO"    itemLabel="#{messages['WarehouseDispatch.state.ANULADO']}"/>
+                </h:selectOneMenu>
 
-                    <s:decorate id="stateFilter" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['WarehouseDispatch.state']}</ui:define>
-                        <h:selectOneMenu id="state" value="#{dispatchVoucherDataModel.criteria.state}"
-                                         styleClass="input" tabindex="4">
-                            <f:selectItem itemValue="#{null}" itemLabel=""/>
-                            <f:selectItem itemValue="BORRADOR" itemLabel="#{messages['WarehouseDispatch.state.BORRADOR']}"/>
-                            <f:selectItem itemValue="APROBADO" itemLabel="#{messages['WarehouseDispatch.state.APROBADO']}"/>
-                            <f:selectItem itemValue="ANULADO"  itemLabel="#{messages['WarehouseDispatch.state.ANULADO']}"/>
-                        </h:selectOneMenu>
-                    </s:decorate>
+                <rich:calendar id="startDate" value="#{dispatchVoucherDataModel.startDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               inputClass="app-filterbar__input app-filterbar__input--date app-ph-start"
+                               enableManualInput="true"
+                               tabindex="5">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
 
-                    <s:decorate id="startDateFilter" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['WarehouseDispatch.filter.startDate']}</ui:define>
-                        <rich:calendar id="startDate" value="#{dispatchVoucherDataModel.startDate}"
-                                       datePattern="#{messages['patterns.date']}"
-                                       inputClass="input" tabindex="5"/>
-                    </s:decorate>
+                <rich:calendar id="endDate" value="#{dispatchVoucherDataModel.endDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               inputClass="app-filterbar__input app-filterbar__input--date app-ph-end"
+                               enableManualInput="true"
+                               tabindex="6">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}"
+                                       type="date"/>
+                </rich:calendar>
 
-                    <s:decorate id="endDateFilter" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['WarehouseDispatch.filter.endDate']}</ui:define>
-                        <rich:calendar id="endDate" value="#{dispatchVoucherDataModel.endDate}"
-                                       datePattern="#{messages['patterns.date']}"
-                                       inputClass="input" tabindex="6"/>
-                    </s:decorate>
-                </h:panelGrid>
+                <a4j:commandLink action="#{dispatchVoucherDataModel.search}"
+                                 reRender="dispatchVoucherList, dataScroller"
+                                 styleClass="app-iconbtn"
+                                 title="#{messages['Common.search']}"
+                                 id="searchButtonId"
+                                 tabindex="7">
+                    <h:graphicImage value="/img/search-line.svg" alt="#{messages['Common.search']}"/>
+                    <s:defaultAction/>
+                </a4j:commandLink>
+            </div>
 
-                <div class="buttons">
-                    <a4j:commandButton action="#{dispatchVoucherDataModel.search}"
-                                       reRender="dispatchVoucherList, dataScroller"
-                                       styleClass="button"
-                                       value="#{messages['Common.search']}" tabindex="7">
-                        <s:defaultAction/>
-                    </a4j:commandButton>
-                </div>
-            </rich:simpleTogglePanel>
+            <!-- Placeholders (JSF 1.2 no propaga el atributo placeholder): se aplican por clase marcador.
+                 El texto proviene de las claves i18n, no esta hardcodeado. -->
+            <script type="text/javascript">
+                (function () {
+                    function ph(sel, t) {
+                        var e = document.querySelector(sel);
+                        if (e) { e.setAttribute("placeholder", t); }
+                    }
+                    ph(".app-ph-order", "#{messages['WarehouseDispatch.filter.orderNumber']}");
+                    ph(".app-ph-lot", "#{messages['WarehouseDispatch.salesLotCode']}");
+                    ph(".app-ph-plate", "#{messages['WarehouseDispatch.vehicle.plate']}");
+                    ph(".app-ph-start", "#{messages['Common.start']}");
+                    ph(".app-ph-end", "#{messages['Common.end']}");
+                })();
+            </script>
 
-            <div class="buttons">
+            <!-- Toolbar de acciones (app-toolbar): fila compacta a la derecha.
+                 Orden: Exportar y Nuevo (Nuevo siempre el ultimo, extremo derecho). -->
+            <div class="app-toolbar">
+                <h:commandLink action="#{dispatchVoucherReportAction.generateReport}"
+                               styleClass="app-iconbtn app-iconbtn--excel"
+                               title="#{messages['Common.export']}"
+                               id="generateButtonId"
+                               rendered="#{s:hasPermission('WAREHOUSEDISPATCH','VIEW')}">
+                    <h:graphicImage value="/img/excel-line.svg" alt="#{messages['Common.export']}"/>
+                </h:commandLink>
+
                 <s:button value="#{messages['WarehouseDispatch.new']}"
                           view="/warehouse/dispatchVoucherCreate.xhtml"
-                          styleClass="button" propagation="begin"
+                          styleClass="app-btn-primary" propagation="begin"
                           rendered="#{s:hasPermission('WAREHOUSEDISPATCH','CREATE')}"/>
             </div>
 
@@ -152,13 +176,6 @@
             </rich:dataTable>
             <app:dataScroller id="dataScroller" for="dispatchVoucherList"
                               dataModel="#{dispatchVoucherDataModel}"/>
-
-            <div class="buttons">
-                <s:button value="#{messages['WarehouseDispatch.new']}"
-                          view="/warehouse/dispatchVoucherCreate.xhtml"
-                          styleClass="button" propagation="begin"
-                          rendered="#{s:hasPermission('WAREHOUSEDISPATCH','CREATE')}"/>
-            </div>
 
         </h:form>
     </ui:define>
