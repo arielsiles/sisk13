@@ -1,7 +1,9 @@
 package com.encens.khipus.service.xproduction;
 
 import com.encens.khipus.model.production.CollectMaterialState;
+import com.encens.khipus.model.production.ProductionState;
 import com.encens.khipus.model.warehouse.DispatchState;
+import com.encens.khipus.model.warehouse.WarehouseVoucherState;
 import com.encens.khipus.model.xproduction.ProductionLine;
 import com.encens.khipus.model.xproduction.XProduction;
 import org.jboss.seam.annotations.AutoCreate;
@@ -30,12 +32,16 @@ public class BaritinaDailyReportServiceBean implements BaritinaDailyReportServic
     @SuppressWarnings("unchecked")
     public List<XProduction> findProductions(ProductionLine line, Date from, Date to) {
         if (line == null || from == null || to == null) return Collections.emptyList();
+        // Las ordenes anuladas no se cuentan: no producen ni consumen nada. Mismo criterio que
+        // XProductionBalanceService, para que el reporte y "Saldos de Almacen" no discrepen.
         Query q = em.createQuery(
                 "select p from XProduction p " +
                 "where p.productionLine = :line " +
+                "  and p.state <> :anl " +
                 "  and p.initDate >= :from and p.initDate < :to " +
                 "order by p.initDate asc, p.id asc");
         q.setParameter("line", line);
+        q.setParameter("anl", ProductionState.ANL);
         q.setParameter("from", from);
         q.setParameter("to", to);
         return q.getResultList();
@@ -106,5 +112,29 @@ public class BaritinaDailyReportServiceBean implements BaritinaDailyReportServic
                 .setParameter("fin", DispatchState.FINALIZADO)
                 .getSingleResult();
         return r != null ? (BigDecimal) r : BigDecimal.ZERO;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Object[]> adjustmentRows(Collection<String> codArts, Date from, Date to) {
+        if (codArts == null || codArts.isEmpty() || from == null || to == null) return Collections.emptyList();
+        // Se excluyen los movimientos cuyo vale fue generado por un despacho: el despacho
+        // se enlaza con el vale por (no_cia_vale, no_trans_vale) y ya tiene su propia columna.
+        Query q = em.createQuery(
+                "select md.movementDetailDate, md.movementType, md.quantity, " +
+                "       md.productItemCode, md.transactionNumber " +
+                "from MovementDetail md " +
+                "where md.productItemCode in (:cods) " +
+                "  and md.state = :apr " +
+                "  and md.movementDetailDate >= :from and md.movementDetailDate < :to " +
+                "  and not exists (select d.id from WarehouseVoucherDispatch d "+
+                "                  where d.warehouseVoucherTransactionNumber = md.transactionNumber " +
+                "                    and d.warehouseVoucherCompanyNumber = md.companyNumber) " +
+                "order by md.movementDetailDate");
+        q.setParameter("cods", codArts);
+        q.setParameter("apr", WarehouseVoucherState.APR);
+        q.setParameter("from", from);
+        q.setParameter("to", to);
+        return q.getResultList();
     }
 }

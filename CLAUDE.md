@@ -65,7 +65,10 @@ src/main/com/encens/khipus/
 
 > **XProduction (órdenes de producción):** los cálculos de la orden por tipo de línea
 > (ULEXITA, BARITINA, General), templates y costeo están documentados en
-> `docs/xproduction_ordenes_calculos.md`.
+> `docs/xproduction_ordenes_calculos.md`. De dónde sale cada número de los **reportes
+> diarios** (saldo anterior desde Saldos de Almacén, artículos desde la configuración de
+> la línea, fecha por plan de producción, marcadores de vales) está en
+> `docs/xproduction_reporte_diario_criterios.md`.
 
 > **Plan de Cuentas (`arcgms`):** estructura del código por niveles, reglas de
 > `cta_raiz`/`cta_niv3`, validaciones del alta, renumeración, integridad referencial

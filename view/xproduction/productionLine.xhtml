@@ -184,6 +184,22 @@
 
                     <c:if test="#{productionLine.baritinaTemplate}">
 
+                        <!-- MP principal: mismo campo/modal que ULEXITA (ramas c:if excluyentes).
+                             El reporte diario lo usa para el saldo anterior, el ingreso por acopio
+                             y el uso de materia prima. -->
+                        <s:decorate id="codArtMpPrincipalField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.codArtMpPrincipal']}</ui:define>
+                            <app:selectPopUp id="codArtMpPrincipal"
+                                             textValue="#{productionLineAction.mpPrincipalItem.fullName}"
+                                             value="#{productionLineAction.mpPrincipalItem}"
+                                             clearAction="#{productionLineAction.clearMpPrincipal()}"
+                                             searchModalPanel="mpPrincipalListModalPanel"
+                                             dataModel="#{productItemSearchDataModel}"
+                                             reRender="codArtMpPrincipalField"
+                                             styleClass="input250"
+                                             hotKeySelect="alt+4"/>
+                        </s:decorate>
+
                         <s:decorate id="codArtPtPrincipalField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductionLine.codArtPtPrincipal']}</ui:define>
                             <app:selectPopUp id="codArtPtPrincipal"
@@ -194,7 +210,7 @@
                                              dataModel="#{productItemSearchDataModel}"
                                              reRender="codArtPtPrincipalField"
                                              styleClass="input250"
-                                             hotKeySelect="alt+4"/>
+                                             hotKeySelect="alt+5"/>
                         </s:decorate>
 
                         <s:decorate id="factorPtMpField" template="/include/inputField.xhtml" styleClass="formRow">

@@ -2,6 +2,7 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.production.ProductiveZone;
+import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.service.warehouse.ProductItemService;
@@ -10,6 +11,8 @@ import com.encens.khipus.service.xproduction.WarehouseBalanceRow;
 import com.encens.khipus.service.xproduction.XProductionBalanceService;
 import com.encens.khipus.service.xproduction.XProductionBaritinaService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.FormatUtils;
+import com.encens.khipus.util.MessageUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.CellRangeAddress;
 import org.jboss.seam.ScopeType;
@@ -61,6 +64,8 @@ public class BaritinaDailyReportAction {
     private FacesMessages facesMessages;
 
     private static final BigDecimal THOUSAND = new BigDecimal("1000");
+    /** Locale de los numeros escritos como texto dentro de OBSERVACIONES (miles '.', decimal ','). */
+    private static final Locale SPANISH = new Locale("es");
 
     private Integer year;
     private Integer month;
@@ -94,6 +99,11 @@ public class BaritinaDailyReportAction {
             return;
         }
         try {
+            // El componente es de scope PAGE: los caches deben limpiarse en cada generacion,
+            // porque el balance depende de la fecha de corte del periodo solicitado.
+            balanceCache.clear();
+            itemLabelCache.clear();
+
             Calendar c = Calendar.getInstance();
             c.clear();
             c.set(year, month - 1, 1, 0, 0, 0);
@@ -102,37 +112,46 @@ public class BaritinaDailyReportAction {
             c.add(Calendar.MONTH, 1);
             Date nextMonth = c.getTime();
 
-            // 1. Ordenes: todas hasta nextMonth (para derivar articulos y saldo inicial)
+            // 1. Ordenes: todas hasta nextMonth (para derivar articulos si la linea no los configura)
             List<XProduction> allOrders = baritinaDailyReportService.findProductions(productionLine, new Date(0), nextMonth);
 
-            // 2. Articulos derivados de las ordenes
-            String mpCodArt = deriveMpCodArt(allOrders);
-            Set<String> productCodArts = derivePtCodArts(allOrders);
+            // 2. Articulos: configuracion de la linea primero (mismo criterio que ULEXITA); la
+            //    derivacion desde las ordenes queda solo como respaldo para lineas sin configurar.
+            //    Sin esto, un periodo sin ordenes deja los codigos en nulo y TODO el reporte en cero.
+            String mpCodArt = productionLine.getCodArtMpPrincipal();
+            if (mpCodArt == null) mpCodArt = deriveMpCodArt(allOrders);
+            Set<String> productCodArts = new LinkedHashSet<String>();
+            if (productionLine.getCodArtPtPrincipal() != null) {
+                productCodArts.add(productionLine.getCodArtPtPrincipal());
+            } else {
+                productCodArts = derivePtCodArts(allOrders);
+            }
 
             // 3. Agregacion por dia (periodo) desde las ordenes
             DayData[] days = new DayData[lastDayNum + 1];
             for (int d = 1; d <= lastDayNum; d++) days[d] = new DayData();
             Map<Long, ProductiveZone> zoneById = new LinkedHashMap<Long, ProductiveZone>();
 
-            BigDecimal beforePtTn = BigDecimal.ZERO;
-
             for (XProduction p : allOrders) {
-                BigDecimal usoTn = tn(defaultInputQty(p));
-                BigDecimal ptTn = tn(sumPt(p));
-                if (p.getInitDate() == null) continue;
-                if (p.getInitDate().before(firstDay)) {
-                    beforePtTn = BigDecimalUtil.sum(beforePtTn, ptTn, 6);
-                    continue;
-                }
-                if (!p.getInitDate().before(nextMonth)) continue;
+                // Ubicar la orden por la fecha del PLAN de produccion (mismo criterio que ULEXITA,
+                // el Kardex y XProductionBalanceService), NO por initDate: un turno que arranca
+                // pasada la medianoche tiene initDate en el dia calendario siguiente al de su plan.
+                Date od = orderDate(p);
+                if (od == null) continue;
+                if (od.before(firstDay)) continue;
+                if (!od.before(nextMonth)) continue;
+
+                BigDecimal usoTn = tn(mpInputQty(p, mpCodArt));
+                BigDecimal ptTn = tn(sumPt(p, productCodArts));
 
                 Calendar dc = Calendar.getInstance();
-                dc.setTime(p.getInitDate());
+                dc.setTime(od);
                 int day = dc.get(Calendar.DAY_OF_MONTH);
                 DayData dd = days[day];
                 dd.hasProduction = true;
                 dd.usoTn = BigDecimalUtil.sum(dd.usoTn, usoTn, 6);
                 dd.ptTn = BigDecimalUtil.sum(dd.ptTn, ptTn, 6);
+                collectUnconfiguredMarks(dd, p, mpCodArt, productCodArts);
 
                 XProductionBaritina header = xproductionBaritinaService.findByProduction(p);
                 if (header != null) {
@@ -165,13 +184,27 @@ public class BaritinaDailyReportAction {
                 }
             }
 
-            // 5. Saldos iniciales
-            // Saldo anterior de MP: se toma del mismo calculo que la pantalla "Saldos de
-            // Almacen" (XProductionBalanceService) para el articulo MP de la linea, al ultimo
-            // dia del mes anterior (firstDay - 1), convertido KG -> TN. El PT mantiene su calculo.
-            BigDecimal openMpTn = mpBalanceBeforeTn(mpCodArt, firstDay);
-            BigDecimal openProdTn = BigDecimalUtil.subtract(
-                    beforePtTn, tn(baritinaDailyReportService.sumDispatchBefore(productCodArts, firstDay)), 6);
+            // 4.b Vales de ajuste del periodo (no despachos). No alteran los saldos del reporte;
+            //     se anotan en OBSERVACIONES para que el movimiento no quede perdido y se pueda
+            //     explicar cualquier diferencia contra "Saldos de Almacen".
+            Set<String> adjustCods = new LinkedHashSet<String>();
+            if (mpCodArt != null) adjustCods.add(mpCodArt);
+            adjustCods.addAll(productCodArts);
+            for (Object[] row : baritinaDailyReportService.adjustmentRows(adjustCods, firstDay, nextMonth)) {
+                int day = dayOfMonth((Date) row[0]);
+                if (day < 1 || day > lastDayNum) continue;
+                addAdjustment(days[day], row);
+            }
+
+            // 5. Saldos iniciales: ambos se toman del mismo calculo que la pantalla "Saldos de
+            //    Almacen" (XProductionBalanceService) al ultimo dia del mes anterior (firstDay - 1),
+            //    convertido KG -> TN. El PT no puede derivarse de las ordenes: su saldo tambien
+            //    incluye cargas y ajustes por vale, que las ordenes de produccion no ven.
+            BigDecimal openMpTn = balanceBeforeTn(mpCodArt, firstDay);
+            BigDecimal openProdTn = BigDecimal.ZERO;
+            for (String cod : productCodArts) {
+                openProdTn = BigDecimalUtil.sum(openProdTn, balanceBeforeTn(cod, firstDay), 6);
+            }
 
             // 6. Zonas ordenadas (columnas dinamicas)
             List<ProductiveZone> zones = new ArrayList<ProductiveZone>(zoneById.values());
@@ -249,7 +282,7 @@ public class BaritinaDailyReportAction {
                 if (dd.hasProduction) setNumber(row, colSuma, suma, s.numCenter); else setText(row, colSuma, null, s.numCenter);
                 if (dd.hasProduction && dd.turnos > 0) setNumber(row, colTurnos, new BigDecimal(dd.turnos), s.center);
                 else setText(row, colTurnos, null, s.center);
-                setText(row, colObs, dd.obs.length() > 0 ? dd.obs : null, s.body);
+                setText(row, colObs, composeObs(dd), s.body);
 
                 totIngreso = BigDecimalUtil.sum(totIngreso, dd.ingresoTn, 6);
                 totUso = BigDecimalUtil.sum(totUso, dd.usoTn, 6);
@@ -333,22 +366,40 @@ public class BaritinaDailyReportAction {
     }
 
     /**
-     * Saldo anterior de MP en TN: balance del articulo MP segun XProductionBalanceService
-     * (mismo criterio que la pantalla "Saldos de Almacen") al ultimo dia del mes anterior
-     * (firstDay - 1). El balance viene en la unidad del articulo (KG) y se convierte a TN.
+     * Fecha con la que el reporte ubica una orden en el dia: la del PLAN de produccion (mismo
+     * criterio que ULEXITA, el Kardex de Articulos y XProductionBalanceService). Si la orden no
+     * tiene plan, cae a initDate. Asi un turno que arranca pasada la medianoche queda en el dia
+     * de su plan y no en el siguiente.
      */
-    private BigDecimal mpBalanceBeforeTn(String mpCod, Date firstDay) {
-        if (mpCod == null) return BigDecimal.ZERO;
-        ProductItem mp = productItemService.findProductItemByCode(mpCod);
-        if (mp == null) return BigDecimal.ZERO;
+    private static Date orderDate(XProduction p) {
+        if (p.getProductionPlan() != null && p.getProductionPlan().getDate() != null) {
+            return p.getProductionPlan().getDate();
+        }
+        return p.getInitDate();
+    }
+
+    /**
+     * Saldo en TN de un articulo al ultimo dia del mes anterior (firstDay - 1) segun
+     * XProductionBalanceService, o sea con el mismo criterio que la pantalla "Saldos de Almacen"
+     * (incluye vales, acopio y produccion). El balance viene en la unidad del articulo (KG) y se
+     * convierte a TN. Los balances por almacen se cachean: MP y PT suelen repetir almacen.
+     */
+    private BigDecimal balanceBeforeTn(String cod, Date firstDay) {
+        if (cod == null) return BigDecimal.ZERO;
+        ProductItem item = productItemService.findProductItemByCode(cod);
+        if (item == null) return BigDecimal.ZERO;
         Calendar c = Calendar.getInstance();
         c.setTime(firstDay);
         c.add(Calendar.DAY_OF_MONTH, -1);
-        Date cutoff = c.getTime();
-        List<WarehouseBalanceRow> balances = xproductionBalanceService.computeBalances(
-                mp.getCompanyNumber(), mp.getWarehouseCode(), cutoff);
+        String key = item.getCompanyNumber() + "|" + item.getWarehouseCode();
+        List<WarehouseBalanceRow> balances = balanceCache.get(key);
+        if (balances == null) {
+            balances = xproductionBalanceService.computeBalances(
+                    item.getCompanyNumber(), item.getWarehouseCode(), c.getTime());
+            balanceCache.put(key, balances);
+        }
         for (WarehouseBalanceRow row : balances) {
-            if (mpCod.equals(row.getProductItemCode())) {
+            if (cod.equals(row.getProductItemCode())) {
                 return tn(row.getBalance());
             }
         }
@@ -366,23 +417,115 @@ public class BaritinaDailyReportAction {
         return set;
     }
 
-    private BigDecimal defaultInputQty(XProduction p) {
+    /**
+     * Consumo de materia prima de la orden: solo el articulo MP configurado en la linea, para que
+     * la columna USO y el saldo arrastrado correspondan a un unico articulo. Si la linea no tiene
+     * MP configurada se cae al comportamiento anterior (insumo marcado por defecto en la formula).
+     */
+    private BigDecimal mpInputQty(XProduction p, String mpCodArt) {
         BigDecimal q = BigDecimal.ZERO;
         for (XSupply sup : p.getSupplyList()) {
-            if (sup.hasFormula() && Boolean.TRUE.equals(sup.getFormulationInput().getInputDefault())
-                    && sup.getQuantity() != null) {
-                q = BigDecimalUtil.sum(q, sup.getQuantity(), 6);
+            if (sup.getQuantity() == null) continue;
+            boolean isMp = (mpCodArt != null)
+                    ? mpCodArt.equals(sup.getProductItemCode())
+                    : (sup.hasFormula() && Boolean.TRUE.equals(sup.getFormulationInput().getInputDefault()));
+            if (isMp) q = BigDecimalUtil.sum(q, sup.getQuantity(), 6);
+        }
+        return q;
+    }
+
+    /** Produccion de la orden, contando solo los PT configurados en la linea. */
+    private BigDecimal sumPt(XProduction p, Set<String> productCodArts) {
+        BigDecimal q = BigDecimal.ZERO;
+        for (XProductionProduct pr : p.getProductionProductList()) {
+            if (pr.getQuantity() == null) continue;
+            if (pr.getProductItemCode() != null && productCodArts.contains(pr.getProductItemCode())) {
+                q = BigDecimalUtil.sum(q, pr.getQuantity(), 6);
             }
         }
         return q;
     }
 
-    private BigDecimal sumPt(XProduction p) {
-        BigDecimal q = BigDecimal.ZERO;
-        for (XProductionProduct pr : p.getProductionProductList()) {
-            if (pr.getQuantity() != null) q = BigDecimalUtil.sum(q, pr.getQuantity(), 6);
+    // -------------------------------------------------------------- observaciones
+
+    /** Balances por almacen ya calculados (clave compania|almacen): MP y PT suelen repetirlo. */
+    private final Map<String, List<WarehouseBalanceRow>> balanceCache =
+            new HashMap<String, List<WarehouseBalanceRow>>();
+
+    /** Etiquetas de articulo ya resueltas, para no repetir consultas al armar los marcadores. */
+    private final Map<String, String> itemLabelCache = new HashMap<String, String>();
+
+    /** "2021 BARITINA MOLIDA", o solo el codigo si el articulo no se encuentra. */
+    private String itemLabel(String cod) {
+        if (cod == null) return "";
+        String label = itemLabelCache.get(cod);
+        if (label == null) {
+            ProductItem item = productItemService.findProductItemByCode(cod);
+            label = (item == null || item.getName() == null) ? cod : cod + " " + item.getName();
+            itemLabelCache.put(cod, label);
         }
-        return q;
+        return label;
+    }
+
+    /**
+     * Acumula en el dia los articulos que la orden movio pero que NO estan configurados en la
+     * linea: no entran en las columnas (romperian el cuadre del saldo, que sigue a un solo
+     * articulo) pero deben quedar visibles en OBSERVACIONES.
+     */
+    private void collectUnconfiguredMarks(DayData dd, XProduction p, String mpCodArt, Set<String> productCodArts) {
+        for (XProductionProduct pr : p.getProductionProductList()) {
+            String cod = pr.getProductItemCode();
+            if (cod == null || productCodArts.contains(cod) || isZero(pr.getQuantity())) continue;
+            accumulate(dd.otherPtTn, cod, tn(pr.getQuantity()));
+        }
+        // Sin MP configurada no hay contra que comparar: se omite para no marcar todo el consumo.
+        if (mpCodArt == null) return;
+        for (XSupply sup : p.getSupplyList()) {
+            String cod = sup.getProductItemCode();
+            if (cod == null || mpCodArt.equals(cod) || isZero(sup.getQuantity())) continue;
+            accumulate(dd.otherSupplyTn, cod, tn(sup.getQuantity()));
+        }
+    }
+
+    /** Acumula el ajuste por vale del dia, con signo (entrada +, salida -), agrupado por vale y articulo. */
+    private void addAdjustment(DayData dd, Object[] row) {
+        BigDecimal qty = (BigDecimal) row[2];
+        if (isZero(qty)) return;
+        BigDecimal signedTn = MovementDetailType.E.equals(row[1]) ? tn(qty) : tn(qty).negate();
+        accumulate(dd.adjustTn, row[4] + "|" + row[3], signedTn);
+    }
+
+    private static void accumulate(Map<String, BigDecimal> map, String key, BigDecimal value) {
+        BigDecimal prev = map.get(key);
+        map.put(key, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, value, 6));
+    }
+
+    /** Observacion final del dia: la capturada en la orden mas los marcadores. Null si no hay nada. */
+    private String composeObs(DayData dd) {
+        StringBuilder sb = new StringBuilder(dd.obs);
+        for (Map.Entry<String, BigDecimal> e : dd.adjustTn.entrySet()) {
+            String[] parts = e.getKey().split("\\|", 2);
+            append(sb, MessageUtils.getMessage("DailyProductionReport.obs.adjustment",
+                    parts[0], itemLabel(parts.length > 1 ? parts[1] : null), decimal(e.getValue())));
+        }
+        for (Map.Entry<String, BigDecimal> e : dd.otherPtTn.entrySet()) {
+            append(sb, MessageUtils.getMessage("DailyProductionReport.obs.unconfiguredProduct",
+                    itemLabel(e.getKey()), decimal(e.getValue())));
+        }
+        for (Map.Entry<String, BigDecimal> e : dd.otherSupplyTn.entrySet()) {
+            append(sb, MessageUtils.getMessage("DailyProductionReport.obs.unconfiguredSupply",
+                    itemLabel(e.getKey()), decimal(e.getValue())));
+        }
+        return sb.length() > 0 ? sb.toString() : null;
+    }
+
+    private static void append(StringBuilder sb, String text) {
+        if (sb.length() > 0) sb.append(" | ");
+        sb.append(text);
+    }
+
+    private static String decimal(BigDecimal value) {
+        return FormatUtils.formatNumber(value == null ? BigDecimal.ZERO : value, "#,##0.00", SPANISH);
     }
 
     // -------------------------------------------------------------- helpers
@@ -552,6 +695,12 @@ public class BaritinaDailyReportAction {
         int turnos = 0;
         String obs = "";
         Map<Long, BigDecimal> zoneTn = new HashMap<Long, BigDecimal>();
+        /** Ajustes por vale del dia: clave "noTrans|codArt" -> TN con signo (entrada +, salida -). */
+        Map<String, BigDecimal> adjustTn = new LinkedHashMap<String, BigDecimal>();
+        /** PT producidos que no estan configurados en la linea: cod_art -> TN. */
+        Map<String, BigDecimal> otherPtTn = new LinkedHashMap<String, BigDecimal>();
+        /** Insumos consumidos distintos de la MP configurada: cod_art -> TN. */
+        Map<String, BigDecimal> otherSupplyTn = new LinkedHashMap<String, BigDecimal>();
     }
 
     // -------------------------------------------------------------- getters/setters

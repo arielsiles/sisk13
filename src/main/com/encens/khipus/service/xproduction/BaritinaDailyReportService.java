@@ -34,4 +34,16 @@ public interface BaritinaDailyReportService {
 
     /** Total despachado de los articulos antes de :before. */
     BigDecimal sumDispatchBefore(Collection<String> codArts, Date before);
+
+    /**
+     * Movimientos de inventario por vale (ajustes) de los articulos en [from, to), EXCLUYENDO
+     * los vales generados por un despacho: esos ya se reportan en la columna DESPACHO.
+     *
+     * El reporte diario no arrastra estos movimientos en sus saldos (sus columnas son acopio,
+     * produccion y despacho); se listan para dejarlos visibles en OBSERVACIONES y explicar por
+     * que el saldo del reporte puede separarse del de "Saldos de Almacen".
+     *
+     * Filas [Date fecha, MovementDetailType tipo, BigDecimal cantidad, String codArt, String noTrans].
+     */
+    List<Object[]> adjustmentRows(Collection<String> codArts, Date from, Date to);
 }

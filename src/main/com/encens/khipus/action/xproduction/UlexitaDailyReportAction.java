@@ -4,6 +4,7 @@ import com.encens.khipus.model.xproduction.ProductionLine;
 import com.encens.khipus.model.xproduction.XProduction;
 import com.encens.khipus.model.xproduction.XProductionUlexita;
 import com.encens.khipus.model.xproduction.XSupply;
+import com.encens.khipus.model.warehouse.MovementDetailType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.warehouse.ProductItemService;
 import com.encens.khipus.service.xproduction.BaritinaDailyReportService;
@@ -12,6 +13,8 @@ import com.encens.khipus.service.xproduction.XProductionBalanceService;
 import com.encens.khipus.service.xproduction.XProductionUlexitaCalc;
 import com.encens.khipus.service.xproduction.XProductionUlexitaService;
 import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.FormatUtils;
+import com.encens.khipus.util.MessageUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.CellRangeAddress;
 import org.jboss.seam.ScopeType;
@@ -64,6 +67,11 @@ public class UlexitaDailyReportAction {
     private FacesMessages facesMessages;
 
     private static final BigDecimal THOUSAND = new BigDecimal("1000");
+    /** Locale de los numeros escritos como texto dentro de OBSERVACIONES (miles '.', decimal ','). */
+    private static final Locale SPANISH = new Locale("es");
+
+    /** Etiquetas de articulo ya resueltas, para no repetir consultas al armar los marcadores. */
+    private final Map<String, String> itemLabelCache = new HashMap<String, String>();
 
     private Integer year;
     private Integer month;
@@ -117,6 +125,9 @@ public class UlexitaDailyReportAction {
             return;
         }
         try {
+            // El componente es de scope PAGE: se limpia el cache en cada generacion.
+            itemLabelCache.clear();
+
             Calendar c = Calendar.getInstance();
             c.clear();
             c.set(year, month - 1, 1, 0, 0, 0);
@@ -169,6 +180,13 @@ public class UlexitaDailyReportAction {
             Map<Integer, BigDecimal> despachoAByDay = bucketByDay(baritinaDailyReportService.dispatchRows(codes(codPtA), firstDay, nextMonth));
             Map<Integer, BigDecimal> despachoBByDay = bucketByDay(baritinaDailyReportService.dispatchRows(codes(codPtB), firstDay, nextMonth));
 
+            // Ajustes por vale del periodo (movimientos de inventario que no son despacho). El
+            // reporte no los arrastra en sus saldos -sus columnas son acopio, produccion y
+            // despacho-, pero se anotan en OBSERVACIONES para que el movimiento no quede perdido
+            // y se pueda explicar cualquier diferencia contra "Saldos de Almacen".
+            Map<Integer, String> ajusteByDay = adjustmentsByDay(
+                    Arrays.asList(mpCod, codPtA, codPtB), firstDay, nextMonth);
+
             // Saldo anterior de ULEX DISPONIBLE (col E): balance del MP principal segun
             // "Saldos de Almacen" (XProductionBalanceService) al ultimo dia del mes anterior.
             BigDecimal ulexDisp = ulexBalanceBeforeTn(mpCod, firstDay);
@@ -219,7 +237,7 @@ public class UlexitaDailyReportAction {
                     saldoA = BigDecimalUtil.subtract(saldoA, despachoA, 6);
                     saldoB = BigDecimalUtil.subtract(saldoB, despachoB, 6);
                     HSSFRow row = sheet.createRow(rowIdx++);
-                    writeFlowCells(row, s, fmt.format(date), dayLetter(date), ingreso, ulexDisp, despachoA, despachoB, saldoA, saldoB, null);
+                    writeFlowCells(row, s, fmt.format(date), dayLetter(date), ingreso, ulexDisp, despachoA, despachoB, saldoA, saldoB, ajusteByDay.get(d));
                     blankProcessCells(row, s);
                     addTotals(totals, ingreso, despachoA, despachoB, null, null);
                 } else {
@@ -240,7 +258,9 @@ public class UlexitaDailyReportAction {
                         saldoB = BigDecimalUtil.subtract(BigDecimalUtil.sum(saldoB, nz(calc.getPtB()), 6), rowDespachoB, 6);
 
                         HSSFRow row = sheet.createRow(rowIdx++);
-                        writeFlowCells(row, s, fmt.format(date), dayLetter(date), rowIngreso, ulexDisp, rowDespachoA, rowDespachoB, saldoA, saldoB, p.getObservation());
+                        // El ajuste del dia se anota una sola vez, en la primera orden del dia.
+                        String rowObs = first ? joinObs(p.getObservation(), ajusteByDay.get(d)) : p.getObservation();
+                        writeFlowCells(row, s, fmt.format(date), dayLetter(date), rowIngreso, ulexDisp, rowDespachoA, rowDespachoB, saldoA, saldoB, rowObs);
                         writeProcessCells(row, s, p, u, calc);
                         addTotals(totals, rowIngreso, rowDespachoA, rowDespachoB, u, calc);
                         first = false;
@@ -505,6 +525,63 @@ public class UlexitaDailyReportAction {
     /** Coleccion de un solo codigo (o vacia si es null) para pasar a dispatchRows. */
     private static Collection<String> codes(String cod) {
         return cod == null ? Collections.<String>emptyList() : Collections.singletonList(cod);
+    }
+
+    /**
+     * Ajustes por vale de los articulos en el periodo, ya formateados y agrupados por dia del mes.
+     * Se agrupan por vale y articulo para que dos filas del mismo vale salgan como una sola nota.
+     */
+    private Map<Integer, String> adjustmentsByDay(List<String> cods, Date from, Date to) {
+        Map<Integer, String> result = new HashMap<Integer, String>();
+        Set<String> filtered = new LinkedHashSet<String>();
+        for (String cod : cods) { if (cod != null) filtered.add(cod); }
+        if (filtered.isEmpty()) return result;
+
+        // dia -> ("noTrans|codArt" -> TN con signo)
+        Map<Integer, Map<String, BigDecimal>> byDay = new HashMap<Integer, Map<String, BigDecimal>>();
+        for (Object[] row : baritinaDailyReportService.adjustmentRows(filtered, from, to)) {
+            BigDecimal qty = (BigDecimal) row[2];
+            if (row[0] == null || qty == null || qty.compareTo(BigDecimal.ZERO) == 0) continue;
+            Calendar cc = Calendar.getInstance();
+            cc.setTime((Date) row[0]);
+            int day = cc.get(Calendar.DAY_OF_MONTH);
+            Map<String, BigDecimal> byVale = byDay.get(day);
+            if (byVale == null) { byVale = new LinkedHashMap<String, BigDecimal>(); byDay.put(day, byVale); }
+            BigDecimal signedTn = MovementDetailType.E.equals(row[1]) ? tn(qty) : tn(qty).negate();
+            String key = row[4] + "|" + row[3];
+            BigDecimal prev = byVale.get(key);
+            byVale.put(key, BigDecimalUtil.sum(prev != null ? prev : BigDecimal.ZERO, signedTn, 6));
+        }
+        for (Map.Entry<Integer, Map<String, BigDecimal>> e : byDay.entrySet()) {
+            String text = null;
+            for (Map.Entry<String, BigDecimal> a : e.getValue().entrySet()) {
+                String[] parts = a.getKey().split("\\|", 2);
+                text = joinObs(text, MessageUtils.getMessage("DailyProductionReport.obs.adjustment",
+                        parts[0], itemLabel(parts.length > 1 ? parts[1] : null),
+                        FormatUtils.formatNumber(a.getValue(), "#,##0.00", SPANISH)));
+            }
+            result.put(e.getKey(), text);
+        }
+        return result;
+    }
+
+    /** "1255 BORO 10 - A", o solo el codigo si el articulo no se encuentra. */
+    private String itemLabel(String cod) {
+        if (cod == null) return "";
+        String label = itemLabelCache.get(cod);
+        if (label == null) {
+            ProductItem item = productItemService.findProductItemByCode(cod);
+            label = (item == null || item.getName() == null) ? cod : cod + " " + item.getName();
+            itemLabelCache.put(cod, label);
+        }
+        return label;
+    }
+
+    /** Concatena observacion y marcador con el separador del reporte; tolera nulos. */
+    private static String joinObs(String obs, String mark) {
+        if (mark == null || mark.length() == 0) return obs;
+        if (obs == null || obs.length() == 0) return mark;
+        return obs + " | " + mark;
     }
 
     // ------------------------------------------------------------------ helpers
