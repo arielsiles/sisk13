@@ -164,6 +164,11 @@
                                          styleClass="inputSmall right" tabindex="9">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"
                                                          forId="mermaFactor"/>
+                                <!-- El factor es divisor en Kpm merma: cero o negativo no tiene
+                                     sentido de calculo. El valor lo define el usuario. -->
+                                <app:numberRangeValidator forValue="#{0}"
+                                                          forLabel="0"
+                                                          type="greater"/>
                             </h:inputText>
                         </s:decorate>
 

@@ -137,4 +137,39 @@ public class BaritinaDailyReportServiceBean implements BaritinaDailyReportServic
         q.setParameter("to", to);
         return q.getResultList();
     }
+
+    @Override
+    public boolean isSharedMaterial(String codArt, ProductionLine line) {
+        if (codArt == null || line == null) return false;
+        Number n = (Number) em.createQuery(
+                "select count(l) from ProductionLine l " +
+                "where l.codArtMpPrincipal = :cod and l <> :line")
+                .setParameter("cod", codArt)
+                .setParameter("line", line)
+                .getSingleResult();
+        return n != null && n.intValue() > 0;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Object[]> supplyRowsOtherLines(String codArt, ProductionLine line, Date from, Date to) {
+        if (codArt == null || line == null || from == null || to == null) return Collections.emptyList();
+        // Se devuelven las dos fechas sin agregar: el llamador elige plan (o initDate como
+        // respaldo) y agrupa por dia. Evita coalesce dentro de group by, que no es terreno
+        // seguro en Hibernate 3, y el volumen por articulo y mes es chico.
+        Query q = em.createQuery(
+                "select pl.date, pr.initDate, s.quantity " +
+                "from XSupply s left join s.production pr left join pr.productionPlan pl " +
+                "where s.productItemCode = :cod " +
+                "  and pr.state <> :anl " +
+                "  and (pr.productionLine is null or pr.productionLine <> :line) " +
+                "  and ((pl.date is not null and pl.date >= :from and pl.date < :to) " +
+                "    or (pl.date is null and pr.initDate >= :from and pr.initDate < :to))");
+        q.setParameter("cod", codArt);
+        q.setParameter("anl", ProductionState.ANL);
+        q.setParameter("line", line);
+        q.setParameter("from", from);
+        q.setParameter("to", to);
+        return q.getResultList();
+    }
 }

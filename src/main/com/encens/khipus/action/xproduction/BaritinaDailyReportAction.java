@@ -71,23 +71,39 @@ public class BaritinaDailyReportAction {
     private Integer month;
     private ProductionLine productionLine;
 
-    // Columnas fijas (0-based). Las de zona y las 3 finales se calculan en runtime.
-    private static final int COL_MARGIN     = 0; // A
-    private static final int COL_FECHA      = 1; // B
-    private static final int COL_DIA        = 2; // C
-    private static final int COL_INGRESO    = 3; // D
-    private static final int COL_USO        = 4; // E
-    private static final int COL_SALDO_MP   = 5; // F
-    private static final int COL_PT         = 6; // G
-    private static final int COL_SALDO_BAR  = 7; // H
-    private static final int COL_DESPACHO   = 8; // I
-    private static final int COL_ZONE_START = 9; // J ...
-
     private static final int TITLE_ROW   = 0;
     private static final int PERIOD_ROW  = 1;
     private static final int HEADER_ROW  = 3;
     private static final int SALDO_ROW   = 4;
     private static final int DATA_START  = 5;
+
+    /**
+     * Indices de columna (0-based) del reporte. No son fijos: la columna "USO OTRAS LINEAS"
+     * solo existe cuando la materia prima se comparte con otra linea, y las columnas de zona
+     * productiva son tantas como zonas haya en el periodo. Todo lo posterior se corre.
+     */
+    private static class Cols {
+        int margin = 0;   // A
+        int fecha = 1;    // B
+        int dia = 2;      // C
+        int ingreso = 3;  // D
+        int uso = 4;      // E
+        int usoOtras;     // solo si la MP es compartida; -1 si no aplica
+        int saldoMp, pt, saldoPt, despacho, zoneStart, suma, turnos, obs, last;
+
+        Cols(boolean showUsoOtras, int zoneCount) {
+            usoOtras  = showUsoOtras ? uso + 1 : -1;
+            saldoMp   = uso + (showUsoOtras ? 2 : 1);
+            pt        = saldoMp + 1;
+            saldoPt   = pt + 1;
+            despacho  = saldoPt + 1;
+            zoneStart = despacho + 1;
+            suma      = zoneStart + zoneCount;
+            turnos    = suma + 1;
+            obs       = turnos + 1;
+            last      = obs;
+        }
+    }
 
     public void generateReport() {
         if (productionLine == null) {
@@ -102,7 +118,7 @@ public class BaritinaDailyReportAction {
             // El componente es de scope PAGE: los caches deben limpiarse en cada generacion,
             // porque el balance depende de la fecha de corte del periodo solicitado.
             balanceCache.clear();
-            itemLabelCache.clear();
+            itemCache.clear();
 
             Calendar c = Calendar.getInstance();
             c.clear();
@@ -196,6 +212,23 @@ public class BaritinaDailyReportAction {
                 addAdjustment(days[day], row);
             }
 
+            // 4.c Consumo de la MP por OTRAS lineas. Cuando dos lineas comparten la materia prima
+            //     el saldo del articulo es uno solo, asi que hay que descontar tambien lo ajeno o
+            //     el reporte se separa de "Saldos de Almacen". La columna se muestra si la MP esta
+            //     compartida por configuracion o si de hecho hubo consumo ajeno en el periodo.
+            boolean hasUsoOtras = false;
+            for (Object[] row : baritinaDailyReportService.supplyRowsOtherLines(
+                    mpCodArt, productionLine, firstDay, nextMonth)) {
+                Date od = (row[0] != null) ? (Date) row[0] : (Date) row[1];   // plan, o initDate
+                if (od == null || row[2] == null) continue;
+                int day = dayOfMonth(od);
+                if (day < 1 || day > lastDayNum) continue;
+                days[day].usoOtrasTn = BigDecimalUtil.sum(days[day].usoOtrasTn, tn((BigDecimal) row[2]), 6);
+                hasUsoOtras = true;
+            }
+            boolean showUsoOtras = hasUsoOtras
+                    || baritinaDailyReportService.isSharedMaterial(mpCodArt, productionLine);
+
             // 5. Saldos iniciales: ambos se toman del mismo calculo que la pantalla "Saldos de
             //    Almacen" (XProductionBalanceService) al ultimo dia del mes anterior (firstDay - 1),
             //    convertido KG -> TN. El PT no puede derivarse de las ordenes: su saldo tambien
@@ -205,6 +238,10 @@ public class BaritinaDailyReportAction {
             for (String cod : productCodArts) {
                 openProdTn = BigDecimalUtil.sum(openProdTn, balanceBeforeTn(cod, firstDay), 6);
             }
+
+            // 5.b Nombres de los articulos para los titulos de columna (sin literales de producto).
+            String mpName = itemName(mpCodArt);
+            String ptName = productCodArts.isEmpty() ? "" : itemName(productCodArts.iterator().next());
 
             // 6. Zonas ordenadas (columnas dinamicas)
             List<ProductiveZone> zones = new ArrayList<ProductiveZone>(zoneById.values());
@@ -219,29 +256,27 @@ public class BaritinaDailyReportAction {
             });
 
             // 7. Construir Excel
-            int colSuma   = COL_ZONE_START + zones.size();
-            int colTurnos = colSuma + 1;
-            int colObs    = colTurnos + 1;
-            int lastCol   = colObs;
+            Cols c2 = new Cols(showUsoOtras, zones.size());
 
             HSSFWorkbook wb = new HSSFWorkbook();
-            HSSFSheet sheet = wb.createSheet("BARITINA " + month + "-" + year);
+            HSSFSheet sheet = wb.createSheet(MessageUtils.getMessage(
+                    "DailyProductionReport.baritina.sheet", mpName, month, year));
             sheet.setDisplayGridlines(false);
             Styles s = buildStyles(wb);
 
-            buildHeader(sheet, s, zones, colSuma, colTurnos, colObs, lastCol);
+            buildHeader(sheet, s, c2, zones, mpName, ptName);
 
             // Fila SALDO ANT.: saldos iniciales (al fin del periodo anterior) de MP y producto
             HSSFRow rs = sheet.createRow(SALDO_ROW);
-            setText(rs, COL_FECHA, "SALDO ANT.", s.headerLeft);
-            for (int col = COL_DIA; col <= lastCol; col++) setText(rs, col, null, s.body);
-            setNumber(rs, COL_SALDO_MP, openMpTn, s.num);
-            setNumber(rs, COL_SALDO_BAR, openProdTn, s.num);
+            setText(rs, c2.fecha, MessageUtils.getMessage("DailyProductionReport.baritina.row.openingBalance"), s.headerLeft);
+            for (int col = c2.dia; col <= c2.last; col++) setText(rs, col, null, s.body);
+            setNumber(rs, c2.saldoMp, openMpTn, s.num);
+            setNumber(rs, c2.saldoPt, openProdTn, s.num);
 
             // Filas de datos por dia
             BigDecimal saldoMp = openMpTn;
             BigDecimal saldoProd = openProdTn;
-            BigDecimal totIngreso = BigDecimal.ZERO, totUso = BigDecimal.ZERO,
+            BigDecimal totIngreso = BigDecimal.ZERO, totUso = BigDecimal.ZERO, totUsoOtras = BigDecimal.ZERO,
                        totPt = BigDecimal.ZERO, totDespacho = BigDecimal.ZERO;
 
             int rowIdx = DATA_START;
@@ -254,22 +289,31 @@ public class BaritinaDailyReportAction {
                 dayCal.set(year, month - 1, d);
                 Date date = dayCal.getTime();
 
-                saldoMp = BigDecimalUtil.subtract(BigDecimalUtil.sum(saldoMp, dd.ingresoTn, 6), dd.usoTn, 6);
+                // El saldo de MP es el del ARTICULO, no el de la linea: si otra linea consume la
+                // misma materia prima tambien lo baja. Sin ese termino el saldo del reporte se
+                // separaria del de "Saldos de Almacen".
+                saldoMp = BigDecimalUtil.subtract(
+                        BigDecimalUtil.subtract(BigDecimalUtil.sum(saldoMp, dd.ingresoTn, 6), dd.usoTn, 6),
+                        dd.usoOtrasTn, 6);
                 saldoProd = BigDecimalUtil.subtract(BigDecimalUtil.sum(saldoProd, dd.ptTn, 6), dd.despachoTn, 6);
 
                 HSSFRow row = sheet.createRow(rowIdx++);
-                setText(row, COL_FECHA, fmt.format(date), s.body);
-                setText(row, COL_DIA, dayLetter(date), s.center);
-                setNumber(row, COL_INGRESO, dd.ingresoTn, s.num);
-                setNumber(row, COL_SALDO_MP, saldoMp, s.num);
-                if (dd.hasProduction) setNumber(row, COL_USO, dd.usoTn, s.num); else setText(row, COL_USO, null, s.num);
-                setNumber(row, COL_PT, dd.ptTn, s.num);
-                setNumber(row, COL_SALDO_BAR, saldoProd, s.num);
-                if (isZero(dd.despachoTn)) setText(row, COL_DESPACHO, null, s.num); else setNumber(row, COL_DESPACHO, dd.despachoTn, s.num);
+                setText(row, c2.fecha, fmt.format(date), s.body);
+                setText(row, c2.dia, dayLetter(date), s.center);
+                setNumber(row, c2.ingreso, dd.ingresoTn, s.num);
+                setNumber(row, c2.saldoMp, saldoMp, s.num);
+                if (dd.hasProduction) setNumber(row, c2.uso, dd.usoTn, s.num); else setText(row, c2.uso, null, s.num);
+                if (c2.usoOtras >= 0) {
+                    if (isZero(dd.usoOtrasTn)) setText(row, c2.usoOtras, null, s.num);
+                    else setNumber(row, c2.usoOtras, dd.usoOtrasTn, s.num);
+                }
+                setNumber(row, c2.pt, dd.ptTn, s.num);
+                setNumber(row, c2.saldoPt, saldoProd, s.num);
+                if (isZero(dd.despachoTn)) setText(row, c2.despacho, null, s.num); else setNumber(row, c2.despacho, dd.despachoTn, s.num);
 
                 BigDecimal suma = BigDecimal.ZERO;
                 for (int zi = 0; zi < zones.size(); zi++) {
-                    int col = COL_ZONE_START + zi;
+                    int col = c2.zoneStart + zi;
                     BigDecimal zoneTn = dd.zoneTn.get(zones.get(zi).getId());
                     if (dd.hasProduction && zoneTn != null && !isZero(dd.usoTn)) {
                         BigDecimal pct = BigDecimalUtil.divide(BigDecimalUtil.multiply(zoneTn, ONE_HUNDRED, 6), dd.usoTn, 4);
@@ -279,38 +323,38 @@ public class BaritinaDailyReportAction {
                         setText(row, col, null, s.pct);
                     }
                 }
-                if (dd.hasProduction) setNumber(row, colSuma, suma, s.numCenter); else setText(row, colSuma, null, s.numCenter);
-                if (dd.hasProduction && dd.turnos > 0) setNumber(row, colTurnos, new BigDecimal(dd.turnos), s.center);
-                else setText(row, colTurnos, null, s.center);
-                setText(row, colObs, composeObs(dd), s.body);
+                if (dd.hasProduction) setNumber(row, c2.suma, suma, s.numCenter); else setText(row, c2.suma, null, s.numCenter);
+                if (dd.hasProduction && dd.turnos > 0) setNumber(row, c2.turnos, new BigDecimal(dd.turnos), s.center);
+                else setText(row, c2.turnos, null, s.center);
+                setText(row, c2.obs, composeObs(dd), s.body);
 
                 totIngreso = BigDecimalUtil.sum(totIngreso, dd.ingresoTn, 6);
                 totUso = BigDecimalUtil.sum(totUso, dd.usoTn, 6);
+                totUsoOtras = BigDecimalUtil.sum(totUsoOtras, dd.usoOtrasTn, 6);
                 totPt = BigDecimalUtil.sum(totPt, dd.ptTn, 6);
                 totDespacho = BigDecimalUtil.sum(totDespacho, dd.despachoTn, 6);
             }
 
             // Fila TOTAL
             HSSFRow rt = sheet.createRow(rowIdx);
-            setText(rt, COL_FECHA, "TOTAL:", s.totalsLabel);
-            setText(rt, COL_DIA, null, s.totalsLabel);
-            sheet.addMergedRegion(new CellRangeAddress(rowIdx, rowIdx, COL_FECHA, COL_DIA));
-            for (int col = COL_INGRESO; col <= lastCol; col++) setText(rt, col, null, s.totals);
-            setNumber(rt, COL_INGRESO, totIngreso, s.totals);
-            setNumber(rt, COL_SALDO_MP, saldoMp, s.totals);
-            setNumber(rt, COL_USO, totUso, s.totals);
-            setNumber(rt, COL_PT, totPt, s.totals);
-            setNumber(rt, COL_SALDO_BAR, saldoProd, s.totals);
-            setNumber(rt, COL_DESPACHO, totDespacho, s.totals);
+            setText(rt, c2.fecha, MessageUtils.getMessage("DailyProductionReport.baritina.row.total"), s.totalsLabel);
+            setText(rt, c2.dia, null, s.totalsLabel);
+            sheet.addMergedRegion(new CellRangeAddress(rowIdx, rowIdx, c2.fecha, c2.dia));
+            for (int col = c2.ingreso; col <= c2.last; col++) setText(rt, col, null, s.totals);
+            setNumber(rt, c2.ingreso, totIngreso, s.totals);
+            setNumber(rt, c2.saldoMp, saldoMp, s.totals);
+            setNumber(rt, c2.uso, totUso, s.totals);
+            if (c2.usoOtras >= 0) setNumber(rt, c2.usoOtras, totUsoOtras, s.totals);
+            setNumber(rt, c2.pt, totPt, s.totals);
+            setNumber(rt, c2.saldoPt, saldoProd, s.totals);
+            setNumber(rt, c2.despacho, totDespacho, s.totals);
 
-            // Anchos: D,E,F = 15.00 ; G = 116px ; H..N (SALDO BARITINA..TURNOS) = 12.50
-            sheet.setColumnWidth(COL_MARGIN, 915);
-            sheet.setColumnWidth(COL_FECHA, 2400);
-            sheet.setColumnWidth(COL_DIA, 1100);
-            for (int col = COL_INGRESO; col <= COL_SALDO_MP; col++) sheet.setColumnWidth(col, excelWidth(15.0));
-            sheet.setColumnWidth(COL_PT, pxWidth(116));
-            for (int col = COL_SALDO_BAR; col <= colTurnos; col++) sheet.setColumnWidth(col, excelWidth(12.5));
-            sheet.setColumnWidth(colObs, 8000);
+            // Anchos: todas las columnas de datos (INGRESO..TURNOS, incluidas las de zona) a 112 px.
+            sheet.setColumnWidth(c2.margin, 915);
+            sheet.setColumnWidth(c2.fecha, 2400);
+            sheet.setColumnWidth(c2.dia, 1100);
+            for (int col = c2.ingreso; col <= c2.turnos; col++) sheet.setColumnWidth(col, pxWidth(112));
+            sheet.setColumnWidth(c2.obs, 8000);
 
             sendResponse(wb);
         } catch (Exception e) {
@@ -321,32 +365,47 @@ public class BaritinaDailyReportAction {
 
     // -------------------------------------------------------------- cabecera
 
-    private void buildHeader(HSSFSheet sheet, Styles s, List<ProductiveZone> zones,
-                             int colSuma, int colTurnos, int colObs, int lastCol) {
+    /**
+     * Cabecera del reporte. Los titulos de columna se arman con el NOMBRE del articulo configurado
+     * en la linea ({@code mpName} / {@code ptName}) y no con literales, para que el mismo template
+     * sirva a cualquier linea de este tipo (molienda, chancado, otra materia prima).
+     */
+    private void buildHeader(HSSFSheet sheet, Styles s, Cols c, List<ProductiveZone> zones,
+                             String mpName, String ptName) {
         HSSFRow r0 = sheet.createRow(TITLE_ROW);
-        HSSFCell t = r0.createCell(COL_FECHA);
-        t.setCellValue("REPORTE DIARIO DE PRODUCCION \"" + safe(productionLine.getName()).toUpperCase() + "\"");
+        HSSFCell t = r0.createCell(c.fecha);
+        t.setCellValue(MessageUtils.getMessage("DailyProductionReport.baritina.title",
+                safe(productionLine.getName()).toUpperCase()));
         t.setCellStyle(s.title);
-        sheet.addMergedRegion(new CellRangeAddress(TITLE_ROW, TITLE_ROW, COL_FECHA, lastCol));
+        sheet.addMergedRegion(new CellRangeAddress(TITLE_ROW, TITLE_ROW, c.fecha, c.last));
 
-        sheet.createRow(PERIOD_ROW).createCell(COL_FECHA).setCellValue("Periodo: " + monthName(month) + " " + year);
+        // El anio va como texto: si se pasa como numero, la interpolacion lo formatea con el
+        // separador de miles del locale y sale "2.026".
+        sheet.createRow(PERIOD_ROW).createCell(c.fecha).setCellValue(
+                MessageUtils.getMessage("DailyProductionReport.baritina.period",
+                        monthName(month), String.valueOf(year)));
 
         HSSFRow h = sheet.createRow(HEADER_ROW);
         h.setHeightInPoints(40f);
-        setText(h, COL_FECHA,     "FECHA", s.header);
-        setText(h, COL_DIA,       "DIA", s.header);
-        setText(h, COL_INGRESO,   "INGRESO MATERIA PRIMA BARITINA (TN)", s.header);
-        setText(h, COL_SALDO_MP,  "SALDO MATERIA PRIMA BARITINA (TN)", s.header);
-        setText(h, COL_USO,       "USO MATERIA PRIMA BARITINA (TN)", s.header);
-        setText(h, COL_PT,        "BARITINA PRODUCTO TERMINADO (TN)", s.header);
-        setText(h, COL_SALDO_BAR, "SALDO BARITINA (TN)", s.header);
-        setText(h, COL_DESPACHO,  "DESPACHO BARITINA (TN)", s.header);
-        for (int zi = 0; zi < zones.size(); zi++) {
-            setText(h, COL_ZONE_START + zi, safe(zones.get(zi).getName()) + " %", s.header);
+        setText(h, c.fecha,    MessageUtils.getMessage("DailyProductionReport.baritina.col.date"), s.header);
+        setText(h, c.dia,      MessageUtils.getMessage("DailyProductionReport.baritina.col.day"), s.header);
+        setText(h, c.ingreso,  MessageUtils.getMessage("DailyProductionReport.baritina.col.mpInput", mpName), s.header);
+        setText(h, c.saldoMp,  MessageUtils.getMessage("DailyProductionReport.baritina.col.mpBalance", mpName), s.header);
+        setText(h, c.uso,      MessageUtils.getMessage("DailyProductionReport.baritina.col.mpUsage", mpName), s.header);
+        if (c.usoOtras >= 0) {
+            setText(h, c.usoOtras,
+                    MessageUtils.getMessage("DailyProductionReport.baritina.col.mpUsageOtherLines", mpName), s.header);
         }
-        setText(h, colSuma,   "SUMA DE PROPORCIONES", s.header);
-        setText(h, colTurnos, "TURNOS PRODUCIDOS", s.header);
-        setText(h, colObs,    "OBSERVACIONES", s.header);
+        setText(h, c.pt,       MessageUtils.getMessage("DailyProductionReport.baritina.col.pt", ptName), s.header);
+        setText(h, c.saldoPt,  MessageUtils.getMessage("DailyProductionReport.baritina.col.ptBalance", ptName), s.header);
+        setText(h, c.despacho, MessageUtils.getMessage("DailyProductionReport.baritina.col.dispatch", ptName), s.header);
+        for (int zi = 0; zi < zones.size(); zi++) {
+            setText(h, c.zoneStart + zi,
+                    MessageUtils.getMessage("DailyProductionReport.baritina.col.zone", safe(zones.get(zi).getName())), s.header);
+        }
+        setText(h, c.suma,   MessageUtils.getMessage("DailyProductionReport.baritina.col.pctSum"), s.header);
+        setText(h, c.turnos, MessageUtils.getMessage("DailyProductionReport.baritina.col.shifts"), s.header);
+        setText(h, c.obs,    MessageUtils.getMessage("DailyProductionReport.baritina.col.observations"), s.header);
 
         sheet.createFreezePane(0, DATA_START);
     }
@@ -386,7 +445,7 @@ public class BaritinaDailyReportAction {
      */
     private BigDecimal balanceBeforeTn(String cod, Date firstDay) {
         if (cod == null) return BigDecimal.ZERO;
-        ProductItem item = productItemService.findProductItemByCode(cod);
+        ProductItem item = item(cod);
         if (item == null) return BigDecimal.ZERO;
         Calendar c = Calendar.getInstance();
         c.setTime(firstDay);
@@ -452,19 +511,28 @@ public class BaritinaDailyReportAction {
     private final Map<String, List<WarehouseBalanceRow>> balanceCache =
             new HashMap<String, List<WarehouseBalanceRow>>();
 
-    /** Etiquetas de articulo ya resueltas, para no repetir consultas al armar los marcadores. */
-    private final Map<String, String> itemLabelCache = new HashMap<String, String>();
+    /** Articulos ya resueltos, para no repetir consultas al armar cabeceras y marcadores. */
+    private final Map<String, ProductItem> itemCache = new HashMap<String, ProductItem>();
+
+    private ProductItem item(String cod) {
+        if (cod == null) return null;
+        if (!itemCache.containsKey(cod)) {
+            itemCache.put(cod, productItemService.findProductItemByCode(cod));
+        }
+        return itemCache.get(cod);
+    }
+
+    /** Nombre del articulo para los titulos de columna ("BARITINA"); vacio si no se encuentra. */
+    private String itemName(String cod) {
+        ProductItem it = item(cod);
+        return (it == null || it.getName() == null) ? "" : it.getName();
+    }
 
     /** "2021 BARITINA MOLIDA", o solo el codigo si el articulo no se encuentra. */
     private String itemLabel(String cod) {
         if (cod == null) return "";
-        String label = itemLabelCache.get(cod);
-        if (label == null) {
-            ProductItem item = productItemService.findProductItemByCode(cod);
-            label = (item == null || item.getName() == null) ? cod : cod + " " + item.getName();
-            itemLabelCache.put(cod, label);
-        }
-        return label;
+        ProductItem it = item(cod);
+        return (it == null || it.getName() == null) ? cod : cod + " " + it.getName();
     }
 
     /**
@@ -479,12 +547,22 @@ public class BaritinaDailyReportAction {
             accumulate(dd.otherPtTn, cod, tn(pr.getQuantity()));
         }
         // Sin MP configurada no hay contra que comparar: se omite para no marcar todo el consumo.
-        if (mpCodArt == null) return;
+        ProductItem mp = item(mpCodArt);
+        if (mp == null) return;
         for (XSupply sup : p.getSupplyList()) {
             String cod = sup.getProductItemCode();
             if (cod == null || mpCodArt.equals(cod) || isZero(sup.getQuantity())) continue;
+            // Solo se marcan las materias primas: se comparan contra el almacen de la MP para no
+            // ensuciar las observaciones con envases, agua, aglutinantes y demas consumibles, que
+            // no forman parte de la historia de la columna USO.
+            if (!sameWarehouse(mp, item(cod))) continue;
             accumulate(dd.otherSupplyTn, cod, tn(sup.getQuantity()));
         }
+    }
+
+    private static boolean sameWarehouse(ProductItem a, ProductItem b) {
+        return a != null && b != null && a.getWarehouseCode() != null
+                && a.getWarehouseCode().equals(b.getWarehouseCode());
     }
 
     /** Acumula el ajuste por vale del dia, con signo (entrada +, salida -), agrupado por vale y articulo. */
@@ -564,14 +642,14 @@ public class BaritinaDailyReportAction {
 
     private static String safe(String s) { return s == null ? "" : s; }
 
-    /** Convierte un ancho en caracteres de Excel a unidades POI (1/256 de char + padding de 5px). */
-    private static int excelWidth(double chars) {
-        return (int) Math.round((chars + 5.0 / 7.0) * 256);
-    }
-
-    /** Convierte pixeles a unidades POI: poiUnits = (px - 5) * 256 / 7. */
+    /**
+     * Convierte pixeles a unidades POI: poiUnits = px * 256 / 7.
+     * El ancho mostrado en Excel coincide con el px solicitado (sin el offset de 5px de la
+     * formula clasica, que en la practica dejaba las columnas 5px mas angostas que lo pedido).
+     * Mismo criterio que UlexitaDailyReportAction.
+     */
     private static int pxWidth(int px) {
-        return (int) Math.round((px - 5) * 256.0 / 7.0);
+        return (int) Math.round(px * 256.0 / 7.0);
     }
 
     private static String monthName(int m) {
@@ -624,20 +702,25 @@ public class BaritinaDailyReportAction {
         HSSFFont titleFont = wb.createFont();
         titleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
         titleFont.setFontHeightInPoints((short) 14);
+        // Fuente de los encabezados (fila de titulos y etiqueta SALDO ANT.): mas chica para que
+        // los titulos largos entren en el ancho de columna sin depender del ajuste de texto.
+        HSSFFont headerFont = wb.createFont();
+        headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        headerFont.setFontHeightInPoints((short) 9);
 
         s.title = wb.createCellStyle();
         s.title.setFont(titleFont);
         s.title.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
         s.header = wb.createCellStyle();
-        s.header.setFont(bold);
+        s.header.setFont(headerFont);
         s.header.setAlignment(HSSFCellStyle.ALIGN_CENTER);
         s.header.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
         s.header.setWrapText(true);
         applyBorders(s.header);
 
         s.headerLeft = wb.createCellStyle();
-        s.headerLeft.setFont(bold);
+        s.headerLeft.setFont(headerFont);
         s.headerLeft.setAlignment(HSSFCellStyle.ALIGN_LEFT);
         applyBorders(s.headerLeft);
 
@@ -690,6 +773,8 @@ public class BaritinaDailyReportAction {
         boolean hasProduction = false;
         BigDecimal ingresoTn = BigDecimal.ZERO;
         BigDecimal usoTn = BigDecimal.ZERO;
+        /** Consumo de la misma materia prima por ordenes de otras lineas. */
+        BigDecimal usoOtrasTn = BigDecimal.ZERO;
         BigDecimal ptTn = BigDecimal.ZERO;
         BigDecimal despachoTn = BigDecimal.ZERO;
         int turnos = 0;

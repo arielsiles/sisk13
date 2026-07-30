@@ -14,10 +14,21 @@ La pantalla `view/xproduction/dailyProductionReport.xhtml` es un dispatcher:
 Ambos reportes resuelven los `cod_art` desde `xpr_linea`, y solo caen a derivarlos de las
 órdenes si la línea no está configurada:
 
-| Línea | Materia prima | Producto terminado |
-|-------|---------------|--------------------|
+| Template | Materia prima | Producto terminado |
+|----------|---------------|--------------------|
 | ULEXITA | `cod_art_mp_principal` | `cod_art_pt_a`, `cod_art_pt_b` |
 | BARITINA | `cod_art_mp_principal` | `cod_art_pt_principal` |
+
+**El template describe la forma del proceso, no el producto.** Varias líneas pueden compartir el
+mismo `report_template_code` y diferenciarse solo por configuración: molienda de baritina y
+chancado de baritina usan las dos el template BARITINA, con distinto PT y distinto factor. Agregar
+una línea nueva de la misma forma —otro chancado, otra materia prima— es una fila de configuración
+y **no cuesta código**. Por eso los títulos de columna del Excel se arman con el nombre del
+artículo configurado y no con literales.
+
+Los límites del template BARITINA: **una** MP y **un** PT por línea (si una línea produjera dos
+productos con rendimientos distintos haría falta el patrón PT A/B de ULEXITA), y captura uso MP,
+PT, turnos, observación y distribución por zonas productivas.
 
 Ambos campos se configuran en `view/xproduction/productionLine.xhtml` (bloques condicionales por
 template, reutilizando el mismo modal `mpPrincipalListModalPanel`).
@@ -37,12 +48,35 @@ cualquier pantalla del sistema. Lo no configurado no se pierde: ver §4.
 | SALDO ANTERIOR (MP y PT) | `XProductionBalanceService.computeBalances` — la misma pantalla "Saldos de Almacén" | corte = último día del mes anterior, fin de día |
 | INGRESO materia prima | `CollectMaterial` / `acopiomp`, campo `pesobal` | estados `APR`, `CONTA` |
 | USO / CONSUMO de MP | `XSupply` / `xpr_insumo` del artículo MP configurado (ULEXITA usa el consumo teórico `consumoMpCalc`) | — |
+| USO OTRAS LINEAS (solo BARITINA) | `XSupply` del mismo artículo MP, en órdenes de otras líneas | ver §2.1 |
 | PRODUCTO TERMINADO | `XProductionProduct` / `xpr_producto` de los PT configurados | — |
 | DESPACHO | `WarehouseVoucherDispatchDetail` / `inv_valedespacho_det` | estados `APROBADO`, `FINALIZADO` |
 
 El saldo anterior **debe** salir del balance y no de las órdenes: el saldo real incluye cargas y
 ajustes por vale que la producción no ve. Ejemplo real: el PT `2021 BARITINA MOLIDA` tenía
 140.000 KG al 31/03/2026 provenientes de un vale de entrada, con cero órdenes de producción.
+
+### 2.1 Materia prima compartida entre líneas
+
+Dos líneas pueden consumir el **mismo** artículo de materia prima (caso real: molienda y chancado
+de baritina, ambas sobre `4 BARITINA`). El saldo de un artículo es uno solo, así que si cada
+reporte descontara únicamente su propio consumo, los dos mostrarían saldo de más y ninguno
+cuadraría contra Saldos de Almacén.
+
+Por eso el reporte del template BARITINA descuenta también el consumo ajeno, y lo hace visible en
+una columna **USO OTRAS LINEAS**:
+
+```
+SALDO MP = saldo_ant + INGRESO − USO (esta línea) − USO OTRAS LINEAS
+```
+
+Con ese término el saldo de MP de **todas** las líneas que comparten el artículo coincide, día por
+día, con Saldos de Almacén. Que el saldo anterior y el ingreso por acopio salgan iguales en los dos
+reportes es correcto: es la misma pila física entrando al mismo almacén.
+
+La columna se muestra cuando otra línea está **configurada** con la misma
+`cod_art_mp_principal`, o cuando de hecho hubo consumo ajeno en el período. Las líneas con materia
+prima exclusiva no la ven nunca, y el término que se resta es cero.
 
 ## 3. Fecha con la que se ubica una orden en el día
 
@@ -63,7 +97,13 @@ queden perdidos. Claves en `messages_app.properties`, prefijo `DailyProductionRe
 |----------|--------|---------|
 | `adjustment` | movimiento de inventario por vale que **no** proviene de un despacho | ULEXITA y BARITINA |
 | `unconfiguredProduct` | la orden produjo un PT que no está configurado en la línea | BARITINA |
-| `unconfiguredSupply` | la orden consumió un insumo distinto de la MP configurada | BARITINA |
+| `unconfiguredSupply` | la orden consumió otra **materia prima** distinta de la MP configurada | BARITINA |
+
+`unconfiguredSupply` se limita a los insumos del **mismo almacén que la MP configurada**. El
+marcador existe para detectar materia prima que se consume y no está entrando en la columna USO;
+envases, agua, aglutinantes y demás consumibles viven en otros almacenes y no forman parte de esa
+historia, así que no lo disparan. Sin ese recorte el marcador saldría todos los días: la línea
+ULEXITA, por ejemplo, consume seis artículos además de su MP, desde tres almacenes distintos.
 
 Los vales de despacho se excluyen del marcador porque ya tienen su propia columna. La separación
 es exacta y no depende de texto: `inv_valedespacho.no_trans_vale` + `no_cia_vale` enlazan el

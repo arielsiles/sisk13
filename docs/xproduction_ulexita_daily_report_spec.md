@@ -65,9 +65,15 @@ El módulo `xproduction` actual gestiona órdenes de producción genéricas (ins
 | AA | % MERMA | Calc | `MERMA / (MERMA + GRANULADO)` |
 | AB | OBSERVACIONES | Dato | `xproduction.observation` (existente) |
 
-### 3.2 Constante mermaFactor
+### 3.2 Factor de merma
 
-La constante `1.03` del Excel se modela como `ProductionLine.mermaFactor` (configurable, default `1.03`). Aplica únicamente a las fórmulas de Kpm merma (X) y MERMA (Z).
+Lo que en el Excel original era la constante `1.03` se modela como `ProductionLine.mermaFactor`: un valor **configurable por línea, que define el usuario**. Aplica únicamente a las fórmulas de Kpm merma (X) y MERMA (Z).
+
+**No tiene valor por defecto.** El sistema nunca sustituye un factor faltante por una constante: hacerlo ocultaría que la línea está mal configurada y falsearía el cálculo. Si el factor no está cargado, Kpm merma y MERMA devuelven `null` y el reporte muestra celda vacía, igual que con cualquier otro dato faltante (§5.2).
+
+Se admite cualquier valor **mayor a cero**, con decimales. El campo lo valida en pantalla `app:numberRangeValidator forValue="#{0}" type="greater"`: el factor va en el divisor de Kpm merma, así que cero o negativo no tienen sentido de cálculo.
+
+La columna `xpr_linea.merma_factor` es NULLABLE desde `v6.0.120`. Se creó en `v6.0.76` como `NOT NULL DEFAULT 1.0300`, pero ese default nunca llegaba a aplicarse —Hibernate siempre incluye la columna en el INSERT— y hacía fallar el alta de cualquier línea que no fuera ULEXITA, que es la única que captura el campo.
 
 ### 3.3 Validaciones
 
@@ -89,6 +95,8 @@ ALTER TABLE xpr_linea ADD cod_art_diluy_bent   VARCHAR(20) NULL;
 ALTER TABLE xpr_linea ADD cod_art_diluy_caolin VARCHAR(20) NULL;
 ALTER TABLE xpr_linea ADD merma_factor         DECIMAL(10,4) NOT NULL DEFAULT 1.03;
 ```
+
+> `merma_factor` pasó a NULLABLE en `v6.0.120`; el bloque de arriba refleja la migración original. Ver §3.2.
 
 Valores admitidos en `report_template_code`: `ULEXITA`, `MOLIENDA` (futuro), `NULL` (línea sin reporte específico).
 
@@ -125,7 +133,7 @@ Al aprobar la orden se snapshotea **todos** los valores calculados para inmutabi
 
 ```sql
 ALTER TABLE xpr_produccion_ulexita
-    ADD COLUMN merma_factor_snap     DECIMAL(10,4),  -- factor 1.03 vigente al aprobar
+    ADD COLUMN merma_factor_snap     DECIMAL(10,4),  -- factor de merma vigente al aprobar
     ADD COLUMN diluyente_total_snap  DECIMAL(14,4),
     ADD COLUMN bentonita_pct_snap    DECIMAL(8,4),
     ADD COLUMN caolin_pct_snap       DECIMAL(8,4),
@@ -253,7 +261,7 @@ Agregar campos:
 - Suggestion `PT clasificación B` (cod_art).
 - Suggestion `Diluyente bentonita` (cod_art).
 - Suggestion `Diluyente caolín` (cod_art).
-- Input numérico `Factor de merma` (default 1.03, 4 decimales).
+- Input numérico `Factor de merma` (4 decimales, mayor a cero, sin valor por defecto).
 
 Visibilidad condicional: los campos específicos aparecen cuando `Template de reporte != —`. Para `ULEXITA` se muestran todos los campos descritos.
 
@@ -524,7 +532,7 @@ DailyProductionReport.showEmptyDays=Mostrar días sin producción
 
 ## 13. Criterios de aceptación
 
-1. Configurada la línea ULEXITA con los seis cod_art y `mermaFactor=1.03`, una orden de producción muestra el tab "Datos del Proceso".
+1. Configurada la línea ULEXITA con los seis cod_art y un `mermaFactor` mayor a cero, una orden de producción muestra el tab "Datos del Proceso".
 2. Capturando los 6 valores de la fila 1 del Excel original (01-abr), los cálculos en vivo coinciden con el Excel con tolerancia `1e−4`.
 3. Aprobada la orden, los snapshots `ulex_disponible_snap` y `consumo_mp_calc_snap` quedan poblados.
 4. La vista previa Excel muestra la fila idéntica a la del reporte mensual.

@@ -31,7 +31,6 @@ public class XProductionUlexitaCalc {
     public static final int PCT_SCALE = 4;
     public static final BigDecimal ONE_HUNDRED = new BigDecimal("100");
     public static final BigDecimal ONE_THOUSAND = new BigDecimal("1000");
-    public static final BigDecimal DEFAULT_MERMA_FACTOR = new BigDecimal("1.03");
     public static final String UNIT_KG = "KG";
 
     private final XProduction production;
@@ -198,7 +197,9 @@ public class XProductionUlexitaCalc {
         BigDecimal pt = getPtTotalBueno();
         BigDecimal kpa = getKpa();
         BigDecimal mermaFactor = getMermaFactor();
-        if (kpmBent == null || dil == null || !isPositive(pt) || !isPositive(kpa)) return null;
+        // El factor va en el divisor: sin configurar, cero o negativo, el calculo no existe.
+        if (kpmBent == null || dil == null || !isPositive(pt) || !isPositive(kpa)
+                || !isPositive(mermaFactor)) return null;
         BigDecimal denom = pt.multiply(mermaFactor).multiply(kpa);
         if (!isPositive(denom)) return null;
         BigDecimal frac = dil.divide(denom, SCALE, RoundingMode.HALF_UP);
@@ -250,14 +251,19 @@ public class XProductionUlexitaCalc {
 
     // ------------------------------------------------------------------ getters auxiliares
 
+    /**
+     * Factor de merma configurado en la linea (o el snapshot, si la orden esta aprobada).
+     *
+     * No hay valor por defecto: el factor lo define el usuario. Si no esta configurado, las
+     * formulas que dependen de el (Kpm merma y MERMA) devuelven null y el reporte muestra celda
+     * vacia, igual que con cualquier otro dato faltante. Sustituirlo por una constante ocultaria
+     * que la linea esta mal configurada y falsearia el calculo.
+     */
     public BigDecimal getMermaFactor() {
         if (useSnapshots() && ulexita.getMermaFactorSnap() != null) {
             return ulexita.getMermaFactorSnap();
         }
-        if (line != null && isPositive(line.getMermaFactor())) {
-            return line.getMermaFactor();
-        }
-        return DEFAULT_MERMA_FACTOR;
+        return line != null ? line.getMermaFactor() : null;
     }
 
     public boolean isShiftDay() {

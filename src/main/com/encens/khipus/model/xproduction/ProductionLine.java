@@ -51,6 +51,11 @@ public class ProductionLine implements BaseModel {
     @Column(name = "cod_art_diluy_caolin", length = 20)
     private String codArtDiluyCaolin;
 
+    /**
+     * ULEXITA: factor de merma del proceso, definido por el usuario. No tiene valor por defecto:
+     * null en las demas lineas, donde no aplica, y sin el las formulas que dependen de el quedan
+     * sin calcular.
+     */
     @Column(name = "merma_factor")
     private BigDecimal mermaFactor;
 

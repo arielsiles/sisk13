@@ -46,4 +46,23 @@ public interface BaritinaDailyReportService {
      * Filas [Date fecha, MovementDetailType tipo, BigDecimal cantidad, String codArt, String noTrans].
      */
     List<Object[]> adjustmentRows(Collection<String> codArts, Date from, Date to);
+
+    /**
+     * ¿Hay otra linea de produccion configurada con la misma materia prima principal?
+     *
+     * Cuando dos lineas comparten el articulo de MP, el saldo de ese articulo es uno solo: el
+     * reporte de cada linea debe descontar tambien lo que consumieron las otras, o ninguno cuadra
+     * contra "Saldos de Almacen".
+     */
+    boolean isSharedMaterial(String codArt, ProductionLine line);
+
+    /**
+     * Consumo del articulo por las ordenes que NO son de esta linea, en [from, to). Incluye las
+     * ordenes sin linea asignada y excluye las anuladas. El rango se evalua con la fecha del plan
+     * de produccion e initDate como respaldo, el mismo criterio con que el reporte ubica sus
+     * propias ordenes; el llamador arma el dia con la misma regla.
+     *
+     * Filas [Date fechaPlan (puede ser null), Date initDate, BigDecimal cantidad], sin agregar.
+     */
+    List<Object[]> supplyRowsOtherLines(String codArt, ProductionLine line, Date from, Date to);
 }
