@@ -4,6 +4,7 @@ import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.CollectionDocumentType;
 import com.encens.khipus.model.finances.CostCenter;
+import com.encens.khipus.model.finances.FinancesEntity;
 import com.encens.khipus.model.finances.Provider;
 import com.encens.khipus.model.purchases.PayConditions;
 import com.encens.khipus.model.purchases.PurchaseOrder;
@@ -50,6 +51,13 @@ public class WarehousePurchaseOrderDataModel extends QueryDataModel<Long, Purcha
     private Employee responsible;
     private CostCenter costCenter;
     private Provider provider;
+    /**
+     * Texto a mostrar en el filtro de proveedor. Se resuelve al asignar el proveedor
+     * -con el entity manager abierto- y no en el render: Provider.entity es LAZY y este
+     * dataModel es de PAGE, por lo que en cualquier request posterior la entidad ya esta
+     * desacoplada y navegar la asociacion lanza LazyInitializationException.
+     */
+    private String providerAcronym;
     private Warehouse warehouse;
     private CollectionDocumentType documentType;
     private PayConditions payConditions;
@@ -68,6 +76,11 @@ public class WarehousePurchaseOrderDataModel extends QueryDataModel<Long, Purcha
                 " left join fetch warehousePurchaseOrder.responsible responsible" +
                 " left join fetch warehousePurchaseOrder.costCenter costCenter" +
                 " left join fetch warehousePurchaseOrder.provider provider" +
+                /* La columna Proveedor de la grilla muestra provider.fullName, que navega
+                   provider.entity (LAZY). Sin este fetch las filas quedan con un proxy sin
+                   inicializar y, al reutilizarse desde la cache del QueryDataModel en un
+                   request posterior, revientan con LazyInitializationException. */
+                " left join fetch provider.entity providerEntity" +
                 " left join fetch warehousePurchaseOrder.warehouse";
     }
 
@@ -122,6 +135,19 @@ public class WarehousePurchaseOrderDataModel extends QueryDataModel<Long, Purcha
 
     public void setProvider(Provider provider) {
         this.provider = provider;
+        this.providerAcronym = resolveProviderAcronym(provider);
+    }
+
+    public String getProviderAcronym() {
+        return providerAcronym;
+    }
+
+    private String resolveProviderAcronym(Provider provider) {
+        if (provider == null) {
+            return null;
+        }
+        FinancesEntity financesEntity = provider.getEntity();
+        return financesEntity != null ? financesEntity.getAcronym() : provider.getProviderCode();
     }
 
     public void cleanProvider() {

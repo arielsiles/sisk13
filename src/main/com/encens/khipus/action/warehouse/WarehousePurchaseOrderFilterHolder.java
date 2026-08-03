@@ -1,15 +1,20 @@
 package com.encens.khipus.action.warehouse;
 
+import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.model.finances.CollectionDocumentType;
 import com.encens.khipus.model.finances.Provider;
+import com.encens.khipus.model.finances.ProviderPk;
 import com.encens.khipus.model.purchases.PayConditions;
 import com.encens.khipus.model.purchases.PurchaseOrder;
 import com.encens.khipus.model.warehouse.Warehouse;
+import com.encens.khipus.service.finances.FinanceProviderService;
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -25,7 +30,10 @@ import java.util.Date;
  */
 @Name("warehousePurchaseOrderFilterHolder")
 @Scope(ScopeType.SESSION)
-public class WarehousePurchaseOrderFilterHolder {
+public class WarehousePurchaseOrderFilterHolder implements Serializable {
+
+    @In
+    private FinanceProviderService financeProviderService;
 
     private boolean saved = false;
 
@@ -34,7 +42,14 @@ public class WarehousePurchaseOrderFilterHolder {
     // filtros que viven directamente en el dataModel
     private Date startDate;
     private Date endDate;
-    private Provider provider;
+    /**
+     * Del proveedor se guarda SOLO la clave, nunca la instancia: este holder es de
+     * SESSION y los entity manager de lista (listEntityManager /
+     * businessUnitListEntityManager) son de EVENT. Una entidad retenida entre requests
+     * queda desacoplada, y su asociacion lazy 'entity' (FinancesEntity) revienta con
+     * LazyInitializationException al leerse en el render del filtro.
+     */
+    private ProviderPk providerId;
     private Warehouse warehouse;
     private CollectionDocumentType documentType;
     private PayConditions payConditions;
@@ -44,6 +59,23 @@ public class WarehousePurchaseOrderFilterHolder {
                 Component.getInstance("warehousePurchaseOrderDataModel", true);
     }
 
+    /**
+     * Recarga el proveedor con el entity manager del request actual. El named query
+     * Provider.findById hace 'left join fetch p.entity', de modo que la instancia
+     * devuelta trae la entidad ya inicializada y se puede leer aunque despues se
+     * desacople.
+     */
+    private Provider loadProvider() {
+        if (providerId == null) {
+            return null;
+        }
+        try {
+            return financeProviderService.findById(providerId);
+        } catch (EntryNotFoundException e) {
+            return null;
+        }
+    }
+
     /** Accion del boton Buscar: ejecuta la busqueda y guarda los filtros en sesion. */
     public void searchAndSave() {
         WarehousePurchaseOrderDataModel m = model();
@@ -51,7 +83,7 @@ public class WarehousePurchaseOrderFilterHolder {
         savedCriteria = m.getCriteria();
         startDate = m.getStartDate();
         endDate = m.getEndDate();
-        provider = m.getProvider();
+        providerId = m.getProvider() != null ? m.getProvider().getId() : null;
         warehouse = m.getWarehouse();
         documentType = m.getDocumentType();
         payConditions = m.getPayConditions();
@@ -72,7 +104,7 @@ public class WarehousePurchaseOrderFilterHolder {
         savedCriteria = null;
         startDate = null;
         endDate = null;
-        provider = null;
+        providerId = null;
         warehouse = null;
         documentType = null;
         payConditions = null;
@@ -96,7 +128,7 @@ public class WarehousePurchaseOrderFilterHolder {
             }
             m.setStartDate(startDate);
             m.setEndDate(endDate);
-            m.setProvider(provider);
+            m.setProvider(loadProvider());
             m.setWarehouse(warehouse);
             m.setDocumentType(documentType);
             m.setPayConditions(payConditions);
