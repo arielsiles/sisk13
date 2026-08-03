@@ -566,4 +566,14 @@
         </navigation>
     </page>
 
+    <!--
+        La provision de DPF necesita conversacion de larga duracion: el resultado de
+        Calcular tiene que sobrevivir hasta que se confirme el asiento en el modal.
+        flush-mode MANUAL para que las cuentas que se cargan para el calculo no se
+        escriban por un flush automatico; saveVoucher hace su flush explicito.
+    -->
+    <page view-id="/customers/provisionInterestPayable.xhtml">
+        <begin-conversation join="true" flush-mode="MANUAL"/>
+    </page>
+
 </pages>

@@ -630,6 +630,34 @@
                     <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermInterestNationalCurrency.col']}"/>
                 </s:decorate>
             </s:div>
+            <s:div id="fixedTermPayableInterestNationalCurrencyDiv">
+                <s:decorate id="fixedTermPayableInterestNationalCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.fixedTermPayableInterestNationalCurrency']}</ui:define>
+                    <app:selectPopUp styleClass="input350" id="fixedTermPayableInterestNationalCurrency"
+                                     textValue="#{companySettingAction.instance.fixedTermPayableInterestNationalCurrency.fullName}"
+                                     value="#{companySettingAction.instance.fixedTermPayableInterestNationalCurrency}"
+                                     selectAction="companySettingAction.prepareAccountSelection('fixedTermPayableInterestNationalCurrency')"
+                                     clearAction="companySettingAction.clearAccount('fixedTermPayableInterestNationalCurrency')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="fixedTermPayableInterestNationalCurrencyDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermPayableInterestNationalCurrency.col']}"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="fixedTermPayableInterestForeignCurrencyDiv">
+                <s:decorate id="fixedTermPayableInterestForeignCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.fixedTermPayableInterestForeignCurrency']}</ui:define>
+                    <app:selectPopUp styleClass="input350" id="fixedTermPayableInterestForeignCurrency"
+                                     textValue="#{companySettingAction.instance.fixedTermPayableInterestForeignCurrency.fullName}"
+                                     value="#{companySettingAction.instance.fixedTermPayableInterestForeignCurrency}"
+                                     selectAction="companySettingAction.prepareAccountSelection('fixedTermPayableInterestForeignCurrency')"
+                                     clearAction="companySettingAction.clearAccount('fixedTermPayableInterestForeignCurrency')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="fixedTermPayableInterestForeignCurrencyDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermPayableInterestForeignCurrency.col']}"/>
+                </s:decorate>
+            </s:div>
             <s:div id="fixedAssetProvidersAccountDiv">
                 <s:decorate id="fixedAssetProvidersAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fixedAssetProvidersAccount']}</ui:define>

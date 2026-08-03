@@ -5,6 +5,7 @@ import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundExceptio
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.finances.ExchangeKind;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
+import com.encens.khipus.model.finances.FinancesExchangeRate;
 
 import javax.ejb.Local;
 import java.math.BigDecimal;
@@ -33,4 +34,12 @@ public interface FinancesExchangeRateService extends GenericService {
     BigDecimal getExchangeRateByCurrencyType(FinancesCurrencyType currencyType, BigDecimal defaultExchangeRate)
             throws FinancesCurrencyNotFoundException,
             FinancesExchangeRateNotFoundException;
+
+    /**
+     * Busca el tipo de cambio de una clase de cambio en una fecha exacta.
+     *
+     * @return el registro, o <code>null</code> si no esta cargado. No lanza excepcion:
+     *         la ausencia es un caso esperado que cada pantalla reporta a su manera.
+     */
+    FinancesExchangeRate findByExchangeKindAndDate(String exchangeKindCode, Date date);
 }

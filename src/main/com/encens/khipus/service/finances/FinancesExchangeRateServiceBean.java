@@ -122,4 +122,14 @@ public class FinancesExchangeRateServiceBean extends GenericServiceBean implemen
 
         return currentExchangeRate;
     }
+
+    public FinancesExchangeRate findByExchangeKindAndDate(String exchangeKindCode, Date date) {
+        if (exchangeKindCode == null || date == null) {
+            return null;
+        }
+        FinancesExchangeRatePk pk = new FinancesExchangeRatePk();
+        pk.setExchangeKind(exchangeKindCode);
+        pk.setDate(date);
+        return getEntityManager().find(FinancesExchangeRate.class, pk);
+    }
 }

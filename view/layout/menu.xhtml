@@ -1817,7 +1817,8 @@
                         propagation="none"/>
             </rich:menuItem>
 
-            <rich:menuItem submitMode="none" styleClass="main-menu-item">
+            <rich:menuItem submitMode="none" styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('PROVISIONDPF','VIEW')}">
                 <s:link view="/customers/provisionInterestPayable.xhtml"
                         value="#{messages['menu.customers.process.provisionInterestPayableDPF']}"
                         propagation="none"/>
@@ -3032,7 +3033,8 @@
                        rendered="#{s:hasPermission('MEASUREUNIT','VIEW') or
                         s:hasPermission('CASHACCOUNTGROUP','VIEW') or
                         s:hasPermission('COSTCENTER','VIEW') or
-                        s:hasPermission('COSTCENTERGROUP','VIEW')}">
+                        s:hasPermission('COSTCENTERGROUP','VIEW') or
+                        s:hasPermission('FINANCESEXCHANGERATE','VIEW')}">
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('MEASUREUNIT','VIEW')}">
@@ -3081,6 +3083,13 @@
         <rich:menuItem submitMode="none" styleClass="main-menu-item">
             <s:link view="/finances/dosageTypeList.xhtml"
                     value="#{messages['menu.finances.configuration.dosageType']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('FINANCESEXCHANGERATE','VIEW')}">
+            <s:link view="/finances/financesExchangeRateList.xhtml"
+                    value="#{messages['menu.finances.configuration.financesExchangeRate']}"
                     propagation="none"/>
         </rich:menuItem>
 
@@ -3583,8 +3592,10 @@
                 rendered="#{s:hasPermission('ADMINISTRATIVENOTIFICATION','VIEW')}"
                 styleClass="tab-cell"
                 propagation="none"/>
-        <s:link action="#{companySettingAction.loadCompanySettings()}"
-                view="/admin/companySetting.xhtml"
+        <!-- view fijo (GET): el guardian es un page-action en companySetting.xhtml
+             (pages.xml), que desvia a la pantalla de reparacion si hay cuentas
+             colgadas. Un s:link con action pero sin view no navega. -->
+        <s:link view="/admin/companySetting.xhtml"
                 value="#{messages['menu.admin.company']}"
                 rendered="#{s:hasPermission('COMPANYSETTING','VIEW')}"
                 styleClass="tab-cell"/>
@@ -3628,6 +3639,13 @@
                            rendered="#{s:hasPermission('BRANCHOFFICE','VIEW')}">
                 <s:link view="/admin/dosageList.xhtml"
                         value="#{messages['menu.admin.configuration.dosage']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('COMPANYSETTING','VIEW')}">
+                <s:link view="/admin/companyAccountRepair.xhtml"
+                        value="#{messages['menu.admin.accountIntegrity']}"
                         propagation="none"/>
             </rich:menuItem>
         </rich:dropDownMenu>

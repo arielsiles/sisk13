@@ -4,128 +4,252 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:rich="http://richfaces.org/rich"
-                xmlns:app="http://encens.com/products/khipus/facelets" xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                xmlns:a4j="http://richfaces.org/a4j"
                 template="/layout/template.xhtml">
 
     <ui:define name="pageTitle">#{messages['Customers.process.provisionInterestPayableDPF']}</ui:define>
     <ui:param name="bodyAlign" value="center"/>
-    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyWidth" value="95%"/>
 
     <ui:param name="selectedTab" value="customers"/>
     <ui:define name="body">
-        <h:form id="provisionInterestReportForm">
+        <h:form id="provisionInterestPayableForm">
 
             <rich:panel>
                 <f:facet name="header">
                     #{messages['Customers.process.provisionInterestPayableDPF']}
                 </f:facet>
 
-                <!--<s:decorate id="accountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Account.accountType']}</ui:define>
-                    <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
-                                     styleClass="input"
-                                     required="true" disabled="#{accountAction.managed}"
-                                     tabindex="1">
-                        <s:selectItems value="#{accountTypeList.resultList}"
-                                       var="accountType"
-                                       label="#{accountType.name}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                    </h:selectOneMenu>
-                </s:decorate>-->
-
-                <s:decorate id="savingTypeField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Account.savingType']}</ui:define>
-                    <h:selectOneMenu id="savingType" value="#{provisionInterestPayableAction.savingType}" styleClass="input"
-                                     tabindex="3" required="true">
-                        <s:selectItems value="#{savingTypeEnum}" var="savingType" label="#{messages[savingType.resourceKey]}"
-                                       noSelectionLabel=""
+                <s:decorate id="monthField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Month.month']}</ui:define>
+                    <h:selectOneMenu id="month" value="#{provisionInterestPayableAction.month}"
+                                     styleClass="input" required="true" tabindex="1">
+                        <s:selectItems value="#{provisionInterestPayableAction.monthEnum}" var="monthItem"
+                                       label="#{messages[monthItem.resourceKey]}"
                                        hideNoSelectionLabel="false"/>
                         <s:convertEnum/>
+                        <a4j:support event="onchange" ajaxSingle="true"
+                                     action="#{provisionInterestPayableAction.resetResults}"
+                                     reRender="resultPanel"/>
                     </h:selectOneMenu>
                 </s:decorate>
 
-                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Account.currency']}</ui:define>
-                    <h:selectOneMenu id="currency" value="#{provisionInterestPayableAction.currencyType}" styleClass="input"
-                                     tabindex="3" required="true">
-                        <s:selectItems value="#{currencyTypeEnum}" var="currency" label="#{messages[currency.resourceKey]}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEnum/>
+                <s:decorate id="yearField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ProvisionInterestPayable.year']}</ui:define>
+                    <h:selectOneMenu id="year" value="#{provisionInterestPayableAction.year}"
+                                     styleClass="input" required="true" tabindex="2">
+                        <f:selectItems value="#{provisionInterestPayableAction.yearSelectItems}"/>
+                        <a4j:support event="onchange" ajaxSingle="true"
+                                     action="#{provisionInterestPayableAction.resetResults}"
+                                     reRender="resultPanel"/>
                     </h:selectOneMenu>
                 </s:decorate>
 
-                <s:decorate id="itemAccountField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['MajorAccounting.accountingAccount']}</ui:define>
-                    <app:selectPopUp id="itemAccount"
-                                     required="false"
-                                     textValue="#{provisionInterestPayableAction.cashAccount.fullName}"
-                                     value="#{provisionInterestPayableAction.cashAccount}"
-                                     clearAction="kardexProviderReportAction.clearAccount()"
-                                     searchModalPanel="cashAccountListModalPanel"
-                                     dataModel="#{cashAccountDataModel}"
-                                     reRender="itemAccountField"
-                                     tabindex="4"
-                                     styleClass="inputLarge">
-                        <ui:define name="criteriaValues">
-                            <app:criteriaValue fieldName="accountClass" value="#{productItemAction.accountClass}"/>
-                        </ui:define>
-                    </app:selectPopUp>
-                </s:decorate>
-
-                <s:decorate id="endPeriodDateField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <ui:define name="label">#{messages['Credit.date']}</ui:define>
-                    <rich:calendar id="endPeriodDate"
-                                   value="#{provisionInterestPayableAction.endPeriodDate}"
-                                   popup="true"
-                                   required="false"
-                                   datePattern="#{messages['patterns.date']}"
-                                   styleClass="input"
-                                   enableManualInput="true"
-                                   tabindex="3">
-                        <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                    </rich:calendar>
-                </s:decorate>
+                <div class="buttons">
+                    <a4j:commandButton action="#{provisionInterestPayableAction.calculate}"
+                                       styleClass="button"
+                                       value="#{messages['ProvisionInterestPayable.calculate']}"
+                                       id="calculateButtonId" tabindex="3"
+                                       reRender="resultPanel, :provisionConfirmationForm:provisionVoucherPreviewPanel">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                </div>
 
             </rich:panel>
 
-            <div class="buttons">
-                <h:commandButton action="#{provisionInterestPayableAction.generateProvisionInterest}"
-                                 styleClass="button"
-                                 value="#{messages['Common.generate']}" id="generateButtonId" tabindex="4">
-                    <s:defaultAction/>
-                </h:commandButton>
-            </div>
+            <s:div id="resultPanel">
+                <s:fragment rendered="#{provisionInterestPayableAction.calculated}">
+
+                    <rich:panel>
+                        <f:facet name="header">
+                            <h:outputFormat value="#{messages['ProvisionInterestPayable.detail.header']}">
+                                <f:param value="#{provisionInterestPayableAction.periodLabel}"/>
+                            </h:outputFormat>
+                        </f:facet>
+
+                        <rich:dataTable value="#{provisionInterestPayableAction.detailList}" var="detailItem"
+                                        id="provisionDetailList" width="100%">
+                            <f:facet name="header">
+                                <rich:columnGroup>
+                                    <rich:column>#{messages['Account.accountType']}</rich:column>
+                                    <rich:column>#{messages['Account.partner.firstName']}</rich:column>
+                                    <rich:column>#{messages['Account.partner.lastName']}</rich:column>
+                                    <rich:column>#{messages['Account.openingDate']}</rich:column>
+                                    <rich:column>#{messages['Account.exprirationDate']}</rich:column>
+                                    <rich:column>#{messages['ProvisionInterestPayable.rate']}</rich:column>
+                                    <rich:column>#{messages['Account.code']}</rich:column>
+                                    <rich:column>#{messages['Account.currency']}</rich:column>
+                                    <rich:column>#{messages['Account.state']}</rich:column>
+                                    <rich:column>#{messages['ProvisionInterestPayable.capital']}</rich:column>
+                                    <rich:column>#{messages['ProvisionInterestPayable.provisionUntil']}</rich:column>
+                                    <rich:column>#{messages['ProvisionInterestPayable.days']}</rich:column>
+                                    <rich:column>#{messages['ProvisionInterestPayable.provision']}</rich:column>
+                                </rich:columnGroup>
+                            </f:facet>
+
+                            <rich:column>
+                                <h:outputText value="#{detailItem.accountTypeName}"/>
+                            </rich:column>
+                            <rich:column>
+                                <h:outputText value="#{detailItem.firstName}"/>
+                            </rich:column>
+                            <rich:column>
+                                <h:outputText value="#{detailItem.lastName}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{detailItem.openingDate}">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                       timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </h:outputText>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{detailItem.expirationDate}">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                       timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </h:outputText>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{detailItem.rate}">
+                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+                            <rich:column>
+                                <h:outputText value="#{detailItem.code}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{messages[detailItem.currency.symbolResourceKey]}"/>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{messages[detailItem.accountState.resourceKey]}"/>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{detailItem.capital}">
+                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{detailItem.provisionUntilDate}">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                       timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </h:outputText>
+                            </rich:column>
+                            <rich:column styleClass="center">
+                                <h:outputText value="#{detailItem.days}"/>
+                            </rich:column>
+                            <rich:column styleClass="right">
+                                <h:outputText value="#{detailItem.provision}">
+                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </rich:column>
+                        </rich:dataTable>
+
+                        <rich:spacer height="8"/>
+
+                        <h:panelGrid columns="2" cellpadding="2" cellspacing="0" border="0">
+                            <h:outputText value="#{messages['ProvisionInterestPayable.totalForeign']}"/>
+                            <h:outputText value="#{provisionInterestPayableAction.totalForeignCurrency}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+
+                            <h:outputText value="#{messages['ProvisionInterestPayable.totalNational']}"/>
+                            <h:outputText value="#{provisionInterestPayableAction.totalNationalCurrency}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+
+                            <h:outputText value="#{messages['ProvisionInterestPayable.exchangeRate']}"
+                                          rendered="#{provisionInterestPayableAction.exchangeRate != null}"/>
+                            <h:outputText value="#{provisionInterestPayableAction.exchangeRate}"
+                                          rendered="#{provisionInterestPayableAction.exchangeRate != null}">
+                                <f:convertNumber pattern="#{messages['patterns.decimal6FNumber']}"/>
+                            </h:outputText>
+                        </h:panelGrid>
+
+                    </rich:panel>
+
+                    <div class="buttons">
+                        <a4j:commandButton value="#{messages['ProvisionInterestPayable.generate']}"
+                                           styleClass="button"
+                                           id="openConfirmButtonId" tabindex="4"
+                                           reRender=":provisionConfirmationForm:provisionVoucherPreviewPanel"
+                                           oncomplete="Richfaces.showModalPanel('provisionConfirmationPanel');"/>
+                    </div>
+
+                </s:fragment>
+            </s:div>
 
         </h:form>
 
-        <s:decorate id="progressDialog" template="/include/progressDialog.xhtml">
-            <ui:param name="dialogId" value="progressModalPanel"/>
-            <ui:define name="dialogTitle">#{messages['Common.processing']}</ui:define>
-            <ui:define name="progressTitle">#{messages['ProductInventory.processTitle']}</ui:define>
-            <ui:define name="dialogContent">
-                <p>
-                    <h:outputFormat value="#{messages['ProductInventory.processMessage']}"/>
-                </p>
-            </ui:define>
-        </s:decorate>
+        <rich:modalPanel id="provisionConfirmationPanel" minWidth="720" autosized="true" zindex="2000">
+            <f:facet name="header">
+                #{messages['ProvisionInterestPayable.confirmation.title']}
+            </f:facet>
+            <h:form id="provisionConfirmationForm">
+                <s:div id="provisionVoucherPreviewPanel">
 
+                    <p>
+                        <h:outputFormat value="#{messages['ProvisionInterestPayable.confirmation.gloss']}">
+                            <f:param value="#{provisionInterestPayableAction.gloss}"/>
+                        </h:outputFormat>
+                    </p>
 
-        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
-            <ui:param name="hasWarehousePermission" value="true"/>
-            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
-            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
-            <ui:define name="assignButton">
-                <a4j:commandButton id="assignButton"
-                                   action="#{provisionInterestPayableAction.setCashAccount(cashAccountItem)}"
-                                   image="/img/active.gif"
-                                   styleClass="select-image-middle"
-                                   reRender="itemAccountField"
-                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
-            </ui:define>
-        </s:decorate>
+                    <rich:dataTable value="#{provisionInterestPayableAction.voucherDetails}" var="voucherDetailItem"
+                                    id="provisionVoucherDetailList" width="100%">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column>#{messages['Voucher.accountDescription']}</rich:column>
+                                <rich:column>#{messages['Voucher.debit']}</rich:column>
+                                <rich:column>#{messages['Voucher.credit']}</rich:column>
+                                <rich:column>#{messages['Voucher.debitMe']}</rich:column>
+                                <rich:column>#{messages['Voucher.creditMe']}</rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+
+                        <rich:column>
+                            <h:outputText value="#{voucherDetailItem.cashAccount.fullName}"/>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{voucherDetailItem.debit}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{voucherDetailItem.credit}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{voucherDetailItem.debitMe}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                        <rich:column styleClass="right">
+                            <h:outputText value="#{voucherDetailItem.creditMe}">
+                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </rich:column>
+                    </rich:dataTable>
+
+                    <rich:spacer height="8"/>
+
+                    <p>
+                        <h:outputText value="#{messages['ProvisionInterestPayable.confirmation.warning']}"/>
+                    </p>
+
+                    <div class="buttons">
+                        <h:commandButton action="#{provisionInterestPayableAction.generateProvisionInterest}"
+                                         value="#{messages['Common.accept']}"
+                                         styleClass="button"
+                                         tabindex="1000"/>
+                        <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                            <rich:componentControl for="provisionConfirmationPanel" event="onclick"
+                                                   disableDefault="true" operation="hide"/>
+                        </h:commandButton>
+                    </div>
+
+                </s:div>
+            </h:form>
+        </rich:modalPanel>
 
     </ui:define>
 </ui:composition>

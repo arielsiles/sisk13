@@ -29,6 +29,16 @@ public interface AccountService {
     List<Account> getAccountList();
     List<Account> getSavingsAccounts(SavingType savingType);
     List<Account> getSavingsAccounts(SavingType savingType, FinancesCurrencyType currencyType);
+
+    /**
+     * Cuentas de un tipo de ahorro cuyo periodo de vigencia se solapa con el rango dado.
+     * <p/>
+     * Deliberadamente NO filtra por <code>estado</code>: al renovar un DPF el sistema deja
+     * la cuenta anterior en INACTIVE, y esa cuenta igual devengo intereses hasta su
+     * vencimiento dentro del mes que se esta provisionando. Filtrar por estado activo
+     * perderia esos dias. Lo que manda es la fecha de vencimiento.
+     */
+    List<Account> getSavingsAccountsByPeriod(SavingType savingType, Date startDate, Date endDate);
     List<Account> getAccountList(Partner partner);
 
 }

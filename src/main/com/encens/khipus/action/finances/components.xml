@@ -28,6 +28,11 @@
     <framework:entity-query name="exchangeRateQuery"
                             ejbql="select o from ExchangeRate o order by o.rate ASC"/>
 
+    <!-- Clases de cambio de contabilidad (arcgcc): D = dolar, U = UFV -->
+    <factory name="exchangeKindList" value="#{exchangeKindQuery}"/>
+    <framework:entity-query name="exchangeKindQuery"
+                            ejbql="select o from ExchangeKind o order by o.id ASC"/>
+
     <factory name="bankAccountList" value="#{bankAccountQuery}"/>
     <framework:entity-query name="bankAccountQuery"
                             ejbql="select o from BankAccount o order by o.accountNumber ASC"/>

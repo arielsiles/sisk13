@@ -13,6 +13,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -174,6 +175,19 @@ public class AccountServiceBean implements AccountService {
                 .setParameter("savingType", savingType)
                 .getResultList();
         return accountList;
+    }
+
+    public List<Account> getSavingsAccountsByPeriod(SavingType savingType, Date startDate, Date endDate) {
+        return (List<Account>) em.createQuery("select account from Account account " +
+                " where account.accountType.savingType =:savingType" +
+                "   and account.capital > 0" +
+                "   and account.openingDate <=:endDate" +
+                "   and account.expirationDate >=:startDate" +
+                " order by account.currency, account.code")
+                .setParameter("savingType", savingType)
+                .setParameter("startDate", startDate, TemporalType.DATE)
+                .setParameter("endDate", endDate, TemporalType.DATE)
+                .getResultList();
     }
 
     @Override

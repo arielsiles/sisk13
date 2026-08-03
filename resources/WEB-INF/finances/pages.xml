@@ -109,6 +109,24 @@
         </navigation>
     </page>
 
+    <page view-id="/finances/financesExchangeRateList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{financesExchangeRateAction.select(financesExchangeRateItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/financesExchangeRate.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/financesExchangeRate.xhtml"
+          no-conversation-view-id="/finances/financesExchangeRateList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/financesExchangeRateList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/finances/preBookEntryPeriodTypeList.xhtml">
         <end-conversation/>
         <navigation from-action="#{preBookEntryPeriodTypeAction.select(preBookEntryPeriodTypeItem)}">

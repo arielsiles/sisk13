@@ -672,6 +672,33 @@ public class CompanyConfiguration {
     })
     private CashAccount fixedTermInterestNationalCurrency;
 
+    /**
+     * Cuentas de gasto de la provision mensual de intereses por pagar sobre DPF.
+     * El contrapartida (pasivo "cargos financieros por pagar") NO va aca: sale de
+     * CTACF_MN / CTACF_ME del tipo de cuenta, que es lo que ya usa la renovacion de DPF.
+     */
+    @Column(name = "i_ppag_dpf_mn", length = 20)
+    @Length(max = 20)
+    private String fixedTermPayableInterestNationalCurrencyCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "i_ppag_dpf_mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount fixedTermPayableInterestNationalCurrency;
+
+    @Column(name = "i_ppag_dpf_me", length = 20)
+    @Length(max = 20)
+    private String fixedTermPayableInterestForeignCurrencyCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "i_ppag_dpf_me", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount fixedTermPayableInterestForeignCurrency;
+
     @Column(name = "ctaprovaf", length = 20)
     @Length(max = 20)
     private String fixedAssetProvidersAccountCode;
@@ -1790,6 +1817,40 @@ public class CompanyConfiguration {
         setFixedTermInterestNationalCurrencyCode(this.fixedTermInterestNationalCurrency != null ? this.fixedTermInterestNationalCurrency.getAccountCode() : null);
     }
 
+    public CashAccount getFixedTermPayableInterestNationalCurrency() {
+        return fixedTermPayableInterestNationalCurrency;
+    }
+
+    public void setFixedTermPayableInterestNationalCurrency(CashAccount fixedTermPayableInterestNationalCurrency) {
+        this.fixedTermPayableInterestNationalCurrency = fixedTermPayableInterestNationalCurrency;
+        setFixedTermPayableInterestNationalCurrencyCode(this.fixedTermPayableInterestNationalCurrency != null ? this.fixedTermPayableInterestNationalCurrency.getAccountCode() : null);
+    }
+
+    public String getFixedTermPayableInterestNationalCurrencyCode() {
+        return fixedTermPayableInterestNationalCurrencyCode;
+    }
+
+    public void setFixedTermPayableInterestNationalCurrencyCode(String fixedTermPayableInterestNationalCurrencyCode) {
+        this.fixedTermPayableInterestNationalCurrencyCode = fixedTermPayableInterestNationalCurrencyCode;
+    }
+
+    public CashAccount getFixedTermPayableInterestForeignCurrency() {
+        return fixedTermPayableInterestForeignCurrency;
+    }
+
+    public void setFixedTermPayableInterestForeignCurrency(CashAccount fixedTermPayableInterestForeignCurrency) {
+        this.fixedTermPayableInterestForeignCurrency = fixedTermPayableInterestForeignCurrency;
+        setFixedTermPayableInterestForeignCurrencyCode(this.fixedTermPayableInterestForeignCurrency != null ? this.fixedTermPayableInterestForeignCurrency.getAccountCode() : null);
+    }
+
+    public String getFixedTermPayableInterestForeignCurrencyCode() {
+        return fixedTermPayableInterestForeignCurrencyCode;
+    }
+
+    public void setFixedTermPayableInterestForeignCurrencyCode(String fixedTermPayableInterestForeignCurrencyCode) {
+        this.fixedTermPayableInterestForeignCurrencyCode = fixedTermPayableInterestForeignCurrencyCode;
+    }
+
     public String getFixedTermInterestNationalCurrencyCode() {
         return fixedTermInterestNationalCurrencyCode;
     }
@@ -2676,6 +2737,22 @@ public class CompanyConfiguration {
      */
     public CashAccount requireFixedTermInterestNationalCurrency() {
         return requireAccount(getFixedTermInterestNationalCurrency(), "i_pvig_pf_mn", "CompanyConfiguration.fixedTermInterestNationalCurrency");
+    }
+    /**
+     * @return la cuenta de gasto de la provision de intereses sobre DPF en MN
+     *         (columna <code>i_ppag_dpf_mn</code>).
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireFixedTermPayableInterestNationalCurrency() {
+        return requireAccount(getFixedTermPayableInterestNationalCurrency(), "i_ppag_dpf_mn", "CompanyConfiguration.fixedTermPayableInterestNationalCurrency");
+    }
+    /**
+     * @return la cuenta de gasto de la provision de intereses sobre DPF en ME
+     *         (columna <code>i_ppag_dpf_me</code>).
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireFixedTermPayableInterestForeignCurrency() {
+        return requireAccount(getFixedTermPayableInterestForeignCurrency(), "i_ppag_dpf_me", "CompanyConfiguration.fixedTermPayableInterestForeignCurrency");
     }
     /**
      * @return la cuenta de la columna <code>ctaprovaf</code>.
