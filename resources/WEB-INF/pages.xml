@@ -38,6 +38,18 @@
 
     <page view-id="/admin/companySetting.xhtml" login-required="true">
         <end-conversation/>
+        <!-- Guardian de integridad como page-action: corre al ENTRAR a Preferencias
+             (on-postback="false" para no dispararse en el postback de saveChanges).
+             Si hay cuentas colgadas desvia a la pantalla de reparacion ANTES de que
+             Preferencias intente renderizar y explote con EntityNotFoundException.
+             Cubre cualquier via de entrada: menu, URL directa, o el redirect que
+             hace saveChanges. -->
+        <action execute="#{companyAccountRepairAction.checkBeforeSettings}" on-postback="false"/>
+        <navigation from-action="#{companyAccountRepairAction.checkBeforeSettings}">
+            <rule if-outcome="repair">
+                <redirect view-id="/admin/companyAccountRepair.xhtml"/>
+            </rule>
+        </navigation>
         <!-- Al guardar se vuelve a la MISMA pantalla, no al home: es una pantalla de
              configuracion de ~123 campos en 7 tabs, y mandar al inicio obligaba a
              navegar de nuevo hasta aca por cada ajuste.
@@ -50,6 +62,21 @@
              "actualizado correctamente" se sigue viendo. -->
         <navigation from-action="#{companySettingAction.saveChanges}">
             <rule if-outcome="Success">
+                <redirect view-id="/admin/companySetting.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- Pantalla de integridad/reparacion. Inicia conversacion para que la lista
+         de cuentas colgadas persista entre el render y el postback de anular.
+         load() carga la lista solo al ENTRAR (on-postback="false"); en el postback
+         de anular no corre y la recarga nullifySelected(). -->
+    <page view-id="/admin/companyAccountRepair.xhtml" login-required="true">
+        <begin-conversation join="true" flush-mode="MANUAL"/>
+        <action execute="#{companyAccountRepairAction.load}" on-postback="false"/>
+        <navigation from-action="#{companyAccountRepairAction.goToSettings}">
+            <rule if-outcome="settings">
+                <end-conversation/>
                 <redirect view-id="/admin/companySetting.xhtml"/>
             </rule>
         </navigation>

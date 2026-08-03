@@ -203,6 +203,20 @@ ALTER TABLE configuracion
     ADD CONSTRAINT fk_configuracion_res_utilidad FOREIGN KEY (res_utilidad) REFERENCES arcgms (cuenta),
     ADD CONSTRAINT fk_configuracion_oc_pagodefault FOREIGN KEY (oc_pagodefault) REFERENCES arcgms (cuenta);
 
+/* solo si da error la anterior *//*
+UPDATE configuracion c SET
+    c.ctaivacrefitrmn = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctaivacrefitrmn), c.ctaivacrefitrmn, NULL),
+    c.ctatransalmmn   = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctatransalmmn),   c.ctatransalmmn,   NULL),
+    c.ctaCostPV       = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctaCostPV),       c.ctaCostPV,       NULL),
+    c.ctaAlmPV        = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctaAlmPV),        c.ctaAlmPV,        NULL),
+    c.ctaMermaBaj     = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctaMermaBaj),     c.ctaMermaBaj,     NULL),
+    c.ctaReproc       = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctaReproc),       c.ctaReproc,       NULL),
+    c.ct_cajaahorro   = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ct_cajaahorro),   c.ct_cajaahorro,   NULL),
+    c.ct_cajaveter    = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ct_cajaveter),    c.ct_cajaveter,    NULL),
+    c.ctaG_it         = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctaG_it),         c.ctaG_it,         NULL),
+    c.ctaI_ventasec   = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctaI_ventasec),   c.ctaI_ventasec,   NULL),
+    c.ctacomision     = IF(EXISTS(SELECT 1 FROM arcgms a WHERE a.cuenta = c.ctacomision),     c.ctacomision,     NULL);
+    */
 -- Verificacion: deben quedar 51 constraints.
 --   select count(*) from information_schema.key_column_usage
 --    where table_schema = database() and table_name = 'configuracion'

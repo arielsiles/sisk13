@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['AccountIntegrity.title']}</ui:define>
+
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="selectedTab" value="admin"/>
+
+    <ui:define name="body">
+        <h:form id="accountRepairForm">
+
+            <rich:panel id="repairPanel">
+                <f:facet name="header">#{messages['AccountIntegrity.title']}</f:facet>
+
+                <!-- Todo integro: no hay cuentas colgadas -->
+                <s:fragment rendered="#{companyAccountRepairAction.clean}">
+                    <div class="message messageInfo" style="margin:10px 0;">
+                        #{messages['AccountIntegrity.allClean']}
+                    </div>
+                    <div class="buttons">
+                        <h:commandButton action="#{companyAccountRepairAction.goToSettings}"
+                                         value="#{messages['AccountIntegrity.continue']}"
+                                         styleClass="button"/>
+                    </div>
+                </s:fragment>
+
+                <!-- Hay cuentas colgadas: bloquear y ofrecer anularlas -->
+                <s:fragment rendered="#{not companyAccountRepairAction.clean}">
+                    <div class="message messageError" style="margin:10px 0;">
+                        #{messages['AccountIntegrity.blocked']}
+                    </div>
+                    <p>#{messages['AccountIntegrity.help']}</p>
+
+                    <rich:dataTable id="danglingList"
+                                    value="#{companyAccountRepairAction.danglingAccounts}"
+                                    var="item"
+                                    width="100%"
+                                    rowKeyVar="rowKey">
+                        <f:facet name="header">
+                            <rich:columnGroup>
+                                <rich:column styleClass="center" width="60px">
+                                    #{messages['AccountIntegrity.col.select']}
+                                </rich:column>
+                                <rich:column>#{messages['AccountIntegrity.col.origin']}</rich:column>
+                                <rich:column>#{messages['AccountIntegrity.col.record']}</rich:column>
+                                <rich:column>#{messages['AccountIntegrity.col.column']}</rich:column>
+                                <rich:column>#{messages['AccountIntegrity.col.code']}</rich:column>
+                            </rich:columnGroup>
+                        </f:facet>
+
+                        <rich:column styleClass="center">
+                            <h:selectBooleanCheckbox value="#{item.selected}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{messages['AccountIntegrity.origin.bank']}"
+                                          rendered="#{item.bank}"/>
+                            <h:outputText value="#{messages['AccountIntegrity.origin.config']}"
+                                          rendered="#{item.config}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{item.bankAccountNumber} - #{item.description} (#{item.state})"
+                                          rendered="#{item.bank}"/>
+                            <h:outputText value="#{messages['AccountIntegrity.record.config']}"
+                                          rendered="#{item.config}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{item.column}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{item.code}" styleClass="errors"/>
+                        </rich:column>
+                    </rich:dataTable>
+
+                    <div class="buttons" style="margin-top:10px;">
+                        <h:commandButton action="#{companyAccountRepairAction.nullifySelected}"
+                                         value="#{messages['AccountIntegrity.nullifySelected']}"
+                                         styleClass="button"
+                                         rendered="#{s:hasPermission('COMPANYSETTING','UPDATE')}">
+                            <s:conversationPropagation value="join"/>
+                        </h:commandButton>
+                    </div>
+                </s:fragment>
+
+            </rich:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>
