@@ -81,9 +81,7 @@
                         <h:commandButton action="#{companyAccountRepairAction.nullifySelected}"
                                          value="#{messages['AccountIntegrity.nullifySelected']}"
                                          styleClass="button"
-                                         rendered="#{s:hasPermission('COMPANYSETTING','UPDATE')}">
-                            <s:conversationPropagation value="join"/>
-                        </h:commandButton>
+                                         rendered="#{s:hasPermission('COMPANYSETTING','UPDATE')}"/>
                     </div>
                 </s:fragment>
 

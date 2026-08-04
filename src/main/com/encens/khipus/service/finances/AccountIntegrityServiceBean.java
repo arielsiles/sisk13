@@ -129,6 +129,13 @@ public class AccountIntegrityServiceBean extends GenericServiceBean implements A
         return list;
     }
 
+    /**
+     * Anula (NULL) el codigo colgado. Corre en la transaccion del request, que
+     * commitea al final (la pantalla ya no usa flush-mode MANUAL). NO se usa
+     * REQUIRES_NEW: al llamarse en un loop, un extended persistence context de Seam
+     * no tolera abrir una sub-transaccion nueva por cada item -- la segunda fallaba
+     * y por eso solo se anulaba una cuenta.
+     */
     public boolean nullify(DanglingAccount item) {
         if (item == null) {
             return false;
@@ -153,7 +160,6 @@ public class AccountIntegrityServiceBean extends GenericServiceBean implements A
                 query.setParameter("code", item.getCode());
             }
             query.executeUpdate();
-            getEntityManager().flush();
             return true;
         } catch (Exception e) {
             // p.ej. columna NOT NULL en la BD del cliente: se reporta, no se rompe.

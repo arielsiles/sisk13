@@ -71,12 +71,15 @@
          de cuentas colgadas persista entre el render y el postback de anular.
          load() carga la lista solo al ENTRAR (on-postback="false"); en el postback
          de anular no corre y la recarga nullifySelected(). -->
+    <!-- companyAccountRepairAction es @Scope(PAGE): la lista de cuentas colgadas
+         persiste entre el render y el postback de anular sin necesidad de
+         conversacion (mismo patron que los DataModels). load() carga solo al
+         ENTRAR (on-postback="false"); en el postback la lista ya esta en el
+         componente PAGE y la recarga nullifySelected(). -->
     <page view-id="/admin/companyAccountRepair.xhtml" login-required="true">
-        <begin-conversation join="true" flush-mode="MANUAL"/>
         <action execute="#{companyAccountRepairAction.load}" on-postback="false"/>
         <navigation from-action="#{companyAccountRepairAction.goToSettings}">
             <rule if-outcome="settings">
-                <end-conversation/>
                 <redirect view-id="/admin/companySetting.xhtml"/>
             </rule>
         </navigation>

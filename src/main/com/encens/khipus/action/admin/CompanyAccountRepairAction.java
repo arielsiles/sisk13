@@ -30,7 +30,7 @@ import java.util.List;
  * @version 1.0
  */
 @Name("companyAccountRepairAction")
-@Scope(ScopeType.CONVERSATION)
+@Scope(ScopeType.PAGE)
 @Restrict("#{s:hasPermission('COMPANYSETTING','VIEW')}")
 public class CompanyAccountRepairAction {
 
@@ -75,8 +75,10 @@ public class CompanyAccountRepairAction {
     public void nullifySelected() {
         int done = 0;
         int failed = 0;
+        int selected = 0;
         for (DanglingAccount item : danglingAccounts) {
             if (item.isSelected()) {
+                selected++;
                 if (accountIntegrityService.nullify(item)) {
                     done++;
                 } else {
@@ -84,6 +86,8 @@ public class CompanyAccountRepairAction {
                 }
             }
         }
+        log.info("nullifySelected: lista=#0 seleccionadas=#1 anuladas=#2 fallidas=#3",
+                danglingAccounts.size(), selected, done, failed);
 
         if (done == 0 && failed == 0) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
