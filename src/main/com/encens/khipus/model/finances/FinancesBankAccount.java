@@ -126,6 +126,22 @@ public class FinancesBankAccount implements BaseModel {
         this.state = state;
     }
 
+    /**
+     * Vista booleana de `estado` para el check "Vigente" del CRUD.
+     * VIG = vigente (aparece en los selectores); cualquier otro valor = inactiva.
+     * No es persistente: escribe/lee sobre {@link #state}. Las constantes NO se
+     * declaran como campos static de la entidad: UpperCaseStringListener recorre
+     * los campos String por reflexion y falla al tocar un static final.
+     */
+    @javax.persistence.Transient
+    public boolean isActive() {
+        return FinancesEntityState.VIG.name().equals(state);
+    }
+
+    public void setActive(boolean active) {
+        this.state = (active ? FinancesEntityState.VIG : FinancesEntityState.BLO).name();
+    }
+
     public Boolean isNationalCurrency() {
         return FinancesCurrencyType.P.equals(getState());
     }

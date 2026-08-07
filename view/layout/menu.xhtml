@@ -3034,12 +3034,20 @@
                         s:hasPermission('CASHACCOUNTGROUP','VIEW') or
                         s:hasPermission('COSTCENTER','VIEW') or
                         s:hasPermission('COSTCENTERGROUP','VIEW') or
+                        s:hasPermission('FINANCESBANKACCOUNT','VIEW') or
                         s:hasPermission('FINANCESEXCHANGERATE','VIEW')}">
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{s:hasPermission('MEASUREUNIT','VIEW')}">
             <s:link view="/finances/measureUnitList.xhtml"
                     value="#{messages['menu.finances.configuration.measureUnit']}"
+                    propagation="none"/>
+        </rich:menuItem>
+        <rich:menuItem submitMode="none"
+                       styleClass="main-menu-item"
+                       rendered="#{s:hasPermission('FINANCESBANKACCOUNT','VIEW')}">
+            <s:link view="/finances/financesBankAccountList.xhtml"
+                    value="#{messages['menu.finances.configuration.financesBankAccount']}"
                     propagation="none"/>
         </rich:menuItem>
         <rich:menuItem submitMode="none"

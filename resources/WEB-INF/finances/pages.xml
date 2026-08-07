@@ -285,6 +285,24 @@
         </navigation>
     </page>
 
+    <page view-id="/finances/financesBankAccountList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{financesBankAccountAction.select(item)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/finances/financesBankAccount.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/finances/financesBankAccount.xhtml"
+          no-conversation-view-id="/finances/financesBankAccountList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/finances/financesBankAccountList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/finances/advanceList.xhtml">
         <end-conversation/>
         <navigation from-action="#{advanceAction.select(advanceItem)}">
