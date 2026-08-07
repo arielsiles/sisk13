@@ -6,6 +6,7 @@ import com.encens.khipus.action.warehouse.reports.ValuedPhysicalInventoryReportA
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
+import com.encens.khipus.exception.finances.FixedTermDepositCapitalException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.accounting.DocType;
@@ -212,6 +213,20 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
             setOp(OP_UPDATE);
             return Outcome.SUCCESS;
+
+        } catch (FixedTermDepositCapitalException e) {
+            /**
+             * Se atrapa aparte del Exception generico para que el contador vea que fue lo
+             * que paso y que tiene que hacer, en vez del "no se pudo guardar" de siempre:
+             * un DPF no recibe capital a mitad de plazo, hay que renovarlo.
+             */
+            rollbackAndDiscardGeneratedIds(e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.dpfCapitalAfterOpening",
+                    e.getAccountCode(),
+                    DateUtils.format(e.getOpeningDate(), "dd/MM/yyyy"),
+                    DateUtils.format(e.getVoucherDate(), "dd/MM/yyyy"));
+            return Outcome.REDISPLAY;
 
         } catch (Exception e) {
             /**

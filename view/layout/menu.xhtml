@@ -1824,6 +1824,7 @@
                         propagation="none"/>
             </rich:menuItem>
 
+
         </rich:dropDownMenu>
 
         <rich:dropDownMenu value="#{messages['menu.customers.configuration']}" rendered="#{
@@ -1836,7 +1837,8 @@
                 s:hasPermission('INCOTERM','VIEW') or
                 s:hasPermission('COMMERCIALCOSTCENTER','VIEW') or
                 s:hasPermission('SALESORDERNOTE','VIEW') or
-                s:hasPermission('SALESORDERTERM','VIEW')}">
+                s:hasPermission('SALESORDERTERM','VIEW') or
+                s:hasPermission('ACCOUNTTYPE','VIEW')}">
 
             <rich:menuItem submitMode="none"
                            styleClass="main-menu-item"
@@ -1867,6 +1869,14 @@
                            rendered="#{s:hasPermission('CREDIT','VIEW')}">
                 <s:link view="/customers/creditTypeList.xhtml"
                         value="#{messages['menu.customers.configuration.creditType']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('ACCOUNTTYPE','VIEW')}">
+                <s:link view="/customers/accountTypeList.xhtml"
+                        value="#{messages['menu.customers.configuration.accountType']}"
                         propagation="none"/>
             </rich:menuItem>
 

@@ -57,12 +57,13 @@ update configuracion
 --      (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
 --    Ultima sembrada: 503 (COMPANYSETTING, query_v6.0.110).
 --    idmodulo: 5 = finances, 1 = customers.
-
-insert into funcionalidad values (514, 'FINANCESEXCHANGERATE', 'Tipos de cambio de contabilidad (arcgtc)', 5, 15, 'Functionality.finances.financesExchangeRate', 1);
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+insert into funcionalidad values (@nuevo_id, 'FINANCESEXCHANGERATE', 'Tipos de cambio de contabilidad (arcgtc)', 5, 15, 'Functionality.finances.financesExchangeRate', 1);
 
 -- La pantalla de provision no tiene edicion ni baja: solo consultar/calcular
 -- (VIEW=1) y generar el asiento (CREATE=2). Por eso permiso = 3.
-insert into funcionalidad values (515, 'PROVISIONDPF', 'Provision de intereses por pagar sobre DPF', 1, 3, 'Functionality.customers.provisionDPF', 1);
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+insert into funcionalidad values (@nuevo_id, 'PROVISIONDPF', 'Provision de intereses por pagar sobre DPF', 1, 3, 'Functionality.customers.provisionDPF', 1);
 
 
 -- 4) Otorgar los permisos al rol Administrador (idrol = 1) -------------------

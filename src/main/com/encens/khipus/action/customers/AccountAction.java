@@ -24,8 +24,10 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -51,7 +53,6 @@ public class AccountAction extends GenericAction<Account> {
     @In
     private CreditService creditService;
 
-    private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
 
     private BigDecimal totalCredit  = BigDecimal.ZERO;
     private BigDecimal totalDebit   = BigDecimal.ZERO;
@@ -60,6 +61,13 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalCreditMe  = BigDecimal.ZERO;
     private BigDecimal totalDebitMe   = BigDecimal.ZERO;
     private BigDecimal totalBalanceMe = BigDecimal.ZERO;
+
+    /**
+     * Cuantos asientos tiene la cuenta en el mayor. Distingue "saldo cero porque se retiro
+     * todo" de "saldo cero porque todavia no se contabilizo nada". Lo carga
+     * {@link #calculateTotalAmounts(Account)}.
+     */
+    private int accountMovementCount;
 
     private Boolean partialRenewal;
 
@@ -72,7 +80,11 @@ public class AccountAction extends GenericAction<Account> {
 
     /** Renovation DPF **/
     private BigDecimal capitalRenewDPF;
-    private BigDecimal partialCapitalRenewDPF = BigDecimal.ZERO;
+    /** Arranca en null para que el campo se vea vacio, no con un 0,00 heredado. */
+    private BigDecimal partialCapitalRenewDPF;
+
+    /** Tramos del interes ganado: uno por cada aumento de capital durante el plazo. */
+    private List<FixedTermDepositProvision> interestSegmentsDPF = new ArrayList<FixedTermDepositProvision>();
     private AccountType accountTypeRenewDPF;
     private BigDecimal interestRenewDPF;
     private DocType documentType = new DocType();
@@ -148,8 +160,118 @@ public class AccountAction extends GenericAction<Account> {
         return Outcome.CANCEL;
     }
 
+    /**
+     * Un certificado terminado: ya se renovo, o se retiro todo el dinero, o nunca fue una
+     * operacion real. No queda capital que renovar y volver a hacerlo duplicaria el pasivo.
+     * <p/>
+     * Se mira por dos lados porque se llega por dos caminos distintos:
+     * <p/>
+     * 1) El estado. {@link #createDpfRenewal()} deja el certificado viejo en INACTIVE, y
+     *    ANNULLED marca al que nunca existio como operacion.
+     * 2) El mayor. Un retiro total registrado por comprobante NO toca el estado: la cuenta
+     *    queda en ACTIVE con saldo cero. Por eso el estado solo no alcanza.
+     * <p/>
+     * El saldo cero solo cuenta si hay movimientos. Un certificado sin ningun asiento
+     * tambien da saldo cero y no esta cerrado: esta sin contabilizar (caso ME00148).
+     * <p/>
+     * Los totales salen de {@link #calculateTotalAmounts(Account)}, que corre en select():
+     * este metodo describe la cuenta que se esta editando, no una cualquiera.
+     */
+    public boolean isClosed(Account account) {
+        if (account == null) {
+            return false;
+        }
+        if (AccountState.ANNULLED.equals(account.getAccountState())
+                || AccountState.INACTIVE.equals(account.getAccountState())) {
+            return true;
+        }
+        if (accountMovementCount <= 0) {
+            return false;
+        }
+        BigDecimal balance = isForeignAccount() ? getTotalBalanceMe() : getTotalBalance();
+        return balance != null && balance.compareTo(BigDecimal.ZERO) == 0;
+    }
+
+    /**
+     * Condiciones para poder renovar un DPF:
+     * <p/>
+     * 1) Que no este terminado (ver {@link #isClosed(Account)}).
+     * 2) Que tenga fecha de vencimiento cargada; sin plazo no hay interes que calcular.
+     * 3) Que el plazo se haya cumplido: nunca se paga interes por dias que no
+     *    transcurrieron. El dia del vencimiento cuenta como cumplido, porque el
+     *    certificado devenga hasta esa fecha inclusive.
+     */
+    public boolean isRenewable(Account account) {
+        if (account == null
+                || isClosed(account)
+                || account.getExpirationDate() == null) {
+            return false;
+        }
+        return !DateUtils.removeTime(account.getExpirationDate()).after(DateUtils.toDay());
+    }
+
+    /**
+     * Motivo por el que Renovar esta deshabilitado, ya resuelto a texto. Cadena vacia si
+     * se puede renovar. Se arma aca y no en la vista para no repetir la cadena de
+     * condiciones de {@link #isRenewable(Account)} en un EL.
+     */
+    public String getRenewalBlockedReason() {
+        Account account = getInstance();
+        if (account == null || isRenewable(account)) {
+            return "";
+        }
+        if (AccountState.ANNULLED.equals(account.getAccountState())) {
+            return messages.get("Account.renewal.blocked.annulled");
+        }
+        if (isClosed(account)) {
+            return messages.get("Account.renewal.blocked.closed");
+        }
+        if (account.getExpirationDate() == null) {
+            return messages.get("Account.renewal.blocked.noExpirationDate");
+        }
+        return MessageFormat.format(messages.get("Account.renewal.blocked.notExpiredYet"),
+                getExpirationDateLabel());
+    }
+
+    /** Vencimiento del certificado ya formateado, para el mensaje de la pantalla. */
+    public String getExpirationDateLabel() {
+        Date expirationDate = getInstance() != null ? getInstance().getExpirationDate() : null;
+        return expirationDate != null ? DateUtils.format(expirationDate, "dd/MM/yyyy") : "";
+    }
+
+    /**
+     * Fecha de inicio del nuevo certificado: el dia siguiente al vencimiento, o hoy si el
+     * vencimiento ya paso hace tiempo. Asi no queda un hueco sin devengar entre los dos
+     * certificados ni se arranca antes de que el anterior termine.
+     * <p/>
+     * Sin fecha de vencimiento se cae a hoy en vez de reventar: la pantalla se abre igual
+     * para consultar y el boton Renovar ya queda deshabilitado por {@link #isRenewable}.
+     */
+    private Date calculateRenewalStartDate(Account account) {
+        Date today = DateUtils.toDay();
+        Date expirationDate = DateUtils.removeTime(account.getExpirationDate());
+        if (expirationDate == null) {
+            return today;
+        }
+        Date dayAfterExpiration = DateUtils.addDay(expirationDate, 1);
+        return dayAfterExpiration.after(today) ? dayAfterExpiration : today;
+    }
+
+    /**
+     * Un certificado terminado ni siquiera abre la pantalla: ya se renovo o se retiro todo
+     * el dinero, no hay nada que calcular ni que renovar.
+     * <p/>
+     * El plazo, en cambio, NO se valida aca a proposito: mientras el DPF sigue vigente la
+     * pantalla se abre y muestra todos los calculos (capital, interes por tramos, retencion,
+     * total). Lo que se bloquea en ese caso es el boton Renovar, asi se puede consultar sin
+     * poder ejecutar.
+     */
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)
     public String renewalDPF() {
+        if (isClosed(getInstance())) {
+            facesMessages.add(StatusMessage.Severity.ERROR, getRenewalBlockedReason());
+            return Outcome.REDISPLAY;
+        }
         setOp(OP_UPDATE);
 
         if (!isForeignAccount())
@@ -157,9 +279,17 @@ public class AccountAction extends GenericAction<Account> {
         if (isForeignAccount())
             setCapitalDPF(getTotalBalanceMe());
 
-        BigDecimal interestVal = calculateInterestForDays(getInstance().getAccountType().getDays(), getCapitalDPF(), getInstance().getAccountType().getInta());
+        /** El interes se calcula por tramos: si el certificado recibio un aumento de
+         *  capital durante el plazo, los dias anteriores devengan sobre el capital que
+         *  tenia antes. Con un solo tramo -- el caso normal -- da igual que antes. */
+        setInterestSegmentsDPF(buildInterestSegments(getInstance()));
+        BigDecimal interestVal = BigDecimal.ZERO;
+        for (FixedTermDepositProvision segment : getInterestSegmentsDPF()) {
+            interestVal = BigDecimalUtil.sum(interestVal, segment.getProvision(), 6);
+        }
         setInterestDPF(interestVal);
 
+        /** La retencion se calcula sobre el interes total, no por tramo. */
         if (getInstance().getRetentionFlag())
             setRcivaDPF(BigDecimalUtil.multiply(interestVal, Constants.VAT));
         else
@@ -176,19 +306,128 @@ public class AccountAction extends GenericAction<Account> {
 
         setCapitalRenewDPF(totalAmountDPF);
 
+        /** Defaults del nuevo certificado: mismo socio y mismo tipo de cuenta, con el
+         *  vencimiento ya calculado. Quedan editables. */
+        setPartnerDPF(getInstance().getPartner());
+        setAccountTypeRenewDPF(getInstance().getAccountType());
+        setStartDateDPF(calculateRenewalStartDate(getInstance()));
+        calculateExpirationDateDPF();
+
         return Outcome.SUCCESS;
     }
 
-    @End(beforeRedirect = true)
+    /**
+     * Tramos de interes ganado del certificado durante su plazo. Uno por cada aumento de
+     * capital; lo normal es uno solo.
+     * <p/>
+     * Los dias del ultimo tramo se calculan por diferencia contra el plazo contratado
+     * (<code>tipocuenta.dias</code>), asi la suma de los tramos siempre da el plazo exacto
+     * y no depende de como caigan las fechas.
+     */
+    private List<FixedTermDepositProvision> buildInterestSegments(Account account) {
+        List<FixedTermDepositProvision> segments = new ArrayList<FixedTermDepositProvision>();
+
+        AccountType accountType = account.getAccountType();
+        BigDecimal rate = accountType.getInta();
+        int totalDays = accountType.getDays() != null ? accountType.getDays() : 0;
+        Date openingDate = DateUtils.removeTime(account.getOpeningDate());
+        boolean foreign = FinancesCurrencyType.D.equals(account.getCurrency());
+
+        List<Long> accountIds = new ArrayList<Long>();
+        accountIds.add(account.getId());
+        List<Object[]> movements = accountService.getAccountLedgerMovements(accountIds);
+
+        /** Fechas de aumento: abonos posteriores a la apertura, mismo criterio que la
+         *  provision mensual. */
+        List<Date> increaseDates = new ArrayList<Date>();
+        for (Object[] movement : movements) {
+            Date movementDate = DateUtils.removeTime((Date) movement[1]);
+            BigDecimal credit = (BigDecimal) (foreign ? movement[5] : movement[3]);
+            if (movementDate != null && movementDate.after(openingDate)
+                    && credit != null && credit.doubleValue() > 0
+                    && !increaseDates.contains(movementDate)) {
+                increaseDates.add(movementDate);
+            }
+        }
+        Collections.sort(increaseDates);
+
+        Date segmentFrom = openingDate;
+        int consumedDays = 0;
+        for (int i = 0; i <= increaseDates.size(); i++) {
+            boolean last = i == increaseDates.size();
+            int days = last
+                    ? totalDays - consumedDays
+                    : (int) DateUtils.daysBetween(segmentFrom, DateUtils.addDay(increaseDates.get(i), -1), true);
+            if (days <= 0) {
+                if (!last) {
+                    segmentFrom = increaseDates.get(i);
+                }
+                continue;
+            }
+
+            BigDecimal capital = accumulatedCredits(movements, segmentFrom, foreign);
+
+            FixedTermDepositProvision segment = new FixedTermDepositProvision();
+            segment.setAccount(account);
+            segment.setProvisionFromDate(segmentFrom);
+            segment.setProvisionUntilDate(last ? DateUtils.addDay(segmentFrom, days - 1)
+                    : DateUtils.addDay(increaseDates.get(i), -1));
+            segment.setRate(rate);
+            segment.setCapital(capital);
+            segment.setDays(days);
+            segment.setProvision(calculateInterestForDays(days, capital, rate));
+            if (i > 0) {
+                segment.setCapitalIncreaseDate(increaseDates.get(i - 1));
+            }
+            segments.add(segment);
+
+            consumedDays += days;
+            if (!last) {
+                segmentFrom = increaseDates.get(i);
+            }
+        }
+        return segments;
+    }
+
+    /** Capital vigente a una fecha: suma de los abonos hasta esa fecha inclusive. */
+    private BigDecimal accumulatedCredits(List<Object[]> movements, Date date, boolean foreign) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (Object[] movement : movements) {
+            Date movementDate = DateUtils.removeTime((Date) movement[1]);
+            if (movementDate == null || movementDate.after(date)) {
+                continue;
+            }
+            BigDecimal credit = (BigDecimal) (foreign ? movement[5] : movement[3]);
+            if (credit != null) {
+                total = total.add(credit);
+            }
+        }
+        return total;
+    }
+
+    /**
+     * El <code>ifOutcome</code> es necesario: sin el, una validacion fallida cerraria
+     * igual la conversacion y la pantalla quedaria sin datos.
+     */
+    @End(beforeRedirect = true, ifOutcome = Outcome.SUCCESS)
     public String createDpfRenewal(){
+
+        if (!validateRenewal()) {
+            return Outcome.REDISPLAY;
+        }
 
         BigDecimal exchangeRate = BigDecimal.ZERO;
         try {
-            exchangeRate = financesExchangeRateService.findLastExchangeRateByCurrency(FinancesCurrencyType.D.toString());
+            /** El tipo de cambio del dia del asiento, no el ultimo cargado: una
+             *  renovacion registrada dias despues tiene que valuarse a su fecha. */
+            exchangeRate = financesExchangeRateService
+                    .findExchangeRateByDateByCurrency(DateUtils.removeTime(startDateDPF), FinancesCurrencyType.D.toString());
         }catch (FinancesExchangeRateNotFoundException e){
             addFinancesExchangeRateNotFoundExceptionMessage();
+            return Outcome.REDISPLAY;
         }catch (FinancesCurrencyNotFoundException e){
             addFinancesCurrencyNotFoundMessage();
+            return Outcome.REDISPLAY;
         }
 
         Account currentAccount = getInstance();
@@ -218,6 +457,9 @@ public class AccountAction extends GenericAction<Account> {
         Voucher voucher = new Voucher();
         voucher.setDocumentType(documentType.getName());
         voucher.setGloss(glossRenewDPF);
+        /** Sin esto el comprobante se fechaba con el dia en que se opera, no con la
+         *  fecha de la renovacion: coincidian solo porque siempre se hacen el mismo dia. */
+        voucher.setDate(DateUtils.removeTime(startDateDPF));
 
         VoucherDetail vd1 = new VoucherDetail();
         VoucherDetail vd2 = new VoucherDetail();
@@ -247,10 +489,27 @@ public class AccountAction extends GenericAction<Account> {
             vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMn().getAccountCode(), interestValue, "DEBIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
             vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMn().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
             if (partialRenewal)
-                vd4 = buildAccountEntryDetail("1110110100", withdrawal, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+                /** Cuenta en bolivianos: el retiro tambien va en MN. Estaba armandose
+                 *  como moneda extranjera y convertia el importe por el tipo de cambio. */
+                vd4 = buildAccountEntryDetail("1110110100", withdrawal, "CREDIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
         }
 
         newAccount.setCapital(capitalRenewDPF);
+
+        /**
+         * Candado: el capital que se guarda en la ficha tiene que ser exactamente el que
+         * se acredita en el asiento. Es lo que evita que la cuenta quede con un capital
+         * que la contabilidad desmiente, como paso historicamente.
+         */
+        BigDecimal creditedCapital = FinancesCurrencyType.D.equals(currentAccount.getCurrency())
+                ? vd3.getCreditMe() : vd3.getCredit();
+        if (BigDecimalUtil.roundBigDecimal(capitalRenewDPF, 2)
+                .compareTo(BigDecimalUtil.roundBigDecimal(creditedCapital, 2)) != 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.renewalCapitalMismatch", capitalRenewDPF, creditedCapital);
+            return Outcome.REDISPLAY;
+        }
+
         accountService.createAccount(newAccount);
         accountService.updateAccount(currentAccount);
 
@@ -267,6 +526,56 @@ public class AccountAction extends GenericAction<Account> {
 
 
         return Outcome.SUCCESS;
+    }
+
+    /**
+     * Controles previos a generar la renovacion. Se validan aca y no en la vista porque
+     * son reglas del negocio, y porque el campo de capital parcial solo se renderiza
+     * condicionado al check: su <code>required</code> no corre si el check llega apagado.
+     */
+    private boolean validateRenewal() {
+        boolean valid = true;
+
+        /** Ultima barrera: la pantalla ya no deja llegar aca -- Renovar esta deshabilitado
+         *  --, pero renovar un certificado cerrado o antes de plazo son reglas del negocio
+         *  y se validan antes de grabar, no solo en la vista. */
+        if (!isRenewable(getInstance())) {
+            facesMessages.add(StatusMessage.Severity.ERROR, getRenewalBlockedReason());
+            valid = false;
+        }
+
+        if (documentType == null || documentType.getName() == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.renewalDocumentTypeRequired");
+            valid = false;
+        }
+
+        if (startDateDPF == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.renewalStartDateRequired");
+            valid = false;
+        }
+
+        if (capitalRenewDPF == null || capitalRenewDPF.doubleValue() <= 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.renewalCapitalRequired");
+            valid = false;
+        }
+
+        if (Boolean.TRUE.equals(partialRenewal)) {
+            if (partialCapitalRenewDPF == null || partialCapitalRenewDPF.doubleValue() <= 0) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                        "Account.error.partialCapitalRequired");
+                valid = false;
+            } else if (capitalRenewDPF != null
+                    && partialCapitalRenewDPF.compareTo(capitalRenewDPF) > 0) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                        "Account.error.partialCapitalTooBig", partialCapitalRenewDPF, capitalRenewDPF);
+                valid = false;
+            }
+        }
+
+        return valid;
     }
 
     public String generateAccountNumber(){
@@ -290,6 +599,18 @@ public class AccountAction extends GenericAction<Account> {
 
     public void calculateTotalAmounts(Account account){
         List<VoucherDetail> voucherDetails = accountService.getAccountDetailList(account);
+
+        /**
+         * Se parte de cero. La accion es de conversacion y este metodo se llama desde
+         * select(): sin el reset, entrar dos veces a una cuenta dentro de la misma
+         * conversacion duplicaba los totales, y de ahi sale el capital base de la
+         * renovacion (renewalDPF usa getTotalBalance/getTotalBalanceMe).
+         */
+        setTotalCredit(BigDecimal.ZERO);
+        setTotalDebit(BigDecimal.ZERO);
+        setTotalCreditMe(BigDecimal.ZERO);
+        setTotalDebitMe(BigDecimal.ZERO);
+        accountMovementCount = voucherDetails.size();
 
         for (VoucherDetail voucherDetail : voucherDetails){
             setTotalCredit(BigDecimalUtil.sum(getTotalCredit(), voucherDetail.getCredit(), 2));
@@ -374,8 +695,13 @@ public class AccountAction extends GenericAction<Account> {
         setPartnerDPF(null);
     }
 
-    public List<AccountTransaction> getAccountTransactionList() {
-        return accountTransactionList;
+    /**
+     * Al tildar o destildar "Renovacion parcial" se limpia el capital parcial. Sin esto el
+     * valor quedaba vivo en la conversacion: al destildar no se borraba, y al volver a
+     * tildar reaparecia el importe tipeado antes.
+     */
+    public void togglePartialRenewal() {
+        setPartialCapitalRenewDPF(null);
     }
 
     public boolean isForeignAccount(){
@@ -794,15 +1120,27 @@ public class AccountAction extends GenericAction<Account> {
     }
 
 
-    public void setAccountTransactionList(List<AccountTransaction> accountTransactionList) {
-        this.accountTransactionList = accountTransactionList;
-    }
-
     public boolean isActive(Account account){
         if (account != null)
             return account.getAccountState().equals(AccountState.ACTIVE);
 
         return false;
+    }
+
+    /**
+     * Solo se puede anular una cuenta que nunca tuvo movimiento contable. Si tiene
+     * asientos es un certificado real: corresponde INACTIVE, no ANNULLED.
+     */
+    @Override
+    @End
+    public String update() {
+        if (AccountState.ANNULLED.equals(getInstance().getAccountState())
+                && !accountService.getAccountDetailList(getInstance()).isEmpty()) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.cannotAnnulWithMovements", getInstance().getCode());
+            return Outcome.REDISPLAY;
+        }
+        return super.update();
     }
 
     public BigDecimal getTotalCredit() {
@@ -996,6 +1334,19 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setBeneficiary2(String beneficiary2) {
         this.beneficiary2 = beneficiary2;
+    }
+
+    public List<FixedTermDepositProvision> getInterestSegmentsDPF() {
+        return interestSegmentsDPF;
+    }
+
+    public void setInterestSegmentsDPF(List<FixedTermDepositProvision> interestSegmentsDPF) {
+        this.interestSegmentsDPF = interestSegmentsDPF;
+    }
+
+    /** Solo hay que mostrar el desglose cuando hubo un aumento de capital. */
+    public boolean isInterestSegmented() {
+        return interestSegmentsDPF != null && interestSegmentsDPF.size() > 1;
     }
 
     public Boolean getPartialRenewal() {

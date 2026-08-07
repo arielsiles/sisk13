@@ -178,15 +178,36 @@ public class AccountServiceBean implements AccountService {
     }
 
     public List<Account> getSavingsAccountsByPeriod(SavingType savingType, Date startDate, Date endDate) {
+        /**
+         * No se filtra por capital: una cuenta con capital cero es un dato a corregir y
+         * tiene que salir a la luz, no desaparecer del calculo en silencio.
+         * Si se excluyen las ANNULLED, que nunca fueron una operacion real.
+         */
         return (List<Account>) em.createQuery("select account from Account account " +
                 " where account.accountType.savingType =:savingType" +
-                "   and account.capital > 0" +
+                "   and account.accountState <> :annulled" +
                 "   and account.openingDate <=:endDate" +
                 "   and account.expirationDate >=:startDate" +
                 " order by account.currency, account.code")
                 .setParameter("savingType", savingType)
+                .setParameter("annulled", AccountState.ANNULLED)
                 .setParameter("startDate", startDate, TemporalType.DATE)
                 .setParameter("endDate", endDate, TemporalType.DATE)
+                .getResultList();
+    }
+
+    public List<Object[]> getAccountLedgerMovements(List<Long> accountIds) {
+        if (accountIds == null || accountIds.isEmpty()) {
+            return new ArrayList<Object[]>();
+        }
+        return (List<Object[]>) em.createQuery("select voucherDetail.partnerAccount.id," +
+                "       voucherDetail.voucher.date," +
+                "       voucherDetail.debit, voucherDetail.credit," +
+                "       voucherDetail.debitMe, voucherDetail.creditMe" +
+                "  from VoucherDetail voucherDetail" +
+                " where voucherDetail.partnerAccount.id in (:accountIds)" +
+                "   and voucherDetail.voucher.state <> 'ANL'")
+                .setParameter("accountIds", accountIds)
                 .getResultList();
     }
 
@@ -194,9 +215,12 @@ public class AccountServiceBean implements AccountService {
     public List<Account> getAccountList(Partner partner) {
         List<Account> accountList = new ArrayList<Account>();
 
+        /** Alimenta el selector de cuentas destino de transferencias: las anuladas no van. */
         accountList = (List<Account>) em.createQuery("select account from Account account" +
-                " where account.partner =:partner ")
+                " where account.partner =:partner " +
+                "   and account.accountState <> :annulled ")
                 .setParameter("partner", partner)
+                .setParameter("annulled", AccountState.ANNULLED)
                 .getResultList();
 
         return accountList;

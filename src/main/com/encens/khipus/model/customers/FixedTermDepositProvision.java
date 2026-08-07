@@ -13,6 +13,11 @@ import java.util.Date;
  * tipo de cuenta, socio, fechas, tasa, capital, dias devengados y provision del mes.
  * No es una entidad: se calcula en memoria y solo alimenta la grilla de la pantalla y
  * la totalizacion del asiento.
+ * <p/>
+ * Representa un TRAMO de devengue, no necesariamente el mes completo. Lo normal es que
+ * un certificado tenga un solo tramo por mes; si recibio un aumento de capital dentro
+ * del mes, se generan dos o mas tramos, cada uno con su capital y sus dias, porque el
+ * interes se devenga sobre el capital vigente en cada dia.
  *
  * @author
  */
@@ -39,6 +44,16 @@ public class FixedTermDepositProvision implements Serializable {
 
     /** Cuenta de pasivo (CTACF_MN / CTACF_ME del tipo de cuenta) donde se acredita. */
     private String liabilityAccountCode;
+
+    /**
+     * Capital vigente durante este tramo, tomado de la linea de tiempo del mayor.
+     * No se lee de <code>cuenta.capital</code>: ese campo guarda un solo valor y no puede
+     * representar un capital que cambio a mitad del plazo.
+     */
+    private BigDecimal capital = BigDecimal.ZERO;
+
+    /** Fecha del aumento que abre este tramo; null si el tramo arranca con el mes. */
+    private Date capitalIncreaseDate;
 
     public FixedTermDepositProvision() {
     }
@@ -134,6 +149,23 @@ public class FixedTermDepositProvision implements Serializable {
     }
 
     public BigDecimal getCapital() {
-        return account != null ? account.getCapital() : BigDecimal.ZERO;
+        return capital;
+    }
+
+    public void setCapital(BigDecimal capital) {
+        this.capital = capital;
+    }
+
+    public Date getCapitalIncreaseDate() {
+        return capitalIncreaseDate;
+    }
+
+    public void setCapitalIncreaseDate(Date capitalIncreaseDate) {
+        this.capitalIncreaseDate = capitalIncreaseDate;
+    }
+
+    /** Marca las filas que nacen de un aumento, para resaltarlas en la grilla. */
+    public boolean isFromCapitalIncrease() {
+        return capitalIncreaseDate != null;
     }
 }

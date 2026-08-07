@@ -116,6 +116,10 @@
                             </rich:column>
                             <rich:column>
                                 <h:outputText value="#{detailItem.code}"/>
+                                <!-- Tramo abierto por un aumento de capital: se marca para
+                                     que se entienda por que el certificado aparece dos veces. -->
+                                <h:outputText value=" *" rendered="#{detailItem.fromCapitalIncrease}"
+                                              title="#{messages['ProvisionInterestPayable.increaseMark']}"/>
                             </rich:column>
                             <rich:column styleClass="center">
                                 <h:outputText value="#{messages[detailItem.currency.symbolResourceKey]}"/>
@@ -129,6 +133,14 @@
                                 </h:outputText>
                             </rich:column>
                             <rich:column styleClass="center">
+                                <!-- Se muestra el tramo completo (desde a hasta): con un
+                                     aumento de capital el mes se parte y solo el "hasta"
+                                     no alcanza para entender los dias de cada fila. -->
+                                <h:outputText value="#{detailItem.provisionFromDate}">
+                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                       timeZone="#{sessionUser.timeZone}" type="date"/>
+                                </h:outputText>
+                                <h:outputText value=" - "/>
                                 <h:outputText value="#{detailItem.provisionUntilDate}">
                                     <f:convertDateTime pattern="#{messages['patterns.date']}"
                                                        timeZone="#{sessionUser.timeZone}" type="date"/>

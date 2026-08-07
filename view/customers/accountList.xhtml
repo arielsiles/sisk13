@@ -40,24 +40,69 @@
                                  maxlength="80" tabindex="3" styleClass="input">
                     </h:inputText>
                 </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.state']}</ui:define>
+                    <h:selectOneMenu id="accountState" value="#{accountDataModel.criteria.accountState}"
+                                     tabindex="4" styleClass="input">
+                        <s:selectItems value="#{accountStateEnum}" var="accountStateItem"
+                                       label="#{messages[accountStateItem.resourceKey]}"
+                                       noSelectionLabel="#{messages['Common.all']}"
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.accountType']}</ui:define>
+                    <h:selectOneMenu id="accountTypeId" value="#{accountDataModel.criteria.accountType}"
+                                     tabindex="5" styleClass="input">
+                        <s:selectItems value="#{accountTypeList.resultList}" var="accountTypeItem"
+                                       label="#{accountTypeItem.name}"
+                                       noSelectionLabel="#{messages['Common.all']}"
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
             </s:div>
             <s:div>
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Account.code']}</ui:define>
                     <h:inputText id="accountNumber" value="#{accountDataModel.criteria.code}"
-                                 maxlength="80" tabindex="4" styleClass="inputMedium">
+                                 maxlength="80" tabindex="6" styleClass="inputMedium">
                     </h:inputText>
                 </s:decorate>
                 <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Account.accountNumber']}</ui:define>
                     <h:inputText id="accountNumber" value="#{accountDataModel.criteria.accountNumber}"
-                                 maxlength="80" tabindex="5" styleClass="inputMedium">
+                                 maxlength="80" tabindex="7" styleClass="inputMedium">
                     </h:inputText>
                 </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.expirationFrom']}</ui:define>
+                    <rich:calendar id="expirationFrom" value="#{accountDataModel.expirationFrom}"
+                                   inputClass="inputMedium"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="8">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Account.expirationTo']}</ui:define>
+                    <rich:calendar id="expirationTo" value="#{accountDataModel.expirationTo}"
+                                   inputClass="inputMedium"
+                                   datePattern="#{messages['patterns.date']}"
+                                   enableManualInput="true"
+                                   tabindex="9">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
                 <s:decorate id="buttonField" template="/include/inputField.xhtml" styleClass="formRow">
-                    <a4j:commandButton action="#{accountDataModel.search}" reRender="accountList, dataScroller"
+                    <a4j:commandButton action="#{accountDataModel.updateAndSearch}"
+                                       reRender="accountList, dataScroller"
                                        styleClass="button"
-                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="10">
                         <s:defaultAction/>
                     </a4j:commandButton>
                 </s:decorate>
@@ -80,9 +125,9 @@
             </div>
 
             <rich:dataTable value="#{accountDataModel}" var="accountItem" id="accountList"
-                            rows="#{sessionUser.rowsPerPage}"
+                            rows="#{sessionUser.rowsPerPage15}"
                             width="100%"
-                            columnsWidth="8%, 8%, 8%, 8%, 5%, 30%, 20%, 5%, 8%">
+                            columnsWidth="6%, 6%, 10%, 5%, 8%, 8%, 24%, 20%, 6%, 7%">
                 <f:facet name="header">
                     <rich:columnGroup>
 
@@ -90,11 +135,25 @@
 
                         <rich:column>#{messages['Account.code']}</rich:column>
 
-                        <rich:column>#{messages['Account.openingDate']}</rich:column>
-
-                        <rich:column>#{messages['Account.exprirationDate']}</rich:column>
+                        <rich:column styleClass="right">#{messages['Account.capital']}</rich:column>
 
                         <rich:column>#{messages['Account.currency']}</rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="account.openingDate"
+                                                   dataModel="#{accountDataModel}"
+                                                   reRender="accountList, dataScroller">
+                                #{messages['Account.openingDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="account.expirationDate"
+                                                   dataModel="#{accountDataModel}"
+                                                   reRender="accountList, dataScroller">
+                                #{messages['Account.exprirationDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
 
                         <rich:column>#{messages['Account.partner']}</rich:column>
 
@@ -116,6 +175,16 @@
                     <h:outputText value="#{accountItem.code}"/>
                 </rich:column>
 
+                <rich:column styleClass="right">
+                    <h:outputText value="#{accountItem.capital}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{messages[accountItem.currency.symbolResourceKey]}"/>
+                </rich:column>
+
                 <rich:column styleClass="center">
                     <h:outputText value="#{accountItem.openingDate}">
                         <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
@@ -126,10 +195,6 @@
                     <h:outputText value="#{accountItem.expirationDate}">
                         <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
                     </h:outputText>
-                </rich:column>
-
-                <rich:column styleClass="center">
-                    <h:outputText value="#{messages[accountItem.currency.symbolResourceKey]}"/>
                 </rich:column>
 
                 <rich:column>

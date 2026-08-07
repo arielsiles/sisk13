@@ -17,9 +17,15 @@
 
             <div class="buttons">
 
+                <!-- No se renueva un certificado ya renovado o cerrado, ni uno cuyo plazo
+                     no vencio: no se pagan intereses por dias que no transcurrieron. La
+                     pantalla se consulta igual, con todos los calculos a la vista; lo que
+                     se bloquea es ejecutar la renovacion. -->
                 <h:commandButton id="createButtonId"
                                  action="#{accountAction.createDpfRenewal}"
                                  value="#{messages['Common.renew']}"
+                                 disabled="#{!accountAction.isRenewable(account)}"
+                                 title="#{accountAction.renewalBlockedReason}"
                                  styleClass="button">
                 </h:commandButton>
 
@@ -33,96 +39,66 @@
             <rich:panel id="formPanel">
                 <f:facet name="header">#{messages['Account.renewal']}</f:facet>
 
+                <!-- Explica por que Renovar esta deshabilitado. Va como primera linea DENTRO
+                     del panel: aprovecha su padding (no agrega espacio en blanco) y no
+                     desplaza la fila de botones, pero queda a la vista al entrar. -->
+                <s:fragment rendered="#{!accountAction.isRenewable(account)}">
+                    <h:outputText value="#{accountAction.renewalBlockedReason}" styleClass="colHint"/>
+                    <rich:spacer height="10"/>
+                </s:fragment>
+
                 <h:panelGrid columns="3" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent, width50percent">
                 <s:div id="leftSidePanel">
 
+                    <!--
+                        Certificado que se esta cerrando: TODO de solo lectura.
+                        Cuando estos campos eran editables, el submit de Renovar los
+                        escribia sobre la cuenta vieja y updateAccount() los persistia,
+                        alterando fechas y codigos de un certificado ya vencido.
+                    -->
+
                     <s:decorate id="openDateField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.openingDate']}</ui:define>
-                        <rich:calendar value="#{account.openingDate}"
-                                       popup="true"
-                                       required="true"
-                                       datePattern="#{messages['patterns.date']}"
-                                       styleClass="input"
-                                       enableManualInput="true"
-                                       tabindex="6">
+                        <h:outputText value="#{account.openingDate}">
                             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                        </rich:calendar>
+                        </h:outputText>
                     </s:decorate>
 
                     <s:decorate id="partnerField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
-                        <app:selectPopUp id="partnerFieldId"
-                                         required="true"
-                                         textValue="#{account.partner.fullName}"
-                                         value="#{account.partner}"
-                                         clearAction="#{accountAction.clearPartner()}"
-                                         searchModalPanel="partnerListModalPanel"
-                                         dataModel="#{partnerDataModel}"
-                                         reRender="partnerField" styleClass="input"
-                                         tabindex="12">
-                        </app:selectPopUp>
+                        <h:outputText value="#{account.partner.fullName}"/>
                     </s:decorate>
-
 
                     <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow" rendered="#{accountAction.managed}">
                         <ui:define name="label">#{messages['Account.accountNumber']}</ui:define>
-                        <h:outputText id="accountNumber" styleClass="input"
-                                     value="#{account.accountNumber}"  />
+                        <h:outputText id="accountNumber" value="#{account.accountNumber}"/>
                     </s:decorate>
 
                     <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.code']}</ui:define>
-                        <h:inputText id="code" value="#{account.code}" styleClass="input" />
+                        <h:outputText value="#{account.code}"/>
                     </s:decorate>
 
                     <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.currency']}</ui:define>
-                        <h:selectOneMenu id="currency" value="#{account.currency}" styleClass="input" disabled="#{accountAction.managed}"
-                                         tabindex="3" required="true">
-                            <s:selectItems value="#{currencyTypeEnum}" var="currency" label="#{messages[currency.resourceKey]}"
-                                           noSelectionLabel=""
-                                           hideNoSelectionLabel="false"/>
-                            <s:convertEnum/>
-                        </h:selectOneMenu>
+                        <h:outputText value="#{messages[account.currency.resourceKey]}"/>
                     </s:decorate>
 
                     <s:decorate id="accountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.accountType']}</ui:define>
-                        <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
-                                         styleClass="input"
-                                         required="true" disabled="#{accountAction.managed}"
-                                         tabindex="1">
-                            <s:selectItems value="#{accountTypeList.resultList}"
-                                           var="accountType"
-                                           label="#{accountType.name}"
-                                           noSelectionLabel=""
-                                           hideNoSelectionLabel="false"/>
-                            <s:convertEntity/>
-                        </h:selectOneMenu>
+                        <h:outputText value="#{account.accountType.name}"/>
                     </s:decorate>
 
                     <s:decorate id="accountStateField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.state']}</ui:define>
-                        <h:selectOneMenu id="accountState" value="#{account.accountState}" styleClass="input"
-                                         tabindex="3" required="true">
-                            <s:selectItems value="#{accountStateEnum}" var="accountState" label="#{messages[accountState.resourceKey]}"
-                                           noSelectionLabel=""
-                                           hideNoSelectionLabel="false"/>
-                            <s:convertEnum/>
-                        </h:selectOneMenu>
+                        <h:outputText value="#{messages[account.accountState.resourceKey]}"/>
                     </s:decorate>
 
                     <s:decorate id="exprirationDateField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.exprirationDate']}</ui:define>
-                        <rich:calendar value="#{account.expirationDate}"
-                                       popup="true"
-                                       required="false"
-                                       datePattern="#{messages['patterns.date']}"
-                                       styleClass="input"
-                                       enableManualInput="true"
-                                       tabindex="6">
+                        <h:outputText value="#{account.expirationDate}">
                             <f:convertDateTime pattern="#{messages['patterns.date']}" timeZone="#{sessionUser.timeZone}" type="date"/>
-                        </rich:calendar>
+                        </h:outputText>
                     </s:decorate>
 
                     <s:decorate id="capitalDpfField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -132,11 +108,40 @@
                         </h:outputText>
                     </s:decorate>
 
+                    <!--
+                        Interes ganado. Si durante el plazo hubo un aumento de capital, se
+                        muestra una linea por tramo: los dias anteriores al aumento devengan
+                        sobre el capital que el certificado tenia antes. Con un solo tramo
+                        (el caso normal) se ve un unico importe, como siempre.
+                    -->
                     <s:decorate id="interestField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.interestGained']}</ui:define>
-                        <h:outputText id="interest" value="#{accountAction.interestDPF}" >
-                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
-                        </h:outputText>
+                        <h:panelGroup>
+                            <!-- Todo el renglon va en una sola celda: separado en columnas,
+                                 el HTML colapsaba los espacios contra el borde de cada <td>
+                                 y quedaba "27.141,49x 212 dias =639,33". -->
+                            <h:dataTable value="#{accountAction.interestSegmentsDPF}" var="segment"
+                                         rendered="#{accountAction.interestSegmented}"
+                                         border="0" cellpadding="0" cellspacing="0">
+                                <h:column>
+                                    <h:outputText value="#{segment.capital}" styleClass="bold">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                    <h:outputFormat value="#{messages['Account.interestGained.segmentDays']}">
+                                        <f:param value="#{segment.days}"/>
+                                    </h:outputFormat>
+                                    <h:outputText value="#{segment.provision}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </h:column>
+                            </h:dataTable>
+
+                            <!-- Con un solo tramo no hay desglose: se muestra el importe unico. -->
+                            <h:outputText id="interest" value="#{accountAction.interestDPF}"
+                                          rendered="#{!accountAction.interestSegmented}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="interest"/>
+                            </h:outputText>
+                        </h:panelGroup>
                     </s:decorate>
 
                     <s:decorate id="rcivaDPFField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -165,6 +170,7 @@
                                                   value="#{accountAction.partialRenewal}"
                                                   tabindex="14">
                              <a4j:support event="onchange"
+                                          action="#{accountAction.togglePartialRenewal}"
                                           reRender="partialRenewalField, partialCapitalDiv"
                                           ajaxSingle="true"/>
                          </h:selectBooleanCheckbox>
@@ -176,7 +182,11 @@
                                       value="#{accountAction.capitalRenewDPF}"
                                       required="true">
                              <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capitalRenew"/>
-                             <a4j:support event="onblur" reRender="capitalRenewField"/>
+                             <!-- ajaxSingle: sin esto el blur enviaba y validaba TODO el
+                                  formulario. Con los required todavia vacios la validacion
+                                  falla, JSF se saltea el update del modelo y los inputs
+                                  quedan dibujando su submitted value para siempre. -->
+                             <a4j:support event="onblur" reRender="capitalRenewField" ajaxSingle="true"/>
                          </h:inputText>
                      </s:decorate>
                     <s:div id="partialCapitalDiv">
@@ -186,7 +196,7 @@
                                           value="#{accountAction.partialCapitalRenewDPF}"
                                           required="true">
                                  <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="partialCapitalRenew"/>
-                                 <a4j:support event="onblur" reRender="partialCapitalRenewField"/>
+                                 <a4j:support event="onblur" reRender="partialCapitalRenewField" ajaxSingle="true"/>
                              </h:inputText>
                          </s:decorate>
                     </s:div>
@@ -261,7 +271,7 @@
                          <ui:define name="label">#{messages['Voucher.type']}</ui:define>
                          <h:selectOneMenu id="documentType" value="#{accountAction.documentType}"
                                           styleClass="input"
-                                          required="false">
+                                          required="true">
                              <s:selectItems value="#{voucherDocumentTypeList}"
                                             var="element"
                                             label="#{element.fullName}"
@@ -302,20 +312,8 @@
 
         </h:form>
 
-        <s:div id="partnerListModalPanelDiv">
-            <s:decorate id="partnerListModalPanelContainer" template="/finances/partnerListModalPanel.xhtml">
-                <ui:param name="containerId" value="partnerListModalPanelContainer"/>
-                <ui:param name="dialogId" value="partnerListModalPanel"/>
-                <ui:define name="assignButton">
-                    <a4j:commandButton id="assignButton"
-                                       action="#{accountAction.assignPartner(partnerItem)}"
-                                       image="/img/active.gif"
-                                       styleClass="select-image-middle"
-                                       reRender="partnerField"
-                                       oncomplete="Richfaces.hideModalPanel('partnerListModalPanel');"/>
-                </ui:define>
-            </s:decorate>
-        </s:div>
+        <!-- El buscador de socio del certificado viejo se quito junto con su campo:
+             ese panel ya no se edita. El unico selector es el del titular del nuevo. -->
 
         <s:div id="newPartnerListModalPanelDiv">
             <s:decorate id="newPartnerListModalPanelContainer" template="/finances/partnerListModalPanel.xhtml">

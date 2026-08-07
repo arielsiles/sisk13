@@ -33,9 +33,15 @@
                                  styleClass="button"
                                  immediate="true"/>
 
+                <!-- Un certificado ya renovado o cerrado no se puede renovar: se deshabilita
+                     aca mismo, con el motivo en el tooltip. Si solo esta corriendo el plazo
+                     el boton queda habilitado a proposito: se entra a consultar los calculos
+                     y el bloqueo vive en el boton Renovar de la pantalla de renovacion. -->
                 <h:commandButton action="#{accountAction.renewalDPF}"
                                  value="#{messages['Account.renewal']}"
                                  rendered="#{accountAction.isDpfAccount(account)}"
+                                 disabled="#{accountAction.isClosed(account)}"
+                                 title="#{accountAction.isClosed(account) ? accountAction.renewalBlockedReason : ''}"
                                  styleClass="button"
                                  immediate="true"
                                  />

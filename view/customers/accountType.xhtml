@@ -1,0 +1,300 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{accountTypeAction.managed}">
+                #{messages['AccountType.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['AccountType.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="accountTypeForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{accountTypeAction.create}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!accountTypeAction.managed and s:hasPermission('ACCOUNTTYPE','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton action="#{accountTypeAction.update}"
+                                 value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{accountTypeAction.managed and s:hasPermission('ACCOUNTTYPE','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{accountTypeAction.managed and s:hasPermission('ACCOUNTTYPE','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation"
+                                           event="onclick"
+                                           disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
+                <h:commandButton action="#{accountTypeAction.cancel}"
+                                 value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="accountTypePanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{accountTypeAction.managed}">
+                            #{messages['AccountType.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['AccountType.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.name']}</ui:define>
+                    <h:inputText id="name"
+                                 value="#{accountType.name}"
+                                 styleClass="input"
+                                 required="true"
+                                 maxlength="100"
+                                 tabindex="1"/>
+                </s:decorate>
+
+                <!--
+                    El tipo de ahorro se fija en el alta: la columna esta mapeada
+                    updatable=false y cambiarlo movería de listado a certificados ya
+                    emitidos. Al editar se muestra, no se edita.
+                -->
+                <s:decorate id="savingTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.savingType']}</ui:define>
+                    <h:selectOneMenu id="savingType"
+                                     value="#{accountType.savingType}"
+                                     styleClass="input"
+                                     required="true"
+                                     rendered="#{!accountTypeAction.managed}"
+                                     tabindex="2">
+                        <s:selectItems value="#{savingTypeEnum}"
+                                       var="savingTypeItem"
+                                       label="#{messages[savingTypeItem.resourceKey]}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                    <h:outputText value="#{messages[accountType.savingType.resourceKey]}"
+                                  rendered="#{accountTypeAction.managed and not empty accountType.savingType}"/>
+                </s:decorate>
+
+                <s:decorate id="daysField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.days']}</ui:define>
+                    <h:inputText id="days"
+                                 value="#{accountType.days}"
+                                 styleClass="input"
+                                 maxlength="5"
+                                 tabindex="3"/>
+                </s:decorate>
+
+                <s:decorate id="intaField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.inta']}</ui:define>
+                    <h:inputText id="inta"
+                                 value="#{accountType.inta}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="4">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="inta"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="intbField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.intb']}</ui:define>
+                    <h:inputText id="intb"
+                                 value="#{accountType.intb}"
+                                 styleClass="input"
+                                 required="true"
+                                 tabindex="5">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="intb"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Common.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active"
+                                             value="#{accountType.active}"
+                                             tabindex="6"/>
+                </s:decorate>
+
+                <s:decorate id="cashAccountMnField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.cashAccountMn']}</ui:define>
+                    <app:selectPopUp id="cashAccountMn"
+                                     styleClass="inputLarge"
+                                     textValue="#{accountType.cashAccountMn.fullName}"
+                                     value="#{accountType.cashAccountMn}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{accountTypeAction.clearCashAccountMn()}"
+                                     searchModalPanel="cashAccountMnListModalPanel"
+                                     reRender="cashAccountMnField"
+                                     tabindex="7"
+                                     hotKeySelect="alt+1"/>
+                </s:decorate>
+
+                <s:decorate id="cashAccountMeField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.cashAccountMe']}</ui:define>
+                    <app:selectPopUp id="cashAccountMe"
+                                     styleClass="inputLarge"
+                                     textValue="#{accountType.cashAccountMe.fullName}"
+                                     value="#{accountType.cashAccountMe}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{accountTypeAction.clearCashAccountMe()}"
+                                     searchModalPanel="cashAccountMeListModalPanel"
+                                     reRender="cashAccountMeField"
+                                     tabindex="8"
+                                     hotKeySelect="alt+2"/>
+                </s:decorate>
+
+                <s:decorate id="cashAccountMvField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.cashAccountMv']}</ui:define>
+                    <app:selectPopUp id="cashAccountMv"
+                                     styleClass="inputLarge"
+                                     textValue="#{accountType.cashAccountMv.fullName}"
+                                     value="#{accountType.cashAccountMv}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{accountTypeAction.clearCashAccountMv()}"
+                                     searchModalPanel="cashAccountMvListModalPanel"
+                                     reRender="cashAccountMvField"
+                                     tabindex="9"
+                                     hotKeySelect="alt+3"/>
+                </s:decorate>
+
+                <s:decorate id="cashAccountChargeMnField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.cashAccountChargeMn']}</ui:define>
+                    <app:selectPopUp id="cashAccountChargeMn"
+                                     styleClass="inputLarge"
+                                     textValue="#{accountType.cashAccountChargeMn.fullName}"
+                                     value="#{accountType.cashAccountChargeMn}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{accountTypeAction.clearCashAccountChargeMn()}"
+                                     searchModalPanel="cashAccountChargeMnListModalPanel"
+                                     reRender="cashAccountChargeMnField"
+                                     tabindex="10"
+                                     hotKeySelect="alt+4"/>
+                </s:decorate>
+
+                <s:decorate id="cashAccountChargeMeField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['AccountType.cashAccountChargeMe']}</ui:define>
+                    <app:selectPopUp id="cashAccountChargeMe"
+                                     styleClass="inputLarge"
+                                     textValue="#{accountType.cashAccountChargeMe.fullName}"
+                                     value="#{accountType.cashAccountChargeMe}"
+                                     dataModel="#{cashAccountDataModel}"
+                                     clearAction="#{accountTypeAction.clearCashAccountChargeMe()}"
+                                     searchModalPanel="cashAccountChargeMeListModalPanel"
+                                     reRender="cashAccountChargeMeField"
+                                     tabindex="11"
+                                     hotKeySelect="alt+5"/>
+                </s:decorate>
+
+                <s:div styleClass="formNote">
+                    <h:outputText value="#{messages['AccountType.chargeAccountsHint']}"/>
+                </s:div>
+
+            </rich:panel>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['AccountType.delete.confirmation']}"/>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{accountTypeAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="cashAccountMnListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="cashAccountMnListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountMnListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{accountTypeAction.assignCashAccountMn(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="cashAccountMnField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountMnListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="cashAccountMeListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="cashAccountMeListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountMeListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{accountTypeAction.assignCashAccountMe(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="cashAccountMeField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountMeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="cashAccountMvListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="cashAccountMvListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountMvListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{accountTypeAction.assignCashAccountMv(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="cashAccountMvField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountMvListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="cashAccountChargeMnListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="cashAccountChargeMnListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountChargeMnListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{accountTypeAction.assignCashAccountChargeMn(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="cashAccountChargeMnField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountChargeMnListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="cashAccountChargeMeListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="cashAccountChargeMeListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountChargeMeListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   action="#{accountTypeAction.assignCashAccountChargeMe(cashAccountItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   reRender="cashAccountChargeMeField"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountChargeMeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

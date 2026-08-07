@@ -1348,12 +1348,34 @@ input[type="text"].disabledInput {
     width: 350px;
 }
 
-/* Nombre de columna a la derecha del input (texto informativo tecnico) */
+/*
+   Nombre de columna a la derecha del input (texto informativo tecnico).
+   Tamano absoluto y no 0.85em a proposito: en em depende de donde cuelgue el nodo
+   -- 10,2px dentro de una fila .entry (9pt) pero 9,4px colgando del cuerpo de un
+   rich:panel (11px del skin) --, y ahi se veia diminuto. 8pt es el escalon secundario
+   que ya usa .textLabel.
+*/
 .colHint {
     color: #999;
-    font-size: 0.85em;
+    font-size: 8pt;
     margin-left: 8px;
     white-space: nowrap;
+}
+
+/*
+   Nota al pie de un formulario. A diferencia de .colHint, que es un apunte corto al
+   lado de un input y por eso va con nowrap, esta ocupa su propia linea, respeta el
+   ancho del panel y corta el texto en varias lineas.
+*/
+.formNote {
+    display: block;
+    margin-top: 16px;
+    padding-top: 10px;
+    border-top: 1px solid #e3e3e3;
+    color: #999;
+    font-size: 8pt;
+    line-height: 1.5;
+    white-space: normal;
 }
 
 /* =========================================================================

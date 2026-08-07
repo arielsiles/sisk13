@@ -1,6 +1,7 @@
 package com.encens.khipus.service.accouting;
 
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.exception.finances.FixedTermDepositCapitalException;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.ProductSaleType;
@@ -72,6 +73,8 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
     public void saveVoucher(Voucher voucher){
 
+        validateFixedTermDepositCredits(voucher);
+
         /** El id_tmpenc lo asigna Hibernate al persistir (@GeneratedValue TABLE sobre 'secuencia') **/
 
         if (voucher.getTransactionNumber() == null){
@@ -112,6 +115,45 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
             }
         }
 
+    }
+
+    /**
+     * Impide que un comprobante acredite capital a un DPF despues de su apertura.
+     * <p/>
+     * Un DPF no recibe dinero a mitad de plazo: para aumentar el capital hay que cerrar
+     * el certificado y abrir uno nuevo (Renovacion). Hasta ahora ese aumento se cargaba
+     * como un asiento suelto desde la pantalla de comprobantes, que no pasa por el modulo
+     * de DPF, y dejaba la contabilidad diciendo un capital y la ficha otro.
+     * <p/>
+     * El control es por fecha y no por un marcador: la apertura de un certificado puede
+     * venir en dos lineas del mismo comprobante (pasa en 21 de los 24 casos historicos),
+     * y eso es legitimo. Lo que no lo es, es un credito fechado despues de la apertura.
+     */
+    private void validateFixedTermDepositCredits(Voucher voucher) {
+        if (voucher == null || voucher.getDate() == null) {
+            return;
+        }
+        Date voucherDate = DateUtils.removeTime(voucher.getDate());
+
+        for (VoucherDetail voucherDetail : voucher.getDetails()) {
+            Account account = voucherDetail.getPartnerAccount();
+            if (account == null
+                    || account.getAccountType() == null
+                    || !SavingType.DPF.equals(account.getAccountType().getSavingType())) {
+                continue;
+            }
+
+            BigDecimal credit = voucherDetail.getCredit() != null ? voucherDetail.getCredit() : BigDecimal.ZERO;
+            BigDecimal creditMe = voucherDetail.getCreditMe() != null ? voucherDetail.getCreditMe() : BigDecimal.ZERO;
+            if (credit.doubleValue() <= 0 && creditMe.doubleValue() <= 0) {
+                continue;
+            }
+
+            Date openingDate = DateUtils.removeTime(account.getOpeningDate());
+            if (openingDate != null && voucherDate.after(openingDate)) {
+                throw new FixedTermDepositCapitalException(account.getCode(), openingDate, voucherDate);
+            }
+        }
     }
 
     /**

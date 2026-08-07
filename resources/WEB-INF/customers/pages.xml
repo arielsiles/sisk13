@@ -70,6 +70,26 @@
         </navigation>
     </page>
 
+    <page view-id="/customers/accountType.xhtml" no-conversation-view-id="/customers/accountTypeList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/accountTypeList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/accountTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/accountTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{accountTypeAction.select(accountTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/accountType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/customers/transferCredit.xhtml" no-conversation-view-id="/customers/creditTypeList.xhtml">
         <navigation>
             <rule if-outcome="Success">

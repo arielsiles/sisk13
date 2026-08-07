@@ -1,0 +1,194 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['AccountType.list']}</ui:define>
+
+    <ui:param name="bodyWidth" value="100%"/>
+    <ui:param name="selectedTab" value="customers"/>
+    <ui:define name="body">
+        <h:form id="accountTypeSearch">
+            <rich:simpleTogglePanel id="searchPanelId"
+                                    label="#{messages['AccountType.search']}"
+                                    switchType="client">
+                <h:panelGrid columns="2"
+                             width="100%"
+                             cellpadding="0"
+                             cellspacing="0"
+                             border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['AccountType.name']}</ui:define>
+                            <h:inputText id="name"
+                                         value="#{accountTypeDataModel.criteria.name}"
+                                         maxlength="100"
+                                         tabindex="1"
+                                         styleClass="input"/>
+                        </s:decorate>
+
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['AccountType.savingType']}</ui:define>
+                            <h:selectOneMenu id="savingType"
+                                             value="#{accountTypeDataModel.criteria.savingType}"
+                                             styleClass="input"
+                                             tabindex="2">
+                                <s:selectItems value="#{savingTypeEnum}"
+                                               var="savingTypeItem"
+                                               label="#{messages[savingTypeItem.resourceKey]}"
+                                               noSelectionLabel="#{messages['Common.all']}"
+                                               hideNoSelectionLabel="false"/>
+                                <s:convertEnum/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+                    </s:div>
+
+                    <s:div>
+                        <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Common.active']}</ui:define>
+                            <h:selectOneMenu id="activeFilter"
+                                             value="#{accountTypeDataModel.activeFilter}"
+                                             styleClass="input"
+                                             tabindex="3">
+                                <f:selectItem itemValue="" itemLabel="#{messages['Common.all']}"/>
+                                <f:selectItem itemValue="1" itemLabel="#{messages['Common.yes']}"/>
+                                <f:selectItem itemValue="0" itemLabel="#{messages['Common.no']}"/>
+                            </h:selectOneMenu>
+                        </s:decorate>
+
+                        <s:decorate id="buttonField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <a4j:commandButton action="#{accountTypeDataModel.updateAndSearch}"
+                                               reRender="accountTypeList, dataScroller"
+                                               styleClass="button"
+                                               value="#{messages['Common.search']}"
+                                               id="searchButtonId"
+                                               tabindex="4">
+                                <s:defaultAction/>
+                            </a4j:commandButton>
+                        </s:decorate>
+                    </s:div>
+                </h:panelGrid>
+                <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/customers/accountType.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('ACCOUNTTYPE','CREATE')}"/>
+            </div>
+
+            <rich:dataTable id="accountTypeList"
+                            value="#{accountTypeDataModel}"
+                            var="accountTypeItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="27%, 18%, 4%, 5%, 5%, 8%, 8%, 8%, 8%, 4%, 5%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="accountType.name"
+                                                   dataModel="#{accountTypeDataModel}"
+                                                   reRender="accountTypeList, dataScroller">
+                                #{messages['AccountType.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+
+                        <rich:column styleClass="column-nowrap">#{messages['AccountType.savingType']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['AccountType.days']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['AccountType.inta']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['AccountType.intb']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['AccountType.cashAccountMn.short']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['AccountType.cashAccountMe.short']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['AccountType.cashAccountChargeMn.short']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['AccountType.cashAccountChargeMe.short']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['Common.active']}</rich:column>
+
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column styleClass="column-nowrap">
+                    <h:outputText value="#{accountTypeItem.name}"/>
+                </rich:column>
+
+                <rich:column styleClass="column-nowrap">
+                    <h:outputText value="#{messages[accountTypeItem.savingType.resourceKey]}"
+                                  rendered="#{not empty accountTypeItem.savingType}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountTypeItem.days}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountTypeItem.inta}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountTypeItem.intb}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <!--
+                    Solo el numero de cuenta, con el codigo y la descripcion completos en
+                    el tooltip: asi la columna entra en el ancho del numero y le deja el
+                    espacio a Nombre y Tipo de ahorro.
+                -->
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountTypeItem.cashAccountMn.accountCode}"
+                                  title="#{accountTypeItem.cashAccountMn.fullName}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountTypeItem.cashAccountMe.accountCode}"
+                                  title="#{accountTypeItem.cashAccountMe.fullName}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountTypeItem.cashAccountChargeMn.accountCode}"
+                                  title="#{accountTypeItem.cashAccountChargeMn.fullName}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountTypeItem.cashAccountChargeMe.accountCode}"
+                                  title="#{accountTypeItem.cashAccountChargeMe.fullName}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{accountTypeItem.active ? messages['Common.yes'] : messages['Common.no']}"/>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   action="#{accountTypeAction.select(accountTypeItem)}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('ACCOUNTTYPE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+
+            <app:dataScroller id="dataScroller" for="accountTypeList"
+                              dataModel="#{accountTypeDataModel}"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

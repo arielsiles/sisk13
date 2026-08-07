@@ -35,6 +35,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -139,18 +140,31 @@ public class ProvisionInterestPayableAction extends GenericAction {
             return;
         }
 
+        /**
+         * Se traen todos los movimientos, sin recortar por el fin del periodo: el control
+         * contra cuenta.capital necesita el total del certificado, y los tramos filtran
+         * por fecha cada uno por su cuenta.
+         */
+        Map<Long, List<Object[]>> movementsByAccount = loadMovements(accountList);
+
+        if (!validateAgainstLedger(accountList, movementsByAccount)) {
+            clearResults();
+            return;
+        }
+
         List<FixedTermDepositProvision> details = new ArrayList<FixedTermDepositProvision>();
         for (Account account : accountList) {
-            FixedTermDepositProvision detail = buildDetail(account, startDate, endDate);
-            if (detail == null) {
-                /** buildDetail ya reporto el motivo; se corta para no generar a medias. */
+            List<FixedTermDepositProvision> accountDetails =
+                    buildDetails(account, startDate, endDate, movementsByAccount.get(account.getId()));
+            if (accountDetails == null) {
+                /** buildDetails ya reporto el motivo; se corta para no generar a medias. */
                 clearResults();
                 return;
             }
-            if (detail.getDays() > 0) {
-                details.add(detail);
-            }
+            details.addAll(accountDetails);
         }
+
+        warnAboutCapitalIncreases(details);
 
         if (details.isEmpty()) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
@@ -212,10 +226,144 @@ public class ProvisionInterestPayableAction extends GenericAction {
     /* ------------------------------------------------------------------ */
 
     /**
-     * @return la linea de detalle, o <code>null</code> si la cuenta no se puede
-     *         procesar (moneda no soportada o cuenta contable sin configurar).
+     * Trae los movimientos del mayor de todo el lote en una sola consulta, agrupados por
+     * cuenta. Una consulta por certificado seria inaceptable en la provision mensual.
      */
-    private FixedTermDepositProvision buildDetail(Account account, Date startDate, Date endDate) {
+    private Map<Long, List<Object[]>> loadMovements(List<Account> accountList) {
+        List<Long> accountIds = new ArrayList<Long>();
+        for (Account account : accountList) {
+            accountIds.add(account.getId());
+        }
+
+        Map<Long, List<Object[]>> movementsByAccount = new LinkedHashMap<Long, List<Object[]>>();
+        for (Object[] movement : accountService.getAccountLedgerMovements(accountIds)) {
+            Long accountId = (Long) movement[0];
+            List<Object[]> movements = movementsByAccount.get(accountId);
+            if (movements == null) {
+                movements = new ArrayList<Object[]>();
+                movementsByAccount.put(accountId, movements);
+            }
+            movements.add(movement);
+        }
+        return movementsByAccount;
+    }
+
+    /**
+     * Candado: <code>cuenta.capital</code> tiene que coincidir con el capital que dice la
+     * contabilidad del certificado, o sea con la suma de los importes acreditados.
+     * <p/>
+     * Se compara contra el TOTAL acreditado y no contra el saldo a una fecha: un capital
+     * que cambio a mitad del plazo es legitimo y lo resuelve el calculo por tramos. Lo que
+     * este candado atrapa es el dato genuinamente mal cargado, que es otra cosa.
+     * <p/>
+     * Se reportan TODOS los certificados con problema, no solo el primero, para que la
+     * correccion se haga de una sola pasada.
+     *
+     * @return <code>false</code> si hay alguna inconsistencia.
+     */
+    private boolean validateAgainstLedger(List<Account> accountList,
+                                          Map<Long, List<Object[]>> movementsByAccount) {
+        boolean valid = true;
+        for (Account account : accountList) {
+            List<Object[]> movements = movementsByAccount.get(account.getId());
+            if (movements == null || movements.isEmpty()) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                        "ProvisionInterestPayable.error.noLedgerMovements", account.getCode());
+                valid = false;
+                continue;
+            }
+
+            BigDecimal credits = BigDecimalUtil.roundBigDecimal(
+                    capitalAt(movements, null, account.getCurrency()), 2);
+            BigDecimal capital = BigDecimalUtil.roundBigDecimal(
+                    account.getCapital() != null ? account.getCapital() : BigDecimal.ZERO, 2);
+            if (capital.compareTo(credits) != 0) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                        "ProvisionInterestPayable.error.capitalMismatch",
+                        account.getCode(), capital, credits);
+                valid = false;
+            }
+        }
+        return valid;
+    }
+
+    /**
+     * Capital vigente de un certificado a una fecha: suma de los ABONOS hasta esa fecha
+     * inclusive. Con <code>date</code> en null suma todos.
+     * <p/>
+     * Los debitos se ignoran a proposito. El unico movimiento deudor de un certificado es
+     * su cancelacion, y viene fechada el dia del vencimiento: un DPF devenga interes hasta
+     * su vencimiento INCLUSIVE, asi que el asiento que lo liquida ese dia no reduce la base
+     * de ese dia. Restarlo costaba un dia de interes en el ultimo mes de cada certificado.
+     */
+    private BigDecimal capitalAt(List<Object[]> movements, Date date, FinancesCurrencyType currency) {
+        boolean foreign = FinancesCurrencyType.D.equals(currency);
+        BigDecimal capital = BigDecimal.ZERO;
+        for (Object[] movement : movements) {
+            Date movementDate = DateUtils.removeTime((Date) movement[1]);
+            if (movementDate == null || (date != null && movementDate.after(date))) {
+                continue;
+            }
+            capital = capital.add(nullToZero((BigDecimal) (foreign ? movement[5] : movement[3])));
+        }
+        return capital;
+    }
+
+    /**
+     * Fechas, dentro del rango devengado, en las que el capital aumento. Cada una abre un
+     * tramo nuevo. Solo los abonos cortan tramo, por lo explicado en {@link #capitalAt}.
+     */
+    private List<Date> getCapitalIncreaseDates(List<Object[]> movements, Date from, Date until,
+                                               FinancesCurrencyType currency) {
+        boolean foreign = FinancesCurrencyType.D.equals(currency);
+        List<Date> dates = new ArrayList<Date>();
+        for (Object[] movement : movements) {
+            Date movementDate = DateUtils.removeTime((Date) movement[1]);
+            if (movementDate == null || !movementDate.after(from) || movementDate.after(until)) {
+                continue;
+            }
+            BigDecimal credit = nullToZero((BigDecimal) (foreign ? movement[5] : movement[3]));
+            if (credit.doubleValue() > 0 && !dates.contains(movementDate)) {
+                dates.add(movementDate);
+            }
+        }
+        Collections.sort(dates);
+        return dates;
+    }
+
+    private static BigDecimal nullToZero(BigDecimal value) {
+        return value != null ? value : BigDecimal.ZERO;
+    }
+
+    /**
+     * Avisa arriba de la grilla que tal certificado recibio un aumento de capital en tal
+     * fecha. Es un caso excepcional -- un DPF normalmente no recibe dinero a mitad de
+     * plazo -- y el contador tiene que verlo, no descubrirlo cuadrando el importe.
+     */
+    private void warnAboutCapitalIncreases(List<FixedTermDepositProvision> details) {
+        for (FixedTermDepositProvision detail : details) {
+            if (detail.isFromCapitalIncrease()) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                        "ProvisionInterestPayable.warn.capitalIncrease",
+                        detail.getCode(),
+                        DateUtils.format(detail.getCapitalIncreaseDate(), "dd/MM/yyyy"),
+                        detail.getCapital());
+            }
+        }
+    }
+
+    /**
+     * Arma los tramos devengados del mes para un certificado.
+     * <p/>
+     * Lo normal es un solo tramo. Si el certificado recibio un aumento de capital dentro
+     * del mes, se parte en tantos tramos como haga falta: el interes se devenga sobre el
+     * capital vigente cada dia, y un solo importe para todo el mes seria incorrecto.
+     *
+     * @return los tramos, o <code>null</code> si la cuenta no se puede procesar (moneda no
+     *         soportada, cuenta contable sin configurar o tasa sin definir).
+     */
+    private List<FixedTermDepositProvision> buildDetails(Account account, Date startDate, Date endDate,
+                                                         List<Object[]> movements) {
         FinancesCurrencyType currency = account.getCurrency();
         if (!FinancesCurrencyType.P.equals(currency) && !FinancesCurrencyType.D.equals(currency)) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
@@ -246,21 +394,47 @@ public class ProvisionInterestPayableAction extends GenericAction {
         Date from = maxDate(startDate, DateUtils.removeTime(account.getOpeningDate()));
         Date until = minDate(endDate, DateUtils.removeTime(account.getExpirationDate()));
 
-        FixedTermDepositProvision detail = new FixedTermDepositProvision();
-        detail.setAccount(account);
-        detail.setProvisionFromDate(from);
-        detail.setProvisionUntilDate(until);
-        detail.setRate(rate);
-        detail.setLiabilityAccountCode(liabilityAccount.getAccountCode());
+        List<FixedTermDepositProvision> result = new ArrayList<FixedTermDepositProvision>();
+        if (until.before(from)) {
+            return result;
+        }
 
-        int days = until.before(from) ? 0 : (int) DateUtils.daysBetween(from, until, true);
-        detail.setDays(days);
-        detail.setProvision(days > 0
-                ? account.getCapital().multiply(rate).multiply(new BigDecimal(days))
-                        .divide(DAILY_RATE_DIVISOR, WORKING_SCALE, RoundingMode.HALF_UP)
-                : BigDecimal.ZERO);
+        List<Date> increaseDates = getCapitalIncreaseDates(movements, from, until, currency);
 
-        return detail;
+        Date segmentFrom = from;
+        for (int i = 0; i <= increaseDates.size(); i++) {
+            /** El dia del aumento ya devenga con el capital nuevo: el tramo anterior
+             *  cierra el dia previo. */
+            Date segmentUntil = i < increaseDates.size()
+                    ? DateUtils.addDay(increaseDates.get(i), -1)
+                    : until;
+
+            int days = segmentUntil.before(segmentFrom)
+                    ? 0 : (int) DateUtils.daysBetween(segmentFrom, segmentUntil, true);
+            if (days > 0) {
+                BigDecimal capital = capitalAt(movements, segmentFrom, currency);
+
+                FixedTermDepositProvision detail = new FixedTermDepositProvision();
+                detail.setAccount(account);
+                detail.setProvisionFromDate(segmentFrom);
+                detail.setProvisionUntilDate(segmentUntil);
+                detail.setRate(rate);
+                detail.setLiabilityAccountCode(liabilityAccount.getAccountCode());
+                detail.setCapital(capital);
+                detail.setDays(days);
+                detail.setProvision(capital.multiply(rate).multiply(new BigDecimal(days))
+                        .divide(DAILY_RATE_DIVISOR, WORKING_SCALE, RoundingMode.HALF_UP));
+                if (i > 0) {
+                    detail.setCapitalIncreaseDate(increaseDates.get(i - 1));
+                }
+                result.add(detail);
+            }
+
+            if (i < increaseDates.size()) {
+                segmentFrom = increaseDates.get(i);
+            }
+        }
+        return result;
     }
 
     /**

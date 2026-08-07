@@ -39,6 +39,22 @@ public interface AccountService {
      * perderia esos dias. Lo que manda es la fecha de vencimiento.
      */
     List<Account> getSavingsAccountsByPeriod(SavingType savingType, Date startDate, Date endDate);
+
+    /**
+     * Movimientos del mayor de las cuentas indicadas, en un solo viaje a la base (una
+     * consulta por certificado seria inaceptable en la provision mensual).
+     * <p/>
+     * Se traen TODOS, sin tope de fecha: quien los consume decide a que fecha corta. Poner
+     * el tope aca hacia que el capital total de un certificado con un aumento posterior al
+     * periodo saliera recortado, y el control contra <code>cuenta.capital</code> fallaba
+     * por comparar el total final contra un total parcial.
+     * <p/>
+     * Excluye comprobantes anulados, igual que {@link #getAccountDetailList(Account)},
+     * para que el saldo coincida con el que muestra la pantalla de la cuenta.
+     *
+     * @return filas <code>[idcuenta, fecha, debe, haber, debeMe, haberMe]</code>
+     */
+    List<Object[]> getAccountLedgerMovements(List<Long> accountIds);
     List<Account> getAccountList(Partner partner);
 
 }

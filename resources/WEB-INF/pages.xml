@@ -144,4 +144,14 @@
         </redirect>
     </exception>
 
+    <!-- Intento de acreditar capital a un DPF despues de su apertura. Un DPF no
+         recibe dinero a mitad de plazo: se cierra y se abre uno nuevo. Es la ultima
+         barrera, en el servicio; la pantalla de comprobantes ademas avisa antes. -->
+    <exception class="com.encens.khipus.exception.finances.FixedTermDepositCapitalException">
+        <end-conversation/>
+        <redirect view-id="/error/exception.xhtml">
+            <message severity="error">#{fixedTermDepositCapitalMessage.getMessage(org.jboss.seam.caughtException)}</message>
+        </redirect>
+    </exception>
+
 </pages>

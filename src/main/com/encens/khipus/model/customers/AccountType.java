@@ -52,9 +52,10 @@ public class AccountType implements BaseModel {
     @Column(name = "intb", precision = 4, scale = 2, nullable = false)
     private BigDecimal intb;
 
+    /** Un tipo inactivo deja de ofrecerse al abrir o renovar cuentas, pero no se borra. */
     @Column(name = "activo")
     @Type(type = IntegerBooleanUserType.NAME)
-    private Boolean active;
+    private Boolean active = Boolean.TRUE;
 
     @Column(name = "tipo", updatable = false)
     @Enumerated(EnumType.STRING)
@@ -64,37 +65,31 @@ public class AccountType implements BaseModel {
     @Column(name = "version", nullable = false)
     private long version;
 
-    /*@ManyToOne(fetch = FetchType.LAZY)*/
-    /*@ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "CTAP_MN", referencedColumnName = "CUENTA", updatable = false, insertable = false)
-    })
-    private CashAccount cashAccountMn;*/
+    /*
+     * Las cinco cuentas contables estaban mapeadas insertable=false/updatable=false, es
+     * decir de solo lectura: se cargaban por SQL. Se abren para que el ABM de tipos de
+     * cuenta pueda darlas de alta y corregirlas, que es de donde salen las cuentas del
+     * asiento de provision (CTACF_*) y del de renovacion (CTAP_*).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CTAP_MN", referencedColumnName = "CUENTA", insertable = false, updatable = false)
+    @JoinColumn(name = "CTAP_MN", referencedColumnName = "CUENTA")
     private CashAccount cashAccountMn;
 
-    /*@ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "CTAP_ME", referencedColumnName = "CUENTA", updatable = false, insertable = false)
-    })
-    private CashAccount cashAccountMe;*/
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CTAP_ME", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+    @JoinColumn(name = "CTAP_ME", referencedColumnName = "CUENTA")
     private CashAccount cashAccountMe;
 
+    /** Se deja EAGER como estaba: lo leen VoucherCreateAction y AccountServiceBean. */
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "CTAP_MV", referencedColumnName = "CUENTA", updatable = false, insertable = false)
-    })
+    @JoinColumn(name = "CTAP_MV", referencedColumnName = "CUENTA")
     private CashAccount cashAccountMv;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CTACF_MN", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+    @JoinColumn(name = "CTACF_MN", referencedColumnName = "CUENTA")
     private CashAccount cashAccountChargeMn;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CTACF_ME", referencedColumnName = "CUENTA", updatable = false, insertable = false)
+    @JoinColumn(name = "CTACF_ME", referencedColumnName = "CUENTA")
     private CashAccount cashAccountChargeMe;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
