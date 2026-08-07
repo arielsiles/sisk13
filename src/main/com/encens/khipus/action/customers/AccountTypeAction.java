@@ -10,7 +10,7 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.international.StatusMessage;
 
 /**
- * ABM de tipos de cuenta de ahorro (tabla tipocuenta).
+ * CRUD de tipos de cuenta de ahorro (tabla tipocuenta).
  * <p/>
  * De aca salen las cuentas contables que arman los asientos del modulo: CTACF_MN /
  * CTACF_ME son el pasivo de la provision mensual de intereses sobre DPF y CTAP_MN /

@@ -25,7 +25,7 @@ La aprobación de un despacho debe **descontar el stock** del almacén seleccion
 
 ### 2.1 Incluido (v1)
 
-- ABM de catálogo **Lugar de Despacho/Entrega** (plano: código + descripción + dirección).
+- CRUD de catálogo **Lugar de Despacho/Entrega** (plano: código + descripción + dirección).
 - Creación / edición / eliminación de Despachos en estado **BORRADOR**.
 - Listado y búsqueda de Despachos.
 - Aprobación con **doble confirmación** (dos paneles modales secuenciales con detalle explicativo).
@@ -357,7 +357,7 @@ DispatchPlace.kind.AMBOS=Ambos
 | AC06 | Anulación revierte stock y genera contra-asiento; despacho queda ANULADO | Test manual + revisión asientos |
 | AC07 | Reporte PDF se genera y coincide visualmente con el formato del PDF de referencia | Comparación lado a lado |
 | AC08 | Usuario sin permiso no puede ver / crear / aprobar / anular según corresponda | Test con dos usuarios |
-| AC09 | El catálogo `DispatchPlace` permite ABM completo y se respeta el filtro por `kind` en los combos del despacho | Test manual |
+| AC09 | El catálogo `DispatchPlace` permite CRUD completo y se respeta el filtro por `kind` en los combos del despacho | Test manual |
 | AC10 | Multi-company: dos empresas con sequence independiente, datos aislados | Test en dev con dos compañías |
 | AC11 | Build con JDK 1.8 pasa (`ant clean explode`) | CI/local |
 | AC12 | Numeración de Orden de Entrega es correlativa y única por empresa | Crear varios despachos consecutivos |

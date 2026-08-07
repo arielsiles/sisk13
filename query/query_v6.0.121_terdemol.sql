@@ -1,11 +1,11 @@
 -- query_v6.0.121_terdemol.sql
--- Provision mensual de intereses por pagar sobre DPF + ABM de tipos de cambio.
+-- Provision mensual de intereses por pagar sobre DPF + CRUD de tipos de cambio.
 --
 -- Contenido:
 --   1) Dos columnas nuevas en `configuracion` para las cuentas de GASTO de la
 --      provision de DPF (MN y ME), con su FK hacia arcgms como el resto de las
 --      cuentas de la pantalla Preferencias de compania (ver query_v6.0.113).
---   2) La funcionalidad FINANCESEXCHANGERATE (ABM de arcgtc).
+--   2) La funcionalidad FINANCESEXCHANGERATE (CRUD de arcgtc).
 --   3) La funcionalidad PROVISIONDPF (pantalla de provision).
 --
 -- La contrapartida del asiento (pasivo "cargos financieros por pagar") NO se

@@ -67,7 +67,7 @@ public class AccountType implements BaseModel {
 
     /*
      * Las cinco cuentas contables estaban mapeadas insertable=false/updatable=false, es
-     * decir de solo lectura: se cargaban por SQL. Se abren para que el ABM de tipos de
+     * decir de solo lectura: se cargaban por SQL. Se abren para que el CRUD de tipos de
      * cuenta pueda darlas de alta y corregirlas, que es de donde salen las cuentas del
      * asiento de provision (CTACF_*) y del de renovacion (CTAP_*).
      */

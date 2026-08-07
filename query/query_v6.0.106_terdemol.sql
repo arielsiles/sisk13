@@ -30,7 +30,7 @@ ALTER TABLE ordenventa
 
 -- ----------------------------------------------------------------------------
 -- 3) Semilla: el texto legal que estaba fijo en el reporte queda como 1 termino
---    (compania 1). Se puede editar/inactivar desde el ABM.
+--    (compania 1). Se puede editar/inactivar desde el CRUD.
 -- ----------------------------------------------------------------------------
 INSERT INTO ordenventa_termino (idordenventa_termino, texto, orden, activo, idcompania, version) VALUES
     (1, '48 HOURS AFTER RECEIVED THIS ORDER IT WILL BE CONSIDERED ACCEPTED, THE SUPPLIER MUST FOLLOW THE COMPANY BUYING TERMS.', 1, 1, 1, 0);

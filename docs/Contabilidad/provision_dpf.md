@@ -153,7 +153,7 @@ de 2025 no tienen DPF en bolivianos y su asiento lleva únicamente las dos líne
   Columnas `i_ppag_dpf_mn` / `i_ppag_dpf_me`.
 - **Pasivo (haber):** `tipocuenta.CTACF_MN` / `CTACF_ME` del tipo de cuenta de cada DPF.
   Son las mismas que ya usa la renovación de DPF, por eso no se duplican en configuración.
-  Se cargan desde el ABM de tipos de cuenta (ver *Tipos de cuenta*).
+  Se cargan desde el CRUD de tipos de cuenta (ver *Tipos de cuenta*).
 
 El pasivo se agrupa **por código de cuenta**, no por moneda: si dos tipos de DPF apuntaran
 a cuentas de cargos financieros distintas, salen líneas separadas en vez de mezclarse. Con
@@ -438,7 +438,7 @@ vacía.
 
 ## Tipos de cuenta (`tipocuenta`)
 
-ABM en **Atención al cliente → Configuración → Tipo de Cuenta**, permiso `ACCOUNTTYPE`.
+CRUD en **Atención al cliente → Configuración → Tipo de Cuenta**, permiso `ACCOUNTTYPE`.
 Es de donde salen las cuentas de los asientos de este módulo, así que un error acá se
 arrastra a todos los certificados de ese tipo.
 
@@ -446,7 +446,7 @@ arrastra a todos los certificados de ese tipo.
 `insertable = false, updatable = false`: JPA no las escribía **ni al crear**, se cargaban
 por SQL. Un tipo dado de alta desde una pantalla habría nacido con `CTAP_*` y `CTACF_*` en
 NULL, y la provisión y la renovación no habrían podido armar el asiento. Se abrieron para
-escritura al hacer el ABM.
+escritura al hacer el CRUD.
 
 `CTAP_MV` se dejó **EAGER** como estaba: la leen `VoucherCreateAction`, `AccountServiceBean`
 y `CreditTransactionAction`. Las otras cuatro ya eran LAZY.
@@ -467,7 +467,7 @@ contra MySQL, se convierte en `ReferentialIntegrityException` y sale la adverten
 
 Lo que corresponde es **desactivar** (`activo`). El factory `accountTypeList` —el que
 alimenta los combos de abrir y renovar cuenta— filtra `active = true`, así que un tipo
-inactivo deja de ofrecerse. El listado del ABM sigue trayendo todos, con filtro
+inactivo deja de ofrecerse. El listado del CRUD sigue trayendo todos, con filtro
 Todos / Sí / No; si no, no habría manera de reactivarlos.
 
 **Ojo:** si un tipo con DPF vivos se inactiva, al abrir esas cuentas el combo no contendrá
@@ -500,7 +500,7 @@ Hay **dos** tablas de tipo de cambio en el sistema y no son la misma:
 | Pantalla | RRHH (existía) | Finanzas → Configuración (nueva) |
 | La usa | planillas | **contabilidad: provisión DPF, comprobantes en ME** |
 
-El ABM nuevo es sobre `arcgtc`. Su catálogo de clases es `arcgcc` (**D** = dólar,
+El CRUD nuevo es sobre `arcgtc`. Su catálogo de clases es `arcgcc` (**D** = dólar,
 **U** = UFV) y `cg_moneda` mapea moneda → clase.
 
 Como `clase_cambio` y `fecha` son la clave primaria y son inmutables, la edición sólo

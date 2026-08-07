@@ -71,7 +71,7 @@ src/main/com/encens/khipus/
 > `docs/xproduction_reporte_diario_criterios.md`.
 
 > **Provisión de intereses sobre DPF:** el cálculo mensual (días inclusivos, base 360,
-> orden del redondeo), de dónde sale cada cuenta del asiento, el ABM de tipos de cambio
+> orden del redondeo), de dónde sale cada cuenta del asiento, el CRUD de tipos de cambio
 > de `arcgtc` y la verificación contra el histórico 2025 —incluido el error de fórmula
 > de la planilla en mayo/junio— están en `docs/Contabilidad/provision_dpf.md`.
 

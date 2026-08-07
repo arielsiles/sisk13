@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * ABM de tipos de cambio de contabilidad (tabla <code>arcgtc</code>): clase de cambio
+ * CRUD de tipos de cambio de contabilidad (tabla <code>arcgtc</code>): clase de cambio
  * (D = dolar, U = UFV), fecha y valor.
  * <p/>
  * Ojo: no confundir con {@link ExchangeRateAction}, que administra la tabla

@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Listado del ABM de tipos de cuenta.
+ * Listado del CRUD de tipos de cuenta.
  *
  * @author
  */

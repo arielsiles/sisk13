@@ -17,7 +17,7 @@
 
     <!--
         Solo tipos activos: un tipo inactivo deja de ofrecerse al abrir o renovar una
-        cuenta. El listado del ABM (accountTypeDataModel) sigue trayendo todos, si no
+        cuenta. El listado del CRUD (accountTypeDataModel) sigue trayendo todos, si no
         no habria manera de volver a activarlos.
     -->
     <factory name="accountTypeList" value="#{accountTypeQuery}"/>

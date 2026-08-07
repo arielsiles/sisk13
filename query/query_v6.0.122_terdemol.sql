@@ -83,7 +83,7 @@ SELECT m.clase_cambio, f.fecha, 6.960000
  WHERE NOT EXISTS (SELECT 1 FROM arcgtc t WHERE t.fecha = f.fecha AND t.clase_cambio = m.clase_cambio);
 
 
--- Permiso del ABM de tipos de cuenta de ahorro (tipocuenta), en Atencion al cliente > Configuracion.
+-- Permiso del CRUD de tipos de cuenta de ahorro (tipocuenta), en Atencion al cliente > Configuracion.
 SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
 INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
 SELECT @nuevo_id, 'ACCOUNTTYPE', 'Tipos de cuenta de ahorro (tipocuenta)', 1, 15, 'Functionality.customers.accountType', 1
