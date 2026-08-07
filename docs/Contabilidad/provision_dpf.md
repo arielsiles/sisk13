@@ -474,9 +474,19 @@ Todos / Sí / No; si no, no habría manera de reactivarlos.
 su tipo. No se corrompe nada —el `required` hace fallar el guardado—, pero no se podrán
 guardar cambios en esa cuenta sin elegir un tipo activo.
 
-**Antes de la primera alta desde la pantalla** conviene verificar `secuencia` para
-`tipocuenta`: el id sale de un `@TableGenerator` sobre esa tabla y si la fila falta o quedó
-por debajo del máximo, el insert choca. El diagnóstico está en `query_v6.0.122_terdemol.sql`.
+### El id: `secuencia` no significa lo mismo para todos
+
+El alta usa un `@TableGenerator` sobre `secuencia`, y ahí **`valor` es el próximo id a
+entregar**, no el último entregado: `MultipleHiLoPerTableGenerator` devuelve lo que leyó y
+recién después incrementa.
+
+**No es la misma semántica que la fila de `funcionalidad`**, que va por función almacenada,
+donde `nextValue` devuelve `valor + 1` y por eso se siembra con `MAX(...)`. Las dos
+conviven en la misma tabla: normalizarlas a un criterio único rompe una de las dos.
+
+No había fila para `tipocuenta` (el máximo era 9). Sin fila, Hibernate la crea en 0,
+descarta el 0 y **el primer alta intenta el id 1**, que ya existe → clave duplicada. Por eso
+`query_v6.0.122_terdemol.sql` la siembra en `MAX + 1`.
 
 ## Tipos de cambio (`arcgtc`)
 

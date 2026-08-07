@@ -95,7 +95,18 @@ SELECT @nuevo_id, 'ACCOUNTTYPE', 'Tipos de cuenta de ahorro (tipocuenta)', 1, 15
 UPDATE tipocuenta SET activo = 1 WHERE activo IS NULL;
 
 
--- Diagnostico antes del primer alta desde la aplicacion: si no hay fila o valor < max_id, el @TableGenerator chocaria.
+-- El alta de tipos de cuenta usa @TableGenerator sobre `secuencia`, donde `valor` es el
+-- PROXIMO id a entregar, no el ultimo entregado: MultipleHiLoPerTableGenerator devuelve lo
+-- que leyo y recien despues incrementa. OJO que no es la misma semantica que la fila de
+-- `funcionalidad` de mas abajo, que va por funcion almacenada (nextValue = valor + 1).
+-- Sin fila, Hibernate la crea en 0, descarta el 0 y el primer alta intenta el id 1, que ya
+-- existe. Por eso se siembra en MAX + 1.
+INSERT INTO secuencia (tabla, valor)
+SELECT 'tipocuenta', (SELECT COALESCE(MAX(idtipocuenta), 0) + 1 FROM tipocuenta)
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'tipocuenta');
+
+-- Verificacion. Esperado: secuencia = max_id + 1.
 SELECT (SELECT valor FROM secuencia WHERE tabla = 'tipocuenta') AS secuencia,
        (SELECT MAX(idtipocuenta) FROM tipocuenta)               AS max_id;
 
