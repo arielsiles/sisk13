@@ -7,9 +7,15 @@ import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.customers.*;
+import com.encens.khipus.exception.finances.CompanyAccountNotConfiguredException;
+import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
+import com.encens.khipus.model.finances.CashAccount;
+import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.util.FixedTermDepositAccrual;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.customers.AccountService;
@@ -21,6 +27,7 @@ import com.encens.khipus.util.DateUtils;
 import com.encens.khipus.util.MessageUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
@@ -52,6 +59,8 @@ public class AccountAction extends GenericAction<Account> {
     private SequenceGeneratorService sequenceGeneratorService;
     @In
     private CreditService creditService;
+    @In
+    private CompanyConfigurationService companyConfigurationService;
 
 
     private BigDecimal totalCredit  = BigDecimal.ZERO;
@@ -94,6 +103,30 @@ public class AccountAction extends GenericAction<Account> {
 
     private Date startDateDPF = new Date();
     private Date expirationDateDPF;
+
+    /** Cierre de DPF **/
+    private Date closingDateDPF;
+    private BigDecimal closingCapitalDPF     = BigDecimal.ZERO;
+    /** Interes bruto: cero si el cierre es hasta el vencimiento inclusive. */
+    private BigDecimal closingInterestDPF    = BigDecimal.ZERO;
+    private BigDecimal closingRcivaDPF       = BigDecimal.ZERO;
+    private BigDecimal closingNetInterestDPF = BigDecimal.ZERO;
+    /** Lo que se le entrega al socio: capital + interes neto. */
+    private BigDecimal closingTotalDPF       = BigDecimal.ZERO;
+    /** Lo que la provision mensual ya acredito en el pasivo por este certificado. */
+    private BigDecimal closingAccruedDPF     = BigDecimal.ZERO;
+    /** Interes bruto - provision acumulada. Negativo = reversa. */
+    private BigDecimal closingExpenseDPF     = BigDecimal.ZERO;
+    private List<FixedTermDepositProvision> closingAccruedDetail = new ArrayList<FixedTermDepositProvision>();
+    private String glossCloseDPF;
+
+    /** Comprobante que se esta viendo en el modal de la pestana Transacciones. */
+    private Voucher selectedVoucher;
+    private List<VoucherDetail> selectedVoucherDetails = new ArrayList<VoucherDetail>();
+    private BigDecimal selectedVoucherTotalDebit    = BigDecimal.ZERO;
+    private BigDecimal selectedVoucherTotalCredit   = BigDecimal.ZERO;
+    private BigDecimal selectedVoucherTotalDebitMe  = BigDecimal.ZERO;
+    private BigDecimal selectedVoucherTotalCreditMe = BigDecimal.ZERO;
 
 
     private Partner partnerDPF;
@@ -317,6 +350,376 @@ public class AccountAction extends GenericAction<Account> {
     }
 
     /**
+     * Abre la pantalla de cierre de un DPF. Reemplaza al procedimiento manual de cargar el
+     * comprobante por Contabilidad y despues acordarse de inactivar el certificado.
+     */
+    @Restrict("#{s:hasPermission('DPFCLOSE','VIEW')}")
+    @Begin(nested = true, flushMode = FlushModeType.MANUAL)
+    public String closeDPF() {
+        if (isClosed(getInstance())) {
+            facesMessages.add(StatusMessage.Severity.ERROR, getRenewalBlockedReason());
+            return Outcome.REDISPLAY;
+        }
+        setOp(OP_UPDATE);
+        setClosingDateDPF(DateUtils.toDay());
+        setGlossCloseDPF(buildClosingGloss());
+        calculateClosure();
+        return Outcome.SUCCESS;
+    }
+
+    @End(beforeRedirect = true)
+    public String cancelCloseDPF() {
+        clearClosingFields();
+        return Outcome.CANCEL;
+    }
+
+    /**
+     * Recalcula todo el cierre. Se dispara al cambiar la fecha, que es lo unico editable
+     * que mueve los importes: de ella depende si el plazo se cumplio o no.
+     */
+    public void calculateClosure() {
+        Account account = getInstance();
+        Date closingDate = DateUtils.removeTime(closingDateDPF);
+
+        closingCapitalDPF = isForeignAccount() ? getTotalBalanceMe() : getTotalBalance();
+
+        /**
+         * El interes depende de una sola cosa: si el plazo se cumplio.
+         * <p/>
+         * Cerrar hasta el dia del vencimiento inclusive es retiro anticipado y no paga
+         * interes: el socio resigna lo devengado. Desde el dia siguiente el plazo esta
+         * cumplido y cobra lo mismo que si renovara, con el mismo calculo por tramos.
+         */
+        if (isClosedAfterExpiration(account, closingDate)) {
+            setInterestSegmentsDPF(buildInterestSegments(account));
+            BigDecimal gross = BigDecimal.ZERO;
+            for (FixedTermDepositProvision segment : getInterestSegmentsDPF()) {
+                gross = BigDecimalUtil.sum(gross, segment.getProvision(), 6);
+            }
+            closingInterestDPF = BigDecimalUtil.roundBigDecimal(gross, 2);
+            closingRcivaDPF = Boolean.TRUE.equals(account.getRetentionFlag())
+                    ? BigDecimalUtil.roundBigDecimal(
+                            BigDecimalUtil.multiply(closingInterestDPF, Constants.VAT, 6), 2)
+                    : BigDecimal.ZERO;
+        } else {
+            setInterestSegmentsDPF(new ArrayList<FixedTermDepositProvision>());
+            closingInterestDPF = BigDecimal.ZERO;
+            closingRcivaDPF = BigDecimal.ZERO;
+        }
+
+        closingNetInterestDPF = BigDecimalUtil.subtract(closingInterestDPF, closingRcivaDPF, 2);
+        closingTotalDPF = BigDecimalUtil.sum(closingCapitalDPF, closingNetInterestDPF, 2);
+
+        /**
+         * Lo que la provision mensual ya acredito en "cargos financieros por pagar" por
+         * este certificado. El asiento tiene que debitarlo COMPLETO: si se debita de menos
+         * queda un saldo en el pasivo que no le corresponde a ningun DPF vivo y que ya no
+         * se limpia nunca.
+         */
+        closingAccruedDetail = buildAccruedProvisionDetail(account, closingDate);
+        BigDecimal accrued = BigDecimal.ZERO;
+        for (FixedTermDepositProvision detail : closingAccruedDetail) {
+            accrued = BigDecimalUtil.sum(accrued, detail.getProvision(), 6);
+        }
+        closingAccruedDPF = BigDecimalUtil.roundBigDecimal(accrued, 2);
+
+        /**
+         * Lo que falta reconocer como gasto: se compara contra el interes NETO, no contra
+         * el bruto, porque el asiento no lleva linea de RC-IVA. Es el criterio que se viene
+         * usando desde 2019 -- ni una sola retencion registrada en 2420310100 en toda la
+         * base --, y se mantiene para no cambiarlo de golpe.
+         * <p/>
+         * Con eso la retencion no queda colgada en ningun lado: simplemente baja el costo
+         * financiero del certificado, porque es plata que no se pago.
+         * <p/>
+         * Negativo cuando se provisiono mas de lo que finalmente se paga: el caso del
+         * retiro anticipado, donde el interes es cero y todo lo provisionado se reversa.
+         */
+        closingExpenseDPF = BigDecimalUtil.subtract(closingNetInterestDPF, closingAccruedDPF, 2);
+    }
+
+    /** Un cierre posterior al vencimiento paga el plazo completo; hasta el vencimiento, nada. */
+    public boolean isClosedAfterExpiration(Account account, Date closingDate) {
+        Date expirationDate = DateUtils.removeTime(account.getExpirationDate());
+        return expirationDate != null && closingDate != null && closingDate.after(expirationDate);
+    }
+
+    /**
+     * Provision mensual ya contabilizada de este certificado, mes por mes.
+     * <p/>
+     * El mes del cierre NO entra: un DPF no devenga en el mes en que se cierra, porque este
+     * mismo asiento liquida ese tramo. Es el mismo criterio que aplica la provision para
+     * saltearlo, asi los dos lados coinciden.
+     * <p/>
+     * Se recalcula en vez de leerse del mayor porque la provision agrupa por cuenta
+     * contable: el asiento mensual no deja rastro de cuanto le toco a cada DPF. Por eso el
+     * calculo comparte codigo con la provision ({@link FixedTermDepositAccrual}) -- si
+     * cada uno tuviera el suyo, cualquier diferencia quedaria colgada en el pasivo.
+     */
+    private List<FixedTermDepositProvision> buildAccruedProvisionDetail(Account account, Date closingDate) {
+        List<FixedTermDepositProvision> months = new ArrayList<FixedTermDepositProvision>();
+
+        Date openingDate = DateUtils.removeTime(account.getOpeningDate());
+        BigDecimal rate = account.getAccountType() != null ? account.getAccountType().getInta() : null;
+        if (closingDate == null || openingDate == null || rate == null) {
+            return months;
+        }
+        Date expirationDate = DateUtils.removeTime(account.getExpirationDate());
+        boolean foreign = FinancesCurrencyType.D.equals(account.getCurrency());
+        List<Object[]> movements = loadLedgerMovements(account);
+
+        Calendar cursor = Calendar.getInstance();
+        cursor.setTime(openingDate);
+        cursor.set(Calendar.DAY_OF_MONTH, 1);
+
+        while (true) {
+            Date monthStart = DateUtils.removeTime(cursor.getTime());
+            Calendar endOfMonth = (Calendar) cursor.clone();
+            endOfMonth.set(Calendar.DAY_OF_MONTH, endOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
+            Date monthEnd = DateUtils.removeTime(endOfMonth.getTime());
+
+            /** Corta en el mes del cierre: ese ya no se provisiona. */
+            if (!monthEnd.before(closingDate)) {
+                break;
+            }
+
+            Date from = monthStart.before(openingDate) ? openingDate : monthStart;
+            Date until = (expirationDate != null && expirationDate.before(monthEnd))
+                    ? expirationDate : monthEnd;
+
+            if (!until.before(from)) {
+                BigDecimal amount = FixedTermDepositAccrual.accrualBetween(movements, from, until, rate, foreign);
+                if (amount.compareTo(BigDecimal.ZERO) != 0) {
+                    FixedTermDepositProvision detail = new FixedTermDepositProvision();
+                    detail.setAccount(account);
+                    detail.setProvisionFromDate(from);
+                    detail.setProvisionUntilDate(until);
+                    detail.setRate(rate);
+                    detail.setCapital(FixedTermDepositAccrual.capitalAt(movements, from, foreign));
+                    detail.setDays((int) DateUtils.daysBetween(from, until, true));
+                    detail.setProvision(amount);
+                    months.add(detail);
+                }
+            }
+            cursor.add(Calendar.MONTH, 1);
+        }
+        return months;
+    }
+
+    /**
+     * Carga el comprobante completo de una fila de la pestana Transacciones, para verlo en
+     * el modal. Sirve para revisar como quedo contabilizado el movimiento sin salir de la
+     * ficha del certificado.
+     * <p/>
+     * No se reusa voucherCreateAction.initView() a proposito: ese action es del modulo de
+     * contabilidad, vive en conversacion y ademas carga documentos de compra que aca no
+     * hacen falta.
+     */
+    public void viewVoucher(VoucherDetail accountDetail) {
+        selectedVoucher = accountDetail != null ? accountDetail.getVoucher() : null;
+        selectedVoucherDetails = new ArrayList<VoucherDetail>();
+        selectedVoucherTotalDebit = BigDecimal.ZERO;
+        selectedVoucherTotalCredit = BigDecimal.ZERO;
+        selectedVoucherTotalDebitMe = BigDecimal.ZERO;
+        selectedVoucherTotalCreditMe = BigDecimal.ZERO;
+        if (selectedVoucher == null) {
+            return;
+        }
+        selectedVoucherDetails = voucherAccoutingService.getVoucherDetailList(selectedVoucher);
+        for (VoucherDetail detail : selectedVoucherDetails) {
+            selectedVoucherTotalDebit = BigDecimalUtil.sum(selectedVoucherTotalDebit, detail.getDebit(), 2);
+            selectedVoucherTotalCredit = BigDecimalUtil.sum(selectedVoucherTotalCredit, detail.getCredit(), 2);
+            selectedVoucherTotalDebitMe = BigDecimalUtil.sum(selectedVoucherTotalDebitMe, detail.getDebitMe(), 2);
+            selectedVoucherTotalCreditMe = BigDecimalUtil.sum(selectedVoucherTotalCreditMe, detail.getCreditMe(), 2);
+        }
+    }
+
+    private List<Object[]> loadLedgerMovements(Account account) {
+        List<Long> accountIds = new ArrayList<Long>();
+        accountIds.add(account.getId());
+        return accountService.getAccountLedgerMovements(accountIds);
+    }
+
+    /**
+     * Registra el cierre: el asiento contable Y la baja del certificado, en una sola
+     * operacion. Antes eran dos pasos manuales y el segundo se olvidaba, con lo que el DPF
+     * quedaba figurando vivo y la provision lo seguia devengando.
+     * <p/>
+     * El asiento replica el que venia armando el contador a mano:
+     * <pre>
+     *   Debe   capital del DPF                    capital
+     *   Debe   cargos financieros por pagar       provision ya acumulada
+     *   Debe   intereses sobre DPF (gasto)        interes neto - provision acumulada
+     *   Haber  caja                               capital + interes neto
+     * </pre>
+     * La tercera linea se invierte a HABER cuando da negativo, que es el retiro anticipado:
+     * el interes es cero y lo provisionado se reversa entero contra el gasto.
+     * <p/>
+     * Sin linea de RC-IVA, igual que las renovaciones desde 2019.
+     */
+    @Restrict("#{s:hasPermission('DPFCLOSE','CREATE')}")
+    @End(beforeRedirect = true, ifOutcome = Outcome.SUCCESS)
+    public String createDpfClosure() {
+        if (!validateClosure()) {
+            return Outcome.REDISPLAY;
+        }
+
+        Account account = getInstance();
+        Date closingDate = DateUtils.removeTime(closingDateDPF);
+        boolean foreign = isForeignAccount();
+        FinancesCurrencyType currency = foreign ? FinancesCurrencyType.D : FinancesCurrencyType.P;
+
+        BigDecimal exchangeRate = BigDecimal.ONE;
+        if (foreign) {
+            try {
+                /** El tipo de cambio del dia del asiento, no el ultimo cargado. */
+                exchangeRate = financesExchangeRateService
+                        .findExchangeRateByDateByCurrency(closingDate, FinancesCurrencyType.D.toString());
+            } catch (FinancesExchangeRateNotFoundException e) {
+                addFinancesExchangeRateNotFoundExceptionMessage();
+                return Outcome.REDISPLAY;
+            } catch (FinancesCurrencyNotFoundException e) {
+                addFinancesCurrencyNotFoundMessage();
+                return Outcome.REDISPLAY;
+            }
+        }
+
+        CompanyConfiguration companyConfiguration;
+        try {
+            companyConfiguration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {
+            addCompanyConfigurationNotFoundErrorMessage();
+            return Outcome.REDISPLAY;
+        }
+
+        AccountType accountType = account.getAccountType();
+        CashAccount capitalAccount = foreign ? accountType.getCashAccountMe() : accountType.getCashAccountMn();
+        CashAccount chargeAccount = foreign ? accountType.getCashAccountChargeMe() : accountType.getCashAccountChargeMn();
+        if (capitalAccount == null || chargeAccount == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.closingAccountsMissing", accountType.getName());
+            return Outcome.REDISPLAY;
+        }
+
+        CashAccount cashAccount;
+        CashAccount expenseAccount;
+        try {
+            cashAccount = foreign
+                    ? companyConfiguration.requireGeneralCashAccountForeign()
+                    : companyConfiguration.requireGeneralCashAccountNational();
+            expenseAccount = foreign
+                    ? companyConfiguration.requireFixedTermPayableInterestForeignCurrency()
+                    : companyConfiguration.requireFixedTermPayableInterestNationalCurrency();
+        } catch (CompanyAccountNotConfiguredException e) {
+            facesMessages.add(StatusMessage.Severity.ERROR,
+                    MessageUtils.getMessage("CompanyConfiguration.account.notConfigured",
+                            MessageUtils.getMessage(e.getLabelKey())));
+            return Outcome.REDISPLAY;
+        }
+
+        Voucher voucher = new Voucher();
+        voucher.setDocumentType(documentType.getName());
+        voucher.setGloss(glossCloseDPF);
+        voucher.setDate(closingDate);
+
+        VoucherDetail capitalDetail = buildAccountEntryDetail(capitalAccount.getAccountCode(),
+                closingCapitalDPF, "DEBIT", currency, foreign, exchangeRate);
+        capitalDetail.setPartnerAccount(account);
+        voucher.getDetails().add(capitalDetail);
+
+        if (closingAccruedDPF.compareTo(BigDecimal.ZERO) > 0) {
+            voucher.getDetails().add(buildAccountEntryDetail(chargeAccount.getAccountCode(),
+                    closingAccruedDPF, "DEBIT", currency, foreign, exchangeRate));
+        }
+
+        if (closingExpenseDPF.compareTo(BigDecimal.ZERO) > 0) {
+            voucher.getDetails().add(buildAccountEntryDetail(expenseAccount.getAccountCode(),
+                    closingExpenseDPF, "DEBIT", currency, foreign, exchangeRate));
+        } else if (closingExpenseDPF.compareTo(BigDecimal.ZERO) < 0) {
+            voucher.getDetails().add(buildAccountEntryDetail(expenseAccount.getAccountCode(),
+                    closingExpenseDPF.negate(), "CREDIT", currency, foreign, exchangeRate));
+        }
+
+        /**
+         * NO se registra la retencion RC-IVA, por decision expresa: se sigue el criterio de
+         * las renovaciones de 2019 en adelante, que la descuentan del importe pagado pero no
+         * la acreditan en 2420310100. Al socio se le informa igual, en pantalla y en el
+         * certificado impreso.
+         */
+        voucher.getDetails().add(buildAccountEntryDetail(cashAccount.getAccountCode(),
+                closingTotalDPF, "CREDIT", currency, foreign, exchangeRate));
+
+        /** El cierre del certificado y su asiento van juntos: misma transaccion. */
+        account.setAccountState(AccountState.INACTIVE);
+        accountService.updateAccount(account);
+        voucherAccoutingService.saveVoucher(voucher);
+
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                "Account.message.closed", account.getCode());
+        clearClosingFields();
+        return Outcome.SUCCESS;
+    }
+
+    /**
+     * Controles previos al cierre. Se validan aca y no en la vista porque son reglas del
+     * negocio y tienen que valer aunque alguien fuerce el submit.
+     */
+    private boolean validateClosure() {
+        boolean valid = true;
+        Account account = getInstance();
+
+        if (isClosed(account)) {
+            facesMessages.add(StatusMessage.Severity.ERROR, getRenewalBlockedReason());
+            return false;
+        }
+        if (documentType == null || documentType.getName() == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.renewalDocumentTypeRequired");
+            valid = false;
+        }
+        if (closingDateDPF == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.closingDateRequired");
+            return false;
+        }
+        Date closingDate = DateUtils.removeTime(closingDateDPF);
+        Date openingDate = DateUtils.removeTime(account.getOpeningDate());
+        if (openingDate != null && closingDate.before(openingDate)) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.closingDateBeforeOpening",
+                    DateUtils.format(openingDate, "dd/MM/yyyy"));
+            valid = false;
+        }
+        if (closingCapitalDPF == null || closingCapitalDPF.doubleValue() <= 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.closingCapitalRequired", account.getCode());
+            valid = false;
+        }
+        return valid;
+    }
+
+    /** Glosa sugerida con el formato que se venia usando a mano. Queda editable. */
+    private String buildClosingGloss() {
+        Account account = getInstance();
+        String partner = account.getPartner() != null ? account.getPartner().getFullName() : "";
+        return MessageUtils.getMessage("Account.closing.gloss", partner, account.getCode());
+    }
+
+    private void clearClosingFields() {
+        closingDateDPF = null;
+        closingCapitalDPF = BigDecimal.ZERO;
+        closingInterestDPF = BigDecimal.ZERO;
+        closingRcivaDPF = BigDecimal.ZERO;
+        closingNetInterestDPF = BigDecimal.ZERO;
+        closingTotalDPF = BigDecimal.ZERO;
+        closingAccruedDPF = BigDecimal.ZERO;
+        closingExpenseDPF = BigDecimal.ZERO;
+        closingAccruedDetail = new ArrayList<FixedTermDepositProvision>();
+        glossCloseDPF = null;
+        documentType = new DocType();
+    }
+
+    /**
      * Tramos de interes ganado del certificado durante su plazo. Uno por cada aumento de
      * capital; lo normal es uno solo.
      * <p/>
@@ -431,6 +834,30 @@ public class AccountAction extends GenericAction<Account> {
         }
 
         Account currentAccount = getInstance();
+
+        /**
+         * Caja del retiro parcial: sale de Preferencias de compania segun la moneda. Antes
+         * estaban hardcodeadas 1110220000 (ME) y 1110110100 (MN), que son justamente las
+         * dos que quedaron configuradas en cajagral1me / cajagral1mn.
+         */
+        CashAccount withdrawalCashAccount = null;
+        if (Boolean.TRUE.equals(partialRenewal)) {
+            try {
+                CompanyConfiguration configuration = companyConfigurationService.findCompanyConfiguration();
+                withdrawalCashAccount = FinancesCurrencyType.D.equals(currentAccount.getCurrency())
+                        ? configuration.requireGeneralCashAccountForeign()
+                        : configuration.requireGeneralCashAccountNational();
+            } catch (CompanyConfigurationNotFoundException e) {
+                addCompanyConfigurationNotFoundErrorMessage();
+                return Outcome.REDISPLAY;
+            } catch (CompanyAccountNotConfiguredException e) {
+                facesMessages.add(StatusMessage.Severity.ERROR,
+                        MessageUtils.getMessage("CompanyConfiguration.account.notConfigured",
+                                MessageUtils.getMessage(e.getLabelKey())));
+                return Outcome.REDISPLAY;
+            }
+        }
+
         currentAccount.setAccountState(AccountState.INACTIVE);
 
         AccountType currentAccountType = currentAccount.getAccountType();
@@ -480,7 +907,7 @@ public class AccountAction extends GenericAction<Account> {
             vd2 = buildAccountEntryDetail(currentAccountType.getCashAccountChargeMe().getAccountCode(), interestValue, "DEBIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
             vd3 = buildAccountEntryDetail(accountTypeRenewDPF.getCashAccountMe().getAccountCode(), capitalRenewDPF, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
             if (partialRenewal)
-                vd4 = buildAccountEntryDetail("1110220000", withdrawal, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
+                vd4 = buildAccountEntryDetail(withdrawalCashAccount.getAccountCode(), withdrawal, "CREDIT", FinancesCurrencyType.D, Boolean.TRUE, exchangeRate);
 
         }
 
@@ -491,7 +918,7 @@ public class AccountAction extends GenericAction<Account> {
             if (partialRenewal)
                 /** Cuenta en bolivianos: el retiro tambien va en MN. Estaba armandose
                  *  como moneda extranjera y convertia el importe por el tipo de cambio. */
-                vd4 = buildAccountEntryDetail("1110110100", withdrawal, "CREDIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
+                vd4 = buildAccountEntryDetail(withdrawalCashAccount.getAccountCode(), withdrawal, "CREDIT", FinancesCurrencyType.P, Boolean.FALSE, exchangeRate);
         }
 
         newAccount.setCapital(capitalRenewDPF);
@@ -1302,6 +1729,87 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setPartnerDPF(Partner partnerDPF) {
         this.partnerDPF = partnerDPF;
+    }
+
+    public Voucher getSelectedVoucher() {
+        return selectedVoucher;
+    }
+
+    public List<VoucherDetail> getSelectedVoucherDetails() {
+        return selectedVoucherDetails;
+    }
+
+    public BigDecimal getSelectedVoucherTotalDebit() {
+        return selectedVoucherTotalDebit;
+    }
+
+    public BigDecimal getSelectedVoucherTotalCredit() {
+        return selectedVoucherTotalCredit;
+    }
+
+    public BigDecimal getSelectedVoucherTotalDebitMe() {
+        return selectedVoucherTotalDebitMe;
+    }
+
+    public BigDecimal getSelectedVoucherTotalCreditMe() {
+        return selectedVoucherTotalCreditMe;
+    }
+
+    public Date getClosingDateDPF() {
+        return closingDateDPF;
+    }
+
+    public void setClosingDateDPF(Date closingDateDPF) {
+        this.closingDateDPF = closingDateDPF;
+    }
+
+    public BigDecimal getClosingCapitalDPF() {
+        return closingCapitalDPF;
+    }
+
+    public BigDecimal getClosingInterestDPF() {
+        return closingInterestDPF;
+    }
+
+    public BigDecimal getClosingRcivaDPF() {
+        return closingRcivaDPF;
+    }
+
+    public BigDecimal getClosingNetInterestDPF() {
+        return closingNetInterestDPF;
+    }
+
+    public BigDecimal getClosingTotalDPF() {
+        return closingTotalDPF;
+    }
+
+    public BigDecimal getClosingAccruedDPF() {
+        return closingAccruedDPF;
+    }
+
+    public BigDecimal getClosingExpenseDPF() {
+        return closingExpenseDPF;
+    }
+
+    /** Para la vista: el ajuste al gasto se muestra en la columna que corresponde. */
+    public boolean isClosingExpenseReversal() {
+        return closingExpenseDPF != null && closingExpenseDPF.compareTo(BigDecimal.ZERO) < 0;
+    }
+
+    public BigDecimal getClosingExpenseAbsolute() {
+        return closingExpenseDPF == null ? BigDecimal.ZERO : closingExpenseDPF.abs();
+    }
+
+    public List<FixedTermDepositProvision> getClosingAccruedDetail() {
+        return closingAccruedDetail;
+    }
+
+    public String getGlossCloseDPF() {
+        return glossCloseDPF;
+    }
+
+    public void setGlossCloseDPF(String glossCloseDPF) {
+        this.glossCloseDPF = glossCloseDPF;
     }
 
     public BigDecimal getRcivaDPF() {

@@ -4,6 +4,7 @@ import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundExceptio
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.ProductSaleType;
+import com.encens.khipus.model.customers.FixedTermDepositConflict;
 import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
@@ -48,6 +49,40 @@ public interface VoucherAccoutingService extends GenericService {
     List<VoucherDetail> refreshVoucherDetailList(Voucher voucher);
 
     void saveVoucher(Voucher voucher);
+
+    /**
+     * Consulta si el comprobante hace sobre un DPF alguna operacion que no corresponde
+     * cargar como asiento suelto: acreditarle capital despues de su apertura, retirarle una
+     * parte, o cerrarlo (que va por la pantalla "Cerrar DPF", la unica que ademas reversa la
+     * provision acumulada y da de baja el certificado).
+     * <p/>
+     * Identifica el certificado por el ENLACE de la linea (<code>sf_tmpdet.idcuenta</code>),
+     * no por el codigo de cuenta contable: hay una cuenta distinta por plazo y moneda, y las
+     * que se agreguen en el futuro quedan cubiertas sin tocar nada.
+     * <p/>
+     * Se consulta ANTES de guardar y devuelve el conflicto en vez de lanzar. Es a proposito:
+     * saveVoucher es el chokepoint de todos los modulos y una excepcion ahi le mata la
+     * transaccion a quien sea que este guardando.
+     *
+     * @return el conflicto, o <code>null</code> si no hay ninguno.
+     */
+    FixedTermDepositConflict findFixedTermDepositConflict(Date voucherDate, List<VoucherDetail> details);
+
+    /**
+     * Codigos de cuenta del comprobante que son de capital de DPF pero cuya linea NO indica a
+     * que certificado corresponde.
+     * <p/>
+     * Solo sirve para advertir, nunca para bloquear: sin saber el certificado no hay contra
+     * que comparar, y un asiento de reclasificacion sobre esas cuentas es legitimo.
+     * <p/>
+     * La lista de cuentas sale de <code>tipocuenta</code> y se queda con las que usan tipos
+     * DPF y SOLO tipos DPF. La exclusividad importa: hay cuentas compartidas -- hoy
+     * 2120130200 la usan los DPF y un tipo de ahorros -- y advertir sobre esas seria ruido
+     * sobre movimientos legitimos.
+     *
+     * @return los codigos encontrados, vacio si no hay ninguno.
+     */
+    List<String> findUnlinkedFixedTermDepositAccounts(List<VoucherDetail> details);
 
     void savePurchaseDocument();
 

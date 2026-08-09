@@ -616,6 +616,20 @@
                     <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.generalCashAccountNational.col']}"/>
                 </s:decorate>
             </s:div>
+            <s:div id="generalCashAccountForeignDiv">
+                <s:decorate id="generalCashAccountForeignField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.generalCashAccountForeign']}</ui:define>
+                    <app:selectPopUp styleClass="input350" id="generalCashAccountForeign"
+                                     textValue="#{companySettingAction.instance.generalCashAccountForeign.fullName}"
+                                     value="#{companySettingAction.instance.generalCashAccountForeign}"
+                                     selectAction="companySettingAction.prepareAccountSelection('generalCashAccountForeign')"
+                                     clearAction="companySettingAction.clearAccount('generalCashAccountForeign')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="generalCashAccountForeignDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.generalCashAccountForeign.col']}"/>
+                </s:decorate>
+            </s:div>
             <s:div id="fixedTermInterestNationalCurrencyDiv">
                 <s:decorate id="fixedTermInterestNationalCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fixedTermInterestNationalCurrency']}</ui:define>

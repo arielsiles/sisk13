@@ -22,6 +22,7 @@ import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.DateUtils;
+import com.encens.khipus.util.FixedTermDepositAccrual;
 import com.encens.khipus.util.MessageUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
@@ -70,12 +71,6 @@ import java.util.Map;
 @Name("provisionInterestPayableAction")
 @Scope(ScopeType.CONVERSATION)
 public class ProvisionInterestPayableAction extends GenericAction {
-
-    /** Base de calculo de la planilla: tasa anual sobre 360 dias, en porcentaje. */
-    private static final BigDecimal DAILY_RATE_DIVISOR = new BigDecimal("36000");
-
-    /** Escala de trabajo del devengue por cuenta; el redondeo contable va al final. */
-    private static final int WORKING_SCALE = 10;
 
     private Month month;
     private Integer year;
@@ -273,6 +268,14 @@ public class ProvisionInterestPayableAction extends GenericAction {
                 continue;
             }
 
+            /** Un certificado retirado anticipadamente no devenga en este periodo, asi que
+             *  su capital no entra en ningun calculo: no tiene sentido bloquear la
+             *  generacion por el. */
+            Date closingDate = earlyClosingDate(account, movements);
+            if (closingDate != null && !closingDate.after(getPeriodEndDate())) {
+                continue;
+            }
+
             BigDecimal credits = BigDecimalUtil.roundBigDecimal(
                     capitalAt(movements, null, account.getCurrency()), 2);
             BigDecimal capital = BigDecimalUtil.roundBigDecimal(
@@ -288,51 +291,30 @@ public class ProvisionInterestPayableAction extends GenericAction {
     }
 
     /**
-     * Capital vigente de un certificado a una fecha: suma de los ABONOS hasta esa fecha
-     * inclusive. Con <code>date</code> en null suma todos.
-     * <p/>
-     * Los debitos se ignoran a proposito. El unico movimiento deudor de un certificado es
-     * su cancelacion, y viene fechada el dia del vencimiento: un DPF devenga interes hasta
-     * su vencimiento INCLUSIVE, asi que el asiento que lo liquida ese dia no reduce la base
-     * de ese dia. Restarlo costaba un dia de interes en el ultimo mes de cada certificado.
+     * El calculo vive en {@link FixedTermDepositAccrual} y no aca porque el cierre de un
+     * DPF tiene que devengar EXACTAMENTE lo mismo que esta provision: una debita el pasivo
+     * y la otra lo acredita, y cualquier diferencia queda colgada para siempre.
      */
     private BigDecimal capitalAt(List<Object[]> movements, Date date, FinancesCurrencyType currency) {
-        boolean foreign = FinancesCurrencyType.D.equals(currency);
-        BigDecimal capital = BigDecimal.ZERO;
-        for (Object[] movement : movements) {
-            Date movementDate = DateUtils.removeTime((Date) movement[1]);
-            if (movementDate == null || (date != null && movementDate.after(date))) {
-                continue;
-            }
-            capital = capital.add(nullToZero((BigDecimal) (foreign ? movement[5] : movement[3])));
-        }
-        return capital;
+        return FixedTermDepositAccrual.capitalAt(movements, date, isForeign(currency));
+    }
+
+    private List<Date> getCapitalIncreaseDates(List<Object[]> movements, Date from, Date until,
+                                               FinancesCurrencyType currency) {
+        return FixedTermDepositAccrual.capitalIncreaseDates(movements, from, until, isForeign(currency));
     }
 
     /**
-     * Fechas, dentro del rango devengado, en las que el capital aumento. Cada una abre un
-     * tramo nuevo. Solo los abonos cortan tramo, por lo explicado en {@link #capitalAt}.
+     * Solo el cierre ANTICIPADO corta el devengue. Una renovacion tambien deja el saldo en
+     * cero y ese certificado igual devengo su plazo completo.
      */
-    private List<Date> getCapitalIncreaseDates(List<Object[]> movements, Date from, Date until,
-                                               FinancesCurrencyType currency) {
-        boolean foreign = FinancesCurrencyType.D.equals(currency);
-        List<Date> dates = new ArrayList<Date>();
-        for (Object[] movement : movements) {
-            Date movementDate = DateUtils.removeTime((Date) movement[1]);
-            if (movementDate == null || !movementDate.after(from) || movementDate.after(until)) {
-                continue;
-            }
-            BigDecimal credit = nullToZero((BigDecimal) (foreign ? movement[5] : movement[3]));
-            if (credit.doubleValue() > 0 && !dates.contains(movementDate)) {
-                dates.add(movementDate);
-            }
-        }
-        Collections.sort(dates);
-        return dates;
+    private Date earlyClosingDate(Account account, List<Object[]> movements) {
+        return FixedTermDepositAccrual.earlyClosingDate(movements, isForeign(account.getCurrency()),
+                account.getExpirationDate());
     }
 
-    private static BigDecimal nullToZero(BigDecimal value) {
-        return value != null ? value : BigDecimal.ZERO;
+    private static boolean isForeign(FinancesCurrencyType currency) {
+        return FinancesCurrencyType.D.equals(currency);
     }
 
     /**
@@ -391,10 +373,31 @@ public class ProvisionInterestPayableAction extends GenericAction {
             return null;
         }
 
+        List<FixedTermDepositProvision> result = new ArrayList<FixedTermDepositProvision>();
+
+        /**
+         * Un certificado retirado ANTES de su vencimiento no devenga mas, aunque su
+         * fechavence sea posterior: el dinero ya se devolvio. Y no devenga nada en el mes en
+         * que se retira, porque el asiento de cierre liquida ese tramo -- si igual se
+         * provisionara, quedaria un pasivo posterior a la liquidacion que nadie reversa.
+         * <p/>
+         * OJO que es el cierre ANTICIPADO. Una renovacion tambien deja el saldo en cero
+         * (el capital pasa al certificado nuevo) y ese SI devenga hasta su fechavence:
+         * ademas la renovacion debita del pasivo el interes del plazo completo, asi que
+         * saltear su ultimo mes dejaria un faltante permanente.
+         * <p/>
+         * El corte es por FECHA, nunca por "esta cerrado hoy": la provision de agosto se
+         * genera en septiembre con fecha 31/08, y un retiro del 2 de septiembre no tiene
+         * que tocar agosto.
+         */
+        Date closingDate = earlyClosingDate(account, movements);
+        if (closingDate != null && !closingDate.after(endDate)) {
+            return result;
+        }
+
         Date from = maxDate(startDate, DateUtils.removeTime(account.getOpeningDate()));
         Date until = minDate(endDate, DateUtils.removeTime(account.getExpirationDate()));
 
-        List<FixedTermDepositProvision> result = new ArrayList<FixedTermDepositProvision>();
         if (until.before(from)) {
             return result;
         }
@@ -422,8 +425,7 @@ public class ProvisionInterestPayableAction extends GenericAction {
                 detail.setLiabilityAccountCode(liabilityAccount.getAccountCode());
                 detail.setCapital(capital);
                 detail.setDays(days);
-                detail.setProvision(capital.multiply(rate).multiply(new BigDecimal(days))
-                        .divide(DAILY_RATE_DIVISOR, WORKING_SCALE, RoundingMode.HALF_UP));
+                detail.setProvision(FixedTermDepositAccrual.accrual(capital, rate, days));
                 if (i > 0) {
                     detail.setCapitalIncreaseDate(increaseDates.get(i - 1));
                 }

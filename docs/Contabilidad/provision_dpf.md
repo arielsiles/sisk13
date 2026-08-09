@@ -77,6 +77,47 @@ cuadrando el importe.
 En los 12 meses de 2025 **ningún certificado tiene más de un tramo**: el mecanismo está
 inerte en todo el histórico y sólo se activa en el caso excepcional.
 
+### El retiro anticipado deja de devengar
+
+Un DPF retirado **antes de su vencimiento** no devenga en ningún período cuya fecha de corte
+sea igual o posterior a la del retiro, aunque su `fechavence` sea mucho más adelante: el
+dinero ya se devolvió.
+
+Tampoco devenga **nada en el mes del retiro**, porque el asiento de cierre liquida ese tramo.
+Si igual se provisionara, quedaría un pasivo posterior a la liquidación que nadie reversa.
+
+**Anticipado, no simplemente "cerrado".** Ésta es la distinción que importa y es fácil
+equivocarla: una **renovación también deja el saldo en cero** —el capital pasa al
+certificado nuevo—, pero ese certificado ganó el plazo completo y **tiene que devengar hasta
+su `fechavence`**. Y hay una segunda razón, más grave: el asiento de renovación debita del
+pasivo el interés de **todo el plazo**, así que saltear su último mes deja un faltante
+permanente en `CTACF_*`.
+
+El caso que lo destapó: **ME00148** vence el 21/08/2025 y se renovó el 26/08/2025 —cinco
+días después—. Cortando por "saldo cero" quedaba fuera de la provisión de agosto y se
+perdían sus 21 días devengados. **ME00149** es idéntico salvo que se renovó el 01/09, así
+que se salvaba por casualidad de fechas.
+
+Sobre los datos reales: de los 148 certificados que alguna vez quedaron en cero, **138 son
+renovaciones o retiros al vencimiento** y sólo **10 son retiros anticipados**.
+
+La fecha se saca del **mayor** —el saldo llegando a cero— y se compara contra `fechavence`.
+Nunca del estado: un DPF renovado también queda `INACTIVE`, y un retiro total cargado por
+comprobante no toca el estado y deja la cuenta en `ACTIVE` con saldo cero.
+
+Y el corte es por **fecha**, nunca por "¿está cerrado hoy?": la provisión de agosto se
+genera en septiembre con fecha 31/08, y un retiro del 2 de septiembre no debe tocar agosto.
+
+**Esto no era así hasta la versión 6.0.122.** `capitalAt()` ignoraba los débitos partiendo
+de que "el único movimiento deudor de un certificado es su cancelación, y viene fechada el
+día del vencimiento". Esa premisa era falsa: hay cierres anticipados, y esos certificados
+seguían provisionando todos los meses hasta su `fechavence` sobre plata ya devuelta.
+
+Al detectarlo había 10 DPF cerrados antes de vencer, todos en dólares y todos con saldo
+cero. Nueve vencieron entre 2019 y 2024, así que ninguno estaba vivo durante 2025 y la
+planilla de ese año no quedó contaminada. El único que cruza períodos aún sin generar es
+ME00165 (cerrado el 22/07/2026, vence el 28/01/2027).
+
 ### Selección de cuentas: manda `fechavence`, no el estado
 
 ```sql
@@ -435,6 +476,168 @@ vacía.
 - **`getFullCashAccount()` agrega solo el sufijo `(785.17 $us)`** cuando la cuenta es moneda
   D. No hay que armarlo a mano: por eso el asiento se ve igual que los que se cargaban
   manualmente.
+
+## Qué no se puede hacer con un DPF desde un comprobante suelto
+
+Un DPF no recibe dinero a mitad de plazo ni admite retiros parciales, y su cierre va por la
+pantalla **Cerrar DPF** —la única que además reversa la provisión acumulada y da de baja el
+certificado—. Cargarlo como asiento suelto es lo que dejaba la contabilidad diciendo un
+capital y la ficha otro (ver *Por qué el capital se desalineaba*).
+
+El control **es una consulta, no una excepción**: `findFixedTermDepositConflict(fecha,
+detalles)` devuelve el conflicto o `null`. Lo llama `VoucherCreateAction` en `create()` y
+`update()`, junto a la validación de balance, **antes** de entrar al EJB. Si hay conflicto
+muestra el mensaje y redisplaya, con el asiento cargado intacto.
+
+### Nivel 1 — bloquea, por el certificado enlazado
+
+Identifica el DPF por el **enlace de la línea** (`sf_tmpdet.idcuenta` → `cuenta` →
+`tipocuenta.tipo = 'DPF'`), **nunca por el código de cuenta contable**. Eso importa: hay una
+cuenta distinta por plazo y moneda —hoy siete— y las que se agreguen desde el ABM de tipos de
+cuenta quedan cubiertas sin tocar código.
+
+| Caso | Mensaje |
+|---|---|
+| **Abono** posterior a la apertura | Aumento de capital: hay que renovar |
+| **Débito** que deja saldo | El retiro parcial no existe |
+| **Débito** que cierra el certificado | Va por *Cerrar DPF* |
+
+Un abono del **mismo día** de la apertura es legítimo: puede venir en dos líneas del mismo
+comprobante, y pasa en 21 de 24 casos históricos.
+
+No afecta a la renovación ni al cierre: los dos llaman a `saveVoucher()` directo desde
+`AccountAction`, sin pasar por la pantalla de comprobantes, así que el control no puede
+bloquearse a sí mismo.
+
+### Nivel 2 — sólo advierte, por la cuenta contable
+
+Cubre el hueco del nivel 1: una línea que toca una cuenta de capital de DPF **sin indicar el
+certificado**. Ahí no se puede bloquear —sin saber cuál es el certificado no hay contra qué
+comparar, y un asiento de reclasificación sobre esas cuentas es legítimo—, así que sólo avisa.
+
+La lista de cuentas **se calcula, no se hardcodea**: sale de `tipocuenta` y se queda con las
+que usan tipos DPF **y sólo tipos DPF**. La exclusividad no es un detalle: `2120130200 —
+Cuenta Ahorros Socios MV` está configurada en los 7 tipos de DPF **y también en un tipo de
+ahorros**, así que queda afuera; advertir sobre ella sería ruido sobre movimientos legítimos.
+Hoy la consulta devuelve 7 cuentas, todas `2130xxxxxx`.
+
+**Por qué no va dentro de `saveVoucher()`.** Se intentó así primero y estuvo mal. `saveVoucher`
+es el chokepoint de **61 llamadas en 20 archivos** de todos los módulos —almacén, producción,
+activos fijos, ventas, créditos—, y `VoucherAccoutingServiceBean` es un `@Stateless`: una
+`RuntimeException` sin `@ApplicationException` hace que el contenedor **marque la transacción
+para rollback y la envuelva en `EJBException`**. Consecuencias:
+
+- Cualquier módulo podía terminar con la transacción muerta por una validación de DPF.
+- El `catch` específico de `create()` nunca matcheaba, por el wrapping: el mensaje era código
+  muerto.
+- El redisplay reventaba con `LazyInitializationException` al renderizar
+  `partnerAccount.fullAccountName`, porque `Account.partner` es `@ManyToOne(LAZY)` y la
+  transacción ya estaba marcada para rollback.
+
+Una validación de negocio no va en un chokepoint transaccional compartido.
+
+**Y el texto de la cuenta de ahorro se materializa en el setter**, no en la vista:
+`VoucherCreateAction.setPartnerAccount()` guarda `partnerAccountLabel` mientras el contexto de
+persistencia está vivo, y la vista muestra ese String. Así **ningún** camino de error puede
+volver a reventar la pantalla por un proxy sin sesión — tampoco el `catch (Exception e)`
+genérico, que tenía el mismo problema desde antes.
+
+## Cierre de un DPF
+
+Botón **"Cerrar DPF"** en la ficha de la cuenta, junto a *Renovación*, con permiso
+`DPFCLOSE`. Es para cuando el socio se lleva el dinero y no renueva.
+
+Reemplaza al procedimiento manual —cargar el comprobante por Contabilidad y después
+acordarse de inactivar el certificado—, cuyo segundo paso se olvidaba. Ahora el asiento y
+la baja del certificado van en **la misma transacción**: o pasan las dos cosas o no pasa
+ninguna.
+
+### Cuánto interés se paga
+
+| Fecha de cierre | Interés |
+|---|---|
+| **Hasta el vencimiento inclusive** | **0** — retiro anticipado, el socio resigna lo devengado |
+| **Después del vencimiento** | **completo**, con el mismo cálculo por tramos de la renovación |
+
+La retención RC-IVA del 13% sólo aplica cuando hay interés, y sólo si el socio la tiene
+marcada (`cuenta.ret`).
+
+### El asiento
+
+```
+Debe   CTAP_MN / CTAP_ME          capital
+Debe   CTACF_MN / CTACF_ME        provisión ya contabilizada
+Debe   gasto i_ppag_dpf_*         interés neto − provisión acumulada
+Haber  cajagral1mn / cajagral1me  capital + interés neto
+```
+
+**Es una sola fórmula para los dos casos.** Cuando el interés es 0 —retiro anticipado— la
+tercera línea da negativo y se invierte a HABER: eso es la reversa de todo lo provisionado.
+
+Es exactamente la estructura que el contador ya venía armando a mano: se debita el pasivo
+con lo que hay acumulado y el resto va a gasto.
+
+### El RC-IVA no se contabiliza
+
+**Por decisión expresa**, y siguiendo el criterio que se viene usando desde 2019: la
+retención se descuenta del importe que se le entrega al socio y se le informa —en pantalla
+y en el certificado impreso—, pero **no se acredita en ninguna cuenta**.
+
+Verificado contra la base: `2420310100` (*RC IVA retenido a Clientes*) y las otras cuentas
+de retención **no tienen un solo movimiento** entre 2019 y 2026, ni en renovaciones de DPF
+ni en capitalización de ahorros. Las 25 renovaciones más recientes debitan `CTACF_*` con el
+interés **neto** y no llevan línea de retención — comprobado al centavo en ME00160 (79,00
+contra 78,84 de neto sobre 90,62 brutos) y ME00161 (764,00 contra 763,76).
+
+Por eso el ajuste al gasto se calcula contra el **interés neto** y no contra el bruto: sin
+línea de retención, compararlo contra el bruto dejaría el asiento descuadrado justo por ese
+importe. Así la retención no queda colgada en ningún lado, simplemente baja el costo
+financiero del certificado.
+
+Dimensión de lo que esto implica: entre 2019 y 2026 las renovaciones debitaron unos
+**65.700 $us netos**, lo que supone una retención implícita del orden de **9.800 $us** nunca
+registrada como deuda fiscal. 149 de los 167 DPF tienen la marca `ret` activa. Queda
+anotado; es una definición del contador, no del sistema.
+
+### Por qué hay que debitar el pasivo COMPLETO
+
+La provisión mensual fue acreditando `CTACF_*` con el interés **bruto**. Si el cierre
+debita menos que eso, la diferencia **queda en la cuenta para siempre**: un pasivo de
+intereses por pagar que no le corresponde a ningún DPF vivo, que se acumula con cada
+cierre y que después nadie puede rastrear.
+
+Ejemplo real (ME00170, 6.120 $us al 3%, 08/06 → 05/12): la provisión acumula 89,76 entre
+junio y noviembre y el interés neto del plazo es 79,87. El asiento debita los **89,76
+completos** y los 9,89 de diferencia se reversan contra el gasto:
+
+```
+Debe   2130420000  capital                        6.120,00
+Debe   2180320000  provisión acumulada               89,76
+Haber  4110320000  ajuste al gasto                    9,89
+Haber  1110220000  caja ME                        6.199,87
+                                        ─────────────────────
+                                          6.209,76 = 6.209,76
+```
+
+Debitando sólo el neto —como hace la renovación— quedarían **9,89 colgados** en el pasivo.
+
+**La renovación tiene este mismo faltante**: debita el neto e ignora lo acumulado. No se
+corrigió acá por decisión expresa, para no cambiarle el criterio a un flujo en uso. Queda
+anotado.
+
+### La provisión acumulada se recalcula, no se lee
+
+El asiento mensual de la provisión **agrupa por cuenta contable**: una sola línea para
+todos los DPF juntos, sin rastro de cuánto le tocó a cada certificado. Así que el monto a
+debitar hay que recalcularlo.
+
+Por eso el cálculo vive en
+[FixedTermDepositAccrual](../../src/main/com/encens/khipus/util/FixedTermDepositAccrual.java),
+compartido con la provisión: **un lado acredita y el otro debita, y si cada uno calculara
+por su cuenta cualquier diferencia de redondeo quedaría colgada en el pasivo.**
+
+Condición para que el recálculo coincida con los libros: **la provisión tiene que estar al
+día**. Si falta generar algún mes, el cierre debitaría un pasivo que nunca se acreditó.
 
 ## Tipos de cuenta (`tipocuenta`)
 

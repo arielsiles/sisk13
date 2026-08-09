@@ -111,6 +111,29 @@ SELECT (SELECT valor FROM secuencia WHERE tabla = 'tipocuenta') AS secuencia,
        (SELECT MAX(idtipocuenta) FROM tipocuenta)               AS max_id;
 
 
+
+
+-- Caja general en moneda extranjera. La MN ya existia (cajagral1mn = 1110110100); esta
+-- faltaba y por eso el retiro parcial de la renovacion tenia el 1110220000 hardcodeado.
+ALTER TABLE configuracion
+    ADD COLUMN cajagral1me varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT 'Caja general ME';
+
+ALTER TABLE configuracion
+    ADD CONSTRAINT fk_configuracion_cajagral1me FOREIGN KEY (cajagral1me) REFERENCES arcgms (cuenta);
+
+-- 1110220000 Billetes y Monedas Extranjeras: es la que se venia usando a mano.
+UPDATE configuracion SET cajagral1me = '1110220000';
+
+
+-- Permiso del cierre de DPF (boton "Cerrar DPF" de la ficha de la cuenta).
+-- Solo consultar el calculo (VIEW=1) y registrar el cierre (CREATE=2): permiso = 3.
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'DPFCLOSE', 'Cierre de Depositos a Plazo Fijo', 1, 3, 'Functionality.customers.dpfClose', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'DPFCLOSE');
+
+
 -- secuencia.funcionalidad quedo en 18 y el MAX real es 516: un alta desde la aplicacion chocaria.
 UPDATE secuencia
    SET valor = GREATEST(COALESCE(valor, 0), (SELECT MAX(idfuncionalidad) FROM funcionalidad))

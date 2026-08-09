@@ -1,7 +1,7 @@
 package com.encens.khipus.service.accouting;
 
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
-import com.encens.khipus.exception.finances.FixedTermDepositCapitalException;
+import com.encens.khipus.model.customers.FixedTermDepositConflict;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.ProductSaleType;
@@ -73,8 +73,6 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
 
     public void saveVoucher(Voucher voucher){
 
-        validateFixedTermDepositCredits(voucher);
-
         /** El id_tmpenc lo asigna Hibernate al persistir (@GeneratedValue TABLE sobre 'secuencia') **/
 
         if (voucher.getTransactionNumber() == null){
@@ -118,42 +116,142 @@ public class VoucherAccoutingServiceBean extends GenericServiceBean implements V
     }
 
     /**
-     * Impide que un comprobante acredite capital a un DPF despues de su apertura.
+     * Detecta si un comprobante acreditaria capital a un DPF despues de su apertura.
      * <p/>
-     * Un DPF no recibe dinero a mitad de plazo: para aumentar el capital hay que cerrar
-     * el certificado y abrir uno nuevo (Renovacion). Hasta ahora ese aumento se cargaba
-     * como un asiento suelto desde la pantalla de comprobantes, que no pasa por el modulo
-     * de DPF, y dejaba la contabilidad diciendo un capital y la ficha otro.
+     * Un DPF no recibe dinero a mitad de plazo: para aumentar el capital hay que cerrar el
+     * certificado y abrir uno nuevo (Renovacion). Ese aumento se venia cargando como un
+     * asiento suelto desde la pantalla de comprobantes, que no pasa por el modulo de DPF, y
+     * dejaba la contabilidad diciendo un capital y la ficha otro.
+     * <p/>
+     * <b>Es una consulta, no una validacion que corta.</b> Devuelve el conflicto y deja que
+     * decida quien llama. Antes esto vivia dentro de {@link #saveVoucher(Voucher)} lanzando
+     * una RuntimeException, y estaba mal: saveVoucher es el chokepoint que usan 61 llamadas
+     * de todos los modulos, y una excepcion no declarada como @ApplicationException hace que
+     * el contenedor marque la transaccion para rollback y la envuelva en EJBException. El
+     * resultado era que cualquier modulo podia terminar con su transaccion muerta, y en la
+     * pantalla de comprobantes el redisplay reventaba al renderizar una asociacion lazy.
      * <p/>
      * El control es por fecha y no por un marcador: la apertura de un certificado puede
-     * venir en dos lineas del mismo comprobante (pasa en 21 de los 24 casos historicos),
-     * y eso es legitimo. Lo que no lo es, es un credito fechado despues de la apertura.
+     * venir en dos lineas del mismo comprobante (pasa en 21 de los 24 casos historicos), y
+     * eso es legitimo. Lo que no lo es, es un abono fechado despues de la apertura.
+     *
+     * @return el conflicto, o <code>null</code> si el comprobante no acredita capital a
+     *         ningun DPF fuera de su fecha de apertura.
      */
-    private void validateFixedTermDepositCredits(Voucher voucher) {
-        if (voucher == null || voucher.getDate() == null) {
-            return;
+    public FixedTermDepositConflict findFixedTermDepositConflict(Date date, List<VoucherDetail> details) {
+        if (date == null || details == null) {
+            return null;
         }
-        Date voucherDate = DateUtils.removeTime(voucher.getDate());
+        Date voucherDate = DateUtils.removeTime(date);
 
-        for (VoucherDetail voucherDetail : voucher.getDetails()) {
+        for (VoucherDetail voucherDetail : details) {
             Account account = voucherDetail.getPartnerAccount();
             if (account == null
                     || account.getAccountType() == null
                     || !SavingType.DPF.equals(account.getAccountType().getSavingType())) {
                 continue;
             }
+            boolean foreign = !FinancesCurrencyType.P.equals(account.getCurrency());
 
-            BigDecimal credit = voucherDetail.getCredit() != null ? voucherDetail.getCredit() : BigDecimal.ZERO;
-            BigDecimal creditMe = voucherDetail.getCreditMe() != null ? voucherDetail.getCreditMe() : BigDecimal.ZERO;
-            if (credit.doubleValue() <= 0 && creditMe.doubleValue() <= 0) {
-                continue;
+            BigDecimal credit = nullToZero(foreign ? voucherDetail.getCreditMe() : voucherDetail.getCredit());
+            BigDecimal debit = nullToZero(foreign ? voucherDetail.getDebitMe() : voucherDetail.getDebit());
+
+            /**
+             * Abono posterior a la apertura: aumento de capital a mitad de plazo. Un abono
+             * del MISMO dia de la apertura es legitimo -- puede venir en dos lineas del
+             * mismo comprobante, pasa en 21 de 24 casos historicos.
+             */
+            if (credit.doubleValue() > 0) {
+                Date openingDate = DateUtils.removeTime(account.getOpeningDate());
+                if (openingDate != null && voucherDate.after(openingDate)) {
+                    return FixedTermDepositConflict.capitalIncrease(account.getCode(), openingDate, voucherDate);
+                }
             }
 
-            Date openingDate = DateUtils.removeTime(account.getOpeningDate());
-            if (openingDate != null && voucherDate.after(openingDate)) {
-                throw new FixedTermDepositCapitalException(account.getCode(), openingDate, voucherDate);
+            /**
+             * Debito: retiro. Se distingue parcial de total contra el saldo del mayor, para
+             * poder decir cual de las dos cosas esta mal -- el retiro parcial no existe, y el
+             * total va por "Cerrar DPF", que ademas reversa la provision y baja el certificado.
+             */
+            if (debit.doubleValue() > 0) {
+                BigDecimal balance = partnerAccountBalance(account, foreign);
+                boolean total = debit.compareTo(balance) >= 0;
+                return FixedTermDepositConflict.withdrawal(account.getCode(), total);
             }
         }
+        return null;
+    }
+
+    /** Saldo del certificado segun el mayor, en su moneda. */
+    private BigDecimal partnerAccountBalance(Account account, boolean foreign) {
+        String amounts = foreign
+                ? "coalesce(sum(vd.creditMe), 0) - coalesce(sum(vd.debitMe), 0)"
+                : "coalesce(sum(vd.credit), 0) - coalesce(sum(vd.debit), 0)";
+        Object result = em.createQuery("select " + amounts + " from VoucherDetail vd"
+                + " where vd.partnerAccount = :account and vd.voucher.state <> 'ANL'")
+                .setParameter("account", account)
+                .getSingleResult();
+        return result != null ? (BigDecimal) result : BigDecimal.ZERO;
+    }
+
+    public List<String> findUnlinkedFixedTermDepositAccounts(List<VoucherDetail> details) {
+        List<String> found = new ArrayList<String>();
+        if (details == null || details.isEmpty()) {
+            return found;
+        }
+        Set<String> dpfAccounts = loadExclusiveFixedTermDepositAccounts();
+        if (dpfAccounts.isEmpty()) {
+            return found;
+        }
+        for (VoucherDetail voucherDetail : details) {
+            String code = voucherDetail.getAccount();
+            if (voucherDetail.getPartnerAccount() == null
+                    && code != null
+                    && dpfAccounts.contains(code)
+                    && !found.contains(code)) {
+                found.add(code);
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Cuentas de capital configuradas en tipos DPF y en NINGUN otro tipo de ahorro.
+     * <p/>
+     * Se calcula, no se hardcodea: si se da de alta un tipo de DPF con una cuenta nueva queda
+     * cubierta sola, y si esa cuenta pasa a usarse tambien en un tipo de ahorros deja de
+     * considerarse automaticamente.
+     */
+    private Set<String> loadExclusiveFixedTermDepositAccounts() {
+        List<Object[]> rows = em.createQuery(
+                "select at.savingType, mn.accountCode, me.accountCode, mv.accountCode"
+                        + " from AccountType at"
+                        + " left join at.cashAccountMn mn"
+                        + " left join at.cashAccountMe me"
+                        + " left join at.cashAccountMv mv").getResultList();
+
+        Set<String> fixedTerm = new LinkedHashSet<String>();
+        Set<String> shared = new HashSet<String>();
+        for (Object[] row : rows) {
+            boolean isFixedTerm = SavingType.DPF.equals(row[0]);
+            for (int i = 1; i <= 3; i++) {
+                String code = (String) row[i];
+                if (code == null || code.trim().length() == 0) {
+                    continue;
+                }
+                if (isFixedTerm) {
+                    fixedTerm.add(code);
+                } else {
+                    shared.add(code);
+                }
+            }
+        }
+        fixedTerm.removeAll(shared);
+        return fixedTerm;
+    }
+
+    private static BigDecimal nullToZero(BigDecimal value) {
+        return value != null ? value : BigDecimal.ZERO;
     }
 
     /**

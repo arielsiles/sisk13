@@ -46,6 +46,17 @@
                                  immediate="true"
                                  />
 
+                <!-- El socio se lleva el dinero y no renueva. Reemplaza al comprobante
+                     cargado a mano mas el paso de inactivar el certificado, que se olvidaba. -->
+                <h:commandButton action="#{accountAction.closeDPF}"
+                                 value="#{messages['Account.closing']}"
+                                 rendered="#{accountAction.isDpfAccount(account) and s:hasPermission('DPFCLOSE','VIEW')}"
+                                 disabled="#{accountAction.isClosed(account)}"
+                                 title="#{accountAction.isClosed(account) ? accountAction.renewalBlockedReason : ''}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 />
+
                 <h:commandButton id="createButtonId"
                                  action="#{accountAction.create}"
                                  value="#{messages['Common.save']}"
@@ -282,7 +293,7 @@
                                         value="#{accountAction.getAccountDetailList(account)}"
                                         var="accountDetailItem"
                                         width="100%"
-                                        columnsWidth="10%, 10%, 45%, 15%, 10%, 10%">
+                                        columnsWidth="9%, 9%, 41%, 14%, 10%, 10%, 7%">
                             <f:facet name="header">
                                 <rich:columnGroup>
                                     <rich:column>
@@ -311,9 +322,9 @@
                                         <h:outputText value="#{messages['AccountTransaction.credit']}" />
                                     </rich:column>
 
-                                    <!--<rich:column styleClass="center">
+                                    <rich:column styleClass="center">
                                         <h:outputText value="#{messages['Common.action']}" />
-                                    </rich:column>-->
+                                    </rich:column>
 
                                 </rich:columnGroup>
                             </f:facet>
@@ -366,12 +377,18 @@
                                 </rich:column>
                             </c:if>
 
-                            <!--<rich:column styleClass="center">
-                                <h:commandLink value="#{messages['Common.select']}"
-                                               immediate="true"
-                                               action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
-                                               rendered="#{s:hasPermission('CREDIT','VIEW')}" />
-                            </rich:column>-->
+                            <!-- Ver como quedo contabilizado el movimiento, sin salir de la ficha -->
+                            <rich:column styleClass="center">
+                                <a4j:commandLink id="viewVoucherLink"
+                                                 action="#{accountAction.viewVoucher(accountDetailItem)}"
+                                                 immediate="true"
+                                                 ajaxSingle="true"
+                                                 oncomplete="Richfaces.showModalPanel('accountVoucherViewModalPanel');"
+                                                 reRender="accountVoucherViewModalPanel">
+                                    <h:graphicImage value="/img/eye-line.svg" styleClass="select-image"
+                                                    title="#{messages['Voucher.viewDocument']}"/>
+                                </a4j:commandLink>
+                            </rich:column>
 
                         </rich:dataTable>
                         <!--<app:dataScroller id="ListIdListDataScrollerId" for="accountTransactionListId" dataModel="#{accountTransactionDataModel}"/>-->
@@ -396,6 +413,12 @@
                 </ui:define>
             </s:decorate>
         </s:div>
+
+        <s:decorate id="accountVoucherViewModalPanelContainer"
+                    template="/customers/accountVoucherViewModalPanel.xhtml">
+            <ui:param name="containerId" value="accountVoucherViewModalPanelContainer"/>
+            <ui:param name="dialogId" value="accountVoucherViewModalPanel"/>
+        </s:decorate>
 
         <rich:jQuery selector="#customer" query="focus()" timing="onload"/>
     </ui:define>

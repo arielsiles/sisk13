@@ -650,16 +650,36 @@ public class CompanyConfiguration {
     })
     private CashAccount VeterinaryCashAccount;
 
-    @Column(name = "CAJAgRAL1MN", length = 20)
+    /**
+     * Caja general. De aca sale el efectivo que se entrega al socio al cerrar un DPF, y
+     * tambien el del retiro parcial de una renovacion; antes esas dos cuentas estaban
+     * hardcodeadas en AccountAction.
+     * <p/>
+     * El nombre de columna va en minusculas: en MySQL los nombres de columna no distinguen
+     * mayusculas, asi que el "CAJAgRAL1MN" original apuntaba a la misma columna y solo
+     * desentonaba con el resto de la tabla.
+     */
+    @Column(name = "cajagral1mn", length = 20)
     @Length(max = 20)
     private String generalCashAccountNationalCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CAJAgRAL1MN", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "cajagral1mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount generalCashAccountNational;
+
+    @Column(name = "cajagral1me", length = 20)
+    @Length(max = 20)
+    private String generalCashAccountForeignCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cajagral1me", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount generalCashAccountForeign;
 
     @Column(name = "i_pvig_pf_mn", length = 20)
     @Length(max = 20)
@@ -1792,6 +1812,23 @@ public class CompanyConfiguration {
         this.generalCashAccountNationalCode = generalCashAccountNationalCode;
     }
 
+    public CashAccount getGeneralCashAccountForeign() {
+        return generalCashAccountForeign;
+    }
+
+    public void setGeneralCashAccountForeign(CashAccount generalCashAccountForeign) {
+        this.generalCashAccountForeign = generalCashAccountForeign;
+        setGeneralCashAccountForeignCode(this.generalCashAccountForeign != null ? this.generalCashAccountForeign.getAccountCode() : null);
+    }
+
+    public String getGeneralCashAccountForeignCode() {
+        return generalCashAccountForeignCode;
+    }
+
+    public void setGeneralCashAccountForeignCode(String generalCashAccountForeignCode) {
+        this.generalCashAccountForeignCode = generalCashAccountForeignCode;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -2730,6 +2767,13 @@ public class CompanyConfiguration {
      */
     public CashAccount requireGeneralCashAccountNational() {
         return requireAccount(getGeneralCashAccountNational(), "cajagral1mn", "CompanyConfiguration.generalCashAccountNational");
+    }
+    /**
+     * @return la caja general en moneda extranjera (columna <code>cajagral1me</code>).
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireGeneralCashAccountForeign() {
+        return requireAccount(getGeneralCashAccountForeign(), "cajagral1me", "CompanyConfiguration.generalCashAccountForeign");
     }
     /**
      * @return la cuenta de la columna <code>i_pvig_pf_mn</code>.
