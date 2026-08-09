@@ -17,7 +17,16 @@ public enum AccountState {
      * Las cuentas anuladas quedan fuera de toda operacion (provision, renovacion,
      * transferencias); se siguen listando para que el registro no desaparezca.
      */
-    ANNULLED("AccountState.annulled");
+    ANNULLED("AccountState.annulled"),
+    /**
+     * DPF dado de alta pero todavia sin contabilizar: el certificado esta cargado y el
+     * dinero no entro. Nace asi toda cuenta DPF nueva y solo sale de este estado por el
+     * boton Aprobar, que es el que genera el comprobante de ingreso.
+     * <p/>
+     * Mientras esta pendiente no devenga (no tiene un solo asiento, con lo que la
+     * provision mensual lo calcula en cero) y no se puede renovar ni cerrar.
+     */
+    PENDING("AccountState.pending");
 
     private String resourceKey;
 

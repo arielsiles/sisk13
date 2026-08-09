@@ -3,6 +3,7 @@ package com.encens.khipus.model.finances;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.exception.finances.CompanyAccountNotConfiguredException;
+import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.common.File;
 import com.encens.khipus.model.contacts.Salutation;
@@ -680,6 +681,23 @@ public class CompanyConfiguration {
             @JoinColumn(name = "cajagral1me", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount generalCashAccountForeign;
+
+    /**
+     * Tipo de comprobante con el que se registra la apertura de un DPF. Es CI: los 37
+     * asientos de apertura que existen como CI debitan la caja general y acreditan el
+     * capital del certificado, sin una sola excepcion.
+     * <p/>
+     * Se configura aca y no en <code>tipocuenta</code> porque no depende del plazo ni de
+     * la moneda: toda apertura es un ingreso de dinero. Un solo lugar que mantener, y los
+     * tipos de cuenta nuevos quedan cubiertos sin cargar nada.
+     */
+    @Column(name = "tipo_doc_dpf", length = 5)
+    @Length(max = 5)
+    private String fixedTermDepositDocumentTypeName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipo_doc_dpf", referencedColumnName = "nombre", nullable = true, insertable = false, updatable = false)
+    private DocType fixedTermDepositDocumentType;
 
     @Column(name = "i_pvig_pf_mn", length = 20)
     @Length(max = 20)
@@ -1827,6 +1845,24 @@ public class CompanyConfiguration {
 
     public void setGeneralCashAccountForeignCode(String generalCashAccountForeignCode) {
         this.generalCashAccountForeignCode = generalCashAccountForeignCode;
+    }
+
+    public DocType getFixedTermDepositDocumentType() {
+        return fixedTermDepositDocumentType;
+    }
+
+    public void setFixedTermDepositDocumentType(DocType fixedTermDepositDocumentType) {
+        this.fixedTermDepositDocumentType = fixedTermDepositDocumentType;
+        setFixedTermDepositDocumentTypeName(this.fixedTermDepositDocumentType != null
+                ? this.fixedTermDepositDocumentType.getName() : null);
+    }
+
+    public String getFixedTermDepositDocumentTypeName() {
+        return fixedTermDepositDocumentTypeName;
+    }
+
+    public void setFixedTermDepositDocumentTypeName(String fixedTermDepositDocumentTypeName) {
+        this.fixedTermDepositDocumentTypeName = fixedTermDepositDocumentTypeName;
     }
 
     public String getTitle() {

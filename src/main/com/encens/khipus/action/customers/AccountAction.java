@@ -14,6 +14,7 @@ import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.VoucherState;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.FixedTermDepositAccrual;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
@@ -31,6 +32,8 @@ import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -120,6 +123,30 @@ public class AccountAction extends GenericAction<Account> {
     private List<FixedTermDepositProvision> closingAccruedDetail = new ArrayList<FixedTermDepositProvision>();
     private String glossCloseDPF;
 
+    /**
+     * Estado con el que se abrio la ficha. Es contra este valor que se decide si un cambio
+     * de estado es una edicion legitima o una transicion que solo puede hacer una
+     * operacion; ver {@link #validateStateTransition()}.
+     */
+    private AccountState originalAccountState;
+
+    /** Codigo con el que se abrio la ficha; ver {@link #validateAccountCode()}. */
+    private String originalAccountCode;
+
+    /** Aprobacion del DPF: comprobante de ingreso de la apertura **/
+    private Date approvalDateDPF;
+    private String approvalGlossDPF;
+    private BigDecimal approvalExchangeRateDPF = BigDecimal.ONE;
+    private DocType approvalDocumentTypeDPF;
+    /** Las lineas que se van a contabilizar, ya armadas: el modal muestra estas mismas. */
+    private List<VoucherDetail> approvalDetailsDPF = new ArrayList<VoucherDetail>();
+    private BigDecimal approvalTotalDebitDPF    = BigDecimal.ZERO;
+    private BigDecimal approvalTotalCreditDPF   = BigDecimal.ZERO;
+    private BigDecimal approvalTotalDebitMeDPF  = BigDecimal.ZERO;
+    private BigDecimal approvalTotalCreditMeDPF = BigDecimal.ZERO;
+    /** El modal solo se abre si el asiento se pudo armar entero. */
+    private boolean approvalReady;
+
     /** Comprobante que se esta viendo en el modal de la pestana Transacciones. */
     private Voucher selectedVoucher;
     private List<VoucherDetail> selectedVoucherDetails = new ArrayList<VoucherDetail>();
@@ -163,17 +190,48 @@ public class AccountAction extends GenericAction<Account> {
     @Begin(join=true, ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String select(Account instance) {
         calculateTotalAmounts(instance);
-        return super.select(instance);
-
+        String outcome = super.select(instance);
+        originalAccountState = getInstance().getAccountState();
+        originalAccountCode = getInstance().getCode();
+        return outcome;
     }
 
-    @End
+    /**
+     * Un DPF nuevo nace PENDIENTE: la ficha queda cargada pero el dinero todavia no entro.
+     * Lo pasa a ACTIVE el boton Aprobar, que es lo unico que genera el comprobante de
+     * ingreso. Las cuentas que no son DPF siguen tomando el estado del formulario.
+     * <p/>
+     * Ya no termina la conversacion: devuelve SUCCESS con <code>op=UPDATE</code> y
+     * pages.xml redirige a esta misma pantalla, con lo que vuelve en modo edicion sobre el
+     * registro recien grabado. Antes redibujaba el formulario sin recargarlo -- el
+     * vencimiento y el capital se guardaban bien pero desaparecian de la pantalla -- y un
+     * segundo clic en Guardar daba de alta la cuenta dos veces.
+     */
     @Override
     public String create() {
         try {
+            if (isDpfAccount(getInstance())) {
+                getInstance().setAccountState(AccountState.PENDING);
+                String code = generateAccountCode(getInstance());
+                if (code == null) {
+                    return Outcome.REDISPLAY;
+                }
+                getInstance().setCode(code);
+            } else if (getInstance().getAccountState() == null) {
+                /** El estado dejo de ser un campo del formulario: una cuenta de ahorro
+                 *  nace activa, que es lo unico que tiene sentido al darla de alta. */
+                getInstance().setAccountState(AccountState.ACTIVE);
+            }
+            if (!validateAccountCode()) {
+                return Outcome.REDISPLAY;
+            }
             getInstance().setAccountNumber(generateAccountNumber());
             getService().create(getInstance());
             addCreatedMessage();
+            setOp(OP_UPDATE);
+            originalAccountState = getInstance().getAccountState();
+            originalAccountCode = getInstance().getCode();
+            calculateTotalAmounts(getInstance());
             return Outcome.SUCCESS;
         } catch (EntryDuplicatedException e) {
             addDuplicatedMessage();
@@ -331,11 +389,9 @@ public class AccountAction extends GenericAction<Account> {
         totalAmountDPF = BigDecimalUtil.sum(capitalDPF, interestDPF);
         totalAmountDPF = BigDecimalUtil.subtract(totalAmountDPF, rcivaDPF);
 
-        /* Para asignar codigo automaticamente, hacerlo al momento de guardar ya que la secuencia se actualiza
-        String str = "ME0000";
-        Long number = sequenceGeneratorService.nextValue(Constants.ACCOUNT_DPF_CODE);
-        newAccountCodeDPF = FormatUtils.convert(number.toString(), str);
-        */
+        /** El codigo del certificado nuevo se sigue tipeando a mano en esta pantalla. El
+         *  alta si lo genera sola, con {@link #generateAccountCode(Account)}; traerlo aca
+         *  queda pendiente y es la via que todavia puede repetir un codigo. */
 
         setCapitalRenewDPF(totalAmountDPF);
 
@@ -525,7 +581,14 @@ public class AccountAction extends GenericAction<Account> {
         if (selectedVoucher == null) {
             return;
         }
-        selectedVoucherDetails = voucherAccoutingService.getVoucherDetailList(selectedVoucher);
+        /**
+         * Refresh y no una consulta a secas: un asiento generado en esta misma conversacion
+         * -- el cierre, la aprobacion, la renovacion -- sigue vivo en el contexto de
+         * persistencia con la asociacion cashAccount sin cargar, porque buildAccountEntryDetail
+         * solo setea el codigo de cuenta. Consultar de nuevo devuelve esos mismos objetos
+         * desde el cache de primer nivel, y getFullCashAccount() revienta al dereferenciarla.
+         */
+        selectedVoucherDetails = voucherAccoutingService.refreshVoucherDetailList(selectedVoucher);
         for (VoucherDetail detail : selectedVoucherDetails) {
             selectedVoucherTotalDebit = BigDecimalUtil.sum(selectedVoucherTotalDebit, detail.getDebit(), 2);
             selectedVoucherTotalCredit = BigDecimalUtil.sum(selectedVoucherTotalCredit, detail.getCredit(), 2);
@@ -617,10 +680,7 @@ public class AccountAction extends GenericAction<Account> {
             return Outcome.REDISPLAY;
         }
 
-        Voucher voucher = new Voucher();
-        voucher.setDocumentType(documentType.getName());
-        voucher.setGloss(glossCloseDPF);
-        voucher.setDate(closingDate);
+        Voucher voucher = buildDpfVoucher(documentType.getName(), glossCloseDPF, closingDate);
 
         VoucherDetail capitalDetail = buildAccountEntryDetail(capitalAccount.getAccountCode(),
                 closingCapitalDPF, "DEBIT", currency, foreign, exchangeRate);
@@ -653,6 +713,12 @@ public class AccountAction extends GenericAction<Account> {
         account.setAccountState(AccountState.INACTIVE);
         accountService.updateAccount(account);
         voucherAccoutingService.saveVoucher(voucher);
+
+        /** Se vuelve a la ficha del certificado, no al listado: ahi se ve el asiento que
+         *  acaba de generarse en la pestana Transacciones y se lo puede imprimir. Por eso
+         *  hay que dejar los totales al dia, que si no muestran el saldo de antes. */
+        originalAccountState = account.getAccountState();
+        calculateTotalAmounts(account);
 
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
                 "Account.message.closed", account.getCode());
@@ -717,6 +783,227 @@ public class AccountAction extends GenericAction<Account> {
         closingAccruedDetail = new ArrayList<FixedTermDepositProvision>();
         glossCloseDPF = null;
         documentType = new DocType();
+    }
+
+    /** Un DPF cargado pero todavia sin contabilizar: el unico que se puede aprobar. */
+    public boolean isPendingDpf(Account account) {
+        return account != null
+                && isDpfAccount(account)
+                && AccountState.PENDING.equals(account.getAccountState());
+    }
+
+    /**
+     * Certificado DPF ya aprobado, es decir con su apertura contabilizada. Sus datos de
+     * fondo -- capital, fechas y tipo de cuenta -- quedan bloqueados en la ficha: cambiar
+     * cualquiera de ellos la desincroniza del asiento que ya esta en el mayor y del
+     * interes que se viene devengando.
+     * <p/>
+     * Alcanza tambien a los certificados anteriores a esta pantalla, que nacieron ACTIVE
+     * sin pasar por PENDING. Es correcto: todos ellos ya estan contabilizados.
+     */
+    public boolean isApprovedDpf(Account account) {
+        return account != null
+                && isManaged()
+                && isDpfAccount(account)
+                && !AccountState.PENDING.equals(account.getAccountState());
+    }
+
+    /**
+     * Arma el comprobante de ingreso de la apertura y lo deja listo para que el modal lo
+     * muestre. Lo que se ve es exactamente lo que se graba: la lista que se dibuja es la
+     * misma que despues recibe saveVoucher, asi que no hay forma de que la pantalla
+     * prometa un asiento y se contabilice otro.
+     * <p/>
+     * Cualquier cosa que falte -- tipo de cambio del dia, cuentas sin configurar, capital
+     * en cero -- corta aca con un mensaje y deja {@link #approvalReady} en falso, que es
+     * lo que impide que el modal se abra.
+     */
+    public void prepareApprovalDPF() {
+        approvalReady = false;
+        approvalDetailsDPF = new ArrayList<VoucherDetail>();
+        approvalTotalDebitDPF = BigDecimal.ZERO;
+        approvalTotalCreditDPF = BigDecimal.ZERO;
+        approvalTotalDebitMeDPF = BigDecimal.ZERO;
+        approvalTotalCreditMeDPF = BigDecimal.ZERO;
+
+        Account account = getInstance();
+        if (!isPendingDpf(account)) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.approvalNotPending");
+            return;
+        }
+        if (account.getCapital() == null || account.getCapital().doubleValue() <= 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.approvalCapitalRequired");
+            return;
+        }
+        if (account.getExpirationDate() == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.approvalExpirationDateRequired");
+            return;
+        }
+
+        boolean foreign = isForeignAccount();
+        /** El comprobante se fecha el dia de la apertura del certificado, no el dia en que
+         *  se lo aprueba: es la fecha desde la que devenga. */
+        approvalDateDPF = DateUtils.removeTime(account.getOpeningDate());
+        approvalExchangeRateDPF = BigDecimal.ONE;
+        if (foreign) {
+            try {
+                approvalExchangeRateDPF = financesExchangeRateService
+                        .findExchangeRateByDateByCurrency(approvalDateDPF, FinancesCurrencyType.D.toString());
+            } catch (FinancesExchangeRateNotFoundException e) {
+                addFinancesExchangeRateNotFoundExceptionMessage();
+                return;
+            } catch (FinancesCurrencyNotFoundException e) {
+                addFinancesCurrencyNotFoundMessage();
+                return;
+            }
+        }
+
+        CompanyConfiguration configuration;
+        try {
+            configuration = companyConfigurationService.findCompanyConfiguration();
+        } catch (CompanyConfigurationNotFoundException e) {
+            addCompanyConfigurationNotFoundErrorMessage();
+            return;
+        }
+
+        approvalDocumentTypeDPF = configuration.getFixedTermDepositDocumentType();
+        if (approvalDocumentTypeDPF == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.approvalDocumentTypeNotConfigured");
+            return;
+        }
+
+        CashAccount cashAccount;
+        try {
+            cashAccount = foreign
+                    ? configuration.requireGeneralCashAccountForeign()
+                    : configuration.requireGeneralCashAccountNational();
+        } catch (CompanyAccountNotConfiguredException e) {
+            facesMessages.add(StatusMessage.Severity.ERROR,
+                    MessageUtils.getMessage("CompanyConfiguration.account.notConfigured",
+                            MessageUtils.getMessage(e.getLabelKey())));
+            return;
+        }
+
+        AccountType accountType = account.getAccountType();
+        CashAccount capitalAccount = foreign ? accountType.getCashAccountMe() : accountType.getCashAccountMn();
+        if (capitalAccount == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.approvalCapitalAccountMissing", accountType.getName());
+            return;
+        }
+
+        FinancesCurrencyType currency = foreign ? FinancesCurrencyType.D : FinancesCurrencyType.P;
+        BigDecimal capital = BigDecimalUtil.roundBigDecimal(account.getCapital(), 2);
+
+        /** Entra la plata: Debe caja. */
+        VoucherDetail cashDetail = buildAccountEntryDetail(cashAccount.getAccountCode(),
+                capital, "DEBIT", currency, foreign, approvalExchangeRateDPF);
+        cashDetail.setCashAccount(cashAccount);
+
+        /** Nace el pasivo con el socio: Haber capital del DPF, con el certificado enlazado
+         *  en la linea. Ese enlace es el que hace que el movimiento aparezca despues en la
+         *  pestana Transacciones de la ficha. */
+        VoucherDetail capitalDetail = buildAccountEntryDetail(capitalAccount.getAccountCode(),
+                capital, "CREDIT", currency, foreign, approvalExchangeRateDPF);
+        capitalDetail.setCashAccount(capitalAccount);
+        capitalDetail.setPartnerAccount(account);
+
+        approvalDetailsDPF.add(cashDetail);
+        approvalDetailsDPF.add(capitalDetail);
+
+        for (VoucherDetail detail : approvalDetailsDPF) {
+            approvalTotalDebitDPF = BigDecimalUtil.sum(approvalTotalDebitDPF, detail.getDebit(), 2);
+            approvalTotalCreditDPF = BigDecimalUtil.sum(approvalTotalCreditDPF, detail.getCredit(), 2);
+            approvalTotalDebitMeDPF = BigDecimalUtil.sum(approvalTotalDebitMeDPF, detail.getDebitMe(), 2);
+            approvalTotalCreditMeDPF = BigDecimalUtil.sum(approvalTotalCreditMeDPF, detail.getCreditMe(), 2);
+        }
+
+        approvalGlossDPF = buildApprovalGloss(account);
+        approvalReady = true;
+    }
+
+    /** Glosa sugerida con el formato que se venia usando a mano. Queda editable. */
+    private String buildApprovalGloss(Account account) {
+        String partner = account.getPartner() != null ? account.getPartner().getFullName() : "";
+        Integer days = account.getAccountType() != null ? account.getAccountType().getDays() : null;
+        String symbol = account.getCurrency() != null
+                ? MessageUtils.getMessage(account.getCurrency().getSymbolResourceKey()).toUpperCase()
+                : "";
+        return MessageUtils.getMessage("Account.approval.gloss", partner, account.getCode(),
+                symbol, formatAmountForGloss(account.getCapital()), days != null ? days : 0);
+    }
+
+    /**
+     * Importe para la glosa: separador de miles y decimales solo si los tiene, para que un
+     * capital redondo se lea "20.000" y no "20.000,00". Los simbolos van fijos y no por
+     * locale: la glosa es un texto contable, no depende de la configuracion del servidor.
+     */
+    private String formatAmountForGloss(BigDecimal amount) {
+        if (amount == null) {
+            return "0";
+        }
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setGroupingSeparator('.');
+        symbols.setDecimalSeparator(',');
+        boolean whole = amount.stripTrailingZeros().scale() <= 0;
+        return new DecimalFormat(whole ? "#,##0" : "#,##0.00", symbols).format(amount);
+    }
+
+    /**
+     * Registra la apertura: el comprobante de ingreso Y el paso del certificado a ACTIVO,
+     * en una sola operacion. Desde aca empieza a devengar y sus datos quedan bloqueados.
+     * <p/>
+     * Se vuelve a armar el asiento en vez de confiar en lo que quedo del modal, para que
+     * las validaciones corran igual aunque alguien fuerce el submit sin haber pasado por
+     * la preparacion. Lo unico que se toma de la pantalla es la glosa, que es editable.
+     */
+    public String approveDpf() {
+        String gloss = approvalGlossDPF;
+        prepareApprovalDPF();
+        if (!approvalReady) {
+            return Outcome.REDISPLAY;
+        }
+        if (gloss != null && gloss.trim().length() > 0) {
+            approvalGlossDPF = gloss;
+        }
+
+        Account account = getInstance();
+
+        Voucher voucher = buildDpfVoucher(approvalDocumentTypeDPF.getName(),
+                approvalGlossDPF, approvalDateDPF);
+        voucher.getDetails().addAll(approvalDetailsDPF);
+
+        account.setAccountState(AccountState.ACTIVE);
+        accountService.updateAccount(account);
+        voucherAccoutingService.saveVoucher(voucher);
+
+        /** Se relee el certificado: quedo tocado por una transaccion de fuera de esta
+         *  conversacion y hay que traerse la version nueva antes de seguir editandolo. */
+        refreshInstance();
+        originalAccountState = getInstance().getAccountState();
+        originalAccountCode = getInstance().getCode();
+        calculateTotalAmounts(getInstance());
+        clearApprovalFields();
+
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                "Account.message.approved", account.getCode());
+        return Outcome.REDISPLAY;
+    }
+
+    private void clearApprovalFields() {
+        approvalReady = false;
+        approvalDetailsDPF = new ArrayList<VoucherDetail>();
+        approvalGlossDPF = null;
+        approvalDocumentTypeDPF = null;
+        approvalExchangeRateDPF = BigDecimal.ONE;
+        approvalTotalDebitDPF = BigDecimal.ZERO;
+        approvalTotalCreditDPF = BigDecimal.ZERO;
+        approvalTotalDebitMeDPF = BigDecimal.ZERO;
+        approvalTotalCreditMeDPF = BigDecimal.ZERO;
     }
 
     /**
@@ -858,17 +1145,30 @@ public class AccountAction extends GenericAction<Account> {
             }
         }
 
+        /**
+         * Codigo del certificado nuevo, de la misma secuencia que usa el alta. Se tipeaba a
+         * mano y esta era la ultima via por la que un codigo podia repetirse.
+         * <p/>
+         * Se genera antes de tocar nada: si falla, la pantalla vuelve sin haber dejado el
+         * certificado viejo marcado como inactivo a medio camino. La serie la elige la
+         * moneda, que es la del certificado que se renueva.
+         */
+        Account newAccount = new Account();
+        newAccount.setCurrency(currentAccount.getCurrency());
+        newAccountCodeDPF = generateAccountCode(newAccount);
+        if (newAccountCodeDPF == null) {
+            return Outcome.REDISPLAY;
+        }
+        newAccount.setCode(newAccountCodeDPF);
+
         currentAccount.setAccountState(AccountState.INACTIVE);
 
         AccountType currentAccountType = currentAccount.getAccountType();
-        Account newAccount = new Account();
         //newAccount.setCapital(capitalRenewDPF);
         newAccount.setOpeningDate(startDateDPF);
         newAccount.setExpirationDate(expirationDateDPF);
         newAccount.setAccountNumber(generateAccountNumber());
         newAccount.setAccountType(accountTypeRenewDPF);
-        newAccount.setCode(newAccountCodeDPF);
-        newAccount.setCurrency(currentAccount.getCurrency());
         newAccount.setPartner(partnerDPF);
         newAccount.setAccountState(AccountState.ACTIVE);
         newAccount.setBalance(BigDecimal.ZERO);
@@ -881,12 +1181,10 @@ public class AccountAction extends GenericAction<Account> {
 
         BigDecimal withdrawal = BigDecimal.ZERO;
 
-        Voucher voucher = new Voucher();
-        voucher.setDocumentType(documentType.getName());
-        voucher.setGloss(glossRenewDPF);
-        /** Sin esto el comprobante se fechaba con el dia en que se opera, no con la
-         *  fecha de la renovacion: coincidian solo porque siempre se hacen el mismo dia. */
-        voucher.setDate(DateUtils.removeTime(startDateDPF));
+        /** La fecha es la de la renovacion, no el dia en que se opera: coincidian solo
+         *  porque siempre se hacen el mismo dia. */
+        Voucher voucher = buildDpfVoucher(documentType.getName(), glossRenewDPF,
+                DateUtils.removeTime(startDateDPF));
 
         VoucherDetail vd1 = new VoucherDetail();
         VoucherDetail vd2 = new VoucherDetail();
@@ -1005,9 +1303,154 @@ public class AccountAction extends GenericAction<Account> {
         return valid;
     }
 
+    /**
+     * Cabecera del comprobante de una operacion de DPF: apertura, renovacion o cierre.
+     * <p/>
+     * Nace APROBADO. No es una carga manual que alguien tenga que revisar despues: lo arma
+     * el sistema con datos ya validados, las cuentas salen de la configuracion y el asiento
+     * cuadra por construccion. Dejarlo pendiente obligaba a entrar a Contabilidad a
+     * aprobarlo a mano detras de cada operacion.
+     * <p/>
+     * Las tres operaciones pasan por aca para que el criterio sea uno solo y no se separe
+     * con el tiempo.
+     */
+    private Voucher buildDpfVoucher(String documentType, String gloss, Date date) {
+        Voucher voucher = new Voucher();
+        voucher.setDocumentType(documentType);
+        voucher.setGloss(gloss);
+        voucher.setDate(date);
+        voucher.setState(VoucherState.APR.toString());
+        return voucher;
+    }
+
     public String generateAccountNumber(){
         String result = String.valueOf(sequenceGeneratorService.nextValue(Constants.SAVINGS_ACCOUNT_NUMBER));
         return result;
+    }
+
+    /**
+     * Codigo del certificado, tomado de <code>gensecuencia</code>: prefijo por moneda mas
+     * cinco digitos, que es el formato de los ultimos codigos cargados (ME00303).
+     * <p/>
+     * Hay una secuencia por moneda porque las dos series son independientes: la de ME va
+     * por 303 y la de MN por 2, y un solo contador haria que el proximo DPF en bolivianos
+     * saliera MN00304, heredando el numero de la serie de dolares.
+     * <p/>
+     * El incremento es atomico y sale de
+     * {@link AccountService#nextAccountCodeNumber(String)}: dos altas simultaneas se
+     * serializan en el motor y cada una se lleva su numero.
+     * <p/>
+     * Si el codigo que entrega la secuencia ya existe se pide el siguiente, hasta diez
+     * veces. Es lo que hace que una base con la secuencia atrasada -- el caso de una copia
+     * de produccion restaurada sobre desarrollo -- se acomode sola en vez de trabar el
+     * alta.
+     *
+     * @return el codigo, o <code>null</code> si falta la secuencia en la configuracion.
+     */
+    private String generateAccountCode(Account account) {
+        boolean national = FinancesCurrencyType.P.equals(account.getCurrency());
+        String prefix = national ? "MN" : "ME";
+        String sequenceName = national ? Constants.ACCOUNT_DPF_CODE_MN : Constants.ACCOUNT_DPF_CODE_ME;
+
+        String code = null;
+        for (int attempt = 0; attempt < 10; attempt++) {
+            long number = accountService.nextAccountCodeNumber(sequenceName);
+            if (number <= 0) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                        "Account.error.codeSequenceMissing", sequenceName);
+                return null;
+            }
+            code = String.format("%s%05d", prefix, number);
+            if (!accountService.existsAccountCode(code, null)) {
+                return code;
+            }
+        }
+        return code;
+    }
+
+    /**
+     * El codigo identifica al certificado en toda la contabilidad y en los reportes. Hay 5
+     * codigos repetidos en el historico, cada par apuntando a dos socios distintos, y de
+     * ahi que cualquier consulta por codigo toque dos certificados. No se agregan mas.
+     * <p/>
+     * En una edicion solo se controla si el codigo cambio. Validarlo siempre dejaria esos
+     * 10 certificados historicos imposibles de guardar: chocarian contra su propio gemelo
+     * en cada intento, aunque nadie estuviera tocando el codigo.
+     */
+    private boolean validateAccountCode() {
+        Account account = getInstance();
+        String code = account.getCode();
+        if (isManaged() && code != null && code.equals(originalAccountCode)) {
+            return true;
+        }
+        if (accountService.existsAccountCode(code, account.getId())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.duplicatedCode", account.getCode());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * El codigo solo se muestra, y solo cuando existe: lo genera el alta, asi que durante
+     * el alta no hay nada que mostrar. Una cuenta de ahorro no tiene codigo, se identifica
+     * por su numero de cuenta.
+     */
+    public boolean isAccountCodeVisible() {
+        return isManaged() && isDpfAccount(getInstance());
+    }
+
+    /**
+     * Anular es para el certificado que nunca fue una operacion: se cargo por error o se
+     * duplico. Por eso exige que no tenga ningun asiento; si ya se contabilizo, lo que
+     * corresponde es cerrarlo, no borrarlo del devengue historico.
+     */
+    public boolean isAnnullable() {
+        Account account = getInstance();
+        return isManaged()
+                && account != null
+                && !AccountState.ANNULLED.equals(account.getAccountState())
+                && accountMovementCount <= 0;
+    }
+
+    /** Por que Anular esta deshabilitado. Cadena vacia si se puede anular. */
+    public String getAnnulBlockedReason() {
+        Account account = getInstance();
+        if (account == null || isAnnullable()) {
+            return "";
+        }
+        if (AccountState.ANNULLED.equals(account.getAccountState())) {
+            return messages.get("Account.annul.blocked.alreadyAnnulled");
+        }
+        return messages.get("Account.annul.blocked.hasMovements");
+    }
+
+    /** Texto del modal de confirmacion, ya resuelto. */
+    public String getAnnulQuestion() {
+        Account account = getInstance();
+        if (account == null) {
+            return "";
+        }
+        String partner = account.getPartner() != null ? account.getPartner().getFullName() : "";
+        return MessageFormat.format(messages.get("Account.annul.question"), account.getCode(), partner);
+    }
+
+    @Restrict("#{s:hasPermission('ACCOUNTANNUL','UPDATE')}")
+    public String annulAccount() {
+        if (!isAnnullable()) {
+            facesMessages.add(StatusMessage.Severity.ERROR, getAnnulBlockedReason());
+            return Outcome.REDISPLAY;
+        }
+        Account account = getInstance();
+        account.setAccountState(AccountState.ANNULLED);
+        accountService.updateAccount(account);
+        refreshInstance();
+        originalAccountState = getInstance().getAccountState();
+        originalAccountCode = getInstance().getCode();
+        calculateTotalAmounts(getInstance());
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                "Account.message.annulled", account.getCode());
+        return Outcome.REDISPLAY;
     }
 
     @Begin(nested = true, flushMode = FlushModeType.MANUAL)
@@ -1142,15 +1585,14 @@ public class AccountAction extends GenericAction<Account> {
         return result;
     }
 
+    /**
+     * Se consulta en cada evaluacion de un <code>rendered</code> o un <code>disabled</code>
+     * de la ficha, o sea muchas veces por request: nada de trazas por consola aca.
+     */
     public Boolean isDpfAccount(Account account){
-        boolean result = Boolean.FALSE;
-
-        if (account.getAccountType() != null)
-            if (account.getAccountType().getSavingType().equals(SavingType.DPF))
-                result = Boolean.TRUE;
-
-        System.out.println("-----> account.getAccountType(): " + account.getAccountType() + " - " + result);
-        return result;
+        return account != null
+                && account.getAccountType() != null
+                && SavingType.DPF.equals(account.getAccountType().getSavingType());
     }
 
 
@@ -1535,10 +1977,21 @@ public class AccountAction extends GenericAction<Account> {
         setInterestRenewDPF(interestValue);
     }
 
+    /**
+     * Corre al elegir el tipo de cuenta. El vencimiento sale del plazo del tipo, y un DPF
+     * que se esta dando de alta muestra desde ya el estado con el que va a nacer.
+     * <p/>
+     * Tolera que no haya tipo elegido: el combo tiene opcion en blanco y volver a ella
+     * dejaba el certificado sin tipo de cuenta y esta llamada reventaba.
+     */
     public void calculateExpirationDate(){
-        System.out.println("-----------> Acount Type: " + getInstance().getAccountType());
-        if (getInstance().getAccountType().getSavingType().equals(SavingType.DPF)) {
-            getInstance().setExpirationDate(DateUtils.addDay(getInstance().getOpeningDate(), getInstance().getAccountType().getDays()));
+        Account account = getInstance();
+        if (!isDpfAccount(account)) {
+            return;
+        }
+        account.setExpirationDate(DateUtils.addDay(account.getOpeningDate(), account.getAccountType().getDays()));
+        if (!isManaged()) {
+            account.setAccountState(AccountState.PENDING);
         }
     }
 
@@ -1557,17 +2010,63 @@ public class AccountAction extends GenericAction<Account> {
     /**
      * Solo se puede anular una cuenta que nunca tuvo movimiento contable. Si tiene
      * asientos es un certificado real: corresponde INACTIVE, no ANNULLED.
+     * <p/>
+     * Se queda en la pantalla en vez de terminar la conversacion. La regla de navegacion
+     * que habia abria una conversacion nueva y redirigia aca: el action volvia vacio y la
+     * ficha se veia como si fuera un alta, con el vencimiento y el capital en blanco.
      */
     @Override
-    @End
     public String update() {
+        if (!validateStateTransition() || !validateAccountCode()) {
+            return Outcome.REDISPLAY;
+        }
         if (AccountState.ANNULLED.equals(getInstance().getAccountState())
                 && !accountService.getAccountDetailList(getInstance()).isEmpty()) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                     "Account.error.cannotAnnulWithMovements", getInstance().getCode());
             return Outcome.REDISPLAY;
         }
-        return super.update();
+        super.update();
+        originalAccountState = getInstance().getAccountState();
+        originalAccountCode = getInstance().getCode();
+        calculateTotalAmounts(getInstance());
+        return Outcome.REDISPLAY;
+    }
+
+    /**
+     * El estado de un DPF es consecuencia de una operacion, no un campo libre del
+     * formulario. De PENDIENTE a ACTIVO se pasa por Aprobar, que es lo unico que genera el
+     * comprobante de ingreso; hacerlo a mano dejaria un certificado activo devengando
+     * sobre un capital que nunca entro. Y volver a PENDIENTE uno ya aprobado permitiria
+     * aprobarlo de nuevo y contabilizar la apertura dos veces.
+     * <p/>
+     * Anular un pendiente si se permite: es exactamente el deposito que nunca ocurrio.
+     */
+    private boolean validateStateTransition() {
+        Account account = getInstance();
+        AccountState state = account.getAccountState();
+        String errorKey = null;
+
+        if (!AccountState.PENDING.equals(originalAccountState)
+                && AccountState.PENDING.equals(state)) {
+            /** Vale para toda cuenta: PENDIENTE no se elige a mano, lo pone el alta de un
+             *  DPF y lo saca la aprobacion. En una cuenta de ahorro no significa nada. */
+            errorKey = "Account.error.stateChangeToPending";
+        } else if (isDpfAccount(account)
+                && AccountState.PENDING.equals(originalAccountState)
+                && !AccountState.PENDING.equals(state)
+                && !AccountState.ANNULLED.equals(state)) {
+            errorKey = "Account.error.stateChangeNeedsApproval";
+        }
+
+        if (errorKey == null) {
+            return true;
+        }
+        /** Se devuelve el estado real a la ficha: si no, la pantalla sigue mostrando el
+         *  valor rechazado como si hubiera quedado guardado. */
+        account.setAccountState(originalAccountState);
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, errorKey);
+        return false;
     }
 
     public BigDecimal getTotalCredit() {
@@ -1810,6 +2309,50 @@ public class AccountAction extends GenericAction<Account> {
 
     public void setGlossCloseDPF(String glossCloseDPF) {
         this.glossCloseDPF = glossCloseDPF;
+    }
+
+    public Date getApprovalDateDPF() {
+        return approvalDateDPF;
+    }
+
+    public String getApprovalGlossDPF() {
+        return approvalGlossDPF;
+    }
+
+    public void setApprovalGlossDPF(String approvalGlossDPF) {
+        this.approvalGlossDPF = approvalGlossDPF;
+    }
+
+    public BigDecimal getApprovalExchangeRateDPF() {
+        return approvalExchangeRateDPF;
+    }
+
+    public DocType getApprovalDocumentTypeDPF() {
+        return approvalDocumentTypeDPF;
+    }
+
+    public List<VoucherDetail> getApprovalDetailsDPF() {
+        return approvalDetailsDPF;
+    }
+
+    public BigDecimal getApprovalTotalDebitDPF() {
+        return approvalTotalDebitDPF;
+    }
+
+    public BigDecimal getApprovalTotalCreditDPF() {
+        return approvalTotalCreditDPF;
+    }
+
+    public BigDecimal getApprovalTotalDebitMeDPF() {
+        return approvalTotalDebitMeDPF;
+    }
+
+    public BigDecimal getApprovalTotalCreditMeDPF() {
+        return approvalTotalCreditMeDPF;
+    }
+
+    public boolean isApprovalReady() {
+        return approvalReady;
     }
 
     public BigDecimal getRcivaDPF() {

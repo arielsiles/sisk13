@@ -438,6 +438,10 @@ input, select, textarea {
     width:250px;
 }
 
+.input260 {
+    width:260px;
+}
+
 .input105 {
     width:105px;
 }
@@ -1264,6 +1268,24 @@ a.row-order-link:hover {
 input[type="text"].disabledInput {
     color: #555252;
     background: #ceced6;
+}
+
+/* Campos bloqueados: legibles sin dejar de verse bloqueados.
+   Las clases .input* solo definen el ancho, asi que el color de un campo
+   deshabilitado lo ponia el navegador: texto al 30% de opacidad, por debajo de
+   cualquier minimo legible.
+   Chrome ignora `color` en un input disabled y usa -webkit-text-fill-color;
+   Safari ademas le baja la opacity. Por eso van las tres declaraciones.
+   El !important es por CONTROL_SKINNING, que inyecta sus propias reglas.
+   Solo color y fondo: nada de bordes, alto ni fuente, para no repetir el
+   flicker que dio el skinning de controles. */
+input[disabled],
+textarea[disabled],
+select[disabled] {
+    color: #4a4a4a !important;
+    -webkit-text-fill-color: #4a4a4a;
+    opacity: 1;
+    background-color: #ececec;
 }
 
 .tiny-menu-option-list {

@@ -134,7 +134,62 @@ SELECT @nuevo_id, 'DPFCLOSE', 'Cierre de Depositos a Plazo Fijo', 1, 3, 'Functio
  WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'DPFCLOSE');
 
 
+-- Tipo de comprobante con el que se registra la apertura de un DPF al aprobarlo.
+-- CI es el criterio historico: debita la caja general y acredita el capital del certificado.
+ALTER TABLE configuracion
+    ADD COLUMN tipo_doc_dpf varchar(5) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT 'Comprobante de apertura DPF';
+
+ALTER TABLE configuracion
+    ADD CONSTRAINT fk_configuracion_tipo_doc_dpf FOREIGN KEY (tipo_doc_dpf) REFERENCES tipodoc (nombre);
+
+UPDATE configuracion SET tipo_doc_dpf = 'CI';
+
+
+-- Codigo de DPF autogenerado: una secuencia por moneda (gensecuencia.valor = ultimo entregado).
+-- Se siembra con el MAX real de cada serie, asi vale igual en local que en produccion.
+-- La secuencia vieja ACCOUNT_DPF_CODE era la de ME sin decirlo: se renombra, no se pierde.
+UPDATE gensecuencia SET nombre = 'ACCOUNT_DPF_CODE_ME' WHERE nombre = 'ACCOUNT_DPF_CODE';
+
+SET @max_me = (SELECT COALESCE(MAX(CAST(SUBSTRING(c.codigo, 3) AS UNSIGNED)), 0)
+                 FROM cuenta c JOIN tipocuenta t ON t.idtipocuenta = c.idtipocuenta
+                WHERE t.tipo = 'DPF' AND c.codigo REGEXP '^ME[0-9]+$');
+SET @max_mn = (SELECT COALESCE(MAX(CAST(SUBSTRING(c.codigo, 3) AS UNSIGNED)), 0)
+                 FROM cuenta c JOIN tipocuenta t ON t.idtipocuenta = c.idtipocuenta
+                WHERE t.tipo = 'DPF' AND c.codigo REGEXP '^MN[0-9]+$');
+
+SET @next_id = (SELECT COALESCE(MAX(idgensecuencia), 0) + 1 FROM gensecuencia);
+INSERT INTO gensecuencia (idgensecuencia, nombre, valor, idcompania)
+SELECT @next_id, 'ACCOUNT_DPF_CODE_ME', 0, 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM gensecuencia WHERE nombre = 'ACCOUNT_DPF_CODE_ME');
+
+SET @next_id = (SELECT COALESCE(MAX(idgensecuencia), 0) + 1 FROM gensecuencia);
+INSERT INTO gensecuencia (idgensecuencia, nombre, valor, idcompania)
+SELECT @next_id, 'ACCOUNT_DPF_CODE_MN', 0, 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM gensecuencia WHERE nombre = 'ACCOUNT_DPF_CODE_MN');
+
+UPDATE gensecuencia SET valor = GREATEST(COALESCE(valor, 0), @max_me) WHERE nombre = 'ACCOUNT_DPF_CODE_ME';
+UPDATE gensecuencia SET valor = GREATEST(COALESCE(valor, 0), @max_mn) WHERE nombre = 'ACCOUNT_DPF_CODE_MN';
+
+-- secuencia.gensecuencia entrega el id de las filas nuevas de gensecuencia: no puede quedar atras.
+UPDATE secuencia
+   SET valor = GREATEST(COALESCE(valor, 0), (SELECT MAX(idgensecuencia) + 1 FROM gensecuencia))
+ WHERE tabla = 'gensecuencia';
+
+
+-- Permiso del boton Anular de la ficha de la cuenta. Solo UPDATE = 4.
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'ACCOUNTANNUL', 'Anulacion de cuentas de ahorro y DPF', 1, 4, 'Functionality.customers.accountAnnul', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'ACCOUNTANNUL');
+
+
 -- secuencia.funcionalidad quedo en 18 y el MAX real es 516: un alta desde la aplicacion chocaria.
 UPDATE secuencia
    SET valor = GREATEST(COALESCE(valor, 0), (SELECT MAX(idfuncionalidad) FROM funcionalidad))
  WHERE tabla = 'funcionalidad';
+
+
+-- Fila huerfana: RevisionEntityInfo numera por secuencia/revisionentidad, no por gensecuencia.
+-- Solo local
+-- DELETE FROM gensecuencia WHERE nombre = 'RevisionEntityInfo';

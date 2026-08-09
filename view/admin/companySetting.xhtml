@@ -672,6 +672,18 @@
                     <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermPayableInterestForeignCurrency.col']}"/>
                 </s:decorate>
             </s:div>
+            <s:decorate id="fixedTermDepositDocumentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.fixedTermDepositDocumentType']}</ui:define>
+                <h:selectOneMenu id="fixedTermDepositDocumentType"
+                                 value="#{companySettingAction.instance.fixedTermDepositDocumentType}"
+                                 styleClass="input">
+                    <s:selectItems value="#{voucherDocumentTypeList}" var="fixedTermDepositDocumentTypeItem"
+                                   label="#{fixedTermDepositDocumentTypeItem.fullName}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermDepositDocumentType.col']}"/>
+            </s:decorate>
             <s:div id="fixedAssetProvidersAccountDiv">
                 <s:decorate id="fixedAssetProvidersAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fixedAssetProvidersAccount']}</ui:define>

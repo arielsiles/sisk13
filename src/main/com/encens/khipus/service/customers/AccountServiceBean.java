@@ -13,9 +13,11 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +42,54 @@ public class AccountServiceBean implements AccountService {
     public void updateAccount(Account account){
         em.merge(account);
         em.flush();
+    }
+
+    public boolean existsAccountCode(String code, Long excludedId) {
+        if (code == null || code.trim().length() == 0) {
+            return false;
+        }
+        /** Sin parametros nulos en el where: Hibernate 3 los resuelve de forma despareja. */
+        String jpql = "select count(account) from Account account where account.code = :code";
+        if (excludedId != null) {
+            jpql += " and account.id <> :excludedId";
+        }
+        Query query = em.createQuery(jpql).setParameter("code", code.trim());
+        if (excludedId != null) {
+            query.setParameter("excludedId", excludedId);
+        }
+        Long count = (Long) query.getSingleResult();
+        return count != null && count > 0;
+    }
+
+    /**
+     * Incremento atomico de una serie de codigos de DPF.
+     * <p/>
+     * No pasa por SequenceGeneratorService a proposito. Ese generador lee, suma y graba
+     * desde Java, y confia en un reintento por OptimisticLockException que aca no puede
+     * dispararse: ni <code>gensecuencia</code> ni la entidad Sequence tienen version. Dos
+     * altas simultaneas podrian leer el mismo valor y llevarse el mismo codigo.
+     * <p/>
+     * El <code>valor = valor + 1</code> resuelve el incremento dentro del motor y deja
+     * tomado el candado de fila de InnoDB hasta que la transaccion del alta confirma: la
+     * segunda espera y se lleva el numero siguiente. Si el alta se cae, el incremento se
+     * deshace con ella y no queda un hueco en la numeracion.
+     * <p/>
+     * Tampoco se arregla el generador compartido: lo usan compras, almacenes, activos fijos
+     * y produccion, y este codigo no necesita meterse en ese camino.
+     */
+    public long nextAccountCodeNumber(String sequenceName) {
+        int updated = em.createNativeQuery(
+                "update gensecuencia set valor = valor + 1 where nombre = :sequenceName")
+                .setParameter("sequenceName", sequenceName)
+                .executeUpdate();
+        if (updated == 0) {
+            return 0;
+        }
+        Number value = (Number) em.createNativeQuery(
+                "select valor from gensecuencia where nombre = :sequenceName")
+                .setParameter("sequenceName", sequenceName)
+                .getSingleResult();
+        return value != null ? value.longValue() : 0;
     }
 
     @Override
@@ -181,16 +231,20 @@ public class AccountServiceBean implements AccountService {
         /**
          * No se filtra por capital: una cuenta con capital cero es un dato a corregir y
          * tiene que salir a la luz, no desaparecer del calculo en silencio.
-         * Si se excluyen las ANNULLED, que nunca fueron una operacion real.
+         * <p/>
+         * Quedan afuera las ANNULLED, que nunca fueron una operacion real, y las PENDING,
+         * que todavia no se aprobaron: su capital contable es cero legitimamente y sin
+         * excluirlas apareceria una fila en cero todos los meses, justo la senal que este
+         * calculo reserva para los datos que hay que corregir.
          */
         return (List<Account>) em.createQuery("select account from Account account " +
                 " where account.accountType.savingType =:savingType" +
-                "   and account.accountState <> :annulled" +
+                "   and account.accountState not in (:excludedStates)" +
                 "   and account.openingDate <=:endDate" +
                 "   and account.expirationDate >=:startDate" +
                 " order by account.currency, account.code")
                 .setParameter("savingType", savingType)
-                .setParameter("annulled", AccountState.ANNULLED)
+                .setParameter("excludedStates", Arrays.asList(AccountState.ANNULLED, AccountState.PENDING))
                 .setParameter("startDate", startDate, TemporalType.DATE)
                 .setParameter("endDate", endDate, TemporalType.DATE)
                 .getResultList();
@@ -215,12 +269,15 @@ public class AccountServiceBean implements AccountService {
     public List<Account> getAccountList(Partner partner) {
         List<Account> accountList = new ArrayList<Account>();
 
-        /** Alimenta el selector de cuentas destino de transferencias: las anuladas no van. */
+        /**
+         * Alimenta el selector de cuentas destino de transferencias: no van las anuladas
+         * ni los DPF pendientes de aprobacion, cuya apertura todavia no se contabilizo.
+         */
         accountList = (List<Account>) em.createQuery("select account from Account account" +
                 " where account.partner =:partner " +
-                "   and account.accountState <> :annulled ")
+                "   and account.accountState not in (:excludedStates) ")
                 .setParameter("partner", partner)
-                .setParameter("annulled", AccountState.ANNULLED)
+                .setParameter("excludedStates", Arrays.asList(AccountState.ANNULLED, AccountState.PENDING))
                 .getResultList();
 
         return accountList;

@@ -122,7 +122,7 @@ ME00165 (cerrado el 22/07/2026, vence el 28/01/2027).
 
 ```sql
 tipocuenta.tipo = 'DPF'
-AND cuenta.accountState <> 'ANNULLED'
+AND cuenta.accountState NOT IN ('ANNULLED', 'PENDING')
 AND cuenta.fechaapertura <= :finMes
 AND cuenta.fechavence    >= :inicioMes
 ```
@@ -135,7 +135,8 @@ días, y al regenerar meses viejos los perdería en casi todas las cuentas.
 Tampoco se filtra por `capital > 0`: un capital en cero es un dato a corregir y tiene que
 salir a la luz, no desaparecer de la grilla sin dejar rastro. Lo atrapa el candado.
 
-Sí quedan fuera las cuentas **anuladas**, que nunca fueron una operación real.
+Sí quedan fuera las cuentas **anuladas**, que nunca fueron una operación real, y las
+**pendientes de aprobación**, cuya apertura todavía no se contabilizó.
 
 ### El candado: `capital` contra el mayor
 
@@ -329,6 +330,117 @@ Llenarla crearía una segunda fuente de verdad para el mismo hecho, que es exact
 problema que este trabajo vino a resolver. Su cableado muerto —un campo nunca poblado en
 `AccountAction` y un DataModel referenciado solo desde una línea comentada— se eliminó,
 porque fue lo que hizo perder tiempo en el diagnóstico.
+
+## Alta y aprobación de un DPF
+
+Un DPF nuevo nace en **`PENDING`**: la ficha está cargada pero el dinero todavía no entró.
+No tiene un solo asiento, así que no devenga, no se puede renovar ni cerrar, y no se imprime
+su certificado. Queda fuera de la provisión y de los destinos de transferencia por
+`AccountServiceBean`, que excluye `PENDING` junto con `ANNULLED`.
+
+El botón **Aprobar** de la ficha lo pasa a `ACTIVE` y genera el comprobante de ingreso de la
+apertura, todo en la misma operación:
+
+```
+Debe   caja general              capital        cajagral1me / cajagral1mn
+Haber  capital del DPF           capital        tipocuenta.CTAP_ME / CTAP_MN, con el certificado enlazado
+```
+
+El comprobante se fecha **el día de la apertura**, no el día en que se aprueba: es la fecha
+desde la que devenga. En ME se valúa al tipo de cambio de esa fecha; si no está cargado, no
+aprueba. El tipo de comprobante sale de `configuracion.tipo_doc_dpf` (**CI**) y no de
+`tipocuenta`, porque no depende del plazo ni de la moneda: toda apertura es un ingreso.
+
+Antes de contabilizar, el modal muestra exactamente las líneas que se van a grabar —son la
+misma lista de `VoucherDetail` que después recibe `saveVoucher`, no una copia—, con la glosa
+editable.
+
+El comprobante nace en estado `PEN`: aprobar el DPF no aprueba el asiento, eso lo sigue
+haciendo Contabilidad. Por eso el ícono de PDF de la pestaña Transacciones **no** exige que
+el asiento esté aprobado, a diferencia del listado de comprobantes: desde la ficha se imprime
+el comprobante tal como quedó.
+
+### El código lo genera el sistema
+
+`cuenta.codigo` es la clave con la que el certificado aparece en la contabilidad y en los
+reportes, y escribirlo a mano es de donde salieron los **5 códigos repetidos** del histórico.
+En un DPF ya no se escribe: al guardar se toma de `gensecuencia`, prefijo por moneda más
+cinco dígitos (`ME00304`, `MN00003`).
+
+Hay **una secuencia por moneda** —`ACCOUNT_DPF_CODE_ME` y `ACCOUNT_DPF_CODE_MN`— porque las
+dos series son independientes: ME va por 303 y MN por 2, y un solo contador haría que el
+próximo DPF en bolivianos saliera MN00304, heredando el número de la serie de dólares.
+
+La de ME es la vieja `ACCOUNT_DPF_CODE`, renombrada. Existía desde antes —resto de un intento
+de numeración automática en la renovación que quedó comentado y nunca corrió— y significaba
+ME sin decirlo, porque en la práctica todos los DPF son en dólares (157 contra 2). El nombre
+sin sufijo al lado de uno con `_MN` se leía como si fueran "el código" y "el código en
+bolivianos", que no es lo que son.
+
+Ojo con la semántica de esta tabla: `valor` es el **último entregado** y `nextValue()`
+devuelve `valor + 1`, al revés que `secuencia` (ver *El id: `secuencia` no significa lo mismo
+para todos*).
+
+Si el código que entrega la secuencia ya existe se pide el siguiente, hasta diez veces: así
+una base con la secuencia atrasada —una copia de producción restaurada sobre desarrollo— se
+acomoda sola en vez de trabar el alta.
+
+El incremento **no** pasa por `SequenceGeneratorService`. Ese generador lee, suma y graba
+desde Java, y confía en un reintento por `OptimisticLockException` que acá no puede
+dispararse: ni `gensecuencia` ni la entidad `Sequence` tienen columna de versión, así que dos
+altas simultáneas podrían leer el mismo valor. En su lugar,
+`AccountServiceBean.nextAccountCodeNumber()` hace `valor = valor + 1` en el motor: InnoDB
+toma el candado de fila en el `UPDATE` y lo suelta al confirmar la transacción del alta, con
+lo que la segunda espera y se lleva el número siguiente. Si el alta falla, el incremento se
+deshace con ella y no queda un hueco.
+
+Tampoco se arregla el generador compartido: lo usan compras, almacenes, activos fijos y
+producción, y este código no necesita meterse en ese camino. La garantía definitiva sería un
+índice único sobre `cuenta.codigo`, pero los 5 pares duplicados del histórico lo impiden.
+
+La **renovación** usa la misma secuencia. Hasta la 6.0.123 pedía el código a mano y era la
+última vía por la que uno podía repetirse; ahora lo genera antes de tocar nada, así un fallo
+no deja el certificado viejo marcado como inactivo a medio camino.
+
+`codigo` es de los DPF. Una cuenta de ahorro se identifica por `nocuenta` y va con el código
+en null; la entidad lo declaraba `nullable = false` —y esa anotación no es decorativa,
+Hibernate valida la propiedad antes del insert—, así que hubo que aflojarla para que
+coincidiera con la columna, que siempre aceptó nulos.
+
+La duplicidad se valida además al guardar, pero **sólo si el código cambió**. Validarlo
+siempre dejaría esos 10 certificados históricos imposibles de guardar: chocarían contra su
+propio gemelo en cada intento, sin que nadie hubiera tocado el código.
+
+### El estado no es un campo libre
+
+El estado dejó de ser un combo: es la consecuencia de una operación. Un DPF nace `PENDING`,
+lo pasa a `ACTIVE` el botón **Aprobar** —lo único que genera el asiento—, y a `INACTIVE` la
+renovación o el cierre. Elegirlo a mano dejaba un certificado devengando sobre un capital que
+nunca entró, o permitía contabilizar la apertura dos veces volviéndolo a `PENDING`.
+`AccountAction.validateStateTransition()` sigue como red por si alguien fuerza el submit.
+
+Para marcar la cuenta que nunca existió está el botón **Anular**, con permiso propio
+(`ACCOUNTANNUL`) y modal de confirmación. Exige que no tenga **ningún** asiento: un
+certificado ya contabilizado se cierra, no se anula.
+
+### Una vez aprobado, los datos se bloquean
+
+Apertura, vencimiento, capital y tipo de cuenta quedan deshabilitados en la ficha: cambiar
+cualquiera de ellos la desincroniza del asiento que ya está en el mayor y del interés que se
+viene devengando. Alcanza también a los certificados anteriores a esta pantalla, que
+nacieron `ACTIVE` sin pasar por `PENDING` —correcto, porque todos ellos ya están
+contabilizados.
+
+### Guardar ya no vacía el formulario
+
+`create()` y `update()` terminaban la conversación, y la regla de navegación de `update`
+además abría una **conversación nueva**: el action volvía vacío y la ficha se veía como un
+alta, sin vencimiento ni capital, aunque en la base los datos estuvieran bien. Ahora
+`create()` devuelve `SUCCESS` con `op=UPDATE` y pages.xml redirige a la misma pantalla
+propagando la conversación; `update()` se queda sin navegar. El redirect del alta no es
+cosmético: da un límite de transacción limpio antes de que se pueda aprobar el certificado
+en esa misma conversación. De paso, un segundo clic en Guardar ya no da de alta la cuenta
+dos veces.
 
 ## Estado ANULADO
 

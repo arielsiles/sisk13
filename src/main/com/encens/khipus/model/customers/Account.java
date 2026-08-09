@@ -55,7 +55,16 @@ public class Account implements BaseModel {
     @Length(max = 20)
     private String accountNumber;
 
-    @Column(name = "codigo", nullable = false, length = 20)
+    /**
+     * Codigo del certificado. Es de los DPF: lo genera el sistema al darlos de alta y es la
+     * clave con la que aparecen en la contabilidad y en los reportes. Una cuenta de ahorro
+     * no tiene, se identifica por <code>nocuenta</code>.
+     * <p/>
+     * Nulo permitido, como la columna. Estaba declarado <code>nullable = false</code> y esa
+     * anotacion no es decorativa: Hibernate valida la propiedad antes del insert, asi que
+     * una cuenta de ahorro sin codigo no se podia guardar aunque la base lo aceptara.
+     */
+    @Column(name = "codigo", nullable = true, length = 20)
     @Length(max = 20)
     private String code;
 

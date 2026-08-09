@@ -1,7 +1,5 @@
 package com.encens.khipus.action.accounting.reports;
 
-import com.encens.khipus.action.accounting.VoucherCreateAction;
-import com.encens.khipus.action.accounting.VoucherUpdateAction;
 import com.encens.khipus.action.reports.GenericReportAction;
 import com.encens.khipus.action.reports.PageFormat;
 import com.encens.khipus.action.reports.PageOrientation;
@@ -9,8 +7,11 @@ import com.encens.khipus.action.reports.ReportFormat;
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.model.finances.CompanyConfiguration;
 import com.encens.khipus.model.finances.Voucher;
+import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.VoucherService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.MoneyNumberUtil;
 import com.encens.khipus.util.MoneyUtil;
 import org.jboss.seam.ScopeType;
@@ -46,10 +47,8 @@ public class VoucherReportAction extends GenericReportAction {
     private String description = "";
 
 
-    @In(create = true)
-    VoucherUpdateAction voucherUpdateAction;
-    @In(create = true)
-    VoucherCreateAction voucherCreateAction;
+    @In
+    private VoucherAccoutingService voucherAccoutingService;
     @In
     private VoucherService voucherService;
     @In
@@ -98,8 +97,21 @@ public class VoucherReportAction extends GenericReportAction {
         String companyTitle = companyConfiguration.getTitle();
         String subTitle = companyConfiguration.getSubTitle();
 
-        BigDecimal totalD = voucherCreateAction.getTotalsDebit();
-        BigDecimal totalC = voucherCreateAction.getTotalsCredit();
+        /**
+         * Los totales salen del comprobante que se recibe, no del estado de otra pantalla.
+         * <p/>
+         * Estaban tomandose de voucherCreateAction.getTotalsDebit/Credit, que solo tiene
+         * valores si antes alguien llamo a su select(). Por eso el mismo asiento imprimia
+         * bien desde el listado de comprobantes -- que hace ese select -- y con los totales
+         * en cero desde cualquier otra pantalla, con el detalle correcto y el pie diciendo
+         * "SON: CERO". El reporte tiene que bastarse con el comprobante que le pasan.
+         */
+        BigDecimal totalD = BigDecimal.ZERO;
+        BigDecimal totalC = BigDecimal.ZERO;
+        for (VoucherDetail voucherDetail : voucherAccoutingService.getVoucherDetailList(voucher)) {
+            totalD = BigDecimalUtil.sum(totalD, voucherDetail.getDebit(), 2);
+            totalC = BigDecimalUtil.sum(totalC, voucherDetail.getCredit(), 2);
+        }
 
         System.out.println("-----> Documento: " +voucher.getDocumentType());
 

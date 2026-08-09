@@ -215,12 +215,13 @@
                          </app:selectPopUp>
                      </s:decorate>
 
+                     <!-- El codigo del certificado nuevo lo genera el sistema al renovar,
+                          de la misma secuencia que el alta. Se tipeaba a mano y era la
+                          ultima via por la que un codigo podia repetirse. -->
                      <s:decorate id="newAccountCodeDPFField" template="/include/inputField.xhtml" styleClass="formRow">
                          <ui:define name="label">#{messages['Account.newAccountCodeDPF']}</ui:define>
-                         <h:inputText id="newAccountCodeDPF" styleClass="input100"
-                                      value="#{accountAction.newAccountCodeDPF}"
-                                      required="true">
-                         </h:inputText>
+                         <h:outputText id="newAccountCodeDPF" styleClass="input100"
+                                       value="#{messages['Account.newAccountCodeDPF.auto']}"/>
                      </s:decorate>
 
                      <s:decorate id="newAccountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -283,12 +284,12 @@
 
                      <s:decorate id="beneficiary1Field" template="/include/inputField.xhtml" styleClass="formRow">
                          <ui:define name="label">#{messages['Account.beneficiary']}</ui:define>
-                         <h:inputText id="beneficiary1" value="#{accountAction.beneficiary1}" styleClass="inputLarge" />
+                         <h:inputText id="beneficiary1" value="#{accountAction.beneficiary1}" styleClass="inputLarge400" />
                      </s:decorate>
 
                      <s:decorate id="beneficiary2Field" template="/include/inputField.xhtml" styleClass="formRow">
                          <ui:define name="label">#{messages['Account.beneficiary']}</ui:define>
-                         <h:inputText id="beneficiary2" value="#{accountAction.beneficiary2}" styleClass="inputLarge" />
+                         <h:inputText id="beneficiary2" value="#{accountAction.beneficiary2}" styleClass="inputLarge400" />
                      </s:decorate>
 
                      <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">

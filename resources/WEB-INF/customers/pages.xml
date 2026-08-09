@@ -222,9 +222,15 @@
             </rule>
         </navigation>-->
 
-        <navigation from-action="#{accountAction.update}">
+        <!-- Guardar y quedarse en modo edicion. La conversacion se propaga en el redirect,
+             asi que el action vuelve con el registro recien grabado y op=UPDATE. El
+             redirect no es cosmetico: da un limite de transaccion limpio antes de que se
+             pueda aprobar el certificado en esa misma conversacion.
+             La regla que habia para update hacia <begin-conversation>, es decir arrancaba
+             una conversacion NUEVA: el action volvia vacio y la ficha se veia como un alta,
+             sin vencimiento ni capital. update() ahora se queda en la pantalla y no navega. -->
+        <navigation from-action="#{accountAction.create}">
             <rule if-outcome="Success">
-                <begin-conversation flush-mode="MANUAL"/>
                 <redirect view-id="/customers/account.xhtml"/>
             </rule>
         </navigation>
@@ -269,9 +275,13 @@
     </page>
 
     <page view-id="/customers/closeDeposit.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
+        <!-- Vuelve a la ficha, no al listado: el asiento recien generado se ve en la
+             pestana Transacciones y desde ahi se lo imprime. La conversacion del cierre es
+             anidada, asi que al terminar reaparece la de la ficha con el certificado
+             cargado. Mismo camino que la renovacion. -->
         <navigation from-action="#{accountAction.createDpfClosure}">
             <rule if-outcome="Success">
-                <redirect view-id="/customers/accountList.xhtml"/>
+                <redirect view-id="/customers/account.xhtml"/>
             </rule>
         </navigation>
         <navigation from-action="#{accountAction.cancelCloseDPF}">

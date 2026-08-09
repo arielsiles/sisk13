@@ -22,6 +22,19 @@ public interface AccountService {
 
     void createAccount(Account account);
     void updateAccount(Account account);
+
+    /**
+     * Si el codigo ya lo usa otra cuenta. <code>excludedId</code> deja fuera a la cuenta
+     * que se esta editando; en un alta va en null.
+     */
+    boolean existsAccountCode(String code, Long excludedId);
+
+    /**
+     * Siguiente numero de una serie de codigos de DPF, incrementado de forma atomica.
+     *
+     * @return el numero, o 0 si la secuencia no existe en <code>gensecuencia</code>.
+     */
+    long nextAccountCodeNumber(String sequenceName);
     List<VoucherDetail> getAccountDetailList(Account account);
     List<VoucherDetail> getPartnerDetailList(Partner partner);
     BigDecimal  calculateAccountBalance(Account account, Date startDate, Date endDate);

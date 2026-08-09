@@ -1931,9 +1931,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         System.out.println("-> ACCOUNT : " + account);
     }
 
+    /**
+     * El select() previo estaba solo para que el reporte encontrara los totales en este
+     * action. Ahora los calcula del comprobante que recibe, asi que cargar el asiento en
+     * la pantalla de edicion para imprimirlo dejo de tener sentido.
+     */
     public void generateReport(Voucher instance){
         try{
-            select(instance);
             voucherReportAction.generateReport(instance);
         } catch (NullPointerException e) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");

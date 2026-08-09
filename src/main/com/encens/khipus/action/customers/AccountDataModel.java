@@ -44,12 +44,18 @@ public class AccountDataModel extends QueryDataModel<Long, Account> {
 
     /**
      * Sin ORDER BY la paginacion no es estable: la misma cuenta puede repetirse o
-     * saltearse entre paginas. Se arranca por codigo y los encabezados de Apertura y
-     * Vencimiento cambian el criterio.
+     * saltearse entre paginas. Los encabezados de Apertura y Vencimiento cambian el
+     * criterio.
+     * <p/>
+     * Arranca por id descendente, es decir la ultima cuenta creada arriba, que es la que se
+     * viene a buscar al entrar. No se ordena por fecha de apertura: esa es una fecha del
+     * negocio que se tipea y puede ser anterior a la de una cuenta cargada antes, con lo
+     * que la recien creada no quedaria primera. El id sigue el orden real de alta.
      */
     @Create
     public void init() {
-        sortProperty = "account.code";
+        sortProperty = "account.id";
+        sortAsc = false;
     }
 
     @Override

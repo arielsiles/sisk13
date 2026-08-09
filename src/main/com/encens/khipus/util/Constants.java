@@ -150,7 +150,9 @@ public final class Constants {
     public static final String PURCHASEORDER_BY_BUSINESSUNIT = "PURCHASEORDER_BY_BUSINESSUNIT";
     public static final String PRODUCTION_CODE = "PRODUCTION_CODE";
     public static final String SAVINGS_ACCOUNT_NUMBER = "SAVINGS_ACCOUNT_NUMBER";
-    public static final String ACCOUNT_DPF_CODE = "ACCOUNT_DPF_CODE";
+    /** Codigo de DPF: una serie por moneda, extranjera (prefijo ME) y bolivianos (MN). */
+    public static final String ACCOUNT_DPF_CODE_ME = "ACCOUNT_DPF_CODE_ME";
+    public static final String ACCOUNT_DPF_CODE_MN = "ACCOUNT_DPF_CODE_MN";
 
     /* Employee Constants*/
     public static final String DISMISSALCAUSE_CODE_SEQUENCE = "DISMISSALCAUSE_CODE_SEQUENCE";
