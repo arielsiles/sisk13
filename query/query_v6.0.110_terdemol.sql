@@ -49,7 +49,8 @@ ALTER TABLE configuracion ADD COLUMN idlogologin    BIGINT(20) DEFAULT NULL;
 --    ('Functionality.admin.companySetting = Preferencias de compania'), que hasta
 --    ahora estaba huerfana.
 
-insert into funcionalidad values (503, 'COMPANYSETTING', 'Preferencias de compania (configuracion)', 2, 5, 'Functionality.admin.companySetting', 1);
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+insert into funcionalidad values (@nuevo_id, 'COMPANYSETTING', 'Preferencias de compania (configuracion)', 2, 5, 'Functionality.admin.companySetting', 1);
 
 -- 3) Otorgar el permiso al rol Administrador (idrol = 1) ---------------------
 

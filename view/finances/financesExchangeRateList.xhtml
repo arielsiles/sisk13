@@ -1,0 +1,150 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">#{messages['FinancesExchangeRate.list']}</ui:define>
+    <ui:param name="bodyWidth" value="100%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="financesExchangeRateSearch">
+
+            <rich:simpleTogglePanel id="financesExchangeRateSearchPanel"
+                                    label="#{messages['FinancesExchangeRate.search']}"
+                                    switchType="client">
+
+                <s:decorate id="exchangeKindField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesExchangeRate.exchangeKind']}</ui:define>
+                    <h:selectOneMenu id="exchangeKindCode"
+                                     value="#{financesExchangeRateDataModel.exchangeKindCode}"
+                                     styleClass="input" tabindex="1">
+                        <f:selectItem itemValue="#{null}" itemLabel=""/>
+                        <f:selectItems value="#{financesExchangeRateDataModel.exchangeKindSelectItems}"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="startDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesExchangeRate.startDate']}</ui:define>
+                    <rich:calendar id="startDate" value="#{financesExchangeRateDataModel.startDate}"
+                                   popup="true" datePattern="#{messages['patterns.date']}"
+                                   styleClass="input" enableManualInput="true" tabindex="2">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesExchangeRate.endDate']}</ui:define>
+                    <rich:calendar id="endDate" value="#{financesExchangeRateDataModel.endDate}"
+                                   popup="true" datePattern="#{messages['patterns.date']}"
+                                   styleClass="input" enableManualInput="true" tabindex="3">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="buttonField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <a4j:commandButton action="#{financesExchangeRateDataModel.updateAndSearch}"
+                                       reRender="financesExchangeRateSearchPanel, financesExchangeRateList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.search']}" id="searchButtonId" tabindex="4">
+                        <s:defaultAction/>
+                    </a4j:commandButton>
+                    <a4j:commandButton action="#{financesExchangeRateDataModel.clear}"
+                                       reRender="financesExchangeRateSearchPanel, financesExchangeRateList, dataScroller"
+                                       styleClass="button"
+                                       value="#{messages['Common.clear']}" id="clearButtonId" tabindex="5"/>
+                </s:decorate>
+
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/finances/financesExchangeRate.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('FINANCESEXCHANGERATE','CREATE')}"
+                          tabindex="6"/>
+            </div>
+
+            <rich:dataTable value="#{financesExchangeRateDataModel}" var="financesExchangeRateItem"
+                            id="financesExchangeRateList"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%" columnsWidth="25%, 25%, 25%, 25%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="financesExchangeRate.id.date"
+                                                   dataModel="#{financesExchangeRateDataModel}"
+                                                   reRender="financesExchangeRateList, dataScroller">
+                                #{messages['FinancesExchangeRate.date']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="financesExchangeRate.id.exchangeKind"
+                                                   dataModel="#{financesExchangeRateDataModel}"
+                                                   reRender="financesExchangeRateList, dataScroller">
+                                #{messages['FinancesExchangeRate.exchangeKind']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="financesExchangeRate.rate"
+                                                   dataModel="#{financesExchangeRateDataModel}"
+                                                   reRender="financesExchangeRateList, dataScroller">
+                                #{messages['FinancesExchangeRate.rate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column styleClass="center">
+                    <h:outputText value="#{financesExchangeRateItem.id.date}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column>
+                    <h:outputText value="#{financesExchangeRateItem.id.exchangeKind}"/>
+                    <h:outputText value=" - #{financesExchangeRateItem.exchangeKind.description}"
+                                  rendered="#{financesExchangeRateItem.exchangeKind != null}"/>
+                </rich:column>
+
+                <rich:column styleClass="right">
+                    <h:outputText value="#{financesExchangeRateItem.rate}">
+                        <f:convertNumber pattern="#{messages['patterns.decimal6FNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{financesExchangeRateAction.select(financesExchangeRateItem)}"
+                                   rendered="#{s:hasPermission('FINANCESEXCHANGERATE','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="financesExchangeRateList"
+                              dataModel="#{financesExchangeRateDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/finances/financesExchangeRate.xhtml"
+                          styleClass="button"
+                          propagation="none"
+                          rendered="#{s:hasPermission('FINANCESEXCHANGERATE','CREATE')}"
+                          tabindex="7"/>
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

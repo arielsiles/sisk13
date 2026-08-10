@@ -28,6 +28,11 @@
     <framework:entity-query name="exchangeRateQuery"
                             ejbql="select o from ExchangeRate o order by o.rate ASC"/>
 
+    <!-- Clases de cambio de contabilidad (arcgcc): D = dolar, U = UFV -->
+    <factory name="exchangeKindList" value="#{exchangeKindQuery}"/>
+    <framework:entity-query name="exchangeKindQuery"
+                            ejbql="select o from ExchangeKind o order by o.id ASC"/>
+
     <factory name="bankAccountList" value="#{bankAccountQuery}"/>
     <framework:entity-query name="bankAccountQuery"
                             ejbql="select o from BankAccount o order by o.accountNumber ASC"/>
@@ -42,6 +47,15 @@
     <factory name="financesBankAccountList" value="#{financesBankAccountQuery}"/>
     <framework:entity-query name="financesBankAccountQuery"
                             ejbql="select financesBankAccount from FinancesBankAccount financesBankAccount where financesBankAccount.state='VIG' order by financesBankAccount.description asc,financesBankAccount.currency asc"/>
+
+    <!-- Bancos (ck_bancos) para el desplegable del CRUD de cuentas bancarias -->
+    <factory name="financesBankList" value="#{financesBankQuery}"/>
+    <framework:entity-query name="financesBankQuery"
+                            ejbql="select financesBank from FinancesBank financesBank order by financesBank.name asc"/>
+
+    <!-- Enum de moneda (P/D/M/U) para el CRUD de cuentas bancarias -->
+    <factory name="financesCurrencyTypeEnumList"
+             value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.finances.FinancesCurrencyType')}"/>
 
     <factory name="financesDocumentTypeList" value="#{financesDocumentTypeQuery}"/>
     <framework:entity-query name="financesDocumentTypeQuery"

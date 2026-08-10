@@ -8,7 +8,10 @@
          actual para que un mensaje de 1 renglon NO desplace el contenido; solo crece si
          el mensaje excede. El <br/> se elimino: el espaciado se controla por CSS. -->
     <div class="app-msgband">
-        <rich:messages globalOnly="true" styleClass="message" errorClass="messageError" infoClass="messageInfo"
+        <!-- id: para que una accion ajax pueda refrescar la banda (reRender=":globalMessages")
+             y sus mensajes se vean sin recargar la pagina. -->
+        <rich:messages id="globalMessages"
+                       globalOnly="true" styleClass="message" errorClass="messageError" infoClass="messageInfo"
                        warnClass="messageWarm">
             <f:facet name="errorMarker">
                 <h:graphicImage value="/img/errorIcon.gif"/>

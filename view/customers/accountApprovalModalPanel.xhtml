@@ -1,0 +1,145 @@
+<rich:modalPanel height="420" width="1000" zindex="2000" resizeable="false" autosized="false"
+                 style="overflow:auto;"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['Account.approval.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeApprovalLink"/>
+    </f:facet>
+
+    <!-- Form propio: el modalPanel lo mueve el javascript de RichFaces fuera del form de
+         la ficha, asi que no puede depender de aquel para hacer submit. -->
+    <h:form id="accountApprovalForm">
+
+        <app:fieldset id="accountApprovalHeaderFieldset" title="">
+            <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         columnClasses="width30percent,width70percent">
+                <s:div>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Voucher.type']}: </ui:define>
+                        <h:outputText value="#{accountAction.approvalDocumentTypeDPF.fullName}" styleClass="bold"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Common.date']}: </ui:define>
+                        <h:outputText value="#{accountAction.approvalDateDPF}" styleClass="bold">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow"
+                                rendered="#{accountAction.isForeignAccount()}">
+                        <ui:define name="label">#{messages['Account.approval.exchangeRate']}: </ui:define>
+                        <h:outputText value="#{accountAction.approvalExchangeRateDPF}" styleClass="bold">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </s:decorate>
+                </s:div>
+
+                <s:decorate id="approvalGlossField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.gloss']}: </ui:define>
+                    <h:inputTextarea id="approvalGloss" value="#{accountAction.approvalGlossDPF}"
+                                     rows="3" styleClass="input350"/>
+                </s:decorate>
+            </h:panelGrid>
+        </app:fieldset>
+
+        <rich:spacer height="7"/>
+
+        <s:div id="accountApprovalDetailPanel">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                <thead class="rich-table-thead">
+                <tr class="rich-table-header">
+                    <th class="rich-table-headercell" rowspan="2">#{messages['Voucher.accountDescription']}</th>
+                    <th class="rich-table-headercell center" colspan="2">#{messages['Voucher.amountsNational']}</th>
+                    <th class="rich-table-headercell center" colspan="2">#{messages['Voucher.amountsForeign']}</th>
+                </tr>
+                <tr class="rich-table-header">
+                    <th class="rich-table-headercell">#{messages['Voucher.debit']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.credit']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.debit']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.credit']}</th>
+                </tr>
+                </thead>
+
+                <c:forEach var="approvalDetail" items="#{accountAction.approvalDetailsDPF}">
+                    <tr class="rich-table-row">
+                        <td class="rich-table-cell">
+                            <h:outputText value="#{approvalDetail.fullCashAccount}"/>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{approvalDetail.debit}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{approvalDetail.credit}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{approvalDetail.debitMe}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{approvalDetail.creditMe}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </td>
+                    </tr>
+                </c:forEach>
+
+                <thead class="rich-table-thead">
+                <tr class="rich-table-header">
+                    <td class="rich-table-headercell center">-</td>
+                    <td class="rich-table-headercell right">
+                        <h:outputText value="#{accountAction.approvalTotalDebitDPF}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </td>
+                    <td class="rich-table-headercell right">
+                        <h:outputText value="#{accountAction.approvalTotalCreditDPF}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </td>
+                    <td class="rich-table-headercell right">
+                        <h:outputText value="#{accountAction.approvalTotalDebitMeDPF}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </td>
+                    <td class="rich-table-headercell right">
+                        <h:outputText value="#{accountAction.approvalTotalCreditMeDPF}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </td>
+                </tr>
+                </thead>
+            </table>
+        </s:div>
+
+        <rich:spacer height="7"/>
+        <h:outputText styleClass="formNote" value="#{messages['Account.approval.note']}"/>
+
+        <div class="buttonsRight">
+            <h:commandButton id="approveConfirmButton"
+                             action="#{accountAction.approveDpf}"
+                             value="#{messages['Account.approval.confirm']}"
+                             styleClass="button"/>
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </h:commandButton>
+        </div>
+    </h:form>
+
+    <rich:componentControl for="#{dialogId}" attachTo="closeApprovalLink" operation="hide" event="onclick"/>
+
+</rich:modalPanel>

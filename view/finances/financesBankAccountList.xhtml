@@ -1,0 +1,106 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['FinancesBankAccount.list']}</ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="selectedTab" value="finances2"/>
+    <ui:define name="body">
+        <h:form id="financesBankAccountSearch">
+            <rich:simpleTogglePanel label="#{messages['FinancesBankAccount.search']}" switchType="client">
+                <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesBankAccount.accountNumber']}</ui:define>
+                    <h:inputText id="accountNumber" value="#{financesBankAccountDataModel.criteria.id.accountNumber}"
+                                 maxlength="20" tabindex="1" styleClass="input"/>
+                </s:decorate>
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesBankAccount.description']}</ui:define>
+                    <h:inputText id="description" value="#{financesBankAccountDataModel.criteria.description}"
+                                 maxlength="100" tabindex="2" styleClass="input">
+                        <a4j:commandButton action="#{financesBankAccountDataModel.search}"
+                                           reRender="financesBankAccountList, dataScroller"
+                                           styleClass="button"
+                                           value="#{messages['Common.search']}" id="searchButtonId" tabindex="3">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                    </h:inputText>
+                </s:decorate>
+                <rich:jQuery selector="#accountNumber" query="focus()" timing="onload"/>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/financesBankAccount.xhtml"
+                          styleClass="button" propagation="none"
+                          rendered="#{s:hasPermission('FINANCESBANKACCOUNT','CREATE')}"/>
+            </div>
+
+            <rich:dataTable value="#{financesBankAccountDataModel}" var="item" id="financesBankAccountList"
+                            rows="#{sessionUser.rowsPerPage}" width="100%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="financesBankAccount.id.accountNumber"
+                                                   dataModel="#{financesBankAccountDataModel}"
+                                                   reRender="financesBankAccountList, dataScroller">
+                                #{messages['FinancesBankAccount.accountNumber']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="financesBankAccount.description"
+                                                   dataModel="#{financesBankAccountDataModel}"
+                                                   reRender="financesBankAccountList, dataScroller">
+                                #{messages['FinancesBankAccount.description']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['FinancesBankAccount.bank']}</rich:column>
+                        <rich:column>#{messages['FinancesBankAccount.accountingAccount']}</rich:column>
+                        <rich:column>#{messages['FinancesBankAccount.currency']}</rich:column>
+                        <rich:column styleClass="center">#{messages['FinancesBankAccount.active']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{item.accountNumber}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{item.description}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{item.financesBank.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{item.accountingAccountCode}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[item.currency.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{item.active ? messages['Common.yes'] : messages['Common.no']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{financesBankAccountAction.select(item)}"
+                                   rendered="#{s:hasPermission('FINANCESBANKACCOUNT','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="financesBankAccountList"
+                              dataModel="#{financesBankAccountDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/finances/financesBankAccount.xhtml"
+                          styleClass="button" propagation="none"
+                          rendered="#{s:hasPermission('FINANCESBANKACCOUNT','CREATE')}"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

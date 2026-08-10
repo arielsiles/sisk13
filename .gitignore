@@ -1,5 +1,6 @@
 build/
 dist/
+tmp/
 .idea/
 .gradle/
 gradle/
@@ -9,4 +10,3 @@ out/
 build.properties
 *.~m2
 resources/khipus-dev-ds.xml
-tmp/

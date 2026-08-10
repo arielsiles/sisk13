@@ -89,8 +89,9 @@ public class VoucherUpdateAction extends GenericAction<Voucher> {
         return outCome;
     }
 
+    /** Ver la nota en VoucherCreateAction.generateReport: el reporte ya no depende de que
+     *  antes se cargue el asiento en la pantalla. */
     public void generateReport(Voucher instance){
-        select(instance);
         voucherReportAction.generateReport(instance);
     }
 

@@ -263,7 +263,7 @@
             <ui:define name="label"><h:outputText value="#{messages['Partner.partnerAccount']}"/></ui:define>
             <app:selectPopUp id="accountFieldId"
                              required="false"
-                             textValue="#{voucherCreateAction.partnerAccount.fullAccountName}"
+                             textValue="#{voucherCreateAction.partnerAccountLabel}"
                              value="#{voucherCreateAction.partnerAccount}"
                              clearAction="#{voucherCreateAction.clearPartnerAccount()}"
                              searchModalPanel="accountListModalPanel"

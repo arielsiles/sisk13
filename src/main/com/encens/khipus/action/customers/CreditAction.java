@@ -3,6 +3,7 @@ package com.encens.khipus.action.customers;
 import com.encens.khipus.action.accounting.VoucherCreateAction;
 import com.encens.khipus.action.accounting.reports.VoucherReportAction;
 import com.encens.khipus.action.customers.reports.CreditReportAction;
+import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
@@ -15,6 +16,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.VoucherState;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.customers.CreditService;
@@ -101,20 +103,66 @@ public class CreditAction extends GenericAction<Credit> {
         return outCome;
     }
 
+    /**
+     * El <code>ifOutcome</code> es necesario: sin el, una validacion fallida cerraria igual
+     * la conversacion y la pantalla volveria vacia.
+     */
     @Override
-    @End
+    @End(ifOutcome = Outcome.SUCCESS)
     public String create() {
         Credit instance = getInstance();
+
+        /**
+         * Una transferencia sin credito origen no tiene contra que transferir, y
+         * approveTransfer() lo da por presente: lee originCredit.getPartner() sin mirar si
+         * existe. El campo esta como opcional en la pantalla, asi que la regla se valida
+         * aca, antes de empezar el alta.
+         */
+        if (Boolean.TRUE.equals(instance.getTransfer()) && instance.getOriginCredit() == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Credit.error.originCreditRequired");
+            return Outcome.REDISPLAY;
+        }
+
         Partner partner = instance.getPartner();
         Integer num = partner.getNumberCredit()+1;
         String creditNumber = partner.getProductiveZone().getNumber()+'-'+partner.getNumber()+'-'+num;
         getInstance().setCode(creditNumber);
         getInstance().setState(CreditState.VIG);
         getInstance().setCapitalBalance(instance.getAmount());
-        super.create();
+
+        /**
+         * El alta va por el servicio de creditos y no por super.create(), que usa
+         * GenericServiceBean.create con REQUIRES_NEW: ese confirma en su propia
+         * transaccion, asi que lo que falle a continuacion -- el contador del socio, la
+         * aprobacion de la transferencia -- se deshace y el credito queda grabado igual,
+         * con el contador de su socio sin incrementar y el codigo del proximo credito
+         * repetido.
+         * <p/>
+         * Persist y flush son los mismos, sobre el mismo entityManager: lo unico que
+         * cambia es que ahora todo vive en una sola transaccion.
+         */
+        try {
+            creditService.createCredit(getInstance());
+            addCreatedMessage();
+        } catch (EntryDuplicatedException e) {
+            addDuplicatedMessage();
+            return Outcome.REDISPLAY;
+        }
+
         sequenceGeneratorService.nextCreditNumber(getInstance().getPartner().getId());
 
-        approveTransfer();
+        /**
+         * Solo una transferencia se aprueba al crearse: cierra el credito origen y arma el
+         * asiento del traspaso. Se llamaba siempre, y en un alta normal reventaba con un
+         * NPE porque approveTransfer lee originCredit.getPartner() sin mirar si existe.
+         * <p/>
+         * Aparte del NPE, correrlo en un alta normal marcaria el credito como entregado y
+         * le sacaria el boton de Desembolso.
+         */
+        if (Boolean.TRUE.equals(instance.getTransfer())) {
+            approveTransfer();
+        }
 
         return Outcome.SUCCESS;
     }
@@ -287,10 +335,12 @@ public class CreditAction extends GenericAction<Credit> {
         String outcome = Outcome.FAIL;
         BigDecimal exchangeRate = getExchangeRate();
 
+        /** Nace aprobado: lo arma el sistema, no es una carga manual a revisar. */
         Voucher voucher = new Voucher();
         voucher.setDocumentType("CD");
         voucher.setDate(this.transferDate);
         voucher.setGloss(this.gloss);
+        voucher.setState(VoucherState.APR.toString());
 
         System.out.println("-------------APERTURA DE CREDITOS-------------");
 

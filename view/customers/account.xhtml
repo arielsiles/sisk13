@@ -26,19 +26,76 @@
 
             <div class="buttons">
 
+                <!-- Un certificado pendiente todavia no es una operacion: no hay dinero
+                     recibido, no devenga y no tiene asientos. Por eso mientras esta en ese
+                     estado no se imprime el certificado ni se lo puede renovar o cerrar;
+                     lo unico que corresponde es aprobarlo. -->
                 <h:commandButton id="generateReportButtonId"
                                  action="#{accountDPFReportAction.generateReport(account)}"
                                  value="#{messages['Account.generateDocumentDPF']}"
-                                 rendered="#{accountAction.isDpfAccount(account)}"
+                                 rendered="#{accountAction.isDpfAccount(account) and !accountAction.isPendingDpf(account)}"
                                  styleClass="button"
                                  immediate="true"/>
 
+                <!-- Un certificado ya renovado o cerrado no se puede renovar: se deshabilita
+                     aca mismo, con el motivo en el tooltip. Si solo esta corriendo el plazo
+                     el boton queda habilitado a proposito: se entra a consultar los calculos
+                     y el bloqueo vive en el boton Renovar de la pantalla de renovacion. -->
                 <h:commandButton action="#{accountAction.renewalDPF}"
                                  value="#{messages['Account.renewal']}"
-                                 rendered="#{accountAction.isDpfAccount(account)}"
+                                 rendered="#{accountAction.isDpfAccount(account) and !accountAction.isPendingDpf(account)}"
+                                 disabled="#{accountAction.isClosed(account)}"
+                                 title="#{accountAction.isClosed(account) ? accountAction.renewalBlockedReason : ''}"
                                  styleClass="button"
                                  immediate="true"
                                  />
+
+                <!-- El socio se lleva el dinero y no renueva. Reemplaza al comprobante
+                     cargado a mano mas el paso de inactivar el certificado, que se olvidaba. -->
+                <h:commandButton action="#{accountAction.closeDPF}"
+                                 value="#{messages['Account.closing']}"
+                                 rendered="#{accountAction.isDpfAccount(account) and !accountAction.isPendingDpf(account) and s:hasPermission('DPFCLOSE','VIEW')}"
+                                 disabled="#{accountAction.isClosed(account)}"
+                                 title="#{accountAction.isClosed(account) ? accountAction.renewalBlockedReason : ''}"
+                                 styleClass="button"
+                                 immediate="true"
+                                 />
+
+                <!-- Aprueba la apertura: genera el comprobante de ingreso y pasa el
+                     certificado a Activo. El modal se abre solo si el asiento se pudo armar
+                     entero; si falta el tipo de cambio del dia o una cuenta de la
+                     configuracion, queda el mensaje de error en pantalla.
+
+                     Envia el formulario completo, sin immediate ni ajaxSingle: el asiento
+                     tiene que armarse con lo que hay en pantalla, no con lo ultimo grabado.
+                     Con esos atributos, lo editado y no guardado (los beneficiarios, o peor,
+                     el capital) no llegaba al modelo: el comprobante salia con el importe
+                     viejo y los cambios se perdian al redibujar la ficha.
+
+                     Se refresca formPanel porque los errores de validacion de campo los
+                     muestra cada s:decorate, no la banda de mensajes globales: sin eso, un
+                     campo obligatorio vacio dejaba el boton sin hacer nada y sin decir por
+                     que. -->
+                <a4j:commandButton id="approveButtonId"
+                                   action="#{accountAction.prepareApprovalDPF}"
+                                   value="#{messages['Account.approve']}"
+                                   rendered="#{accountAction.isPendingDpf(account)}"
+                                   styleClass="button"
+                                   reRender="formPanel, accountApprovalModalPanel, :globalMessages"
+                                   oncomplete="if (#{accountAction.approvalReady}) { Richfaces.showModalPanel('accountApprovalModalPanel'); }"/>
+
+                <!-- Marca la cuenta que nunca fue una operacion. Solo si no tiene ningun
+                     asiento: un certificado ya contabilizado se cierra, no se anula. -->
+                <a4j:commandButton id="annulButtonId"
+                                   value="#{messages['Account.annul']}"
+                                   rendered="#{accountAction.managed and s:hasPermission('ACCOUNTANNUL','UPDATE')}"
+                                   disabled="#{!accountAction.annullable}"
+                                   title="#{accountAction.annulBlockedReason}"
+                                   styleClass="button"
+                                   immediate="true"
+                                   ajaxSingle="true"
+                                   reRender="accountAnnulModalPanel"
+                                   oncomplete="Richfaces.showModalPanel('accountAnnulModalPanel');"/>
 
                 <h:commandButton id="createButtonId"
                                  action="#{accountAction.create}"
@@ -47,11 +104,13 @@
                                  rendered="#{!accountAction.managed and s:hasPermission('CREDIT','CREATE')}">
                 </h:commandButton>
 
+                <!-- Un DPF aprobado ya esta contabilizado: no queda nada editable en la
+                     ficha, asi que Guardar tampoco tiene sentido. -->
                 <h:commandButton id="updateButtonId"
                                  action="#{accountAction.update}"
                                  value="#{messages['Common.save']}"
                                  styleClass="button"
-                                 rendered="#{accountAction.managed}">
+                                 rendered="#{accountAction.managed and !accountAction.isApprovedDpf(account)}">
                     <s:defaultAction/>
                 </h:commandButton>
 
@@ -77,11 +136,16 @@
                 <h:panelGrid columns="3" width="100%" cellpadding="0" cellspacing="0" border="0" columnClasses="width50percent, width50percent">
                 <s:div id="leftSidePanel">
 
+                    <!-- Un DPF aprobado ya tiene su apertura contabilizada: apertura,
+                         vencimiento, capital y tipo de cuenta quedan bloqueados. Tocar
+                         cualquiera de ellos desincroniza la ficha del asiento que esta en
+                         el mayor y del interes que se viene devengando. -->
                     <s:decorate id="openDateField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.openingDate']}</ui:define>
                         <rich:calendar value="#{account.openingDate}"
                                        popup="true"
                                        required="true"
+                                       disabled="#{accountAction.isApprovedDpf(account)}"
                                        datePattern="#{messages['patterns.date']}"
                                        styleClass="input"
                                        enableManualInput="true"
@@ -94,6 +158,7 @@
                         <ui:define name="label"><h:outputText value="#{messages['Partner.partner']}"/></ui:define>
                         <app:selectPopUp id="partnerFieldId"
                                          required="true"
+                                         readOnly="#{accountAction.isApprovedDpf(account)}"
                                          textValue="#{account.partner.fullName}"
                                          value="#{account.partner}"
                                          clearAction="#{accountAction.clearPartner()}"
@@ -111,10 +176,24 @@
                                      value="#{account.accountNumber}"  />
                     </s:decorate>
 
-                    <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.code']}</ui:define>
-                        <h:inputText id="code" value="#{account.code}" styleClass="input" />
-                    </s:decorate>
+                    <!-- El codigo de un DPF lo genera el sistema al guardar, desde
+                         gensecuencia: es la clave con la que el certificado aparece en la
+                         contabilidad y en los reportes, y escribirlo a mano es de donde
+                         salieron los codigos repetidos del historico. Solo se muestra, y
+                         solo una vez guardado. Las cuentas de ahorro no llevan codigo.
+
+                         El div de afuera va siempre renderizado: RichFaces no puede sacar
+                         por ajax un componente cuyo rendered pasa a falso, porque no tiene
+                         con que reemplazar el nodo y el viejo se queda en pantalla. Eso era
+                         lo que dejaba visible la caja de texto del codigo al elegir un tipo
+                         DPF. -->
+                    <s:div id="codeFieldDiv">
+                        <s:decorate id="codeField" template="/include/inputField.xhtml" styleClass="formRow"
+                                    rendered="#{accountAction.accountCodeVisible}">
+                            <ui:define name="label">#{messages['Account.code']}</ui:define>
+                            <h:outputText id="code" value="#{account.code}" styleClass="input"/>
+                        </s:decorate>
+                    </s:div>
 
                     <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.currency']}</ui:define>
@@ -127,13 +206,12 @@
                         </h:selectOneMenu>
                     </s:decorate>
 
-                    <!-- disabled="false" : todo: implement access rights -->
                     <s:decorate id="accountTypeField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.accountType']}</ui:define>
                         <h:selectOneMenu id="accountTypeId" value="#{account.accountType}"
                                          styleClass="input"
                                          required="true"
-                                         disabled="false"
+                                         disabled="#{accountAction.isApprovedDpf(account)}"
                                          tabindex="1">
                             <s:selectItems value="#{accountTypeList.resultList}"
                                            var="accountType"
@@ -142,19 +220,19 @@
                                            hideNoSelectionLabel="false"/>
                             <s:convertEntity/>
                             <a4j:support event="onchange" action="#{accountAction.calculateExpirationDate}"
-                                         reRender="targetDPF" ajaxSingle="true" />
+                                         reRender="targetDPF, accountStateField, codeFieldDiv, beneficiaryPanel"
+                                         ajaxSingle="true" />
                         </h:selectOneMenu>
                     </s:decorate>
 
+                    <!-- El estado no se elige: es la consecuencia de una operacion. Un DPF
+                         nace Pendiente, lo pasa a Activo el boton Aprobar, y a Inactivo la
+                         renovacion o el cierre. Para marcar una cuenta que nunca existio
+                         esta el boton Anular. -->
                     <s:decorate id="accountStateField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.state']}</ui:define>
-                        <h:selectOneMenu id="accountState" value="#{account.accountState}" styleClass="input"
-                                         tabindex="3" required="true">
-                            <s:selectItems value="#{accountStateEnum}" var="accountState" label="#{messages[accountState.resourceKey]}"
-                                           noSelectionLabel=""
-                                           hideNoSelectionLabel="false"/>
-                            <s:convertEnum/>
-                        </h:selectOneMenu>
+                        <h:outputText id="accountState" styleClass="input"
+                                      value="#{account.accountState != null ? messages[account.accountState.resourceKey] : ''}"/>
                     </s:decorate>
 
                     <s:div id="targetDPF">
@@ -163,6 +241,7 @@
                             <rich:calendar value="#{account.expirationDate}"
                                            popup="true"
                                            required="true"
+                                           disabled="#{accountAction.isApprovedDpf(account)}"
                                            datePattern="#{messages['patterns.date']}"
                                            styleClass="input"
                                            enableManualInput="true"
@@ -175,7 +254,8 @@
                             <ui:define name="label">#{messages['Account.capital']}</ui:define>
                             <h:inputText id="capital" styleClass="input100"
                                          value="#{account.capital}"
-                                         required="true">
+                                         required="true"
+                                         disabled="#{accountAction.isApprovedDpf(account)}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="capital"/>
                                 <a4j:support event="onblur" reRender="capitalField"/>
                             </h:inputText>
@@ -186,6 +266,7 @@
                         <ui:define name="label">#{messages['Account.retention']}</ui:define>
                         <h:selectBooleanCheckbox id="retentionFlag"
                                                  value="#{account.retentionFlag}"
+                                                 disabled="#{accountAction.isApprovedDpf(account)}"
                                                  tabindex="17"/>
                     </s:decorate>
 
@@ -193,10 +274,13 @@
                         <ui:define name="label">#{messages['Account.companyAccount']}</ui:define>
                         <h:selectBooleanCheckbox id="companyAccountFlag"
                                                  value="#{account.companyAccountFlag}"
+                                                 disabled="#{accountAction.isApprovedDpf(account)}"
                                                  tabindex="17"/>
                     </s:decorate>
 
                 </s:div>
+
+                    <s:div id="rightSideColumn">
 
                     <!-- Moneda Extranjera -->
                     <c:if test="#{accountAction.isForeignAccount()}">
@@ -221,16 +305,6 @@
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />
                             </h:outputText>
                         </s:decorate>
-
-                        <!--<s:decorate id="beneficiary1Field" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Account.beneficiary']}</ui:define>
-                            <h:inputText id="beneficiary1" value="#{account.beneficiary1}" styleClass="input" />
-                        </s:decorate>
-
-                        <s:decorate id="beneficiary2Field" template="/include/inputField.xhtml" styleClass="formRow">
-                            <ui:define name="label">#{messages['Account.beneficiary']}</ui:define>
-                            <h:inputText id="beneficiary2" value="#{account.beneficiary2}" styleClass="input" />
-                        </s:decorate>-->
 
                     </s:div>
                     </c:if>
@@ -261,6 +335,31 @@
                         </s:div>
                     </c:if>
 
+                    <!-- Beneficiarios del certificado. Van fuera de los dos bloques de
+                         moneda para no duplicarlos, y el div de afuera va siempre
+                         renderizado para poder refrescarlos al elegir el tipo de cuenta.
+                         Se cargan mientras el certificado esta pendiente; una vez aprobado
+                         quedan bloqueados como todo lo demas. -->
+                    <s:div id="beneficiaryPanel">
+                        <s:decorate id="beneficiary1Field" template="/include/inputField.xhtml" styleClass="formRow"
+                                    rendered="#{accountAction.isDpfAccount(account)}">
+                            <ui:define name="label">#{messages['Account.beneficiary1']}</ui:define>
+                            <h:inputText id="beneficiary1" value="#{account.beneficiary1}"
+                                         maxlength="100" styleClass="input260"
+                                         disabled="#{accountAction.isApprovedDpf(account)}"/>
+                        </s:decorate>
+
+                        <s:decorate id="beneficiary2Field" template="/include/inputField.xhtml" styleClass="formRow"
+                                    rendered="#{accountAction.isDpfAccount(account)}">
+                            <ui:define name="label">#{messages['Account.beneficiary2']}</ui:define>
+                            <h:inputText id="beneficiary2" value="#{account.beneficiary2}"
+                                         maxlength="100" styleClass="input260"
+                                         disabled="#{accountAction.isApprovedDpf(account)}"/>
+                        </s:decorate>
+                    </s:div>
+
+                    </s:div>
+
                 </h:panelGrid>
 
             </rich:panel>
@@ -276,7 +375,7 @@
                                         value="#{accountAction.getAccountDetailList(account)}"
                                         var="accountDetailItem"
                                         width="100%"
-                                        columnsWidth="10%, 10%, 45%, 15%, 10%, 10%">
+                                        columnsWidth="9%, 9%, 39%, 14%, 10%, 10%, 9%">
                             <f:facet name="header">
                                 <rich:columnGroup>
                                     <rich:column>
@@ -305,9 +404,9 @@
                                         <h:outputText value="#{messages['AccountTransaction.credit']}" />
                                     </rich:column>
 
-                                    <!--<rich:column styleClass="center">
+                                    <rich:column styleClass="center">
                                         <h:outputText value="#{messages['Common.action']}" />
-                                    </rich:column>-->
+                                    </rich:column>
 
                                 </rich:columnGroup>
                             </f:facet>
@@ -360,12 +459,33 @@
                                 </rich:column>
                             </c:if>
 
-                            <!--<rich:column styleClass="center">
-                                <h:commandLink value="#{messages['Common.select']}"
-                                               immediate="true"
-                                               action="#{creditAction.selectCreditTransaction(creditTransactionItem)}"
-                                               rendered="#{s:hasPermission('CREDIT','VIEW')}" />
-                            </rich:column>-->
+                            <!-- Ver como quedo contabilizado el movimiento, sin salir de la ficha -->
+                            <rich:column styleClass="center">
+                                <a4j:commandLink id="viewVoucherLink"
+                                                 action="#{accountAction.viewVoucher(accountDetailItem)}"
+                                                 immediate="true"
+                                                 ajaxSingle="true"
+                                                 oncomplete="Richfaces.showModalPanel('accountVoucherViewModalPanel');"
+                                                 reRender="accountVoucherViewModalPanel">
+                                    <h:graphicImage value="/img/eye-line.svg" styleClass="select-image"
+                                                    title="#{messages['Voucher.viewDocument']}"/>
+                                </a4j:commandLink>
+                                &#160;
+                                <!-- El mismo PDF del comprobante que se genera desde Contabilidad.
+                                     Se llama a voucherReportAction y no a voucherCreateAction: aquel
+                                     es de scope PAGE y recibe el comprobante, asi que no arrastra el
+                                     adentro de la conversacion de la cuenta al action de
+                                     contabilidad, que vive en conversacion.
+                                     A diferencia del listado de comprobantes, no se exige que el
+                                     asiento este aprobado: la aprobacion contable la hace despues
+                                     Contabilidad, y desde la ficha se imprime el comprobante tal
+                                     como quedo. -->
+                                <h:commandLink action="#{voucherReportAction.generateReport(accountDetailItem.voucher)}"
+                                               immediate="true">
+                                    <h:graphicImage value="/img/pdf-line.svg" styleClass="select-image"
+                                                    title="#{messages['Voucher.report.generateReport']}"/>
+                                </h:commandLink>
+                            </rich:column>
 
                         </rich:dataTable>
                         <!--<app:dataScroller id="ListIdListDataScrollerId" for="accountTransactionListId" dataModel="#{accountTransactionDataModel}"/>-->
@@ -390,6 +510,24 @@
                 </ui:define>
             </s:decorate>
         </s:div>
+
+        <s:decorate id="accountVoucherViewModalPanelContainer"
+                    template="/customers/accountVoucherViewModalPanel.xhtml">
+            <ui:param name="containerId" value="accountVoucherViewModalPanelContainer"/>
+            <ui:param name="dialogId" value="accountVoucherViewModalPanel"/>
+        </s:decorate>
+
+        <s:decorate id="accountApprovalModalPanelContainer"
+                    template="/customers/accountApprovalModalPanel.xhtml">
+            <ui:param name="containerId" value="accountApprovalModalPanelContainer"/>
+            <ui:param name="dialogId" value="accountApprovalModalPanel"/>
+        </s:decorate>
+
+        <s:decorate id="accountAnnulModalPanelContainer"
+                    template="/customers/accountAnnulModalPanel.xhtml">
+            <ui:param name="containerId" value="accountAnnulModalPanelContainer"/>
+            <ui:param name="dialogId" value="accountAnnulModalPanel"/>
+        </s:decorate>
 
         <rich:jQuery selector="#customer" query="focus()" timing="onload"/>
     </ui:define>

@@ -1,0 +1,131 @@
+<rich:modalPanel height="600" width="1050" zindex="2000" resizeable="false" autosized="false"
+                 style="overflow:auto;"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:c="http://java.sun.com/jstl/core"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['Voucher.viewDocument']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLink"/>
+    </f:facet>
+
+    <app:fieldset id="accountVoucherHeaderFieldset" title="">
+        <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                     columnClasses="width30percent,width70percent">
+            <s:div>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Common.date']}: </ui:define>
+                    <h:outputText value="#{accountAction.selectedVoucher.date}" styleClass="bold">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.doc']}: </ui:define>
+                    <h:outputText value="#{accountAction.selectedVoucher.fullDocument}" styleClass="bold"/>
+                </s:decorate>
+                <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Voucher.state']}: </ui:define>
+                    <h:outputText value="#{accountAction.selectedVoucher.state}" styleClass="bold"/>
+                </s:decorate>
+            </s:div>
+
+            <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Voucher.gloss']}: </ui:define>
+                <h:outputText value="#{accountAction.selectedVoucher.gloss}"/>
+            </s:decorate>
+        </h:panelGrid>
+    </app:fieldset>
+
+    <rich:spacer height="7"/>
+
+    <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <s:div id="accountVoucherDetailPanel">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
+                <thead class="rich-table-thead">
+                <tr class="rich-table-header">
+                    <th class="rich-table-headercell" rowspan="2">#{messages['Voucher.accountDescription']}</th>
+                    <th class="rich-table-headercell center" colspan="2">#{messages['Voucher.amountsNational']}</th>
+                    <th class="rich-table-headercell center" colspan="2">#{messages['Voucher.amountsForeign']}</th>
+                </tr>
+                <tr class="rich-table-header">
+                    <th class="rich-table-headercell">#{messages['Voucher.debit']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.credit']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.debit']}</th>
+                    <th class="rich-table-headercell">#{messages['Voucher.credit']}</th>
+                </tr>
+                </thead>
+
+                <c:forEach var="voucherDetail" items="#{accountAction.selectedVoucherDetails}">
+                    <tr class="rich-table-row">
+                        <td class="rich-table-cell">
+                            <h:outputText value="#{voucherDetail.fullCashAccount}"/>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{voucherDetail.debit}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{voucherDetail.credit}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{voucherDetail.debitMe}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </td>
+                        <td class="rich-table-cell right">
+                            <h:outputText value="#{voucherDetail.creditMe}">
+                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                            </h:outputText>
+                        </td>
+                    </tr>
+                </c:forEach>
+
+                <thead class="rich-table-thead">
+                <tr class="rich-table-header">
+                    <td class="rich-table-headercell center">-</td>
+                    <td class="rich-table-headercell right">
+                        <h:outputText value="#{accountAction.selectedVoucherTotalDebit}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </td>
+                    <td class="rich-table-headercell right">
+                        <h:outputText value="#{accountAction.selectedVoucherTotalCredit}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </td>
+                    <td class="rich-table-headercell right">
+                        <h:outputText value="#{accountAction.selectedVoucherTotalDebitMe}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </td>
+                    <td class="rich-table-headercell right">
+                        <h:outputText value="#{accountAction.selectedVoucherTotalCreditMe}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </td>
+                </tr>
+                </thead>
+            </table>
+        </s:div>
+    </h:panelGrid>
+
+    <div class="buttonsRight">
+        <h:commandButton value="#{messages['Common.close']}" styleClass="button">
+            <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+        </h:commandButton>
+    </div>
+
+    <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
+
+</rich:modalPanel>

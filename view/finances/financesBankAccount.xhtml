@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{financesBankAccountAction.managed}">#{messages['FinancesBankAccount.edit']}</c:when>
+            <c:otherwise>#{messages['FinancesBankAccount.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="60%"/>
+    <ui:param name="selectedTab" value="finances2"/>
+    <ui:define name="body">
+        <h:form id="financesBankAccountForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{financesBankAccountAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!financesBankAccountAction.managed and s:hasPermission('FINANCESBANKACCOUNT','CREATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{financesBankAccountAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{financesBankAccountAction.managed and s:hasPermission('FINANCESBANKACCOUNT','UPDATE')}">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                                 rendered="#{financesBankAccountAction.managed and s:hasPermission('FINANCESBANKACCOUNT','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{financesBankAccountAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{financesBankAccountAction.managed}">#{messages['FinancesBankAccount.edit']}</c:when>
+                        <c:otherwise>#{messages['FinancesBankAccount.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="accountNumberField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesBankAccount.accountNumber']}</ui:define>
+                    <h:inputText id="accountNumber" value="#{financesBankAccount.id.accountNumber}" required="true"
+                                 maxlength="20" tabindex="1" styleClass="input"
+                                 rendered="#{!financesBankAccountAction.managed}">
+                        <f:validateLength maximum="20"/>
+                    </h:inputText>
+                    <h:outputLabel styleClass="input" value="#{financesBankAccount.id.accountNumber}"
+                                   rendered="#{financesBankAccountAction.managed}"/>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesBankAccount.description']}</ui:define>
+                    <h:inputText id="description" value="#{financesBankAccount.description}" required="true"
+                                 maxlength="100" tabindex="2" styleClass="input">
+                        <f:validateLength maximum="100"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:decorate id="bankField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesBankAccount.bank']}</ui:define>
+                    <h:selectOneMenu id="bank" value="#{financesBankAccount.bankCode}" required="true"
+                                     styleClass="input" tabindex="3">
+                        <s:selectItems value="#{financesBankList}" var="bank"
+                                       label="#{bank.name}" itemValue="#{bank.id}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="currencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesBankAccount.currency']}</ui:define>
+                    <h:selectOneMenu id="currency" value="#{financesBankAccount.currency}" required="true"
+                                     styleClass="input" tabindex="4">
+                        <s:selectItems value="#{financesCurrencyTypeEnumList}" var="currency"
+                                       label="#{messages[currency.resourceKey]}"
+                                       noSelectionLabel="" hideNoSelectionLabel="false"/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:div id="cashAccountDiv">
+                    <s:decorate id="cashAccountField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['FinancesBankAccount.accountingAccount']}</ui:define>
+                        <app:selectPopUp id="cashAccount"
+                                         textValue="#{financesBankAccount.cashAccount.fullName}"
+                                         value="#{financesBankAccount.cashAccount}"
+                                         dataModel="#{cashAccountDataModel}"
+                                         clearAction="financesBankAccountAction.clearCashAccount()"
+                                         searchModalPanel="cashAccountListModalPanel"
+                                         reRender="cashAccountDiv"
+                                         hotKeySelect="alt+5"/>
+                    </s:decorate>
+                </s:div>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesBankAccount.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{financesBankAccount.active}" tabindex="6"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{financesBankAccountAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!financesBankAccountAction.managed and s:hasPermission('FINANCESBANKACCOUNT','CREATE')}"/>
+                <h:commandButton action="#{financesBankAccountAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{financesBankAccountAction.managed and s:hasPermission('FINANCESBANKACCOUNT','UPDATE')}"/>
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                                 rendered="#{financesBankAccountAction.managed and s:hasPermission('FINANCESBANKACCOUNT','DELETE')}">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{financesBankAccountAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"/>
+            </div>
+        </h:form>
+
+        <!-- Modal compartido para elegir la cuenta contable -->
+        <s:decorate id="cashAccountListModalPanelContainer" template="/finances/cashAccountListModalPanel.xhtml">
+            <ui:param name="containerId" value="cashAccountListModalPanelContainer"/>
+            <ui:param name="dialogId" value="cashAccountListModalPanel"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
+                                   action="#{financesBankAccountAction.assignCashAccount(cashAccountItem)}"
+                                   image="/img/active.gif" styleClass="select-image-middle"
+                                   reRender="cashAccountDiv"
+                                   oncomplete="Richfaces.hideModalPanel('cashAccountListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{financesBankAccountAction.managed and s:hasPermission('FINANCESBANKACCOUNT','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['FinancesBankAccount.delete.confirmation']}">
+                        <f:param value="#{financesBankAccount.fullName}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{financesBankAccountAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{financesBankAccountAction.managed and s:hasPermission('FINANCESBANKACCOUNT','DELETE')}"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+        <rich:jQuery selector="#accountNumber" query="focus()" timing="onload"/>
+    </ui:define>
+</ui:composition>

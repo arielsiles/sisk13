@@ -6,6 +6,7 @@ import com.encens.khipus.action.warehouse.reports.ValuedPhysicalInventoryReportA
 import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundException;
 import com.encens.khipus.exception.finances.FinancesCurrencyNotFoundException;
 import com.encens.khipus.exception.finances.FinancesExchangeRateNotFoundException;
+import com.encens.khipus.model.customers.FixedTermDepositConflict;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.accounting.DocType;
@@ -68,6 +69,8 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     private Client client;
     private ProductItem productItem;
     private Account partnerAccount;
+    /** Texto de la cuenta de ahorro ya resuelto: la vista NO debe tocar la asociacion lazy. */
+    private String partnerAccountLabel;
     private Partner partner;
 
     //private PurchaseDocument purchaseDocument;
@@ -197,6 +200,11 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             return Outcome.REDISPLAY;
         }
 
+        if (!validateFixedTermDepositCapital()) {
+            return Outcome.REDISPLAY;
+        }
+
+        warnUnlinkedFixedTermDepositAccounts();
         warnIfFiscalCreditDoesNotMatch();
 
         try {
@@ -256,6 +264,58 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
      * NIT, numero y fecha. Se controla contra las facturas ya registradas en la base
      * de datos (excepto anuladas) y tambien dentro del asiento que se esta cargando.
      */
+    /**
+     * Un DPF no recibe dinero a mitad de plazo: para aumentar el capital hay que cerrar el
+     * certificado y abrir uno nuevo desde Renovacion. Si se carga como un asiento suelto, la
+     * contabilidad queda diciendo un capital y la ficha de la cuenta otro.
+     * <p/>
+     * Se consulta ANTES de entrar al EJB, junto al resto de las validaciones. Antes esto
+     * vivia dentro de saveVoucher() como una excepcion, y eso le mataba la transaccion a
+     * cualquiera de los 61 llamadores de todos los modulos; en esta pantalla el redisplay
+     * ademas reventaba al renderizar una asociacion lazy con la transaccion ya marcada para
+     * rollback. Validando antes no hay excepcion, no hay rollback y el asiento cargado se
+     * conserva.
+     */
+    private boolean validateFixedTermDepositCapital() {
+        /** create() trabaja sobre el campo voucher; update() sobre la instancia gestionada. */
+        Voucher target = isManaged() && getInstance() != null ? getInstance() : voucher;
+        Date date = target != null ? target.getDate() : null;
+        FixedTermDepositConflict conflict =
+                voucherAccoutingService.findFixedTermDepositConflict(date, getVoucherDetails());
+        if (conflict == null) {
+            return true;
+        }
+        if (FixedTermDepositConflict.Type.CAPITAL_INCREASE.equals(conflict.getType())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.dpfCapitalAfterOpening",
+                    conflict.getAccountCode(),
+                    DateUtils.format(conflict.getOpeningDate(), "dd/MM/yyyy"),
+                    DateUtils.format(conflict.getVoucherDate(), "dd/MM/yyyy"));
+        } else if (FixedTermDepositConflict.Type.PARTIAL_WITHDRAWAL.equals(conflict.getType())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.dpfPartialWithdrawal", conflict.getAccountCode());
+        } else {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Account.error.dpfWithdrawalUseClosing", conflict.getAccountCode());
+        }
+        return false;
+    }
+
+    /**
+     * Nivel 2 del control de DPF: la linea toca una cuenta de capital de DPF pero no dice a
+     * que certificado corresponde.
+     * <p/>
+     * Solo advierte. Sin el enlace no se sabe cual es el certificado, asi que no hay contra
+     * que comparar, y un asiento de reclasificacion sobre esas cuentas es legitimo.
+     */
+    private void warnUnlinkedFixedTermDepositAccounts() {
+        List<String> accounts = voucherAccoutingService.findUnlinkedFixedTermDepositAccounts(getVoucherDetails());
+        for (String accountCode : accounts) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "Account.warn.dpfAccountWithoutCertificate", accountCode);
+        }
+    }
+
     private boolean validateDuplicatedInvoices() {
 
         for (PurchaseDocument purchaseDocument : purchaseDocumentList) {
@@ -455,6 +515,11 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
             return Outcome.REDISPLAY;
         }
 
+        if (!validateFixedTermDepositCapital()) {
+            return Outcome.REDISPLAY;
+        }
+
+        warnUnlinkedFixedTermDepositAccounts();
         warnIfFiscalCreditDoesNotMatch();
 
         try{
@@ -1866,9 +1931,13 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
         System.out.println("-> ACCOUNT : " + account);
     }
 
+    /**
+     * El select() previo estaba solo para que el reporte encontrara los totales en este
+     * action. Ahora los calcula del comprobante que recibe, asi que cargar el asiento en
+     * la pantalla de edicion para imprimirlo dejo de tener sentido.
+     */
     public void generateReport(Voucher instance){
         try{
-            select(instance);
             voucherReportAction.generateReport(instance);
         } catch (NullPointerException e) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN, "Voucher.message.incomplete");
@@ -1958,6 +2027,22 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
 
     public void setPartnerAccount(Account partnerAccount) {
         this.partnerAccount = partnerAccount;
+        /**
+         * El texto de la cuenta de ahorro se materializa ACA, no en la vista.
+         * <p/>
+         * Account.getFullAccountName() atraviesa partner, que es @ManyToOne(LAZY). Si la
+         * vista lo resuelve al renderizar, cualquier camino de error que haya marcado la
+         * transaccion para rollback deja el proxy sin sesion y la pantalla revienta con
+         * LazyInitializationException en vez de mostrar el mensaje -- pasaba con el
+         * catch(Exception) generico de create() y update(). Este setter corre en
+         * UPDATE_MODEL, con el contexto de persistencia vivo, asi que el texto queda
+         * resuelto antes de que nada pueda fallar.
+         */
+        this.partnerAccountLabel = partnerAccount != null ? partnerAccount.getFullAccountName() : null;
+    }
+
+    public String getPartnerAccountLabel() {
+        return partnerAccountLabel;
     }
 
     public Boolean getFiscalCredit() {

@@ -3,6 +3,7 @@ package com.encens.khipus.model.finances;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.CompanyNumberListener;
 import com.encens.khipus.exception.finances.CompanyAccountNotConfiguredException;
+import com.encens.khipus.model.accounting.DocType;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.common.File;
 import com.encens.khipus.model.contacts.Salutation;
@@ -650,16 +651,53 @@ public class CompanyConfiguration {
     })
     private CashAccount VeterinaryCashAccount;
 
-    @Column(name = "CAJAgRAL1MN", length = 20)
+    /**
+     * Caja general. De aca sale el efectivo que se entrega al socio al cerrar un DPF, y
+     * tambien el del retiro parcial de una renovacion; antes esas dos cuentas estaban
+     * hardcodeadas en AccountAction.
+     * <p/>
+     * El nombre de columna va en minusculas: en MySQL los nombres de columna no distinguen
+     * mayusculas, asi que el "CAJAgRAL1MN" original apuntaba a la misma columna y solo
+     * desentonaba con el resto de la tabla.
+     */
+    @Column(name = "cajagral1mn", length = 20)
     @Length(max = 20)
     private String generalCashAccountNationalCode;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns({
             @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
-            @JoinColumn(name = "CAJAgRAL1MN", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+            @JoinColumn(name = "cajagral1mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount generalCashAccountNational;
+
+    @Column(name = "cajagral1me", length = 20)
+    @Length(max = 20)
+    private String generalCashAccountForeignCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "cajagral1me", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount generalCashAccountForeign;
+
+    /**
+     * Tipo de comprobante con el que se registra la apertura de un DPF. Es CI: los 37
+     * asientos de apertura que existen como CI debitan la caja general y acreditan el
+     * capital del certificado, sin una sola excepcion.
+     * <p/>
+     * Se configura aca y no en <code>tipocuenta</code> porque no depende del plazo ni de
+     * la moneda: toda apertura es un ingreso de dinero. Un solo lugar que mantener, y los
+     * tipos de cuenta nuevos quedan cubiertos sin cargar nada.
+     */
+    @Column(name = "tipo_doc_dpf", length = 5)
+    @Length(max = 5)
+    private String fixedTermDepositDocumentTypeName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipo_doc_dpf", referencedColumnName = "nombre", nullable = true, insertable = false, updatable = false)
+    private DocType fixedTermDepositDocumentType;
 
     @Column(name = "i_pvig_pf_mn", length = 20)
     @Length(max = 20)
@@ -671,6 +709,33 @@ public class CompanyConfiguration {
             @JoinColumn(name = "i_pvig_pf_mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
     })
     private CashAccount fixedTermInterestNationalCurrency;
+
+    /**
+     * Cuentas de gasto de la provision mensual de intereses por pagar sobre DPF.
+     * El contrapartida (pasivo "cargos financieros por pagar") NO va aca: sale de
+     * CTACF_MN / CTACF_ME del tipo de cuenta, que es lo que ya usa la renovacion de DPF.
+     */
+    @Column(name = "i_ppag_dpf_mn", length = 20)
+    @Length(max = 20)
+    private String fixedTermPayableInterestNationalCurrencyCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "i_ppag_dpf_mn", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount fixedTermPayableInterestNationalCurrency;
+
+    @Column(name = "i_ppag_dpf_me", length = 20)
+    @Length(max = 20)
+    private String fixedTermPayableInterestForeignCurrencyCode;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumns({
+            @JoinColumn(name = "no_cia", referencedColumnName = "no_cia", nullable = false, updatable = false, insertable = false),
+            @JoinColumn(name = "i_ppag_dpf_me", referencedColumnName = "cuenta", nullable = false, updatable = false, insertable = false)
+    })
+    private CashAccount fixedTermPayableInterestForeignCurrency;
 
     @Column(name = "ctaprovaf", length = 20)
     @Length(max = 20)
@@ -1765,6 +1830,41 @@ public class CompanyConfiguration {
         this.generalCashAccountNationalCode = generalCashAccountNationalCode;
     }
 
+    public CashAccount getGeneralCashAccountForeign() {
+        return generalCashAccountForeign;
+    }
+
+    public void setGeneralCashAccountForeign(CashAccount generalCashAccountForeign) {
+        this.generalCashAccountForeign = generalCashAccountForeign;
+        setGeneralCashAccountForeignCode(this.generalCashAccountForeign != null ? this.generalCashAccountForeign.getAccountCode() : null);
+    }
+
+    public String getGeneralCashAccountForeignCode() {
+        return generalCashAccountForeignCode;
+    }
+
+    public void setGeneralCashAccountForeignCode(String generalCashAccountForeignCode) {
+        this.generalCashAccountForeignCode = generalCashAccountForeignCode;
+    }
+
+    public DocType getFixedTermDepositDocumentType() {
+        return fixedTermDepositDocumentType;
+    }
+
+    public void setFixedTermDepositDocumentType(DocType fixedTermDepositDocumentType) {
+        this.fixedTermDepositDocumentType = fixedTermDepositDocumentType;
+        setFixedTermDepositDocumentTypeName(this.fixedTermDepositDocumentType != null
+                ? this.fixedTermDepositDocumentType.getName() : null);
+    }
+
+    public String getFixedTermDepositDocumentTypeName() {
+        return fixedTermDepositDocumentTypeName;
+    }
+
+    public void setFixedTermDepositDocumentTypeName(String fixedTermDepositDocumentTypeName) {
+        this.fixedTermDepositDocumentTypeName = fixedTermDepositDocumentTypeName;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -1788,6 +1888,40 @@ public class CompanyConfiguration {
     public void setFixedTermInterestNationalCurrency(CashAccount fixedTermInterestNationalCurrency) {
         this.fixedTermInterestNationalCurrency = fixedTermInterestNationalCurrency;
         setFixedTermInterestNationalCurrencyCode(this.fixedTermInterestNationalCurrency != null ? this.fixedTermInterestNationalCurrency.getAccountCode() : null);
+    }
+
+    public CashAccount getFixedTermPayableInterestNationalCurrency() {
+        return fixedTermPayableInterestNationalCurrency;
+    }
+
+    public void setFixedTermPayableInterestNationalCurrency(CashAccount fixedTermPayableInterestNationalCurrency) {
+        this.fixedTermPayableInterestNationalCurrency = fixedTermPayableInterestNationalCurrency;
+        setFixedTermPayableInterestNationalCurrencyCode(this.fixedTermPayableInterestNationalCurrency != null ? this.fixedTermPayableInterestNationalCurrency.getAccountCode() : null);
+    }
+
+    public String getFixedTermPayableInterestNationalCurrencyCode() {
+        return fixedTermPayableInterestNationalCurrencyCode;
+    }
+
+    public void setFixedTermPayableInterestNationalCurrencyCode(String fixedTermPayableInterestNationalCurrencyCode) {
+        this.fixedTermPayableInterestNationalCurrencyCode = fixedTermPayableInterestNationalCurrencyCode;
+    }
+
+    public CashAccount getFixedTermPayableInterestForeignCurrency() {
+        return fixedTermPayableInterestForeignCurrency;
+    }
+
+    public void setFixedTermPayableInterestForeignCurrency(CashAccount fixedTermPayableInterestForeignCurrency) {
+        this.fixedTermPayableInterestForeignCurrency = fixedTermPayableInterestForeignCurrency;
+        setFixedTermPayableInterestForeignCurrencyCode(this.fixedTermPayableInterestForeignCurrency != null ? this.fixedTermPayableInterestForeignCurrency.getAccountCode() : null);
+    }
+
+    public String getFixedTermPayableInterestForeignCurrencyCode() {
+        return fixedTermPayableInterestForeignCurrencyCode;
+    }
+
+    public void setFixedTermPayableInterestForeignCurrencyCode(String fixedTermPayableInterestForeignCurrencyCode) {
+        this.fixedTermPayableInterestForeignCurrencyCode = fixedTermPayableInterestForeignCurrencyCode;
     }
 
     public String getFixedTermInterestNationalCurrencyCode() {
@@ -2671,11 +2805,34 @@ public class CompanyConfiguration {
         return requireAccount(getGeneralCashAccountNational(), "cajagral1mn", "CompanyConfiguration.generalCashAccountNational");
     }
     /**
+     * @return la caja general en moneda extranjera (columna <code>cajagral1me</code>).
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireGeneralCashAccountForeign() {
+        return requireAccount(getGeneralCashAccountForeign(), "cajagral1me", "CompanyConfiguration.generalCashAccountForeign");
+    }
+    /**
      * @return la cuenta de la columna <code>i_pvig_pf_mn</code>.
      * @throws CompanyAccountNotConfiguredException si no esta configurada.
      */
     public CashAccount requireFixedTermInterestNationalCurrency() {
         return requireAccount(getFixedTermInterestNationalCurrency(), "i_pvig_pf_mn", "CompanyConfiguration.fixedTermInterestNationalCurrency");
+    }
+    /**
+     * @return la cuenta de gasto de la provision de intereses sobre DPF en MN
+     *         (columna <code>i_ppag_dpf_mn</code>).
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireFixedTermPayableInterestNationalCurrency() {
+        return requireAccount(getFixedTermPayableInterestNationalCurrency(), "i_ppag_dpf_mn", "CompanyConfiguration.fixedTermPayableInterestNationalCurrency");
+    }
+    /**
+     * @return la cuenta de gasto de la provision de intereses sobre DPF en ME
+     *         (columna <code>i_ppag_dpf_me</code>).
+     * @throws CompanyAccountNotConfiguredException si no esta configurada.
+     */
+    public CashAccount requireFixedTermPayableInterestForeignCurrency() {
+        return requireAccount(getFixedTermPayableInterestForeignCurrency(), "i_ppag_dpf_me", "CompanyConfiguration.fixedTermPayableInterestForeignCurrency");
     }
     /**
      * @return la cuenta de la columna <code>ctaprovaf</code>.

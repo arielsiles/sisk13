@@ -1,0 +1,145 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{financesExchangeRateAction.managed}">
+                #{messages['FinancesExchangeRate.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['FinancesExchangeRate.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="50%"/>
+
+    <ui:param name="selectedTab" value="finances"/>
+    <ui:define name="body">
+        <h:form id="financesExchangeRateForm">
+
+            <div class="buttons">
+                <h:commandButton action="#{financesExchangeRateAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!financesExchangeRateAction.managed and s:hasPermission('FINANCESEXCHANGERATE','CREATE')}"
+                                 id="createButtonId" tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{financesExchangeRateAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{financesExchangeRateAction.managed and s:hasPermission('FINANCESEXCHANGERATE','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{financesExchangeRateAction.managed and s:hasPermission('FINANCESEXCHANGERATE','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{financesExchangeRateAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="4"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{financesExchangeRateAction.managed}">
+                            #{messages['FinancesExchangeRate.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['FinancesExchangeRate.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="exchangeKindField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesExchangeRate.exchangeKind']}</ui:define>
+                    <h:selectOneMenu id="exchangeKind" value="#{financesExchangeRateAction.exchangeKind}"
+                                     styleClass="input" required="true"
+                                     disabled="#{financesExchangeRateAction.managed}"
+                                     tabindex="5">
+                        <s:selectItems value="#{exchangeKindList}"
+                                       var="exchangeKindItem"
+                                       label="#{exchangeKindItem.id} - #{exchangeKindItem.description}"
+                                       noSelectionLabel=""
+                                       hideNoSelectionLabel="false"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesExchangeRate.date']}</ui:define>
+                    <rich:calendar id="date" value="#{financesExchangeRate.id.date}" popup="true"
+                                   datePattern="#{messages['patterns.date']}"
+                                   styleClass="input" required="true"
+                                   disabled="#{financesExchangeRateAction.managed}"
+                                   enableManualInput="true" tabindex="6">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </rich:calendar>
+                </s:decorate>
+
+                <s:decorate id="rateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['FinancesExchangeRate.rate']}</ui:define>
+                    <h:inputText id="rate" value="#{financesExchangeRate.rate}" styleClass="input"
+                                 required="true" maxlength="20" tabindex="7">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimal6FNumber']}" forId="rate"/>
+                    </h:inputText>
+                </s:decorate>
+
+                <s:div styleClass="formRow" rendered="#{financesExchangeRateAction.managed}">
+                    <h:outputText value="#{messages['FinancesExchangeRate.keyNotEditable']}"/>
+                </s:div>
+
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{financesExchangeRateAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!financesExchangeRateAction.managed and s:hasPermission('FINANCESEXCHANGERATE','CREATE')}"
+                                 tabindex="8"/>
+                <h:commandButton action="#{financesExchangeRateAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{financesExchangeRateAction.managed and s:hasPermission('FINANCESEXCHANGERATE','UPDATE')}"
+                                 tabindex="9"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{financesExchangeRateAction.managed and s:hasPermission('FINANCESEXCHANGERATE','DELETE')}"
+                                 tabindex="10">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{financesExchangeRateAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true"
+                                 tabindex="11"/>
+            </div>
+
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml" rendered="#{financesExchangeRateAction.managed}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['FinancesExchangeRate.delete.confirmation']}">
+                        <f:param value="#{financesExchangeRate.id.exchangeKind}"/>
+                        <f:param value="#{financesExchangeRateAction.formattedDate}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{financesExchangeRateAction.delete}"
+                                   value="#{messages['Common.delete']}" immediate="true"
+                                   styleClass="button"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

@@ -1,5 +1,6 @@
 package com.encens.khipus.service.customers;
 
+import com.encens.khipus.exception.EntryDuplicatedException;
 import com.encens.khipus.model.contacts.Entity;
 import com.encens.khipus.model.customers.Credit;
 import com.encens.khipus.model.customers.CreditState;
@@ -30,6 +31,16 @@ public interface CreditService {
     List<Credit> getCredits(CreditState creditState, CreditType creditType);
     void changeCreditState(Credit credit, CreditState state);
     List<Credit> getCreditList(Partner partner);
+    /**
+     * Da de alta el credito DENTRO de la transaccion de quien llama.
+     * <p/>
+     * Existe para no pasar por GenericServiceBean.create(), que esta anotado
+     * REQUIRES_NEW y confirma en una transaccion propia: lo que fallara despues -- el
+     * contador de creditos del socio, la aprobacion de una transferencia -- se deshacia
+     * dejando el credito grabado igual. Mismo criterio que AccountServiceBean.createAccount.
+     */
+    void createCredit(Credit credit) throws EntryDuplicatedException;
+
     void updateCredit(Credit credit);
     Object[] getAmountNewCredits(Long productiveZoneId, Date startDate, Date endDate);
     Object[] getCreditRecovery(Long productiveZoneId, Date startDate, Date endDate);

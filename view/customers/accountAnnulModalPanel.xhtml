@@ -1,0 +1,34 @@
+<rich:modalPanel width="520" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 id="#{dialogId}">
+    <f:facet name="header">
+        <h:outputText value="#{messages['Account.annul.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeAnnulLink"/>
+    </f:facet>
+
+    <h:form id="accountAnnulForm">
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <h:outputText styleClass="formNote" value="#{accountAction.annulQuestion}"/>
+        </h:panelGrid>
+
+        <div class="buttonsRight">
+            <h:commandButton id="annulConfirmButton"
+                             action="#{accountAction.annulAccount}"
+                             value="#{messages['Account.annul.confirm']}"
+                             styleClass="button"/>
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </h:commandButton>
+        </div>
+    </h:form>
+
+    <rich:componentControl for="#{dialogId}" attachTo="closeAnnulLink" operation="hide" event="onclick"/>
+
+</rich:modalPanel>

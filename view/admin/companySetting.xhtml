@@ -616,6 +616,20 @@
                     <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.generalCashAccountNational.col']}"/>
                 </s:decorate>
             </s:div>
+            <s:div id="generalCashAccountForeignDiv">
+                <s:decorate id="generalCashAccountForeignField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.generalCashAccountForeign']}</ui:define>
+                    <app:selectPopUp styleClass="input350" id="generalCashAccountForeign"
+                                     textValue="#{companySettingAction.instance.generalCashAccountForeign.fullName}"
+                                     value="#{companySettingAction.instance.generalCashAccountForeign}"
+                                     selectAction="companySettingAction.prepareAccountSelection('generalCashAccountForeign')"
+                                     clearAction="companySettingAction.clearAccount('generalCashAccountForeign')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="generalCashAccountForeignDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.generalCashAccountForeign.col']}"/>
+                </s:decorate>
+            </s:div>
             <s:div id="fixedTermInterestNationalCurrencyDiv">
                 <s:decorate id="fixedTermInterestNationalCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fixedTermInterestNationalCurrency']}</ui:define>
@@ -630,6 +644,46 @@
                     <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermInterestNationalCurrency.col']}"/>
                 </s:decorate>
             </s:div>
+            <s:div id="fixedTermPayableInterestNationalCurrencyDiv">
+                <s:decorate id="fixedTermPayableInterestNationalCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.fixedTermPayableInterestNationalCurrency']}</ui:define>
+                    <app:selectPopUp styleClass="input350" id="fixedTermPayableInterestNationalCurrency"
+                                     textValue="#{companySettingAction.instance.fixedTermPayableInterestNationalCurrency.fullName}"
+                                     value="#{companySettingAction.instance.fixedTermPayableInterestNationalCurrency}"
+                                     selectAction="companySettingAction.prepareAccountSelection('fixedTermPayableInterestNationalCurrency')"
+                                     clearAction="companySettingAction.clearAccount('fixedTermPayableInterestNationalCurrency')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="fixedTermPayableInterestNationalCurrencyDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermPayableInterestNationalCurrency.col']}"/>
+                </s:decorate>
+            </s:div>
+            <s:div id="fixedTermPayableInterestForeignCurrencyDiv">
+                <s:decorate id="fixedTermPayableInterestForeignCurrencyField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['CompanyConfiguration.fixedTermPayableInterestForeignCurrency']}</ui:define>
+                    <app:selectPopUp styleClass="input350" id="fixedTermPayableInterestForeignCurrency"
+                                     textValue="#{companySettingAction.instance.fixedTermPayableInterestForeignCurrency.fullName}"
+                                     value="#{companySettingAction.instance.fixedTermPayableInterestForeignCurrency}"
+                                     selectAction="companySettingAction.prepareAccountSelection('fixedTermPayableInterestForeignCurrency')"
+                                     clearAction="companySettingAction.clearAccount('fixedTermPayableInterestForeignCurrency')"
+                                     searchModalPanel="cashAccountListModalPanel"
+                                     dataModel="#{cashAccountDataModel}"
+                                     reRender="fixedTermPayableInterestForeignCurrencyDiv"/>
+                    <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermPayableInterestForeignCurrency.col']}"/>
+                </s:decorate>
+            </s:div>
+            <s:decorate id="fixedTermDepositDocumentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.fixedTermDepositDocumentType']}</ui:define>
+                <h:selectOneMenu id="fixedTermDepositDocumentType"
+                                 value="#{companySettingAction.instance.fixedTermDepositDocumentType}"
+                                 styleClass="input">
+                    <s:selectItems value="#{voucherDocumentTypeList}" var="fixedTermDepositDocumentTypeItem"
+                                   label="#{fixedTermDepositDocumentTypeItem.fullName}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.fixedTermDepositDocumentType.col']}"/>
+            </s:decorate>
             <s:div id="fixedAssetProvidersAccountDiv">
                 <s:decorate id="fixedAssetProvidersAccountField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['CompanyConfiguration.fixedAssetProvidersAccount']}</ui:define>

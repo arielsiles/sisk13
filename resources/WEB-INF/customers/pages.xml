@@ -70,6 +70,26 @@
         </navigation>
     </page>
 
+    <page view-id="/customers/accountType.xhtml" no-conversation-view-id="/customers/accountTypeList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/accountTypeList.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/accountTypeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/customers/accountTypeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{accountTypeAction.select(accountTypeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/accountType.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/customers/transferCredit.xhtml" no-conversation-view-id="/customers/creditTypeList.xhtml">
         <navigation>
             <rule if-outcome="Success">
@@ -202,9 +222,15 @@
             </rule>
         </navigation>-->
 
-        <navigation from-action="#{accountAction.update}">
+        <!-- Guardar y quedarse en modo edicion. La conversacion se propaga en el redirect,
+             asi que el action vuelve con el registro recien grabado y op=UPDATE. El
+             redirect no es cosmetico: da un limite de transaccion limpio antes de que se
+             pueda aprobar el certificado en esa misma conversacion.
+             La regla que habia para update hacia <begin-conversation>, es decir arrancaba
+             una conversacion NUEVA: el action volvia vacio y la ficha se veia como un alta,
+             sin vencimiento ni capital. update() ahora se queda en la pantalla y no navega. -->
+        <navigation from-action="#{accountAction.create}">
             <rule if-outcome="Success">
-                <begin-conversation flush-mode="MANUAL"/>
                 <redirect view-id="/customers/account.xhtml"/>
             </rule>
         </navigation>
@@ -218,6 +244,15 @@
         <navigation from-action="#{accountAction.renewalDPF}">
             <rule if-outcome="Success">
                 <redirect view-id="/customers/renewalDeposit.xhtml"/>
+            </rule>
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+        </navigation>
+
+        <navigation from-action="#{accountAction.closeDPF}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/closeDeposit.xhtml"/>
             </rule>
             <rule if-outcome="Cancel">
                 <redirect view-id="/customers/account.xhtml"/>
@@ -237,6 +272,23 @@
             </rule>
         </navigation>
 
+    </page>
+
+    <page view-id="/customers/closeDeposit.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
+        <!-- Vuelve a la ficha, no al listado: el asiento recien generado se ve en la
+             pestana Transacciones y desde ahi se lo imprime. La conversacion del cierre es
+             anidada, asi que al terminar reaparece la de la ficha con el certificado
+             cargado. Mismo camino que la renovacion. -->
+        <navigation from-action="#{accountAction.createDpfClosure}">
+            <rule if-outcome="Success">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+        </navigation>
+        <navigation from-action="#{accountAction.cancelCloseDPF}">
+            <rule if-outcome="Cancel">
+                <redirect view-id="/customers/account.xhtml"/>
+            </rule>
+        </navigation>
     </page>
 
     <page view-id="/customers/addPaymentAccount.xhtml" no-conversation-view-id="/customers/accountList.xhtml">
@@ -564,6 +616,16 @@
                 <redirect view-id="/customers/changeBillingMode.xhtml"/>
             </rule>
         </navigation>
+    </page>
+
+    <!--
+        La provision de DPF necesita conversacion de larga duracion: el resultado de
+        Calcular tiene que sobrevivir hasta que se confirme el asiento en el modal.
+        flush-mode MANUAL para que las cuentas que se cargan para el calculo no se
+        escriban por un flush automatico; saveVoucher hace su flush explicito.
+    -->
+    <page view-id="/customers/provisionInterestPayable.xhtml">
+        <begin-conversation join="true" flush-mode="MANUAL"/>
     </page>
 
 </pages>
