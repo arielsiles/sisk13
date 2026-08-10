@@ -13,6 +13,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.VoucherState;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.customers.AccountService;
 import com.encens.khipus.service.customers.CreditService;
@@ -185,8 +186,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
         //if (getTotalTransferAmount().compareTo(getTotalAmountValue()) < 0)
         //BigDecimal difference = BigDecimalUtil.subtract(getTotalTransferAmount(), getTotalAmountValue(), 2);
 
+        /** Nace aprobado: lo arma el sistema, no es una carga manual a revisar. */
         Voucher voucher = new Voucher();
         voucher.setDocumentType(Constants.CT_VOUCHER_DOCTYPE);
+        voucher.setState(VoucherState.APR.toString());
         BigDecimal amountTotalDebitAux = BigDecimal.ZERO;
         for (Account account : this.getAccountTransferList()){
             VoucherDetail voucherDetailDebit = new VoucherDetail();
@@ -313,8 +316,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
                 creditTransaction.getCredit().getState().equals(CreditState.VEN) ||
                 creditTransaction.getCredit().getState().equals(CreditState.EJE)    ){
 
+            /** Nace aprobado: lo arma el sistema, no es una carga manual a revisar. */
             Voucher voucher = new Voucher();
             voucher.setDocumentType(Constants.CI_VOUCHER_DOCTYPE);
+            voucher.setState(VoucherState.APR.toString());
 
             VoucherDetail voucherDetailDifferenceChange = new VoucherDetail();
 
@@ -527,8 +532,10 @@ public class CreditTransactionAction extends GenericAction<CreditTransaction> {
     }
 
     public void createCashAccountForCreditTransactionPayout(Credit credit, CreditTransaction creditTransaction){
+        /** Nace aprobado: lo arma el sistema, no es una carga manual a revisar. */
         Voucher voucher = new Voucher();
         voucher.setDocumentType(Constants.CE_VOUCHER_DOCTYPE);
+        voucher.setState(VoucherState.APR.toString());
 
         VoucherDetail voucherDetailDebit = new VoucherDetail();
         voucherDetailDebit.setAccount(credit.getCreditType().getCurrentAccountCode());

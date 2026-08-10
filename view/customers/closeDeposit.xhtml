@@ -15,10 +15,13 @@
         <h:form id="closeDepositForm">
 
             <div class="buttons">
+                <!-- Confirmacion en el cliente y no en un modal: asi el boton sigue siendo
+                     el que envia el formulario, con la fecha, el tipo y la glosa. -->
                 <h:commandButton id="closeButtonId"
                                  action="#{accountAction.createDpfClosure}"
                                  value="#{messages['Account.closing.confirm']}"
-                                 styleClass="button">
+                                 styleClass="button"
+                                 onclick="if (!confirm('#{messages['Account.closing.confirmJs']}')) return false;">
                 </h:commandButton>
 
                 <h:commandButton action="#{accountAction.cancelCloseDPF}"

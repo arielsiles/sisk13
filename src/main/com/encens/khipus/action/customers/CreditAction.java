@@ -15,6 +15,7 @@ import com.encens.khipus.model.finances.CashAccount;
 import com.encens.khipus.model.finances.FinancesCurrencyType;
 import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.finances.VoucherDetail;
+import com.encens.khipus.model.finances.VoucherState;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.common.SequenceGeneratorService;
 import com.encens.khipus.service.customers.CreditService;
@@ -287,10 +288,12 @@ public class CreditAction extends GenericAction<Credit> {
         String outcome = Outcome.FAIL;
         BigDecimal exchangeRate = getExchangeRate();
 
+        /** Nace aprobado: lo arma el sistema, no es una carga manual a revisar. */
         Voucher voucher = new Voucher();
         voucher.setDocumentType("CD");
         voucher.setDate(this.transferDate);
         voucher.setGloss(this.gloss);
+        voucher.setState(VoucherState.APR.toString());
 
         System.out.println("-------------APERTURA DE CREDITOS-------------");
 
