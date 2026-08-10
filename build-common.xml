@@ -161,7 +161,12 @@
                 <antcall target="restore-dev-sources"/>
                 <mkdir dir="${src.backup.dev.dir}"/>
                 <copy file="${constants.java}" todir="${src.backup.dev.dir}" overwrite="true"/>
-                <replaceregexp byline="true">
+                <!-- encoding: sin el, Ant lee y reescribe Constants.java con la
+                     codificacion por defecto de la plataforma (cp1252 en Windows) y
+                     destroza cualquier caracter acentuado del archivo, que javac compila
+                     como UTF-8. Solo se nota en las ramas cuyo Constants.java tiene
+                     acentos, y ahi la compilacion no arranca. -->
+                <replaceregexp byline="true" encoding="UTF-8">
                     <regexp pattern="(public.*static.*final.*String.*(KHIPUS|FINANCES|CASHBOX|ACADEMIC)_SCHEMA.*=.*&quot;).*(&quot;;)"/>
                     <substitution expression="\1${devDbSchema}\3"/>
                     <fileset dir="${src.main.dir}">
