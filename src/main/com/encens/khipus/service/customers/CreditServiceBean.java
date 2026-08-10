@@ -14,8 +14,11 @@ import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
+import com.encens.khipus.exception.EntryDuplicatedException;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -141,6 +144,22 @@ public class CreditServiceBean implements CreditService {
     }
 
     @Override
+    /**
+     * Alta del credito en la transaccion de quien llama. Ver la nota de la interfaz.
+     * <p/>
+     * El persist y el flush son los mismos que hacia GenericServiceBean.create sobre el
+     * mismo entityManager de Seam, y se conserva la traduccion de PersistenceException a
+     * EntryDuplicatedException para que la pantalla siga mostrando el mismo mensaje.
+     */
+    public void createCredit(Credit credit) throws EntryDuplicatedException {
+        try {
+            em.persist(credit);
+            em.flush();
+        } catch (PersistenceException e) {
+            throw new EntryDuplicatedException();
+        }
+    }
+
     public void updateCredit(Credit credit) {
         em.merge(credit);
         em.flush();
