@@ -78,17 +78,31 @@ public class CashAccount implements BaseModel {
     @Length(max = 1)
     private String accountClass;
 
+    /**
+     * Los flags booleanos (S/N en la base) nacen con valor, nunca en NULL.
+     * <p/>
+     * Las cuentas cargadas antes de que estos flags existieran los tienen en NULL, y ahi
+     * cada consumidor tiene que acordarse de tratar el nulo: uno solo que haga
+     * <code>getFlag().equals(...)</code> tira un NullPointerException. Ya paso con
+     * permite_iva y los botones de acceso directo de la pantalla de asientos.
+     * <p/>
+     * El default vive en la entidad y no en un servicio para que valga en cualquier via de
+     * alta. <code>active</code> arranca en TRUE -- una cuenta nueva nace activa -- y el
+     * resto en FALSE.
+     * <p/>
+     * No afecta a la lectura: Hibernate sobreescribe el campo con lo que traiga la columna.
+     */
     @Column(name = "ind_mov")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean movementAccount;
+    private Boolean movementAccount = Boolean.FALSE;
 
     @Column(name = "ind_regulariz")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean regulating;
+    private Boolean regulating = Boolean.FALSE;
 
     @Column(name = "ind_presup")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean budgetAccount;
+    private Boolean budgetAccount = Boolean.FALSE;
 
     @Column(name = "debitos", precision = 14, scale = 2)
     private BigDecimal debit;
@@ -129,11 +143,11 @@ public class CashAccount implements BaseModel {
 
     @Column(name = "activa", updatable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean active;
+    private Boolean active = Boolean.TRUE;
 
     @Column(name = "util", updatable = true)
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean util;
+    private Boolean util = Boolean.FALSE;
 
     @Column(name = "nomutil", updatable = true)
     private String utilName;
@@ -144,7 +158,7 @@ public class CashAccount implements BaseModel {
 
     @Column(name = "permite_iva")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean allowIva;
+    private Boolean allowIva = Boolean.FALSE;
 
     @Column(name = "saldo_per_ant_dol", precision = 20, scale = 6)
     private BigDecimal foreignBalancePreviousPeriod;
@@ -161,36 +175,36 @@ public class CashAccount implements BaseModel {
     // contabilidad
     @Column(name = "permiso_con")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean hasAccountingPermission;
+    private Boolean hasAccountingPermission = Boolean.FALSE;
 
     //tessoreria
     @Column(name = "permiso_che")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean hasTreasuryPermission;
+    private Boolean hasTreasuryPermission = Boolean.FALSE;
 
     //cuentas por pagar
     @Column(name = "permiso_cxp")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean hasPayableAccountsPermission;
+    private Boolean hasPayableAccountsPermission = Boolean.FALSE;
 
     //activos fijos
     @Column(name = "permiso_afijo")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean hasFixedAssetsPermission;
+    private Boolean hasFixedAssetsPermission = Boolean.FALSE;
 
     //inventarios
     @Column(name = "permiso_inv")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean hasWarehousePermission;
+    private Boolean hasWarehousePermission = Boolean.FALSE;
 
     //cuentas por cobrar
     @Column(name = "permiso_cxc")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean hasReceivableAccountsPermission;
+    private Boolean hasReceivableAccountsPermission = Boolean.FALSE;
 
     @Column(name = "exije_cc")
     @Type(type = com.encens.khipus.model.usertype.StringBooleanUserType.NAME)
-    private Boolean hasCostCenter;
+    private Boolean hasCostCenter = Boolean.FALSE;
 
     @Column(name = "gru_cta", length = 6)
     @Length(max = 6)

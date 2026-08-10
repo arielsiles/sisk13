@@ -160,14 +160,12 @@ public class CashAccountServiceBean implements CashAccountService {
         cashAccount.setAccountLevel3Code(cashAccount.getCashAccountLeve3() != null
                 ? cashAccount.getCashAccountLeve3().getAccountCode() : cashAccount.getAccountLevel3Code());
 
-        // Evitar NULL en los flags donde el insert anterior ponia 'S'/'N'.
-        if (cashAccount.getActive() == null) cashAccount.setActive(Boolean.TRUE);
-        if (cashAccount.getMovementAccount() == null) cashAccount.setMovementAccount(Boolean.FALSE);
-        if (cashAccount.getRegulating() == null) cashAccount.setRegulating(Boolean.FALSE);
-        if (cashAccount.getUtil() == null) cashAccount.setUtil(Boolean.FALSE);
-        if (cashAccount.getHasWarehousePermission() == null) cashAccount.setHasWarehousePermission(Boolean.FALSE);
-        if (cashAccount.getHasCostCenter() == null) cashAccount.setHasCostCenter(Boolean.FALSE);
-        if (cashAccount.getAllowIva() == null) cashAccount.setAllowIva(Boolean.FALSE);
+        /**
+         * Los flags booleanos ya no se normalizan aca: su valor por defecto vive en la
+         * entidad CashAccount, asi vale para cualquier via de alta y no solo para esta.
+         * Esta lista cubria 7 de los 13 flags, y los 6 que faltaban se seguian grabando en
+         * NULL.
+         */
 
         try {
             em.persist(cashAccount);

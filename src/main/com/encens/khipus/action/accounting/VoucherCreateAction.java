@@ -917,8 +917,16 @@ public class VoucherCreateAction extends GenericAction<Voucher> {
     public void assignCashAccountVoucherDetail(){
 
         if (account != null){
-            //if (account.getAccountCode().equals("1420710000")){ /** MODIFYID Credito Fiscal **/
-            if (account.getAllowIva().equals(Boolean.TRUE)){
+            /**
+             * La comparacion va con la constante adelante: permite_iva es una columna
+             * nulable y las cuentas cargadas antes de que existiera el flag lo tienen en
+             * NULL. Con account.getAllowIva().equals(...) cualquier boton de acceso directo
+             * reventaba con un NullPointerException, no solo el de Caja General.
+             * <p/>
+             * NULL vale como falso, que es el criterio que ya aplica CashAccountServiceBean
+             * al dar de alta una cuenta: sin flag, no es cuenta de credito fiscal.
+             */
+            if (Boolean.TRUE.equals(account.getAllowIva())){
                 /** Cuenta con IVA (Credito Fiscal): en vez de agregar una fila editable,
                     se abre el modal para registrar la factura. */
                 setFiscalCredit(true);
