@@ -45,6 +45,13 @@
                     <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
                                            operation="show"/>
                 </h:commandButton>
+                <h:commandButton value="#{messages['CollectMaterial.revert']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('COLLECTMATERIALREVERT','VIEW') and collectMaterialAction.revertVisible}">
+                    <rich:componentControl for="revertConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
                 <h:commandButton action="#{collectMaterialAction.cancel}" value="#{messages['Common.cancel']}"
                                  styleClass="button" immediate="true"/>
             </div>
@@ -257,6 +264,41 @@
                     </h:inputTextarea>
                 </s:decorate>
 
+                <s:decorate id="auditField" template="/include/inputField.xhtml" styleClass="formRow"
+                            rendered="#{collectMaterialAction.managed}">
+                    <ui:define name="label">#{messages['CollectMaterial.audit']}</ui:define>
+
+                    <h:outputText value="#{messages['CollectMaterial.audit.created']}: "/>
+                    <h:panelGroup rendered="#{collectMaterial.createdAt != null}">
+                        <h:outputText value="#{collectMaterial.createdAt}">
+                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
+                        </h:outputText>
+                        <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterial.createdBy}"/>
+                    </h:panelGroup>
+                    <h:outputText value="#{messages['CollectMaterial.audit.unknown']}"
+                                  rendered="#{collectMaterial.createdAt == null}"/>
+
+                    <h:panelGroup rendered="#{collectMaterial.updatedAt != null}">
+                        <h:outputText value="&#160;&#160;|&#160;&#160;" escape="false"/>
+                        <h:outputText value="#{messages['CollectMaterial.audit.updated']}: "/>
+                        <h:outputText value="#{collectMaterial.updatedAt}">
+                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
+                        </h:outputText>
+                        <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterial.updatedBy}"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{collectMaterial.reverted}">
+                        <br/>
+                        <h:outputText value="#{messages['CollectMaterial.audit.lastRevert']}: "/>
+                        <h:outputText value="#{collectMaterial.lastRevertAt}">
+                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
+                        </h:outputText>
+                        <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterial.lastRevertBy} &#8212; #{collectMaterial.lastRevertReason}"
+                                      escape="false"/>
+                    </h:panelGroup>
+
+                </s:decorate>
+
             </rich:panel>
 
             <div class="buttons">
@@ -280,6 +322,13 @@
                     <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
                                            operation="show"/>
                 </h:commandButton>
+                <h:commandButton value="#{messages['CollectMaterial.revert']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.managed and s:hasPermission('COLLECTMATERIALREVERT','VIEW') and collectMaterialAction.revertVisible}">
+                    <rich:componentControl for="revertConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+
                 <h:commandButton action="#{collectMaterialAction.cancel}" value="#{messages['Common.cancel']}"
                                  styleClass="button" immediate="true"/>
             </div>
@@ -299,6 +348,68 @@
                 <a4j:commandButton action="#{collectMaterialAction.delete}"
                                    value="#{messages['Common.delete']}" immediate="true"
                                    styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+
+        <!-- Revertir: un unico punto de entrada. Si alguna guarda bloquea, el modal explica
+             cual; si no, muestra el impacto en inventario y pide el motivo. -->
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{collectMaterialAction.managed and collectMaterialAction.revertVisible}">
+            <ui:param name="dialogId" value="revertConfirmation"/>
+            <ui:param name="dialogHideCancel" value="#{collectMaterialAction.revertBlocked}"/>
+            <ui:define name="dialogTitle">#{messages['CollectMaterial.revert.title']}</ui:define>
+            <ui:define name="dialogContent">
+
+                <h:outputText value="#{collectMaterialAction.revertBlockedMessage}"
+                              rendered="#{collectMaterialAction.revertBlocked}"/>
+
+                <s:fragment rendered="#{collectMaterialAction.revertable}">
+                    <h:panelGrid columns="3" cellpadding="3" styleClass="app-revert-impact">
+                        <h:outputText value="#{messages['CollectMaterial.revert.impact']}" styleClass="bold"/>
+                        <h:outputText value="#{messages['CollectMaterial.revert.impact.current']}"/>
+                        <h:outputText value="#{messages['CollectMaterial.revert.impact.projected']}"/>
+
+                        <h:outputText value="#{messages['CollectMaterial.revert.impact.balance']}"/>
+                        <h:outputText value="#{collectMaterialAction.currentBalance}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                        <h:outputText value="#{collectMaterialAction.projectedBalance}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+
+                        <h:outputText value="#{messages['CollectMaterial.revert.impact.unitCost']}"/>
+                        <h:outputText value="#{collectMaterialAction.currentUnitCost}">
+                            <f:convertNumber pattern="#,##0.000000"/>
+                        </h:outputText>
+                        <h:outputText value="#{collectMaterialAction.projectedUnitCost}">
+                            <f:convertNumber pattern="#,##0.000000"/>
+                        </h:outputText>
+                    </h:panelGrid>
+
+                    <br/>
+                    <h:outputText value="#{messages['CollectMaterial.revert.reason']}"/>
+                    <br/>
+                    <!-- Sin required de JSF: la banda global (include/messages.xhtml) usa
+                         globalOnly="true" y no muestra mensajes atados a un componente. La
+                         obligatoriedad se valida en la accion, que si emite mensaje global. -->
+                    <h:inputTextarea id="revertReason"
+                                     value="#{collectMaterialAction.revertReason}"
+                                     styleClass="input textarea-medium">
+                        <f:validateLength maximum="500"/>
+                    </h:inputTextarea>
+                </s:fragment>
+
+            </ui:define>
+            <ui:define name="dialogOption">
+                <h:commandButton action="#{collectMaterialAction.revert}"
+                                 value="#{messages['CollectMaterial.revert.confirm']}"
+                                 styleClass="button"
+                                 rendered="#{collectMaterialAction.revertable}"/>
+                <h:commandButton value="#{messages['Common.close']}" styleClass="button"
+                                 rendered="#{collectMaterialAction.revertBlocked}">
+                    <rich:componentControl for="revertConfirmation" event="onclick" disableDefault="true"
+                                           operation="hide"/>
+                </h:commandButton>
             </ui:define>
         </s:decorate>
 

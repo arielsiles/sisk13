@@ -1756,3 +1756,58 @@ select[disabled] {
 .usr-pwd .pwd-match.is-on { display: block; }
 .usr-pwd .pwd-match.ok { color: #567d47; }
 .usr-pwd .pwd-match.no { color: #c0504d; }
+
+/* ============================================================================
+   .app-tag - resalta el texto de una celda (p.ej. el estado de un acopio corregido).
+   Va SIEMPRE en linea y sin margenes verticales: reemplaza al texto en su lugar,
+   no se agrega debajo, para no crecer el alto de la fila.
+   Se declara con la especificidad de la celda de RichFaces (.rich-table-cell)
+   porque el skin fija font-size/color en las celdas y de otro modo la pisa.
+   ============================================================================ */
+.app-tag,
+.rich-table-cell .app-tag {
+    display: inline-block;
+    padding: 1px 5px;
+    border: 1px solid #e3e3e0;
+    border-radius: 3px;
+    background: #f6f6f4;
+    color: #616161;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 10px;
+    line-height: 14px;
+    letter-spacing: .3px;
+    white-space: nowrap;
+}
+
+/* Variante de atencion: el acopio fue corregido despues de aprobarse. */
+.app-tag--warn,
+.rich-table-cell .app-tag--warn {
+    border-color: #e0c97f;
+    background: #fdf6e3;
+    color: #8a6d1f;
+}
+
+/* Tooltip de la marca de correccion. */
+.app-tooltip {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    line-height: 16px;
+    color: #616161;
+    text-align: left;
+}
+
+/* Cuadro de impacto del modal de reversion. */
+.app-revert-impact td {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    padding: 2px 8px;
+    text-align: right;
+}
+.app-revert-impact td:first-child {
+    text-align: left;
+}
+
+/* Marca de auditoria en la columna de acciones: separa el icono del de editar. */
+.app-audit-mark {
+    margin-left: 4px;
+}

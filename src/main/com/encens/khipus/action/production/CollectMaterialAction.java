@@ -6,6 +6,7 @@ import com.encens.khipus.exception.EntryNotFoundException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.employees.Employee;
+import com.encens.khipus.model.finances.Voucher;
 import com.encens.khipus.model.production.CollectMaterial;
 import com.encens.khipus.model.production.CollectMaterialState;
 import com.encens.khipus.model.production.ProductiveZone;
@@ -13,11 +14,16 @@ import com.encens.khipus.model.production.RawMaterialProducer;
 import com.encens.khipus.service.production.CollectMaterialService;
 import com.encens.khipus.service.production.ProducerPriceService;
 import com.encens.khipus.service.warehouse.InventoryService;
+import com.encens.khipus.util.BigDecimalUtil;
+import com.encens.khipus.util.DateUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.international.Messages;
 import org.jboss.seam.international.StatusMessage;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +37,15 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
 
     private Date startDate = new Date();
     private Date endDate  = new Date();
+
+    /** Datos del modal de reversion, cacheados por conversacion. */
+    private Voucher voucher;
+    private BigDecimal currentBalance;
+    private BigDecimal currentUnitCost;
+    private BigDecimal projectedUnitCost;
+    private int revertWindowDays;
+    private boolean revertDataLoaded = false;
+    private String revertReason;
 
     @In
     private ProducerPriceService producerPriceService;
@@ -186,6 +201,161 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
 
     public boolean isPending(){
         return getInstance().getState().equals(CollectMaterialState.PEN);
+    }
+
+    /* ------------------------------------------------------------------------
+     * Revertir acopio (Aprobado / Contabilizado -> Pendiente)
+     * ------------------------------------------------------------------------ */
+
+    public boolean isApproved(){
+        return getInstance().getState().equals(CollectMaterialState.APR);
+    }
+
+    public boolean isAccounted(){
+        return getInstance().getState().equals(CollectMaterialState.CONTA);
+    }
+
+    /** El boton se ofrece en estos dos estados; si esta bloqueado, el modal explica por que. */
+    public boolean isRevertVisible(){
+        return isApproved() || isAccounted();
+    }
+
+    /** Contabilizado con asiento aun vigente: hay que anularlo primero. */
+    public boolean isBlockedByVoucher(){
+        Voucher voucher = getVoucher();
+        return isAccounted() && voucher != null && !voucher.isNullified();
+    }
+
+    /** Contabilizado sin vinculo al asiento: lo contabilizado con el esquema viejo ('IA',
+     *  un asiento por dia para varios acopios). No se toca. */
+    public boolean isBlockedByMissingLink(){
+        return isAccounted() && getInstance().getVoucherId() == null;
+    }
+
+    /** Fuera de la ventana de reversion configurada. */
+    public boolean isBlockedByWindow(){
+        int days = getRevertWindowDays();
+        return days > 0 && getInstance().getDate() != null
+                && DateUtils.daysBetween(getInstance().getDate(), new Date(), false) > days;
+    }
+
+    /** El material ya se consumio: no hay saldo para descontar. */
+    public boolean isBlockedByStock(){
+        return getCurrentBalance().compareTo(getInstance().getBalanceWeight()) < 0;
+    }
+
+    public boolean isRevertBlocked(){
+        return isBlockedByVoucher() || isBlockedByMissingLink() || isBlockedByWindow() || isBlockedByStock();
+    }
+
+    /** Mensaje de la guarda que bloquea, ya interpolado. Se arma aca y no en la vista porque
+     *  f:param es un UIParameter y no admite converters anidados. */
+    public String getRevertBlockedMessage(){
+        if (isBlockedByVoucher()) {
+            return format("CollectMaterial.revert.blocked.voucher", getVoucherNumber());
+        }
+        if (isBlockedByMissingLink()) {
+            return Messages.instance().get("CollectMaterial.revert.blocked.missingLink");
+        }
+        if (isBlockedByWindow()) {
+            return format("CollectMaterial.revert.blocked.window",
+                    String.valueOf(getRevertWindowDays()),
+                    DateUtils.format(getInstance().getDate(), Messages.instance().get("patterns.date")));
+        }
+        if (isBlockedByStock()) {
+            return format("CollectMaterial.revert.blocked.stock",
+                    decimal(getInstance().getBalanceWeight()), decimal(getCurrentBalance()));
+        }
+        return "";
+    }
+
+    private String format(String key, Object... params) {
+        return MessageFormat.format(Messages.instance().get(key), params);
+    }
+
+    private String decimal(BigDecimal value) {
+        return new DecimalFormat(Messages.instance().get("patterns.decimalNumber")).format(value);
+    }
+
+    public boolean isRevertable(){
+        return isRevertVisible() && !isRevertBlocked();
+    }
+
+    /** Todo lo del modal se calcula una vez por conversacion: cada entrada a la pantalla
+     *  desde el listado abre una conversacion nueva, asi que siempre son datos frescos. */
+    public Voucher getVoucher(){
+        if (!revertDataLoaded) {
+            voucher            = collectMaterialService.findVoucher(getInstance());
+            currentBalance     = collectMaterialService.findCurrentBalance(getInstance());
+            currentUnitCost    = collectMaterialService.findCurrentUnitCost(getInstance());
+            projectedUnitCost  = collectMaterialService.findProjectedUnitCost(getInstance());
+            revertWindowDays   = collectMaterialService.getRevertWindowDays();
+            revertDataLoaded   = true;
+        }
+        return voucher;
+    }
+
+    public String getVoucherNumber(){
+        Voucher voucher = getVoucher();
+        return voucher == null ? "" : voucher.getDocumentType() + "-" + voucher.getTransactionNumber();
+    }
+
+    public BigDecimal getCurrentBalance(){
+        getVoucher();
+        return currentBalance == null ? BigDecimal.ZERO : currentBalance;
+    }
+
+    public BigDecimal getProjectedBalance(){
+        return BigDecimalUtil.subtract(getCurrentBalance(), getInstance().getBalanceWeight());
+    }
+
+    public BigDecimal getCurrentUnitCost(){
+        getVoucher();
+        return currentUnitCost == null ? BigDecimal.ZERO : currentUnitCost;
+    }
+
+    public BigDecimal getProjectedUnitCost(){
+        getVoucher();
+        return projectedUnitCost == null ? BigDecimal.ZERO : projectedUnitCost;
+    }
+
+    public int getRevertWindowDays(){
+        getVoucher();
+        return revertWindowDays;
+    }
+
+    public String getRevertReason() {
+        return revertReason;
+    }
+
+    public void setRevertReason(String revertReason) {
+        this.revertReason = revertReason;
+    }
+
+    /** Revierte el acopio. Revalida las guardas en servidor: el estado pudo cambiar entre
+     *  que se pinto la pantalla y que se apreto el boton.
+     *  Sin @End: si algo falla hay que quedarse en la pantalla con el mensaje. En el camino
+     *  feliz la conversacion la cierra el <end-conversation/> del listado. */
+    public String revert(){
+
+        CollectMaterial collectMaterial = getInstance();
+
+        if (!isRevertVisible() || isRevertBlocked()) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "CollectMaterial.revert.notAllowed");
+            return Outcome.REDISPLAY;
+        }
+
+        if (revertReason == null || revertReason.trim().length() == 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "CollectMaterial.revert.reasonRequired");
+            return Outcome.REDISPLAY;
+        }
+
+        collectMaterialService.revert(collectMaterial, revertReason.trim());
+
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                "CollectMaterial.revert.done", getDisplayPropertyValue());
+
+        return Outcome.SUCCESS;
     }
 
     public BigDecimal getRawMaterialPrice() {

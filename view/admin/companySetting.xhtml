@@ -1396,6 +1396,15 @@
                 <ui:define name="label">#{messages['CompanyConfiguration.dispatchInventoryControl']}</ui:define>
                 <h:selectBooleanCheckbox id="dispatchInventoryControl" value="#{companySettingAction.instance.dispatchInventoryControl}"/>
             </s:decorate>
+            <s:decorate id="collectMaterialRevertDaysField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.collectMaterialRevertDays']}</ui:define>
+                <h:inputText id="collectMaterialRevertDays"
+                             value="#{companySettingAction.instance.collectMaterialRevertDays}"
+                             required="true" maxlength="4" styleClass="inputNumberMedium">
+                    <f:validateLongRange minimum="0" maximum="3650"/>
+                </h:inputText>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.collectMaterialRevertDays.hint']}"/>
+            </s:decorate>
             <s:decorate id="dealerParameterField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.dealerParameter']}</ui:define>
                 <h:inputText id="dealerParameter" value="#{companySettingAction.instance.dealerParameter}"

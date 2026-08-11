@@ -4,16 +4,20 @@ import com.encens.khipus.exception.finances.CompanyConfigurationNotFoundExceptio
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.model.production.CollectMaterial;
+import com.encens.khipus.model.production.CollectMaterialRevert;
 import com.encens.khipus.model.production.CollectMaterialState;
+import com.encens.khipus.model.warehouse.Inventory;
 import com.encens.khipus.service.accouting.VoucherAccoutingService;
 import com.encens.khipus.service.finances.FinanceProviderService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.service.warehouse.InventoryService;
 import com.encens.khipus.util.*;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.faces.FacesMessages;
 import org.jboss.seam.international.StatusMessage;
+import org.jboss.seam.security.Identity;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -38,6 +42,9 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
 
     @In
     private CompanyConfigurationService companyConfigurationService;
+
+    @In
+    private InventoryService inventoryService;
 
     @In
     private FacesMessages facesMessages;
@@ -98,6 +105,100 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
                 .getResultList();
 
         return resultList;
+    }
+
+    @Override
+    public Voucher findVoucher(CollectMaterial collectMaterial) {
+        if (collectMaterial.getVoucherId() == null) {
+            return null;
+        }
+        return em.find(Voucher.class, collectMaterial.getVoucherId());
+    }
+
+    @Override
+    public int getRevertWindowDays() {
+        CompanyConfiguration companyConfiguration = getCompanyConfiguration();
+        if (companyConfiguration == null || companyConfiguration.getCollectMaterialRevertDays() == null) {
+            return 0;
+        }
+        return companyConfiguration.getCollectMaterialRevertDays();
+    }
+
+    @Override
+    public BigDecimal findCurrentBalance(CollectMaterial collectMaterial) {
+        Inventory inventory = inventoryService.findInventoryByProductItemCode(
+                collectMaterial.getMetaProduct().getProductItemCode());
+        return inventory == null ? BigDecimal.ZERO : inventory.getUnitaryBalance();
+    }
+
+    @Override
+    public BigDecimal findCurrentUnitCost(CollectMaterial collectMaterial) {
+        Inventory inventory = inventoryService.findInventoryByProductItemCode(
+                collectMaterial.getMetaProduct().getProductItemCode());
+        return inventory == null ? BigDecimal.ZERO : inventory.getProductItem().getUnitCost();
+    }
+
+    /** Misma aritmetica que la reversa (InventoryServiceBean.decreaseProductItemAmount),
+     *  pero sin escribir: es lo que el modal muestra antes de confirmar. */
+    @Override
+    public BigDecimal findProjectedUnitCost(CollectMaterial collectMaterial) {
+        Inventory inventory = inventoryService.findInventoryByProductItemCode(
+                collectMaterial.getMetaProduct().getProductItemCode());
+        if (inventory == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal newQuantity = BigDecimalUtil.subtract(inventory.getUnitaryBalance(), collectMaterial.getBalanceWeight());
+        if (BigDecimalUtil.isZeroOrNull(newQuantity)) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal newAmount = BigDecimalUtil.subtract(inventory.getProductItem().getInvestmentAmount(),
+                inventoryService.collectMaterialNetAmount(collectMaterial), 6);
+        return BigDecimalUtil.divide(newAmount, newQuantity, 6);
+    }
+
+    /** Todo en una sola llamada para que inventario, estado y bitacora vivan en la misma
+     *  transaccion: o queda todo, o no queda nada. */
+    @Override
+    public void revert(CollectMaterial collectMaterial, String reason) {
+
+        CollectMaterialState previousState = collectMaterial.getState();
+        Long voucherId = collectMaterial.getVoucherId();
+        Date now = new Date();
+        String user = Identity.instance().isLoggedIn() ? Identity.instance().getPrincipal().getName() : "unknown";
+
+        Inventory inventory = inventoryService.findInventoryByProductItemCode(
+                collectMaterial.getMetaProduct().getProductItemCode());
+        BigDecimal balanceBefore  = inventory.getUnitaryBalance();
+        BigDecimal unitCostBefore = inventory.getProductItem().getUnitCost();
+
+        inventoryService.revertInventoryForCollectMaterial(collectMaterial);
+
+        /** Se releen de la misma instancia gestionada, ya actualizada y flusheada. */
+        BigDecimal balanceAfter  = inventory.getUnitaryBalance();
+        BigDecimal unitCostAfter = inventory.getProductItem().getUnitCost();
+
+        collectMaterial.setState(CollectMaterialState.PEN);
+        collectMaterial.setAccountigFlag(Boolean.FALSE);
+        collectMaterial.setVoucherId(null);
+        collectMaterial.setRevertCount(collectMaterial.getRevertCount() == null ? 1 : collectMaterial.getRevertCount() + 1);
+        collectMaterial.setLastRevertAt(now);
+        collectMaterial.setLastRevertBy(user);
+        collectMaterial.setLastRevertReason(reason);
+        em.merge(collectMaterial);
+
+        CollectMaterialRevert log = new CollectMaterialRevert();
+        log.setCollectMaterial(collectMaterial);
+        log.setDateTime(now);
+        log.setUser(user);
+        log.setReason(reason);
+        log.setPreviousState(previousState);
+        log.setVoucherId(voucherId);
+        log.setBalanceBefore(balanceBefore);
+        log.setBalanceAfter(balanceAfter);
+        log.setUnitCostBefore(unitCostBefore);
+        log.setUnitCostAfter(unitCostAfter);
+        em.persist(log);
+        em.flush();
     }
 
     @Override
@@ -193,6 +294,10 @@ public class CollectMaterialServiceBean implements CollectMaterialService {
             }
 
             voucherAccoutingService.saveVoucher(voucher);
+
+            /** Vinculo acopio -> asiento. Antes no se guardaba y el unico rastro quedaba en
+             *  la glosa, que se pierde si alguien edita el codigo del acopio. */
+            colMat.setVoucherId(voucher.getId());
 
         }
 
