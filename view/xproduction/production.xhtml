@@ -244,11 +244,14 @@
 
                 <s:decorate id="groupShiftField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['XProduction.productionGroup']}</ui:define>
+                    <!-- En el alta (orden aun no persistida) canEditProduction es false porque
+                         isPending() exige isManaged(); Grupo y Turno deben poder elegirse igual,
+                         asi que aqui solo se bloquean cuando la orden ya existe. -->
                     <h:selectOneMenu id="productionGroup"
                                      value="#{xproductionAction.productionGroup}"
                                      styleClass="inputMedium" style="width:135px;"
                                      required="true"
-                                     disabled="#{!xproductionAction.canEditProduction}"
+                                     disabled="#{xproductionAction.managed and !xproductionAction.canEditProduction}"
                                      tabindex="7">
                         <s:selectItems value="#{productionGroupList}"
                                        var="productionGroup"
@@ -258,11 +261,13 @@
                         <s:convertEntity/>
                     </h:selectOneMenu>
                     <h:outputText value="#{messages['XProduction.productionShift']}" style="margin:0 6px 0 14px;"/>
+                    <span class="required">*</span>
+                    <ui:param name="validateId" value="productionShiftType"/>
                     <h:selectOneMenu id="productionShiftType"
                                      value="#{xproductionAction.productionShiftType}"
                                      styleClass="inputMedium" style="width:135px;"
                                      required="true"
-                                     disabled="#{!xproductionAction.canEditProduction}"
+                                     disabled="#{xproductionAction.managed and !xproductionAction.canEditProduction}"
                                      tabindex="8">
                         <s:selectItems value="#{productionShiftTypesEnum}"
                                        var="element"
