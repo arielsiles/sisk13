@@ -33,6 +33,7 @@
                       s:hasPermission('DIARY_BOOK','VIEW') or
                       s:hasPermission('DIARY_MAJOR','VIEW') or
                       s:hasPermission('PURCHASEBOOKREPORT','VIEW') or
+                      s:hasPermission('DAILYCOLLECTIONREPORT','VIEW') or
                       s:hasPermission('ACCOUNTINGPLAN','VIEW')}">
     <h:panelGrid columns="10" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
         <!--<h:graphicImage value="/img/report-icon.png" styleClass="select-image-middle"/>-->
@@ -41,6 +42,12 @@
                 rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
                 propagation="none" >
         </s:link>
+
+        <!-- For CISC -->
+        <s:link view="/accounting/dailyCollectionReport.xhtml" styleClass="tab-cell"
+                value="#{messages['menu.finances.accounting.dailyCollection']}"
+                rendered="#{s:hasPermission('DAILYCOLLECTIONREPORT','VIEW')}"
+                propagation="none" />
 
         <s:link view="/accounting/majorAccountingReport.xhtml" styleClass="tab-cell"
                 value="#{messages['menu.finances.accounting.majorAccounting']}"
@@ -2082,15 +2089,6 @@
                     value="#{messages['menu.finances.accounting.diaryMajor']}"
                     propagation="none" />
         </rich:menuItem>
-
-        <!-- For CISC
-        <rich:menuItem submitMode="none"
-                       rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
-                       styleClass="main-menu-item">
-            <s:link view="/accounting/dailyCollectionReport.xhtml"
-                    value="#{messages['menu.finances.accounting.dailyCollection']}"
-                    propagation="none" />
-        </rich:menuItem>-->
 
         <!--<rich:menuItem submitMode="none"
                        rendered="#{s:hasPermission('ACCOUNTING','VIEW')}"
