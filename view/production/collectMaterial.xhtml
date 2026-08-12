@@ -264,41 +264,6 @@
                     </h:inputTextarea>
                 </s:decorate>
 
-                <s:decorate id="auditField" template="/include/inputField.xhtml" styleClass="formRow"
-                            rendered="#{collectMaterialAction.managed}">
-                    <ui:define name="label">#{messages['CollectMaterial.audit']}</ui:define>
-
-                    <h:outputText value="#{messages['CollectMaterial.audit.created']}: "/>
-                    <h:panelGroup rendered="#{collectMaterial.createdAt != null}">
-                        <h:outputText value="#{collectMaterial.createdAt}">
-                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
-                        </h:outputText>
-                        <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterial.createdBy}"/>
-                    </h:panelGroup>
-                    <h:outputText value="#{messages['CollectMaterial.audit.unknown']}"
-                                  rendered="#{collectMaterial.createdAt == null}"/>
-
-                    <h:panelGroup rendered="#{collectMaterial.updatedAt != null}">
-                        <h:outputText value="&#160;&#160;|&#160;&#160;" escape="false"/>
-                        <h:outputText value="#{messages['CollectMaterial.audit.updated']}: "/>
-                        <h:outputText value="#{collectMaterial.updatedAt}">
-                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
-                        </h:outputText>
-                        <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterial.updatedBy}"/>
-                    </h:panelGroup>
-
-                    <h:panelGroup rendered="#{collectMaterial.reverted}">
-                        <br/>
-                        <h:outputText value="#{messages['CollectMaterial.audit.lastRevert']}: "/>
-                        <h:outputText value="#{collectMaterial.lastRevertAt}">
-                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}" timeZone="#{sessionUser.timeZone}"/>
-                        </h:outputText>
-                        <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterial.lastRevertBy} &#8212; #{collectMaterial.lastRevertReason}"
-                                      escape="false"/>
-                    </h:panelGroup>
-
-                </s:decorate>
-
             </rich:panel>
 
             <div class="buttons">

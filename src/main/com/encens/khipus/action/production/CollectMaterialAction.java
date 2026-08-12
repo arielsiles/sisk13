@@ -295,9 +295,17 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
         return voucher;
     }
 
+    /** Numero tal como lo ve el contador: tipo + no_doc, el correlativo por tipo de documento
+     *  que muestra y filtra la pantalla de Comprobantes. NO se usa no_trans, que es una
+     *  secuencia global interna y no aparece en ninguna pantalla. */
     public String getVoucherNumber(){
         Voucher voucher = getVoucher();
-        return voucher == null ? "" : voucher.getDocumentType() + "-" + voucher.getTransactionNumber();
+        if (voucher == null) {
+            return "";
+        }
+        String number = voucher.getDocumentNumber() != null ? voucher.getDocumentNumber()
+                                                            : voucher.getTransactionNumber();
+        return voucher.getDocumentType() + "-" + number;
     }
 
     public BigDecimal getCurrentBalance(){
