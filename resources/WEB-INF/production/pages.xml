@@ -689,6 +689,16 @@
                 <redirect view-id="/production/collectMaterial.xhtml"/>
             </rule>
         </navigation>
+        <!-- Revertir: al listado si salio bien; si fallo una guarda se queda en la pantalla
+             con el mensaje, sin perder la conversacion. -->
+        <navigation from-action="#{collectMaterialAction.revert}">
+            <rule if-outcome="Success">
+                <redirect view-id="/production/collectMaterialList.xhtml"/>
+            </rule>
+            <rule>
+                <redirect view-id="/production/collectMaterial.xhtml"/>
+            </rule>
+        </navigation>
         <navigation>
             <rule>
                 <redirect view-id="/production/collectMaterialList.xhtml"/>

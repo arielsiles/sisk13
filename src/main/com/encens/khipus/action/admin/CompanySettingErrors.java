@@ -159,6 +159,7 @@ public class CompanySettingErrors {
             "treasuryDocumentsAuthorizationEnabled",
             "payablesDocumentsAuthorizationEnabled",
             "dispatchInventoryControl",
+            "collectMaterialRevertDays",
             "dealerParameter",
             "unitPriceMilk",
             "cashBoxDocumentType",

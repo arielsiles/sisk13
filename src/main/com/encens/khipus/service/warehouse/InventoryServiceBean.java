@@ -121,25 +121,70 @@ public class InventoryServiceBean extends GenericServiceBean implements Inventor
         eventEm.merge(inventoryDetail);
         eventEm.flush();
 
-        /** Update ProductItem (valor NETO, consistente con la contabilizacion del acopio
-         *  en CollectMaterialServiceBean.createCollectMaterialListAccounting):
-         *    precio es Bs/Tonelada; la cantidad que entra al inventario es la misma que se
-         *    suma al saldo (balanceWeight, en KG). Valor bruto = (KG / 1000) * precio; si hay
-         *    factura se descuenta el IVA (credito fiscal): neto = bruto - bruto * VAT.
-         *  Correccion: antes usaba precio/100 (en vez de /1000) y dividia por VAT_COMPLEMENT
-         *  (en vez de descontar el IVA), lo que inflaba saldo_mon/costo_uni ~13x. */
-        BigDecimal weightTon  = BigDecimalUtil.divide(quantity, BigDecimalUtil.ONE_THOUSAND, 6);
+        BigDecimal amountToAdd = collectMaterialNetAmount(collectMaterial);
+
+        increaseProductItemAmount(collectMaterial.getMetaProduct().getProductItem(), newAvailableQuantity, amountToAdd, amountToAdd);
+
+    }
+
+    @Override
+    public void revertInventoryForCollectMaterial(CollectMaterial collectMaterial){
+
+        /** Reversa exacta de updateInventoryForCollectMaterial: descuenta del saldo la misma
+         *  cantidad (balanceWeight) y del Saldo_Mon el mismo valor neto que se sumo al aprobar. **/
+        Inventory inventory = findInventoryByProductItemCode(collectMaterial.getMetaProduct().getProductItemCode());
+        BigDecimal quantity = collectMaterial.getBalanceWeight();
+
+        BigDecimal newAvailableQuantity = BigDecimalUtil.subtract(inventory.getUnitaryBalance(), quantity);
+        inventory.setUnitaryBalance(newAvailableQuantity);
+        eventEm.merge(inventory);
+        eventEm.flush();
+
+        InventoryDetail inventoryDetail = findInventoryDetailByProductItemCode(collectMaterial.getMetaProduct().getProductItemCode());
+        inventoryDetail.setQuantity(inventory.getUnitaryBalance());
+        eventEm.merge(inventoryDetail);
+        eventEm.flush();
+
+        decreaseProductItemAmount(collectMaterial.getMetaProduct().getProductItem(), newAvailableQuantity,
+                collectMaterialNetAmount(collectMaterial));
+
+    }
+
+    /** Valor NETO que el acopio aporta al Saldo_Mon del articulo, consistente con la
+     *  contabilizacion en CollectMaterialServiceBean.createCollectMaterialListAccounting:
+     *  precio es Bs/Tonelada y la cantidad que entra al inventario es balanceWeight (KG),
+     *  asi que valor bruto = (KG / 1000) * precio; si hay factura se descuenta el IVA
+     *  (credito fiscal): neto = bruto - bruto * VAT.
+     *  Correccion historica: antes usaba precio/100 (en vez de /1000) y dividia por
+     *  VAT_COMPLEMENT (en vez de descontar el IVA), lo que inflaba saldo_mon/costo_uni ~13x.
+     *  Alta, reversa y previsualizacion comparten esta formula a proposito: no pueden
+     *  desalinearse. */
+    @Override
+    public BigDecimal collectMaterialNetAmount(CollectMaterial collectMaterial) {
+        BigDecimal weightTon   = BigDecimalUtil.divide(collectMaterial.getBalanceWeight(), BigDecimalUtil.ONE_THOUSAND, 6);
         BigDecimal grossAmount = BigDecimalUtil.multiply(weightTon, collectMaterial.getPrice(), 6);
-        BigDecimal amountToAdd;
         if ( collectMaterial.getHasInvoice() ) {
             BigDecimal taxCreditFiscal = BigDecimalUtil.multiply(grossAmount, Constants.VAT, 6);
-            amountToAdd = BigDecimalUtil.subtract(grossAmount, taxCreditFiscal, 6);
-        } else {
-            amountToAdd = grossAmount;
+            return BigDecimalUtil.subtract(grossAmount, taxCreditFiscal, 6);
         }
-        BigDecimal amountCTAdd = amountToAdd;
+        return grossAmount;
+    }
 
-        increaseProductItemAmount(collectMaterial.getMetaProduct().getProductItem(), newAvailableQuantity, amountToAdd, amountCTAdd);
+    /** Inversa de increaseProductItemAmount. Si el saldo queda en cero el costo unitario
+     *  tambien: no se puede dividir entre cero. */
+    private void decreaseProductItemAmount(ProductItem productItem, BigDecimal newQuantityInventory, BigDecimal amountToSubtract) {
+
+        ProductItem managed = eventEm.find(ProductItem.class, productItem.getId());
+        if (managed == null) {
+            managed = productItem;
+        }
+
+        BigDecimal newInvestmentAmount = BigDecimalUtil.subtract(managed.getInvestmentAmount(), amountToSubtract, 6);
+        managed.setInvestmentAmount(newInvestmentAmount);
+        managed.setUnitCost( BigDecimalUtil.isZeroOrNull(newQuantityInventory) ?
+                BigDecimal.ZERO : BigDecimalUtil.divide(newInvestmentAmount, newQuantityInventory, 6) );
+
+        eventEm.flush();
 
     }
 

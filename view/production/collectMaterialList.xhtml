@@ -181,13 +181,83 @@
                     <h:outputText value="#{collectMaterialItem.hasInvoice ? 'Si' : 'No'}"/>
                 </rich:column>
                 <rich:column styleClass="center">
-                    <h:outputText value="#{messages[collectMaterialItem.state.resourceKey]}"/>
+                    <h:outputText value="#{messages[collectMaterialItem.state.resourceKey]}"
+                                  rendered="#{!collectMaterialItem.reverted}"/>
+
+                    <!-- Acopio corregido: el estado mismo lleva el estilo de marca y es el que
+                         muestra el detalle al pasar el mouse. Va en la misma linea para no
+                         crecer la fila. El id y el styleClass son obligatorios: sin ellos JSF
+                         no emite el <span> y el rich:toolTip se queda sin donde engancharse. -->
+                    <h:panelGroup id="revertMark" styleClass="app-tag app-tag--warn"
+                                  rendered="#{collectMaterialItem.reverted}">
+                        <h:outputText value="#{messages[collectMaterialItem.state.resourceKey]}"/>
+                        <rich:toolTip for="revertMark" followMouse="false" direction="top-left"
+                                      showDelay="200" styleClass="app-tooltip">
+                            <h:panelGroup rendered="#{collectMaterialItem.createdAt != null}">
+                                <h:outputText value="#{messages['CollectMaterial.audit.created']}: "/>
+                                <h:outputText value="#{collectMaterialItem.createdAt}">
+                                    <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                                       timeZone="#{sessionUser.timeZone}"/>
+                                </h:outputText>
+                                <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterialItem.createdBy}"/>
+                                <br/>
+                            </h:panelGroup>
+
+                            <h:outputText value="#{messages['CollectMaterial.audit.lastRevert']}: "/>
+                            <h:outputText value="#{collectMaterialItem.lastRevertAt}">
+                                <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                                   timeZone="#{sessionUser.timeZone}"/>
+                            </h:outputText>
+                            <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterialItem.lastRevertBy}"/>
+                            <h:outputText value=" (#{collectMaterialItem.revertCount})"
+                                          rendered="#{collectMaterialItem.revertCount gt 1}"/>
+                            <br/>
+                            <h:outputText value="#{collectMaterialItem.lastRevertReason}"/>
+                        </rich:toolTip>
+                    </h:panelGroup>
                 </rich:column>
 
                 <rich:column styleClass="center">
-                    <h:commandLink value="#{messages['Common.select']}"
-                                   action="#{collectMaterialAction.select(collectMaterialItem)}">
+                    <h:commandLink action="#{collectMaterialAction.select(collectMaterialItem)}">
+                        <h:graphicImage value="/img/edit-line.svg" styleClass="select-image"
+                                        title="#{messages['Common.edit']}"/>
                     </h:commandLink>
+
+                    <!-- Auditoria del registro: quien lo creo y quien lo modifico. En todas las
+                         filas. El id y el styleClass son obligatorios: sin ellos JSF no emite el
+                         <span> y el rich:toolTip se queda sin donde engancharse. -->
+                    <h:panelGroup id="auditMark" styleClass="app-audit-mark">
+                        <h:graphicImage value="/img/user-line.svg" styleClass="select-image"
+                                        alt="#{messages['CollectMaterial.audit']}"
+                                        title="#{messages['CollectMaterial.audit']}"/>
+                        <rich:toolTip for="auditMark" followMouse="false" direction="top-left"
+                                      showDelay="200" styleClass="app-tooltip">
+                            <!-- 'Creado' siempre: si el registro es anterior a estas columnas se
+                                 dice explicitamente que no hay dato, en vez de omitir la linea y
+                                 parecer que falta algo. 'Modificado' solo si hubo modificacion. -->
+                            <h:outputText value="#{messages['CollectMaterial.audit.created']}: "/>
+                            <h:panelGroup rendered="#{collectMaterialItem.createdAt != null}">
+                                <h:outputText value="#{collectMaterialItem.createdAt}">
+                                    <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                                       timeZone="#{sessionUser.timeZone}"/>
+                                </h:outputText>
+                                <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterialItem.createdBy}"/>
+                            </h:panelGroup>
+                            <h:outputText value="#{messages['CollectMaterial.audit.unknown']}"
+                                          rendered="#{collectMaterialItem.createdAt == null}"/>
+
+                            <h:panelGroup rendered="#{collectMaterialItem.updatedAt != null}">
+                                <!-- el salto va envuelto: 'rendered' no aplica sobre un <br/> HTML plano -->
+                                <br/>
+                                <h:outputText value="#{messages['CollectMaterial.audit.updated']}: "/>
+                                <h:outputText value="#{collectMaterialItem.updatedAt}">
+                                    <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                                       timeZone="#{sessionUser.timeZone}"/>
+                                </h:outputText>
+                                <h:outputText value=" #{messages['CollectMaterial.audit.by']} #{collectMaterialItem.updatedBy}"/>
+                            </h:panelGroup>
+                        </rich:toolTip>
+                    </h:panelGroup>
                 </rich:column>
             </rich:dataTable>
             <app:dataScroller id="dataScroller" for="collectMaterialList" dataModel="#{collectMaterialDataModel}"/>

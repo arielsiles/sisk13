@@ -511,6 +511,11 @@ public class CompanyConfiguration {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean dispatchInventoryControl = true;
 
+    /** Antiguedad maxima, en dias, de un acopio de materia prima para poder revertirlo.
+     *  0 = sin limite. */
+    @Column(name = "acopio_dias_reversion", nullable = false)
+    private Integer collectMaterialRevertDays = 30;
+
     @Column(name = "retencionprestamoanti", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private boolean retentionForLoanAndAdvance;
@@ -1401,6 +1406,14 @@ public class CompanyConfiguration {
 
     public void setDispatchInventoryControl(boolean dispatchInventoryControl) {
         this.dispatchInventoryControl = dispatchInventoryControl;
+    }
+
+    public Integer getCollectMaterialRevertDays() {
+        return collectMaterialRevertDays;
+    }
+
+    public void setCollectMaterialRevertDays(Integer collectMaterialRevertDays) {
+        this.collectMaterialRevertDays = collectMaterialRevertDays;
     }
 
     public boolean isRetentionForLoanAndAdvance() {

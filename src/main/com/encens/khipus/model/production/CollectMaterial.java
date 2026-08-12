@@ -9,6 +9,7 @@ import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Type;
+import org.jboss.seam.security.Identity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -79,6 +80,63 @@ public class CollectMaterial implements Serializable, BaseModel {
     @Version
     @Column(name = "version", nullable = false)
     private long version;
+
+    /** Auditoria: mismo patron y mismos nombres de columna que Voucher (sf_tmpenc). */
+    @Column(name = "created_at", updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @Column(name = "created_by", updatable = false)
+    private String createdBy;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
+
+    /**
+     * Asiento contable (sf_tmpenc.id_tmpenc) que genero la contabilizacion de ESTE acopio.
+     * Se guarda como Long y no como relacion: sf_tmpenc vive en FINANCES_SCHEMA, que no
+     * siempre coincide con el schema de la aplicacion, y no se necesita navegar el asiento
+     * completo, solo consultar su estado al revertir.
+     * NULL en lo contabilizado con el esquema viejo (un asiento 'IA' por dia para varios
+     * acopios): esos acopios no son revertibles por el sistema.
+     */
+    @Column(name = "id_tmpenc")
+    private Long voucherId;
+
+    /** Marcas de correccion. Copia de la ultima fila de acopiomp_reversion, para pintar el
+     *  listado sin joins; el historial autoritativo esta en la bitacora. */
+    @Column(name = "nro_reversiones", nullable = false)
+    private Integer revertCount = 0;
+
+    @Column(name = "ultima_reversion_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastRevertAt;
+
+    @Column(name = "ultima_reversion_by")
+    private String lastRevertBy;
+
+    @Column(name = "ultima_reversion_motivo")
+    private String lastRevertReason;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = new Date();
+        this.createdBy = getCurrentUser();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Date();
+        this.updatedBy = getCurrentUser();
+    }
+
+    private String getCurrentUser() {
+        return Identity.instance().isLoggedIn() ? Identity.instance().getPrincipal().getName() : "unknown";
+    }
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idzonaproductiva", nullable = false)
@@ -277,6 +335,83 @@ public class CollectMaterial implements Serializable, BaseModel {
 
     public void setProviderWeight(BigDecimal providerWeight) {
         this.providerWeight = providerWeight;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Long getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(Long voucherId) {
+        this.voucherId = voucherId;
+    }
+
+    public Integer getRevertCount() {
+        return revertCount;
+    }
+
+    public void setRevertCount(Integer revertCount) {
+        this.revertCount = revertCount;
+    }
+
+    public Date getLastRevertAt() {
+        return lastRevertAt;
+    }
+
+    public void setLastRevertAt(Date lastRevertAt) {
+        this.lastRevertAt = lastRevertAt;
+    }
+
+    public String getLastRevertBy() {
+        return lastRevertBy;
+    }
+
+    public void setLastRevertBy(String lastRevertBy) {
+        this.lastRevertBy = lastRevertBy;
+    }
+
+    public String getLastRevertReason() {
+        return lastRevertReason;
+    }
+
+    public void setLastRevertReason(String lastRevertReason) {
+        this.lastRevertReason = lastRevertReason;
+    }
+
+    /** El acopio fue revertido y vuelto a procesar al menos una vez. */
+    public boolean isReverted() {
+        return revertCount != null && revertCount > 0;
     }
 
     public BigDecimal getAverageWeight() {

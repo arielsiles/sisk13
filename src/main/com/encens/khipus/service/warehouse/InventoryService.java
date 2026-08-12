@@ -32,6 +32,14 @@ public interface InventoryService extends GenericService {
     void updateInventoryForProduction(ProductionProduct product);
     void updateInventoryForCollectMaterial(CollectMaterial collectMaterial);
 
+    /** Deshace en inventario el ingreso hecho al aprobar el acopio: reversa exacta de
+     *  updateInventoryForCollectMaterial (misma cantidad y mismo valor neto). */
+    void revertInventoryForCollectMaterial(CollectMaterial collectMaterial);
+
+    /** Valor neto que el acopio aporta al Saldo_Mon del articulo. Unica formula: la usan
+     *  el alta, la reversa y la previsualizacion del impacto. */
+    BigDecimal collectMaterialNetAmount(CollectMaterial collectMaterial);
+
     void updateInventoryForProduction(XProductionProduct product);
 
     void updateInventoryForSalesAnnuled(CustomerOrder customerOrder);
