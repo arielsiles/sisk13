@@ -121,17 +121,6 @@
         </framework:restrictions>
     </framework:entity-query>
 
-    <factory name="soldProductList" value="#{soldProductQuery}"/>
-    <framework:entity-query name="soldProductQuery"
-                            ejbql="select distinct soldProduct from SoldProduct soldProduct">
-        <framework:restrictions>
-            <value>
-                soldProduct.state =
-                #{enumerationUtil.getEnumValue('com.encens.khipus.model.warehouse.SoldProductState','PENDING')}
-            </value>
-        </framework:restrictions>
-    </framework:entity-query>
-
 
     <factory name="productItemQuickSearchList" value="#{productItemQuickSearchQuery}"/>
     <framework:entity-query name="productItemQuickSearchQuery"
