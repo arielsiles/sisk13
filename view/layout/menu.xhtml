@@ -254,7 +254,7 @@
 </rich:tab>
 
 <rich:tab id="warehouses" label="#{messages['menu.finances.inventory']}" disabled="#{disableMenu}">
-        <h:panelGrid columns="10" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
+        <h:panelGrid columns="11" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
 
             <s:link view="/warehouse/productItemList.xhtml" styleClass="tab-cell"
                     value="#{messages['menu.warehouse.configuration.productItem']}"
@@ -295,6 +295,11 @@
                     value="#{messages['menu.warehouse.dispatch']}"
                     rendered="#{s:hasPermission('WAREHOUSEDISPATCH','VIEW')}"
                     propagation="none"/>
+
+            <s:link view="/warehouse/warehouseProductTransfer.xhtml" styleClass="tab-cell"
+                    value="#{messages['menu.warehouse.productTransfer']}"
+                    rendered="#{s:hasPermission('WAREHOUSEVOUCHER','VIEW')}"
+                    propagation="begin"/>
 
             <rich:dropDownMenu value="#{messages['menu.warehouse.report']}" rendered="#{
                             s:hasPermission('GENERAL_INVENTORY_REPORT','VIEW') or
@@ -1990,38 +1995,13 @@
     <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
 
     <rich:dropDownMenu value="#{messages['menu.finances.inventory']}"
-                       rendered="#{legacyMenu.can('WAREHOUSEVOUCHER') or
-            legacyMenu.can('PRODUCTDELIVERY') or
-            legacyMenu.can('PREPAREDELIVERY') or
-            legacyMenu.can('APPROVEDALLACCOUNTENTRIES')}">
-
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('WAREHOUSEVOUCHER')}">
-            <s:link view="/warehouse/warehouseProductTransfer.xhtml"
-                    value="#{messages['menu.warehouse.productTransfer']}"
-                    propagation="begin"/>
-        </rich:menuItem>
+                       rendered="#{legacyMenu.can('PRODUCTDELIVERY')}">
 
         <rich:menuItem submitMode="none"
                        styleClass="main-menu-item"
                        rendered="#{legacyMenu.can('PRODUCTDELIVERY')}">
             <s:link view="/warehouse/productDeliveryList.xhtml"
                     value="#{messages['menu.warehouse.productDelivery']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('PREPAREDELIVERY')}">
-            <s:link view="/warehouse/productDeliveryPrepare.xhtml"
-                    value="#{messages['menu.warehouse.prepareDelivery']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('APPROVEDALLACCOUNTENTRIES')}">
-            <s:link view="/warehouse/accountEntriesList.xhtml"
-                    value="#{messages['menu.warehouse.accountEntries']}"
                     propagation="none"/>
         </rich:menuItem>
 
