@@ -1994,19 +1994,6 @@
           rendered="#{legacyMenu.enabled}">
     <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
 
-    <rich:dropDownMenu value="#{messages['menu.finances.inventory']}"
-                       rendered="#{legacyMenu.can('PRODUCTDELIVERY')}">
-
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('PRODUCTDELIVERY')}">
-            <s:link view="/warehouse/productDeliveryList.xhtml"
-                    value="#{messages['menu.warehouse.productDelivery']}"
-                    propagation="none"/>
-        </rich:menuItem>
-
-    </rich:dropDownMenu>
-
     <rich:dropDownMenu value="#{messages['menu.finances.budget']}" rendered="#{
         legacyMenu.can('ENTRYBUDGETS') or
         legacyMenu.can('EXPENSEBUDGET') or

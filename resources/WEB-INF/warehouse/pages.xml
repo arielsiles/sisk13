@@ -612,17 +612,8 @@
         </navigation>
     </page>
 
-    <page view-id="/warehouse/productDeliveryList.xhtml">
-        <end-conversation/>
-        <navigation from-action="#{productDeliveryAction.select(productDeliveryItem)}">
-            <rule>
-                <redirect view-id="/warehouse/productDelivery.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-
     <page view-id="/warehouse/productDelivery.xhtml"
-          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
+          no-conversation-view-id="/customers/printInvoiceList.xhtml">
         <navigation from-action="#{productDeliveryAction.create}">
             <rule if-outcome="Success">
                 <begin-conversation flush-mode="MANUAL"/>
@@ -631,13 +622,13 @@
         </navigation>
         <navigation>
             <rule>
-                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
+                <redirect view-id="/customers/printInvoiceList.xhtml"/>
             </rule>
         </navigation>
     </page>
 
     <page view-id="/warehouse/productDeliveryVentaDirecta.xhtml"
-          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
+          no-conversation-view-id="/customers/printInvoiceList.xhtml">
         <navigation from-action="#{productDeliveryAction.create}">
             <rule if-outcome="Success">
                 <begin-conversation flush-mode="MANUAL"/>
@@ -646,13 +637,13 @@
         </navigation>
         <navigation>
             <rule>
-                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
+                <redirect view-id="/customers/printInvoiceList.xhtml"/>
             </rule>
         </navigation>
     </page>
 
     <page view-id="/warehouse/productDeliveryByDate.xhtml"
-          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
+          no-conversation-view-id="/customers/printInvoiceList.xhtml">
         <navigation from-action="#{productDeliveryAction.create}">
             <rule if-outcome="Success">
                 <begin-conversation flush-mode="MANUAL"/>
@@ -661,7 +652,7 @@
         </navigation>
         <navigation>
             <rule>
-                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
+                <redirect view-id="/customers/printInvoiceList.xhtml"/>
             </rule>
         </navigation>
     </page>
