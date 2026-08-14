@@ -35,7 +35,7 @@
                       s:hasPermission('PURCHASEBOOKREPORT','VIEW') or
                       s:hasPermission('DAILYCOLLECTIONREPORT','VIEW') or
                       s:hasPermission('ACCOUNTINGPLAN','VIEW')}">
-    <h:panelGrid columns="10" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
+    <h:panelGrid columns="14" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
         <!--<h:graphicImage value="/img/report-icon.png" styleClass="select-image-middle"/>-->
         <s:link view="/accounting/voucherList.xhtml" styleClass="tab-cell"
                 value="#{messages['menu.finances.accounting.transaction']}"
@@ -250,6 +250,309 @@
 
         </rich:dropDownMenu>
 
+        <rich:dropDownMenu value="#{messages['menu.finances.configuration']}"
+                           rendered="#{s:hasPermission('MEASUREUNIT','VIEW') or
+                            s:hasPermission('CASHACCOUNTGROUP','VIEW') or
+                            s:hasPermission('COSTCENTER','VIEW') or
+                            s:hasPermission('COSTCENTERGROUP','VIEW') or
+                            s:hasPermission('FINANCESBANKACCOUNT','VIEW') or
+                            s:hasPermission('FINANCESEXCHANGERATE','VIEW') or
+                            s:hasPermission('TAXRULE','VIEW') or
+                            s:hasPermission('TAXPERCENTAGE','VIEW') or
+                            s:hasPermission('TAXPERCENTAGETYPE','VIEW') or
+                            s:hasPermission('DOSAGETYPE','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('MEASUREUNIT','VIEW')}">
+                <s:link view="/finances/measureUnitList.xhtml"
+                        value="#{messages['menu.finances.configuration.measureUnit']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('FINANCESBANKACCOUNT','VIEW')}">
+                <s:link view="/finances/financesBankAccountList.xhtml"
+                        value="#{messages['menu.finances.configuration.financesBankAccount']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('CASHACCOUNTGROUP','VIEW')}">
+                <s:link view="/finances/cashAccountGroupList.xhtml"
+                        value="#{messages['menu.finances.configuration.cashAccountGroup']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('COSTCENTER','VIEW')}">
+                <s:link view="/finances/costCenterList.xhtml"
+                        value="#{messages['menu.rrhh.configuration.costCenter']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('COSTCENTERGROUP','VIEW')}">
+                <s:link view="/finances/costCenterGroupList.xhtml"
+                        value="#{messages['menu.rrhh.configuration.costCenterGroup']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('TAXRULE','VIEW')}">
+                <s:link view="/finances/taxRuleList.xhtml"
+                        value="#{messages['menu.finances.taxRule']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('TAXPERCENTAGE','VIEW')}">
+                <s:link view="/finances/taxPercentageList.xhtml"
+                        value="#{messages['menu.finances.configuration.taxPercentage']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('TAXPERCENTAGETYPE','VIEW')}">
+                <s:link view="/finances/taxPercentageTypeList.xhtml"
+                        value="#{messages['menu.finances.configuration.taxPercentageType']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('DOSAGETYPE','VIEW')}">
+                <s:link view="/finances/dosageTypeList.xhtml"
+                        value="#{messages['menu.finances.configuration.dosageType']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('FINANCESEXCHANGERATE','VIEW')}">
+                <s:link view="/finances/financesExchangeRateList.xhtml"
+                        value="#{messages['menu.finances.configuration.financesExchangeRate']}"
+                        propagation="none"/>
+            </rich:menuItem>
+
+        </rich:dropDownMenu>
+
+        <rich:dropDownMenu value="#{messages['menu.finances.budget']}" rendered="#{
+            s:hasPermission('ENTRYBUDGETS','VIEW') or
+            s:hasPermission('EXPENSEBUDGET','VIEW') or
+            s:hasPermission('EXPENSEBUDGETREPORT','VIEW') or
+            s:hasPermission('ENTRYBUDGETREPORT','VIEW') or
+            s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW') or
+            s:hasPermission('EXPENSEBUDGETCONSOLIDATEDEXECREPORT','VIEW') or
+            s:hasPermission('EXPENSEBUDGETGLOBALEXECUTIONREPORT','VIEW') or
+            s:hasPermission('CLASSIFIERS','VIEW') or
+            s:hasPermission('BUDGETPROGRAM','VIEW') or
+            s:hasPermission('BUDGETDISTRIBUTION','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('ENTRYBUDGETS','VIEW')}">
+                <s:link view="/budget/entryBudgetList.xhtml"
+                        value="#{messages['menu.finances.budget.entryBudget']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('EXPENSEBUDGET','VIEW')}">
+                <s:link view="/budget/expenseBudgetList.xhtml"
+                        value="#{messages['menu.finances.budget.expenseBudget']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuGroup value="#{messages['Budget.menu.reports']}" rendered="#{
+                s:hasPermission('EXPENSEBUDGETREPORT','VIEW') or
+                s:hasPermission('ENTRYBUDGETREPORT','VIEW') or
+                s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW') or
+                s:hasPermission('EXPENSEBUDGETCONSOLIDATEDEXECREPORT','VIEW') or
+                s:hasPermission('EXPENSEBUDGETGLOBALEXECUTIONREPORT','VIEW')}">
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('EXPENSEBUDGETREPORT','VIEW')}">
+                    <s:link view="/budget/expenseBudgetReport.xhtml"
+                            value="#{messages['menu.finances.budget.expenseBudgetReport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('ENTRYBUDGETREPORT','VIEW')}">
+                    <s:link view="/budget/entryBudgetReport.xhtml"
+                            value="#{messages['menu.finances.budget.entryBudgetReport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('EXPENSEBUDGETEXECUTIONREPORT','VIEW')}">
+                    <s:link view="/budget/expenseBudgetExecutionReport.xhtml"
+                            value="#{messages['menu.finances.budget.expenseBudgetExecutionReport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('EXPENSEBUDGETCONSOLIDATEDEXECREPORT','VIEW')}">
+                    <s:link view="/budget/expenseBudgetConsolidatedExecutionReport.xhtml"
+                            value="#{messages['menu.finances.budget.expenseBudgetConsolidatedExecutionReport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('EXPENSEBUDGETGLOBALEXECUTIONREPORT','VIEW')}">
+                    <s:link view="/budget/expenseBudgetGlobalExecutionReport.xhtml"
+                            value="#{messages['menu.finances.budget.expenseBudgetGlobalExecutionReport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+            </rich:menuGroup>
+            <rich:menuGroup value="#{messages['menu.finances.budget.configuration']}" rendered="#{
+                s:hasPermission('CLASSIFIERS','VIEW') or
+                s:hasPermission('BUDGETPROGRAM','VIEW') or
+                s:hasPermission('BUDGETDISTRIBUTION','VIEW')}">
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('CLASSIFIERS','VIEW')}">
+                    <s:link view="/budget/burdenList.xhtml"
+                            value="#{messages['menu.finances.configuration.burden']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('CLASSIFIERS','VIEW')}">
+                    <s:link view="/budget/accountingItemList.xhtml"
+                            value="#{messages['menu.finances.configuration.accountingItem']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('BUDGETPROGRAM','VIEW')}">
+                    <s:link view="/budget/budgetProgramList.xhtml"
+                            value="#{messages['menu.finances.budget.budgetProgram']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('BUDGETDISTRIBUTION','VIEW')}">
+                    <s:link view="/budget/budgetDistributionList.xhtml"
+                            value="#{messages['menu.finances.budget.budgetDistribution']}"
+                            propagation="none"/>
+                </rich:menuItem>
+            </rich:menuGroup>
+        </rich:dropDownMenu>
+
+        <rich:dropDownMenu value="#{messages['menu.finances.treasury']}"
+                           rendered="#{s:hasPermission('BANKINGMOVEMENTSYNC','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           styleClass="main-menu-item"
+                           rendered="#{s:hasPermission('BANKINGMOVEMENTSYNC','VIEW')}">
+                <s:link view="/treasury/bankingMovementSyncInfo.xhtml"
+                        value="#{messages['menu.treasury.bankingMovementSync']}"
+                        propagation="begin"/>
+            </rich:menuItem>
+        </rich:dropDownMenu>
+        <rich:dropDownMenu value="#{messages['menu.finances.receivables']}"
+                           rendered="#{s:hasPermission('ROTATORYFUND','VIEW')
+                        or s:hasPermission('ROTATORYFUND','CREATE')
+                        or s:hasPermission('OTHERRECEIVABLES','VIEW')
+                        or s:hasPermission('REPORTROTATORYFUND','VIEW')
+                        or s:hasPermission('REPORTROTATORYFUNDBALANCES','VIEW')
+                        or s:hasPermission('REPORTROTATORYFUNDBALANCESDETAIL','VIEW')
+                        or s:hasPermission('REPORTROTATORYFUNDPAYRECEIVABLE','VIEW')
+                        or s:hasPermission('REPORTRETRIEVEBYDEBTOR','VIEW')
+                        or s:hasPermission('REPORTROTATORYFUNDCOLLECTIONDETAIL','VIEW')
+                        or s:hasPermission('REPORTROTATORYFUNDINVOICECOLLECTION','VIEW')
+                        or s:hasPermission('ROTFUNDBYACCOUNTREPORT','VIEW')
+                        or s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW')}">
+            <rich:menuItem submitMode="none"
+                           rendered="#{s:hasPermission('ROTATORYFUND','VIEW') or s:hasPermission('OTHERRECEIVABLES','VIEW')}"
+                           styleClass="main-menu-item">
+                <s:link view="/finances/rotatoryFundList.xhtml"
+                        value="#{messages['menu.finances.rotatoryFund']}"
+                        propagation="none"/>
+            </rich:menuItem>
+            <rich:menuItem submitMode="none"
+                           rendered="#{s:hasPermission('ROTATORYFUND','CREATE')}"
+                           styleClass="main-menu-item">
+                <s:link view="/finances/rotatoryFund.xhtml"
+                        value="#{messages['menu.finances.newRotatoryFund']}"
+                        action="#{rotatoryFundAction.newRotatoryFund}"/>
+            </rich:menuItem>
+            <rich:menuGroup value="#{messages['menu.finances.receivables.report']}" rendered="#{
+                s:hasPermission('REPORTROTATORYFUND','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDBALANCES','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDBALANCESDETAIL','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDPAYRECEIVABLE','VIEW')
+                or s:hasPermission('REPORTRETRIEVEBYDEBTOR','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDCOLLECTIONDETAIL','VIEW')
+                or s:hasPermission('REPORTROTATORYFUNDINVOICECOLLECTION','VIEW')
+                or s:hasPermission('ROTFUNDBYACCOUNTREPORT','VIEW')}">
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTROTATORYFUND','VIEW')}">
+                    <s:link view="/finances/rotatoryFundReport.xhtml"
+                            value="#{messages['Reports.rotatoryFund.menu.title']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTROTATORYFUNDBALANCES','VIEW')}">
+                    <s:link view="/finances/rotatoryFundBalancesReport.xhtml"
+                            value="#{messages['Reports.rotatoryFundBalances.menu.title']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTROTATORYFUNDBALANCESDETAIL','VIEW')}">
+                    <s:link view="/finances/rotatoryFundBalancesDetailReport.xhtml"
+                            value="#{messages['Reports.rotatoryFundBalancesDetail.menu.title']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTROTATORYFUNDPAYRECEIVABLE','VIEW')}">
+                    <s:link view="/finances/rotatoryFundPaymentReceivableReport.xhtml"
+                            value="#{messages['Reports.rotatoryFundPaymentReceivable.menu.title']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTRETRIEVEBYDEBTOR','VIEW')}">
+                    <s:link view="/finances/retrieveByDebtorReport.xhtml"
+                            value="#{messages['Reports.retrieveByDebtor.menu.title']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTROTATORYFUNDCOLLECTIONDETAIL','VIEW')}">
+                    <s:link view="/finances/rotatoryFundCollectionDetailReport.xhtml"
+                            value="#{messages['Reports.rotatoryFundCollectionDetail.menu.title']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('REPORTROTATORYFUNDINVOICECOLLECTION','VIEW')}">
+                    <s:link view="/finances/rotatoryFundInvoiceCollectionReport.xhtml"
+                            value="#{messages['Reports.rotatoryFundInvoiceCollection.menu.title']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('ROTFUNDBYACCOUNTREPORT','VIEW')}">
+                    <s:link view="/finances/rotatoryFundByAccountReport.xhtml"
+                            value="#{messages['Reports.rotatoryFundByAccount.menu.title']}"
+                            propagation="none"/>
+                </rich:menuItem>
+            </rich:menuGroup>
+            <rich:menuGroup value="#{messages['menu.finances.receivables.configuration']}"
+                            rendered="#{s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW')}">
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('ROTATORYFUNDDOCUMENTTYPE','VIEW')}">
+                    <s:link view="/finances/rotatoryFundDocumentTypeList.xhtml"
+                            value="#{messages['menu.finances.receivables.configuration.documentType']}"
+                            propagation="none"/>
+                </rich:menuItem>
+            </rich:menuGroup>
+        </rich:dropDownMenu>
+
     </h:panelGrid>
 </rich:tab>
 
@@ -318,7 +621,6 @@
                             s:hasPermission('PRODUCTITEMBYPROVIDERHISTORYREPORT','VIEW') or
                             s:hasPermission('GENERALVALUEDEVOLUTIONREPORT','VIEW') or
                             s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW') or
-                            s:hasPermission('PENDINGSOLDPRODUCTDELIVERYREPORT','VIEW') or
                             s:hasPermission('PRODUCTITEMPROVIDERREPORT','VIEW') or
                             s:hasPermission('ARTICLESREPORT','VIEW') or
                             s:hasPermission('SUBGROUPREPORT','VIEW') or
@@ -449,14 +751,6 @@
                                rendered="#{s:hasPermission('WAREHOUSEEVOLUTIONREPORT','VIEW')}">
                     <s:link view="/warehouse/warehouseEvolutionReport.xhtml"
                             value="#{messages['Reports.warehouseEvolution.menu.title']}"
-                            propagation="none"/>
-                </rich:menuItem>
-
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('PENDINGSOLDPRODUCTDELIVERYREPORT','VIEW')}">
-                    <s:link view="/warehouse/pendingSoldProductDeliveryReport.xhtml"
-                            value="#{messages['Reports.pendingSoldProductDelivery.menu.title']}"
                             propagation="none"/>
                 </rich:menuItem>
 
@@ -1976,324 +2270,6 @@
             </rich:menuItem>
 
         </rich:dropDownMenu>
-    </h:panelGrid>
-</rich:tab>
-
-<!--
-    Tab transitorio "Legacy Gestion Administrativa Financiera": agrupa opciones de
-    contabilidad, almacenes, activos fijos, presupuestos y fondos rotatorios que se iran
-    migrando a sus tabs definitivos. Se gobierna con un unico permiso
-    (LEGACYFINANCIALADMINMANAGEMENT): quien lo tiene ve el tab con TODAS sus opciones
-    habilitadas; quien no lo tiene no ve el tab.
-    Cada opcion conserva el codigo de su permiso real en legacyMenu.can('X'): ese es el
-    mapa de migracion. Al mover una opcion a su tab definitivo hay que devolverle su
-    s:hasPermission('X','VIEW'). Cuando este bloque quede vacio, eliminarlo junto con
-    LegacyMenuAction y la funcionalidad LEGACYFINANCIALADMINMANAGEMENT.
--->
-<rich:tab id="finances2" label="#{messages['menu.finances']}" disabled="#{disableMenu}"
-          rendered="#{legacyMenu.enabled}">
-    <h:panelGrid columns="9" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-end-separator">
-
-    <rich:dropDownMenu value="#{messages['menu.finances.budget']}" rendered="#{
-        legacyMenu.can('ENTRYBUDGETS') or
-        legacyMenu.can('EXPENSEBUDGET') or
-        legacyMenu.can('EXPENSEBUDGETREPORT') or
-        legacyMenu.can('ENTRYBUDGETREPORT') or
-        legacyMenu.can('EXPENSEBUDGETEXECUTIONREPORT') or
-        legacyMenu.can('EXPENSEBUDGETCONSOLIDATEDEXECREPORT') or
-        legacyMenu.can('EXPENSEBUDGETGLOBALEXECUTIONREPORT') or
-        legacyMenu.can('CLASSIFIERS') or
-        legacyMenu.can('BUDGETPROGRAM') or
-        legacyMenu.can('BUDGETDISTRIBUTION')}">
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('ENTRYBUDGETS')}">
-            <s:link view="/budget/entryBudgetList.xhtml"
-                    value="#{messages['menu.finances.budget.entryBudget']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('EXPENSEBUDGET')}">
-            <s:link view="/budget/expenseBudgetList.xhtml"
-                    value="#{messages['menu.finances.budget.expenseBudget']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuGroup value="#{messages['Budget.menu.reports']}" rendered="#{
-            legacyMenu.can('EXPENSEBUDGETREPORT') or
-            legacyMenu.can('ENTRYBUDGETREPORT') or
-            legacyMenu.can('EXPENSEBUDGETEXECUTIONREPORT') or
-            legacyMenu.can('EXPENSEBUDGETCONSOLIDATEDEXECREPORT') or
-            legacyMenu.can('EXPENSEBUDGETGLOBALEXECUTIONREPORT')}">
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('EXPENSEBUDGETREPORT')}">
-                <s:link view="/budget/expenseBudgetReport.xhtml"
-                        value="#{messages['menu.finances.budget.expenseBudgetReport']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('ENTRYBUDGETREPORT')}">
-                <s:link view="/budget/entryBudgetReport.xhtml"
-                        value="#{messages['menu.finances.budget.entryBudgetReport']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('EXPENSEBUDGETEXECUTIONREPORT')}">
-                <s:link view="/budget/expenseBudgetExecutionReport.xhtml"
-                        value="#{messages['menu.finances.budget.expenseBudgetExecutionReport']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('EXPENSEBUDGETCONSOLIDATEDEXECREPORT')}">
-                <s:link view="/budget/expenseBudgetConsolidatedExecutionReport.xhtml"
-                        value="#{messages['menu.finances.budget.expenseBudgetConsolidatedExecutionReport']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('EXPENSEBUDGETGLOBALEXECUTIONREPORT')}">
-                <s:link view="/budget/expenseBudgetGlobalExecutionReport.xhtml"
-                        value="#{messages['menu.finances.budget.expenseBudgetGlobalExecutionReport']}"
-                        propagation="none"/>
-            </rich:menuItem>
-        </rich:menuGroup>
-        <rich:menuGroup value="#{messages['menu.finances.budget.configuration']}" rendered="#{
-            legacyMenu.can('CLASSIFIERS') or
-            legacyMenu.can('BUDGETPROGRAM') or
-            legacyMenu.can('BUDGETDISTRIBUTION')}">
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('CLASSIFIERS')}">
-                <s:link view="/budget/burdenList.xhtml"
-                        value="#{messages['menu.finances.configuration.burden']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('CLASSIFIERS')}">
-                <s:link view="/budget/accountingItemList.xhtml"
-                        value="#{messages['menu.finances.configuration.accountingItem']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('BUDGETPROGRAM')}">
-                <s:link view="/budget/budgetProgramList.xhtml"
-                        value="#{messages['menu.finances.budget.budgetProgram']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('BUDGETDISTRIBUTION')}">
-                <s:link view="/budget/budgetDistributionList.xhtml"
-                        value="#{messages['menu.finances.budget.budgetDistribution']}"
-                        propagation="none"/>
-            </rich:menuItem>
-        </rich:menuGroup>
-    </rich:dropDownMenu>
-
-    <rich:dropDownMenu value="#{messages['menu.finances.treasury']}"
-                       rendered="#{legacyMenu.can('BANKINGMOVEMENTSYNC')}">
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('BANKINGMOVEMENTSYNC')}">
-            <s:link view="/treasury/bankingMovementSyncInfo.xhtml"
-                    value="#{messages['menu.treasury.bankingMovementSync']}"
-                    propagation="begin"/>
-        </rich:menuItem>
-    </rich:dropDownMenu>
-    <rich:dropDownMenu value="#{messages['menu.finances.receivables']}"
-                       rendered="#{legacyMenu.can('ROTATORYFUND')
-                    or legacyMenu.can('ROTATORYFUND','CREATE')
-                    or legacyMenu.can('OTHERRECEIVABLES')
-                    or legacyMenu.can('REPORTROTATORYFUND')
-                    or legacyMenu.can('REPORTROTATORYFUNDBALANCES')
-                    or legacyMenu.can('REPORTROTATORYFUNDBALANCESDETAIL')
-                    or legacyMenu.can('REPORTROTATORYFUNDPAYRECEIVABLE')
-                    or legacyMenu.can('REPORTRETRIEVEBYDEBTOR')
-                    or legacyMenu.can('REPORTROTATORYFUNDCOLLECTIONDETAIL')
-                    or legacyMenu.can('REPORTROTATORYFUNDINVOICECOLLECTION')
-                    or legacyMenu.can('ROTFUNDBYACCOUNTREPORT')
-                    or legacyMenu.can('ROTATORYFUNDDOCUMENTTYPE')}">
-        <rich:menuItem submitMode="none"
-                       rendered="#{legacyMenu.can('ROTATORYFUND') or legacyMenu.can('OTHERRECEIVABLES')}"
-                       styleClass="main-menu-item">
-            <s:link view="/finances/rotatoryFundList.xhtml"
-                    value="#{messages['menu.finances.rotatoryFund']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       rendered="#{legacyMenu.can('ROTATORYFUND','CREATE')}"
-                       styleClass="main-menu-item">
-            <s:link view="/finances/rotatoryFund.xhtml"
-                    value="#{messages['menu.finances.newRotatoryFund']}"
-                    action="#{rotatoryFundAction.newRotatoryFund}"/>
-        </rich:menuItem>
-        <rich:menuGroup value="#{messages['menu.finances.receivables.report']}" rendered="#{
-            legacyMenu.can('REPORTROTATORYFUND')
-            or legacyMenu.can('REPORTROTATORYFUNDBALANCES')
-            or legacyMenu.can('REPORTROTATORYFUNDBALANCESDETAIL')
-            or legacyMenu.can('REPORTROTATORYFUNDPAYRECEIVABLE')
-            or legacyMenu.can('REPORTRETRIEVEBYDEBTOR')
-            or legacyMenu.can('REPORTROTATORYFUNDCOLLECTIONDETAIL')
-            or legacyMenu.can('REPORTROTATORYFUNDINVOICECOLLECTION')
-            or legacyMenu.can('ROTFUNDBYACCOUNTREPORT')}">
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('REPORTROTATORYFUND')}">
-                <s:link view="/finances/rotatoryFundReport.xhtml"
-                        value="#{messages['Reports.rotatoryFund.menu.title']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('REPORTROTATORYFUNDBALANCES')}">
-                <s:link view="/finances/rotatoryFundBalancesReport.xhtml"
-                        value="#{messages['Reports.rotatoryFundBalances.menu.title']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('REPORTROTATORYFUNDBALANCESDETAIL')}">
-                <s:link view="/finances/rotatoryFundBalancesDetailReport.xhtml"
-                        value="#{messages['Reports.rotatoryFundBalancesDetail.menu.title']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('REPORTROTATORYFUNDPAYRECEIVABLE')}">
-                <s:link view="/finances/rotatoryFundPaymentReceivableReport.xhtml"
-                        value="#{messages['Reports.rotatoryFundPaymentReceivable.menu.title']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('REPORTRETRIEVEBYDEBTOR')}">
-                <s:link view="/finances/retrieveByDebtorReport.xhtml"
-                        value="#{messages['Reports.retrieveByDebtor.menu.title']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('REPORTROTATORYFUNDCOLLECTIONDETAIL')}">
-                <s:link view="/finances/rotatoryFundCollectionDetailReport.xhtml"
-                        value="#{messages['Reports.rotatoryFundCollectionDetail.menu.title']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('REPORTROTATORYFUNDINVOICECOLLECTION')}">
-                <s:link view="/finances/rotatoryFundInvoiceCollectionReport.xhtml"
-                        value="#{messages['Reports.rotatoryFundInvoiceCollection.menu.title']}"
-                        propagation="none"/>
-            </rich:menuItem>
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('ROTFUNDBYACCOUNTREPORT')}">
-                <s:link view="/finances/rotatoryFundByAccountReport.xhtml"
-                        value="#{messages['Reports.rotatoryFundByAccount.menu.title']}"
-                        propagation="none"/>
-            </rich:menuItem>
-        </rich:menuGroup>
-        <rich:menuGroup value="#{messages['menu.finances.receivables.configuration']}"
-                        rendered="#{legacyMenu.can('ROTATORYFUNDDOCUMENTTYPE')}">
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyMenu.can('ROTATORYFUNDDOCUMENTTYPE')}">
-                <s:link view="/finances/rotatoryFundDocumentTypeList.xhtml"
-                        value="#{messages['menu.finances.receivables.configuration.documentType']}"
-                        propagation="none"/>
-            </rich:menuItem>
-        </rich:menuGroup>
-    </rich:dropDownMenu>
-    <rich:dropDownMenu value="#{messages['menu.finances.report']}" rendered="#{
-            legacyMenu.can('REPORTPURCHASEORDER')
-            }">
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('REPORTPURCHASEORDER')}">
-            <s:link view="/purchases/purchaseOrderReport.xhtml"
-                    value="#{messages['Reports.purchaseOrder.menu.title']}"
-                    propagation="none"/>
-        </rich:menuItem>
-    </rich:dropDownMenu>
-    <rich:dropDownMenu value="#{messages['menu.finances.configuration']}"
-                       rendered="#{legacyMenu.can('MEASUREUNIT') or
-                        legacyMenu.can('CASHACCOUNTGROUP') or
-                        legacyMenu.can('COSTCENTER') or
-                        legacyMenu.can('COSTCENTERGROUP') or
-                        legacyMenu.can('FINANCESBANKACCOUNT') or
-                        legacyMenu.can('FINANCESEXCHANGERATE')}">
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('MEASUREUNIT')}">
-            <s:link view="/finances/measureUnitList.xhtml"
-                    value="#{messages['menu.finances.configuration.measureUnit']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('FINANCESBANKACCOUNT')}">
-            <s:link view="/finances/financesBankAccountList.xhtml"
-                    value="#{messages['menu.finances.configuration.financesBankAccount']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('CASHACCOUNTGROUP')}">
-            <s:link view="/finances/cashAccountGroupList.xhtml"
-                    value="#{messages['menu.finances.configuration.cashAccountGroup']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('COSTCENTER')}">
-            <s:link view="/finances/costCenterList.xhtml"
-                    value="#{messages['menu.rrhh.configuration.costCenter']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('COSTCENTERGROUP')}">
-            <s:link view="/finances/costCenterGroupList.xhtml"
-                    value="#{messages['menu.rrhh.configuration.costCenterGroup']}"
-                    propagation="none"/>
-        </rich:menuItem>
-
-
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/finances/taxRuleList.xhtml"
-                    value="#{messages['menu.finances.taxRule']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/finances/taxPercentageList.xhtml"
-                    value="#{messages['menu.finances.configuration.taxPercentage']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/finances/taxPercentageTypeList.xhtml"
-                    value="#{messages['menu.finances.configuration.taxPercentageType']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none" styleClass="main-menu-item">
-            <s:link view="/finances/dosageTypeList.xhtml"
-                    value="#{messages['menu.finances.configuration.dosageType']}"
-                    propagation="none"/>
-        </rich:menuItem>
-        <rich:menuItem submitMode="none"
-                       styleClass="main-menu-item"
-                       rendered="#{legacyMenu.can('FINANCESEXCHANGERATE')}">
-            <s:link view="/finances/financesExchangeRateList.xhtml"
-                    value="#{messages['menu.finances.configuration.financesExchangeRate']}"
-                    propagation="none"/>
-        </rich:menuItem>
-
-    </rich:dropDownMenu>
     </h:panelGrid>
 </rich:tab>
 

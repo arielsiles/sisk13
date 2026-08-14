@@ -1408,69 +1408,6 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
     }
 
     @SuppressWarnings(value = "unchecked")
-    public void createAccountEntryFromProductDelivery(WarehouseVoucher warehouseVoucher, String[] gloss)
-            throws CompanyConfigurationNotFoundException,
-            FinancesCurrencyNotFoundException,
-            FinancesExchangeRateNotFoundException, WarehouseAccountCashNotFoundException {
-        if (warehouseVoucher.isTransfer()) {
-            log.debug("The account entry should not be generated for transference vouchers.");
-            return;
-        }
-
-        if (!existsControlValuedProductsItems(warehouseVoucher)) {
-            log.debug("Unable to generate the account entry because the all productItems " +
-                    "related with movement details are not enabled controlValued property.");
-            return;
-        }
-
-        log.debug("Generating the account entry for warehouse voucher Nro: " + warehouseVoucher.getNumber());
-
-        if (warehouseVoucher.isReception()) {
-            createAccountEntryForReception(warehouseVoucher,
-                    warehouseVoucher.getExecutorUnit(),
-                    warehouseVoucher.getCostCenterCode(),
-                    gloss[0]);
-        } else if (warehouseVoucher.isExecutorUnitTransfer()) {
-            createAccountEntryForExecutorUnitTransfer(warehouseVoucher, gloss);
-        } else if ((warehouseVoucher.isInput() || warehouseVoucher.isOutput()) &&
-                (warehouseVoucher.getDocumentType().isContraAccountDefinedByUser() ||
-                        warehouseVoucher.getDocumentType().isContraAccountDefinedByDefault())) {
-            CashAccount contraAccount = warehouseVoucher.getDocumentType().isContraAccountDefinedByUser() ?
-                    warehouseVoucher.getContraAccount() : warehouseVoucher.getDocumentType().getContraAccount();
-            if (warehouseVoucher.isInput()) {
-                createAccountEntryForInputsAndContraAccount(warehouseVoucher,
-                        contraAccount,
-                        warehouseVoucher.getExecutorUnit(),
-                        warehouseVoucher.getCostCenterCode(),
-                        gloss[0]);
-            } else {
-                createAccountEntryForOutputsAndContraAccount(warehouseVoucher,
-                        contraAccount,
-                        warehouseVoucher.getExecutorUnit(),
-                        warehouseVoucher.getCostCenterCode(),
-                        gloss[0]);
-            }
-        } else {
-            MovementDetailType movementDetailType =
-                    WarehouseUtil.getMovementTye(warehouseVoucher.getDocumentType());
-
-            if (MovementDetailType.E.equals(movementDetailType)) {
-                createAccountEntryForInputs(warehouseVoucher,
-                        warehouseVoucher.getExecutorUnit(),
-                        warehouseVoucher.getCostCenterCode(),
-                        gloss[0]);
-            }
-
-            if (MovementDetailType.S.equals(movementDetailType)) {
-                createAccountEntryForOutputsFromProductDelivery(warehouseVoucher,
-                        warehouseVoucher.getExecutorUnit(),
-                        warehouseVoucher.getCostCenterCode(),
-                        gloss[0]);
-            }
-        }
-    }
-
-    @SuppressWarnings(value = "unchecked")
     public String createAccountEntryFromCollection(WarehouseVoucher warehouseVoucher, String[] gloss)
             throws CompanyConfigurationNotFoundException,
             FinancesCurrencyNotFoundException,
@@ -1970,64 +1907,6 @@ public class WarehouseAccountEntryServiceBean extends GenericServiceBean impleme
             //voucherService.create(voucherForGeneration);
             warehouseVoucher.setVoucher(voucherForGeneration);
             voucherAccoutingService.saveVoucher(voucherForGeneration);
-        }
-    }
-
-    private void createAccountEntryForOutputsFromProductDelivery(WarehouseVoucher warehouseVoucher,
-                                                                 BusinessUnit executorUnit,
-                                                                 String costCenterCode,
-                                                                 String gloss)
-            throws CompanyConfigurationNotFoundException,
-            FinancesCurrencyNotFoundException,
-            FinancesExchangeRateNotFoundException {
-        //todo:muy importante restablecer el cambio luego
-        //Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.ORDER_VOUCHER_FORM, gloss);
-        Voucher voucherForGeneration = VoucherBuilder.newGeneralVoucher(Constants.ORDER_VOUCHER_FORM, gloss);
-        CompanyConfiguration companyConfiguration = companyConfigurationService.findCompanyConfiguration();
-        List<MovementDetail> movementDetails = movementDetailService.findDetailByVoucherAndType(warehouseVoucher, MovementDetailType.S);
-
-        BigDecimal total = BigDecimal.ZERO;
-        for (MovementDetail movementDetail : movementDetails) {
-            if (!movementDetail.getProductItem().getControlValued()) {
-                log.debug("The movement detail with id=" +
-                        movementDetail.getId() +
-                        " was skipped because his product item does not have the controlValue field enabled.");
-                continue;
-            }
-
-            if (BigDecimalUtil.isZeroOrNull(movementDetail.getAmount())) {
-                log.debug("The movement detail with id=" +
-                        movementDetail.getId() +
-                        " was skipped because his amount its equal to zero.");
-                continue;
-            }
-
-            BigDecimal detailAmount = BigDecimalUtil.roundBigDecimal(movementDetail.getAmount());
-            total = BigDecimalUtil.sum(total, detailAmount);
-            voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newDebitVoucherDetail(
-                    executorUnit.getExecutorUnitCode(),
-                    costCenterCode,
-                    movementDetail.getProductItemCashAccount(),
-                    detailAmount,
-                    movementDetail.getProductItemCashAccount().getCurrency(),
-                    financesExchangeRateService.getExchangeRateByCurrencyType(movementDetail.getProductItemCashAccount().getCurrency(), BigDecimal.ONE)));
-        }
-
-        if (BigDecimalUtil.isPositive(total)) {
-
-            System.out.println(">>>>>>>>>>>>>>>>>>>>> CUENTA CONTABLE: " + companyConfiguration.requireWarehouseNationalCurrencyTransientAccount2().getFullName());
-            voucherForGeneration.setUserNumber(companyConfigurationService.findDefaultAccountancyUserNumber());
-            voucherForGeneration.addVoucherDetail(VoucherDetailBuilder.newCreditVoucherDetail(
-                    executorUnit.getExecutorUnitCode(),
-                    costCenterCode,
-                    cashAccountService.findByAccountCode(warehouseVoucher.getWarehouse().getCashAccount()),
-                    //companyConfiguration.getWarehouseNationalCurrencyTransientAccount2(),
-                    total,
-                    FinancesCurrencyType.P,
-                    BigDecimal.ONE));
-            voucherForGeneration.setDate(warehouseVoucher.getDate());
-            //check transactionNumber
-            voucherService.create(voucherForGeneration);
         }
     }
 

@@ -25,8 +25,6 @@ import java.util.List;
 public interface WarehouseAccountEntryService extends GenericService {
     void createAccountEntry(WarehouseVoucher warehouseVoucher, String[] gloss) throws CompanyConfigurationNotFoundException, FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException, WarehouseAccountCashNotFoundException;
 
-    void createAccountEntryFromProductDelivery(WarehouseVoucher warehouseVoucher, String[] gloss) throws CompanyConfigurationNotFoundException, FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException, WarehouseAccountCashNotFoundException;
-
     String createAccountEntryFromCollection(WarehouseVoucher warehouseVoucher, String[] gloss) throws CompanyConfigurationNotFoundException, FinancesCurrencyNotFoundException, FinancesExchangeRateNotFoundException, WarehouseAccountCashNotFoundException;
 
     void createAdvancePaymentAccountEntry(PurchaseOrderPayment purchaseOrderPayment) throws CompanyConfigurationNotFoundException;

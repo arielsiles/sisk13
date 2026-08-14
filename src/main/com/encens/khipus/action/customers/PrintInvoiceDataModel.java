@@ -2,7 +2,6 @@ package com.encens.khipus.action.customers;
 
 import com.encens.khipus.framework.action.QueryDataModel;
 import com.encens.khipus.model.customers.CustomerOrder;
-import com.encens.khipus.model.warehouse.ProductDelivery;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.Create;
