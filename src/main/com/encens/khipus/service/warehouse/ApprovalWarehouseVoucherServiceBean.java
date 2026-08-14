@@ -700,8 +700,6 @@ public class ApprovalWarehouseVoucherServiceBean extends GenericServiceBean impl
         if (gloss[1] != null) {
             gloss[1] = gloss[1].replaceAll(Constants.WAREHOUSEVOUCHER_NUMBER_PARAM, warehouseVoucher.getNumber());
         }
-        //todo: este metodo  crea el asiento contable
-        //warehouseAccountEntryService.createAccountEntryFromProductDelivery(warehouseVoucher, gloss); //Change by createAccountEntryFromProductDelivery
 
         updatePendantVoucherWarningContent(productItemService.findByWarehouseVoucher(warehouseVoucher));
     }

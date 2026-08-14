@@ -612,60 +612,6 @@
         </navigation>
     </page>
 
-    <page view-id="/warehouse/productDeliveryList.xhtml">
-        <end-conversation/>
-        <navigation from-action="#{productDeliveryAction.select(productDeliveryItem)}">
-            <rule>
-                <redirect view-id="/warehouse/productDelivery.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-
-    <page view-id="/warehouse/productDelivery.xhtml"
-          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
-        <navigation from-action="#{productDeliveryAction.create}">
-            <rule if-outcome="Success">
-                <begin-conversation flush-mode="MANUAL"/>
-                <redirect view-id="/warehouse/productDelivery.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation>
-            <rule>
-                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-
-    <page view-id="/warehouse/productDeliveryVentaDirecta.xhtml"
-          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
-        <navigation from-action="#{productDeliveryAction.create}">
-            <rule if-outcome="Success">
-                <begin-conversation flush-mode="MANUAL"/>
-                <redirect view-id="/warehouse/productDeliveryVentaDirecta.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation>
-            <rule>
-                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-
-    <page view-id="/warehouse/productDeliveryByDate.xhtml"
-          no-conversation-view-id="/warehouse/productDeliveryList.xhtml">
-        <navigation from-action="#{productDeliveryAction.create}">
-            <rule if-outcome="Success">
-                <begin-conversation flush-mode="MANUAL"/>
-                <redirect view-id="/warehouse/productDeliveryByDate.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation>
-            <rule>
-                <redirect view-id="/warehouse/productDeliveryList.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-
     <page view-id="/warehouse/warehousePurchaseDocument.xhtml" no-conversation-view-id="/warehouse/warehousePurchaseOrderList.xhtml">
         <!--<navigation>
             <rule if-outcome="Success">

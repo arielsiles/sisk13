@@ -31,37 +31,11 @@ public interface AccountItemService extends GenericService {
 
     public Collection<OrderItem> findOrderItemPack(Date dateOrder, String stateOrder);
 
-    public Collection<OrderItem> findOrderItemPackByState(Date dateOrder);
-
     public Integer getAmountCombo(String codArt, String idOrder);
 
     public List<OrderClient> findClientsOrder(BigDecimal distribuidor,Date date);
 
-    public List<OrderItem> findOrderItemByState(Date dateOrder);
-
-    public Integer getAmountByDateAndDistributorInstitution(String codArt,BigDecimal idDistribution,Date dateOrder);
-
-    public Integer getAmountByDateAndDistributorOrder(String codArt,BigDecimal idDistribution,Date dateOrder);
-
-    public Integer getAmountByDateAndDistributorInstitution(String codArt,Date dateOrder);
-
-    public Integer getAmountByDateAndDistributorOrder(String codArt ,Date dateOrder);
-
     public Integer getAmountCombo(String codPaquete,BigDecimal idDistributor, Date date);
-
-    public Integer getAmountComboTotalAndDistributor(String codPaquete,BigDecimal distribuidor, Date date);
-
-    public Integer getAmountComboTotal(String codPaquete, Date date);
-
-    public Integer getAmountByDateAndDistributorOrderDelivery(String codArt,BigDecimal idDistribution,Date dateOrder);
-
-    public Integer getAmountByDateAndDistributorInstitutionDelivery(String codArt,BigDecimal idDistribution,Date dateOrder);
-
-    public Integer getAmountByDateAndDistributorOrderDelivery(String codArt ,Date dateOrder);
-
-    public Integer getAmountByDateAndDistributorInstitutionDelivery(String codArt,Date dateOrder);
-
-    public Integer getAmountComboTotalDelivery(String codPaquete, Date date);
 
     List<OrderItem> findArticulosPorFecha(Date date);
 
