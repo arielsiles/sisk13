@@ -1,4 +1,4 @@
--- Fusion de cambios de estructura v6.0.17 -> v6.0.125 (FCISC). Solo DDL + catalogo de funcionalidad. Requiere MySQL 8.
+-- Fusion de cambios de estructura v6.0.17 -> v6.0.125 (FCISC). Solo DDL + catalogo de funcionalidad. Compatible MySQL 5.6 y 8.
 
 -- ---------------------------------------------------------------------------
 -- Helpers idempotentes. Se crean al inicio y se eliminan al final.
@@ -1472,8 +1472,8 @@ CALL mg_func_add('CASHACCOUNTLEVEL', 'Analisis y correccion de niveles de cuenta
 -- ===========================================================================
 -- v6.0.112_terdemol
 -- ===========================================================================
-CALL mg_mod_col('arcgms', 'cta_raiz', '`cta_raiz` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('arcgms', 'cta_niv3', '`cta_niv3` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
+CALL mg_mod_col('arcgms', 'cta_raiz', '`cta_raiz` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('arcgms', 'cta_niv3', '`cta_niv3` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
 
 -- [!] Las 2 FK fallan si hay cta_raiz/cta_niv3 apuntando a cuentas inexistentes.
 --     Verificado en khipus local: 0 colgadas. Diagnostico si falla:
@@ -1486,40 +1486,40 @@ CALL mg_add_fk('arcgms', 'fk_arcgms_cta_niv3', 'FOREIGN KEY (cta_niv3) REFERENCE
 -- ===========================================================================
 -- v6.0.113_terdemol
 -- ===========================================================================
-CALL mg_mod_col('configuracion', 'cajagral1mn',    '`cajagral1mn` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ct_cajaahorro',  '`ct_cajaahorro` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ct_cajaveter',   '`ct_cajaveter` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cta_pat01',      '`cta_pat01` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cta_pat02',      '`cta_pat02` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cta_pat03',      '`cta_pat03` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cta_pat04',      '`cta_pat04` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cta_pat05',      '`cta_pat05` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaAlmPT',       '`ctaAlmPT` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaAlmPTAG',     '`ctaAlmPTAG` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaAlmPV',       '`ctaAlmPV` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctacomision',    '`ctacomision` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaCostPT',      '`ctaCostPT` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaCostPV',      '`ctaCostPV` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaG_it',        '`ctaG_it` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaI_ventapri',  '`ctaI_ventapri` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaI_ventasec',  '`ctaI_ventasec` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaMerma',       '`ctaMerma` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaMermaBaj',    '`ctaMermaBaj` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaP_debFisIva', '`ctaP_debFisIva` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaP_itxpagar',  '`ctaP_itxpagar` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaProm',        '`ctaProm` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaprovaf',      '`ctaprovaf` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'ctaReproc',      '`ctaReproc` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cxp_cns',        '`cxp_cns` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cxp_iva',        '`cxp_iva` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cxp_provmn',     '`cxp_provmn` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'cxp_regalia',    '`cxp_regalia` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'i_pvig_pf_mn',   '`i_pvig_pf_mn` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'it_ret',         '`it_ret` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'iue_ret',        '`iue_ret` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'oc_pagodefault', '`oc_pagodefault` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'res_perdida',    '`res_perdida` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
-CALL mg_mod_col('configuracion', 'res_utilidad',   '`res_utilidad` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cajagral1mn',    '`cajagral1mn` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ct_cajaahorro',  '`ct_cajaahorro` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ct_cajaveter',   '`ct_cajaveter` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cta_pat01',      '`cta_pat01` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cta_pat02',      '`cta_pat02` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cta_pat03',      '`cta_pat03` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cta_pat04',      '`cta_pat04` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cta_pat05',      '`cta_pat05` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaAlmPT',       '`ctaAlmPT` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaAlmPTAG',     '`ctaAlmPTAG` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaAlmPV',       '`ctaAlmPV` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctacomision',    '`ctacomision` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaCostPT',      '`ctaCostPT` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaCostPV',      '`ctaCostPV` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaG_it',        '`ctaG_it` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaI_ventapri',  '`ctaI_ventapri` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaI_ventasec',  '`ctaI_ventasec` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaMerma',       '`ctaMerma` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaMermaBaj',    '`ctaMermaBaj` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaP_debFisIva', '`ctaP_debFisIva` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaP_itxpagar',  '`ctaP_itxpagar` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaProm',        '`ctaProm` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaprovaf',      '`ctaprovaf` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'ctaReproc',      '`ctaReproc` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cxp_cns',        '`cxp_cns` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cxp_iva',        '`cxp_iva` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cxp_provmn',     '`cxp_provmn` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'cxp_regalia',    '`cxp_regalia` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'i_pvig_pf_mn',   '`i_pvig_pf_mn` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'it_ret',         '`it_ret` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'iue_ret',        '`iue_ret` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'oc_pagodefault', '`oc_pagodefault` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'res_perdida',    '`res_perdida` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
+CALL mg_mod_col('configuracion', 'res_utilidad',   '`res_utilidad` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL');
 
 -- Saneamiento previo: toda cuenta de configuracion que no exista en arcgms pasa a
 -- NULL, si no la FK correspondiente no se puede crear. Generaliza el UPDATE de
@@ -1690,8 +1690,8 @@ CALL mg_mod_col('xpr_linea', 'merma_factor', '`merma_factor` DECIMAL(10,4) NULL'
 -- ===========================================================================
 -- v6.0.121_terdemol
 -- ===========================================================================
-CALL mg_add_col('configuracion', 'i_ppag_dpf_mn', '`i_ppag_dpf_mn` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT ''Gasto intereses provision DPF MN''');
-CALL mg_add_col('configuracion', 'i_ppag_dpf_me', '`i_ppag_dpf_me` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT ''Gasto intereses provision DPF ME''');
+CALL mg_add_col('configuracion', 'i_ppag_dpf_mn', '`i_ppag_dpf_mn` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT ''Gasto intereses provision DPF MN''');
+CALL mg_add_col('configuracion', 'i_ppag_dpf_me', '`i_ppag_dpf_me` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT ''Gasto intereses provision DPF ME''');
 CALL mg_null_fk('configuracion', 'i_ppag_dpf_mn', 'arcgms', 'cuenta');
 CALL mg_null_fk('configuracion', 'i_ppag_dpf_me', 'arcgms', 'cuenta');
 CALL mg_add_fk('configuracion',  'fk_configuracion_i_ppag_dpf_mn', 'FOREIGN KEY (i_ppag_dpf_mn) REFERENCES arcgms (cuenta)');
@@ -1715,13 +1715,13 @@ CALL mg_mod_col('sf_tmpenc', 'close', '`close` int NOT NULL DEFAULT 0');
 
 CALL mg_func_add('ACCOUNTTYPE', 'Tipos de cuenta de ahorro (tipocuenta)', 1, 15, 'Functionality.customers.accountType', 1);
 
-CALL mg_add_col('configuracion', 'cajagral1me', '`cajagral1me` varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin DEFAULT NULL COMMENT ''Caja general ME''');
+CALL mg_add_col('configuracion', 'cajagral1me', '`cajagral1me` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT ''Caja general ME''');
 CALL mg_null_fk('configuracion', 'cajagral1me', 'arcgms', 'cuenta');
 CALL mg_add_fk('configuracion',  'fk_configuracion_cajagral1me', 'FOREIGN KEY (cajagral1me) REFERENCES arcgms (cuenta)');
 
 CALL mg_func_add('DPFCLOSE', 'Cierre de Depositos a Plazo Fijo', 1, 3, 'Functionality.customers.dpfClose', 1);
 
-CALL mg_add_col('configuracion', 'tipo_doc_dpf', '`tipo_doc_dpf` varchar(5) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT ''Comprobante de apertura DPF''');
+CALL mg_add_col('configuracion', 'tipo_doc_dpf', '`tipo_doc_dpf` varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT ''Comprobante de apertura DPF''');
 CALL mg_null_fk('configuracion', 'tipo_doc_dpf', 'tipodoc', 'nombre');
 CALL mg_add_fk('configuracion',  'fk_configuracion_tipo_doc_dpf', 'FOREIGN KEY (tipo_doc_dpf) REFERENCES tipodoc (nombre)');
 
