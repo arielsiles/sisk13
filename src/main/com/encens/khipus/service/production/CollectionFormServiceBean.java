@@ -64,21 +64,6 @@ public class CollectionFormServiceBean extends ExtendedGenericServiceBean implem
         }
     }
 
-    public CollectionForm finCollectionFormByDate(Date date)
-    {
-        CollectionForm collectionForm;
-        try{
-            collectionForm = (CollectionForm)getEntityManager().createQuery(" select collectionForm from CollectionForm collectionForm" +
-                                                                            " where collectionForm.date = :date ")
-                                                               .setParameter("date",date)
-                                                               .getSingleResult();
-        }catch (NoResultException e)
-        {
-            return null;
-        }
-        return collectionForm;
-    }
-
     public void updateProductiveZone(CollectionForm collectionForm)
     {
 

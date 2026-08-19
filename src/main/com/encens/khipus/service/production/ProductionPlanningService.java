@@ -63,10 +63,6 @@ public interface ProductionPlanningService extends GenericService {
 
     BigDecimal getTotalMilkBySubGroup(String codGroup, String codSubGroup, Date startDate, Date endDate);
 
-    Double getTotalMilkByDateAndCodArt(Date date, String codArt);
-
-    BigDecimal getTotalMilkByDate(Date startDate, Date endDate);
-
     Double getTotalProducedOrderByArticleAndDate(String codArt, Date startDate, Date endDate);
 
     Double getTotalProducedReproByArticleAndDate(String codArt, Date startDate, Date endDate);

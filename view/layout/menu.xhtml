@@ -2277,13 +2277,8 @@
 <rich:tab id="production"
               label="#{messages['menu.production']}"
               disabled="#{disableMenu}"
-              rendered="false">
+              rendered="true">
     <h:panelGrid columns="7" cellpadding="0" cellspacing="0" border="0" columnClasses="tab-separator,tab-separator,tab-separator,tab-separator,tab-separator,tab-separator">
-
-        <s:link view="/production/productionPlanningList.xhtml"
-                value="#{messages['menu.production.planification.distribution']}"
-                styleClass="tab-cell"
-                propagation="none"/>
 
         <s:link view="/production/productionPlanList.xhtml"
                 value="#{messages['menu.production.productionPlan']}"
@@ -2338,38 +2333,6 @@
 
         </rich:dropDownMenu>
 
-        <rich:dropDownMenu value="#{messages['menu.production.planification.Reportes']}" rendered="#{
-                        s:hasPermission('REPORTMILKRAW','VIEW') or
-                        s:hasPermission('REPORTPRODUCTPRODUCED','VIEW') or
-                        s:hasPermission('REPORTPRODUCCTIONBALANCE','VIEW')}">
-
-            <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('REPORTMILKRAW','VIEW')}">
-
-                <s:link view="/production/reports/rawMilkReport.xhtml"
-                            value="#{messages['menu.production.planification.ReportMilkRaw']}"
-                            propagation="begin"/>
-            </rich:menuItem>
-
-            <rich:menuItem submitMode="none"
-                        styleClass="main-menu-item"
-                        rendered="#{s:hasPermission('REPORTPRODUCTPRODUCED','VIEW')}">
-                <s:link view="/production/totalProductionReport.xhtml"
-                            value="#{messages['menu.production.planification.totalProduction']}"
-                            propagation="begin"/>
-            </rich:menuItem>
-
-            <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('REPORTPRODUCCTIONBALANCE','VIEW')}">
-
-                <s:link view="/production/reports/productionBalanceReport.xhtml"
-                        value="#{messages['menu.production.planification.reportProductionBalance']}"
-                        propagation="begin"/>
-            </rich:menuItem>
-        </rich:dropDownMenu>
-
         <rich:dropDownMenu value="#{messages['menu.production.configuration']}"
                            rendered="#{s:hasPermission('PRODUCTCONFIG','VIEW')}">
             <rich:menuItem submitMode="none"
@@ -2401,10 +2364,9 @@
     productos y sus reportes que se iran migrando a sus tabs definitivos. Se gobierna con
     un unico permiso (LEGACYPRODUCTIONPROCESSES): quien lo tiene ve el tab con TODAS sus
     opciones habilitadas; quien no lo tiene no ve el tab. Necesita permiso propio porque
-    9 de sus 17 codigos (COLLECTMATERIAL, MATERIALCOLLECTIONRECORD, METAPRODUCT,
-    PRODUCERPRICE, PRODUCTCONFIG, REPORTMILKRAW, REPORTPRODUCCTIONBALANCE,
-    REPORTPRODUCTPRODUCED, ZONEINSPECTION) tambien se usan en otros tabs: revocarlos para
-    apagar este tab romperia los otros menus.
+    6 de sus 14 codigos (COLLECTMATERIAL, MATERIALCOLLECTIONRECORD, METAPRODUCT,
+    PRODUCERPRICE, PRODUCTCONFIG, ZONEINSPECTION) tambien se usan en otros tabs:
+    revocarlos para apagar este tab romperia los otros menus.
     Cada opcion conserva el codigo de su permiso real en legacyProductsMenu.can('X'): ese
     es el mapa de migracion. Al mover una opcion a su tab definitivo hay que devolverle su
     s:hasPermission('X','VIEW'). Cuando este bloque quede vacio, eliminarlo junto con
@@ -2702,47 +2664,6 @@
                     value="#{messages['menu.production.planification.productionTransferLog']}"
                     propagation="none"/>
         </rich:menuItem>
-        <rich:menuGroup value="#{messages['menu.production.planification.Reportes']}"
-                        rendered="#{
-                legacyProductsMenu.can('REPORTMILKRAW') or
-                legacyProductsMenu.can('REPORTPRODUCTPRODUCED') or
-                legacyProductsMenu.can('REPORTPRODUCCTIONBALANCE')}">
-
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyProductsMenu.can('REPORTMILKRAW')}">
-
-                <s:link view="/production/reports/rawMilkReport.xhtml"
-                        value="#{messages['menu.production.planification.ReportMilkRaw']}"
-                        propagation="begin"/>
-            </rich:menuItem>
-
-            <!--<rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyProductsMenu.can('REPORTPRODUCTPRODUCED')}">
-                <s:link view="/production/reports/productsProducedReport.xhtml"
-                        value="#{messages['menu.production.planification.produced']}"
-                        propagation="begin"/>
-            </rich:menuItem>-->
-
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyProductsMenu.can('REPORTPRODUCTPRODUCED')}">
-                <s:link view="/production/totalProductionReport.xhtml"
-                        value="#{messages['menu.production.planification.totalProduction']}"
-                        propagation="begin"/>
-            </rich:menuItem>
-
-            <rich:menuItem submitMode="none"
-                           styleClass="main-menu-item"
-                           rendered="#{legacyProductsMenu.can('REPORTPRODUCCTIONBALANCE')}">
-
-                <s:link view="/production/reports/productionBalanceReport.xhtml"
-                        value="#{messages['menu.production.planification.reportProductionBalance']}"
-                        propagation="begin"/>
-            </rich:menuItem>
-
-        </rich:menuGroup>
     </rich:dropDownMenu>
 
 

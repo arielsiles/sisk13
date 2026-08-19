@@ -21,6 +21,4 @@ public interface CollectionFormService extends GenericService {
 
     public WarehouseDocumentType getFirstReceptionType();
 
-    public CollectionForm finCollectionFormByDate(Date date);
-
 }
