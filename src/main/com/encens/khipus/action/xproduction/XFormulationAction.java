@@ -9,6 +9,7 @@ import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.service.xproduction.XFormulationService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
+import org.jboss.seam.international.StatusMessage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,9 +54,33 @@ public class XFormulationAction extends GenericAction<XFormulation> {
     }
 
     public void approveFormulation(){
+        if (!validateDefaultInput()) {
+            return;
+        }
         XFormulation formulation = getInstance();
         formulation.setState(FormulationState.APR);
         xformulationService.updateFormulation(formulation, formulationInputList);
+    }
+
+    /**
+     * Exactamente un insumo debe quedar marcado como 'defecto': es el que define la
+     * M.P. Usada de las ordenes que usan la formulacion. Sin ninguno el consumo de esas
+     * ordenes se calcula en cero, y con varios se contaria mas de una vez.
+     */
+    private boolean validateDefaultInput() {
+        int defaults = 0;
+        for (XFormulationInput formulationInput : formulationInputList) {
+            if (Boolean.TRUE.equals(formulationInput.getInputDefault())) {
+                defaults++;
+            }
+        }
+
+        if (defaults == 1) return true;
+
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                defaults == 0 ? "XFormulation.error.defaultInputRequired"
+                              : "XFormulation.error.defaultInputUnique");
+        return false;
     }
 
     public void annulFormulation(){

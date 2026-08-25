@@ -58,7 +58,7 @@ public class DailyProductionReportAction {
             a.setYear(year);
             a.setMonth(month);
             a.generateReport();
-        } else if (productionLine.isBaritinaTemplate()) {
+        } else if (productionLine.isDailyReportTemplate()) {
             BaritinaDailyReportAction a = (BaritinaDailyReportAction)
                     Component.getInstance("baritinaDailyReportAction", true);
             a.setProductionLine(productionLine);

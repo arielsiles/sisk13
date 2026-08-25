@@ -98,7 +98,9 @@ ALTER TABLE xpr_linea ADD merma_factor         DECIMAL(10,4) NOT NULL DEFAULT 1.
 
 > `merma_factor` pasó a NULLABLE en `v6.0.120`; el bloque de arriba refleja la migración original. Ver §3.2.
 
-Valores admitidos en `report_template_code`: `ULEXITA`, `MOLIENDA` (futuro), `NULL` (línea sin reporte específico).
+Valores admitidos en `report_template_code` al escribir esta spec: `ULEXITA`, `MOLIENDA` (futuro),
+`NULL` (línea sin reporte específico). Hoy los códigos vigentes son `ULEXITA`, `BARITINA`, `GENERAL`
+y `NULL`; ver [`xproduction_ordenes_calculos.md`](xproduction_ordenes_calculos.md) §1.1.
 
 ### 4.2 Nueva tabla `xpr_produccion_ulexita`
 

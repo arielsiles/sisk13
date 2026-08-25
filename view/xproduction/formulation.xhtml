@@ -194,9 +194,11 @@
                             </c:if>
 
                             <td class="rich-table-cell center">
+                                <!-- Solo editable mientras la formulacion esta pendiente: cambiarlo en una
+                                     formulacion ya aprobada altera la M.P. Usada de sus ordenes historicas. -->
                                 <h:selectBooleanCheckbox 
                                                          value="#{formulationInput.inputDefault}"
-                                                         disabled="false"
+                                                         disabled="#{!xformulationAction.pending}"
                                                          tabindex="31">
                                 </h:selectBooleanCheckbox>
                             </td>

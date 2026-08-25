@@ -17,7 +17,8 @@ package com.encens.khipus.model.xproduction;
 public enum ProductionLineType {
 
     ULEXITA("ULEXITA", "ProductionLine.type.ulexita"),
-    BARITINA("BARITINA", "ProductionLine.type.baritina");
+    BARITINA("BARITINA", "ProductionLine.type.baritina"),
+    GENERAL("GENERAL", "ProductionLine.type.general");
 
     private final String code;
     private final String resourceKey;

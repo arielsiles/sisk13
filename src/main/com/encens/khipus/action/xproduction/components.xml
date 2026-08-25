@@ -128,7 +128,7 @@
              value="#{enumerationUtil.getEnumValues('com.encens.khipus.model.xproduction.ProductionLineType')}"/>
 
     <!-- Zonas productivas (maestro compartido con el acopio de materia prima),
-         usadas en la distribucion por zonas de las ordenes de produccion BARITINA. -->
+         usadas en la distribucion por zonas de las lineas que la tienen activada. -->
     <factory name="xproductiveZoneList" value="#{xproductiveZoneQuery}"/>
     <framework:entity-query name="xproductiveZoneQuery"
                             ejbql="select o from ProductiveZone o order by o.name ASC"/>

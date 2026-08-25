@@ -408,7 +408,7 @@
                 </s:div>
 
                 <s:div id="baritinaCalcPanel">
-                <c:if test="#{xproductionAction.baritinaTemplate}">
+                <c:if test="#{xproductionAction.dailyReportTemplate}">
                     <rich:panel styleClass="ulexCalcHeaderPanel">
                         <f:facet name="header">#{messages['XProduction.baritina.section.summary']}</f:facet>
                         <h:panelGrid columns="4" width="100%" cellpadding="3" cellspacing="0" border="0"
@@ -424,11 +424,19 @@
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
 
-                            <h:outputText value="#{messages['XProduction.baritina.pctTotal']}"/>
-                            <h:outputText value="#{xproductionAction.baritinaZonaPctTotal}" styleClass="right"
-                                          style="color: #{xproductionAction.baritinaZonaPctComplete ? '#35B056' : 'red'}; font-weight:bold;">
-                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
-                            </h:outputText>
+                            <!-- Los panelGroup mantienen las celdas de la grilla cuando la linea no
+                                 usa zonas: si se ocultara el outputText, las columnas se correrian. -->
+                            <h:panelGroup>
+                                <h:outputText value="#{messages['XProduction.baritina.pctTotal']}"
+                                              rendered="#{xproductionAction.zonesEnabled}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <h:outputText value="#{xproductionAction.baritinaZonaPctTotal}" styleClass="right"
+                                              rendered="#{xproductionAction.zonesEnabled}"
+                                              style="color: #{xproductionAction.baritinaZonaPctComplete ? '#35B056' : 'red'}; font-weight:bold;">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </h:panelGroup>
                             <h:outputText value=""/>
                             <h:outputText value=""/>
 
@@ -437,7 +445,7 @@
                 </c:if>
                 </s:div>
 
-                <c:if test="#{xproductionAction.baritinaTemplate}">
+                <c:if test="#{xproductionAction.dailyReportTemplate}">
                     <s:div id="baritinaExtraPanel" style="margin-top:6px;">
                         <rich:panel>
                             <f:facet name="header">#{messages['XProduction.baritina.section.extra']}</f:facet>
@@ -544,7 +552,7 @@
                                     <a4j:support event="onblur" ajaxSingle="true"
                                                  action="#{xproductionAction.recalcBaritinaZonas}"
                                                  rendered="#{!xproductionAction.approved}"
-                                                 reRender="ingredientPanel, totalCostField, totalRawMaterialField#{xproductionAction.baritinaTemplate ? ', baritinaCalcPanel, baritinaZonaPanel' : ''}" />
+                                                 reRender="ingredientPanel, totalCostField, totalRawMaterialField#{xproductionAction.dailyReportTemplate ? ', baritinaCalcPanel' : ''}#{xproductionAction.zonesEnabled ? ', baritinaZonaPanel' : ''}" />
                                 </h:inputText>
                                 <h:message for="#{quantityInputFieldId}" styleClass="errors" style="display:block;" rendered="true"/>
                             </td>
@@ -556,12 +564,14 @@
                             </td>
 
                             <td class="rich-table-cell center">
+                                <!-- La MP por defecto no se puede retirar: es la que define la M.P. Usada
+                                     de la orden. Si no hubo consumo, va con cantidad en cero. -->
                                 <a4j:commandLink immediate="true"
                                                  title="#{messages['Common.remove']}"
                                                  action="#{xproductionAction.removeSupply(supplyDetail)}"
                                                  ajaxSingle="true"
-                                                 rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','DELETE')}"
-                                                 reRender="ingredientPanel, totalCostField, totalRawMaterialField">
+                                                 rendered="#{xproductionAction.pending and s:hasPermission('XPRODUCTION_PLAN','DELETE') and !xproductionAction.isDefaultRawMaterial(supplyDetail)}"
+                                                 reRender="ingredientPanel, totalCostField, totalRawMaterialField, :globalMessages">
                                     <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
                                 </a4j:commandLink>
                             </td>
@@ -817,7 +827,7 @@
     <rich:spacer height="10" />
     </c:if>
 
-    <c:if test="#{xproductionAction.baritinaTemplate}">
+    <c:if test="#{xproductionAction.zonesEnabled}">
     <table width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
     <td valign="top" width="50%" style="padding-right:4px;">
@@ -930,8 +940,8 @@
     </c:if>
 
     <rich:tabPanel id="finalProductPanel" switchType="ajax" selectedTab="#{xproductionAction.activeTabName}"
-                   rendered="#{!xproductionAction.baritinaTemplate or s:hasPermission('PRODUCTION_LABOR','VIEW')}">
-        <c:if test="#{!xproductionAction.baritinaTemplate}">
+                   rendered="#{!xproductionAction.zonesEnabled or s:hasPermission('PRODUCTION_LABOR','VIEW')}">
+        <c:if test="#{!xproductionAction.zonesEnabled}">
         <rich:tab name="productsTab" label="#{messages['Production.products']}" action="#{xproductionAction.enableProductsTab}" ajaxSingle="true" immediate="true">
             <ui:include src="/xproduction/finishedProductsTable.xhtml"/>
         </rich:tab>

@@ -10,6 +10,7 @@ import com.encens.khipus.model.production.MeasurementUnit;
 import com.encens.khipus.model.production.ProductionState;
 import com.encens.khipus.model.production.SupplyType;
 import com.encens.khipus.model.warehouse.ProductItem;
+import com.encens.khipus.model.warehouse.WarehouseType;
 import com.encens.khipus.model.xproduction.*;
 import com.encens.khipus.service.common.SequenceService;
 import com.encens.khipus.service.employees.JobContractService;
@@ -151,7 +152,7 @@ public class XProductionAction extends GenericAction<XProduction> {
         baritinaData = null;
         baritinaZonaList = new ArrayList<XProductionBaritinaZona>();
         if (getInstance() == null || getInstance().getId() == null) return;
-        if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isBaritinaTemplate()) return;
+        if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isDailyReportTemplate()) return;
         baritinaData = xproductionBaritinaService.findByProduction(getInstance());
         if (baritinaData == null) {
             baritinaData = new XProductionBaritina();
@@ -165,7 +166,7 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     private void persistBaritinaData() {
         if (getInstance() == null || getInstance().getId() == null) return;
-        if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isBaritinaTemplate()) return;
+        if (getInstance().getProductionLine() == null || !getInstance().getProductionLine().isDailyReportTemplate()) return;
         recalcBaritinaZonas();
         if (baritinaData != null) {
             if (baritinaData.getProduction() == null) {
@@ -290,6 +291,14 @@ public class XProductionAction extends GenericAction<XProduction> {
         recalcBaritinaZonas();
 
         if (!validateSupplyQuantities()) {
+            return;
+        }
+
+        if (!validateDefaultRawMaterial()) {
+            return;
+        }
+
+        if (!validateMaterialsWithoutRawMaterial()) {
             return;
         }
 
@@ -504,9 +513,18 @@ public class XProductionAction extends GenericAction<XProduction> {
     }
 
     public void addMaterialProductItems(List<ProductItem> productItems) {
+        StringBuilder rejected = new StringBuilder();
         for (ProductItem productItem : productItems) {
             /** does not work **/
             if (materialSupplyList.contains(productItem.getProductItemCode())) {
+                continue;
+            }
+
+            // Las materias primas van en Insumos, nunca en Materiales: cargarlas en las dos
+            // tablas duplica el consumo del articulo contra Saldos de Almacen y el costo de
+            // la orden, y la copia de Materiales no suma en M.P. Usada ni se ve en el reporte.
+            if (isRawMaterialItem(productItem)) {
+                appendItemName(rejected, productItem);
                 continue;
             }
 
@@ -517,6 +535,27 @@ public class XProductionAction extends GenericAction<XProduction> {
             //supply.setUnitCost(productItem.getUnitCost());
             materialSupplyList.add(supply);
         }
+
+        if (rejected.length() > 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "XProduction.error.rawMaterialAsMaterial", rejected.toString());
+        }
+    }
+
+    /**
+     * El articulo es materia prima: vive en un almacen de tipo MATERIA PRIMA. El criterio es
+     * el almacen y no la formulacion ni la linea, para que valga tambien cuando se carga una
+     * MP distinta de la de la orden. Es el mismo criterio del reporte diario.
+     */
+    public boolean isRawMaterialItem(ProductItem productItem) {
+        return productItem != null
+                && productItem.getWarehouse() != null
+                && WarehouseType.RAW_MATERIAL.equals(productItem.getWarehouse().getWarehouseType());
+    }
+
+    private void appendItemName(StringBuilder sb, ProductItem productItem) {
+        if (sb.length() > 0) sb.append(", ");
+        sb.append(productItem.getFullName());
     }
 
     /**
@@ -570,6 +609,9 @@ public class XProductionAction extends GenericAction<XProduction> {
             supply.setProductItem(productItem);
             supply.setQuantity(BigDecimal.ZERO);
             supply.setType(SupplyType.INGREDIENT);
+            // Si el articulo pertenece a la formulacion de la orden hay que enlazarlo: sin
+            // ese enlace el insumo no suma en M.P. Usada aunque sea el mismo articulo.
+            supply.setFormulationInput(findFormulationInput(productItem.getProductItemCode()));
             ingredientSupplyList.add(supply);
         }
     }
@@ -646,6 +688,10 @@ public class XProductionAction extends GenericAction<XProduction> {
         List<XMaterialInput> ingredientInputList = xproductionService.getIngredientOrMaterialInput(product.getProductItemCode(), SupplyType.INGREDIENT);
 
         for (XMaterialInput materialInput : materialInputList){
+            // Misma regla que el alta manual: una materia prima configurada como material
+            // no entra a la tabla de Materiales.
+            if (isRawMaterialItem(materialInput.getProductItemMaterial())) continue;
+
             XSupply supply = new XSupply();
             supply.setProductItemCode(materialInput.getProductItemMaterialCode());
             supply.setProductItem(materialInput.getProductItemMaterial());
@@ -694,12 +740,28 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     public void removeSupply(XSupply supply){
         if (supply == null) return;
+        // La MP por defecto es la que define la M.P. Usada de la orden. Si se retira y se
+        // vuelve a agregar a mano queda sin enlace a la formulacion y el consumo pasa a
+        // calcularse en cero sin aviso. Para no registrar consumo basta con dejar la
+        // cantidad en cero; el articulo lo define la formulacion, no el operador.
+        if (isDefaultRawMaterial(supply)) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "XProduction.warn.defaultRawMaterialNotRemovable");
+            return;
+        }
         xproductionService.removeSupply(supply);
         if (SupplyType.INGREDIENT.equals(supply.getType())) {
             removeSupplyById(ingredientSupplyList, supply.getId());
         }
         if (SupplyType.MATERIAL.equals(supply.getType())) {
             removeSupplyById(materialSupplyList, supply.getId());
+        }
+        // La coleccion de la orden hay que sincronizarla aparte: si la fila borrada sigue
+        // ahi, el em.merge(production) del guardado intenta reenganchar un XSupply que ya no
+        // existe y todo el guardado falla con EntityNotFoundException. La coleccion queda
+        // cargada cuando se llega a la orden desde el plan, que la recorre.
+        if (getInstance() != null) {
+            removeSupplyById(getInstance().getSupplyList(), supply.getId());
         }
     }
 
@@ -731,6 +793,91 @@ public class XProductionAction extends GenericAction<XProduction> {
             result = true;
 
         return result;
+    }
+
+    /**
+     * Insumo de MATERIA PRIMA por defecto: el enlazado al insumo de la formulacion
+     * marcado como 'defecto'. Es el unico que suma en M.P. Usada, y de ahi sale el
+     * consumo que llega al dashboard y a los reportes.
+     */
+    public boolean isDefaultRawMaterial(XSupply supply) {
+        return supply != null
+                && supply.hasFormula()
+                && Boolean.TRUE.equals(supply.getFormulationInput().getInputDefault());
+    }
+
+    /** Formulacion de la orden: en el alta aun no esta en la instancia, solo en la seleccion. */
+    private XFormulation getOrderFormulation() {
+        XFormulation result = getInstance() != null ? getInstance().getFormulation() : null;
+        if (result == null) {
+            result = this.formulation;
+        }
+        return result;
+    }
+
+    /** Insumo de la formulacion de la orden para un articulo, o null si no pertenece a ella. */
+    private XFormulationInput findFormulationInput(String productItemCode) {
+        XFormulation orderFormulation = getOrderFormulation();
+        if (orderFormulation == null || productItemCode == null) return null;
+
+        for (XFormulationInput formulationInput : orderFormulation.getFormulationInputList()) {
+            if (productItemCode.equals(formulationInput.getProductItemCode())) {
+                return formulationInput;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Al aprobar: Materiales no puede contener materias primas. Ademas de cerrar el alta,
+     * hay que frenar aqui las ordenes viejas que ya las tienen cargadas: mientras esa fila
+     * exista, el consumo del articulo se descuenta dos veces en Saldos de Almacen.
+     */
+    private boolean validateMaterialsWithoutRawMaterial() {
+        StringBuilder found = new StringBuilder();
+        for (XSupply supply : materialSupplyList) {
+            if (isRawMaterialItem(supply.getProductItem())) {
+                appendSupplyName(found, supply);
+            }
+        }
+
+        if (found.length() == 0) return true;
+
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                "XProduction.error.rawMaterialInMaterials", found.toString());
+        return false;
+    }
+
+    /**
+     * Al aprobar: la orden debe tener el insumo de MP por defecto de su formulacion.
+     * Si falta, o quedo sin enlazar a la formulacion, la M.P. Usada se calcula en cero
+     * en silencio y ese cero es el que se congela en la orden aprobada.
+     */
+    private boolean validateDefaultRawMaterial() {
+        XFormulation orderFormulation = getOrderFormulation();
+        if (orderFormulation == null) return true;
+
+        XFormulationInput defaultInput = null;
+        for (XFormulationInput formulationInput : orderFormulation.getFormulationInputList()) {
+            if (Boolean.TRUE.equals(formulationInput.getInputDefault())) {
+                defaultInput = formulationInput;
+                break;
+            }
+        }
+
+        if (defaultInput == null) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "XProduction.error.formulationWithoutDefaultInput", orderFormulation.getName());
+            return false;
+        }
+
+        for (XSupply supply : ingredientSupplyList) {
+            if (isDefaultRawMaterial(supply)) return true;
+        }
+
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                "XProduction.error.defaultRawMaterialMissing", defaultInput.getProductItem().getFullName());
+        return false;
     }
 
     public void recalculateSupplies(){
@@ -1058,8 +1205,25 @@ public class XProductionAction extends GenericAction<XProduction> {
                 && getInstance().getProductionLine().isBaritinaTemplate();
     }
 
+    /**
+     * Linea con reporte diario generico (BARITINA / GENERAL): hoja de datos de
+     * produccion, factor PT->MP opcional y reporte diario mensual.
+     */
+    public boolean isDailyReportTemplate() {
+        return getInstance() != null
+                && getInstance().getProductionLine() != null
+                && getInstance().getProductionLine().isDailyReportTemplate();
+    }
+
+    /** La linea distribuye la produccion por zona productiva (configurable por linea). */
+    public boolean isZonesEnabled() {
+        return getInstance() != null
+                && getInstance().getProductionLine() != null
+                && getInstance().getProductionLine().isZonesEnabled();
+    }
+
     public XProductionBaritina getBaritinaData() {
-        if (baritinaData == null && isBaritinaTemplate()) {
+        if (baritinaData == null && isDailyReportTemplate()) {
             if (getInstance() != null && getInstance().getId() != null) {
                 baritinaData = xproductionBaritinaService.findByProduction(getInstance());
             }
@@ -1147,7 +1311,7 @@ public class XProductionAction extends GenericAction<XProduction> {
      * redondea a 2 decimales (el mostrado).
      */
     public void syncBaritinaMpFromPt() {
-        if (!isBaritinaTemplate() || getInstance() == null || getInstance().isApproved()) return;
+        if (!isDailyReportTemplate() || getInstance() == null || getInstance().isApproved()) return;
         ProductionLine line = getInstance().getProductionLine();
         if (line == null) return;
         BigDecimal factor = line.getFactorPtMp();
@@ -1268,7 +1432,7 @@ public class XProductionAction extends GenericAction<XProduction> {
      * 0.01). Sin zonas registradas no bloquea (la orden aun puede ser parcial).
      */
     private boolean validateBaritina() {
-        if (!isBaritinaTemplate()) return true;
+        if (!isZonesEnabled()) return true;
         if (baritinaZonaList == null || baritinaZonaList.isEmpty()) return true;
         for (XProductionBaritinaZona zona : baritinaZonaList) {
             if (zona.getProductiveZone() == null) {

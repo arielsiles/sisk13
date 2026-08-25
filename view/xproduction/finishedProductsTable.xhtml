@@ -37,7 +37,7 @@
                              rendered="#{xproductionAction.pending}">
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                              minimum="0" forId="qtyInput"/>
-                    <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.recalcOnPtChange}" reRender="finalProductList#{xproductionAction.baritinaTemplate ? ', baritinaCalcPanel, baritinaZonaPanel, ingredientPanel, totalCostField, totalRawMaterialField' : ''}#{xproductionAction.ulexitaTemplate ? ', ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField' : ''}"/>
+                    <a4j:support event="onblur" ajaxSingle="true" rendered="#{!xproductionAction.approved}" action="#{xproductionAction.recalcOnPtChange}" reRender="finalProductList#{xproductionAction.dailyReportTemplate ? ', baritinaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField' : ''}#{xproductionAction.zonesEnabled ? ', baritinaZonaPanel' : ''}#{xproductionAction.ulexitaTemplate ? ', ulexitaCalcPanel, ingredientPanel, totalCostField, totalRawMaterialField' : ''}"/>
                 </h:inputText>
                 <h:outputText value="#{product.quantity}" rendered="#{xproductionAction.approved}">
                     <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" />

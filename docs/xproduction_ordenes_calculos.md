@@ -23,8 +23,21 @@ discriminadora `report_template_code` que define su **plantilla especializada**:
 | `report_template_code` | Tipo (`ProductionLineType`) | Comportamiento |
 |---|---|---|
 | `ULEXITA` | `ProductionLineType.ULEXITA` | Flujo común + panel ULEXITA (proceso/laboratorio) + cálculos propios + snapshots |
-| `BARITINA` | `ProductionLineType.BARITINA` | Flujo común + distribución de MP por zonas productivas |
-| `NULL` / desconocido | `null` → **General** | Solo el flujo común (Formulación, Insumos, Materiales, Productos Terminados) |
+| `BARITINA` | `ProductionLineType.BARITINA` | Flujo común + hoja de datos de producción + reporte diario |
+| `GENERAL` | `ProductionLineType.GENERAL` | Igual que BARITINA, sin el nombre de un producto: para RUMIFOS y demás líneas |
+| `NULL` / desconocido | `null` → **sin plantilla** | Solo el flujo común (Formulación, Insumos, Materiales, Productos Terminados) |
+
+`BARITINA` y `GENERAL` son la **misma** plantilla (`isDailyReportTemplate()`): misma
+configuración, misma tabla satélite y mismo reporte diario. Lo que las diferencia no es el
+template sino la configuración de la línea:
+
+| Campo de `xpr_linea` | En blanco / apagado | Activado |
+|---|---|---|
+| `factor_pt_mp` | la MP se carga a mano | `syncBaritinaMpFromPt` la sobrescribe con `PT * factor` |
+| `usa_zonas` | sin zonas en la orden ni columnas de zona en el reporte | tabla de zonas (deben sumar 100%) |
+
+`BARITINA` sobrevive como código propio por las líneas ya configuradas; para una línea nueva,
+usar `GENERAL`.
 
 El tipo se resuelve **por código**, no por cadenas hardcodeadas, mediante el enum
 [`ProductionLineType`](../src/main/com/encens/khipus/model/xproduction/ProductionLineType.java):
@@ -33,6 +46,9 @@ El tipo se resuelve **por código**, no por cadenas hardcodeadas, mediante el en
 public ProductionLineType getLineType()    { return ProductionLineType.fromCode(reportTemplateCode); }
 public boolean isUlexitaTemplate()         { return ProductionLineType.ULEXITA == getLineType(); }
 public boolean isBaritinaTemplate()        { return ProductionLineType.BARITINA == getLineType(); }
+public boolean isGeneralTemplate()         { return ProductionLineType.GENERAL == getLineType(); }
+public boolean isDailyReportTemplate()     { return isBaritinaTemplate() || isGeneralTemplate(); }
+public boolean isZonesEnabled()            { return isDailyReportTemplate() && TRUE.equals(usaZonas); }
 ```
 
 `fromCode(null)` o un código desconocido retorna `null` ⇒ la línea es **General**.
@@ -52,22 +68,25 @@ Solo la línea **ULEXITA** usa los campos de configuración de artículos; el re
 ### 1.3 Cómo activa la UI cada template
 
 La vista muestra/oculta paneles y pestañas según el tipo
-(`xproductionAction.ulexitaTemplate` / `baritinaTemplate`):
+(`xproductionAction.ulexitaTemplate` / `dailyReportTemplate` / `zonesEnabled`):
 
-- **General**: Insumos, Materiales, Productos Terminados, Mano de Obra.
+- **Sin plantilla**: Insumos, Materiales, Productos Terminados, Mano de Obra.
 - **ULEXITA**: lo anterior + panel "Datos Calculados" + pestaña "Datos del Proceso"
   (Datos de Producción y Datos de Laboratorio).
-- **BARITINA**: lo anterior + "Resumen Baritina" + pestaña de distribución por zonas.
+- **BARITINA / GENERAL**: lo anterior + panel de resumen (uso MP, PT) + turnos y observación.
+- **… con `usa_zonas`**: además la tabla de distribución por zonas, y el PT pasa a mostrarse
+  al lado de las zonas en vez de en su pestaña.
 
 ### 1.4 Tablas satélite (1‑a‑1 con `xpr_produccion`)
 
 | Tabla | Para | Contenido |
 |---|---|---|
 | `xpr_produccion_ulexita` | ULEXITA | inputs de proceso/lab + snapshots de los cálculos al aprobar |
-| `xpr_produccion_baritina` | BARITINA | uso MP (TN), PT (TN), turnos, observación |
-| `xpr_produccion_baritina_zona` | BARITINA | N filas: zona productiva, porcentaje, cantidad (TN) |
+| `xpr_produccion_baritina` | BARITINA / GENERAL | uso MP (TN), PT (TN), turnos, observación |
+| `xpr_produccion_baritina_zona` | BARITINA / GENERAL con `usa_zonas` | N filas: zona productiva, porcentaje, cantidad (TN) |
 
-Una línea **General** no tiene tabla satélite.
+Una línea **sin plantilla** no tiene tabla satélite. Las tablas conservan el nombre `baritina`
+por compatibilidad, aunque las use cualquier línea del reporte diario.
 
 ---
 
@@ -113,6 +132,29 @@ materiaPrima = Σ cantidad de insumos con fórmula marcados inputDefault
 ```
 Redondeo a 2 decimales. Es el valor **"M.P. Usada"**.
 (En ULEXITA, esta es la cantidad del insumo de MP principal; ver §3.5 syncMpFromConsumo.)
+
+**La suma depende del enlace `xpr_insumo.idinsumoformula`, no del artículo.** Un insumo
+del mismo artículo pero sin enlace a la formulación no suma, y la orden mostraría
+M.P. Usada = 0 sin ningún aviso (pasó con la orden 471, agosto 2026: se borró la fila
+que vino de la fórmula y se volvió a agregar con "+ Insumo", que no enlazaba). Como el
+mapeo es `updatable = false`, el enlace solo se escribe al insertar el insumo y no hay
+forma de repararlo desde la aplicación. Tres barreras lo sostienen:
+
+- `addIngredientItems` enlaza por `cod_art` el insumo agregado a mano si pertenece a la
+  formulación de la orden.
+- La MP por defecto no se puede retirar de la orden (`removeSupply` + el `rendered` del
+  link en `production.xhtml`). Si no hubo consumo, va con cantidad en cero.
+- `approve` no deja aprobar una orden sin el insumo de MP por defecto de su formulación
+  (`validateDefaultRawMaterial`), ni `approveFormulation` aprobar una formulación que no
+  tenga exactamente un insumo marcado `defecto`.
+
+**Materiales no admite materias primas.** Un artículo de un almacén tipo `RAW_MATERIAL` solo
+puede ir en Insumos: cargarlo también en Materiales duplica el consumo del artículo contra
+Saldos de Almacén y el costo de la orden, y esa segunda fila no suma en M.P. Usada ni aparece
+en el reporte diario, así que la diferencia queda invisible. Lo bloquean `addMaterialProductItems`
+(y `addMaterialDefault`) al agregar, y `validateMaterialsWithoutRawMaterial` al aprobar, para que
+las órdenes que ya lo tienen cargado se limpien. El criterio es el **almacén** del artículo, no
+la formulación ni la línea, para que valga también con una MP distinta de la de la orden.
 
 ### 2.5 Recalcular insumos según fórmula — `recalculateSupplies`
 
@@ -308,12 +350,13 @@ aprobar). Ejemplo: línea `LP-MOL` (molienda con formulación RUMIFOS).
 
 ## 6. Resumen por tipo de línea
 
-| Aspecto | General | ULEXITA | BARITINA |
+| Aspecto | Sin plantilla | ULEXITA | BARITINA / GENERAL |
 |---|---|---|---|
-| `report_template_code` | NULL | `ULEXITA` | `BARITINA` |
+| `report_template_code` | NULL | `ULEXITA` | `BARITINA` o `GENERAL` |
 | Tabla satélite | — | `xpr_produccion_ulexita` | `xpr_produccion_baritina(_zona)` |
-| Paneles extra | — | Datos Calculados + Proceso/Lab | Resumen + zonas |
+| Paneles extra | — | Datos Calculados + Proceso/Lab | Resumen + turnos/obs (+ zonas si `usa_zonas`) |
 | Cálculos propios | — | Kpa, Kpm, MERMA, leyes, Consumo MP | Uso MP, PT, distribución por zona |
+| Reporte diario | — | Sí | Sí |
 | Snapshots históricos | — | Sí (al aprobar) | — |
 | Costeo base (§2) | Sí | Sí | Sí |
 

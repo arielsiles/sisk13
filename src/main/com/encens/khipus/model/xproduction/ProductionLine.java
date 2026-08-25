@@ -3,8 +3,10 @@ package com.encens.khipus.model.xproduction;
 import com.encens.khipus.model.BaseModel;
 import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
+import com.encens.khipus.model.usertype.IntegerBooleanUserType;
 import com.encens.khipus.util.Constants;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
@@ -67,6 +69,14 @@ public class ProductionLine implements BaseModel {
 
     @Column(name = "factor_pt_mp", precision = 10, scale = 4)
     private BigDecimal factorPtMp;
+
+    /**
+     * La produccion de la linea se distribuye por zona productiva. No todas las lineas
+     * del reporte diario lo hacen, por eso es configuracion de la linea y no del template.
+     */
+    @Column(name = "usa_zonas")
+    @Type(type = IntegerBooleanUserType.NAME)
+    private Boolean usaZonas = Boolean.FALSE;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -192,13 +202,24 @@ public class ProductionLine implements BaseModel {
         this.codArtPtPrincipal = codArtPtPrincipal;
     }
 
-    /** BARITINA: factor de conversion PT -> Materia Prima (MP = PT * factor). */
+    /**
+     * Factor de conversion PT -> Materia Prima (MP = PT * factor) de las lineas del
+     * reporte diario. Opcional: en nulo la cantidad de MP se carga a mano.
+     */
     public BigDecimal getFactorPtMp() {
         return factorPtMp;
     }
 
     public void setFactorPtMp(BigDecimal factorPtMp) {
         this.factorPtMp = factorPtMp;
+    }
+
+    public Boolean getUsaZonas() {
+        return usaZonas;
+    }
+
+    public void setUsaZonas(Boolean usaZonas) {
+        this.usaZonas = usaZonas;
     }
 
     /**
@@ -214,5 +235,24 @@ public class ProductionLine implements BaseModel {
 
     public boolean isBaritinaTemplate() {
         return ProductionLineType.BARITINA == getLineType();
+    }
+
+    public boolean isGeneralTemplate() {
+        return ProductionLineType.GENERAL == getLineType();
+    }
+
+    /**
+     * Lineas que comparten la hoja de datos de produccion (uso MP, PT, turnos,
+     * observacion), el factor PT->MP y el reporte diario mensual: BARITINA y GENERAL.
+     * BARITINA se mantiene como tipo propio por compatibilidad; funcionalmente
+     * GENERAL es la misma plantilla parametrizada por linea.
+     */
+    public boolean isDailyReportTemplate() {
+        return isBaritinaTemplate() || isGeneralTemplate();
+    }
+
+    /** La linea distribuye su produccion por zona productiva. */
+    public boolean isZonesEnabled() {
+        return isDailyReportTemplate() && Boolean.TRUE.equals(usaZonas);
     }
 }

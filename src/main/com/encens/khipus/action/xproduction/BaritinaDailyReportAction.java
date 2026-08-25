@@ -32,7 +32,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Reporte mensual diario de produccion BARITINA.
+ * Reporte mensual diario de produccion de las lineas BARITINA y GENERAL.
+ *
+ * El template no tiene literales de producto: titulos y encabezados se arman con el
+ * nombre de la linea y de los articulos configurados, y las columnas de zona / suma de
+ * porcentajes solo aparecen si la linea distribuye por zona productiva. Por eso sirve
+ * igual para baritina, para RUMIFOS o para cualquier otra produccion.
  *
  * Genera un Excel (.xls) con una fila por DIA del mes (incluidos dias sin
  * produccion, con saldos arrastrados), replicando la planilla manual
@@ -89,7 +94,8 @@ public class BaritinaDailyReportAction {
         int ingreso = 3;  // D
         int uso = 4;      // E
         int usoOtras;     // solo si la MP es compartida; -1 si no aplica
-        int saldoMp, pt, saldoPt, despacho, zoneStart, suma, turnos, obs, last;
+        int suma;         // solo si la linea distribuye por zonas; -1 si no aplica
+        int saldoMp, pt, saldoPt, despacho, zoneStart, turnos, obs, last;
 
         Cols(boolean showUsoOtras, int zoneCount) {
             usoOtras  = showUsoOtras ? uso + 1 : -1;
@@ -98,8 +104,9 @@ public class BaritinaDailyReportAction {
             saldoPt   = pt + 1;
             despacho  = saldoPt + 1;
             zoneStart = despacho + 1;
-            suma      = zoneStart + zoneCount;
-            turnos    = suma + 1;
+            // Sin zonas no hay nada que sumar: la columna se omite en vez de salir en cero.
+            suma      = zoneCount > 0 ? zoneStart + zoneCount : -1;
+            turnos    = zoneStart + zoneCount + (zoneCount > 0 ? 1 : 0);
             obs       = turnos + 1;
             last      = obs;
         }
@@ -323,7 +330,9 @@ public class BaritinaDailyReportAction {
                         setText(row, col, null, s.pct);
                     }
                 }
-                if (dd.hasProduction) setNumber(row, c2.suma, suma, s.numCenter); else setText(row, c2.suma, null, s.numCenter);
+                if (c2.suma >= 0) {
+                    if (dd.hasProduction) setNumber(row, c2.suma, suma, s.numCenter); else setText(row, c2.suma, null, s.numCenter);
+                }
                 if (dd.hasProduction && dd.turnos > 0) setNumber(row, c2.turnos, new BigDecimal(dd.turnos), s.center);
                 else setText(row, c2.turnos, null, s.center);
                 setText(row, c2.obs, composeObs(dd), s.body);
@@ -358,7 +367,7 @@ public class BaritinaDailyReportAction {
 
             sendResponse(wb);
         } catch (Exception e) {
-            log.error("Error generando reporte BARITINA", e);
+            log.error("Error generando el reporte diario de produccion", e);
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "DailyProductionReport.error.generic");
         }
     }
@@ -403,7 +412,9 @@ public class BaritinaDailyReportAction {
             setText(h, c.zoneStart + zi,
                     MessageUtils.getMessage("DailyProductionReport.baritina.col.zone", safe(zones.get(zi).getName())), s.header);
         }
-        setText(h, c.suma,   MessageUtils.getMessage("DailyProductionReport.baritina.col.pctSum"), s.header);
+        if (c.suma >= 0) {
+            setText(h, c.suma, MessageUtils.getMessage("DailyProductionReport.baritina.col.pctSum"), s.header);
+        }
         setText(h, c.turnos, MessageUtils.getMessage("DailyProductionReport.baritina.col.shifts"), s.header);
         setText(h, c.obs,    MessageUtils.getMessage("DailyProductionReport.baritina.col.observations"), s.header);
 
@@ -522,7 +533,7 @@ public class BaritinaDailyReportAction {
         return itemCache.get(cod);
     }
 
-    /** Nombre del articulo para los titulos de columna ("BARITINA"); vacio si no se encuentra. */
+    /** Nombre del articulo para los titulos de columna; vacio si no se encuentra. */
     private String itemName(String cod) {
         ProductItem it = item(cod);
         return (it == null || it.getName() == null) ? "" : it.getName();

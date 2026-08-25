@@ -187,7 +187,9 @@
 
                     </c:if>
 
-                    <c:if test="#{productionLine.baritinaTemplate}">
+                    <!-- BARITINA y GENERAL comparten configuracion: son la misma plantilla del
+                         reporte diario, parametrizada por linea (zonas y factor son opcionales). -->
+                    <c:if test="#{productionLine.dailyReportTemplate}">
 
                         <!-- MP principal: mismo campo/modal que ULEXITA (ramas c:if excluyentes).
                              El reporte diario lo usa para el saldo anterior, el ingreso por acopio
@@ -218,6 +220,8 @@
                                              hotKeySelect="alt+5"/>
                         </s:decorate>
 
+                        <!-- Opcional: en blanco la cantidad de materia prima se carga a mano en la
+                             orden; con factor se calcula como PT * factor y se sobrescribe. -->
                         <s:decorate id="factorPtMpField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['ProductionLine.factorPtMp']}</ui:define>
                             <h:inputText id="factorPtMp" value="#{productionLine.factorPtMp}"
@@ -225,6 +229,14 @@
                                 <app:realNumberConverter pattern="#{messages['patterns.decimal4FNumber']}"
                                                          forId="factorPtMp"/>
                             </h:inputText>
+                        </s:decorate>
+
+                        <!-- Activa la tabla de Zonas Productivas en la orden y las columnas de zona
+                             del reporte diario. No todas las lineas distribuyen por zona. -->
+                        <s:decorate id="usaZonasField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['ProductionLine.usaZonas']}</ui:define>
+                            <h:selectBooleanCheckbox id="usaZonas" value="#{productionLine.usaZonas}"
+                                                     tabindex="6"/>
                         </s:decorate>
 
                     </c:if>

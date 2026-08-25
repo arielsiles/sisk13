@@ -1,4 +1,4 @@
-# Reporte Diario de Producción — criterios de datos (ULEXITA y BARITINA)
+# Reporte Diario de Producción — criterios de datos (ULEXITA, BARITINA y GENERAL)
 
 > Complementa [`xproduction_ulexita_daily_report_spec.md`](xproduction_ulexita_daily_report_spec.md)
 > (que describe el diseño funcional de ULEXITA) y
@@ -9,6 +9,11 @@ La pantalla `view/xproduction/dailyProductionReport.xhtml` es un dispatcher:
 `DailyProductionReportAction` enruta según `ProductionLine.reportTemplateCode` a
 `UlexitaDailyReportAction` o `BaritinaDailyReportAction`. Cada uno mantiene su propio layout.
 
+**BARITINA y GENERAL son el mismo template** (`isDailyReportTemplate()`, mismo generador, misma
+tabla satélite): comparten configuración, hoja de datos y reporte. GENERAL existe para líneas que
+no son de baritina —RUMIFOS y las que vengan— sin arrastrar el nombre de un producto. BARITINA se
+mantiene como código propio por compatibilidad con las líneas ya configuradas.
+
 ## 1. Artículos: siempre desde la configuración de la línea
 
 Ambos reportes resuelven los `cod_art` desde `xpr_linea`, y solo caen a derivarlos de las
@@ -17,7 +22,7 @@ Ambos reportes resuelven los `cod_art` desde `xpr_linea`, y solo caen a derivarl
 | Template | Materia prima | Producto terminado |
 |----------|---------------|--------------------|
 | ULEXITA | `cod_art_mp_principal` | `cod_art_pt_a`, `cod_art_pt_b` |
-| BARITINA | `cod_art_mp_principal` | `cod_art_pt_principal` |
+| BARITINA / GENERAL | `cod_art_mp_principal` | `cod_art_pt_principal` |
 
 **El template describe la forma del proceso, no el producto.** Varias líneas pueden compartir el
 mismo `report_template_code` y diferenciarse solo por configuración: molienda de baritina y
@@ -26,9 +31,19 @@ una línea nueva de la misma forma —otro chancado, otra materia prima— es un
 y **no cuesta código**. Por eso los títulos de columna del Excel se arman con el nombre del
 artículo configurado y no con literales.
 
-Los límites del template BARITINA: **una** MP y **un** PT por línea (si una línea produjera dos
-productos con rendimientos distintos haría falta el patrón PT A/B de ULEXITA), y captura uso MP,
-PT, turnos, observación y distribución por zonas productivas.
+Los límites del template BARITINA/GENERAL: **una** MP y **un** PT por línea (si una línea
+produjera dos productos con rendimientos distintos haría falta el patrón PT A/B de ULEXITA), y
+captura uso MP, PT, turnos, observación y —si la línea lo activa— distribución por zonas.
+
+Dos rasgos son **opcionales por línea**, no propios del template:
+
+| Configuración | En blanco / desactivado | Activado |
+|---------------|-------------------------|----------|
+| `factor_pt_mp` | la cantidad de MP se carga a mano en la orden | `syncBaritinaMpFromPt` la sobrescribe con `PT * factor` |
+| `usa_zonas` | sin tabla de zonas en la orden ni columnas de zona/SUMA DE % en el Excel | tabla de zonas (deben sumar 100%) y una columna por zona usada en el período |
+
+Las columnas de zona ya eran dinámicas (solo las zonas con datos en el período); con `usa_zonas`
+apagado tampoco sale la columna **SUMA DE %**, que antes aparecía siempre y hubiera salido en cero.
 
 Ambos campos se configuran en `view/xproduction/productionLine.xhtml` (bloques condicionales por
 template, reutilizando el mismo modal `mpPrincipalListModalPanel`).
