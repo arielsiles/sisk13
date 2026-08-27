@@ -144,8 +144,26 @@
                         </h:panelGroup>
                     </s:decorate>
 
-                    <s:decorate id="rcivaDPFField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <!-- La retencion es de la operacion, no del certificado: el socio
+                         presenta el NIT al renovar y tiene que volver a presentarlo la
+                         proxima vez. Arranca como venga el certificado.
+                         Al destildarlo el RC-IVA pasa a cero: sube el interes que se
+                         capitaliza y, con el, el debito a cargos financieros del asiento.
+                         El asiento conserva sus mismas lineas; no lleva linea de RC-IVA. -->
+                    <s:decorate id="retentionRenewField" template="/include/inputField.xhtml" styleClass="formRow">
                         <ui:define name="label">#{messages['Account.retention']}</ui:define>
+                        <h:selectBooleanCheckbox id="retentionRenew"
+                                                 value="#{accountAction.retentionRenewDPF}">
+                            <a4j:support event="onchange"
+                                         action="#{accountAction.calculateRenewalAmounts}"
+                                         reRender="rcivaDPFField, totalAmountDPFField, capitalRenewField"
+                                         ajaxSingle="true"/>
+                        </h:selectBooleanCheckbox>
+                        <h:outputText styleClass="colHint" value="#{messages['Account.retention.nitHint']}"/>
+                    </s:decorate>
+
+                    <s:decorate id="rcivaDPFField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['Account.retentionAmount']}</ui:define>
                         <h:outputText id="rcivaDPF" value="#{accountAction.rcivaDPF}" >
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}" forId="rcivaDPF"/>
                         </h:outputText>

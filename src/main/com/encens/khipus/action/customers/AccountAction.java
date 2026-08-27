@@ -91,6 +91,16 @@ public class AccountAction extends GenericAction<Account> {
     private BigDecimal totalAmountDPF;
 
     /** Renovation DPF **/
+    /**
+     * Si la operacion retiene el RC-IVA. Es de la OPERACION, no del certificado: el socio
+     * presenta el NIT en el momento de renovar o de cerrar, y tiene que volver a
+     * presentarlo la proxima vez. Arranca reflejando el flag del certificado y se decide
+     * en cada operacion.
+     * <p/>
+     * El certificado nuevo de una renovacion sigue naciendo CON retencion, justamente
+     * porque la exencion no se hereda.
+     */
+    private Boolean retentionRenewDPF;
     private BigDecimal capitalRenewDPF;
     /** Arranca en null para que el campo se vea vacio, no con un 0,00 heredado. */
     private BigDecimal partialCapitalRenewDPF;
@@ -121,6 +131,8 @@ public class AccountAction extends GenericAction<Account> {
     /** Interes bruto - provision acumulada. Negativo = reversa. */
     private BigDecimal closingExpenseDPF     = BigDecimal.ZERO;
     private List<FixedTermDepositProvision> closingAccruedDetail = new ArrayList<FixedTermDepositProvision>();
+    /** Retencion del cierre. Mismo criterio que {@link #retentionRenewDPF}. */
+    private Boolean retentionCloseDPF;
     private String glossCloseDPF;
 
     /**
@@ -247,6 +259,7 @@ public class AccountAction extends GenericAction<Account> {
         setAccountTypeRenewDPF(null);
         setDocumentType(null);
         setGlossRenewDPF(null);
+        setRetentionRenewDPF(null);
 
         return Outcome.CANCEL;
     }
@@ -380,20 +393,10 @@ public class AccountAction extends GenericAction<Account> {
         }
         setInterestDPF(interestVal);
 
-        /** La retencion se calcula sobre el interes total, no por tramo. */
-        if (getInstance().getRetentionFlag())
-            setRcivaDPF(BigDecimalUtil.multiply(interestVal, Constants.VAT));
-        else
-            setRcivaDPF(BigDecimal.ZERO);
-
-        totalAmountDPF = BigDecimalUtil.sum(capitalDPF, interestDPF);
-        totalAmountDPF = BigDecimalUtil.subtract(totalAmountDPF, rcivaDPF);
-
-        /** El codigo del certificado nuevo se sigue tipeando a mano en esta pantalla. El
-         *  alta si lo genera sola, con {@link #generateAccountCode(Account)}; traerlo aca
-         *  queda pendiente y es la via que todavia puede repetir un codigo. */
-
-        setCapitalRenewDPF(totalAmountDPF);
+        /** Arranca como venga el certificado; el operador lo cambia si el socio presenta
+         *  el NIT en esta renovacion. */
+        setRetentionRenewDPF(getInstance().getRetentionFlag());
+        calculateRenewalAmounts();
 
         /** Defaults del nuevo certificado: mismo socio y mismo tipo de cuenta, con el
          *  vencimiento ya calculado. Quedan editables. */
@@ -403,6 +406,35 @@ public class AccountAction extends GenericAction<Account> {
         calculateExpirationDateDPF();
 
         return Outcome.SUCCESS;
+    }
+
+    /**
+     * Recalcula la retencion y los importes que dependen de ella. Lo dispara el check de
+     * retencion de la pantalla de renovacion.
+     * <p/>
+     * Pisa el capital a renovar con el total sugerido: al cambiar la retencion cambia lo
+     * que hay para capitalizar, y dejar el importe anterior seria mostrar un total que no
+     * corresponde. El operador puede volver a editarlo despues.
+     * <p/>
+     * La retencion se calcula sobre el interes total, no por tramo.
+     */
+    public void calculateRenewalAmounts() {
+        recalculateRenewalRciva();
+        setCapitalRenewDPF(totalAmountDPF);
+    }
+
+    /**
+     * Retencion y total sugerido, sin tocar el capital a renovar: lo llama tambien el
+     * grabado, donde el operador pudo haber editado ese importe a mano.
+     */
+    private void recalculateRenewalRciva() {
+        if (Boolean.TRUE.equals(retentionRenewDPF)) {
+            setRcivaDPF(BigDecimalUtil.multiply(getInterestDPF(), Constants.VAT));
+        } else {
+            setRcivaDPF(BigDecimal.ZERO);
+        }
+        totalAmountDPF = BigDecimalUtil.sum(capitalDPF, interestDPF);
+        totalAmountDPF = BigDecimalUtil.subtract(totalAmountDPF, rcivaDPF);
     }
 
     /**
@@ -419,6 +451,9 @@ public class AccountAction extends GenericAction<Account> {
         setOp(OP_UPDATE);
         setClosingDateDPF(DateUtils.toDay());
         setGlossCloseDPF(buildClosingGloss());
+        /** Igual que en la renovacion: arranca como venga el certificado y el operador lo
+         *  cambia si el socio presenta el NIT al cerrar. */
+        setRetentionCloseDPF(getInstance().getRetentionFlag());
         calculateClosure();
         return Outcome.SUCCESS;
     }
@@ -453,7 +488,7 @@ public class AccountAction extends GenericAction<Account> {
                 gross = BigDecimalUtil.sum(gross, segment.getProvision(), 6);
             }
             closingInterestDPF = BigDecimalUtil.roundBigDecimal(gross, 2);
-            closingRcivaDPF = Boolean.TRUE.equals(account.getRetentionFlag())
+            closingRcivaDPF = Boolean.TRUE.equals(retentionCloseDPF)
                     ? BigDecimalUtil.roundBigDecimal(
                             BigDecimalUtil.multiply(closingInterestDPF, Constants.VAT, 6), 2)
                     : BigDecimal.ZERO;
@@ -627,6 +662,10 @@ public class AccountAction extends GenericAction<Account> {
             return Outcome.REDISPLAY;
         }
 
+        /** Mismo criterio que la renovacion: los importes se recalculan con la retencion
+         *  marcada antes de armar el asiento. */
+        calculateClosure();
+
         Account account = getInstance();
         Date closingDate = DateUtils.removeTime(closingDateDPF);
         boolean foreign = isForeignAccount();
@@ -781,6 +820,7 @@ public class AccountAction extends GenericAction<Account> {
         closingAccruedDPF = BigDecimal.ZERO;
         closingExpenseDPF = BigDecimal.ZERO;
         closingAccruedDetail = new ArrayList<FixedTermDepositProvision>();
+        retentionCloseDPF = null;
         glossCloseDPF = null;
         documentType = new DocType();
     }
@@ -1105,6 +1145,10 @@ public class AccountAction extends GenericAction<Account> {
         if (!validateRenewal()) {
             return Outcome.REDISPLAY;
         }
+
+        /** El asiento se arma con la retencion que quedo marcada, no con lo que dejo el
+         *  ultimo refresco por ajax. */
+        recalculateRenewalRciva();
 
         BigDecimal exchangeRate = BigDecimal.ZERO;
         try {
@@ -2301,6 +2345,22 @@ public class AccountAction extends GenericAction<Account> {
 
     public List<FixedTermDepositProvision> getClosingAccruedDetail() {
         return closingAccruedDetail;
+    }
+
+    public Boolean getRetentionRenewDPF() {
+        return retentionRenewDPF;
+    }
+
+    public void setRetentionRenewDPF(Boolean retentionRenewDPF) {
+        this.retentionRenewDPF = retentionRenewDPF;
+    }
+
+    public Boolean getRetentionCloseDPF() {
+        return retentionCloseDPF;
+    }
+
+    public void setRetentionCloseDPF(Boolean retentionCloseDPF) {
+        this.retentionCloseDPF = retentionCloseDPF;
     }
 
     public String getGlossCloseDPF() {

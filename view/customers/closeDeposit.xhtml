@@ -112,6 +112,24 @@
                             </h:selectOneMenu>
                         </s:decorate>
 
+                        <!-- La retencion es de la operacion, no del certificado: el socio
+                             presenta el NIT al cerrar y tiene que volver a presentarlo la
+                             proxima vez. Arranca como venga el certificado.
+                             Al destildarlo el RC-IVA pasa a cero y sube el interes neto que
+                             se le entrega. -->
+                        <s:decorate id="retentionCloseField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['Account.retention']}</ui:define>
+                            <h:selectBooleanCheckbox id="retentionClose"
+                                                     value="#{accountAction.retentionCloseDPF}"
+                                                     tabindex="3">
+                                <a4j:support event="onchange"
+                                             action="#{accountAction.calculateClosure}"
+                                             reRender="amountsPanel, accruedPanel"
+                                             ajaxSingle="true"/>
+                            </h:selectBooleanCheckbox>
+                            <h:outputText styleClass="colHint" value="#{messages['Account.retention.nitHint']}"/>
+                        </s:decorate>
+
                         <s:decorate id="glossField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['Voucher.gloss']}</ui:define>
                             <h:inputTextarea id="gloss"
@@ -146,7 +164,7 @@
                     </s:decorate>
 
                     <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
-                        <ui:define name="label">#{messages['Account.retention']}</ui:define>
+                        <ui:define name="label">#{messages['Account.retentionAmount']}</ui:define>
                         <h:outputText value="#{accountAction.closingRcivaDPF}">
                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                         </h:outputText>
