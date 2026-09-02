@@ -80,6 +80,14 @@ src/main/com/encens/khipus/
 > (claves foráneas) y trampas de JSF/RichFaces del módulo están documentados en
 > `docs/Contabilidad/plan_de_cuentas.md`. Leerlo antes de tocar cuentas contables.
 
+> **Recursos Humanos (`employees`):** el módulo completo está documentado en
+> `docs/employees/` — índice en `docs/employees/README.md`. Cubre el modelo de datos,
+> el flujo de generación de planillas (ciclo → gestión planilla → planilla generada →
+> oficial → merge → contabilización), **todas las fórmulas** (haber básico, faltas y la
+> regla del ×2, atrasos, AFP, RC‑IVA, planilla fiscal, aguinaldo), asistencia y marcado,
+> el catálogo de reportes y la deuda técnica conocida (CIs hardcodeadas en el cálculo de
+> AFP, módulo tributario puenteado, código académico muerto). Leerlo antes de tocar RRHH.
+
 ### Configuration Files
 - **Database**: `resources/khipus-{profile}-ds.xml`
 - **Persistence**: `resources/META-INF/persistence-{profile}.xml`
