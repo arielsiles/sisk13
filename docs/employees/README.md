@@ -17,7 +17,7 @@ módulo, leer el archivo correspondiente.
 | [05_contabilizacion.md](05_contabilizacion.md) | Registro contable de la planilla: qué comprobantes genera y con qué cuentas |
 | [06_reportes.md](06_reportes.md) | Catálogo de los ~40 reportes del módulo y de dónde saca los datos cada uno |
 | [07_otros_submodulos.md](07_otros_submodulos.md) | Vacaciones, retiros/finiquitos, documentos de descargo, contratos, postulantes |
-| [08_deuda_tecnica.md](08_deuda_tecnica.md) | Trampas conocidas, hardcodeos, código muerto y cosas que rompen |
+| [08_deuda_tecnica.md](08_deuda_tecnica.md) | Trampas conocidas, código muerto y cosas que rompen |
 
 ## Panorama
 

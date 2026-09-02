@@ -112,6 +112,8 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
     private EntityManager listEm;
     @In
     private DiscountRuleRangeService discountRuleRangeService;
+    @In
+    private SIPContributionRegimeService sipContributionRegimeService;
 
     @Logger
     private Log log;
@@ -936,6 +938,9 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
         Map<Long, List<GrantedBonus>> grantedBonusMap = grantedBonusService.findByPayrollGenerationCycleAndJobCategory(
                 generatedPayroll.getPayrollGenerationCycle(), generatedPayroll.getGestionPayroll().getJobCategory());
         SeniorityBonus seniorityBonus = taxPayrollUtilService.getActiveSeniorityBonus();
+        /* Regimen de aportes al SIP por defecto: se usa cuando el contrato no tiene uno asignado.
+           Si el catalogo esta vacio queda null y se cobran todos los aportes, como antes. */
+        SIPContributionRegime defaultContributionRegime = sipContributionRegimeService.findDefault();
         for (Employee employee : employeeList) {
             index++;
             log.debug("Processing employee = " + employee.getId() + employee.getFullName() + " index=" + index);
@@ -972,6 +977,12 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 Double totalIncomeOutOfIva = 0.0;
                 Double proHome = 0.0;
                 int workedDays = 30;
+                /* Auxiliares del prorrateo por alta/baja de contrato. Los contratos CON bandas
+                   siguen fijando workedDays igual que siempre; el prorrateo de un contrato SIN
+                   bandas se aplica solo si ningun contrato tuvo bandas, para no alterar en nada
+                   el resultado de quienes ya generaban. */
+                boolean workedDaysSetByBandedContract = false;
+                Integer workedDaysWithoutBands = null;
 
                 //sum of Lists
                 Integer cumulativeMinutesIntheMonth4AllContracts = 0;
@@ -993,10 +1004,16 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 // The current values of HoraryBandContract for payroll generation
                 List<HoraryBandContract> hourlyBandContract4EmployeeList = horaryBandContractService.getValidHoraryBandContractsByEmployeeAndBusinessUnitAndJobCategory(employee, gestionPayroll.getBusinessUnit(), gestionPayroll.getJobCategory(), gestionPayroll.getInitDate(), gestionPayroll.getEndDate());
 
-                if (hourlyBandContract4EmployeeList.isEmpty()) {
+                /* Las bandas horarias existen para controlar asistencia. A quien no se le controla
+                   -un gerente, por ejemplo- no se le exige horario cargado: igual entra en planilla.
+                   Un flagcontrol nulo se trata como "si tiene control", para que ante el dato
+                   desconocido la generacion se queje en vez de pagar de mas en silencio. */
+                boolean requiresHoraryBands = !Boolean.FALSE.equals(employee.getControlFlag());
+                if (hourlyBandContract4EmployeeList.isEmpty() && requiresHoraryBands) {
                     return PayrollGenerationResult.WITHOUT_BANDS.assignResultData(employee.getIdNumberAndFullName());
                 }
 
+                /* Con la lista vacia devuelve null y se cae al fallback de abajo. */
                 currentJobContract = getJobContractForPayment(hourlyBandContract4EmployeeList);
                 if (currentJobContract == null) {
                     Contract employeeContract = em.find(Contract.class, employeeValidContractsList.get(0).getId());
@@ -1032,6 +1049,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                         corresponding to the period of the contract in days*/
                         int contractDays = getContractDays4Month(contract, gestionPayroll);
                         workedDays = contractDays;
+                        workedDaysSetByBandedContract = true;
 
                         log.debug("workedDays: " + workedDays);
                         Job job = em.find(Job.class, currentJobContract.getJob().getId());
@@ -1097,7 +1115,16 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                         cumulativeLatenessMinutesIntheMonthByContractList.add(tardinessMonth);
                         cumulativeMinutesIntheMonthByContractList.add(bandDuration);
                         cumulativePerformanceMinutesIntheMonthByContractList.add(performance);
+                    } else {
+                        /* Contrato sin bandas: no hay asistencia que controlar, pero el prorrateo
+                           por alta o baja si corresponde. Se guarda aparte y solo se usa si al
+                           final ningun contrato con bandas fijo workedDays. */
+                        workedDaysWithoutBands = getContractDays4Month(contract, gestionPayroll);
                     }
+                }
+                if (!workedDaysSetByBandedContract && null != workedDaysWithoutBands) {
+                    workedDays = workedDaysWithoutBands;
+                    log.debug("workedDays (contrato sin bandas horarias): " + workedDays);
                 }
                 Double pricePerMinute = 0.0;
                 Double dayAbsences = 0.0;
@@ -1217,12 +1244,12 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                             seniorityBonus,
                             BigDecimalUtil.toBigDecimal(totalOtherIncomes),
                             workedDays,
-                            gestionPayroll.getPayrollGenerationCycle().getEndDate(),
                             generatedPayroll.getPayrollGenerationCycle(),
                             invoicesFormMap.get(employee.getId()),
                             lastMonthBalance,
                             gestionPayroll,
-                            totalRCIvaDiscount /** De MovimientoSueldo **/
+                            totalRCIvaDiscount, /** De MovimientoSueldo **/
+                            sipContributionRegimeService.resolveRegime(currentJobContract.getContract(), defaultContributionRegime)
                             );
 
                     categoryTributaryPayroll = generator.generate();
@@ -3991,11 +4018,12 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                             seniorityBonus,
                             BigDecimalUtil.toBigDecimal(totalOtherIncomes),
                             workedDays,
-                            gestionPayroll.getPayrollGenerationCycle().getEndDate(),
                             generatedPayroll.getPayrollGenerationCycle(),
                             invoicesFormMap.get(employee.getId()),
                             lastMonthBalance,
-                            gestionPayroll, 0.0);
+                            gestionPayroll, 0.0,
+                            sipContributionRegimeService.resolveRegime(currentJobContract.getContract(),
+                                    sipContributionRegimeService.findDefault()));
                     categoryTributaryPayroll = generator.generate();
                     categoryTributaryPayroll.setGeneratedPayroll(generatedPayroll);
 //                    categoryTributaryPayroll.setTotalOtherIncomes(BigDecimalUtil.subtract(categoryTributaryPayroll.getTotalGrained(), categoryTributaryPayroll.getBasicAmount()));

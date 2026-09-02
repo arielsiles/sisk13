@@ -172,6 +172,20 @@
                              reRender="pensionFundOrganizationListModalPanelDiv, socialSecurityOrganizationListModalPanelDiv, pensionFundInfoDiv"/>
             </h:selectBooleanCheckbox>
         </s:decorate>
+        <s:decorate id="sipContributionRegimeField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.sipContributionRegime']}</ui:define>
+            <h:selectOneMenu id="sipContributionRegime"
+                             value="#{contract.sipContributionRegime}"
+                             styleClass="input"
+                             disabled="#{!editable}"
+                             tabindex="27">
+                <s:selectItems value="#{sipContributionRegimeList}" var="sipRegime"
+                               label="#{sipRegime.name}"
+                               noSelectionLabel="#{messages['Contract.sipContributionRegime.byDefault']}"
+                               hideNoSelectionLabel="false"/>
+                <s:convertEntity/>
+            </h:selectOneMenu>
+        </s:decorate>
     </s:div>
 </h:panelGrid>
 <s:div id="pensionFundInfoDiv">

@@ -74,6 +74,10 @@
             </c:otherwise>
         </c:choose>
     </f:facet>
+    <h:panelGroup styleClass="app-tag app-tag--warn"
+                  rendered="#{discountRuleAction.lockedByOfficialPayroll}">
+        <h:outputText value="#{messages['DiscountRule.warn.lockedByOfficialPayroll']}"/>
+    </h:panelGroup>
     <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
                  columnClasses="width50percent,width50percent">
         <s:div>

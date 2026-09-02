@@ -159,7 +159,7 @@ where jobContract.contract.activeForPayrollGeneration = true
 |---|---|---|
 | `SUCCESS` | generación exitosa | — |
 | `WITHOUT_CONTRACTS` | `GeneratedPayroll.error.withoutContracts` | el empleado entró por la consulta pero no tiene contrato válido en el rango |
-| `WITHOUT_BANDS` | `GeneratedPayroll.error.withoutBands` | el empleado no tiene **ninguna banda horaria** vigente → aborta toda la corrida |
+| `WITHOUT_BANDS` | `GeneratedPayroll.error.withoutBands` | el empleado tiene **control de asistencia** y no tiene ninguna banda horaria vigente → aborta toda la corrida. Desde la v6.0.129 no se dispara para quien tiene el control desmarcado |
 | `FAIL` | `GeneratedPayroll.error.generationAborted` | excepción |
 
 > Cualquiera distinto de `SUCCESS` **borra la corrida entera**. Un solo empleado sin banda

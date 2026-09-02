@@ -1354,6 +1354,7 @@
     s:hasPermission('CNSRATE','VIEW') or
     s:hasPermission('IVARATE','VIEW') or
     s:hasPermission('SMNRATE','VIEW') or
+    s:hasPermission('SIPCONTRIBUTIONREGIME','VIEW') or
     s:hasPermission('EMPLOYEE','VIEW') or
     s:hasPermission('GESTION','VIEW') or
     s:hasPermission('CYCLE','VIEW') or
@@ -1836,6 +1837,7 @@
                                             s:hasPermission('CNSRATE','VIEW') or
                                             s:hasPermission('IVARATE','VIEW') or
                                             s:hasPermission('SMNRATE','VIEW') or
+                                            s:hasPermission('SIPCONTRIBUTIONREGIME','VIEW') or
                                             s:hasPermission('BONUS','VIEW')   or
                                             s:hasPermission('DISCHARGEDOCUMENT','VIEW')  or
                                             s:hasPermission('VACATIONRULE','VIEW') or
@@ -1866,6 +1868,13 @@
                                    rendered="#{s:hasPermission('SMNRATE','VIEW')}">
                         <s:link view="/employees/smnRateList.xhtml"
                                 value="#{messages['menu.employees.configuration.smnRate']}"
+                                propagation="none"/>
+                    </rich:menuItem>
+                    <rich:menuItem submitMode="none"
+                                   styleClass="main-menu-item"
+                                   rendered="#{s:hasPermission('SIPCONTRIBUTIONREGIME','VIEW')}">
+                        <s:link view="/employees/sipContributionRegimeList.xhtml"
+                                value="#{messages['menu.employees.configuration.sipContributionRegime']}"
                                 propagation="none"/>
                     </rich:menuItem>
                     <rich:menuItem submitMode="none"

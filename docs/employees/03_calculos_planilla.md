@@ -251,11 +251,35 @@ patronalRetentionAFP                 = totalGrained × (1,71 + 2,00 + 3,00) %
 cns                                  = totalGrained × 10,00 %
 ```
 
-> ⚠️ **Hay cédulas de identidad hardcodeadas** en
-> [RetentionAFPCalculator](../../src/main/com/encens/khipus/util/employees/payroll/tributary/RetentionAFPCalculator.java)
-> y en `PatronalAFPRetentionCalculator`, que ponen en cero el AFP individual y/o de riesgo
-> común de cuatro personas (`815059`, `2862262`, `2868139`, `921886`). Ver
-> [08_deuda_tecnica.md](08_deuda_tecnica.md).
+### Qué componentes se cobran: el régimen de aportes
+
+Desde la v6.0.129 los cinco conceptos de arriba, los tres patronales y el CNS se cobran o
+se eximen segun el **régimen de aportes al SIP** del contrato
+([SIPContributionRegime](../../src/main/com/encens/khipus/model/employees/SIPContributionRegime.java),
+tabla `regimenaportesip`). `contrato.idregimenaportesip` nulo significa "el régimen marcado
+por defecto"; si el catálogo está vacío se cobra todo, que es el comportamiento histórico.
+
+| Régimen | Ind. 10% | R.Común 1,71% | Solid. 0,5% | Comis. 0,5% | Tasa efectiva |
+|---|:---:|:---:|:---:|:---:|---|
+| Asegurado activo *(por defecto)* | ✓ | ✓ | ✓ | ✓ | 12,71 % |
+| Jubilado con edad cumplida | — | — | ✓ | ✓ | 1,00 % |
+| Jubilado sin edad cumplida | — | ✓ | ✓ | ✓ | 2,71 % |
+| Edad de jubilación cumplida | ✓ | — | ✓ | ✓ | 11,00 % |
+
+El Aporte Nacional Solidario y los aportes del empleador (riesgo profesional, pro vivienda,
+solidario patronal y CNS) se cobran en los cuatro regímenes: son redistributivos o cubren
+riesgos que el jubilado sigue corriendo mientras trabaja. Las banderas existen igual, por si
+la norma cambia.
+
+Se administra en **RRHH → Generación de planillas → Configuración → Regímenes de aportes SIP**
+(permiso `SIPCONTRIBUTIONREGIME`) y se asigna en el fieldset *Contrato* de la pantalla de
+contratos puestos.
+
+> Hasta la v6.0.128 esto eran **cuatro números de carnet escritos en el código**
+> (`815059`, `2862262`, `2868139`, `921886`), agregados en el commit `b4eb44d1` para cerrar
+> una planilla. Los porcentajes 1,00 % y 2,71 % ya existían como constantes en
+> `RetentionAFPCalculator` desde antes, pero el refactor que separó el aporte en cuatro
+> componentes dejó de usarlos y la regla del jubilado se perdió en silencio.
 
 ### RC-IVA
 

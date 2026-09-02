@@ -105,6 +105,10 @@ public class DiscountRuleAction extends GenericAction<DiscountRule> {
     @End
     @Restrict("#{s:hasPermission('DISCOUNTRULE','UPDATE')}")
     public String update() {
+        if (isLockedByOfficialPayroll()) {
+            addLockedByOfficialPayrollMessage();
+            return Outcome.REDISPLAY;
+        }
         Long currentVersion = (Long) getVersion(getInstance());
         try {
             discountRuleService.updateDiscountRule(getInstance());
@@ -132,6 +136,10 @@ public class DiscountRuleAction extends GenericAction<DiscountRule> {
     @End
     @Restrict("#{s:hasPermission('DISCOUNTRULE','DELETE')}")
     public String delete() {
+        if (isLockedByOfficialPayroll()) {
+            addLockedByOfficialPayrollMessage();
+            return Outcome.REDISPLAY;
+        }
         try {
             discountRuleService.deleteDiscountRule(getInstance());
             addDeletedMessage();
@@ -143,6 +151,23 @@ public class DiscountRuleAction extends GenericAction<DiscountRule> {
             addDeleteReferentialIntegrityMessage();
         }
         return Outcome.SUCCESS;
+    }
+
+    /**
+     * El ciclo de generacion congela una FK a la regla, no una copia de sus rangos. Si ya se
+     * cerraron planillas oficiales con ella, editarla cambiaria lo que daria una regeneracion
+     * de esos meses. Para cambiar el umbral o el porcentaje hay que crear una regla nueva y
+     * marcarla activa, igual que con las tasas AFP, CNS, IVA y SMN.
+     */
+    public boolean isLockedByOfficialPayroll() {
+        return isManaged() && discountRuleService.isLockedByOfficialPayroll(getInstance());
+    }
+
+    public void addLockedByOfficialPayrollMessage() {
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                "DiscountRule.error.lockedByOfficialPayroll",
+                getInstance().getName(),
+                discountRuleService.countOfficialPayrolls(getInstance()));
     }
 
     public boolean isCurrencyDiscountUnitType() {

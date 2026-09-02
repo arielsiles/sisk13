@@ -54,6 +54,33 @@ Consecuencias prácticas:
   Una banda nocturna que cruza medianoche no se maneja bien.
 - La marca de entrada nunca puede ser también la de salida.
 
+## Cuándo se exigen bandas horarias
+
+Desde la **v6.0.129** las bandas sólo son obligatorias para quien tiene
+`empleado.flagcontrol` (*Control de Asistencia*) marcado:
+
+| `flagcontrol` | Sin bandas cargadas |
+|---|---|
+| Marcado | La generación **aborta** con `GeneratedPayroll.error.withoutBands` |
+| Desmarcado | Genera normal: sin faltas, sin atrasos, sin filas en `reportecontrol` |
+| `NULL` | Se trata como marcado — aborta. Ante el dato desconocido se prefiere el error a pagar de más |
+
+Es el caso de un gerente, que cobra sueldo fijo y no marca. Antes había que cargarle un
+horario ficticio sólo para que la planilla corriera.
+
+Dos consecuencias de generar sin bandas:
+
+- `getJobContractForPayment()` devuelve `null` y se usa el **fallback**: el primer
+  contratopuesto del primer contrato válido. Con un contrato por empleado siempre acierta.
+- El prorrateo por alta/baja **sí se aplica**. `getContractDays4Month()` vivía dentro del
+  bloque que depende de las bandas, así que sin horario `workedDays` quedaba en 30 y se
+  pagaba el mes entero aunque el contrato empezara el día 20. Ahora un contrato sin bandas
+  guarda su prorrateo aparte y se usa **sólo si ningún contrato con bandas fijó el valor**,
+  de modo que el cálculo de quienes ya generaban no cambia en nada.
+
+> El camino académico (`fillFiscalProfessorPayroll`) conserva la validación vieja, sin
+> condicionar por `flagcontrol`. Es código muerto y no se tocó.
+
 ## Recorrido del mes
 
 `executeAttendanceControlManagers(...)` —

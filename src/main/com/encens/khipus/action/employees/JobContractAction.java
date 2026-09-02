@@ -15,7 +15,10 @@ import com.encens.khipus.service.customers.ExtensionService;
 import com.encens.khipus.service.employees.JobCategoryService;
 import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.service.employees.KindOfSalaryService;
+import com.encens.khipus.service.employees.SIPContributionRegimeService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
+import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.MessageUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
@@ -26,6 +29,7 @@ import org.jboss.seam.international.StatusMessage;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,6 +71,8 @@ public class JobContractAction extends GenericAction<JobContract> {
     private JobContractService jobContractService;
     @In
     private CompanyConfigurationService companyConfigurationService;
+    @In
+    private SIPContributionRegimeService sipContributionRegimeService;
 
     @In(value = "#{listEntityManager}")
     private EntityManager eventEm;
@@ -337,6 +343,7 @@ public class JobContractAction extends GenericAction<JobContract> {
 
     public String createOrUpdateContract() {
         getContract().setEmployee(getEmployee());
+        warnOnInconsistentContributionRegime();
         if (getContract().getId() == null) {
             try {
                 genericService.create(getContract());
@@ -369,6 +376,42 @@ public class JobContractAction extends GenericAction<JobContract> {
             }
         }
         return Outcome.SUCCESS;
+    }
+
+    /**
+     * Aviso no bloqueante cuando el regimen de aportes elegido no concuerda con la situacion
+     * del trabajador. No decide por el usuario: las fechas de nacimiento del padron no son
+     * confiables, asi que la ultima palabra la tiene RRHH.
+     */
+    private void warnOnInconsistentContributionRegime() {
+        Employee employee = getEmployee();
+        if (null == employee) {
+            return;
+        }
+        SIPContributionRegime regime = sipContributionRegimeService.resolveRegime(
+                getContract(), sipContributionRegimeService.findDefault());
+        boolean chargesIndividualAccount =
+                SIPContributionConcept.contributes(regime, SIPContributionConcept.INDIVIDUAL_ACCOUNT);
+        boolean chargesCommonRisk =
+                SIPContributionConcept.contributes(regime, SIPContributionConcept.COMMON_RISK);
+        String regimeName = null == regime
+                ? MessageUtils.getMessage("Contract.sipContributionRegime.byDefault") : regime.getName();
+
+        if (Boolean.TRUE.equals(employee.getJubilateFlag()) && chargesIndividualAccount) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "Contract.sipContributionRegime.warn.jubilate", employee.getFullName(), regimeName);
+            return;
+        }
+
+        if (!Boolean.TRUE.equals(employee.getJubilateFlag()) && chargesCommonRisk
+                && null != employee.getBirthDay()) {
+            Integer ageInDays = employee.computeAgeInDaysAtDate(new Date());
+            double ageInYears = ageInDays.doubleValue() / Constants.YEAR_DAYS.doubleValue();
+            if (ageInYears >= Constants.JUBILATION_AGE) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                        "Contract.sipContributionRegime.warn.jubilationAge", employee.getFullName(), regimeName);
+            }
+        }
     }
 
     public String createJob(OrganizationalUnit currentOrganizationalUnit, JobCategory currentJobCategory) {

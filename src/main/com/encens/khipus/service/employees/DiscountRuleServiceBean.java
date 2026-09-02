@@ -8,6 +8,7 @@ import com.encens.khipus.exception.ReferentialIntegrityException;
 import com.encens.khipus.framework.service.GenericServiceBean;
 import com.encens.khipus.model.admin.BusinessUnit;
 import com.encens.khipus.model.employees.DiscountRule;
+import com.encens.khipus.model.employees.GeneratedPayrollType;
 import com.encens.khipus.model.employees.DiscountRuleType;
 import com.encens.khipus.model.employees.Gestion;
 import com.encens.khipus.model.employees.JobCategory;
@@ -56,6 +57,21 @@ public class DiscountRuleServiceBean extends GenericServiceBean implements Disco
     @TransactionAttribute(REQUIRES_NEW)
     public void deleteDiscountRule(DiscountRule discountRule) throws ConcurrencyException, ReferentialIntegrityException {
         delete(discountRule);
+    }
+
+    public Long countOfficialPayrolls(DiscountRule discountRule) {
+        if (null == discountRule || null == discountRule.getId()) {
+            return 0L;
+        }
+        return (Long) getEntityManager().createNamedQuery("DiscountRule.countOfficialPayrollsByDiscountRule")
+                .setParameter("discountRule", discountRule)
+                .setParameter("generatedPayrollType", GeneratedPayrollType.OFFICIAL)
+                .getSingleResult();
+    }
+
+    public boolean isLockedByOfficialPayroll(DiscountRule discountRule) {
+        Long count = countOfficialPayrolls(discountRule);
+        return null != count && count > 0;
     }
 
     private List<DiscountRule> findDiscountRuleForInactive(DiscountRule discountRule) {

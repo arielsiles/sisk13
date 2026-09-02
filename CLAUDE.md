@@ -85,8 +85,9 @@ src/main/com/encens/khipus/
 > el flujo de generación de planillas (ciclo → gestión planilla → planilla generada →
 > oficial → merge → contabilización), **todas las fórmulas** (haber básico, faltas y la
 > regla del ×2, atrasos, AFP, RC‑IVA, planilla fiscal, aguinaldo), asistencia y marcado,
-> el catálogo de reportes y la deuda técnica conocida (CIs hardcodeadas en el cálculo de
-> AFP, módulo tributario puenteado, código académico muerto). Leerlo antes de tocar RRHH.
+> el catálogo de reportes, el régimen de aportes al SIP (`regimenaportesip`, que reemplazó
+> los carnets escritos en el cálculo de AFP) y la deuda técnica conocida (módulo tributario
+> de RC-IVA puenteado, código académico muerto). Leerlo antes de tocar RRHH.
 
 ### Configuration Files
 - **Database**: `resources/khipus-{profile}-ds.xml`

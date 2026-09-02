@@ -23,6 +23,23 @@
         </navigation>
     </page>
 
+    <page view-id="/employees/sipContributionRegimeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{sipContributionRegimeAction.select(sipContributionRegimeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/sipContributionRegime.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/sipContributionRegime.xhtml"
+          no-conversation-view-id="/employees/sipContributionRegimeList.xhtml">
+        <navigation>
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/sipContributionRegimeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/employees/cnsRateList.xhtml">
         <end-conversation/>
         <navigation from-action="#{cnsRateAction.select(cnsRateItem)}">

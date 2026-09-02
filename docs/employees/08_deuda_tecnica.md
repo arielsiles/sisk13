@@ -4,31 +4,70 @@ Lo que hay que saber **antes** de tocar el módulo. Nada de esto está roto al p
 impedir operar: son cosas que sorprenden, que hacen que un cambio "obvio" cambie importes,
 o que hay que arreglar con confirmación del cliente porque tocan plata.
 
-## 🔴 Cédulas de identidad hardcodeadas en el cálculo de AFP
+## ✅ Cédulas de identidad hardcodeadas en el cálculo de AFP — **resuelto en v6.0.129**
 
+Hasta la v6.0.128,
 [RetentionAFPCalculator](../../src/main/com/encens/khipus/util/employees/payroll/tributary/RetentionAFPCalculator.java)
 y [PatronalAFPRetentionCalculator](../../src/main/com/encens/khipus/util/employees/payroll/tributary/PatronalAFPRetentionCalculator.java)
-contienen:
+contenían cuatro números de carnet:
 
 ```java
 /** todo AFP **/
 if (empleado.getIdNumber().equals("815059"))  { setLaborCommonRiskAFP(ZERO); }
-if (empleado.getIdNumber().equals("2862262")) { /* Juana Pozo   */ setLaborIndividualAFP(ZERO); setLaborCommonRiskAFP(ZERO); }
-if (empleado.getIdNumber().equals("2868139")) { /* Eliseo Camacho */ setLaborIndividualAFP(ZERO); setLaborCommonRiskAFP(ZERO); }
-if (empleado.getIdNumber().equals("921886"))  { setLaborCommonRiskAFP(ZERO); }
+if (empleado.getIdNumber().equals("2862262")) { /* Juana Pozo */ setLaborIndividualAFP(ZERO); setLaborCommonRiskAFP(ZERO); }
+...
 ```
 
-Cuatro personas concretas quedan exentas de AFP individual y/o riesgo común. Vino del
-commit `b4eb44d1` *"cambios para ILVA - Juana AFP"* (07/05/2024).
+Venían del commit `b4eb44d1` *"cambios para ILVA - Juana AFP"* (07/05/2024), y el `if` corría
+en **todas** las instalaciones, no sólo en la del cliente que los originó.
 
-**Consecuencias:** el cálculo depende del cliente y del CI; si esas personas se retiran o
-si el mismo CI aparece en otra instalación, el resultado es incorrecto. En
-`PatronalAFPRetentionCalculator` el bloque además es **inútil**: pisa campos *laborales*
-que la calculadora patronal no vuelve a usar y que `RetentionAFPCalculator` ya dejó en cero.
+No eran excepciones arbitrarias: eran dos casos previstos por la norma que el refactor del
+aporte AFP dejó sin implementar. Los porcentajes 1,00 % y 2,71 % ya estaban como constantes
+en el calculador, pero la rama que los usaba quedó comentada y `afpRatePercentage` se
+calculaba sin que nadie lo leyera.
 
-**Qué debería hacerse:** una bandera por empleado o contrato (tipo `flagafp`, que ya
-existe) o un tipo de exención en `Contract`. Requiere confirmar con el cliente el criterio
-real (¿jubilados? ¿consultores?) antes de migrar los datos.
+Sustituidos por el catálogo `regimenaportesip` + `contrato.idregimenaportesip` — ver
+[03_calculos_planilla.md](03_calculos_planilla.md). El bloque muerto de
+`PatronalAFPRetentionCalculator`, que pisaba campos laborales que esa clase no vuelve a
+usar, se eliminó.
+
+> **Al desplegar:** aplicar `query/query_v6.0.129_terdemol.sql` **antes** de arrancar el
+> servidor. `persistence` usa `hbm2ddl.auto=validate` (el despliegue falla si falta la tabla
+> o la columna), y hasta que el script no asigne el régimen a esos cuatro contratos volverían
+> a pagar el aporte completo.
+
+## ✅ La regla del Aporte Nacional Solidario se podía editar hacia atrás — **mitigado en v6.0.129**
+
+`ciclogeneracionplanilla` congela una **FK a `regladescuento`**, no una copia de sus rangos.
+Editar el umbral o el porcentaje hacía que regenerar un mes ya cerrado diera números
+distintos a los guardados.
+
+Se detectó en la instalación **FCISC/ILVA**: su regla tiene el rango en 1,00 % mientras las
+planillas guardadas desde noviembre de 2024 corresponden a 1,15 %. El corte es exacto —
+octubre 2024 cierra con 48,75 (1,00 %) y noviembre abre con 56,06 (1,15 %) sobre el mismo
+total ganado de 17.875—, o sea que alguien editó el porcentaje en esa fecha y con eso
+reescribió lo que daría regenerar cualquier mes anterior:
+
+| | Total ganado | Guardado | Con 1,15 % | Con 1,00 % |
+|---|---:|---:|---:|---:|
+| Eliseo (may‑2026) | 19.685,00 | 76,88 | **76,88** ✓ | 66,85 ✗ |
+
+**En terdemol no pasa:** su regla está en 1,00 % y sus planillas también. El umbral de
+13.000 (`rangoregladescuento.rangoinicial`) nunca cambió en ninguna de las dos.
+
+Desde la v6.0.129 una regla usada por planillas **oficiales** no se puede modificar ni
+borrar, ni ella ni sus rangos: la pantalla lo avisa y el guardado se rechaza. Para cambiar
+el umbral se crea una **regla nueva** y se la marca activa — `inactiveOthersDiscountRules`
+desactiva la anterior sola, igual que con las tasas AFP, CNS, IVA y SMN, y el próximo ciclo
+la toma en `putDefaultRates()`.
+
+> El escalonado de la Ley 065 (1 % sobre el excedente de 13.000, adicional sobre 25.000,
+> adicional sobre 35.000) se arma **agregando filas** a la regla:
+> `findDiscountRuleRangeListInList` devuelve todos los rangos que cubren el total ganado y
+> los suma. No requiere código.
+>
+> `IntervalType` (`OVERLAP` / `CONTIGUOUS`) se guarda pero el filtro lo ignora: siempre
+> solapa. Eso sigue pendiente.
 
 ## 🔴 El módulo tributario de RC-IVA está puenteado
 

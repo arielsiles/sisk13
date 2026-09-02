@@ -225,6 +225,14 @@ public class Contract implements BaseModel {
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
     private Boolean special = false;
 
+    /**
+     * Regimen de aportes al Sistema Integral de Pensiones. Nulo significa "el regimen por
+     * defecto del catalogo", asi los contratos existentes siguen calculando igual que antes.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idregimenaportesip")
+    private SIPContributionRegime sipContributionRegime;
+
     @Version
     @Column(name = "version", nullable = false)
     private long version;
@@ -458,5 +466,13 @@ public class Contract implements BaseModel {
 
     public void setSpecial(Boolean special) {
         this.special = special;
+    }
+
+    public SIPContributionRegime getSipContributionRegime() {
+        return sipContributionRegime;
+    }
+
+    public void setSipContributionRegime(SIPContributionRegime sipContributionRegime) {
+        this.sipContributionRegime = sipContributionRegime;
     }
 }
