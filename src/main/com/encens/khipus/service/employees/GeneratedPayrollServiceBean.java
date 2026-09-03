@@ -231,6 +231,17 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
         }
     }
 
+    private String joinNames(List<String> names) {
+        StringBuilder result = new StringBuilder();
+        for (String name : names) {
+            if (result.length() > 0) {
+                result.append(", ");
+            }
+            result.append(name);
+        }
+        return result.toString();
+    }
+
     protected void unexpectedErrorLog(Exception e) {
         log.error("An unexpected error have happened rolling back", e);
     }
@@ -637,6 +648,11 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 boolean quotasStillValid = true;
                 /*indicates if the collections need to be recreated*/
                 boolean recreateIsNeed = false;
+                /* Empleados que impiden generar. Se acumulan en vez de cortar en el primero,
+                   para poder reportarlos juntos y que RRHH los corrija de una sola pasada.
+                   La corrida se descarta igual al final: no se genera una planilla parcial. */
+                List<String> employeesWithoutBands = new ArrayList<String>();
+                List<String> employeesWithoutContracts = new ArrayList<String>();
                 for (int i = 0; (i < databaseRotatoryFundCollectionList.size() && quotasStillValid); i++) {
                     RotatoryFundCollection rotatoryFundCollection = databaseRotatoryFundCollectionList.get(i);
                     quotasStillValid = quotaService.isQuotaInfoStillValid(rotatoryFundCollection);
@@ -679,7 +695,8 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                                     generatedPayroll, employeeList, specialDate4BusinessUnit,
                                     specialDateTime4BusinessUnit, specialDate4OrganizationalUnit,
                                     specialDateTimeForOrganizationalUnit,
-                                    newRotatoryFundCollectionList);
+                                    newRotatoryFundCollectionList,
+                                    employeesWithoutBands, employeesWithoutContracts);
                         }
                     } else {
                         payrollGenerationResult = fillProffesorsPayroll(
@@ -693,6 +710,15 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
 
                     userTransaction.commit();
                     userTransaction.setTransactionTimeout(0);
+                }
+                /* Se evalua aca, en el mismo punto donde antes el bucle ya salia con el
+                   resultado en falla, para que el resto del flujo se comporte igual. */
+                if (!employeesWithoutContracts.isEmpty()) {
+                    payrollGenerationResult = PayrollGenerationResult.WITHOUT_CONTRACTS
+                            .assignResultData(joinNames(employeesWithoutContracts));
+                } else if (!employeesWithoutBands.isEmpty()) {
+                    payrollGenerationResult = PayrollGenerationResult.WITHOUT_BANDS
+                            .assignResultData(joinNames(employeesWithoutBands));
                 }
                 /* check if its necessary to recreate collections*/
                 log.debug("quotas valid?" + quotasStillValid);
@@ -914,14 +940,19 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
      * @param specialDateTimeForOrganizationalUnit
      *                                       a map that contains a list of special dates by time by OrganizationalUnit
      * @param newRotatoryFundCollectionList  a list of Rotatory Fund Collections
-     * @return PayrollGenerationResult for Managers
+     * @param employeesWithoutBands          acumula los empleados sin banda horaria valida
+     * @param employeesWithoutContracts      acumula los empleados sin contrato valido
+     * @return siempre SUCCESS: los empleados que impiden generar se acumulan en las listas y
+     *         quien llama decide, para poder reportarlos todos juntos en vez de uno por corrida
      */
     public PayrollGenerationResult fillManagersPayroll(GeneratedPayroll generatedPayroll, List<Employee> employeeList,
                                                        List<Date> specialDate4BusinessUnit,
                                                        Map<Date, List<TimeInterval>> specialDateTime4BusinessUnit,
                                                        Map<Long, List<Date>> specialDate4OrganizationalUnit,
                                                        Map<Long, Map<Date, List<TimeInterval>>> specialDateTimeForOrganizationalUnit,
-                                                       List<RotatoryFundCollection> newRotatoryFundCollectionList) {
+                                                       List<RotatoryFundCollection> newRotatoryFundCollectionList,
+                                                       List<String> employeesWithoutBands,
+                                                       List<String> employeesWithoutContracts) {
 
         GestionPayroll gestionPayroll = generatedPayroll.getGestionPayroll();
         // iterates each employee
@@ -1010,7 +1041,8 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                    desconocido la generacion se queje en vez de pagar de mas en silencio. */
                 boolean requiresHoraryBands = !Boolean.FALSE.equals(employee.getControlFlag());
                 if (hourlyBandContract4EmployeeList.isEmpty() && requiresHoraryBands) {
-                    return PayrollGenerationResult.WITHOUT_BANDS.assignResultData(employee.getIdNumberAndFullName());
+                    employeesWithoutBands.add(employee.getIdNumberAndFullName());
+                    continue;
                 }
 
                 /* Con la lista vacia devuelve null y se cae al fallback de abajo. */
@@ -1466,7 +1498,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 }
             }// end if contractList.size>0
             else {
-                return PayrollGenerationResult.WITHOUT_CONTRACTS.assignResultData(employee.getIdNumberAndFullName());
+                employeesWithoutContracts.add(employee.getIdNumberAndFullName());
             }
         }
 

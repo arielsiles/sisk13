@@ -126,7 +126,9 @@ public interface GeneratedPayrollService {
                                                 Map<Date, List<TimeInterval>> specialDateTime4BusinessUnit,
                                                 Map<Long, List<Date>> specialDate4OrganizationalUnit,
                                                 Map<Long, Map<Date, List<TimeInterval>>> specialDateTimeForOrganizationalUnit,
-                                                List<RotatoryFundCollection> newRotatoryFundCollectionList);
+                                                List<RotatoryFundCollection> newRotatoryFundCollectionList,
+                                                List<String> employeesWithoutBands,
+                                                List<String> employeesWithoutContracts);
 
     Long countOfficialGeneratedPayrollByGestionPayrollParameters(GestionPayroll gestionPayroll);
 
