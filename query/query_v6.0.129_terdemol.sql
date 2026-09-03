@@ -115,6 +115,7 @@ SELECT 'regimenaportesip', (SELECT COALESCE(MAX(idregimenaportesip), 0) + 1 FROM
 --   2868139 ELISEO CAMACHO       -> individual 0 y riesgo comun 0  -> regimen 2
 --    815059 LUIS FERRUFINO       -> solo riesgo comun 0            -> regimen 4
 --    921886 SIMON CALUCHO        -> solo riesgo comun 0            -> regimen 4
+--   3610767 RENE ROCHA           -> individual 0, riesgo comun normal -> regimen 3
 
 UPDATE contrato c
    JOIN empleado e ON e.idempleado = c.idempleado
@@ -128,6 +129,13 @@ UPDATE contrato c
    JOIN entidad  n ON n.identidad  = e.idempleado
    SET c.idregimenaportesip = 4
  WHERE n.noidentificacion IN ('815059', '921886')
+   AND c.idregimenaportesip IS NULL;
+
+UPDATE contrato c
+   JOIN empleado e ON e.idempleado = c.idempleado
+   JOIN entidad  n ON n.identidad  = e.idempleado
+   SET c.idregimenaportesip = 3
+ WHERE n.noidentificacion = '3610767'
    AND c.idregimenaportesip IS NULL;
 
 
@@ -152,6 +160,7 @@ UPDATE empleado SET flagcontrol = 0;
 UPDATE regladescuento SET idunidadnegocio = 2 WHERE idregladescuento = 1;
 
 -- Julio 2026: apuntar el ciclo a la regla de AFP solidario vigente.
+-- (OJO para pruebas, para produccion primero crear SOLIDARY_AFP con 1.15%, luego recien crear el periodo/ciclo de planilla)
 UPDATE ciclogeneracionplanilla
    SET idregladescuento = (SELECT idregladescuento FROM regladescuento
                             WHERE tipodescuento = 'SOLIDARY_AFP' AND activo = 1)
