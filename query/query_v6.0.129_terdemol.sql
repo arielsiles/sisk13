@@ -150,3 +150,9 @@ UPDATE empleado SET flagcontrol = 0;
 
 -- solo terdemol
 UPDATE regladescuento SET idunidadnegocio = 2 WHERE idregladescuento = 1;
+
+-- Julio 2026: apuntar el ciclo a la regla de AFP solidario vigente.
+UPDATE ciclogeneracionplanilla
+   SET idregladescuento = (SELECT idregladescuento FROM regladescuento
+                            WHERE tipodescuento = 'SOLIDARY_AFP' AND activo = 1)
+ WHERE nombre = 'COCHABAMBA 2026 JULIO';
