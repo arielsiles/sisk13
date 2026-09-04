@@ -62,6 +62,11 @@ public class SpecialDateAction extends GenericAction<SpecialDate> {
         return SpecialDateType.values();
     }
 
+    @Factory(value = "specialDateReason")
+    public SpecialDateReason[] getSpecialDateReason() {
+        return SpecialDateReason.values();
+    }
+
     public Boolean isTargetEmployee(SpecialDate specialDate) {
         return SpecialDateTarget.EMPLOYEE.equals(specialDate.getSpecialDateTarget());
     }

@@ -1,0 +1,128 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['WeeklyWorkload.list']}</ui:define>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="weeklyWorkloadSearch">
+            <rich:simpleTogglePanel label="#{messages['WeeklyWorkload.search']}" switchType="client">
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width100percent">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['WeeklyWorkload.gender']}</ui:define>
+                        <h:selectOneMenu id="gender" value="#{weeklyWorkloadDataModel.criteria.gender}"
+                                         styleClass="input" tabindex="1">
+                            <s:selectItems value="#{weeklyWorkloadGender}" var="wwg"
+                                           label="#{messages[wwg.resourceKey]}"
+                                           hideNoSelectionLabel="false" noSelectionLabel=""/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                        <a4j:commandButton id="searchButtonId"
+                                           action="#{weeklyWorkloadDataModel.search}"
+                                           value="#{messages['Common.search']}"
+                                           reRender="weeklyWorkloadSearch, weeklyWorkloadList, dataScroller"
+                                           styleClass="button" tabindex="2">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{weeklyWorkloadDataModel.clear}"
+                                           value="#{messages['Common.clear']}"
+                                           reRender="weeklyWorkloadSearch, weeklyWorkloadList, dataScroller"
+                                           styleClass="button" tabindex="3"/>
+                    </s:decorate>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/weeklyWorkload.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('WEEKLYWORKLOAD','CREATE')}"
+                          tabindex="4"/>
+            </div>
+
+            <rich:dataTable id="weeklyWorkloadList"
+                            value="#{weeklyWorkloadDataModel}" var="weeklyWorkloadItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="15%,15%,15%,35%,10%,10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="weeklyWorkload.gender"
+                                                   dataModel="#{weeklyWorkloadDataModel}"
+                                                   reRender="weeklyWorkloadList, dataScroller">
+                                #{messages['WeeklyWorkload.gender']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <app:commandSortHeader sortProperty="weeklyWorkload.weeklyHours"
+                                                   dataModel="#{weeklyWorkloadDataModel}"
+                                                   reRender="weeklyWorkloadList, dataScroller">
+                                #{messages['WeeklyWorkload.weeklyHours']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['WeeklyWorkload.dailyHours']}
+                        </rich:column>
+                        <rich:column>
+                            #{messages['WeeklyWorkload.description']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['WeeklyWorkload.active']}
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            #{messages['Common.action']}
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{messages[weeklyWorkloadItem.gender.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{weeklyWorkloadItem.weeklyHours}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{weeklyWorkloadItem.dailyHours}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{weeklyWorkloadItem.description}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox value="#{weeklyWorkloadItem.active}" disabled="true"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink value="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{weeklyWorkloadAction.select(weeklyWorkloadItem)}"
+                                   rendered="#{s:hasPermission('WEEKLYWORKLOAD','VIEW')}">
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="weeklyWorkloadList"
+                              dataModel="#{weeklyWorkloadDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/weeklyWorkload.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('WEEKLYWORKLOAD','CREATE')}"
+                          tabindex="5"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

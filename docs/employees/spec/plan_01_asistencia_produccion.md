@@ -1,7 +1,7 @@
 # PLAN 01 — Control de asistencia y planilla de producción
 
 > Deriva de [req_01_asistencia_produccion.md](req_01_asistencia_produccion.md).
-> **Ninguna línea de código escrita a partir de este documento.** Esperando aprobación.
+> Aprobado. **E1 implementado**; E2 a E5 pendientes.
 
 ## Criterio que ordena todo el plan
 
@@ -174,6 +174,27 @@ confirmar cero diferencias.
 | Etapa SDD | Estado |
 |---|---|
 | SPEC | Completo y commiteado |
-| **PLAN** | Este documento — esperando aprobación |
-| TASKS | No iniciado |
-| IMPLEMENT | No iniciado |
+| PLAN | Este documento — aprobado |
+| **IMPLEMENT** | **E1 completo** (v6.1.0) · E2 a E5 pendientes |
+
+### E1 — qué quedó implementado
+
+| # | Estado | Dónde |
+|---|---|---|
+| E1.1 | Hecho | `MarkImportService`, `XlsxReader`, `markImport.xhtml`, tabla `loteimportmarcado` |
+| E1.2 | Hecho | `Entrada`/`Salida` → `control` 1/3 en `MarkImportServiceBean` |
+| E1.3 | Hecho | `SpecialDateReason`, columna `fechaespecial.motivo` |
+| E1.4 | Hecho | `WeeklyWorkload`, tabla `jornadasemanal`, 48/40 h configurables |
+
+Dos desvíos respecto de lo planificado, ambos deliberados:
+
+- **El importador no deduplica.** La tarea E1.1 decía "deduplicación"; se cargan todas las
+  marcaciones del archivo, repetidas incluidas. El sistema no puede descartar un hecho del
+  dispositivo: la carga tiene que reflejar el archivo tal cual para ser auditable. Las
+  repetidas se cuentan y se avisan antes de confirmar, nada más.
+- **Se corrigió `RH_Mark.getMarDate()`/`getMarTime()`**, que devolvían `new Date()` y pisaban
+  el campo. No estaba en el plan porque no se conocía; sin eso las marcas importadas se
+  guardaban con la fecha del día de la carga.
+
+El motivo de `SpecialDate` queda nulo en las 14.819 filas existentes: inferirlo hacia atrás
+sería adivinar. El alcance acotado de una justificación (D23) es E2.6, no entra acá.

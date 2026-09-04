@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{weeklyWorkloadAction.managed}">
+                #{messages['WeeklyWorkload.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['WeeklyWorkload.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="weeklyWorkloadForm">
+            <div class="buttons">
+                <h:commandButton action="#{weeklyWorkloadAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!weeklyWorkloadAction.managed and s:hasPermission('WEEKLYWORKLOAD','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{weeklyWorkloadAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{weeklyWorkloadAction.managed and s:hasPermission('WEEKLYWORKLOAD','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{weeklyWorkloadAction.managed and s:hasPermission('WEEKLYWORKLOAD','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{weeklyWorkloadAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="4"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{weeklyWorkloadAction.managed}">
+                            #{messages['WeeklyWorkload.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['WeeklyWorkload.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="genderField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WeeklyWorkload.gender']}</ui:define>
+                    <h:selectOneMenu id="gender" value="#{weeklyWorkload.gender}" required="true"
+                                     styleClass="input" tabindex="5">
+                        <s:selectItems value="#{weeklyWorkloadGender}" var="wwg"
+                                       label="#{messages[wwg.resourceKey]}"
+                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                        <s:convertEnum/>
+                    </h:selectOneMenu>
+                </s:decorate>
+
+                <s:decorate id="weeklyHoursField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WeeklyWorkload.weeklyHours']}</ui:define>
+                    <h:inputText id="weeklyHours" value="#{weeklyWorkload.weeklyHours}" required="true"
+                                 styleClass="input" size="10" tabindex="6">
+                        <app:realNumberConverter forId="weeklyHours" minimum="0" maximum="168"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WeeklyWorkload.weeklyHours.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="dailyHoursField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WeeklyWorkload.dailyHours']}</ui:define>
+                    <h:inputText id="dailyHours" value="#{weeklyWorkload.dailyHours}" required="true"
+                                 styleClass="input" size="10" tabindex="7">
+                        <app:realNumberConverter forId="dailyHours" minimum="0" maximum="24"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WeeklyWorkload.dailyHours.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WeeklyWorkload.description']}</ui:define>
+                    <h:inputText id="description" value="#{weeklyWorkload.description}"
+                                 maxlength="200" styleClass="input" size="60" tabindex="8"/>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WeeklyWorkload.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{weeklyWorkload.active}" tabindex="9"/>
+                    <h:outputText styleClass="app-tag" value="#{messages['WeeklyWorkload.active.hint']}"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{weeklyWorkloadAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!weeklyWorkloadAction.managed and s:hasPermission('WEEKLYWORKLOAD','CREATE')}"
+                                 tabindex="10"/>
+                <h:commandButton action="#{weeklyWorkloadAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{weeklyWorkloadAction.managed and s:hasPermission('WEEKLYWORKLOAD','UPDATE')}"
+                                 tabindex="11"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{weeklyWorkloadAction.managed and s:hasPermission('WEEKLYWORKLOAD','DELETE')}"
+                                 tabindex="12">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{weeklyWorkloadAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="13"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{weeklyWorkloadAction.managed and s:hasPermission('WEEKLYWORKLOAD','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputText value="#{messages['WeeklyWorkload.delete.confirmation']}"/>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{weeklyWorkloadAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('WEEKLYWORKLOAD','DELETE')}"
+                                   tabindex="1000"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

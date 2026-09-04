@@ -113,6 +113,22 @@
                   rendered="#{readOnly}"/>
 </s:decorate>
 
+<s:decorate id="specialDateReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+    <ui:define name="label">#{messages['SpecialDate.reason']}</ui:define>
+    <h:selectOneMenu id="specialDateReason"
+                     value="#{specialDate.reason}"
+                     styleClass="input"
+                     rendered="#{not readOnly}"
+                     tabindex="4">
+        <s:selectItems value="#{specialDateReason}" var="sdr" label="#{messages[sdr.resourceKey]}"
+                       hideNoSelectionLabel="false"
+                       noSelectionLabel=""/>
+        <s:convertEnum/>
+    </h:selectOneMenu>
+    <h:outputText value="#{empty specialDate.reason ? '' : messages[specialDate.reason.resourceKey]}"
+                  rendered="#{readOnly}"/>
+</s:decorate>
+
 <s:decorate id="initPeriodField" template="/include/inputField.xhtml" styleClass="formRow">
     <ui:define name="label">#{messages['SpecialDate.initPeriod']}</ui:define>
     <rich:calendar id="initPeriod"

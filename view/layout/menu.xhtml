@@ -1423,11 +1423,6 @@
                     rendered="#{s:hasPermission('HORARYBANDCONTRACT','VIEW')}"
                     propagation="none"/>
 
-            <s:link view="/employees/markImport.xhtml" styleClass="tab-cell"
-                    value="#{messages['menu.employees.markImport']}"
-                    rendered="#{s:hasPermission('MARKIMPORT','VIEW')}"
-                    propagation="none"/>
-
             <s:link view="/employees/bankAccountList.xhtml" styleClass="tab-cell"
                     value="#{messages['menu.employees.configuration.bankAccount']}"
                     rendered="#{s:hasPermission('BANKACCOUNT','VIEW')}"
@@ -1672,6 +1667,8 @@
                                             s:hasPermission('JOBCATEGORY','VIEW') or
                                             s:hasPermission('BANKENTITY','VIEW') or
                                             s:hasPermission('BANKACCOUNT','VIEW') or
+                                            s:hasPermission('WEEKLYWORKLOAD','VIEW') or
+                                            s:hasPermission('MARKIMPORT','VIEW') or
                                             s:hasPermission('CURRENCY','VIEW')}">
 
                 <!-- No esta registrado DISMISSAL -->
@@ -1834,6 +1831,20 @@
                                rendered="#{s:hasPermission('CONTRACTMODE','VIEW')}">
                     <s:link view="/employees/contractModeList.xhtml"
                             value="#{messages['menu.employees.configuration.contractMode']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WEEKLYWORKLOAD','VIEW')}">
+                    <s:link view="/employees/weeklyWorkloadList.xhtml"
+                            value="#{messages['menu.employees.configuration.weeklyWorkload']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('MARKIMPORT','VIEW')}">
+                    <s:link view="/employees/markImport.xhtml"
+                            value="#{messages['menu.employees.markImport']}"
                             propagation="none"/>
                 </rich:menuItem>
 

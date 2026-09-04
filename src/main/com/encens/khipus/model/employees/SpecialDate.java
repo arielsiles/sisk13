@@ -136,6 +136,12 @@ public class SpecialDate implements BaseModel {
     @Enumerated(EnumType.STRING)
     private SpecialDateType credit;
 
+    /* Nulo en las filas anteriores a la 6.1.0: no se infiere el motivo hacia atras porque
+       seria adivinar. Se completa de aca en adelante. */
+    @Column(name = "motivo", length = 30)
+    @Enumerated(EnumType.STRING)
+    private SpecialDateReason reason;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcontrato", nullable = true)
     private Contract contract;
@@ -308,6 +314,14 @@ public class SpecialDate implements BaseModel {
 
     public void setCredit(SpecialDateType credit) {
         this.credit = credit;
+    }
+
+    public SpecialDateReason getReason() {
+        return reason;
+    }
+
+    public void setReason(SpecialDateReason reason) {
+        this.reason = reason;
     }
 
     public OrganizationalUnit getOrganizationalUnit() {

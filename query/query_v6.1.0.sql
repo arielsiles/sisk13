@@ -61,7 +61,7 @@ SELECT 'loteimportmarcado', 1
 
 SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
 INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
-SELECT @nuevo_id, 'MARKIMPORT', 'Importacion de marcaciones (loteimportmarcado)', 4, 11,
+SELECT @nuevo_id, 'MARKIMPORT', 'Carga masiva de marcaciones', 4, 11,
        'Functionality.employees.markImport', 1
   FROM (SELECT 1) t
  WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'MARKIMPORT');
@@ -221,3 +221,59 @@ UPDATE empleado SET codigomarcacion = '39' WHERE idempleado = 162;
 -- Quedan sin asignar: los codigos 152 "Jhonatanarnezbutron" y 153 "Weimarcallequispe"
 -- no existen en `empleado` (no hay ningun BUTRON ni ningun WEIMAR). Hay que darlos de
 -- alta. Sus marcaciones igual se importan y se vinculan solas cuando se los cree.
+
+
+-- 7) Motivo en fechas especiales (E1.3) ----------------------------------------
+-- Hasta ahora una fecha especial solo decia si era con goce de haber y a quien aplicaba.
+-- Sin motivo no hay forma de reportar por causa ni de que la maternidad no consuma
+-- vacaciones. Queda nulo en las filas existentes: inferirlo hacia atras seria adivinar.
+
+ALTER TABLE fechaespecial ADD COLUMN motivo VARCHAR(30) NULL;
+
+
+-- 8) Jornada semanal por genero (E1.4) -----------------------------------------
+-- 48 h hombres / 40 h mujeres es la norma boliviana, pero el numero no se cablea: puede
+-- cambiar y otras empresas tienen otra jornada.
+
+CREATE TABLE IF NOT EXISTS jornadasemanal (
+  idjornadasemanal BIGINT       NOT NULL,
+  genero           VARCHAR(10)  NOT NULL,
+  horassemana      DECIMAL(5,2) NOT NULL,
+  horasdia         DECIMAL(5,2) NOT NULL,
+  activo           INT          NOT NULL DEFAULT 1,
+  descripcion      VARCHAR(200)     NULL,
+  idcompania       BIGINT       NOT NULL,
+  version          BIGINT       NOT NULL DEFAULT 0,
+  PRIMARY KEY (idjornadasemanal),
+  KEY fk_jornadasemanal_compania (idcompania),
+  CONSTRAINT fk_jornadasemanal_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Valores de la norma boliviana como punto de partida. Cada empresa los ajusta por pantalla.
+INSERT INTO jornadasemanal (idjornadasemanal, genero, horassemana, horasdia, activo, descripcion, idcompania, version)
+SELECT 1, 'MAN', 48.00, 8.00, 1, 'Norma boliviana', 1, 0
+  FROM (SELECT 1) t WHERE NOT EXISTS (SELECT 1 FROM jornadasemanal WHERE genero = 'MAN');
+
+INSERT INTO jornadasemanal (idjornadasemanal, genero, horassemana, horasdia, activo, descripcion, idcompania, version)
+SELECT 2, 'WOMAN', 40.00, 8.00, 1, 'Norma boliviana', 1, 0
+  FROM (SELECT 1) t WHERE NOT EXISTS (SELECT 1 FROM jornadasemanal WHERE genero = 'WOMAN');
+
+-- `valor` es el PROXIMO id a entregar, no el ultimo entregado.
+INSERT INTO secuencia (tabla, valor)
+SELECT 'jornadasemanal', (SELECT COALESCE(MAX(idjornadasemanal), 0) + 1 FROM jornadasemanal)
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'jornadasemanal');
+
+
+-- Permiso. Bitmask: VIEW=1, CREATE=2, UPDATE=4, DELETE=8. idmodulo = 4 (employees).
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'WEEKLYWORKLOAD', 'Jornada semanal por género', 4, 15,
+       'Functionality.employees.weeklyWorkload', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'WEEKLYWORKLOAD');
+
+-- `descripcion` lleva el mismo texto que muestra el sistema (el valor de la clave en
+-- messages_app.properties), para poder ubicar el permiso por ese nombre. MARKIMPORT ya se
+-- aplico antes con otro texto, se corrige.
+UPDATE funcionalidad SET descripcion = 'Carga masiva de marcaciones' WHERE codigo = 'MARKIMPORT';
