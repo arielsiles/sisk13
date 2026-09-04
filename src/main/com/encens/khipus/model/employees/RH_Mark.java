@@ -78,6 +78,13 @@ public class RH_Mark implements BaseModel, Comparable {
     @Column(name = "marippc", nullable = false, length = 200)
     private String marIpPc;
 
+    /**
+     * Lote de importacion que trajo esta marca, o nulo si la escribio el dispositivo directo.
+     * Es lo que hace reversible una carga: anular el lote borra exactamente lo que trajo.
+     */
+    @Column(name = "idloteimportmarcado")
+    private Long importBatchId;
+
     /*@Column(name = "sede", nullable = false, length = 200)
     private String seat;
 
@@ -86,6 +93,14 @@ public class RH_Mark implements BaseModel, Comparable {
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;*/
 
+
+    public Long getImportBatchId() {
+        return importBatchId;
+    }
+
+    public void setImportBatchId(Long importBatchId) {
+        this.importBatchId = importBatchId;
+    }
 
     public Integer getControl() {
         return control;
@@ -111,9 +126,12 @@ public class RH_Mark implements BaseModel, Comparable {
         this.marPerId = marPerId;
     }
 
+    /* Estos dos getters devolvian `new Date()` y de paso pisaban el campo. Funcionaba de
+       casualidad mientras la unica forma de crear una marca era el marcado en vivo, donde la
+       respuesta siempre es "ahora"; con marcas importadas de un archivo borraba la fecha y la
+       hora reales. Devuelven el valor; el marcado en vivo lo sigue fijando con setMarTime(). */
     public Date getMarDate() {
-        this.marDate = new Date();
-        return  this.marDate;
+        return marDate;
     }
 
     public void setMarDate(Date marDate) {
@@ -121,12 +139,6 @@ public class RH_Mark implements BaseModel, Comparable {
     }
 
     public Date getMarTime() {
-       /* Date date = new Date();
-        if (null == marTime) {
-            marTime = new Date();
-            return marTime;
-        }*/
-        this.marTime = new Date();
         return marTime;
     }
 

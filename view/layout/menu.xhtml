@@ -1423,6 +1423,11 @@
                     rendered="#{s:hasPermission('HORARYBANDCONTRACT','VIEW')}"
                     propagation="none"/>
 
+            <s:link view="/employees/markImport.xhtml" styleClass="tab-cell"
+                    value="#{messages['menu.employees.markImport']}"
+                    rendered="#{s:hasPermission('MARKIMPORT','VIEW')}"
+                    propagation="none"/>
+
             <s:link view="/employees/bankAccountList.xhtml" styleClass="tab-cell"
                     value="#{messages['menu.employees.configuration.bankAccount']}"
                     rendered="#{s:hasPermission('BANKACCOUNT','VIEW')}"
