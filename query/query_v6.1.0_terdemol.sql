@@ -271,3 +271,35 @@ SELECT @nuevo_regimen, 'Sin AFP',
        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0
   FROM (SELECT 1) t
  WHERE NOT EXISTS (SELECT 1 FROM regimenaportesip WHERE nombre = 'Sin AFP');
+
+
+-- 12) Turnos (H1 del plan 03) --------------------------------------------------
+-- Reemplaza a bandahoraria, que guardaba una fila por dia de la semana. Un turno es
+-- uno solo y se usa el dia que haga falta. Que cruce la medianoche no se guarda: se
+-- deduce de que la hora de fin no sea posterior a la de inicio.
+
+CREATE TABLE IF NOT EXISTS turno (
+  idturno            BIGINT       NOT NULL,
+  nombre             VARCHAR(100) NOT NULL,
+  horainicio         TIME         NOT NULL,
+  horafin            TIME         NOT NULL,
+  toleranciaentrada  INT          NOT NULL DEFAULT 0,
+  toleranciasalida   INT          NOT NULL DEFAULT 0,
+  activo             INT          NOT NULL DEFAULT 1,
+  idcompania         BIGINT       NOT NULL,
+  version            BIGINT       NOT NULL DEFAULT 0,
+  PRIMARY KEY (idturno),
+  KEY fk_turno_compania (idcompania),
+  CONSTRAINT fk_turno_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO secuencia (tabla, valor)
+SELECT 'turno', 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'turno');
+
+-- Permiso. Bitmask: VIEW=1, CREATE=2, UPDATE=4, DELETE=8. idmodulo = 4 (employees).
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'WORKSHIFT', 'Turnos de trabajo', 4, 15, 'Functionality.employees.workShift', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'WORKSHIFT');

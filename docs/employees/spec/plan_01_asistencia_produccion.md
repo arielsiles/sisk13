@@ -77,6 +77,11 @@ cambiar el resultado; toda diferencia es un defecto hasta que se demuestre lo co
 
 ## E3 · Turnos, patrones y asignación
 
+> **Reemplazada por [plan_03_horarios.md](plan_03_horarios.md).** Lo de abajo quedó obsoleto:
+> en esta base no hay asignaciones de horario vigentes -0 de 10, vencidas en 2024-, así que no
+> hay nada que migrar y la convivencia entre modelos no hace falta. Y el cronograma no se genera
+> desde un patrón: se planifica.
+
 **Qué entra:** RF‑11 (rediseño), RF‑08 (horarios fijos), RF‑03 (cambio de horario en el mes).
 
 **Por qué después de E2:** el motor nuevo ya sabe resolver "qué jornada le tocaba ese día".

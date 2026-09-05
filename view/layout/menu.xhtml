@@ -1668,6 +1668,7 @@
                                             s:hasPermission('BANKENTITY','VIEW') or
                                             s:hasPermission('BANKACCOUNT','VIEW') or
                                             s:hasPermission('WEEKLYWORKLOAD','VIEW') or
+                                            s:hasPermission('WORKSHIFT','VIEW') or
                                             s:hasPermission('MARKIMPORT','VIEW') or
                                             s:hasPermission('CURRENCY','VIEW')}">
 
@@ -1831,6 +1832,13 @@
                                rendered="#{s:hasPermission('CONTRACTMODE','VIEW')}">
                     <s:link view="/employees/contractModeList.xhtml"
                             value="#{messages['menu.employees.configuration.contractMode']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WORKSHIFT','VIEW')}">
+                    <s:link view="/employees/workShiftList.xhtml"
+                            value="#{messages['menu.employees.configuration.workShift']}"
                             propagation="none"/>
                 </rich:menuItem>
                 <rich:menuItem submitMode="none"

@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{workShiftAction.managed}">#{messages['WorkShift.edit']}</c:when>
+            <c:otherwise>#{messages['WorkShift.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="workShiftForm">
+            <div class="buttons">
+                <h:commandButton action="#{workShiftAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!workShiftAction.managed and s:hasPermission('WORKSHIFT','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{workShiftAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                                 rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{workShiftAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="4"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{workShiftAction.managed}">#{messages['WorkShift.edit']}</c:when>
+                        <c:otherwise>#{messages['WorkShift.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.name']}</ui:define>
+                    <h:inputText id="name" value="#{workShift.name}" required="true"
+                                 maxlength="100" styleClass="input" size="50" tabindex="5"/>
+                </s:decorate>
+
+                <s:decorate id="startHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.startHour']}</ui:define>
+                    <rich:calendar id="startHour" value="#{workShift.startHour}"
+                                   datePattern="#{messages['patterns.shortTime']}"
+                                   popup="true" enableManualInput="true" required="true"
+                                   styleClass="input" tabindex="6"/>
+                </s:decorate>
+
+                <s:decorate id="endHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.endHour']}</ui:define>
+                    <rich:calendar id="endHour" value="#{workShift.endHour}"
+                                   datePattern="#{messages['patterns.shortTime']}"
+                                   popup="true" enableManualInput="true" required="true"
+                                   styleClass="input" tabindex="7"/>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.endHour.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="entryToleranceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.entryTolerance']}</ui:define>
+                    <h:inputText id="entryTolerance" value="#{workShift.entryToleranceMinutes}"
+                                 required="true" styleClass="inputNumber" size="6" tabindex="8">
+                        <app:naturalNumberConverter forId="entryTolerance" minimum="0" maximum="240"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.entryTolerance.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="earlyExitToleranceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.earlyExitTolerance']}</ui:define>
+                    <h:inputText id="earlyExitTolerance" value="#{workShift.earlyExitToleranceMinutes}"
+                                 required="true" styleClass="inputNumber" size="6" tabindex="9">
+                        <app:naturalNumberConverter forId="earlyExitTolerance" minimum="0" maximum="240"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.earlyExitTolerance.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{workShift.active}" tabindex="10"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{workShiftAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!workShiftAction.managed and s:hasPermission('WORKSHIFT','CREATE')}"
+                                 tabindex="11"/>
+                <h:commandButton action="#{workShiftAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','UPDATE')}"
+                                 tabindex="12"/>
+                <h:commandButton action="#{workShiftAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="13"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['WorkShift.delete.confirmation']}">
+                        <f:param value="#{workShift.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{workShiftAction.delete}" value="#{messages['Common.delete']}"
+                                   immediate="true" styleClass="button"
+                                   rendered="#{s:hasPermission('WORKSHIFT','DELETE')}" tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>
