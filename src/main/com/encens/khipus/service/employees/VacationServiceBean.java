@@ -18,6 +18,7 @@ import org.jboss.seam.annotations.Name;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.persistence.NoResultException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,6 +35,12 @@ public class VacationServiceBean extends GenericServiceBean implements VacationS
 
     @In
     private VacationPlanningService vacationPlanningService;
+
+    @In
+    private VacationMovementService vacationMovementService;
+
+    @In
+    private VacationRuleService vacationRuleService;
 
     @TransactionAttribute(REQUIRES_NEW)
     public void createVacation(Vacation vacation) throws EntryDuplicatedException, VacationOverlapException, VacationPlanningExceedVacationDaysException {
@@ -74,6 +81,7 @@ public class VacationServiceBean extends GenericServiceBean implements VacationS
         vacation.setDaysOff(getVacationDaysOff(vacation));
         update(vacation);
 
+        vacationMovementService.postTaking(vacation);
         createSpecialDate(vacation);
         vacationPlanningService.synchronizeVacationDaysIgnoreUndefinedVacationRule(vacation.getVacationGestion().getVacationPlanning());
     }
@@ -86,11 +94,12 @@ public class VacationServiceBean extends GenericServiceBean implements VacationS
         }
 
         vacation.setState(VacationState.ANNULLED);
-        vacation.setDaysOff(0);
+        vacation.setDaysOff(BigDecimal.ZERO);
         update(vacation);
 
         deleteSpecialDate(vacation);
         if (VacationState.APPROVED.equals(lastState)) {
+            vacationMovementService.revertTaking(vacation);
             vacationPlanningService.synchronizeVacationDaysIgnoreUndefinedVacationRule(vacation.getVacationGestion().getVacationPlanning());
         }
     }
@@ -106,6 +115,9 @@ public class VacationServiceBean extends GenericServiceBean implements VacationS
             specialDate.setCredit(SpecialDateType.PAID);
             specialDate.setRolType(SpecialDateRol.FECHA);
             specialDate.setSpecialDateTarget(SpecialDateTarget.EMPLOYEE);
+            /* El motivo lo escribe el modulo, no se elige a mano: es lo que permite reportar
+               por causa y distinguir estos dias de los demas permisos pagados. */
+            specialDate.setReason(SpecialDateReason.VACATION);
             specialDate.setVacation(vacation);
             create(specialDate);
         }
@@ -122,16 +134,19 @@ public class VacationServiceBean extends GenericServiceBean implements VacationS
         if (vacation.getInitDate() != null && vacation.getEndDate() != null &&
                 vacation.getInitDate().compareTo(vacation.getEndDate()) <= 0) {
             //todo put here the integration with holidays if necessary
-            vacation.setTotalDays((int) DateUtils.daysBetweenWithoutWeekend(vacation.getInitDate(), vacation.getEndDate()));
+            /* Los dias derivados de un rango son enteros. Los medios dias existen -el informe
+               de vacaciones los usa- y se cargan a mano corrigiendo el total. */
+            vacation.setTotalDays(BigDecimal.valueOf(
+                    DateUtils.daysBetweenWithoutWeekend(vacation.getInitDate(), vacation.getEndDate())));
         } else {
-            vacation.setTotalDays(0);
+            vacation.setTotalDays(BigDecimal.ZERO);
         }
     }
 
-    private Integer getVacationDaysOff(Vacation vacation) {
-        Integer daysOff = 0;
+    private BigDecimal getVacationDaysOff(Vacation vacation) {
+        BigDecimal daysOff = BigDecimal.ZERO;
         if (vacation.getVacationGestion() != null) {
-            daysOff = vacation.getVacationGestion().getDaysOff() - vacation.getTotalDays();
+            daysOff = vacation.getVacationGestion().getDaysOff().subtract(vacation.getTotalDays());
         }
         return daysOff;
     }
@@ -169,21 +184,63 @@ public class VacationServiceBean extends GenericServiceBean implements VacationS
         }
     }
 
+    /**
+     * El limite es el saldo del plan, no los dias de una gestion. Antes se comparaba contra la
+     * gestion a la que la vacacion estaba atada, asi que una vacacion mas larga que el derecho
+     * de un anio se rechazaba aunque el empleado tuviera saldo de sobra: 18 dias no entraban
+     * contra una gestion de 15, teniendo 45 disponibles.
+     * <p/>
+     * El saldo puede quedar por debajo de cero hasta el limite que fije la regla de antiguedad:
+     * son las vacaciones tomadas por adelantado. Con el limite en cero no se permiten.
+     */
     private void validateExceedVacationDays(Vacation vacation) throws VacationPlanningExceedVacationDaysException {
-        VacationGestion vacationGestion = vacation.getVacationGestion();
-        getEntityManager().refresh(vacationGestion);
+        VacationPlanning planning = vacation.getVacationGestion().getVacationPlanning();
 
-        if (vacation.getTotalDays() > vacationGestion.getDaysOff()) {
-            throw new VacationPlanningExceedVacationDaysException(vacationGestion.getDaysOff(), vacation.getTotalDays());
+        BigDecimal available = vacationMovementService.balance(planning);
+        /* Una vacacion aprobada que se esta reeditando ya descontó: no se cuenta dos veces. */
+        if (VacationState.APPROVED.equals(vacation.getState())) {
+            available = available.add(vacation.getTotalDays());
+        }
+
+        Integer advanceLimit = resolveAdvanceDaysLimit(planning);
+        BigDecimal maximum = available.add(BigDecimal.valueOf(advanceLimit));
+
+        if (vacation.getTotalDays().compareTo(maximum) > 0) {
+            VacationPlanningExceedVacationDaysException e =
+                    new VacationPlanningExceedVacationDaysException(available, vacation.getTotalDays());
+            e.setAdvanceDaysLimit(advanceLimit);
+            throw e;
         }
     }
 
-    public Integer sumTotalDaysByVacationGestion(VacationGestion vacationGestion) {
-        Long result = (Long) getEntityManager().createNamedQuery("Vacation.sumTotalDaysByVacationGestion")
+    /**
+     * El limite de anticipo sale del tramo de antiguedad que le toca al empleado. Quien todavia
+     * no cumplio el primer anio no tiene tramo -y es justamente el caso del anticipo-, asi que
+     * ahi se usa el tramo mas bajo del catalogo.
+     */
+    private Integer resolveAdvanceDaysLimit(VacationPlanning vacationPlanning) {
+        VacationRule rule = vacationRuleService.findBySeniorityYear(vacationPlanning.getSeniorityYears());
+        if (null == rule) {
+            rule = vacationRuleService.findFirstTranche();
+        }
+        return (null == rule || null == rule.getAdvanceDaysLimit()) ? 0 : rule.getAdvanceDaysLimit();
+    }
+
+    public BigDecimal sumApprovedDaysByVacationPlanning(VacationPlanning vacationPlanning) {
+        BigDecimal result = (BigDecimal) getEntityManager()
+                .createNamedQuery("Vacation.sumTotalDaysByVacationPlanning")
+                .setParameter("vacationPlanning", vacationPlanning)
+                .setParameter("state", VacationState.APPROVED)
+                .getSingleResult();
+        return (result != null) ? result : BigDecimal.ZERO;
+    }
+
+    public BigDecimal sumTotalDaysByVacationGestion(VacationGestion vacationGestion) {
+        BigDecimal result = (BigDecimal) getEntityManager().createNamedQuery("Vacation.sumTotalDaysByVacationGestion")
                 .setParameter("vacationGestionId", vacationGestion.getId())
                 .setParameter("state", VacationState.APPROVED)
                 .getSingleResult();
-        return (result != null) ? result.intValue() : 0;
+        return (result != null) ? result : BigDecimal.ZERO;
     }
 
 }

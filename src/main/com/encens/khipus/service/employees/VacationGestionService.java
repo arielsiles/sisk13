@@ -9,6 +9,8 @@ import com.encens.khipus.model.employees.VacationGestion;
 import com.encens.khipus.model.employees.VacationPlanning;
 
 import javax.ejb.Local;
+
+import java.math.BigDecimal;
 import javax.ejb.TransactionAttribute;
 import java.util.List;
 
@@ -34,9 +36,16 @@ public interface VacationGestionService extends GenericService {
 
     List<VacationGestion> findByVacationPlanningAvailableDaysOff(VacationPlanning vacationPlanning);
 
-    Integer sumVacationDaysByVacationPlanning(VacationPlanning vacationPlanning);
+    /**
+     * La gestion contra la que se registra una vacacion nueva: la mas antigua con dias libres,
+     * o la mas antigua si ninguna tiene -el caso de las anticipadas-. Ya no se elige a mano:
+     * el consumo se reparte entre gestiones, del mas antiguo al mas nuevo.
+     */
+    VacationGestion findOldestForConsumption(VacationPlanning vacationPlanning);
 
-    Integer sumDaysUsedByVacationPlanning(VacationPlanning vacationPlanning);
+    BigDecimal sumVacationDaysByVacationPlanning(VacationPlanning vacationPlanning);
 
-    Integer sumDaysOffByVacationPlanning(VacationPlanning vacationPlanning);
+    BigDecimal sumDaysUsedByVacationPlanning(VacationPlanning vacationPlanning);
+
+    BigDecimal sumDaysOffByVacationPlanning(VacationPlanning vacationPlanning);
 }

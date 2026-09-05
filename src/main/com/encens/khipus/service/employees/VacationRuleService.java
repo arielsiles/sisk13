@@ -24,4 +24,10 @@ public interface VacationRuleService extends GenericService {
     VacationRule findLastVacationRule();
 
     VacationRule findBySeniorityYear(Integer seniorityYear);
+
+    /**
+     * El tramo mas bajo del catalogo. Se usa para resolver el limite de anticipo de quien
+     * todavia no cumplio el primer anio y por eso no cae en ningun tramo.
+     */
+    VacationRule findFirstTranche();
 }

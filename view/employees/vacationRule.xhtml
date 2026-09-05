@@ -116,6 +116,19 @@
                                                     forId="vacationDays"/>
                     </h:inputText>
                 </s:decorate>
+
+                <s:decorate id="advanceDaysLimitField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['VacationRule.advanceDaysLimit']}</ui:define>
+                    <h:inputText id="advanceDaysLimit"
+                                 value="#{vacationRule.advanceDaysLimit}"
+                                 styleClass="inputNumber"
+                                 required="true"
+                                 tabindex="4">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                                                    forId="advanceDaysLimit"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['VacationRule.advanceDaysLimit.hint']}"/>
+                </s:decorate>
             </rich:panel>
 
             <div class="buttons">

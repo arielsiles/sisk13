@@ -750,11 +750,11 @@ No hay que construir de cero: buena parte del modelo está y sólo está mal apr
 | Rotación | `TypeHoraryBand` + `executeAttendanceControlManagersRotation()` | Existe un esbozo; sólo toma **la primera** banda con tipo y descarta el resto |
 | Descuento por atrasos configurable | `DiscountRule` tipo `LATENESS`, rangos en `MINUTE`, por gestión/unidad/categoría | Modelado y con CRUD; **sin uso** en el camino de sueldos |
 | Horas extra | `ExtraHoursWorked` por ciclo de generación | Existe; sin saldo ni acumulación |
-| Vacaciones | `VacationPlanning`/`VacationGestion`/`Vacation`/`VacationRule` | Completo y **sin uso** (0 filas) |
+| Vacaciones | `VacationPlanning`/`VacationGestion`/`Vacation`/`VacationRule` + `VacationMovement` | **Reactivado** en 6.1.0 (RF‑07) |
 | Permisos y feriados | `SpecialDate` con destino y goce de haber | En uso intensivo (14.819 filas) |
 | Bitácora de asistencia | `ControlReport` | En uso (897.121 filas); sus importes en Bs salen en cero |
 | Marcado | `RH_Mark` → vista `vmarcado` → `RHMark` | En uso; cruza por `codigomarcacion` y **corta en 2020‑01‑01**. No guarda si la marca es entrada o salida |
-| Carga de marcaciones | — | **No existe** (RF‑10) |
+| Carga de marcaciones | `MarkImportBatch` + `XlsxReader` | **Implementado** en 6.1.0 (RF‑10) |
 | Grupos y cronograma | — | **No existe** (RF‑01) |
 | Banco de horas con saldo | — | **No existe** (RF‑05); `ExtraHoursWorked` no lleva saldo |
 
@@ -827,6 +827,60 @@ resuelve al implementar RF‑09, cuadrando contra un mes cerrado.
 | Etapa SDD | Estado |
 |---|---|
 | **SPEC** | 13 requerimientos, 29 decisiones. Sin preguntas de concepto |
-| PLAN | Siguiente paso |
-| TASKS | No iniciado |
-| IMPLEMENT | No iniciado |
+| PLAN | [plan_01_asistencia_produccion.md](plan_01_asistencia_produccion.md) — aprobado |
+| IMPLEMENT | **E1 completo** y **RF‑07 completo** (6.1.0) · E2 a E5 pendientes |
+
+### Estado por requerimiento
+
+Al cierre de la etapa E1, versión 6.1.0.
+
+| RF | Estado | Dónde / cuándo |
+|---|---|---|
+| RF‑01 Grupos y cronograma | Pendiente | E4 |
+| RF‑02 Turno nocturno | Pendiente | E2 |
+| RF‑03 Cambio de horario en el mes | Pendiente | E3 |
+| **RF‑04 Horas semanales por género** | **Implementado** | `WeeklyWorkload`, tabla `jornadasemanal`. Falta que E5 lo consuma |
+| RF‑05 Banco de horas | Pendiente | E4 |
+| RF‑06 Descuento por atrasos configurable | Pendiente | E4 |
+| **RF‑07 Vacaciones** | **Implementado** | [plan_02_vacaciones.md](plan_02_vacaciones.md) — submódulo reactivado, saldo como libro de movimientos |
+| RF‑08 Horarios fijos | Pendiente | E3 |
+| RF‑09 Cierre mensual asistido | Pendiente | E5 |
+| **RF‑10 Carga masiva de marcaciones** | **Implementado** | `MarkImportService`, `XlsxReader`, `markImport.xhtml` |
+| RF‑11 Rediseño del registro de horarios | Pendiente | E3 |
+| RF‑12 Motor de sesiones | Pendiente | E2 |
+| **RF‑13 Trazabilidad** | **Parcial** | Motivo en `SpecialDate` hecho; reporte de control e incidencias en E2 |
+
+### Lo que cambió respecto de lo especificado
+
+**RF‑10 no deduplica.** El SPEC y el plan hablaban de deduplicación; la implementación
+**carga todas las marcaciones del archivo**, repetidas incluidas. El criterio lo fijó el
+usuario y es más fuerte que la conveniencia: el sistema no puede descartar un hecho del
+dispositivo, la carga tiene que reflejar el archivo tal cual para ser auditable, y que el
+export traiga repetidos es responsabilidad de quien lo exporta. Las repetidas se cuentan y
+se avisan antes de confirmar. Lo mismo con las marcaciones cuyo código no cruza con ningún
+empleado: entran igual y se vinculan solas cuando se corrige el código.
+
+**Apareció un defecto que el SPEC no podía prever.** `RH_Mark.getMarDate()` y `getMarTime()`
+devolvían `new Date()` y de paso pisaban el campo. Funcionaba de casualidad mientras la única
+forma de crear una marca era el marcado en vivo, donde la respuesta siempre es "ahora"; con
+marcas importadas de un archivo borraba la fecha y la hora reales. Corregido.
+
+**El motivo de `SpecialDate` no se completó hacia atrás.** Inferirlo de las filas existentes
+sería adivinar. Se completa de las nuevas en adelante.
+
+### Verificación de E1
+
+Sobre julio 2026, en la base de la empresa:
+
+| | |
+|---|---|
+| Archivo | 4.537 filas, 72 códigos de marcación |
+| Importadas | 4.537, del 01/07 al 31/07 |
+| Entradas / salidas | 2.220 con `control=1`, 2.317 con `control=3` |
+| Repetidas informadas | 1.769 — cargadas igual |
+| Sin cruzar | 2 códigos (11 marcaciones) de personas que no existen en `empleado` |
+| Anulación | El lote anterior se anuló y sus marcas se borraron sin tocar las del otro lote |
+| Visibles para la planilla | Las 4.537 aparecen en la vista `vmarcado` con el empleado resuelto |
+
+El cruce de códigos hizo falta porque la base tenía el **CI** donde el dispositivo usa un id
+correlativo: 70 empleados actualizados cruzando por nombre contra el export.

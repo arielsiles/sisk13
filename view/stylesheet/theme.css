@@ -1787,6 +1787,36 @@ select[disabled] {
     color: #8a6d1f;
 }
 
+/* ============================================================================
+   .app-progress - avance de un proceso lanzado a mano (p.ej. actualizar devengos).
+   Deliberadamente SIN animacion: el progressBar de RichFaces se dibuja con un rayado
+   que se mueve siempre, este al 0% o al 100%, y da la sensacion de que el proceso
+   sigue corriendo cuando ya termino. Esta barra solo se llena y se queda quieta.
+   ============================================================================ */
+.app-progress {
+    display: block;
+    height: 14px;
+    margin: 8px 0 4px;
+    border: 1px solid #d7d7d4;
+    border-radius: 3px;
+    background: #f2f2f0;
+    overflow: hidden;
+}
+
+.app-progress__fill {
+    display: block;
+    height: 100%;
+    background: #8aa87b;
+}
+
+.app-progress__label {
+    display: block;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 10px;
+    color: #616161;
+    margin-bottom: 8px;
+}
+
 /* Tooltip de la marca de correccion. */
 .app-tooltip {
     font-family: Verdana, Arial, sans-serif;

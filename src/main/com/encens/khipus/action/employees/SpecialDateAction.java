@@ -8,6 +8,9 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * SpecialDate action class
  *
@@ -65,6 +68,23 @@ public class SpecialDateAction extends GenericAction<SpecialDate> {
     @Factory(value = "specialDateReason")
     public SpecialDateReason[] getSpecialDateReason() {
         return SpecialDateReason.values();
+    }
+
+    /**
+     * Los motivos que se pueden elegir a mano. Deja fuera VACATION: esa fecha especial la
+     * genera el submodulo de vacaciones, que ademas descuenta los dias del saldo. Cargada a
+     * mano quedaria un dia pagado sin respaldo en el kardex y el saldo mentiria en silencio.
+     * En la lista se sigue viendo y se puede filtrar por el.
+     */
+    @Factory(value = "specialDateReasonSelectable")
+    public List<SpecialDateReason> getSelectableSpecialDateReason() {
+        List<SpecialDateReason> selectable = new ArrayList<SpecialDateReason>();
+        for (SpecialDateReason reason : SpecialDateReason.values()) {
+            if (!SpecialDateReason.VACATION.equals(reason)) {
+                selectable.add(reason);
+            }
+        }
+        return selectable;
     }
 
     public Boolean isTargetEmployee(SpecialDate specialDate) {

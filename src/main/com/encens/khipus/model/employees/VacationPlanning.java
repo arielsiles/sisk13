@@ -11,6 +11,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,17 +58,17 @@ public class VacationPlanning implements BaseModel {
     @NotNull
     private Integer seniorityYears;
 
-    @Column(name = "diasvacacion", nullable = false)
+    @Column(name = "diasvacacion", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer vacationDays;
+    private BigDecimal vacationDays;
 
-    @Column(name = "diaslibres", nullable = false)
+    @Column(name = "diaslibres", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer daysOff;
+    private BigDecimal daysOff;
 
-    @Column(name = "diasusados", nullable = false)
+    @Column(name = "diasusados", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer daysUsed;
+    private BigDecimal daysUsed;
 
     @Column(name = "fechainicio", nullable = false)
     @Temporal(TemporalType.DATE)
@@ -77,6 +78,13 @@ public class VacationPlanning implements BaseModel {
     @OneToMany(mappedBy = "vacationPlanning", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
     private List<VacationGestion> vacationGestionList = new ArrayList<VacationGestion>(0);
+
+    /* Fecha del saldo inicial declarado. Cuando esta seteada el sistema NO devenga nada
+       anterior: ese saldo ya contiene todo lo anterior. Nula = el sistema devenga desde el
+       inicio del contrato, y el saldo sale de cargar las vacaciones consumidas. */
+    @Column(name = "fechasaldoinicial")
+    @Temporal(TemporalType.DATE)
+    private Date openingDate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcontractopuesto", nullable = false)
@@ -115,27 +123,27 @@ public class VacationPlanning implements BaseModel {
         this.seniorityYears = seniorityYears;
     }
 
-    public Integer getVacationDays() {
+    public BigDecimal getVacationDays() {
         return vacationDays;
     }
 
-    public void setVacationDays(Integer vacationDays) {
+    public void setVacationDays(BigDecimal vacationDays) {
         this.vacationDays = vacationDays;
     }
 
-    public Integer getDaysOff() {
+    public BigDecimal getDaysOff() {
         return daysOff;
     }
 
-    public void setDaysOff(Integer daysOff) {
+    public void setDaysOff(BigDecimal daysOff) {
         this.daysOff = daysOff;
     }
 
-    public Integer getDaysUsed() {
+    public BigDecimal getDaysUsed() {
         return daysUsed;
     }
 
-    public void setDaysUsed(Integer daysUsed) {
+    public void setDaysUsed(BigDecimal daysUsed) {
         this.daysUsed = daysUsed;
     }
 
@@ -145,6 +153,14 @@ public class VacationPlanning implements BaseModel {
 
     public void setInitDate(Date initDate) {
         this.initDate = initDate;
+    }
+
+    public Date getOpeningDate() {
+        return openingDate;
+    }
+
+    public void setOpeningDate(Date openingDate) {
+        this.openingDate = openingDate;
     }
 
     public JobContract getJobContract() {

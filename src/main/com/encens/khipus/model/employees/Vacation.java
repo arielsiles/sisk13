@@ -15,6 +15,7 @@ import org.hibernate.validator.NotNull;
 import org.jboss.seam.Component;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -29,6 +30,10 @@ import java.util.Date;
                         " ((vacation.initDate<=:initDate and vacation.endDate>=:initDate) " +
                         " or (vacation.initDate<=:endDate and vacation.endDate>=:endDate)" +
                         " or (vacation.initDate>=:initDate and vacation.endDate<=:endDate)) "),
+        @NamedQuery(name = "Vacation.sumTotalDaysByVacationPlanning",
+                query = "select sum(vacation.totalDays) from Vacation vacation" +
+                        " where vacation.vacationGestion.vacationPlanning = :vacationPlanning" +
+                        " and vacation.state = :state"),
         @NamedQuery(name = "Vacation.sumTotalDaysByVacationGestion",
                 query = "select sum(vacation.totalDays) from Vacation vacation" +
                         " where vacation.vacationGestion.id=:vacationGestionId and vacation.state=:state")
@@ -71,13 +76,13 @@ public class Vacation implements BaseModel {
     @NotNull
     private Date endDate;
 
-    @Column(name = "totaldias", nullable = false)
+    @Column(name = "totaldias", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer totalDays;
+    private BigDecimal totalDays;
 
-    @Column(name = "diaslibres", nullable = false)
+    @Column(name = "diaslibres", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer daysOff;
+    private BigDecimal daysOff;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idgestionvacacion", nullable = false)
@@ -169,19 +174,19 @@ public class Vacation implements BaseModel {
         this.endDate = endDate;
     }
 
-    public Integer getTotalDays() {
+    public BigDecimal getTotalDays() {
         return totalDays;
     }
 
-    public void setTotalDays(Integer totalDays) {
+    public void setTotalDays(BigDecimal totalDays) {
         this.totalDays = totalDays;
     }
 
-    public Integer getDaysOff() {
+    public BigDecimal getDaysOff() {
         return daysOff;
     }
 
-    public void setDaysOff(Integer daysOff) {
+    public void setDaysOff(BigDecimal daysOff) {
         this.daysOff = daysOff;
     }
 

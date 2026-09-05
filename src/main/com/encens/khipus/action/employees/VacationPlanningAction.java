@@ -7,14 +7,20 @@ import com.encens.khipus.exception.ReferentialIntegrityException;
 import com.encens.khipus.exception.employees.VacationRuleUndefinedYearException;
 import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
+import com.encens.khipus.model.employees.VacationMovement;
 import com.encens.khipus.model.employees.VacationPlanning;
 import com.encens.khipus.model.finances.JobContract;
 import com.encens.khipus.service.employees.JobContractService;
+import com.encens.khipus.service.employees.VacationMovementService;
 import com.encens.khipus.service.employees.VacationPlanningService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author
@@ -23,6 +29,9 @@ import org.jboss.seam.international.StatusMessage;
 @Name("vacationPlanningAction")
 @Scope(ScopeType.CONVERSATION)
 public class VacationPlanningAction extends GenericAction<VacationPlanning> {
+
+    @In
+    private VacationMovementService vacationMovementService;
 
     @In
     private JobContractService jobContractService;
@@ -34,9 +43,9 @@ public class VacationPlanningAction extends GenericAction<VacationPlanning> {
     public void initialize() {
         if (!isManaged()) {
             getInstance().setSeniorityYears(0);
-            getInstance().setVacationDays(0);
-            getInstance().setDaysOff(0);
-            getInstance().setDaysUsed(0);
+            getInstance().setVacationDays(BigDecimal.ZERO);
+            getInstance().setDaysOff(BigDecimal.ZERO);
+            getInstance().setDaysUsed(BigDecimal.ZERO);
         }
     }
 
@@ -170,6 +179,78 @@ public class VacationPlanningAction extends GenericAction<VacationPlanning> {
             addDeleteReferentialIntegrityMessage();
         }
         return Outcome.SUCCESS;
+    }
+
+    /* Saldo inicial: el saldo con el que el empleado entra al sistema, tomado del informe que
+       RRHH venia llevando por fuera. */
+    private Date openingDate = new Date();
+    private BigDecimal openingDays;
+    private String openingDescription;
+
+    @Restrict("#{s:hasPermission('VACATIONPLANNING','UPDATE')}")
+    public void registerOpeningBalance() {
+        if (null == openingDays) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "VacationPlanning.opening.error.daysRequired");
+            return;
+        }
+        if (vacationMovementService.hasOpeningBalance(getInstance())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "VacationPlanning.opening.error.alreadyRegistered");
+            return;
+        }
+        try {
+            vacationMovementService.postOpeningBalance(getInstance(), openingDate, openingDays,
+                    openingDescription);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                    "VacationPlanning.opening.info.registered", openingDays);
+            openingDays = null;
+            openingDescription = null;
+        } catch (Exception e) {
+            log.error("No se pudo registrar el saldo inicial de vacaciones", e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "VacationPlanning.opening.error.failed");
+        }
+    }
+
+    public boolean isOpeningBalanceRegistered() {
+        return vacationMovementService.hasOpeningBalance(getInstance());
+    }
+
+    public Date getOpeningDate() {
+        return openingDate;
+    }
+
+    public void setOpeningDate(Date openingDate) {
+        this.openingDate = openingDate;
+    }
+
+    public BigDecimal getOpeningDays() {
+        return openingDays;
+    }
+
+    public void setOpeningDays(BigDecimal openingDays) {
+        this.openingDays = openingDays;
+    }
+
+    public String getOpeningDescription() {
+        return openingDescription;
+    }
+
+    public void setOpeningDescription(String openingDescription) {
+        this.openingDescription = openingDescription;
+    }
+
+    /**
+     * El libro de movimientos del plan. Es lo que permite explicar de donde sale el saldo, en
+     * lugar de mostrar un numero que un recalculo pudo pisar.
+     */
+    public List<VacationMovement> getMovementList() {
+        return vacationMovementService.findByVacationPlanning(getInstance());
+    }
+
+    public BigDecimal getBalance() {
+        return vacationMovementService.balance(getInstance());
     }
 
     public void assignJobContract(JobContract jobContract) {

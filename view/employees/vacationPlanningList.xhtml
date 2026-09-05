@@ -71,12 +71,25 @@
                 <rich:jQuery selector="#quickSearchEmployee" query="focus()" timing="onload"/>
             </rich:simpleTogglePanel>
 
+
             <div class="buttons">
                 <s:button value="#{messages['Common.new']}"
                           view="/employees/vacationPlanning.xhtml"
                           rendered="#{s:hasPermission('VACATIONPLANNING','CREATE')}"
                           styleClass="button"
                           propagation="none"/>
+                <h:commandButton value="#{messages['VacationPlanning.bulk.title']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('VACATIONPLANNING','CREATE')}">
+                    <rich:componentControl for="bulkDialog" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton value="#{messages['VacationAccrual.title']}"
+                                 styleClass="button"
+                                 rendered="#{s:hasPermission('VACATIONPLANNING','UPDATE')}">
+                    <rich:componentControl for="accrualDialog" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
             </div>
 
             <rich:dataTable value="#{vacationPlanningDataModel}"
@@ -179,17 +192,17 @@
                 </rich:column>
                 <rich:column styleClass="right">
                     <h:outputText value="#{vacationPlanningItem.vacationDays}">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </rich:column>
                 <rich:column styleClass="right">
                     <h:outputText value="#{vacationPlanningItem.daysOff}">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </rich:column>
                 <rich:column styleClass="right">
                     <h:outputText value="#{vacationPlanningItem.daysUsed}">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </rich:column>
                 <rich:column styleClass="center">
@@ -217,6 +230,18 @@
                           propagation="none"/>
             </div>
         </h:form>
+
+        <s:decorate id="vacationPlanningBulkModalPanelContainer"
+                    template="/employees/vacationPlanningBulkModalPanel.xhtml"
+                    rendered="#{s:hasPermission('VACATIONPLANNING','CREATE')}">
+            <ui:param name="dialogId" value="bulkDialog"/>
+        </s:decorate>
+
+        <s:decorate id="vacationAccrualModalPanelContainer"
+                    template="/employees/vacationAccrualModalPanel.xhtml"
+                    rendered="#{s:hasPermission('VACATIONPLANNING','UPDATE')}">
+            <ui:param name="dialogId" value="accrualDialog"/>
+        </s:decorate>
 
         <s:decorate id="generalEmployeeListModalPanelContainer"
                     template="/employees/generalEmployeeListModalPanel.xhtml">

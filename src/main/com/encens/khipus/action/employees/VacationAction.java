@@ -19,6 +19,8 @@ import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
 import org.jboss.seam.international.StatusMessage;
 
+import java.math.BigDecimal;
+
 import java.util.List;
 
 /**
@@ -45,8 +47,8 @@ public class VacationAction extends GenericAction<Vacation> {
     @Create
     public void init() {
         if (!isManaged()) {
-            getInstance().setTotalDays(0);
-            getInstance().setDaysOff(0);
+            getInstance().setTotalDays(BigDecimal.ZERO);
+            getInstance().setDaysOff(BigDecimal.ZERO);
         }
     }
 
@@ -58,6 +60,10 @@ public class VacationAction extends GenericAction<Vacation> {
     @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL, nested = true)
     public String newInstance() {
         setOp(OP_CREATE);
+        /* La gestion ya no se elige a mano: el consumo se reparte entre gestiones de la mas
+           antigua a la mas nueva, asi que se registra contra la primera con saldo. */
+        getInstance().setVacationGestion(
+                vacationGestionService.findOldestForConsumption(vacationPlanningAction.getInstance()));
         return Outcome.SUCCESS;
     }
 
@@ -264,10 +270,6 @@ public class VacationAction extends GenericAction<Vacation> {
 
     public Boolean getIsAnnulled() {
         return isManaged() && vacationService.hasCurrentState(getInstance(), VacationState.ANNULLED);
-    }
-
-    public List getVacationGestionList() {
-        return vacationGestionService.findByVacationPlanningAvailableDaysOff(vacationPlanningAction.getInstance());
     }
 
 }

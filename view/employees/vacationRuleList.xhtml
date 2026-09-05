@@ -62,7 +62,7 @@
                             var="vacationRuleItem"
                             id="vacationRuleList"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="15%, 30%, 15%, 15%, 15%, 10%">
+                            width="100%" columnsWidth="12%, 26%, 12%, 12%, 12%, 16%, 10%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>
@@ -101,6 +101,9 @@
                             </app:commandSortHeader>
                         </rich:column>
                         <rich:column styleClass="center">
+                            #{messages['VacationRule.advanceDaysLimit']}
+                        </rich:column>
+                        <rich:column styleClass="center">
                             #{messages['Common.action']}
                         </rich:column>
                     </rich:columnGroup>
@@ -125,6 +128,11 @@
                 </rich:column>
                 <rich:column styleClass="right">
                     <h:outputText value="#{vacationRuleItem.vacationDays}">
+                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{vacationRuleItem.advanceDaysLimit}">
                         <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
                     </h:outputText>
                 </rich:column>

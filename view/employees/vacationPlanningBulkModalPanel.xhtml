@@ -1,0 +1,73 @@
+<rich:modalPanel width="560" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 id="#{dialogId}">
+
+    <f:facet name="header">
+        <h:outputText value="#{messages['VacationPlanning.bulk.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeBulkLink"/>
+    </f:facet>
+
+    <h:form id="vacationPlanningBulkForm">
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <h:outputText styleClass="formNote" value="#{messages['VacationPlanning.bulk.hint']}"/>
+        </h:panelGrid>
+
+        <a4j:outputPanel id="bulkResult" layout="block">
+            <h:panelGrid columns="2" cellpadding="3" cellspacing="0" border="0"
+                         rendered="#{vacationPlanningBulkAction.analyzed}">
+                <h:outputText value="#{messages['VacationPlanning.bulk.toCreate']}"/>
+                <h:outputText value="#{vacationPlanningBulkAction.toCreate}" styleClass="app-tag"/>
+
+                <h:outputText value="#{messages['VacationPlanning.bulk.alreadyPlanned']}"/>
+                <h:outputText value="#{vacationPlanningBulkAction.alreadyPlanned}"/>
+
+                <h:outputText value="#{messages['VacationPlanning.bulk.excluded']}"/>
+                <h:outputText value="#{vacationPlanningBulkAction.excludedCount}"
+                              styleClass="#{vacationPlanningBulkAction.excludedCount > 0 ? 'app-tag app-tag--warn' : ''}"/>
+            </h:panelGrid>
+
+            <rich:dataTable id="excludedList"
+                            value="#{vacationPlanningBulkAction.excluded}"
+                            var="excludedItem"
+                            width="100%"
+                            rendered="#{not empty vacationPlanningBulkAction.excluded}">
+                <f:facet name="header">#{messages['VacationPlanning.bulk.excludedDetail']}</f:facet>
+                <rich:column>
+                    <h:outputText value="#{excludedItem}"/>
+                </rich:column>
+            </rich:dataTable>
+        </a4j:outputPanel>
+
+        <div class="buttonsRight">
+            <a4j:commandButton action="#{vacationPlanningBulkAction.analyze}"
+                               value="#{messages['VacationPlanning.bulk.analyze']}"
+                               styleClass="button"
+                               rendered="#{not vacationPlanningBulkAction.analyzed}"
+                               reRender="bulkResult, bulkButtons"/>
+            <a4j:outputPanel id="bulkButtons" layout="inline">
+                <a4j:commandButton action="#{vacationPlanningBulkAction.confirm}"
+                                   value="#{messages['VacationPlanning.bulk.confirm']}"
+                                   styleClass="button"
+                                   rendered="#{vacationPlanningBulkAction.analyzed and vacationPlanningBulkAction.toCreate > 0}"
+                                   reRender="vacationPlanningList, dataScroller, globalMessages"
+                                   oncomplete="Richfaces.hideModalPanel('#{dialogId}');"/>
+            </a4j:outputPanel>
+            <a4j:commandButton action="#{vacationPlanningBulkAction.clear}"
+                               value="#{messages['Common.close']}"
+                               styleClass="button"
+                               reRender="bulkResult, bulkButtons"
+                               oncomplete="Richfaces.hideModalPanel('#{dialogId}');"/>
+        </div>
+    </h:form>
+
+    <rich:componentControl for="#{dialogId}" attachTo="closeBulkLink" operation="hide" event="onclick"/>
+
+</rich:modalPanel>

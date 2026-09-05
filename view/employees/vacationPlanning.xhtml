@@ -38,17 +38,22 @@
                      styleClass="button"
                      rendered="#{!vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}"/>
 
-    <h:commandButton action="#{vacationPlanningAction.synchronizeVacationDays}"
-                     value="#{messages['VacationPlanning.synchronizeGestionVacation']}"
-                     styleClass="button"
-                     immediate="true"
-                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
-
     <h:commandButton action="#{vacationAction.newInstance}"
                      value="#{messages['VacationPlanning.addVacation']}"
                      styleClass="button"
                      immediate="true"
                      rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+    <a4j:outputPanel id="openingButtonTop" layout="inline">
+        <h:commandButton value="#{messages['VacationPlanning.opening.register']}"
+                         styleClass="button"
+                         rendered="#{vacationPlanningAction.managed
+                                     and not vacationPlanningAction.openingBalanceRegistered
+                                     and s:hasPermission('VACATIONPLANNING','UPDATE')}">
+            <rich:componentControl for="openingBalanceDialog" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+    </a4j:outputPanel>
 
     <h:commandButton action="#{vacationPlanningAction.update}"
                      value="#{messages['Common.save']}"
@@ -151,90 +156,17 @@
                     <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
                 </h:outputText>
             </s:decorate>
-            <s:decorate id="vacationDaysField" template="/include/viewField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['VacationPlanning.vacationDays']}</ui:define>
-                <h:outputText value="#{vacationPlanning.vacationDays}"
-                              styleClass="inputNumber">
-                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                </h:outputText>
-            </s:decorate>
-            <s:decorate id="daysOffField" template="/include/viewField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['VacationPlanning.daysOff']}</ui:define>
-                <h:outputText value="#{vacationPlanning.daysOff}"
-                              styleClass="inputNumber">
-                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                </h:outputText>
-            </s:decorate>
-            <s:decorate id="daysUsedField" template="/include/viewField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['VacationPlanning.daysUsed']}</ui:define>
-                <h:outputText value="#{vacationPlanning.daysUsed}"
-                              styleClass="inputNumber">
-                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
-                </h:outputText>
+            <s:decorate id="balanceField" template="/include/viewField.xhtml" styleClass="formRow"
+                        rendered="#{vacationPlanningAction.managed}">
+                <ui:define name="label">#{messages['VacationPlanning.balance']}</ui:define>
+                <a4j:outputPanel id="balanceValue" layout="inline">
+                    <h:outputText value="#{vacationPlanningAction.balance}" styleClass="app-tag">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </a4j:outputPanel>
             </s:decorate>
         </s:div>
     </h:panelGrid>
-
-    <c:if test="#{vacationPlanningAction.managed}">
-        <app:fieldset id="gestionList" title="#{messages['VacationPlanning.gestionVacations']}">
-            <s:div id="vacationGestionListDiv" rendered="#{vacationPlanningAction.managed}">
-                <rich:dataTable value="#{vacationGestionDataModel}"
-                                var="vacationGestionItem"
-                                id="vacationGestionList"
-                                rows="#{sessionUser.rowsPerPage}"
-                                width="100%" columnsWidth="40%, 20%, 20%, 20%">
-                    <f:facet name="header">
-                        <rich:columnGroup>
-                            <rich:column>
-                                <app:commandSortHeader sortProperty="vacationGestion.gestion"
-                                                       dataModel="#{vacationGestionDataModel}"
-                                                       reRender="vacationGestionList, gestionDataScroller">
-                                    <h:outputText value="#{messages['VacationGestion.gestion']}"/>
-                                </app:commandSortHeader>
-                            </rich:column>
-                            <rich:column>
-                                <app:commandSortHeader sortProperty="vacationGestion.vacationDays"
-                                                       dataModel="#{vacationGestionDataModel}"
-                                                       reRender="vacationGestionList, gestionDataScroller">
-                                    <h:outputText value="#{messages['VacationGestion.vacationDays']}"/>
-                                </app:commandSortHeader>
-                            </rich:column>
-                            <rich:column>
-                                <app:commandSortHeader sortProperty="vacationGestion.daysUsed"
-                                                       dataModel="#{vacationGestionDataModel}"
-                                                       reRender="vacationGestionList, gestionDataScroller">
-                                    <h:outputText value="#{messages['VacationGestion.daysUsed']}"/>
-                                </app:commandSortHeader>
-                            </rich:column>
-                            <rich:column>
-                                <app:commandSortHeader sortProperty="vacationGestion.daysOff"
-                                                       dataModel="#{vacationGestionDataModel}"
-                                                       reRender="vacationGestionList, gestionDataScroller">
-                                    <h:outputText value="#{messages['VacationGestion.daysOff']}"/>
-                                </app:commandSortHeader>
-                            </rich:column>
-                        </rich:columnGroup>
-                    </f:facet>
-
-                    <rich:column styleClass="center">
-                        <h:outputText value="#{vacationGestionItem.gestion}"/>
-                    </rich:column>
-                    <rich:column styleClass="right">
-                        <h:outputText value="#{vacationGestionItem.vacationDays}"/>
-                    </rich:column>
-                    <rich:column styleClass="right">
-                        <h:outputText value="#{vacationGestionItem.daysUsed}"/>
-                    </rich:column>
-                    <rich:column styleClass="right">
-                        <h:outputText value="#{vacationGestionItem.daysOff}"/>
-                    </rich:column>
-                </rich:dataTable>
-                <app:dataScroller id="gestionDataScroller"
-                                  for="vacationGestionList"
-                                  dataModel="#{vacationGestionDataModel}"/>
-            </s:div>
-        </app:fieldset>
-    </c:if>
 
 </rich:panel>
 
@@ -251,17 +183,22 @@
                      styleClass="button"
                      rendered="#{!vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','CREATE')}"/>
 
-    <h:commandButton action="#{vacationPlanningAction.synchronizeVacationDays}"
-                     value="#{messages['VacationPlanning.synchronizeGestionVacation']}"
-                     styleClass="button"
-                     immediate="true"
-                     rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
-
     <h:commandButton action="#{vacationAction.newInstance}"
                      value="#{messages['VacationPlanning.addVacation']}"
                      styleClass="button"
                      immediate="true"
                      rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}"/>
+
+    <a4j:outputPanel id="openingButtonBottom" layout="inline">
+        <h:commandButton value="#{messages['VacationPlanning.opening.register']}"
+                         styleClass="button"
+                         rendered="#{vacationPlanningAction.managed
+                                     and not vacationPlanningAction.openingBalanceRegistered
+                                     and s:hasPermission('VACATIONPLANNING','UPDATE')}">
+            <rich:componentControl for="openingBalanceDialog" event="onclick" disableDefault="true"
+                                   operation="show"/>
+        </h:commandButton>
+    </a4j:outputPanel>
 
     <h:commandButton action="#{vacationPlanningAction.update}"
                      value="#{messages['Common.save']}"
@@ -285,7 +222,9 @@
 <br/>
 
 <c:if test="#{vacationPlanningAction.managed}">
-    <!--<s:div id="vacationListDiv" rendered="#{vacationPlanningAction.managed}">-->
+    <rich:tabPanel switchType="ajax" selectedTab="vacationTab">
+
+        <rich:tab name="vacationTab" label="#{messages['VacationPlanning.tab.vacations']}">
         <rich:dataTable value="#{vacationDataModel}"
                         var="vacationItem"
                         id="vacationList"
@@ -373,12 +312,12 @@
             </rich:column>
             <rich:column styleClass="right">
                 <h:outputText value="#{vacationItem.totalDays}">
-                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:outputText>
             </rich:column>
             <rich:column styleClass="right">
                 <h:outputText value="#{vacationItem.daysOff}">
-                    <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                 </h:outputText>
             </rich:column>
             <rich:column styleClass="center">
@@ -399,7 +338,116 @@
         <app:dataScroller id="dataScroller"
                           for="vacationList"
                           dataModel="#{vacationDataModel}"/>
-    <!--</s:div>-->
+        </rich:tab>
+
+        <rich:tab name="gestionTab" label="#{messages['VacationPlanning.tab.gestions']}">
+            <s:div id="vacationGestionListDiv" rendered="#{vacationPlanningAction.managed}">
+                <rich:dataTable value="#{vacationGestionDataModel}"
+                                var="vacationGestionItem"
+                                id="vacationGestionList"
+                                rows="#{sessionUser.rowsPerPage}"
+                                width="100%" columnsWidth="40%, 20%, 20%, 20%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="vacationGestion.gestion"
+                                                       dataModel="#{vacationGestionDataModel}"
+                                                       reRender="vacationGestionList, gestionDataScroller">
+                                    <h:outputText value="#{messages['VacationGestion.gestion']}"/>
+                                </app:commandSortHeader>
+                            </rich:column>
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="vacationGestion.vacationDays"
+                                                       dataModel="#{vacationGestionDataModel}"
+                                                       reRender="vacationGestionList, gestionDataScroller">
+                                    <h:outputText value="#{messages['VacationGestion.vacationDays']}"/>
+                                </app:commandSortHeader>
+                            </rich:column>
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="vacationGestion.daysUsed"
+                                                       dataModel="#{vacationGestionDataModel}"
+                                                       reRender="vacationGestionList, gestionDataScroller">
+                                    <h:outputText value="#{messages['VacationGestion.daysUsed']}"/>
+                                </app:commandSortHeader>
+                            </rich:column>
+                            <rich:column>
+                                <app:commandSortHeader sortProperty="vacationGestion.daysOff"
+                                                       dataModel="#{vacationGestionDataModel}"
+                                                       reRender="vacationGestionList, gestionDataScroller">
+                                    <h:outputText value="#{messages['VacationGestion.daysOff']}"/>
+                                </app:commandSortHeader>
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column styleClass="center">
+                        <h:outputText value="#{vacationGestionItem.gestion}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{vacationGestionItem.vacationDays}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{vacationGestionItem.daysUsed}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{vacationGestionItem.daysOff}"/>
+                    </rich:column>
+                </rich:dataTable>
+                <app:dataScroller id="gestionDataScroller"
+                                  for="vacationGestionList"
+                                  dataModel="#{vacationGestionDataModel}"/>
+            </s:div>
+        </rich:tab>
+
+        <rich:tab name="movementTab" label="#{messages['VacationMovement.list']}">
+            <s:div id="movementPanel">
+                <rich:dataTable id="movementList"
+                        value="#{vacationPlanningAction.movementList}"
+                        var="movementItem"
+                        width="100%"
+                        columnsWidth="15%,20%,15%,35%,15%">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column>#{messages['VacationMovement.date']}</rich:column>
+                    <rich:column>#{messages['VacationMovement.type']}</rich:column>
+                    <rich:column styleClass="center">#{messages['VacationMovement.days']}</rich:column>
+                    <rich:column>#{messages['VacationMovement.description']}</rich:column>
+                    <rich:column>#{messages['VacationMovement.user']}</rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column>
+                <h:outputText value="#{movementItem.date}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}" type="date"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{messages[movementItem.type.resourceKey]}"/>
+            </rich:column>
+            <rich:column styleClass="right">
+                <h:outputText value="#{movementItem.days}">
+                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{movementItem.description}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{movementItem.user.username}"/>
+            </rich:column>
+        </rich:dataTable>
+
+        <div class="buttons">
+            <h:outputText value="#{messages['VacationMovement.balance']}"/>
+            <h:outputText value="#{vacationPlanningAction.balance}" styleClass="app-tag">
+                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+            </h:outputText>
+        </div>
+    
+            </s:div>
+        </rich:tab>
+
+    </rich:tabPanel>
 </c:if>
 
 </h:form>
@@ -421,6 +469,12 @@
                            value="#{messages['Common.delete']}" immediate="true"
                            styleClass="button"/>
     </ui:define>
+</s:decorate>
+
+<s:decorate id="openingBalanceModalPanelContainer"
+            template="/employees/vacationOpeningBalanceModalPanel.xhtml"
+            rendered="#{vacationPlanningAction.managed and s:hasPermission('VACATIONPLANNING','UPDATE')}">
+    <ui:param name="dialogId" value="openingBalanceDialog"/>
 </s:decorate>
 
 <s:decorate id="jobContractListModalPanelContainer"

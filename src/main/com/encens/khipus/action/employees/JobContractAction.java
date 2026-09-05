@@ -16,6 +16,7 @@ import com.encens.khipus.service.employees.JobCategoryService;
 import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.service.employees.KindOfSalaryService;
 import com.encens.khipus.service.employees.SIPContributionRegimeService;
+import com.encens.khipus.service.employees.VacationPlanningService;
 import com.encens.khipus.service.fixedassets.CompanyConfigurationService;
 import com.encens.khipus.util.Constants;
 import com.encens.khipus.util.MessageUtils;
@@ -73,6 +74,8 @@ public class JobContractAction extends GenericAction<JobContract> {
     private CompanyConfigurationService companyConfigurationService;
     @In
     private SIPContributionRegimeService sipContributionRegimeService;
+    @In
+    private VacationPlanningService vacationPlanningService;
 
     @In(value = "#{listEntityManager}")
     private EntityManager eventEm;
@@ -506,7 +509,25 @@ public class JobContractAction extends GenericAction<JobContract> {
         getInstance().setJob(getJob());
         getInstance().setContract(getContract());
 
-        return super.create();
+        String outcome = super.create();
+        if (Outcome.SUCCESS.equals(outcome)) {
+            createVacationPlanningIfAbsent();
+        }
+        return outcome;
+    }
+
+    /**
+     * El plan de vacacion del empleado se crea solo al dar de alta su contrato, para no depender
+     * de que alguien se acuerde de generarlo despues. Va al final y aislado a proposito: el alta
+     * del contrato ya esta guardada, y si esto falla se registra y no se propaga. Dar de alta un
+     * contrato no puede quedar bloqueado por el modulo de vacaciones.
+     */
+    private void createVacationPlanningIfAbsent() {
+        try {
+            vacationPlanningService.createIfAbsent(getInstance());
+        } catch (Exception e) {
+            log.error("No se pudo crear el plan de vacacion del contrato de puesto", e);
+        }
     }
 
     @Override
