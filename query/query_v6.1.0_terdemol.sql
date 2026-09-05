@@ -303,3 +303,51 @@ INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permi
 SELECT @nuevo_id, 'WORKSHIFT', 'Turnos de trabajo', 4, 15, 'Functionality.employees.workShift', 1
   FROM (SELECT 1) t
  WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'WORKSHIFT');
+
+
+-- 13) Grupos de trabajo (H2 del plan 03) ---------------------------------------
+-- El cronograma se planifica por grupo, no por persona: dentro de un grupo todos
+-- hacen el mismo turno. La pertenencia lleva vigencia porque para evaluar un dia
+-- pasado hay que saber en que grupo estaba ESE dia, no en cual esta hoy.
+
+CREATE TABLE IF NOT EXISTS grupotrabajo (
+  idgrupotrabajo BIGINT       NOT NULL,
+  nombre         VARCHAR(100) NOT NULL,
+  area           VARCHAR(100)     NULL,
+  activo         INT          NOT NULL DEFAULT 1,
+  idcompania     BIGINT       NOT NULL,
+  version        BIGINT       NOT NULL DEFAULT 0,
+  PRIMARY KEY (idgrupotrabajo),
+  KEY fk_grupotrabajo_compania (idcompania),
+  CONSTRAINT fk_grupotrabajo_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS grupotrabajomiembro (
+  idgrupotrabajomiembro BIGINT NOT NULL,
+  idgrupotrabajo        BIGINT NOT NULL,
+  idcontrato            BIGINT NOT NULL,
+  fechainicio           DATE   NOT NULL,
+  fechafin              DATE       NULL,
+  idcompania            BIGINT NOT NULL,
+  version               BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (idgrupotrabajomiembro),
+  KEY ix_grupomiembro_contrato_fecha (idcontrato, fechainicio),
+  KEY fk_grupomiembro_grupo (idgrupotrabajo),
+  KEY fk_grupomiembro_compania (idcompania),
+  CONSTRAINT fk_grupomiembro_grupo FOREIGN KEY (idgrupotrabajo) REFERENCES grupotrabajo (idgrupotrabajo),
+  CONSTRAINT fk_grupomiembro_contrato FOREIGN KEY (idcontrato) REFERENCES contrato (idcontrato),
+  CONSTRAINT fk_grupomiembro_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO secuencia (tabla, valor)
+SELECT 'grupotrabajo', 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'grupotrabajo');
+INSERT INTO secuencia (tabla, valor)
+SELECT 'grupotrabajomiembro', 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'grupotrabajomiembro');
+
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'WORKGROUP', 'Grupos de trabajo', 4, 15, 'Functionality.employees.workGroup', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'WORKGROUP');
