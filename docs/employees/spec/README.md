@@ -14,6 +14,7 @@ arriba, en [../README.md](../README.md).
 |---|---|---|
 | [req_01_asistencia_produccion.md](req_01_asistencia_produccion.md) | SPEC: el requerimiento completo de asistencia y planillas para la nueva empresa | Cerrado |
 | [req_02_emparejamiento_marcas.md](req_02_emparejamiento_marcas.md) | SPEC: el emparejamiento de marcas se desfasa cuando faltan marcas | **Abierto — bloquea E2.9** |
+| [plan_10_emparejamiento_marcas.md](plan_10_emparejamiento_marcas.md) | La jornada guía el emparejamiento de las marcas | Pendiente de aprobación |
 | [plan_01_asistencia_produccion.md](plan_01_asistencia_produccion.md) | Carga de marcaciones, motor de asistencia, planillas | **E1 y E2.1–E2.5 hechos** · falta **E2.9**: conectar el motor a la planilla |
 | [plan_02_vacaciones.md](plan_02_vacaciones.md) | Vacaciones como libro mayor de movimientos | **Implementado y probado** |
 | [plan_03_horarios.md](plan_03_horarios.md) | Turnos, grupos, cronograma y las cuatro capas de resolución | **H1–H10 implementados** · probado con julio 2026 |
