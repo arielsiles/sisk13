@@ -34,4 +34,35 @@ public interface WorkGroupService extends GenericService {
      *         persona no puede estar en dos grupos el mismo dia.
      */
     WorkGroupMembership findOverlapping(WorkGroupMembership membership);
+
+    /**
+     * @return los contratos vigentes en la fecha que ese dia no pertenecian a ningun grupo. Es
+     *         la lista de la asignacion masiva: ya viene filtrada para que no se pueda elegir a
+     *         alguien que provocaria un solapamiento
+     */
+    List<Contract> findContractsWithoutGroup(Date date);
+
+    /**
+     * @return los contratos vigentes en la fecha, esten o no en un grupo. Es la lista de la
+     *         reorganizacion: aca SI aparece quien ya pertenece a otro grupo, porque de eso se
+     *         trata
+     */
+    List<Contract> findContractsForMove(Date date);
+
+    /** Las pertenencias base vigentes en una fecha, para saber de que grupo viene cada uno. */
+    List<WorkGroupMembership> findBaseMembershipsAt(Date date);
+
+    /**
+     * Cierra una pertenencia en la fecha indicada, o la borra si el corte cae en su fecha de
+     * inicio o antes -no hay historia que preservar-.
+     */
+    void closeMembership(WorkGroupMembership membership, Date date) throws Exception;
+
+    /**
+     * Mueve contratos a un grupo desde una fecha, cerrando su pertenencia base anterior el dia
+     * previo. Es la reorganizacion: de treinta clics a uno.
+     *
+     * @return cuantos se movieron
+     */
+    int moveMembers(List<Contract> contracts, WorkGroup target, Date from);
 }

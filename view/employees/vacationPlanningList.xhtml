@@ -19,23 +19,22 @@
                              columnClasses="width50percent,width50percent">
                     <ui:insert name="searchOptions"/>
                     <s:div>
+                        <!-- Se escribe directamente. Antes habia que abrir un modal, buscar,
+                             elegir y volver: cuatro pasos para filtrar por una persona. -->
                         <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['VacationPlanning.employee']}</ui:define>
-                            <app:quickSearch id="quickSearchEmployee"
-                                             textValue="vacationPlanningDataModel.employee.idNumber"
-                                             value="#{vacationPlanningDataModel.employee}"
-                                             searchField="idNumber"
-                                             reRender="employeeField"
-                                             tabindex="1"/>
-                            <app:selectPopUp id="employee"
-                                             textValue="#{vacationPlanningDataModel.employee.fullName}"
-                                             value="#{vacationPlanningDataModel.employee}"
-                                             dataModel="#{generalEmployeeDataModel}"
-                                             clearAction="vacationPlanningDataModel.clearEmployee()"
-                                             searchModalPanel="generalEmployeeListModalPanel"
-                                             reRender="employeeField"
-                                             hotKeySelect="alt+1"
-                                             tabindex="2"/>
+                            <h:inputText id="employeeName"
+                                         value="#{vacationPlanningDataModel.employeeName}"
+                                         maxlength="100" styleClass="input" size="40" tabindex="1"/>
+                        </s:decorate>
+                        <!-- Quien reingreso tiene mas de un plan: el del periodo anterior,
+                             cerrado, y el vigente. Sin este filtro aparece repetido. -->
+                        <s:decorate id="closedField" template="/include/inputField.xhtml" styleClass="formRow">
+                            <ui:define name="label">#{messages['VacationPlanning.period']}</ui:define>
+                            <h:selectOneMenu id="closed" styleClass="input" tabindex="2"
+                                             value="#{vacationPlanningDataModel.closed}">
+                                <f:selectItems value="#{vacationPlanningDataModel.closedItems}"/>
+                            </h:selectOneMenu>
                         </s:decorate>
                         <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
                             <ui:define name="label">#{messages['VacationPlanning.sede']}</ui:define>
@@ -96,7 +95,7 @@
                             var="vacationPlanningItem"
                             id="vacationPlanningList"
                             rows="#{sessionUser.rowsPerPage}"
-                            width="100%" columnsWidth="5%,25%,10%,15%,15%,5%,5%,5%,5%,10%">
+                            width="100%" columnsWidth="5%,22%,9%,12%,14%,5%,5%,5%,5%,10%,8%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>
@@ -163,6 +162,7 @@
                                 #{messages['VacationPlanning.daysUsed']}
                             </app:commandSortHeader>
                         </rich:column>
+                        <rich:column styleClass="center">#{messages['VacationPlanning.period']}</rich:column>
                         <rich:column styleClass="center">
                             #{messages['Common.action']}
                         </rich:column>
@@ -205,18 +205,36 @@
                         <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </rich:column>
+                <!-- Un plan cerrado corresponde a un periodo que termino. Sin decirlo, sus dias
+                     se leen como saldo disponible y son saldo pendiente de liquidacion. -->
                 <rich:column styleClass="center">
-                    <h:commandLink value="#{messages['Common.select']}"
+                    <h:outputText value="#{vacationPlanningItem.initDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                    <h:outputText value=" - "/>
+                    <h:outputText styleClass="app-tag" rendered="#{not vacationPlanningItem.closed}"
+                                  value="#{messages['VacationPlanning.open']}"/>
+                    <h:outputText value="#{vacationPlanningItem.closeDate}"
+                                  rendered="#{vacationPlanningItem.closed}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink styleClass="app-iconbtn"
+                                   title="#{messages['Common.select']}"
                                    immediate="true"
                                    rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}"
                                    action="#{vacationPlanningAction.select(vacationPlanningItem)}">
+                        <span class="app-ico app-ico--edit"/>
                         <s:conversationPropagation value="none"/>
                     </h:commandLink>
-                    &#160;
-                    <h:commandLink action="#{vacationPlanningEmployeeReportAction.generateReport(vacationPlanningItem)}"
+                    <h:commandLink styleClass="app-iconbtn"
+                                   title="#{messages['Reports.vacationPlanningEmployee.page.title']}"
+                                   action="#{vacationPlanningEmployeeReportAction.generateReport(vacationPlanningItem)}"
                                    rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}">
-                        <h:graphicImage value="/img/pdfIcon.gif" styleClass="select-image-middle"
-                                        title="#{messages['Reports.vacationPlanningEmployee.page.title']}"/>
+                        <span class="app-ico app-ico--pdf"/>
                     </h:commandLink>
                 </rich:column>
             </rich:dataTable>
@@ -241,22 +259,6 @@
                     template="/employees/vacationAccrualModalPanel.xhtml"
                     rendered="#{s:hasPermission('VACATIONPLANNING','UPDATE')}">
             <ui:param name="dialogId" value="accrualDialog"/>
-        </s:decorate>
-
-        <s:decorate id="generalEmployeeListModalPanelContainer"
-                    template="/employees/generalEmployeeListModalPanel.xhtml">
-            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
-            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
-            <ui:define name="assignButton">
-                <a4j:commandButton id="assignButton"
-                                   title="#{messages['Common.choose']}"
-                                   action="#{vacationPlanningDataModel.setEmployee(employeeItem)}"
-                                   image="/img/active.gif"
-                                   styleClass="select-image-middle"
-                                   ajaxSingle="true"
-                                   reRender="employeeField"
-                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
-            </ui:define>
         </s:decorate>
 
     </ui:define>

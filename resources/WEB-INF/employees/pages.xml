@@ -34,7 +34,7 @@
     <page view-id="/employees/sipContributionRegime.xhtml"
           no-conversation-view-id="/employees/sipContributionRegimeList.xhtml">
         <navigation>
-            <rule if-outcome="Success">
+            <rule>
                 <redirect view-id="/employees/sipContributionRegimeList.xhtml"/>
             </rule>
         </navigation>
@@ -51,7 +51,9 @@
     <page view-id="/employees/workGroup.xhtml"
           no-conversation-view-id="/employees/workGroupList.xhtml">
         <navigation>
-            <rule if-outcome="Success">
+            <!-- Sin if-outcome: vuelve al listado tanto al guardar como al cancelar. Con
+                 `Success` solamente, el boton Cancelar no hacia nada. -->
+            <rule>
                 <redirect view-id="/employees/workGroupList.xhtml"/>
             </rule>
         </navigation>
@@ -68,8 +70,49 @@
     <page view-id="/employees/workShift.xhtml"
           no-conversation-view-id="/employees/workShiftList.xhtml">
         <navigation>
-            <rule if-outcome="Success">
+            <!-- Sin if-outcome: vuelve al listado tanto al guardar como al cancelar. Con
+                 `Success` solamente, el boton Cancelar no hacia nada. -->
+            <rule>
                 <redirect view-id="/employees/workShiftList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- El cronograma no usa conversacion: cada clic guarda y se lee de nuevo. La accion de
+         pagina refresca la grilla en cada peticion para que no muestre datos viejos. -->
+    <page view-id="/employees/groupSchedule.xhtml">
+        <end-conversation/>
+        <action execute="#{groupScheduleAction.init}"/>
+    </page>
+
+    <page view-id="/employees/attendanceCheck.xhtml">
+        <end-conversation/>
+    </page>
+
+    <page view-id="/employees/contractConditionList.xhtml">
+        <end-conversation/>
+    </page>
+
+    <page view-id="/employees/contractSchedule.xhtml">
+        <end-conversation/>
+        <action execute="#{contractScheduleAction.init}"/>
+    </page>
+
+    <page view-id="/employees/scheduleExceptionList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{scheduleExceptionAction.select(exceptionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/scheduleException.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/scheduleException.xhtml"
+          no-conversation-view-id="/employees/scheduleExceptionList.xhtml">
+        <navigation>
+            <!-- Sin if-outcome: vuelve al listado tanto al guardar como al cancelar. Con
+                 `Success` solamente, el boton Cancelar no hacia nada. -->
+            <rule>
+                <redirect view-id="/employees/scheduleExceptionList.xhtml"/>
             </rule>
         </navigation>
     </page>
@@ -85,7 +128,9 @@
     <page view-id="/employees/weeklyWorkload.xhtml"
           no-conversation-view-id="/employees/weeklyWorkloadList.xhtml">
         <navigation>
-            <rule if-outcome="Success">
+            <!-- Sin if-outcome: vuelve al listado tanto al guardar como al cancelar. Con
+                 `Success` solamente, el boton Cancelar no hacia nada. -->
+            <rule>
                 <redirect view-id="/employees/weeklyWorkloadList.xhtml"/>
             </rule>
         </navigation>

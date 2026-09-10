@@ -1744,6 +1744,8 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                 generalPayroll.setDiscountsOutOfRetention(BigDecimalUtil.toBigDecimal(totalDiscountOutOfIva));
                 generalPayroll.setLiquid((BigDecimalUtil.toBigDecimal((mensualTotalSalary + totalOtherIncome) - totalSumOfDiscounts + totalIncomeOutOfIva)));
                 generalPayroll.setContractMode(currentJobContract.getContract().getContractMode().getName());
+                generalPayroll.setContractDuration(null == currentJobContract.getContract().getDuration()
+                        ? null : currentJobContract.getContract().getDuration().name());
                 if (currentJobContract.getJob().getJobCategory() != null) {
                     generalPayroll.setKindOfEmployee(currentJobContract.getJob().getJobCategory().getName());
                 }

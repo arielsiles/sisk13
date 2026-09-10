@@ -12,6 +12,7 @@ import com.encens.khipus.model.contacts.Extension;
 import com.encens.khipus.model.employees.*;
 import com.encens.khipus.model.finances.*;
 import com.encens.khipus.service.customers.ExtensionService;
+import com.encens.khipus.service.employees.ContractConditionService;
 import com.encens.khipus.service.employees.JobCategoryService;
 import com.encens.khipus.service.employees.JobContractService;
 import com.encens.khipus.service.employees.KindOfSalaryService;
@@ -62,6 +63,12 @@ public class JobContractAction extends GenericAction<JobContract> {
     private String inputModificationCode;
     private Boolean modificationCodeUnlock = false;
 
+    /* Lo que vio createOrUpdateContract, para poder decirlo recien cuando el guardado termino.
+       Alli todavia falta grabar el puesto y el contrato de puesto, y esos pasos vuelven a
+       arrastrar al empleado que la pantalla tiene en memoria. */
+    private boolean creatingContract = false;
+    private boolean reentryDetected = false;
+
     @In
     private ExtensionService extensionService;
     @In
@@ -76,6 +83,8 @@ public class JobContractAction extends GenericAction<JobContract> {
     private SIPContributionRegimeService sipContributionRegimeService;
     @In
     private VacationPlanningService vacationPlanningService;
+    @In
+    private ContractConditionService contractConditionService;
 
     @In(value = "#{listEntityManager}")
     private EntityManager eventEm;
@@ -347,7 +356,24 @@ public class JobContractAction extends GenericAction<JobContract> {
     public String createOrUpdateContract() {
         getContract().setEmployee(getEmployee());
         warnOnInconsistentContributionRegime();
-        if (getContract().getId() == null) {
+
+        /* Un contrato que empieza despues de terminar no existe. La pantalla valida el orden de
+           las fechas solo cuando el campo de fin esta a la vista, y en un indefinido no lo esta:
+           editando la fecha de inicio de un contrato ya cerrado se pasaba por el costado. */
+        if (null != getContract().getEndDate() && null != getContract().getInitDate()
+                && getContract().getInitDate().after(getContract().getEndDate())) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "Contract.error.initAfterEnd");
+            return Outcome.REDISPLAY;
+        }
+
+        boolean creating = getContract().getId() == null;
+        /* Se mira ANTES de guardar: despues el contrato nuevo ya cuenta como abierto y el
+           reingreso no se distingue de un contrato adicional. */
+        boolean reentry = creating && null != getEmployee()
+                && contractConditionService.findOpenContracts(getEmployee(), null).isEmpty();
+
+        if (creating) {
             try {
                 genericService.create(getContract());
             } catch (EntryDuplicatedException e) {
@@ -378,7 +404,41 @@ public class JobContractAction extends GenericAction<JobContract> {
                 return Outcome.REDISPLAY;
             }
         }
+
+        creatingContract = creating;
+        reentryDetected = reentry;
         return Outcome.SUCCESS;
+    }
+
+    /**
+     * Deja la marca de principal consistente y lo dice. Nunca designa por su cuenta: si la
+     * persona queda sin contrato principal avisa, porque sin principal no corresponden AFP ni
+     * vacaciones y eso no puede pasar por olvido.
+     */
+    private void applyMainContract() {
+        try {
+            MainContractResult result = contractConditionService.applyMainContract(getContract());
+            String employeeName = null == getEmployee() ? "" : getEmployee().getFullName();
+            StatusMessage.Severity severity = MainContractResult.WITHOUT_MAIN.equals(result)
+                    ? StatusMessage.Severity.WARN : StatusMessage.Severity.INFO;
+            facesMessages.addFromResourceBundle(severity, result.getResourceKey(), employeeName);
+        } catch (Exception e) {
+            log.error("No se pudo aplicar la regla del contrato principal", e);
+        }
+    }
+
+    /**
+     * Crear un contrato para alguien sin contratos activos es un reingreso; para alguien que ya
+     * tiene uno, un contrato adicional. Las dos se hacen igual, asi que sin el aviso se terminan
+     * cargando contratos duplicados creyendo que son altas nuevas.
+     */
+    private void announceEntry(boolean reentry) {
+        if (null == getEmployee()) {
+            return;
+        }
+        facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO,
+                reentry ? "Contract.info.reentry" : "Contract.info.additional",
+                getEmployee().getFullName());
     }
 
     /**
@@ -511,9 +571,25 @@ public class JobContractAction extends GenericAction<JobContract> {
 
         String outcome = super.create();
         if (Outcome.SUCCESS.equals(outcome)) {
+            applyContractRules();
             createVacationPlanningIfAbsent();
         }
         return outcome;
+    }
+
+    /**
+     * Se llama con TODO el guardado terminado, no apenas se graba el contrato.
+     * <p/>
+     * Es lo que costo una vuelta de pruebas: al recalcular en medio del guardado, los pasos que
+     * seguian -el puesto y el contrato de puesto- volvian a arrastrar al empleado que la pantalla
+     * tenia en memoria, con la fecha de salida vieja, y la pisaban de nuevo.
+     */
+    private void applyContractRules() {
+        contractConditionService.refreshRetireDate(getContract());
+        applyMainContract();
+        if (creatingContract) {
+            announceEntry(reentryDetected);
+        }
     }
 
     /**
@@ -583,6 +659,9 @@ public class JobContractAction extends GenericAction<JobContract> {
         getInstance().getContract().setEmployee(getEmployee());
 
         String outcome = super.update();
+        if (Outcome.SUCCESS.equals(outcome)) {
+            applyContractRules();
+        }
 
         if (getDeleteJobId() != null) {
             try {

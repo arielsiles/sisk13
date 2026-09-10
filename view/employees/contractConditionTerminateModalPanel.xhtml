@@ -1,0 +1,61 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <rich:modalPanel id="terminateDialog" width="540" zindex="2000"
+                     resizeable="false" autosized="true">
+        <f:facet name="header">
+            <h:outputText value="#{messages['ContractCondition.terminate.title']}"/>
+        </f:facet>
+        <f:facet name="controls">
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeTerminateLink"/>
+        </f:facet>
+
+        <h:form id="terminateForm">
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <h:outputText styleClass="formNote" value="#{messages['ContractCondition.terminate.hint']}"/>
+                <h:outputText styleClass="app-cal__range"
+                              value="#{contractConditionAction.contract.employee.fullName}"/>
+            </h:panelGrid>
+
+            <s:decorate id="departureDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ContractCondition.departureDate']}</ui:define>
+                <ui:param name="required" value="true"/>
+                <rich:calendar id="departureDate" value="#{contractConditionAction.departureDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               styleClass="input" zindex="2100"/>
+            </s:decorate>
+
+            <div class="app-fieldnote">
+                <h:outputText value="#{messages['ContractCondition.departureDate.hint']}"/>
+            </div>
+
+            <s:decorate id="terminationReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ContractCondition.reason']}</ui:define>
+                <h:inputText id="terminationReason" value="#{contractConditionAction.terminationReason}"
+                             maxlength="250" size="45" styleClass="input"/>
+            </s:decorate>
+
+            <div class="buttonsRight">
+                <a4j:commandButton id="terminateButton"
+                                   action="#{contractConditionAction.terminate}"
+                                   value="#{messages['ContractCondition.terminate.action']}"
+                                   styleClass="button"
+                                   reRender=":contractConditionSearch:contractConditionList, :contractConditionSearch:dataScroller, :globalMessages"
+                                   oncomplete="if (!#{contractConditionAction.selected}) Richfaces.hideModalPanel('terminateDialog');"/>
+                <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                    <rich:componentControl for="terminateDialog" event="onclick"
+                                           disableDefault="true" operation="hide"/>
+                </h:commandButton>
+            </div>
+        </h:form>
+
+        <rich:componentControl for="terminateDialog" attachTo="closeTerminateLink"
+                               operation="hide" event="onclick"/>
+    </rich:modalPanel>
+</ui:composition>

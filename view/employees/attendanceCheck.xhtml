@@ -1,0 +1,282 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['AttendanceCheck.title']}</ui:define>
+    <ui:param name="bodyWidth" value="95%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="attendanceCheckForm">
+
+            <!-- Una sola fila de filtros: persona, desde, hasta y verificar. -->
+            <a4j:outputPanel id="filterBar" layout="block" styleClass="app-cal__bar">
+                <h:outputText styleClass="app-cal__label" value="#{messages['AttendanceCheck.employee']}"/>
+                <app:selectPopUp id="employee"
+                                 textValue="#{attendanceCheckAction.employee.fullName}"
+                                 value="#{attendanceCheckAction.employee}"
+                                 styleClass="app-filterbar__input"
+                                 dataModel="#{generalEmployeeDataModel}"
+                                 clearAction="attendanceCheckAction.clearEmployee()"
+                                 searchModalPanel="generalEmployeeListModalPanel"
+                                 reRender="filterBar"
+                                 hotKeySelect="alt+1"/>
+
+                <h:outputText styleClass="app-cal__label" value="#{messages['AttendanceCheck.from']}"/>
+                <rich:calendar id="startDate" value="#{attendanceCheckAction.startDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               inputClass="app-filterbar__input app-filterbar__input--date"/>
+
+                <h:outputText styleClass="app-cal__label" value="#{messages['AttendanceCheck.to']}"/>
+                <rich:calendar id="endDate" value="#{attendanceCheckAction.endDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               inputClass="app-filterbar__input app-filterbar__input--date"/>
+
+                <a4j:commandLink action="#{attendanceCheckAction.check}"
+                                 styleClass="app-btn-primary"
+                                 reRender="filterBar, summary, dayList, :globalMessages">
+                    <h:outputText value="#{messages['AttendanceCheck.check']}"/>
+                </a4j:commandLink>
+            </a4j:outputPanel>
+
+            <!-- Resumen del periodo. Son los numeros que se miran primero.
+                 El contenedor se renderiza SIEMPRE y la condicion vive adentro: un panel con
+                 rendered=false no existe en el DOM, y entonces el ajax no tiene que reemplazar.
+                 Por eso el resumen no aparecia en la primera verificacion y si despues de F5. -->
+            <a4j:outputPanel id="summary" layout="block">
+            <h:panelGroup layout="block" styleClass="app-check__summary"
+                          rendered="#{attendanceCheckAction.checked}">
+                <span class="app-check__stat">
+                    <span class="app-check__stat-value">
+                        <h:outputText value="#{attendanceCheckAction.scheduledHours}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                    </span>
+                    <span class="app-check__stat-label">
+                        <h:outputText value="#{messages['AttendanceCheck.scheduledHours']}"/>
+                    </span>
+                </span>
+                <span class="app-check__stat">
+                    <span class="app-check__stat-value">
+                        <h:outputText value="#{attendanceCheckAction.workedDays}"/>
+                    </span>
+                    <span class="app-check__stat-label">
+                        <h:outputText value="#{messages['AttendanceCheck.workedDays']}"/>
+                    </span>
+                </span>
+                <span class="app-check__stat app-check__stat--absent">
+                    <span class="app-check__stat-value">
+                        <h:outputText value="#{attendanceCheckAction.absentDays}"/>
+                    </span>
+                    <span class="app-check__stat-label">
+                        <h:outputText value="#{messages['AttendanceCheck.absentDays']}"/>
+                    </span>
+                </span>
+                <span class="app-check__stat app-check__stat--warn">
+                    <span class="app-check__stat-value">
+                        <h:outputText value="#{attendanceCheckAction.lateDays}"/>
+                    </span>
+                    <span class="app-check__stat-label">
+                        <h:outputText value="#{messages['AttendanceCheck.lateDays']}"/>
+                    </span>
+                </span>
+                <span class="app-check__stat app-check__stat--warn">
+                    <span class="app-check__stat-value">
+                        <h:outputText value="#{attendanceCheckAction.latenessMinutes}"/>
+                    </span>
+                    <span class="app-check__stat-label">
+                        <h:outputText value="#{messages['AttendanceCheck.latenessMinutes']}"/>
+                    </span>
+                </span>
+            </h:panelGroup>
+            </a4j:outputPanel>
+
+            <a4j:outputPanel id="dayList" layout="block" styleClass="app-check">
+
+                <h:panelGroup rendered="#{not attendanceCheckAction.checked}">
+                    <div class="app-cal__empty">
+                        <h:outputText value="#{messages['AttendanceCheck.empty']}"/>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{attendanceCheckAction.checked}">
+                    <table class="app-check__table" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th class="app-check__head">#{messages['AttendanceCheck.day']}</th>
+                                <th class="app-check__head">#{messages['AttendanceCheck.journey']}</th>
+                                <th class="app-check__head">#{messages['AttendanceCheck.source']}</th>
+                                <th class="app-check__head app-check__head--time">#{messages['AttendanceCheck.expected']}</th>
+                                <th class="app-check__head app-check__head--time">#{messages['AttendanceCheck.real']}</th>
+                                <th class="app-check__head">#{messages['AttendanceCheck.result']}</th>
+                                <th class="app-check__head">#{messages['AttendanceCheck.marks']}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <a4j:repeat value="#{attendanceCheckAction.days}" var="dayItem">
+                                <tr class="#{dayItem.rowStyleClass}">
+                                    <td class="app-check__day">
+                                        <span class="app-check__dow">
+                                            <h:outputText value="#{dayItem.day}">
+                                                <f:convertDateTime pattern="#{messages['patterns.dayOfWeek']}"
+                                                                   timeZone="#{sessionUser.timeZone}" type="date"/>
+                                            </h:outputText>
+                                        </span>
+                                        <h:outputText value="#{dayItem.day}">
+                                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                                        </h:outputText>
+                                        <h:outputText styleClass="app-tag app-tag--holiday app-check__holiday"
+                                                      value="#{messages['JourneySource.holiday']}"
+                                                      rendered="#{dayItem.holiday}"/>
+                                    </td>
+
+                                    <td>
+                                        <h:outputText styleClass="app-tag"
+                                                      value="#{messages['GroupSchedule.brush.rest']}"
+                                                      rendered="#{not dayItem.showingJourney}"/>
+                                        <h:outputFormat value="#{messages['GroupSchedule.hours']}"
+                                                        rendered="#{dayItem.showingJourney}">
+                                            <f:param value="#{dayItem.shownHours}"/>
+                                        </h:outputFormat>
+                                    </td>
+
+                                    <td>
+                                        <h:outputText styleClass="app-tag"
+                                                      value="#{messages[dayItem.source.resourceKey]}"
+                                                      rendered="#{dayItem.working}"/>
+                                        <h:outputText styleClass="app-tag"
+                                                      value="#{messages['JourneySource.contractSchedule']}"
+                                                      rendered="#{dayItem.suppressedByHoliday
+                                                                  and not empty dayItem.suppressedJourney}"/>
+                                        <h:outputText styleClass="app-tag #{dayItem.loaned ? 'app-tag--warn' : ''}"
+                                                      value="#{dayItem.groupName}"
+                                                      title="#{dayItem.loaned ? messages['AttendanceCheck.loaned'] : ''}"
+                                                      rendered="#{not empty dayItem.groupName}"/>
+                                    </td>
+
+                                    <td class="app-check__time">
+                                        <h:panelGroup rendered="#{dayItem.showingJourney}">
+                                            <h:outputText styleClass="app-check__in"
+                                                          value="#{dayItem.shownEntry}">
+                                                <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                                                   timeZone="#{sessionUser.timeZone}" type="time"/>
+                                            </h:outputText>
+                                            <h:outputText styleClass="app-check__sep" value="–"/>
+                                            <h:outputText styleClass="app-check__out"
+                                                          value="#{dayItem.shownExit}">
+                                                <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                                                   timeZone="#{sessionUser.timeZone}" type="time"/>
+                                            </h:outputText>
+                                        </h:panelGroup>
+                                    </td>
+
+                                    <td class="app-check__time">
+                                        <h:panelGroup rendered="#{dayItem.suppressedByHoliday and not empty dayItem.firstMarkTime}">
+                                            <h:outputText value="#{dayItem.firstMarkTime}">
+                                                <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                                                   timeZone="#{sessionUser.timeZone}" type="time"/>
+                                            </h:outputText>
+                                            <h:outputText value=" – "/>
+                                            <h:outputText value="#{dayItem.lastMarkTime}">
+                                                <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                                                   timeZone="#{sessionUser.timeZone}" type="time"/>
+                                            </h:outputText>
+                                        </h:panelGroup>
+                                        <h:panelGroup rendered="#{not empty dayItem.realEntry
+                                                                  or not empty dayItem.realExit}">
+                                            <!-- Cada lado en su propia casilla de ancho fijo: la
+                                                 entrada y la salida quedan alineadas entre filas,
+                                                 y el hueco de la marca que falta se ve derecho. -->
+                                            <h:outputText styleClass="app-check__in"
+                                                          value="#{dayItem.realEntry}"
+                                                          rendered="#{not empty dayItem.realEntry}">
+                                                <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                                                   timeZone="#{sessionUser.timeZone}" type="time"/>
+                                            </h:outputText>
+                                            <h:outputText styleClass="app-check__in app-check__nomark"
+                                                          value="#{messages['AttendanceCheck.markMissing']}"
+                                                          rendered="#{empty dayItem.realEntry}"/>
+                                            <h:outputText styleClass="app-check__sep" value="–"/>
+                                            <h:outputText styleClass="app-check__out"
+                                                          value="#{dayItem.realExit}"
+                                                          rendered="#{not empty dayItem.realExit}">
+                                                <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                                                   timeZone="#{sessionUser.timeZone}" type="time"/>
+                                            </h:outputText>
+                                        </h:panelGroup>
+                                    </td>
+
+                                    <td>
+                                        <h:outputText styleClass="app-tag app-tag--absent"
+                                                      value="#{messages['AttendanceCheck.absent']}"
+                                                      rendered="#{dayItem.absent}"/>
+                                        <h:outputFormat styleClass="app-tag app-tag--warn"
+                                                        value="#{messages['AttendanceCheck.late']}"
+                                                        rendered="#{dayItem.late}">
+                                            <f:param value="#{dayItem.latenessMinutes}"/>
+                                        </h:outputFormat>
+                                        <h:outputFormat styleClass="app-tag app-tag--warn"
+                                                        value="#{messages['AttendanceCheck.earlyExit']}"
+                                                        rendered="#{dayItem.earlyExit}">
+                                            <f:param value="#{dayItem.earlyExitMinutes}"/>
+                                        </h:outputFormat>
+                                        <h:outputText styleClass="app-tag app-tag--warn"
+                                                      value="#{messages['AttendanceCheck.assumedExit']}"
+                                                      rendered="#{dayItem.assumedExit}"/>
+                                        <h:outputText styleClass="app-tag app-tag--ok"
+                                                      value="#{messages['AttendanceCheck.ok']}"
+                                                      rendered="#{dayItem.ok}"/>
+                                        <h:outputText styleClass="app-tag"
+                                                      value="#{messages['AttendanceCheck.markedWithoutJourney']}"
+                                                      rendered="#{dayItem.markedWithoutJourney}"/>
+                                        <h:outputText styleClass="app-tag"
+                                                      value="#{messages['AttendanceCheck.previousJourneyExit']}"
+                                                      rendered="#{dayItem.previousJourneyExit}"/>
+                                        <h:outputText styleClass="app-tag app-tag--warn"
+                                                      value="#{messages['AttendanceCheck.workedOnHoliday']}"
+                                                      rendered="#{dayItem.workedOnHoliday}"/>
+                                    </td>
+
+                                    <td class="app-check__marks">
+                                        <a4j:repeat value="#{dayItem.marks}" var="markItem">
+                                            <span class="app-check__mark">
+                                                <h:outputText value="#{markItem.marTime}">
+                                                    <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                                                       timeZone="#{sessionUser.timeZone}" type="time"/>
+                                                </h:outputText>
+                                            </span>
+                                        </a4j:repeat>
+                                    </td>
+                                </tr>
+                            </a4j:repeat>
+                        </tbody>
+                    </table>
+                </h:panelGroup>
+            </a4j:outputPanel>
+        </h:form>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{attendanceCheckAction.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender=":attendanceCheckForm"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

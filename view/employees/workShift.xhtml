@@ -28,7 +28,14 @@
                 </h:commandButton>
                 <h:commandButton action="#{workShiftAction.update}" value="#{messages['Common.save']}"
                                  styleClass="button"
-                                 rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','UPDATE')}"
+                                 rendered="#{workShiftAction.managed and not workShiftAction.locked
+                                             and s:hasPermission('WORKSHIFT','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton action="#{workShiftAction.deactivate}"
+                                 value="#{messages['WorkShift.deactivate']}"
+                                 styleClass="button"
+                                 rendered="#{workShiftAction.locked and workShift.active
+                                             and s:hasPermission('WORKSHIFT','UPDATE')}"
                                  tabindex="2"/>
                 <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
                                  rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','DELETE')}"
@@ -39,6 +46,12 @@
                 <h:commandButton action="#{workShiftAction.cancel}" value="#{messages['Common.cancel']}"
                                  styleClass="button" immediate="true" tabindex="4"/>
             </div>
+
+            <h:panelGroup rendered="#{workShiftAction.locked}">
+                <div class="app-cal__empty">
+                    <h:outputText value="#{messages['WorkShift.locked.hint']}"/>
+                </div>
+            </h:panelGroup>
 
             <rich:panel id="formPanel">
                 <f:facet name="header">
@@ -56,18 +69,23 @@
 
                 <s:decorate id="startHourField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['WorkShift.startHour']}</ui:define>
-                    <rich:calendar id="startHour" value="#{workShift.startHour}"
-                                   datePattern="#{messages['patterns.shortTime']}"
-                                   popup="true" enableManualInput="true" required="true"
-                                   styleClass="input" tabindex="6"/>
+                    <!-- Campo de texto y no rich:calendar: esto es una hora, no una fecha, y el
+                         calendario obligaba a elegir un dia que despues se descarta. -->
+                    <h:inputText id="startHour" value="#{workShift.startHour}" required="true"
+                                 maxlength="5" size="6" styleClass="input" tabindex="6">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}" type="time"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.hour.hint']}"/>
                 </s:decorate>
 
                 <s:decorate id="endHourField" template="/include/inputField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['WorkShift.endHour']}</ui:define>
-                    <rich:calendar id="endHour" value="#{workShift.endHour}"
-                                   datePattern="#{messages['patterns.shortTime']}"
-                                   popup="true" enableManualInput="true" required="true"
-                                   styleClass="input" tabindex="7"/>
+                    <h:inputText id="endHour" value="#{workShift.endHour}" required="true"
+                                 maxlength="5" size="6" styleClass="input" tabindex="7">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}" type="time"/>
+                    </h:inputText>
                     <h:outputText styleClass="app-tag" value="#{messages['WorkShift.endHour.hint']}"/>
                 </s:decorate>
 

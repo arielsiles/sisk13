@@ -30,7 +30,7 @@
                                  styleClass="button"
                                  rendered="#{workGroupAction.managed and s:hasPermission('WORKGROUP','UPDATE')}"
                                  tabindex="2"/>
-                <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button" type="button"
                                  rendered="#{workGroupAction.managed and s:hasPermission('WORKGROUP','DELETE')}"
                                  tabindex="3">
                     <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
@@ -91,17 +91,31 @@
                                        datePattern="#{messages['patterns.date']}"
                                        popup="true" enableManualInput="true"
                                        styleClass="input" tabindex="9"/>
-                        <h:commandButton action="#{workGroupAction.addMember}"
-                                         value="#{messages['WorkGroup.addMember.action']}"
-                                         styleClass="button" tabindex="10"/>
+                        <a4j:commandButton action="#{workGroupAction.addMember}"
+                                           value="#{messages['WorkGroup.addMember.action']}"
+                                           styleClass="button" tabindex="10"
+                                           reRender=":workGroupForm:memberList, newMemberField,
+                                                     newMemberDateField, :globalMessages"/>
+                        <!-- type="button": solo abre el modal, no envia el formulario. -->
+                        <h:commandButton value="#{messages['WorkGroup.bulk.open']}" type="button"
+                                         styleClass="button" tabindex="11">
+                            <rich:componentControl for="bulkDialog" event="onclick"
+                                                   disableDefault="true" operation="show"/>
+                        </h:commandButton>
+                        <h:commandButton value="#{messages['WorkGroup.loan.open']}" type="button"
+                                         styleClass="button" tabindex="12">
+                            <rich:componentControl for="loanDialog" event="onclick"
+                                                   disableDefault="true" operation="show"/>
+                        </h:commandButton>
                     </s:decorate>
                 </s:div>
 
                 <rich:dataTable id="memberList" value="#{workGroupAction.memberships}" var="memberItem"
-                                width="100%" columnsWidth="40%,15%,15%,15%,15%">
+                                width="100%" columnsWidth="34%,10%,13%,13%,12%,18%">
                     <f:facet name="header">
                         <rich:columnGroup>
                             <rich:column>#{messages['WorkGroup.member']}</rich:column>
+                            <rich:column styleClass="center">#{messages['WorkGroup.memberType']}</rich:column>
                             <rich:column styleClass="center">#{messages['WorkGroup.memberFrom']}</rich:column>
                             <rich:column styleClass="center">#{messages['WorkGroup.memberTo']}</rich:column>
                             <rich:column styleClass="center">#{messages['WorkGroup.memberState']}</rich:column>
@@ -110,6 +124,12 @@
                     </f:facet>
                     <rich:column>
                         <h:outputText value="#{memberItem.contract.employee.idNumberAndFullName}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:outputText styleClass="app-tag app-tag--warn"
+                                      value="#{messages[memberItem.type.resourceKey]}"
+                                      title="#{memberItem.reason}"
+                                      rendered="#{memberItem.loan}"/>
                     </rich:column>
                     <rich:column styleClass="center">
                         <h:outputText value="#{memberItem.startDate}">
@@ -128,9 +148,24 @@
                                       rendered="#{memberItem.current}"/>
                     </rich:column>
                     <rich:column styleClass="center">
-                        <h:commandLink value="#{messages['WorkGroup.closeMember']}"
-                                       action="#{workGroupAction.closeMember(memberItem)}"
-                                       rendered="#{memberItem.current and s:hasPermission('WORKGROUP','UPDATE')}"/>
+                        <a4j:commandLink styleClass="app-iconbtn"
+                                         title="#{messages['WorkGroup.closeMember']}"
+                                         action="#{workGroupAction.prepareClose(memberItem)}"
+                                         rendered="#{memberItem.current and s:hasPermission('WORKGROUP','UPDATE')}"
+                                         reRender=":closeForm"
+                                         oncomplete="Richfaces.showModalPanel('closeDialog');">
+                            <span class="app-ico app-ico--userMinus"/>
+                        </a4j:commandLink>
+                        <!-- Quitar es deshacer un alta equivocada; no aparece cuando la
+                             pertenencia ya alcanza a una planilla oficial. -->
+                        <a4j:commandLink styleClass="app-iconbtn app-iconbtn--danger"
+                                         title="#{messages['WorkGroup.removeMember.hint']}"
+                                         action="#{workGroupAction.removeMember(memberItem)}"
+                                         rendered="#{workGroupAction.isRemovable(memberItem)
+                                                     and s:hasPermission('WORKGROUP','UPDATE')}"
+                                         reRender=":workGroupForm:memberList, :globalMessages">
+                            <span class="app-ico app-ico--trash"/>
+                        </a4j:commandLink>
                     </rich:column>
                 </rich:dataTable>
             </rich:panel>
@@ -166,6 +201,14 @@
                                    rendered="#{s:hasPermission('WORKGROUP','DELETE')}" tabindex="1000"/>
             </ui:define>
         </s:decorate>
+
+        <s:decorate template="/employees/workGroupBulkModalPanel.xhtml"
+                    rendered="#{workGroupAction.managed and s:hasPermission('WORKGROUP','UPDATE')}">
+            <ui:param name="dialogId" value="bulkDialog"/>
+        </s:decorate>
+
+        <ui:include src="/employees/workGroupLoanModalPanel.xhtml"/>
+        <ui:include src="/employees/workGroupCloseModalPanel.xhtml"/>
 
         <s:decorate id="generalEmployeeListModalPanelContainer"
                     template="/employees/generalEmployeeListModalPanel.xhtml">

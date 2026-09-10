@@ -1,6 +1,7 @@
 package com.encens.khipus.util.employees.attendance;
 
 import com.encens.khipus.model.employees.RHMark;
+import com.encens.khipus.model.employees.RH_Mark;
 import com.encens.khipus.util.DateUtils;
 
 import java.util.ArrayList;
@@ -32,6 +33,24 @@ public class AttendanceMark {
         return new AttendanceMark(
                 DateUtils.joinDateAndTime(mark.getMarDate(), mark.getMarTime()).getTime(),
                 null == mark.getControl() ? WorkSessionBuilder.CONTROL_ENTRY : mark.getControl());
+    }
+
+    /**
+     * Las marcas cargadas desde el biometrico viven en `RH_Mark` -tabla `rh_marcado`- y no en
+     * `RHMark`, que mapea la vista `vmarcado`. El motor tiene que poder leer las dos.
+     */
+    public static AttendanceMark of(RH_Mark mark) {
+        return new AttendanceMark(
+                DateUtils.joinDateAndTime(mark.getMarDate(), mark.getMarTime()).getTime(),
+                null == mark.getControl() ? WorkSessionBuilder.CONTROL_ENTRY : mark.getControl());
+    }
+
+    public static List<AttendanceMark> ofImported(List<RH_Mark> marks) {
+        List<AttendanceMark> result = new ArrayList<AttendanceMark>();
+        for (RH_Mark mark : marks) {
+            result.add(of(mark));
+        }
+        return result;
     }
 
     public static List<AttendanceMark> of(List<RHMark> marks) {

@@ -5,6 +5,7 @@ import com.encens.khipus.model.CompanyListener;
 import com.encens.khipus.model.admin.Company;
 import com.encens.khipus.model.finances.Contract;
 import org.hibernate.annotations.Filter;
+import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
@@ -32,17 +33,48 @@ import java.util.Date;
         allocationSize = com.encens.khipus.util.Constants.SEQUENCE_ALLOCATION_SIZE)
 
 @NamedQueries({
+        /* Se busca por tipo y no todo junto: cuando un prestamo y la pertenencia base cubren
+           el mismo dia, gana el prestamo, y eso tiene que ser explicito y no depender del orden
+           en que la base devuelva las filas. */
         @NamedQuery(name = "WorkGroupMembership.findByContractAndDate",
                 query = "select o from WorkGroupMembership o"
-                        + " where o.contract = :contract"
+                        + " where o.contract = :contract and o.type = :type"
                         + " and o.startDate <= :date"
+                        + " and (o.endDate is null or o.endDate >= :date)"),
+        /* Contratos vigentes en una fecha que ese dia no estaban en ningun grupo. Es la lista
+           que se ofrece para la asignacion masiva: sumar a alguien que ya esta en otro grupo
+           seria un error, y filtrarlo antes evita que el usuario lo descubra de a uno. */
+        @NamedQuery(name = "WorkGroupMembership.findContractsWithoutGroup",
+                query = "select c from Contract c"
+                        + " where c.activeForPayrollGeneration = :active"
+                        + " and c.initDate <= :date"
+                        + " and (c.endDate is null or c.endDate >= :date)"
+                        + " and not exists ("
+                        + "   select m from WorkGroupMembership m"
+                        + "   where m.contract = c and m.startDate <= :date"
+                        + "   and (m.endDate is null or m.endDate >= :date))"
+                        + " order by c.employee.lastName asc, c.employee.firstName asc"),
+        @NamedQuery(name = "WorkGroupMembership.findContractsForMove",
+                query = "select c from Contract c"
+                        + " where c.activeForPayrollGeneration = :active"
+                        + " and c.initDate <= :date"
+                        + " and (c.endDate is null or c.endDate >= :date)"
+                        + " order by c.employee.lastName asc, c.employee.firstName asc"),
+        /* Todas las pertenencias base vigentes en una fecha. Se pide de una sola vez y se
+           cruza en memoria: preguntar el grupo de cada candidato por separado serian
+           doscientas consultas para armar una lista. */
+        @NamedQuery(name = "WorkGroupMembership.findBaseAtDate",
+                query = "select o from WorkGroupMembership o"
+                        + " where o.type = :type and o.startDate <= :date"
                         + " and (o.endDate is null or o.endDate >= :date)"),
         @NamedQuery(name = "WorkGroupMembership.findByGroup",
                 query = "select o from WorkGroupMembership o where o.workGroup = :workGroup"
                         + " order by o.startDate desc"),
+        /* Solo se comparan pertenencias del MISMO tipo: un prestamo tiene que poder pisar a la
+           base -es su razon de ser- pero dos prestamos no pueden pisarse entre si. */
         @NamedQuery(name = "WorkGroupMembership.findOverlapping",
                 query = "select o from WorkGroupMembership o"
-                        + " where o.contract = :contract and o.id <> :id"
+                        + " where o.contract = :contract and o.id <> :id and o.type = :type"
                         + " and (o.endDate is null or o.endDate >= :startDate)"
                         + " and (:endDate is null or o.startDate <= :endDate)")
 })
@@ -75,10 +107,20 @@ public class WorkGroupMembership implements BaseModel {
     @NotNull
     private Date startDate;
 
-    /** Nula mientras la persona siga en el grupo. */
+    /** Nula mientras la persona siga en el grupo. Obligatoria en un prestamo. */
     @Column(name = "fechafin")
     @Temporal(TemporalType.DATE)
     private Date endDate;
+
+    @Column(name = "tipo", nullable = false, length = 10)
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private WorkGroupMembershipType type = WorkGroupMembershipType.BASE;
+
+    /** Por que se presto. Vacio en la pertenencia base. */
+    @Column(name = "motivo", length = 250)
+    @Length(max = 250)
+    private String reason;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
@@ -91,6 +133,27 @@ public class WorkGroupMembership implements BaseModel {
     @Transient
     public boolean isCurrent() {
         return null == endDate;
+    }
+
+    @Transient
+    public boolean isLoan() {
+        return WorkGroupMembershipType.LOAN.equals(type);
+    }
+
+    public WorkGroupMembershipType getType() {
+        return type;
+    }
+
+    public void setType(WorkGroupMembershipType type) {
+        this.type = type;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public Long getId() {

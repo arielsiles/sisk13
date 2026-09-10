@@ -73,13 +73,13 @@
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{workShiftItem.startHour}">
-                        <f:convertDateTime pattern="#{messages['patterns.shortTime']}"
+                        <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
                                            timeZone="#{sessionUser.timeZone}"/>
                     </h:outputText>
                 </rich:column>
                 <rich:column styleClass="center">
                     <h:outputText value="#{workShiftItem.endHour}">
-                        <f:convertDateTime pattern="#{messages['patterns.shortTime']}"
+                        <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
                                            timeZone="#{sessionUser.timeZone}"/>
                     </h:outputText>
                 </rich:column>
@@ -97,10 +97,12 @@
                     <h:selectBooleanCheckbox value="#{workShiftItem.active}" disabled="true"/>
                 </rich:column>
                 <rich:column styleClass="center">
-                    <h:commandLink value="#{messages['Common.select']}"
+                    <h:commandLink styleClass="app-iconbtn"
+                                   title="#{messages['Common.select']}"
                                    immediate="true"
                                    action="#{workShiftAction.select(workShiftItem)}"
                                    rendered="#{s:hasPermission('WORKSHIFT','VIEW')}">
+                        <span class="app-ico app-ico--edit"/>
                         <s:conversationPropagation value="none"/>
                     </h:commandLink>
                 </rich:column>

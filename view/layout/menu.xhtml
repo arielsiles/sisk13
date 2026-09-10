@@ -1355,6 +1355,16 @@
     s:hasPermission('IVARATE','VIEW') or
     s:hasPermission('SMNRATE','VIEW') or
     s:hasPermission('SIPCONTRIBUTIONREGIME','VIEW') or
+    s:hasPermission('GROUPSCHEDULE','VIEW') or
+    s:hasPermission('CONTRACTSCHEDULE','VIEW') or
+    s:hasPermission('SCHEDULEEXCEPTION','VIEW') or
+    s:hasPermission('CONTRACTCONDITION','VIEW') or
+    s:hasPermission('ATTENDANCECHECK','VIEW') or
+    s:hasPermission('VACATIONPLANNING','VIEW') or
+    s:hasPermission('WORKGROUP','VIEW') or
+    s:hasPermission('WORKSHIFT','VIEW') or
+    s:hasPermission('WEEKLYWORKLOAD','VIEW') or
+    s:hasPermission('MARKIMPORT','VIEW') or
     s:hasPermission('EMPLOYEE','VIEW') or
     s:hasPermission('GESTION','VIEW') or
     s:hasPermission('CYCLE','VIEW') or
@@ -1403,10 +1413,94 @@
                     rendered="#{s:hasPermission('PAYROLLGENERATIONCYCLE','VIEW')}"
                     propagation="none"/>
 
-            <s:link view="/employees/vacationPlanningList.xhtml" styleClass="tab-cell"
-                    value="#{messages['menu.employees.vacationPlanning']}"
-                    rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}"
-                    propagation="none"/>
+            <rich:dropDownMenu value="#{messages['menu.rrhh.planning']}" rendered="#{
+                            s:hasPermission('GROUPSCHEDULE','VIEW') or
+                            s:hasPermission('VACATIONPLANNING','VIEW') or
+                            s:hasPermission('CONTRACTSCHEDULE','VIEW') or
+                            s:hasPermission('SCHEDULEEXCEPTION','VIEW') or
+                            s:hasPermission('CONTRACTCONDITION','VIEW') or
+    s:hasPermission('ATTENDANCECHECK','VIEW') or
+                            s:hasPermission('ATTENDANCECHECK','VIEW') or
+                            s:hasPermission('WORKGROUP','VIEW') or
+                            s:hasPermission('WORKSHIFT','VIEW') or
+                            s:hasPermission('WEEKLYWORKLOAD','VIEW') or
+                            s:hasPermission('MARKIMPORT','VIEW')}">
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('GROUPSCHEDULE','VIEW')}">
+                    <s:link view="/employees/groupSchedule.xhtml"
+                            value="#{messages['menu.employees.groupSchedule']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}">
+                    <s:link view="/employees/vacationPlanningList.xhtml"
+                            value="#{messages['menu.employees.vacationPlanning']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('MARKIMPORT','VIEW')}">
+                    <s:link view="/employees/markImport.xhtml"
+                            value="#{messages['menu.employees.markImport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('ATTENDANCECHECK','VIEW')}">
+                    <s:link view="/employees/attendanceCheck.xhtml"
+                            value="#{messages['menu.employees.attendanceCheck']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('CONTRACTSCHEDULE','VIEW')}">
+                    <s:link view="/employees/contractSchedule.xhtml"
+                            value="#{messages['menu.employees.contractSchedule']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('SCHEDULEEXCEPTION','VIEW')}">
+                    <s:link view="/employees/scheduleExceptionList.xhtml"
+                            value="#{messages['menu.employees.scheduleException']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('CONTRACTCONDITION','VIEW')}">
+                    <s:link view="/employees/contractConditionList.xhtml"
+                            value="#{messages['menu.employees.contractCondition']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuSeparator/>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WORKGROUP','VIEW')}">
+                    <s:link view="/employees/workGroupList.xhtml"
+                            value="#{messages['menu.employees.configuration.workGroup']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WORKSHIFT','VIEW')}">
+                    <s:link view="/employees/workShiftList.xhtml"
+                            value="#{messages['menu.employees.configuration.workShift']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WEEKLYWORKLOAD','VIEW')}">
+                    <s:link view="/employees/weeklyWorkloadList.xhtml"
+                            value="#{messages['menu.employees.configuration.weeklyWorkload']}"
+                            propagation="none"/>
+                </rich:menuItem>
+            </rich:dropDownMenu>
 
             <s:link view="/employees/salaryMovementList.xhtml" styleClass="tab-cell"
                     value="#{messages['menu.employees.configuration.salaryMovement']}"
@@ -1833,34 +1927,6 @@
                                rendered="#{s:hasPermission('CONTRACTMODE','VIEW')}">
                     <s:link view="/employees/contractModeList.xhtml"
                             value="#{messages['menu.employees.configuration.contractMode']}"
-                            propagation="none"/>
-                </rich:menuItem>
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('WORKGROUP','VIEW')}">
-                    <s:link view="/employees/workGroupList.xhtml"
-                            value="#{messages['menu.employees.configuration.workGroup']}"
-                            propagation="none"/>
-                </rich:menuItem>
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('WORKSHIFT','VIEW')}">
-                    <s:link view="/employees/workShiftList.xhtml"
-                            value="#{messages['menu.employees.configuration.workShift']}"
-                            propagation="none"/>
-                </rich:menuItem>
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('WEEKLYWORKLOAD','VIEW')}">
-                    <s:link view="/employees/weeklyWorkloadList.xhtml"
-                            value="#{messages['menu.employees.configuration.weeklyWorkload']}"
-                            propagation="none"/>
-                </rich:menuItem>
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('MARKIMPORT','VIEW')}">
-                    <s:link view="/employees/markImport.xhtml"
-                            value="#{messages['menu.employees.markImport']}"
                             propagation="none"/>
                 </rich:menuItem>
 

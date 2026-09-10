@@ -137,10 +137,12 @@
                     </h:outputText>
                 </rich:column>
                 <rich:column styleClass="center">
-                    <h:commandLink value="#{messages['Common.select']}"
+                    <h:commandLink styleClass="app-iconbtn"
+                                   title="#{messages['Common.select']}"
                                    immediate="true"
                                    rendered="#{s:hasPermission('VACATIONRULE','VIEW')}"
                                    action="#{vacationRuleAction.select(vacationRuleItem)}">
+                        <span class="app-ico app-ico--edit"/>
                         <s:conversationPropagation value="none"/>
                     </h:commandLink>
                 </rich:column>

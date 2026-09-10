@@ -80,6 +80,10 @@ src/main/com/encens/khipus/
 > (claves foráneas) y trampas de JSF/RichFaces del módulo están documentados en
 > `docs/Contabilidad/plan_de_cuentas.md`. Leerlo antes de tocar cuentas contables.
 
+> **Iconos de la interfaz:** el sistema de iconos —la regla de que el color lo decide el
+> contexto y no el archivo, el catálogo de los que existen y cómo agregar uno— está en
+> `docs/ui/iconos.md`. **Buscar ahí antes de dibujar un icono nuevo.**
+
 > **Recursos Humanos (`employees`):** el módulo completo está documentado en
 > `docs/employees/` — índice en `docs/employees/README.md`. Cubre el modelo de datos,
 > el flujo de generación de planillas (ciclo → gestión planilla → planilla generada →

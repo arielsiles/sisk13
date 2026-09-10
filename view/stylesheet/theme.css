@@ -1456,7 +1456,12 @@ select[disabled] {
 
 /* Proveedor (selectPopUp) como "input con accion adentro": el icono (lupa/goma) se
    superpone al borde derecho del input y alterna segun haya o no seleccion. Scoped:
-   solo afecta al contenedor con esta clase, no a otros selectPopUp del sistema. */
+   solo afecta al contenedor con esta clase, no a otros selectPopUp del sistema.
+
+   OJO: sirve SOLO cuando se muestra UN icono a la vez. Si el selectPopUp renderiza la
+   lupa y la goma juntas, las dos se posicionan en el mismo lugar y la segunda tapa a la
+   primera -la lupa deja de poder clickearse-. En ese caso NO usar este contenedor: el
+   selectPopUp se pone suelto y sus iconos se acomodan en linea. */
 .app-provider-inline {
     position: relative;
     display: inline-block;
@@ -1840,4 +1845,651 @@ select[disabled] {
 /* Marca de auditoria en la columna de acciones: separa el icono del de editar. */
 .app-audit-mark {
     margin-left: 4px;
+}
+
+/* ============================================================================
+   .app-cal - grilla de planificacion del cronograma (grupos x dias).
+   Es una planilla: filas de grupo, columnas de dia, una celda por turno. Se pinta
+   con un clic, y todo el estilo esta en esta capa app-* para no tocar el skin.
+   ============================================================================ */
+
+/* Barra de la semana. */
+.app-cal__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    border: 1px solid #d7d7d4;
+    border-radius: 3px;
+    background: #fbfbfa;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    color: #444;
+}
+
+.app-cal__spacer {
+    flex: 1 1 auto;
+}
+
+.app-cal__nav {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.app-cal__navbtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 22px;
+    box-sizing: border-box;
+    padding: 0 8px;
+    border: 1px solid #C3BBB6;
+    border-radius: 3px;
+    background: #fff;
+    color: #444;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    line-height: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+
+.app-cal__navbtn:hover {
+    background: #f2f4f7;
+    border-color: #a9bccf;
+    text-decoration: none;
+}
+
+.app-cal__range {
+    font-weight: bold;
+    color: #333;
+    letter-spacing: .2px;
+}
+
+.app-cal__publish {
+    text-decoration: none;
+}
+
+/* Paleta de turnos. El pincel activo lleva un anillo. */
+.app-cal__palette {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    border: 1px solid #e6e6e3;
+    border-radius: 3px;
+    background: #fff;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+}
+
+.app-cal__palette-label {
+    color: #616161;
+    margin-right: 2px;
+}
+
+.app-cal__chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 3px 9px;
+    border: 1px solid #d7d7d4;
+    border-radius: 11px;
+    background: #f6f6f4;
+    color: #444;
+    text-decoration: none;
+    cursor: pointer;
+    transition: box-shadow .15s, border-color .15s;
+}
+
+.app-cal__chip:hover {
+    border-color: #a9bccf;
+    text-decoration: none;
+}
+
+.app-cal__chip--on {
+    border-color: #578BB8;
+    box-shadow: 0 0 0 2px rgba(87, 139, 184, .25);
+}
+
+.app-cal__chip--day {
+    background: #fdf3dd;
+    border-color: #e2c88a;
+    color: #7a5a13;
+}
+
+.app-cal__chip--night {
+    background: #e8eaf6;
+    border-color: #b0b6e0;
+    color: #3b4291;
+}
+
+.app-cal__chip--rest {
+    background: #f4f4f2;
+    border-style: dashed;
+    color: #757575;
+}
+
+.app-cal__chip-name {
+    font-weight: bold;
+}
+
+.app-cal__chip-hours {
+    font-size: 10px;
+    opacity: .85;
+}
+
+.app-cal__hint {
+    color: #8a857f;
+    font-size: 10px;
+    margin-left: 6px;
+}
+
+/* La grilla. */
+.app-cal__table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+}
+
+.app-cal__head {
+    padding: 5px 4px;
+    border-bottom: 1px solid #d7d7d4;
+    background: #f6f6f4;
+    color: #616161;
+    font-weight: normal;
+    text-align: center;
+}
+
+.app-cal__head--group {
+    width: 190px;
+    text-align: left;
+    padding-left: 8px;
+}
+
+.app-cal__head--total {
+    width: 74px;
+}
+
+.app-cal__dow {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    font-size: 10px;
+}
+
+.app-cal__dom {
+    display: block;
+    color: #333;
+    font-weight: bold;
+}
+
+.app-cal__row td {
+    border-bottom: 1px solid #efefec;
+    vertical-align: middle;
+}
+
+.app-cal__group {
+    padding: 4px 8px;
+}
+
+.app-cal__group-name {
+    display: block;
+    font-weight: bold;
+    color: #333;
+}
+
+.app-cal__group-area {
+    display: block;
+    color: #8a857f;
+    font-size: 10px;
+}
+
+/* Pintar la fila entera: discreto, aparece al pasar por la fila. */
+.app-cal__rowfill {
+    display: inline-block;
+    margin-top: 2px;
+    color: #578BB8;
+    font-size: 10px;
+    text-decoration: none;
+    /* Oculto con visibility y no solo con opacity: invisible pero clickeable seria una
+       trampa, y ademas asi no cambia el alto de la fila al aparecer. */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s;
+}
+
+.app-cal__row:hover .app-cal__rowfill {
+    visibility: visible;
+    opacity: 1;
+}
+
+.app-cal__rowfill:hover {
+    text-decoration: underline;
+}
+
+.app-cal__td {
+    padding: 2px;
+}
+
+/* La celda ocupa todo el td para que el clic no tenga que ser preciso. */
+.app-cal__cell {
+    position: relative;
+    display: block;
+    min-height: 34px;
+    box-sizing: border-box;
+    padding: 4px 5px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.app-cal__cell:hover {
+    border-color: #578BB8;
+    text-decoration: none;
+}
+
+.app-cal__cell--day {
+    background: #fdf3dd;
+    border-color: #eeddb4;
+    color: #7a5a13;
+}
+
+.app-cal__cell--night {
+    background: #e8eaf6;
+    border-color: #ccd0ec;
+    color: #3b4291;
+}
+
+/* Descanso decidido: hay registro y dice que ese dia no hay jornada. */
+.app-cal__cell--rest {
+    background: #f4f4f2;
+    border-color: #e6e6e3;
+}
+
+/* Sin planificar: no hay registro todavia. Casi invisible a proposito. */
+.app-cal__cell--empty {
+    background: #fff;
+    border-color: #f0f0ed;
+}
+
+/* Borrador: punto ambar en la esquina. El motor todavia no ve este dia. */
+.app-cal__cell--draft:after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #d9a441;
+}
+
+.app-cal__cell--today {
+    box-shadow: inset 0 0 0 1px #578BB8;
+}
+
+.app-cal__cell-name {
+    display: block;
+    font-weight: bold;
+    line-height: 14px;
+}
+
+.app-cal__cell-hours {
+    display: block;
+    font-size: 10px;
+    opacity: .8;
+    line-height: 13px;
+}
+
+.app-cal__total {
+    padding: 4px;
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+    background: #fbfbfa;
+}
+
+.app-cal__empty {
+    padding: 18px 10px;
+    border: 1px dashed #d7d7d4;
+    border-radius: 3px;
+    background: #fbfbfa;
+    color: #757575;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    text-align: center;
+}
+
+/* Variante verde de .app-tag: la semana esta publicada. */
+.app-tag--published,
+.rich-table-cell .app-tag--published {
+    border-color: #a8c9a0;
+    background: #eef7ea;
+    color: #3f6b32;
+}
+
+/* Total del mes: mismo peso visual que el de la semana pero mas apagado, para que el
+   numero que se vigila mientras se pinta siga siendo el de la semana. */
+.app-cal__total--month {
+    color: #757575;
+    font-weight: normal;
+}
+
+/* Etiqueta de un campo dentro de la barra: mismo gris que el resto de la barra. */
+.app-cal__label {
+    color: #616161;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+}
+
+/* Lista larga dentro de un modal: se desplaza sola en vez de estirar el dialogo mas
+   alla de la pantalla. */
+.app-cal__scroll {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid #e6e6e3;
+    border-radius: 3px;
+}
+
+/* ============================================================================
+   .app-check - verificacion del control de asistencia, dia por dia.
+   El objetivo es que un renglon se lea de un vistazo: que le tocaba, que marco y
+   como cierra. El color va SOLO en el resultado; el resto queda neutro para que
+   la vista salte a las filas con novedad.
+   ============================================================================ */
+
+.app-check__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    border: 1px solid #d7d7d4;
+    border-radius: 3px;
+    background: #fbfbfa;
+}
+
+.app-check__stat {
+    display: inline-flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+
+.app-check__stat-value {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.app-check__stat-label {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 10px;
+    color: #8a857f;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.app-check__stat--absent .app-check__stat-value {
+    color: #a33a3a;
+}
+
+.app-check__stat--warn .app-check__stat-value {
+    color: #8a6d1f;
+}
+
+.app-check__table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+}
+
+.app-check__head {
+    padding: 5px 8px;
+    border-bottom: 1px solid #d7d7d4;
+    background: #f6f6f4;
+    color: #616161;
+    font-weight: normal;
+    text-align: left;
+}
+
+.app-check__head--time {
+    width: 120px;
+}
+
+.app-check__row td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #efefec;
+    vertical-align: middle;
+}
+
+/* Los dias sin jornada se apagan: no son novedad, son la mayoria del mes. */
+.app-check__row--rest td {
+    color: #a7a29c;
+    background: #fcfcfb;
+}
+
+.app-check__row--warn td {
+    background: #fdf9ee;
+}
+
+.app-check__row--absent td {
+    background: #fdf0f0;
+}
+
+.app-check__day {
+    white-space: nowrap;
+}
+
+.app-check__dow {
+    display: inline-block;
+    width: 34px;
+    color: #8a857f;
+    text-transform: uppercase;
+    font-size: 10px;
+}
+
+.app-check__time {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.app-check__marks {
+    color: #757575;
+}
+
+/* Cada marca del biometrico, tal cual vino. */
+.app-check__mark {
+    display: inline-block;
+    margin-right: 4px;
+    padding: 1px 4px;
+    border: 1px solid #e6e6e3;
+    border-radius: 3px;
+    background: #fff;
+    font-size: 10px;
+}
+
+.app-tag--ok,
+.rich-table-cell .app-tag--ok {
+    border-color: #a8c9a0;
+    background: #eef7ea;
+    color: #3f6b32;
+}
+
+.app-tag--absent,
+.rich-table-cell .app-tag--absent {
+    border-color: #dda8a8;
+    background: #fbeaea;
+    color: #a33a3a;
+}
+
+/* Feriado: violeta.
+   El rojo y el ambar de esta pantalla son una escala de GRAVEDAD -falta, atraso-, y un
+   feriado no es un problema de ninguna gravedad: es un dia de otra naturaleza. Meterlo en
+   esa escala lo hacia competir con la falta, del que ademas quedaba casi indistinguible.
+   El violeta sale de esa escala, y a diferencia del naranja se sigue distinguiendo del rojo
+   con daltonismo rojo-verde. */
+.app-check__row--holiday td {
+    background: #f6f3fb;
+}
+
+.app-tag--holiday,
+.rich-table-cell .app-tag--holiday {
+    border-color: #c9bce4;
+    background: #f0eafa;
+    color: #5a3f96;
+}
+
+
+/* La etiqueta del feriado va junto a la fecha: es un hecho del calendario y tiene que
+   verse siempre, tanto si suspendio la jornada como si la persona igual trabajo. */
+.app-check__holiday {
+    margin-left: 6px;
+}
+
+/* Aclaracion de un campo, en su propia linea.
+   Dentro del campo se ponia al lado del calendario y empujaba el renglon. Y NO usa .formNote
+   a proposito: esa clase lleva un border-top que dibuja una linea divisoria en medio del
+   formulario. La alineacion de las etiquetas queda como la del resto del sistema. */
+.app-fieldnote {
+    clear: both;
+    margin: 2px 0 10px 2px;
+    color: #8a857f;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+/* Entrada y salida en casillas de ancho fijo: se alinean entre filas, y cuando falta una
+   marca el hueco queda en su lugar en vez de correr todo el renglon. */
+.app-check__in {
+    display: inline-block;
+    width: 38px;
+    text-align: right;
+}
+
+.app-check__sep {
+    display: inline-block;
+    width: 16px;
+    text-align: center;
+    color: #a7a29c;
+}
+
+.app-check__out {
+    display: inline-block;
+    width: 38px;
+    text-align: left;
+}
+
+/* Marca que falta: se ve el hueco, sin competir con las horas reales. */
+.app-check__nomark {
+    color: #c4bfb9;
+}
+
+/* Varios botones de icono en una celda de acciones: separacion pareja y centrada. */
+.rich-table-cell .app-iconbtn + .app-iconbtn {
+    margin-left: 4px;
+}
+
+/* Accion destructiva o de cierre: se tine al pasar el mouse, no en reposo, para que la
+   fila no se lea como un error. */
+.app-iconbtn--danger:hover {
+    background: #fbeaea;
+    border-color: #dda8a8;
+}
+
+/* ============================================================================
+   .app-ico - iconos como MASCARA, no como imagen.
+   Un <img> no se puede recolorear desde CSS: el color queda quemado dentro del
+   archivo. Por eso habia seis colores distintos entre los iconos y un tacho que
+   se veia rojo hasta en reposo. Usados como mascara, del archivo solo importa la
+   FORMA y el color lo pone el contexto con `currentColor`.
+   Los .svg no cambian: los mismos archivos sirven para las dos formas de uso.
+   ============================================================================ */
+.app-ico {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 16px 16px;
+    mask-size: 16px 16px;
+}
+
+.app-ico--edit      { -webkit-mask-image: url(../img/edit-line.svg);        mask-image: url(../img/edit-line.svg); }
+.app-ico--trash     { -webkit-mask-image: url(../img/trash-line.svg);       mask-image: url(../img/trash-line.svg); }
+.app-ico--search    { -webkit-mask-image: url(../img/search-line.svg);      mask-image: url(../img/search-line.svg); }
+.app-ico--filterOff { -webkit-mask-image: url(../img/filter-off-line.svg);  mask-image: url(../img/filter-off-line.svg); }
+.app-ico--excel     { -webkit-mask-image: url(../img/excel-line.svg);       mask-image: url(../img/excel-line.svg); }
+.app-ico--pdf       { -webkit-mask-image: url(../img/pdf-line.svg);         mask-image: url(../img/pdf-line.svg); }
+.app-ico--eye       { -webkit-mask-image: url(../img/eye-line.svg);         mask-image: url(../img/eye-line.svg); }
+.app-ico--journal   { -webkit-mask-image: url(../img/journal-line.svg);     mask-image: url(../img/journal-line.svg); }
+.app-ico--levels    { -webkit-mask-image: url(../img/levels-line.svg);      mask-image: url(../img/levels-line.svg); }
+.app-ico--equals    { -webkit-mask-image: url(../img/equals-line.svg);      mask-image: url(../img/equals-line.svg); }
+.app-ico--user      { -webkit-mask-image: url(../img/user-line.svg);        mask-image: url(../img/user-line.svg); }
+.app-ico--userSearch{ -webkit-mask-image: url(../img/user-search-line.svg); mask-image: url(../img/user-search-line.svg); }
+.app-ico--userMinus { -webkit-mask-image: url(../img/user-minus-line.svg);  mask-image: url(../img/user-minus-line.svg); }
+.app-ico--exchange  { -webkit-mask-image: url(../img/exchange-line.svg);    mask-image: url(../img/exchange-line.svg); }
+.app-ico--check     { -webkit-mask-image: url(../img/check-line.svg);       mask-image: url(../img/check-line.svg); }
+.app-ico--close     { -webkit-mask-image: url(../img/x-line.svg);           mask-image: url(../img/x-line.svg); }
+
+/* El color lo decide el estado del boton, no el archivo. */
+.app-iconbtn {
+    color: #34617f;
+}
+
+.app-iconbtn:hover {
+    color: #1f4a66;
+}
+
+.app-iconbtn--danger:hover {
+    color: #a33a3a;
+}
+
+/* Condicion actual del contrato, arriba del formulario de cambio: sin esto no se sabe
+   desde que se esta cambiando, y para una simple ampliacion hay que ir a mirar el listado. */
+.app-cond__current {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 10px;
+    padding: 6px 8px;
+    border: 1px solid #e6e6e3;
+    border-radius: 3px;
+    background: #fbfbfa;
+}
+
+.app-cond__label {
+    color: #8a857f;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.app-cond__history {
+    display: block;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #efefec;
 }

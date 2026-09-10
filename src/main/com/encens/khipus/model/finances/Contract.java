@@ -158,6 +158,29 @@ public class Contract implements BaseModel {
     @Column(name = "fechafin")
     private Date endDate;
 
+    /**
+     * Si el contrato tiene un fin acordado. Manda sobre la fecha de fin: en un indefinido la
+     * fecha queda vacia y solo se escribe con la baja.
+     */
+    @Column(name = "tipoduracion", nullable = false, length = 15)
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private ContractDuration duration = ContractDuration.INDEFINITE;
+
+    /**
+     * El contrato principal de la persona: el que tiene AFP, vacaciones y antiguedad.
+     * <p/>
+     * Una persona puede tener varios contratos a la vez. Los secundarios son trabajo eventual
+     * acotado y NO arrastran ninguno de esos derechos. Entre los contratos abiertos de una
+     * persona puede haber uno principal <b>o ninguno</b>: quedarse solo con eventuales corriendo
+     * hasta su fecha de fin es una situacion valida, y el sistema no inventa un principal que
+     * RRHH no designo.
+     */
+    @Column(name = "principal", nullable = false)
+    @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
+    @NotNull
+    private Boolean mainContract = false;
+
     @Column(name = "respaldo", nullable = true, length = 200)
     private String back;
 
@@ -284,6 +307,20 @@ public class Contract implements BaseModel {
         this.initDate = initDate;
     }
 
+    public ContractDuration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(ContractDuration duration) {
+        this.duration = duration;
+    }
+
+    /** Atajo para la vista: solo el plazo fijo pide fecha de fin. */
+    @Transient
+    public boolean isFixedTerm() {
+        return ContractDuration.FIXED_TERM.equals(duration);
+    }
+
     public Date getEndDate() {
         return endDate;
     }
@@ -346,6 +383,27 @@ public class Contract implements BaseModel {
 
     public void setJobContractList(List<JobContract> jobContractList) {
         this.jobContractList = jobContractList;
+    }
+
+    public Boolean getMainContract() {
+        return mainContract;
+    }
+
+    public void setMainContract(Boolean mainContract) {
+        this.mainContract = mainContract;
+    }
+
+    public boolean isMain() {
+        return Boolean.TRUE.equals(mainContract);
+    }
+
+    /**
+     * El contrato principal <b>vigente</b>. Un contrato cerrado conserva la marca -fue el
+     * principal en su momento y eso es historia- pero mostrarlo como principal hoy hace pensar
+     * que sigue mandando en AFP y vacaciones.
+     */
+    public boolean isCurrentMain() {
+        return isMain() && null != contractState && !contractState.isInactive();
     }
 
     public Boolean getActiveForPayrollGeneration() {

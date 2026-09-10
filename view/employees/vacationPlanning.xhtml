@@ -330,9 +330,12 @@
                 <h:outputText value="#{messages[vacationItem.state.resourceKey]}"/>
             </rich:column>
             <rich:column styleClass="center">
-                <h:commandLink value="#{messages['Common.select']}"
+                <h:commandLink styleClass="app-iconbtn"
+                               title="#{messages['Common.select']}"
                                immediate="true"
-                               action="#{vacationAction.select(vacationItem)}"/>
+                               action="#{vacationAction.select(vacationItem)}">
+                    <span class="app-ico app-ico--edit"/>
+                </h:commandLink>
             </rich:column>
         </rich:dataTable>
         <app:dataScroller id="dataScroller"

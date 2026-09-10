@@ -50,14 +50,32 @@
             </h:outputText>
         </s:decorate>
 
+        <s:decorate id="durationField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['ContractCondition.duration']}</ui:define>
+            <h:selectOneMenu id="duration" value="#{contract.duration}" styleClass="input"
+                             rendered="#{editable}" required="true">
+                <s:selectItems value="#{contractDurationList}" var="durationItem"
+                               label="#{messages[durationItem.resourceKey]}"/>
+                <s:convertEnum/>
+                <a4j:support event="onchange" reRender="endDateField" ajaxSingle="true"/>
+            </h:selectOneMenu>
+            <h:outputText value="#{messages[contract.duration.resourceKey]}"
+                          rendered="#{!editable}"/>
+        </s:decorate>
+
+        <!-- La fecha de fin dejo de ser obligatoria: solo el plazo fijo la lleva. En un
+             indefinido se escribe recien con la baja. Un `required` incondicional aca fue lo
+             que hizo que los 234 contratos tuvieran una fecha inventada. -->
         <s:decorate id="endDateField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Contract.endDate']}</ui:define>
+            <h:outputText styleClass="app-tag" value="#{messages['ContractCondition.indefinite.hint']}"
+                          rendered="#{editable and not contract.fixedTerm}"/>
             <rich:calendar id="endDate"
                            value="#{contract.endDate}"
-                           required="true"
+                           required="#{contract.fixedTerm}"
+                           rendered="#{editable and contract.fixedTerm}"
                            enableManualInput="true"
                            datePattern="#{messages['patterns.date']}"
-                           rendered="#{editable}"
                            tabindex="23">
                 <f:convertDateTime pattern="#{messages['patterns.date']}"
                                    timeZone="#{sessionUser.timeZone}"
@@ -74,6 +92,18 @@
                                    type="date"/>
             </h:outputText>
         </s:decorate>
+        <!-- Una persona puede tener varios contratos a la vez. El principal es el que lleva AFP
+             y vacaciones; los secundarios son trabajo eventual acotado y no arrastran ninguna de
+             las dos. Puede no haber ninguno principal, y es valido. -->
+        <s:decorate id="mainContractField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['Contract.mainContract']}</ui:define>
+            <h:selectBooleanCheckbox id="mainContract"
+                                     value="#{contract.mainContract}"
+                                     disabled="#{!editable}"
+                                     tabindex="24"/>
+            <h:outputText styleClass="app-tag" value="#{messages['Contract.mainContract.hint']}"/>
+        </s:decorate>
+
         <s:decorate id="activeForPayrollGenerationField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Contract.activeForPayrollGeneration']}</ui:define>
             <h:selectBooleanCheckbox id="activeForPayrollGeneration"

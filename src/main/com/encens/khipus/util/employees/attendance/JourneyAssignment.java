@@ -68,6 +68,23 @@ public class JourneyAssignment {
         return last;
     }
 
+    /**
+     * La ultima salida REALMENTE marcada, o null si ninguna sesion la tiene.
+     * <p/>
+     * `getLastExit` cierra en el fin de la jornada cuando falta la salida, y eso esta bien para
+     * evaluar. Pero para MOSTRAR hay que distinguir: una hora que puso el motor no puede
+     * presentarse como si la persona la hubiera marcado.
+     */
+    public Date getLastMarkedExit() {
+        Date last = null;
+        for (WorkSession session : sessions) {
+            if (null != session.getExit() && (null == last || session.getExit().after(last))) {
+                last = session.getExit();
+            }
+        }
+        return last;
+    }
+
     /** true si alguna sesion quedo sin su salida: el cierre de arriba fue asumido. */
     public boolean hasAssumedExit() {
         for (WorkSession session : sessions) {

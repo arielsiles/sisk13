@@ -1,0 +1,177 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ContractCondition.list']}</ui:define>
+    <ui:param name="bodyWidth" value="95%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="contractConditionSearch">
+            <rich:simpleTogglePanel label="#{messages['ContractCondition.search']}" switchType="client">
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ContractCondition.employee']}</ui:define>
+                        <h:inputText id="employeeName" value="#{contractConditionDataModel.employeeName}"
+                                     maxlength="100" tabindex="1" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ContractCondition.duration']}</ui:define>
+                        <h:selectOneMenu id="duration" value="#{contractConditionDataModel.duration}"
+                                         styleClass="input" tabindex="2">
+                            <f:selectItem itemValue="#{null}" itemLabel=""/>
+                            <s:selectItems value="#{contractConditionDataModel.durations}"
+                                           var="durationItem"
+                                           label="#{messages[durationItem.resourceKey]}"/>
+                            <s:convertEnum/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <!-- Estado arranca en ACTIVO: es lo que separa la gente de hoy del archivo.
+                         En blanco muestra todo, que es como se busca un contrato de hace anios. -->
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ContractCondition.state']}</ui:define>
+                        <h:selectOneMenu id="contractState"
+                                         value="#{contractConditionDataModel.contractStateName}"
+                                         styleClass="input" tabindex="3">
+                            <f:selectItems value="#{contractConditionDataModel.stateItems}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <!-- Tres opciones y no una casilla: destildar una casilla no apagaba el
+                         filtro, lo invertia, y no habia forma de ver los dos grupos juntos. -->
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ContractCondition.activeForPayroll']}</ui:define>
+                        <h:selectOneMenu id="activeForPayroll"
+                                         value="#{contractConditionDataModel.activeForPayroll}"
+                                         styleClass="input" tabindex="4">
+                            <f:selectItem itemValue="#{null}" itemLabel=""/>
+                            <f:selectItem itemValue="#{true}" itemLabel="#{messages['Common.yes']}"/>
+                            <f:selectItem itemValue="#{false}" itemLabel="#{messages['Common.no']}"/>
+                        </h:selectOneMenu>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ContractCondition.onlyExpiring']}</ui:define>
+                        <h:selectBooleanCheckbox id="onlyExpiring"
+                                                 value="#{contractConditionDataModel.onlyExpiring}"
+                                                 tabindex="5"/>
+                        <h:outputText styleClass="app-tag"
+                                      value="#{messages['ContractCondition.onlyExpiring.hint']}"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['ContractCondition.validOn']}</ui:define>
+                        <rich:calendar id="validOn" value="#{contractConditionDataModel.validOn}"
+                                       datePattern="#{messages['patterns.date']}"
+                                       title="#{messages['ContractCondition.validOn.hint']}"
+                                       popup="true" enableManualInput="true"
+                                       styleClass="input" tabindex="6"/>
+                        <a4j:commandButton id="searchButtonId"
+                                           action="#{contractConditionDataModel.search}"
+                                           value="#{messages['Common.search']}"
+                                           reRender="contractConditionSearch, contractConditionList, dataScroller"
+                                           styleClass="button" tabindex="7">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{contractConditionDataModel.clear}"
+                                           value="#{messages['Common.clear']}"
+                                           reRender="contractConditionSearch, contractConditionList, dataScroller"
+                                           styleClass="button" tabindex="8"/>
+                    </s:decorate>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <rich:dataTable id="contractConditionList"
+                            value="#{contractConditionDataModel}" var="contractItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="30%,13%,14%,11%,11%,10%,11%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="employee.lastName"
+                                                   dataModel="#{contractConditionDataModel}"
+                                                   reRender="contractConditionList, dataScroller">
+                                #{messages['ContractCondition.employee']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>#{messages['ContractCondition.mode']}</rich:column>
+                        <rich:column>#{messages['ContractCondition.duration']}</rich:column>
+                        <rich:column styleClass="center">
+                            <app:commandSortHeader sortProperty="contract.initDate"
+                                                   dataModel="#{contractConditionDataModel}"
+                                                   reRender="contractConditionList, dataScroller">
+                                #{messages['Contract.initDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">
+                            <app:commandSortHeader sortProperty="contract.endDate"
+                                                   dataModel="#{contractConditionDataModel}"
+                                                   reRender="contractConditionList, dataScroller">
+                                #{messages['Contract.endDate']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">#{messages['ContractCondition.state']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{contractItem.employee.idNumberAndFullName}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{contractItem.contractMode.name}"/>
+                    <!-- Que un contrato sea principal o secundario decide si lleva AFP y
+                         vacaciones. Sin verlo en el listado no hay forma de notar que alguien
+                         quedo sin ninguno. -->
+                    <h:outputText styleClass="app-tag" rendered="#{contractItem.currentMain}"
+                                  value="#{messages['Contract.main.tag']}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{messages[contractItem.duration.resourceKey]}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{contractItem.initDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{contractItem.endDate}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{contractItem.contractState.name}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <a4j:commandLink styleClass="app-iconbtn"
+                                     title="#{messages['ContractCondition.change']}"
+                                     action="#{contractConditionAction.select(contractItem)}"
+                                     rendered="#{s:hasPermission('CONTRACTCONDITION','UPDATE')}"
+                                     reRender=":changeForm, :terminateForm"
+                                     oncomplete="Richfaces.showModalPanel('changeConditionDialog');">
+                        <span class="app-ico app-ico--exchange"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink styleClass="app-iconbtn app-iconbtn--danger"
+                                     title="#{messages['ContractCondition.terminate']}"
+                                     action="#{contractConditionAction.select(contractItem)}"
+                                     rendered="#{s:hasPermission('CONTRACTCONDITION','UPDATE')}"
+                                     reRender=":changeForm, :terminateForm"
+                                     oncomplete="Richfaces.showModalPanel('terminateDialog');">
+                        <span class="app-ico app-ico--userMinus"/>
+                    </a4j:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="contractConditionList"
+                              dataModel="#{contractConditionDataModel}"/>
+        </h:form>
+
+        <ui:include src="/employees/contractConditionChangeModalPanel.xhtml"/>
+        <ui:include src="/employees/contractConditionTerminateModalPanel.xhtml"/>
+    </ui:define>
+</ui:composition>

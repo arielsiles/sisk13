@@ -351,3 +351,230 @@ INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permi
 SELECT @nuevo_id, 'WORKGROUP', 'Grupos de trabajo', 4, 15, 'Functionality.employees.workGroup', 1
   FROM (SELECT 1) t
  WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'WORKGROUP');
+
+
+-- 14) Cronograma de turnos por grupo (H3 del plan 03) --------------------------
+-- Una fila por grupo y dia. idturno nulo = ese dia no hay jornada. El estado vive
+-- en el dia y no en una cabecera de semana: asi no existe una semana publicada a
+-- medias. El motor de asistencia solo lee las filas PUBLISHED.
+
+CREATE TABLE IF NOT EXISTS cronogramagrupodia (
+  idcronogramagrupodia BIGINT      NOT NULL,
+  idgrupotrabajo       BIGINT      NOT NULL,
+  dia                  DATE        NOT NULL,
+  idturno              BIGINT          NULL,
+  estado               VARCHAR(15) NOT NULL DEFAULT 'DRAFT',
+  idcompania           BIGINT      NOT NULL,
+  version              BIGINT      NOT NULL DEFAULT 0,
+  PRIMARY KEY (idcronogramagrupodia),
+  UNIQUE KEY uk_cronogramagrupodia (idgrupotrabajo, dia),
+  KEY ix_cronogramagrupodia_dia (dia),
+  KEY fk_cronogramadia_turno (idturno),
+  KEY fk_cronogramadia_compania (idcompania),
+  CONSTRAINT fk_cronogramadia_grupo FOREIGN KEY (idgrupotrabajo) REFERENCES grupotrabajo (idgrupotrabajo),
+  CONSTRAINT fk_cronogramadia_turno FOREIGN KEY (idturno) REFERENCES turno (idturno),
+  CONSTRAINT fk_cronogramadia_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO secuencia (tabla, valor)
+SELECT 'cronogramagrupodia', 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'cronogramagrupodia');
+
+-- permiso = 5: solo VIEW (1) y UPDATE (4). No hay alta ni baja de celdas: se pintan.
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'GROUPSCHEDULE', 'Cronograma de turnos', 4, 5, 'Functionality.employees.groupSchedule', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'GROUPSCHEDULE');
+
+
+-- 15) Horario fijo del contrato (H7 del plan 03) -------------------------------
+-- La semana tipo de quien no rota: administrativos y mantenimiento. Se guarda por
+-- dia de la semana, no por fecha, porque no hay nada que planificar. idturno nulo
+-- = ese dia de la semana no se trabaja. Lleva vigencia: cambiar el horario cierra
+-- el anterior en lugar de pisarlo, para poder reproducir como se evaluo el pasado.
+
+CREATE TABLE IF NOT EXISTS horariocontrato (
+  idhorariocontrato BIGINT NOT NULL,
+  idcontrato        BIGINT NOT NULL,
+  diasemana         INT    NOT NULL,
+  idturno           BIGINT     NULL,
+  fechainicio       DATE   NOT NULL,
+  fechafin          DATE       NULL,
+  idcompania        BIGINT NOT NULL,
+  version           BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (idhorariocontrato),
+  KEY ix_horariocontrato_contrato_dia (idcontrato, diasemana, fechainicio),
+  KEY fk_horariocontrato_turno (idturno),
+  KEY fk_horariocontrato_compania (idcompania),
+  CONSTRAINT fk_horariocontrato_contrato FOREIGN KEY (idcontrato) REFERENCES contrato (idcontrato),
+  CONSTRAINT fk_horariocontrato_turno FOREIGN KEY (idturno) REFERENCES turno (idturno),
+  CONSTRAINT fk_horariocontrato_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO secuencia (tabla, valor)
+SELECT 'horariocontrato', 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'horariocontrato');
+
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'CONTRACTSCHEDULE', 'Horario fijo', 4, 5, 'Functionality.employees.contractSchedule', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'CONTRACTSCHEDULE');
+
+
+-- 16) Excepciones de horario (H8 del plan 03) ----------------------------------
+-- A esta persona, este dia, le tocaba otra cosa. Gana sobre el cronograma del grupo
+-- y sobre el horario fijo. idturno nulo = ese dia no se le evalua asistencia. El
+-- motivo es obligatorio: una excepcion sin explicacion es indefendible.
+
+CREATE TABLE IF NOT EXISTS excepcionhorario (
+  idexcepcionhorario BIGINT       NOT NULL,
+  idcontrato         BIGINT       NOT NULL,
+  fecha              DATE         NOT NULL,
+  idturno            BIGINT           NULL,
+  motivo             VARCHAR(250) NOT NULL,
+  idcompania         BIGINT       NOT NULL,
+  version            BIGINT       NOT NULL DEFAULT 0,
+  PRIMARY KEY (idexcepcionhorario),
+  UNIQUE KEY uk_excepcionhorario (idcontrato, fecha),
+  KEY ix_excepcionhorario_fecha (fecha),
+  KEY fk_excepcionhorario_turno (idturno),
+  KEY fk_excepcionhorario_compania (idcompania),
+  CONSTRAINT fk_excepcionhorario_contrato FOREIGN KEY (idcontrato) REFERENCES contrato (idcontrato),
+  CONSTRAINT fk_excepcionhorario_turno FOREIGN KEY (idturno) REFERENCES turno (idturno),
+  CONSTRAINT fk_excepcionhorario_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO secuencia (tabla, valor)
+SELECT 'excepcionhorario', 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'excepcionhorario');
+
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'SCHEDULEEXCEPTION', 'Excepciones de horario', 4, 15, 'Functionality.employees.scheduleException', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'SCHEDULEEXCEPTION');
+
+
+-- 17) Condicion del contrato: duracion y movimientos (plan 04) -----------------
+-- La fecha de fin dejaba de ser un vencimiento administrativo que nadie renueva y
+-- pasa a registrar cuando termino la relacion. La duracion es un eje aparte de la
+-- modalidad: hay eventuales indefinidos y eventuales a plazo fijo.
+
+ALTER TABLE contrato
+  ADD COLUMN tipoduracion VARCHAR(15) NOT NULL DEFAULT 'INDEFINITE' AFTER fechafin;
+
+-- Historial: sin esto, pasar de eventual a laboral seria una edicion silenciosa y
+-- nadie podria decir desde cuando ni quien lo decidio.
+CREATE TABLE IF NOT EXISTS movimientocontrato (
+  idmovimientocontrato BIGINT       NOT NULL,
+  idcontrato           BIGINT       NOT NULL,
+  tipo                 VARCHAR(20)  NOT NULL,
+  fecha                DATE         NOT NULL,
+  idmodalidadanterior  BIGINT           NULL,
+  idmodalidadnueva     BIGINT           NULL,
+  duracionanterior     VARCHAR(15)      NULL,
+  duracionnueva        VARCHAR(15)      NULL,
+  fechafinanterior     DATE             NULL,
+  fechafinnueva        DATE             NULL,
+  motivo               VARCHAR(250) NOT NULL,
+  idusuario            BIGINT           NULL,
+  fecharegistro        DATETIME     NOT NULL,
+  idcompania           BIGINT       NOT NULL,
+  version              BIGINT       NOT NULL DEFAULT 0,
+  PRIMARY KEY (idmovimientocontrato),
+  KEY ix_movcontrato_contrato (idcontrato, fecha),
+  KEY fk_movcontrato_modant (idmodalidadanterior),
+  KEY fk_movcontrato_modnue (idmodalidadnueva),
+  KEY fk_movcontrato_usuario (idusuario),
+  KEY fk_movcontrato_compania (idcompania),
+  CONSTRAINT fk_movcontrato_contrato FOREIGN KEY (idcontrato) REFERENCES contrato (idcontrato),
+  CONSTRAINT fk_movcontrato_modant FOREIGN KEY (idmodalidadanterior) REFERENCES modalidadcontrato (idmodalidadcontrato),
+  CONSTRAINT fk_movcontrato_modnue FOREIGN KEY (idmodalidadnueva) REFERENCES modalidadcontrato (idmodalidadcontrato),
+  CONSTRAINT fk_movcontrato_usuario FOREIGN KEY (idusuario) REFERENCES usuario (idusuario),
+  CONSTRAINT fk_movcontrato_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO secuencia (tabla, valor)
+SELECT 'movimientocontrato', 1 FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM secuencia s WHERE s.tabla = 'movimientocontrato');
+
+-- La planilla congela la duracion junto a la modalidad: reimprimir un mes muestra la
+-- condicion de ESE mes.
+ALTER TABLE planillageneral
+  ADD COLUMN duracioncontrato VARCHAR(255) NULL AFTER modalidadcontratacion;
+
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'CONTRACTCONDITION', 'Condicion de contratos', 4, 5, 'Functionality.employees.contractCondition', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'CONTRACTCONDITION');
+
+
+-- 18) Verificacion del control de asistencia ----------------------------------
+-- Solo lectura: corre el mismo motor que la planilla pero no calcula ni guarda.
+-- permiso = 1: solo VIEW.
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'ATTENDANCECHECK', 'Verificacion de asistencia', 4, 1, 'Functionality.employees.attendanceCheck', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'ATTENDANCECHECK');
+
+
+-- 19) Movimientos entre grupos: prestamos y reorganizacion (plan 06) -----------
+-- Un prestamo pisa a la pertenencia base sin borrarla y EXIGE fecha de fin: vencido
+-- el plazo la persona vuelve a su grupo sola. Dos prestamos no pueden pisarse entre
+-- si, pero un prestamo y la base si: esa es su razon de ser.
+
+ALTER TABLE grupotrabajomiembro
+  ADD COLUMN tipo VARCHAR(10) NOT NULL DEFAULT 'BASE' AFTER fechafin,
+  ADD COLUMN motivo VARCHAR(250) NULL AFTER tipo;
+
+
+-- 20) Contrato principal (plan 08) ---------------------------------------------
+-- Una persona puede tener varios contratos a la vez: el principal lleva AFP y vacaciones,
+-- los secundarios son trabajo eventual acotado y no arrastran ninguna de las dos cosas.
+-- Entre los contratos abiertos puede haber uno principal O NINGUNO: quedarse solo con
+-- eventuales es valido y el sistema no designa por su cuenta.
+
+ALTER TABLE contrato
+  ADD COLUMN principal INT NOT NULL DEFAULT 0 AFTER tipoduracion;
+
+-- 20.1) Siembra. Hoy hay un contrato por persona, asi que todos son principales.
+UPDATE contrato SET principal = 1;
+
+-- 20.2) Verificacion. Esperado: ninguna persona con mas de un principal abierto.
+-- SELECT c.idempleado, COUNT(*) principales
+--   FROM contrato c
+--   JOIN estadocontrato e ON e.idestadocontrato = c.idestadocontrato
+--  WHERE c.principal = 1 AND UPPER(e.nombre) <> 'INACTIVO'
+--  GROUP BY c.idempleado HAVING COUNT(*) > 1;
+
+
+-- 21) Cierre del plan de vacaciones (plan 09) ----------------------------------
+-- Un plan sin fecha de cierre devenga contra el dia de hoy y no mira el contrato: el de
+-- alguien que se fue en 2024 seguiria sumando anios en 2030. La fecha de cierre es el
+-- ultimo dia de trabajo, y el devengo cuenta hasta ahi.
+
+ALTER TABLE planvacacion
+  ADD COLUMN fechacierre DATE NULL AFTER fechainicio;
+
+-- 21.1) Cierra los planes de contratos ya inactivos con la fecha de fin de su contrato.
+--       Quedan con la antiguedad inflada hasta que el proceso de devengos los recalcule:
+--       correr despues "Actualizar devengos" desde Planificacion de vacaciones.
+UPDATE planvacacion p
+   JOIN contratopuesto cp ON cp.idcontratopuesto = p.idcontractopuesto
+   JOIN contrato c        ON c.idcontrato = cp.idcontrato
+   JOIN estadocontrato ec ON ec.idestadocontrato = c.idestadocontrato
+   SET p.fechacierre = c.fechafin
+ WHERE p.fechacierre IS NULL
+   AND UPPER(ec.nombre) = 'INACTIVO'
+   AND c.fechafin IS NOT NULL;
+
+-- 21.2) Verificacion. Esperado: ningun plan abierto de un contrato inactivo.
+-- SELECT COUNT(*) FROM planvacacion p
+--   JOIN contratopuesto cp ON cp.idcontratopuesto = p.idcontractopuesto
+--   JOIN contrato c ON c.idcontrato = cp.idcontrato
+--   JOIN estadocontrato ec ON ec.idestadocontrato = c.idestadocontrato
+--  WHERE p.fechacierre IS NULL AND UPPER(ec.nombre) = 'INACTIVO';

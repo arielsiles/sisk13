@@ -79,6 +79,18 @@ public class VacationPlanning implements BaseModel {
     @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
     private List<VacationGestion> vacationGestionList = new ArrayList<VacationGestion>(0);
 
+    /**
+     * El dia en que este plan dejo de devengar, que es el ultimo dia de trabajo del contrato.
+     * Nula mientras el periodo sigue abierto.
+     * <p/>
+     * Sin esta fecha el devengo cuenta anios contra el dia de hoy y no mira el contrato: el plan
+     * de alguien que se fue en 2024 seguiria sumando anios en 2030, generando derecho a
+     * vacaciones para una relacion laboral que ya no existe.
+     */
+    @Column(name = "fechacierre")
+    @Temporal(TemporalType.DATE)
+    private Date closeDate;
+
     /* Fecha del saldo inicial declarado. Cuando esta seteada el sistema NO devenga nada
        anterior: ese saldo ya contiene todo lo anterior. Nula = el sistema devenga desde el
        inicio del contrato, y el saldo sale de cargar las vacaciones consumidas. */
@@ -153,6 +165,28 @@ public class VacationPlanning implements BaseModel {
 
     public void setInitDate(Date initDate) {
         this.initDate = initDate;
+    }
+
+    public Date getCloseDate() {
+        return closeDate;
+    }
+
+    public void setCloseDate(Date closeDate) {
+        this.closeDate = closeDate;
+    }
+
+    /** Un plan cerrado corresponde a un periodo terminado: no devenga mas. */
+    public boolean isClosed() {
+        return null != closeDate;
+    }
+
+    /**
+     * Hasta que fecha devenga este plan: hoy si sigue abierto, y el dia del cierre si termino.
+     * Es el unico lugar donde se decide, para que la pantalla y el proceso no puedan discrepar.
+     */
+    public Date getAccrualLimit() {
+        Date today = new Date();
+        return (null != closeDate && closeDate.before(today)) ? closeDate : today;
     }
 
     public Date getOpeningDate() {

@@ -1,0 +1,98 @@
+<rich:modalPanel width="620" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 id="#{dialogId}">
+
+    <f:facet name="header">
+        <h:outputText value="#{messages['WorkGroup.bulk.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeBulkLink"/>
+    </f:facet>
+
+    <!-- Formulario propio: el modal se desprende del DOM y sus tildes no llegarian al
+         servidor dentro del formulario del grupo. -->
+    <h:form id="bulkForm">
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <h:outputText styleClass="formNote" value="#{messages['WorkGroup.bulk.hint']}"/>
+        </h:panelGrid>
+
+        <a4j:outputPanel id="bulkPanel" layout="block">
+            <div class="app-cal__bar">
+                <h:outputText styleClass="app-cal__label" value="#{messages['WorkGroup.memberFrom']}"/>
+                <rich:calendar id="bulkStartDate"
+                               value="#{workGroupAction.bulkStartDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               inputClass="app-filterbar__input app-filterbar__input--date"
+                               zindex="2100">
+                    <!-- El refresco es explicito: la lista de candidatos depende de la fecha,
+                         pero solo se rearma cuando alguien la cambia a proposito. -->
+                    <a4j:support event="onchanged" action="#{workGroupAction.refreshCandidates}"
+                                 reRender="bulkPanel"/>
+                </rich:calendar>
+                <span class="app-cal__spacer"/>
+                <h:outputText styleClass="app-cal__hint" value="#{messages['WorkGroup.bulk.count']}"/>
+                <h:outputText styleClass="app-cal__range" value="#{workGroupAction.candidateCount}"/>
+            </div>
+
+            <div class="app-cal__scroll">
+                <rich:dataTable id="candidateList" value="#{workGroupAction.candidates}"
+                                var="candidateItem" width="100%" columnsWidth="8%,62%,30%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column styleClass="center"/>
+                            <rich:column>#{messages['WorkGroup.member']}</rich:column>
+                            <rich:column>#{messages['WorkGroup.bulk.currentGroup']}</rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:column styleClass="center">
+                        <h:selectBooleanCheckbox value="#{candidateItem.selected}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{candidateItem.contract.employee.idNumberAndFullName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText styleClass="app-tag app-tag--warn"
+                                      value="#{candidateItem.currentGroupName}"
+                                      rendered="#{candidateItem.inAnotherGroup}"/>
+                    </rich:column>
+                </rich:dataTable>
+            </div>
+
+            <h:panelGroup rendered="#{workGroupAction.bulkDateMissing}">
+                <div class="app-cal__empty">
+                    <h:outputText value="#{messages['WorkGroup.error.startDateRequired']}"/>
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{empty workGroupAction.candidates and not workGroupAction.bulkDateMissing}">
+                <div class="app-cal__empty">
+                    <h:outputText value="#{messages['WorkGroup.bulk.empty']}"/>
+                </div>
+            </h:panelGroup>
+        </a4j:outputPanel>
+
+        <div class="buttonsRight">
+            <a4j:commandButton id="bulkAddButton"
+                               action="#{workGroupAction.addSelectedMembers}"
+                               value="#{messages['WorkGroup.bulk.action']}"
+                               styleClass="button"
+                               rendered="#{not empty workGroupAction.candidates}"
+                               reRender="bulkPanel, :workGroupForm:memberList, :globalMessages"
+                               oncomplete="if (#{workGroupAction.bulkApplied}) Richfaces.hideModalPanel('#{dialogId}');"/>
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" type="button">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true"
+                                       operation="hide"/>
+            </h:commandButton>
+        </div>
+    </h:form>
+
+    <rich:componentControl for="#{dialogId}" attachTo="closeBulkLink" operation="hide" event="onclick"/>
+
+</rich:modalPanel>

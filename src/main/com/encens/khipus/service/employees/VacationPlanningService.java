@@ -49,6 +49,15 @@ public interface VacationPlanningService extends GenericService {
      * activo que todavia no tenga plan, con la fecha de inicio del contrato como arranque de
      * la antiguedad. Los que no se pueden armar salen aparte con el motivo.
      */
+    /**
+     * Cierra los planes de un contrato al ultimo dia de trabajo, dejandolos al dia a esa fecha.
+     * Un plan cerrado deja de devengar: sin esto el plan de alguien que se fue sigue sumando
+     * anios para siempre.
+     *
+     * @return cuantos planes se cerraron
+     */
+    int closePlansOfContract(Long contractId, java.util.Date closeDate);
+
     VacationPlanningBulkResult analyzeBulkGeneration();
 
     /**

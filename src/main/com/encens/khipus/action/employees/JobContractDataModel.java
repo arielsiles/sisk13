@@ -42,18 +42,18 @@ public class JobContractDataModel extends QueryDataModel<Long, JobContract> {
             "jobCategory = #{jobContractDataModel.jobCategory}",
             "employee = #{jobContractDataModel.employee}",
             "employee.idNumber like concat(#{jobContractDataModel.idNumber}, '%')",
-            "lower(employee.lastName) like concat('%', concat(lower(#{jobContractDataModel.lastName}), '%'))",
-            "lower(employee.maidenName) like concat('%', concat(lower(#{jobContractDataModel.maidenName}), '%'))",
-            "lower(employee.firstName) like concat('%', concat(lower(#{jobContractDataModel.firstName}), '%'))",
+            /* Un solo campo para la persona, igual que en Condicion de contratos: con tres
+               campos separados hay que acertar en cual de los dos apellidos esta el texto.
+               Se concatena y se compara una vez para no repetir la expresion EL, y con coalesce
+               porque un apellido materno nulo anularia toda la concatenacion. */
+            "lower(concat(concat(concat(coalesce(employee.firstName,''),' '),concat(coalesce(employee.lastName,''),' ')),coalesce(employee.maidenName,''))) like concat('%', concat(lower(#{jobContractDataModel.employeeName}), '%'))",
             "employee.retentionFlag = #{jobContractDataModel.retentionFlag}",
             "jobContract.contract.id = #{contractAction.instance.id}",
             "jobContract.id not in (#{grantedBonusCreateAction.selectedJobContractIdList})"
     };
 
     private String idNumber;
-    private String firstName;
-    private String maidenName;
-    private String lastName;
+    private String employeeName;
     private BusinessUnit businessUnit;
     private JobCategory jobCategory;
     private Sector sector;
@@ -124,28 +124,12 @@ public class JobContractDataModel extends QueryDataModel<Long, JobContract> {
         this.idNumber = idNumber;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getEmployeeName() {
+        return employeeName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getMaidenName() {
-        return maidenName;
-    }
-
-    public void setMaidenName(String maidenName) {
-        this.maidenName = maidenName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
     }
 
     public BusinessUnit getBusinessUnit() {
@@ -219,9 +203,7 @@ public class JobContractDataModel extends QueryDataModel<Long, JobContract> {
     @Override
     public void clear() {
         setIdNumber(null);
-        setFirstName(null);
-        setMaidenName(null);
-        setLastName(null);
+        setEmployeeName(null);
         if (enableBusinessUnitFilter) {
             setBusinessUnit(null);
         }

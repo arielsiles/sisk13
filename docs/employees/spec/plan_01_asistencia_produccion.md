@@ -55,16 +55,25 @@ incidencias).
 el modelo de horarios, para poder validarlo contra los horarios actuales y aislar la causa de
 cualquier diferencia.
 
-| # | Tarea | Riesgo |
-|---|---|---|
-| E2.1 | Construcción de sesiones: emparejar marcas, con fallback cronológico cuando el indicador no es confiable | medio |
-| E2.2 | Asociación sesión↔jornada por solapamiento. **Eliminar `Limit`** | alto |
-| E2.3 | Evaluación direccional: atraso, salida anticipada, tiempo adicional, falta | alto |
-| E2.4 | Sesión que cruza medianoche, razonando en jornadas y no en días | alto |
-| E2.5 | Entrada sin salida: cerrar en fin de jornada + incidencia | medio |
-| E2.6 | Justificación acotada: perdona sólo los minutos que cubre | medio |
-| E2.7 | Reporte de control: nunca dos marcas en null habiendo una; resultados separados | medio |
-| E2.8 | Incidencias visibles y accionables | bajo |
+| # | Tarea | Riesgo | Estado |
+|---|---|---|---|
+| E2.1 | Construcción de sesiones: emparejar marcas, con fallback cronológico cuando el indicador no es confiable | medio | Implementado |
+| E2.2 | Asociación sesión↔jornada por solapamiento. **Eliminar `Limit`** | alto | Implementado |
+| E2.3 | Evaluación direccional: atraso, salida anticipada, tiempo adicional, falta | alto | Implementado — `JourneyEvaluation` |
+| E2.4 | Sesión que cruza medianoche, razonando en jornadas y no en días | alto | Implementado |
+| E2.5 | Entrada sin salida: cerrar en fin de jornada + incidencia | medio | Implementado |
+| E2.6 | Justificación acotada: perdona sólo los minutos que cubre | medio | **Pendiente** |
+| E2.7 | Reporte de control: nunca dos marcas en null habiendo una; resultados separados | medio | **Pendiente** |
+| E2.8 | Incidencias visibles y accionables | bajo | Parcial: el motor las produce, no se muestran |
+| **E2.9** | **Conectar el motor a `GeneratedPayrollServiceBean`** | **alto** | **Pendiente — es lo que falta para que cuente** |
+
+E2.9 no estaba en la lista original: estaba implícito, y conviene que sea una tarea con nombre
+porque es la que convierte todo lo anterior en algo que se paga.
+
+La evaluación (E2.3) vivía dentro del DTO de la pantalla de verificación. Se extrajo a
+`JourneyEvaluation`, en el motor: la planilla va a usar la misma clase, así que **lo que muestra
+la pantalla es exactamente lo que se va a pagar**. Con dos copias de la fórmula habrían
+terminado diciendo cosas distintas.
 
 **Verificación, la más exigente del plan:** regenerar **tres meses cerrados** de
 administrativos y confirmar que **no se mueve un centavo**. Esta etapa cambia la mecánica sin
@@ -180,7 +189,7 @@ confirmar cero diferencias.
 |---|---|
 | SPEC | Completo y commiteado |
 | PLAN | Este documento — aprobado |
-| **IMPLEMENT** | **E1 completo** (v6.1.0) · E2 a E5 pendientes |
+| **IMPLEMENT** | **E1 completo** · **E2.1–E2.5 completos** y validados contra julio 2026 · E2.6–E2.9 pendientes · E3 y E4 absorbidos en buena parte por los planes 03 a 06 · E5 pendiente |
 
 ### E1 — qué quedó implementado
 

@@ -32,7 +32,10 @@ public class VacationAccrualServiceBean extends GenericServiceBean implements Va
     private static final String IDS_TO_REVIEW =
             "select p.idplanvacacion from planvacacion p"
                     + " where p.fechasaldoinicial is not null"
-                    + "    or p.aniosantiguedad <> timestampdiff(YEAR, p.fechainicio, curdate())"
+                    /* Contra la fecha de cierre y no contra hoy: un plan cerrado quedo al dia
+                       el ultimo dia de trabajo y no tiene nada mas que devengar. Sin esto
+                       aparece en la lista de pendientes en cada corrida, para siempre. */
+                    + "    or p.aniosantiguedad <> timestampdiff(YEAR, p.fechainicio, coalesce(p.fechacierre, curdate()))"
                     + "    or p.aniosantiguedad <> (select count(*) from gestionvacacion g"
                     + "                              where g.idplanvacacion = p.idplanvacacion)"
                     + "    or (select count(*) from gestionvacacion g"
@@ -46,10 +49,15 @@ public class VacationAccrualServiceBean extends GenericServiceBean implements Va
                     + " join contrato c on c.idcontrato = cp.idcontrato"
                     + " join empleado e on e.idempleado = c.idempleado"
                     + " where e.fechasalida is null"
+                    /* Solo el contrato principal genera vacaciones: los secundarios son trabajo
+                       eventual acotado. Sin esto, un contrato adicional aparece como una persona
+                       a la que le falta el plan, y nadie deberia crearselo. */
+                    + "   and c.principal = 1"
                     /* La FK en planvacacion se llama idconTRACTOpuesto -con typo- y la PK
                        real es idconTRATOpuesto. */
                     + "   and not exists (select 1 from planvacacion p"
-                    + "                    where p.idcontractopuesto = cp.idcontratopuesto)";
+                    + "                    where p.idcontractopuesto = cp.idcontratopuesto"
+                    + "                      and p.fechacierre is null)";
 
     @SuppressWarnings({"unchecked"})
     public List<Long> findPlanningIdsToReview() {

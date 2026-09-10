@@ -344,10 +344,19 @@ public class SpecialDate implements BaseModel {
         return allDay;
     }
 
+    /**
+     * Un dia completo va de 00:00:00 a 23:59:59.
+     * <p/>
+     * Los milisegundos se ponen en cero a proposito. `toMaxHours` deja 23:59:59.999, y al
+     * guardarlo en una columna TIME sin fraccion de segundo MySQL lo redondea a **24:00:00**:
+     * un valor que MySQL acepta pero que el driver JDBC despues no puede leer -"invalid TIME
+     * value"-. La fila se guardaba bien y explotaba al listarla.
+     */
     public void setAllDay(Boolean allDay) {
         if (allDay) {
             Calendar calendar = Calendar.getInstance();
             DateUtils.toMaxHours(calendar);
+            calendar.set(Calendar.MILLISECOND, 0);
             setEndTime(calendar.getTime());
             DateUtils.toMinHours(calendar);
             setStartTime(calendar.getTime());

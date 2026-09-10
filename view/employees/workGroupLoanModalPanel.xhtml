@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets">
+
+    <rich:modalPanel id="loanDialog" width="540" zindex="2000" resizeable="false" autosized="true">
+        <f:facet name="header">
+            <h:outputText value="#{messages['WorkGroup.loan.title']}"/>
+        </f:facet>
+        <f:facet name="controls">
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLoanLink"/>
+        </f:facet>
+
+        <!-- Formulario propio: el modal se desprende del DOM y sus campos no llegarian al
+             servidor dentro del formulario del grupo. -->
+        <h:form id="loanForm">
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <h:outputText styleClass="formNote" value="#{messages['WorkGroup.loan.hint']}"/>
+            </h:panelGrid>
+
+            <s:decorate id="loanStartField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WorkGroup.loan.from']}</ui:define>
+                <ui:param name="required" value="true"/>
+                <rich:calendar id="loanStartDate" value="#{workGroupAction.loanStartDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               styleClass="input" zindex="2100">
+                    <a4j:support event="onchanged" action="#{workGroupAction.refreshLoanCandidates}"
+                                 reRender="loanMemberField"/>
+                </rich:calendar>
+            </s:decorate>
+
+            <s:decorate id="loanEndField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WorkGroup.loan.to']}</ui:define>
+                <rich:calendar id="loanEndDate" value="#{workGroupAction.loanEndDate}"
+                               currentDate="#{workGroupAction.loanCalendarMonth}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               styleClass="input" zindex="2100"/>
+            </s:decorate>
+
+            <div class="app-fieldnote">
+                <h:outputText value="#{messages['WorkGroup.loan.to.hint']}"/>
+            </div>
+
+            <s:decorate id="loanMemberField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WorkGroup.member']}</ui:define>
+                <ui:param name="required" value="true"/>
+                <h:panelGroup rendered="#{not workGroupAction.loanDateMissing}">
+                    <h:inputText id="loanMemberName" styleClass="input" readonly="true"
+                                 value="#{workGroupAction.loanMemberName}"/>
+                    <a4j:commandLink id="selectLoanMember" ajaxSingle="true" immediate="true"
+                                     title="#{messages['Common.choose']}"
+                                     reRender=":loanPickerForm"
+                                     oncomplete="Richfaces.showModalPanel('loanPickerDialog');">
+                        <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink id="clearLoanMember" ajaxSingle="true" immediate="true"
+                                     title="#{messages['Common.clear']}"
+                                     action="#{workGroupAction.clearLoanMember}"
+                                     reRender="loanMemberField">
+                        <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
+                    </a4j:commandLink>
+                </h:panelGroup>
+                <h:outputText styleClass="app-tag"
+                              value="#{messages['WorkGroup.loan.chooseDate']}"
+                              rendered="#{workGroupAction.loanDateMissing}"/>
+            </s:decorate>
+
+            <s:decorate id="loanReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WorkGroup.loan.reason']}</ui:define>
+                <h:inputText id="loanReason" value="#{workGroupAction.loanReason}"
+                             maxlength="250" size="45" styleClass="input"/>
+            </s:decorate>
+
+            <div class="buttonsRight">
+                <a4j:commandButton id="loanButton"
+                                   action="#{workGroupAction.addLoan}"
+                                   value="#{messages['WorkGroup.loan.action']}"
+                                   styleClass="button"
+                                   reRender="loanForm, :workGroupForm:memberList, :globalMessages"
+                                   oncomplete="if (#{workGroupAction.loanApplied}) Richfaces.hideModalPanel('loanDialog');"/>
+                <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" type="button">
+                    <rich:componentControl for="loanDialog" event="onclick" disableDefault="true"
+                                           operation="hide"/>
+                </h:commandButton>
+            </div>
+        </h:form>
+
+        <rich:componentControl for="loanDialog" attachTo="closeLoanLink" operation="hide" event="onclick"/>
+    </rich:modalPanel>
+
+    <ui:include src="/employees/workGroupLoanPickerModalPanel.xhtml"/>
+</ui:composition>

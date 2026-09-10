@@ -5,6 +5,10 @@ import com.encens.khipus.framework.action.GenericAction;
 import com.encens.khipus.framework.action.Outcome;
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.employees.WorkShift;
+import com.encens.khipus.service.employees.ContractScheduleService;
+import com.encens.khipus.service.employees.GroupScheduleService;
+import com.encens.khipus.service.employees.ScheduleExceptionService;
+import com.encens.khipus.service.employees.ScheduleLockService;
 import com.encens.khipus.service.employees.WorkShiftService;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
@@ -23,6 +27,18 @@ public class WorkShiftAction extends GenericAction<WorkShift> {
 
     @In
     private WorkShiftService workShiftService;
+
+    @In
+    private GroupScheduleService groupScheduleService;
+
+    @In
+    private ContractScheduleService contractScheduleService;
+
+    @In
+    private ScheduleExceptionService scheduleExceptionService;
+
+    @In
+    private ScheduleLockService scheduleLockService;
 
     @Factory(value = "workShift")
     @Restrict("#{s:hasPermission('WORKSHIFT','VIEW')}")
@@ -50,15 +66,48 @@ public class WorkShiftAction extends GenericAction<WorkShift> {
         return validate() ? super.create() : Outcome.REDISPLAY;
     }
 
+    /**
+     * Un turno que ya se uso en un periodo pagado no se edita.
+     * <p/>
+     * Cambiarle las horas cambiaria hacia atras el calculo de faltas y atrasos de una planilla
+     * que alguien ya reviso y firmo, y sin dejar rastro. Lo correcto es desactivarlo y crear
+     * uno nuevo con las horas nuevas: asi la historia queda como fue.
+     */
+    public boolean isLocked() {
+        return isManaged() && scheduleLockService.isWorkShiftLocked(getInstance());
+    }
+
+    /** Desactivar si se puede aunque este bloqueado: es como se retira un turno viejo. */
+    @Restrict("#{s:hasPermission('WORKSHIFT','UPDATE')}")
+    public String deactivate() {
+        getInstance().setActive(Boolean.FALSE);
+        return super.update();
+    }
+
     @Override
     @Restrict("#{s:hasPermission('WORKSHIFT','UPDATE')}")
     public String update() {
+        if (isLocked()) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WorkShift.error.locked", getInstance().getName());
+            return Outcome.REDISPLAY;
+        }
         return validate() ? super.update() : Outcome.REDISPLAY;
     }
 
     @Override
     @Restrict("#{s:hasPermission('WORKSHIFT','DELETE')}")
     public String delete() {
+        /* Un turno usado en el cronograma no se borra: al hacerlo se perderia con que jornada
+           se evaluaron esos dias. Se desactiva, y deja de ofrecerse en la paleta. */
+        Long used = groupScheduleService.countByWorkShift(getInstance())
+                + contractScheduleService.countByWorkShift(getInstance())
+                + scheduleExceptionService.countByWorkShift(getInstance());
+        if (used > 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "WorkShift.error.inUse", getInstance().getName(), used);
+            return Outcome.REDISPLAY;
+        }
         return super.delete();
     }
 

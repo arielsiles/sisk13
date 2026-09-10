@@ -328,6 +328,76 @@ UPDATE persona SET apellidomaterno = CONCAT(IFNULL(apellidomaterno, ''), ' DUPLI
  WHERE idpersona = 32 AND apellidomaterno NOT LIKE '%DUPLICA';
 
 
+-- 4) Condicion de los contratos (plan 04) -------------------------------------
+-- Antes: 234 contratos, NINGUNO sin fecha de fin, y 148 que decian ACTIVO y vencido
+-- a la vez. La fecha se usaba como vencimiento administrativo que nadie renovaba.
+--
+-- Regla del usuario: manda la planilla oficial de julio 2026. Los 71 que estan en
+-- ella quedan activos; con AFP son LABORAL y el resto EVENTUAL; TODOS indefinidos y
+-- sin fecha de fin. Los 115 activos que no estan en esa planilla se inactivan.
+--
+-- DEPENDE de la seccion 17 de query_v6.1.0_terdemol.sql, que crea contrato.tipoduracion.
+-- Si falta, lo de abajo corta con un error que dice que hacer, en lugar de fallar a la
+-- mitad y dejar los datos migrados por partes.
+SET @falta_columna = (SELECT COUNT(*) = 0 FROM information_schema.COLUMNS
+                       WHERE TABLE_SCHEMA = DATABASE()
+                         AND TABLE_NAME = 'contrato'
+                         AND COLUMN_NAME = 'tipoduracion');
+SET @chequeo = IF(@falta_columna,
+  'SELECT * FROM `EJECUTE_PRIMERO_LA_SECCION_17_DE_query_v6_1_0_terdemol_sql`',
+  'SELECT 1');
+PREPARE verificacion FROM @chequeo;
+EXECUTE verificacion;
+DEALLOCATE PREPARE verificacion;
+
+-- Los 71 contratos de la planilla oficial de julio 2026.
+SET @planilla_julio = '97,100,104,106,107,108,109,111,112,113,119,123,125,131,133,134,148,149,151,152,168,173,180,189,203,206,210,212,216,234,236,241,242,243,244,246,254,257,265,266,267,269,282,290,292,294,301,302,304,307,308,310,315,317,318,319,320,321,322,324,325,326,327,328,329,330,331,332,333,334,335';
+
+-- 4.1) Todos los de la planilla: indefinidos y sin fecha de fin.
+UPDATE contrato
+   SET tipoduracion = 'INDEFINITE', fechafin = NULL
+ WHERE FIND_IN_SET(idcontrato, @planilla_julio);
+
+-- 4.2) Con AFP -regimen SIP- son LABORAL. Son 12, e incluye a SILVESTRE JORGE PABLO
+--      ANDRES (contrato 310), el unico EVENTUAL que aportaba.
+UPDATE contrato
+   SET idmodalidadcontrato = (SELECT idmodalidadcontrato FROM modalidadcontrato WHERE nombre = 'LABORAL')
+ WHERE FIND_IN_SET(idcontrato, @planilla_julio)
+   AND idregimenaportesip IS NOT NULL;
+
+-- 4.3) El resto de la planilla es EVENTUAL. Son 59; 17 vienen de LABORAL.
+UPDATE contrato
+   SET idmodalidadcontrato = (SELECT idmodalidadcontrato FROM modalidadcontrato WHERE nombre = 'EVENTUAL')
+ WHERE FIND_IN_SET(idcontrato, @planilla_julio)
+   AND idregimenaportesip IS NULL;
+
+-- 4.4) Los de la planilla quedan activos y dentro de la generacion de planillas.
+UPDATE contrato
+   SET idestadocontrato = (SELECT idestadocontrato FROM estadocontrato WHERE nombre = 'ACTIVO'),
+       activogenplan = 1
+ WHERE FIND_IN_SET(idcontrato, @planilla_julio);
+
+-- 4.5) Los 115 activos que NO estan en la planilla: fuera. Ninguno tiene AFP.
+--      Se les apaga activogenplan en lugar de escribirles una fecha de fin, y es la
+--      unica vez que se hace asi: no sabemos cuando se fueron, y una fecha de salida
+--      inventada es peor que ninguna. Quien conozca la real registra la baja.
+UPDATE contrato c
+   JOIN estadocontrato e ON e.idestadocontrato = c.idestadocontrato
+   SET c.idestadocontrato = (SELECT idestadocontrato FROM estadocontrato WHERE nombre = 'INACTIVO'),
+       c.activogenplan = 0,
+       c.tipoduracion = 'INDEFINITE',
+       c.fechafin = NULL
+ WHERE e.nombre = 'ACTIVO'
+   AND NOT FIND_IN_SET(c.idcontrato, @planilla_julio);
+
+-- 4.6) Verificacion. Esperado: 12 LABORAL y 59 EVENTUAL activos, 0 con fecha de fin.
+-- SELECT m.nombre, COUNT(*) n, SUM(c.fechafin IS NOT NULL) con_fecha_fin
+--   FROM contrato c
+--   JOIN modalidadcontrato m ON m.idmodalidadcontrato = c.idmodalidadcontrato
+--   JOIN estadocontrato e ON e.idestadocontrato = c.idestadocontrato
+--  WHERE e.nombre = 'ACTIVO' GROUP BY m.nombre;
+
+
 -- ===========================================================================
 -- PENDIENTES - no se tocan, quedan para decidir
 -- ===========================================================================
@@ -350,3 +420,51 @@ UPDATE persona SET apellidomaterno = CONCAT(IFNULL(apellidomaterno, ''), ' DUPLI
 --
 -- 4) Los marcados con DUPLICA siguen existiendo. Para eliminarlos hay que revisar
 --    sus referencias en los demas modulos y reasignarlas al que sobrevive.
+--
+-- 5) Finiquito al dar de baja. El modulo de bajas existe con sus reglas
+--    (`DismissalRule`) pero tiene 0 registros y nadie lo usa. La baja del plan 04
+--    registra la salida y escribe la fecha de fin, pero NO calcula finiquito.
+--    Revisar ese modulo aparte y definir si se integra, se reescribe o se descarta.
+--
+-- 6) PENDIENTE. Los 115 contratos que la seccion 4.5 inactiva no tienen fecha de fin
+--    real: no se sabe cuando se fueron. La seccion 5 los cierra con su misma fecha de
+--    inicio para que dejen de figurar abiertos, pero esa fecha es de relleno, no un
+--    dato. Quien conozca la salida real de cada uno la corrige registrando la baja
+--    desde Planificacion > Condicion de contratos.
+
+
+-- ===========================================================================
+-- SECCION 5 - Cierre de los contratos inactivos sin fecha de fin
+-- ===========================================================================
+
+-- 5.1) Cuantos son. Esperado antes de correr 5.2: 115.
+-- SELECT COUNT(*) FROM contrato c
+--   JOIN estadocontrato e ON e.idestadocontrato = c.idestadocontrato
+--  WHERE e.nombre = 'INACTIVO' AND c.fechafin IS NULL;
+
+-- 5.2) Sin fecha de fin el contrato figura abierto: el filtro "Vigente en" los cuenta hoy.
+UPDATE contrato c
+   JOIN estadocontrato e ON e.idestadocontrato = c.idestadocontrato
+   SET c.fechafin = c.fechainicio
+ WHERE e.nombre = 'INACTIVO'
+   AND c.fechafin IS NULL;
+
+-- 5.3) La fecha de salida de la persona, con la misma regla que aplica el sistema de aca en
+--      mas: se fue el que no tiene NINGUN contrato abierto, y la fecha es la mayor fecha de
+--      fin. Quien tenga alguno abierto queda sin fecha, aunque la tuviera puesta.
+--      Idempotente: se puede volver a correr. A quien no tiene contratos no se lo toca.
+UPDATE empleado e
+   JOIN (SELECT c.idempleado,
+                SUM(CASE WHEN UPPER(ec.nombre) = 'INACTIVO' THEN 0 ELSE 1 END) abiertos,
+                MAX(c.fechafin) ultimofin
+           FROM contrato c
+           JOIN estadocontrato ec ON ec.idestadocontrato = c.idestadocontrato
+          GROUP BY c.idempleado) x ON x.idempleado = e.idempleado
+   SET e.fechasalida = CASE WHEN x.abiertos > 0 THEN NULL ELSE x.ultimofin END;
+
+-- 5.4) Verificacion. Esperado: 0 inactivos sin fecha de fin, y los 70 activos sin ella intactos.
+-- SELECT e.nombre, COUNT(*) n, SUM(c.fechafin IS NULL) sin_fecha_fin
+--   FROM contrato c
+--   JOIN estadocontrato e ON e.idestadocontrato = c.idestadocontrato
+--  GROUP BY e.nombre;
+-- SELECT COUNT(*) FROM empleado WHERE fechasalida IS NULL;  -- esperado: 78

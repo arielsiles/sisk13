@@ -328,6 +328,11 @@ public class GeneralPayroll implements GenericPayroll {
     @Column(name = "modalidadcontratacion", nullable = true)
     private String contractMode;
 
+    /* La duracion se congela junto con la modalidad, por el mismo motivo: reimprimir un mes
+       tiene que mostrar la condicion que la persona tenia ESE mes, no la de hoy. */
+    @Column(name = "duracioncontrato", nullable = true)
+    private String contractDuration;
+
     @Column(name = "tipoempleado", nullable = true)
     private String kindOfEmployee;
     /*0 without control,    1 whith control,    2 horary change(without control)*/
@@ -638,6 +643,14 @@ public class GeneralPayroll implements GenericPayroll {
 
     public void setAbsenceTotalDiscount(BigDecimal absenceTotalDiscount) {
         this.absenceTotalDiscount = absenceTotalDiscount;
+    }
+
+    public String getContractDuration() {
+        return contractDuration;
+    }
+
+    public void setContractDuration(String contractDuration) {
+        this.contractDuration = contractDuration;
     }
 
     public String getContractMode() {
