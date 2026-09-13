@@ -23,7 +23,8 @@ arriba, en [../README.md](../README.md).
 | [plan_07_busqueda_contratos.md](plan_07_busqueda_contratos.md) | Los filtros de Condición de contratos y la búsqueda histórica | **B1–B6 implementados** · probado |
 | [plan_08_fecha_salida.md](plan_08_fecha_salida.md) | Fecha de salida derivada y contratos simultáneos con principal | **A y B implementados y probados** con reingreso, baja y contrato secundario |
 | [plan_09_vacaciones_cierre_reingreso.md](plan_09_vacaciones_cierre_reingreso.md) | El plan de vacaciones no se cierra nunca y el reingreso no genera uno nuevo | **V1–V5 implementados y probados**: cierre al dar de baja, plan nuevo al reingresar |
-| [plan_10_emparejamiento_marcas.md](plan_10_emparejamiento_marcas.md) | La jornada guía el emparejamiento de las marcas | **E1–E6 implementados** · falta aplicar SQL, desplegar y comparar el período |
+| [plan_10_emparejamiento_marcas.md](plan_10_emparejamiento_marcas.md) | La jornada guía el emparejamiento de las marcas | **E1–E6 implementados y probados** con julio 2026 |
+| [plan_11_marca_incompleta.md](plan_11_marca_incompleta.md) | La jornada con una sola punta marcada: ni falta entera ni día pagado | **F1 y F2 implementados** · F3–F5 van con E2.9 |
 
 ## El orden en que salieron
 

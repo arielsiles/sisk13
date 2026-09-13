@@ -115,20 +115,36 @@ public class AttendanceCheckAction implements Serializable {
 
     // --------------------------------------------------------------- totales
 
+    /** Dias con la jornada cumplida. Una jornada perdida no cuenta como trabajada. */
     public int getWorkedDays() {
         int total = 0;
         for (AttendanceDay day : days) {
-            if (day.isWorking() && !day.isAbsent()) {
+            if (day.isWorking() && !day.isLost()) {
                 total++;
             }
         }
         return total;
     }
 
-    public int getAbsentDays() {
+    /**
+     * Faltas del mes, en dias. Suma medios dias, asi que puede dar 4,5.
+     * <p/>
+     * Cuenta las jornadas perdidas, no solo las que no tienen ninguna marca: un dia con una sola
+     * punta marcada tambien se perdio, y cobrarlo completo seria pagar sin prueba.
+     */
+    public double getAbsentDays() {
+        double total = 0;
+        for (AttendanceDay day : days) {
+            total += day.getAbsenceDays();
+        }
+        return total;
+    }
+
+    /** De las faltas de arriba, cuantas son por marca incompleta. Son las revisables. */
+    public int getIncompleteMarkDays() {
         int total = 0;
         for (AttendanceDay day : days) {
-            if (day.isAbsent()) {
+            if (day.isLostWithMarks()) {
                 total++;
             }
         }

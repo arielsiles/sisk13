@@ -3,6 +3,7 @@ package com.encens.khipus.action.employees.dto;
 import com.encens.khipus.model.employees.RH_Mark;
 import com.encens.khipus.service.employees.JourneyResolverService.JourneySource;
 import com.encens.khipus.util.employees.attendance.JourneyAssignment;
+import com.encens.khipus.util.employees.attendance.DayAbsence;
 import com.encens.khipus.util.employees.attendance.JourneyEvaluation;
 import com.encens.khipus.util.employees.attendance.ScheduledJourney;
 
@@ -97,6 +98,27 @@ public class AttendanceDay implements Serializable {
     /** Le tocaba trabajar y no hay ninguna marca asociada. */
     public boolean isAbsent() {
         return isWorking() && getEvaluation().isAbsent();
+    }
+
+    /**
+     * La jornada se perdio: sin marcas, o con una sola punta. Las dos cuestan lo mismo, porque
+     * en las dos falta la prueba de que se trabajo el dia.
+     */
+    public boolean isLost() {
+        return isWorking() && getEvaluation().isLost();
+    }
+
+    /**
+     * Cuanto dia se perdio. Hoy hay una jornada por dia, asi que da 0 o 1; el medio dia aparece
+     * con los turnos partidos, cuando se pierda un bloque y no el otro.
+     */
+    public double getAbsenceDays() {
+        return DayAbsence.of(java.util.Collections.singletonList(getEvaluation())).getDays();
+    }
+
+    /** Se perdio la jornada pero SI hubo marcas: falta la otra punta. */
+    public boolean isLostWithMarks() {
+        return isLost() && !isAbsent();
     }
 
     public int getLatenessMinutes() {
@@ -244,7 +266,9 @@ public class AttendanceDay implements Serializable {
     }
 
     public String getRowStyleClass() {
-        if (isAbsent()) {
+        /* Tambien la jornada perdida por marca incompleta: cuesta lo mismo que una falta,
+           asi que tiene que verse igual de fuerte. */
+        if (isLost()) {
             return "app-check__row app-check__row--absent";
         }
         /* Toda novedad pinta la fila. Al agregar un estado hay que sumarlo aca tambien: la

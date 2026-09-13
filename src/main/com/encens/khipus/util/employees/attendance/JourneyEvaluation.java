@@ -35,6 +35,38 @@ public class JourneyEvaluation {
         return null == assignment || assignment.isEmpty();
     }
 
+    /**
+     * La jornada se perdio: no hay asistencia valida para darla por cumplida.
+     * <p/>
+     * Son dos casos y valen lo mismo:
+     * <ul>
+     *   <li><b>Sin ninguna marca</b> — la falta de siempre.</li>
+     *   <li><b>Con una sola punta marcada</b> — entro y no marco la salida, o al reves. Hay
+     *       evidencia de que estuvo, pero no de cuanto: no alcanza para pagar el dia.</li>
+     * </ul>
+     * Basta una sesion completa para que la jornada NO se considere perdida: ahi si hay un tramo
+     * de trabajo con sus dos puntas. Una sesion incompleta que sobre queda como incidencia.
+     * <p/>
+     * El motor viejo cobraba las dos como falta entera y encima al doble; el nuevo pagaba el dia
+     * completo en las dos. El dato real es "no se sabe", y los dos extremos lo inventan.
+     */
+    public boolean isLost() {
+        if (isAbsent()) {
+            return true;
+        }
+        for (WorkSession session : assignment.getSessions()) {
+            if (session.isComplete()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Los minutos que la jornada exigia, cuando se perdio. Cero si se cumplio. */
+    public long getLostMinutes() {
+        return isLost() ? getScheduledMinutes() : 0;
+    }
+
     public Date getEntry() {
         return null == assignment ? null : assignment.getFirstEntry();
     }
@@ -70,7 +102,9 @@ public class JourneyEvaluation {
      * coincidieran, al conectar la planilla en E2.9 le cambiaria el atraso a todo el mundo.
      */
     public int getLatenessMinutes() {
-        if (isAbsent() || null == getEntry()) {
+        /* Una jornada perdida ya cuesta el dia: cobrarle ademas el atraso seria descontar dos
+           veces. Es el mismo criterio que el SPEC aplica a la forma B. */
+        if (isLost() || null == getEntry()) {
             return 0;
         }
         long minutes = minutesBetween(journey.getStart(), getEntry());
@@ -89,7 +123,7 @@ public class JourneyEvaluation {
      * castigarlo como si se hubiera ido temprano seria inventar.
      */
     public int getEarlyExitMinutes() {
-        if (isAbsent() || null == getExit() || hasAssumedExit()) {
+        if (isLost() || null == getExit() || hasAssumedExit()) {
             return 0;
         }
         long minutes = minutesBetween(getExit(), journey.getEnd());
@@ -101,7 +135,9 @@ public class JourneyEvaluation {
      * de mas no se penaliza, se registra. Es el insumo del registro de horas extra.
      */
     public int getExtraMinutes() {
-        if (isAbsent() || null == getExit() || hasAssumedExit()) {
+        /* Una jornada perdida no acredita tiempo adicional: seria pagar horas extra de un dia
+           que ademas se cobra como falta. */
+        if (isLost() || null == getExit() || hasAssumedExit()) {
             return 0;
         }
         long minutes = minutesBetween(journey.getEnd(), getExit());
@@ -150,7 +186,7 @@ public class JourneyEvaluation {
      * la mitad del dato. Ese dia no esta en orden: esta incompleto.
      */
     public boolean isOk() {
-        return !isAbsent() && !isLate() && !isEarlyExit()
+        return !isLost() && !isLate() && !isEarlyExit()
                 && !hasAssumedExit() && !hasAssumedEntry();
     }
 

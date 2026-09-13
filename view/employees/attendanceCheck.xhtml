@@ -73,7 +73,9 @@
                 </span>
                 <span class="app-check__stat app-check__stat--absent">
                     <span class="app-check__stat-value">
-                        <h:outputText value="#{attendanceCheckAction.absentDays}"/>
+                        <h:outputText value="#{attendanceCheckAction.absentDays}">
+                            <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
                     </span>
                     <span class="app-check__stat-label">
                         <h:outputText value="#{messages['AttendanceCheck.absentDays']}"/>
@@ -234,6 +236,13 @@
                                         <h:outputText styleClass="app-tag app-tag--warn"
                                                       value="#{messages['AttendanceCheck.assumedEntry']}"
                                                       rendered="#{dayItem.assumedEntry}"/>
+                                        <!-- Marco una sola punta: no alcanza para dar el dia por
+                                             cumplido, asi que cuesta lo mismo que una falta. Se
+                                             muestra aparte de "Falta" porque no es lo mismo: aca
+                                             la persona estuvo, y el dia se puede corregir. -->
+                                        <h:outputText styleClass="app-tag app-tag--absent"
+                                                      value="#{messages['AttendanceCheck.lostWithMarks']}"
+                                                      rendered="#{dayItem.lostWithMarks}"/>
                                         <h:outputText styleClass="app-tag app-tag--ok"
                                                       value="#{messages['AttendanceCheck.ok']}"
                                                       rendered="#{dayItem.ok}"/>
