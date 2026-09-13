@@ -578,3 +578,31 @@ UPDATE planvacacion p
 --   JOIN contrato c ON c.idcontrato = cp.idcontrato
 --   JOIN estadocontrato ec ON ec.idestadocontrato = c.idestadocontrato
 --  WHERE p.fechacierre IS NULL AND UPPER(ec.nombre) = 'INACTIVO';
+
+
+-- 22) Ventana de atribucion del turno (plan 10) --------------------------------
+-- Decide DE QUE JORNADA es una marca, que es otra cosa que las tolerancias: esas deciden
+-- si la persona esta atrasada. Con los 10 minutos de tolerancia, una salida marcada 17:09
+-- para un turno que termina 17:30 no perteneceria a ninguna jornada.
+-- La ventana mide `duracion + antes + despues`, asi que con 2 y 4 horas queda por debajo
+-- del doble del turno solo si el turno dura 6 horas o mas. Por eso la siembra mira la
+-- duracion: los cortos llevan la mitad.
+
+ALTER TABLE turno
+  ADD COLUMN margenantes   INT NOT NULL DEFAULT 120 AFTER toleranciasalida,
+  ADD COLUMN margendespues INT NOT NULL DEFAULT 240 AFTER margenantes;
+
+-- 22.1) Siembra. Turnos de 6 horas o mas: 2 h y 4 h. Los cortos: 1 h y 2 h.
+--       La duracion sale de las horas, contando el cruce de medianoche.
+UPDATE turno
+   SET margenantes = 60, margendespues = 120
+ WHERE (CASE WHEN horafin > horainicio
+             THEN TIMESTAMPDIFF(MINUTE, horainicio, horafin)
+             ELSE TIMESTAMPDIFF(MINUTE, horainicio, horafin) + 24 * 60 END) < 6 * 60;
+
+-- 22.2) Verificacion. Esperado: ninguna ventana de 24 h o mas, ninguna del doble del turno.
+-- SELECT t.nombre, t.horainicio, t.horafin, t.margenantes, t.margendespues,
+--        (CASE WHEN t.horafin > t.horainicio
+--              THEN TIMESTAMPDIFF(MINUTE, t.horainicio, t.horafin)
+--              ELSE TIMESTAMPDIFF(MINUTE, t.horainicio, t.horafin) + 24*60 END) duracion
+--   FROM turno t;

@@ -85,6 +85,23 @@ public class JourneyAssignment {
         return last;
     }
 
+    /**
+     * true si alguna sesion quedo sin su entrada.
+     * <p/>
+     * Es el espejo de {@link #hasAssumedExit}. Sin esto, un dia con la salida marcada y la
+     * entrada faltante pasaba todas las pruebas -no hay atraso porque no hay entrada, no hay
+     * salida anticipada porque salio en hora- y se mostraba como "En orden", cuando en realidad
+     * falta la mitad del dato y no se sabe si trabajo la jornada entera.
+     */
+    public boolean hasAssumedEntry() {
+        for (WorkSession session : sessions) {
+            if (session.isExitWithoutEntry()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** true si alguna sesion quedo sin su salida: el cierre de arriba fue asumido. */
     public boolean hasAssumedExit() {
         for (WorkSession session : sessions) {

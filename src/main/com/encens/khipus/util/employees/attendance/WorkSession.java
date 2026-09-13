@@ -1,5 +1,6 @@
 package com.encens.khipus.util.employees.attendance;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -24,12 +25,22 @@ public class WorkSession {
         /** Por el indicador entrada/salida del dispositivo. */
         INDICATOR,
         /** Cronologicamente: primera con segunda, tercera con cuarta. */
-        CHRONOLOGICAL
+        CHRONOLOGICAL,
+        /** Dentro de la ventana de una jornada: la mas temprana entra, la mas tardia sale. */
+        JOURNEY
     }
 
     private final Date entry;
     private final Date exit;
     private final Pairing pairing;
+
+    /**
+     * La jornada para la que se armo esta sesion, cuando el emparejamiento fue guiado por el
+     * horario. Se guarda para que la etapa siguiente <b>respete esa decision</b> en lugar de
+     * volver a deducirla por solapamiento: calcular una cosa y despues recalcularla distinto es
+     * como se cuelan las inconsistencias.
+     */
+    private ScheduledJourney journey;
 
     public WorkSession(Date entry, Date exit, Pairing pairing) {
         this.entry = entry;
@@ -47,6 +58,34 @@ public class WorkSession {
 
     public Pairing getPairing() {
         return pairing;
+    }
+
+    public ScheduledJourney getJourney() {
+        return journey;
+    }
+
+    public void setJourney(ScheduledJourney journey) {
+        this.journey = journey;
+    }
+
+    /**
+     * Si la sesion empieza un dia y termina otro.
+     * <p/>
+     * Una sesion asi <b>no puede pertenecer a una jornada que no cruza la medianoche</b>, con
+     * cualquier emparejamiento: es lo que dejaba a un 17:09 emparejado con el 07:45 del dia
+     * siguiente dentro de una jornada de oficina. Una sesion incompleta no cuenta: el tramo que
+     * se le presta para medir el solapamiento es artificial.
+     */
+    public boolean crossesMidnight() {
+        if (!isComplete()) {
+            return false;
+        }
+        Calendar from = Calendar.getInstance();
+        from.setTime(getEntry());
+        Calendar to = Calendar.getInstance();
+        to.setTime(getExit());
+        return from.get(Calendar.YEAR) != to.get(Calendar.YEAR)
+                || from.get(Calendar.DAY_OF_YEAR) != to.get(Calendar.DAY_OF_YEAR);
     }
 
     public boolean isComplete() {

@@ -2,6 +2,7 @@ package com.encens.khipus.util.employees.attendance;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * La jornada que le tocaba a la persona ese dia, con fecha y hora absolutas.
@@ -28,6 +29,21 @@ public class ScheduledJourney {
     private final int earlyExitToleranceMinutes;
     private final Long sourceId;
 
+    /**
+     * La ventana: hasta donde puede estar una marca y seguir siendo de esta jornada.
+     * <p/>
+     * Arranca en `inicio - margen antes` y termina en `fin + margen despues`, y despues se
+     * <b>recorta en el punto medio</b> hacia la jornada vecina. El recorte es lo que hace
+     * funcionar el turno partido: sin el, la ventana del bloque de la mañana se mete adentro del
+     * bloque de la tarde y una marca del mediodia no se puede atribuir.
+     * <p/>
+     * Entre dias consecutivos el punto medio cae mas lejos que el margen, asi que no recorta
+     * nada y <b>queda hueco</b>. Ese hueco es lo que permite que una marca pueda ser trabajo
+     * fuera de horario: si las ventanas se tocaran siempre, ninguna podria serlo.
+     */
+    private Date windowStart;
+    private Date windowEnd;
+
     public ScheduledJourney(Date start, Date end, int entryToleranceMinutes,
                             int earlyExitToleranceMinutes, Long sourceId) {
         this.start = start;
@@ -47,13 +63,88 @@ public class ScheduledJourney {
     public static ScheduledJourney of(Date day, Date startHour, Date endHour,
                                       int entryToleranceMinutes, int earlyExitToleranceMinutes,
                                       Long sourceId) {
+        return of(day, startHour, endHour, entryToleranceMinutes, earlyExitToleranceMinutes,
+                sourceId, 0, 0);
+    }
+
+    public static ScheduledJourney of(Date day, Date startHour, Date endHour,
+                                      int entryToleranceMinutes, int earlyExitToleranceMinutes,
+                                      Long sourceId, int beforeMarginMinutes,
+                                      int afterMarginMinutes) {
         Calendar start = at(day, startHour);
         Calendar end = at(day, endHour);
         if (!end.after(start)) {
             end.add(Calendar.DAY_OF_MONTH, 1);
         }
-        return new ScheduledJourney(start.getTime(), end.getTime(),
+        ScheduledJourney journey = new ScheduledJourney(start.getTime(), end.getTime(),
                 entryToleranceMinutes, earlyExitToleranceMinutes, sourceId);
+        journey.windowStart = shifted(start.getTime(), -beforeMarginMinutes);
+        journey.windowEnd = shifted(end.getTime(), afterMarginMinutes);
+        return journey;
+    }
+
+    private static Date shifted(Date moment, int minutes) {
+        return new Date(moment.getTime() + minutes * 60000L);
+    }
+
+    /**
+     * Recorta las ventanas de una lista de jornadas en el punto medio entre cada una y la
+     * siguiente. La lista tiene que venir ordenada por inicio.
+     * <p/>
+     * Solo recorta cuando hace falta: si las ventanas ya no se tocan -el caso de dos dias
+     * consecutivos- no toca nada y el hueco entre ellas se conserva.
+     */
+    public static void clipWindows(List<ScheduledJourney> journeys) {
+        for (int i = 0; i + 1 < journeys.size(); i++) {
+            ScheduledJourney current = journeys.get(i);
+            ScheduledJourney next = journeys.get(i + 1);
+            if (null == current.windowEnd || null == next.windowStart) {
+                continue;
+            }
+            if (!current.windowEnd.after(next.windowStart)) {
+                continue;
+            }
+            long midpoint = (current.end.getTime() + next.start.getTime()) / 2;
+            current.windowEnd = new Date(midpoint);
+            next.windowStart = new Date(midpoint);
+        }
+    }
+
+    /**
+     * Si el momento cae dentro de la ventana. El limite de arriba es exclusivo para que en el
+     * punto medio exacto gane la jornada anterior: ya esta abierta y necesita su salida,
+     * mientras que la siguiente todavia no empezo.
+     */
+    public boolean windowContains(Date moment) {
+        if (null == windowStart || null == windowEnd) {
+            return false;
+        }
+        return !moment.before(windowStart) && !moment.after(windowEnd);
+    }
+
+    /** Minutos hasta el borde mas cercano de la jornada. Cero si el momento cae adentro. */
+    public long minutesToNearestEdge(Date moment) {
+        if (!moment.before(start) && !moment.after(end)) {
+            return 0;
+        }
+        long toStart = Math.abs(moment.getTime() - start.getTime()) / 60000L;
+        long toEnd = Math.abs(moment.getTime() - end.getTime()) / 60000L;
+        return Math.min(toStart, toEnd);
+    }
+
+    /** Si el momento esta mas cerca del inicio que del fin: sirve para leer una marca suelta. */
+    public boolean closerToStart(Date moment) {
+        long toStart = Math.abs(moment.getTime() - start.getTime());
+        long toEnd = Math.abs(moment.getTime() - end.getTime());
+        return toStart <= toEnd;
+    }
+
+    public Date getWindowStart() {
+        return windowStart;
+    }
+
+    public Date getWindowEnd() {
+        return windowEnd;
     }
 
     @SuppressWarnings({"deprecation"})

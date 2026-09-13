@@ -89,6 +89,11 @@ public class AttendanceDay implements Serializable {
         return getEvaluation().hasAssumedExit();
     }
 
+    /** Marco la salida y no la entrada: el dia esta incompleto, no en orden. */
+    public boolean isAssumedEntry() {
+        return isWorking() && getEvaluation().hasAssumedEntry();
+    }
+
     /** Le tocaba trabajar y no hay ninguna marca asociada. */
     public boolean isAbsent() {
         return isWorking() && getEvaluation().isAbsent();
@@ -114,9 +119,16 @@ public class AttendanceDay implements Serializable {
         return getEarlyExitMinutes() > 0;
     }
 
-    /** Sin novedades: trabajo, entro en hora y salio en hora. */
+    /**
+     * Sin novedades. La regla vive en {@link JourneyEvaluation} y aca solo se consulta.
+     * <p/>
+     * Estaba repetida, y paso lo que siempre pasa: al exigir tambien la marca de entrada se
+     * corrigio la del motor y esta quedo como estaba, asi que la pantalla mostraba a la vez
+     * "Sin marca de entrada" y "En orden". La evaluacion es la misma que va a usar la planilla:
+     * si se duplica, con el tiempo dicen cosas distintas.
+     */
     public boolean isOk() {
-        return isWorking() && !isAbsent() && !isLate() && !isEarlyExit() && !isAssumedExit();
+        return isWorking() && getEvaluation().isOk();
     }
 
     /** Ese dia es feriado, haya o no jornada. */
@@ -152,9 +164,15 @@ public class AttendanceDay implements Serializable {
         return !isWorking() && !coveredByPreviousJourney && !holiday && !marks.isEmpty();
     }
 
-    /** Ese dia solo tiene la salida de la noche anterior. */
+    /**
+     * Ese dia tiene la salida de la noche anterior.
+     * <p/>
+     * Tambien cuando el dia SI tenia jornada y quedo como falta: ahi la fila muestra una marca y
+     * dice "Falta", y sin esta aclaracion se lee como una contradiccion. La marca es real, pero
+     * cierra la jornada del dia anterior, no la de este.
+     */
     public boolean isPreviousJourneyExit() {
-        return !isWorking() && coveredByPreviousJourney && !marks.isEmpty();
+        return coveredByPreviousJourney && !marks.isEmpty() && (!isWorking() || isAbsent());
     }
 
     public void setCoveredByPreviousJourney(boolean coveredByPreviousJourney) {
@@ -229,7 +247,10 @@ public class AttendanceDay implements Serializable {
         if (isAbsent()) {
             return "app-check__row app-check__row--absent";
         }
-        if (isLate() || isEarlyExit() || isAssumedExit()) {
+        /* Toda novedad pinta la fila. Al agregar un estado hay que sumarlo aca tambien: la
+           entrada faltante quedo sin color en la primera version, y una fila sin color se lee
+           como una fila sin problema. */
+        if (isLate() || isEarlyExit() || isAssumedExit() || isAssumedEntry()) {
             return "app-check__row app-check__row--warn";
         }
         if (holiday) {

@@ -354,5 +354,35 @@ planificación, no de asistencia, y hay que mirarlo cuando se pruebe un préstam
 | Etapa SDD | Estado |
 |---|---|
 | SPEC | [req_02](req_02_emparejamiento_marcas.md) |
-| **PLAN** | Este documento — **pendiente de aprobación** |
-| IMPLEMENT | No iniciado |
+| PLAN | Este documento |
+| **IMPLEMENT** | **E1 a E6 escritos y compilando · sin verificar contra datos** |
+
+**Hay SQL que aplicar antes de desplegar** —se agregan dos columnas y el sistema valida el
+esquema al arrancar—: sección **22** de `query_v6.1.0_terdemol.sql`, que crea `margenantes` y
+`margendespues` y los siembra según la duración de cada turno.
+
+La siembra se probó contra los cuatro turnos reales: los cuatro dan 6 horas o más —el de noche
+calcula bien sus 720 minutos cruzando la medianoche— así que los cuatro quedan en 120/240.
+
+### Lo que falta, y es lo que decide si esto sirve
+
+**La comparación del período completo.** Nada de esto está verificado contra las 4.537 marcas.
+Trazar el caso de JUAN CARLOS a mano sobre el código dice que el `17:09` ahora se lee como salida
+—está a 21 minutos del fin y a 489 del inicio— pero un trazado a mano no es una verificación.
+
+Hasta que esa comparación se corra, el plan está **escrito, no probado**.
+
+### Notas de implementación
+
+**La sesión recuerda su jornada.** Cuando el emparejamiento fue guiado por el horario, la sesión
+guarda a qué jornada pertenece y `SessionScheduleMatcher` **respeta esa decisión** en lugar de
+volver a deducirla por solapamiento. Calcular una cosa y después recalcularla distinto es como se
+cuelan las inconsistencias.
+
+**Lo que no cae en ninguna ventana no se descarta.** Se empareja como se pueda —por indicador o
+cronológicamente, acotado por el corte de las 03:00— para que la etapa siguiente lo reporte como
+trabajo fuera de horario.
+
+**Las incidencias todavía no llegan a la pantalla.** `MARK_WITHOUT_PAIR` se registra pero no se
+muestra: la verificación de asistencia no dibuja incidencias hoy. Es lo que hay que agregar para
+que RRHH pueda ver que el `09:51` de YOSELIN existió.

@@ -194,7 +194,9 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
         }
         return ScheduledJourney.of(day, shift.getStartHour(), shift.getEndHour(),
                 shift.getEntryToleranceMinutes(), shift.getEarlyExitToleranceMinutes(),
-                shift.getId());
+                shift.getId(),
+                null == shift.getBeforeMarginMinutes() ? 0 : shift.getBeforeMarginMinutes(),
+                null == shift.getAfterMarginMinutes() ? 0 : shift.getAfterMarginMinutes());
     }
 
     @SuppressWarnings({"unchecked"})

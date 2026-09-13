@@ -55,6 +55,18 @@ import java.util.Date;
 @Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "turno")
 public class WorkShift implements BaseModel {
 
+    /* Precarga de la ventana. La ventana mide `duracion + antes + despues`, asi que con 2 y 4
+       queda por debajo del doble del turno solo si el turno dura 6 horas o mas. Para los cortos
+       -medios turnos de 3, 4 o 5 horas- la precarga es la mitad. Son valores de arranque: cada
+       turno queda dueño de los suyos y se editan a mano. */
+    public static final int DEFAULT_BEFORE_MINUTES = 120;
+    public static final int DEFAULT_AFTER_MINUTES = 240;
+    public static final int SHORT_BEFORE_MINUTES = 60;
+    public static final int SHORT_AFTER_MINUTES = 120;
+
+    /** Menos de esto es un turno corto y la ventana larga le queda desproporcionada. */
+    public static final int SHORT_SHIFT_MINUTES = 6 * 60;
+
     @Id
     @Column(name = "idturno", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "WorkShift.tableGenerator")
@@ -84,6 +96,26 @@ public class WorkShift implements BaseModel {
     @Column(name = "toleranciasalida", nullable = false)
     @NotNull
     private Integer earlyExitToleranceMinutes = 0;
+
+    /**
+     * Cuanto ANTES del inicio puede estar una marca y seguir siendo la entrada de esta jornada.
+     * <p/>
+     * Junto con {@link #afterMarginMinutes} define la <b>ventana</b> del turno, que es lo que
+     * decide <b>de que jornada es una marca</b>. No confundir con las tolerancias, que deciden
+     * <b>si esta atrasado</b>: con los 10 minutos de tolerancia, una salida marcada 17:09 para un
+     * turno que termina 17:30 no pertenecería a ninguna jornada.
+     */
+    @Column(name = "margenantes", nullable = false)
+    @NotNull
+    private Integer beforeMarginMinutes = DEFAULT_BEFORE_MINUTES;
+
+    /**
+     * Cuanto DESPUES del fin puede estar una marca y seguir siendo la salida de esta jornada.
+     * Es, en la practica, cuantas horas extra se reconocen como parte de la jornada.
+     */
+    @Column(name = "margendespues", nullable = false)
+    @NotNull
+    private Integer afterMarginMinutes = DEFAULT_AFTER_MINUTES;
 
     @Column(name = "activo", nullable = false)
     @Type(type = com.encens.khipus.model.usertype.IntegerBooleanUserType.NAME)
@@ -124,6 +156,29 @@ public class WorkShift implements BaseModel {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(hour);
         return calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
+    }
+
+    /** La ventana del turno, en minutos: lo que dura mas los dos margenes. */
+    public int getWindowMinutes() {
+        return getDurationMinutes()
+                + (null == beforeMarginMinutes ? 0 : beforeMarginMinutes)
+                + (null == afterMarginMinutes ? 0 : afterMarginMinutes);
+    }
+
+    public Integer getBeforeMarginMinutes() {
+        return beforeMarginMinutes;
+    }
+
+    public void setBeforeMarginMinutes(Integer beforeMarginMinutes) {
+        this.beforeMarginMinutes = beforeMarginMinutes;
+    }
+
+    public Integer getAfterMarginMinutes() {
+        return afterMarginMinutes;
+    }
+
+    public void setAfterMarginMinutes(Integer afterMarginMinutes) {
+        this.afterMarginMinutes = afterMarginMinutes;
     }
 
     public Long getId() {

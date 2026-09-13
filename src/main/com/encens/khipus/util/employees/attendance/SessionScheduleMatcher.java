@@ -43,9 +43,38 @@ public class SessionScheduleMatcher {
         }
 
         for (WorkSession session : sessions) {
+            /* Si la sesion ya sabe de que jornada es -porque se armo dentro de su ventana- se
+               respeta esa decision. Volver a deducirla por solapamiento podria contradecirla, y
+               la primera lectura es la que tuvo el horario a la vista. */
+            JourneyAssignment declared = assignmentOf(session.getJourney());
+            if (null != declared) {
+                declared.add(session);
+                continue;
+            }
+
+            /* Con jornadas resueltas, una sesion sin jornada declarada es una que se armo con
+               marcas que NO cayeron en ninguna ventana. Eso ya es la respuesta: trabajo fuera de
+               horario. Buscarle jornada por solapamiento revierte esa decision por atras, y con
+               el tramo artificial que se le presta a una sesion incompleta puede alcanzar la
+               jornada del dia anterior. Es lo que hacia que un feriado -sin jornada, marcas
+               sueltas- le pusiera al dia previo una salida de la manana siguiente. */
+            if (!assignments.isEmpty()) {
+                incidences.add(new AttendanceIncidence(
+                        AttendanceIncidenceType.SESSION_WITHOUT_SCHEDULE, session.getStart(), null));
+                continue;
+            }
+
             JourneyAssignment best = null;
             long bestOverlap = 0;
             for (JourneyAssignment assignment : assignments) {
+                /* Una sesion que cruza la medianoche solo puede pertenecer a una jornada que
+                   tambien cruza. La asimetria importa: quien entra 19:30 y sale 23:00 en un turno
+                   de noche NO cruza y sigue siendo de ese turno. Lo imposible es al reves, y era
+                   como una jornada de oficina de 09:00 a 17:30 se quedaba con una sesion de
+                   17:09 a 07:45 del dia siguiente, por 21 minutos de solapamiento. */
+                if (session.crossesMidnight() && !assignment.getJourney().crossesMidnight()) {
+                    continue;
+                }
                 long overlap = overlapMinutes(session, assignment.getJourney());
                 if (overlap > bestOverlap) {
                     bestOverlap = overlap;
@@ -68,6 +97,18 @@ public class SessionScheduleMatcher {
                         assignment.getJourney().getStart(), null));
             }
         }
+    }
+
+    private JourneyAssignment assignmentOf(ScheduledJourney journey) {
+        if (null == journey) {
+            return null;
+        }
+        for (JourneyAssignment assignment : assignments) {
+            if (assignment.getJourney() == journey) {
+                return assignment;
+            }
+        }
+        return null;
     }
 
     /**

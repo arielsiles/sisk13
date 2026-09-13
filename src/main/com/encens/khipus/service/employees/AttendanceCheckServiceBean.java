@@ -71,10 +71,12 @@ public class AttendanceCheckServiceBean implements AttendanceCheckService {
                 .setParameter("to", addDays(end, 1))
                 .getResultList();
 
-        /* El mismo motor que va a usar la planilla: sesiones a partir de las marcas, jornadas
-           a partir de las cuatro capas, y asociacion por solapamiento. */
-        WorkSessionBuilder builder = new WorkSessionBuilder(AttendanceMark.ofImported(marks));
+        /* El mismo motor que va a usar la planilla: las jornadas salen de las cuatro capas y
+           GUIAN el emparejamiento de las marcas. El orden importa: emparejar sin el horario a la
+           vista es lo que producia atrasos inventados de horas cuando faltaba una marca. */
         List<ScheduledJourney> journeys = journeyResolverService.resolve(contract, start, end);
+        WorkSessionBuilder builder = new WorkSessionBuilder(
+                AttendanceMark.ofImported(marks), journeys);
         SessionScheduleMatcher matcher = new SessionScheduleMatcher(
                 builder.getSessions(), journeys);
 

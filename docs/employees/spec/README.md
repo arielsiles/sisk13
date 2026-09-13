@@ -14,7 +14,6 @@ arriba, en [../README.md](../README.md).
 |---|---|---|
 | [req_01_asistencia_produccion.md](req_01_asistencia_produccion.md) | SPEC: el requerimiento completo de asistencia y planillas para la nueva empresa | Cerrado |
 | [req_02_emparejamiento_marcas.md](req_02_emparejamiento_marcas.md) | SPEC: el emparejamiento de marcas se desfasa cuando faltan marcas | **Abierto — bloquea E2.9** |
-| [plan_10_emparejamiento_marcas.md](plan_10_emparejamiento_marcas.md) | La jornada guía el emparejamiento de las marcas | Pendiente de aprobación |
 | [plan_01_asistencia_produccion.md](plan_01_asistencia_produccion.md) | Carga de marcaciones, motor de asistencia, planillas | **E1 y E2.1–E2.5 hechos** · falta **E2.9**: conectar el motor a la planilla |
 | [plan_02_vacaciones.md](plan_02_vacaciones.md) | Vacaciones como libro mayor de movimientos | **Implementado y probado** |
 | [plan_03_horarios.md](plan_03_horarios.md) | Turnos, grupos, cronograma y las cuatro capas de resolución | **H1–H10 implementados** · probado con julio 2026 |
@@ -24,6 +23,7 @@ arriba, en [../README.md](../README.md).
 | [plan_07_busqueda_contratos.md](plan_07_busqueda_contratos.md) | Los filtros de Condición de contratos y la búsqueda histórica | **B1–B6 implementados** · probado |
 | [plan_08_fecha_salida.md](plan_08_fecha_salida.md) | Fecha de salida derivada y contratos simultáneos con principal | **A y B implementados y probados** con reingreso, baja y contrato secundario |
 | [plan_09_vacaciones_cierre_reingreso.md](plan_09_vacaciones_cierre_reingreso.md) | El plan de vacaciones no se cierra nunca y el reingreso no genera uno nuevo | **V1–V5 implementados y probados**: cierre al dar de baja, plan nuevo al reingresar |
+| [plan_10_emparejamiento_marcas.md](plan_10_emparejamiento_marcas.md) | La jornada guía el emparejamiento de las marcas | **E1–E6 implementados** · falta aplicar SQL, desplegar y comparar el período |
 
 ## El orden en que salieron
 

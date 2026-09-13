@@ -26,7 +26,14 @@ public enum AttendanceIncidenceType {
     SCHEDULE_WITHOUT_SESSION("AttendanceIncidence.scheduleWithoutSession"),
 
     /** Una sesion tan larga que casi seguro es un error de marcado. */
-    ABNORMALLY_LONG_SESSION("AttendanceIncidence.abnormallyLongSession");
+    ABNORMALLY_LONG_SESSION("AttendanceIncidence.abnormallyLongSession"),
+
+    /**
+     * Una marca que quedo en el medio de la jornada, sin ser ni la entrada ni la salida.
+     * Suele ser una pasada de mas por el lector. Se reporta y no se descarta: si el
+     * sistema la borrara en silencio, nadie podria revisar por que el dia se leyo asi.
+     */
+    MARK_WITHOUT_PAIR("AttendanceIncidence.markWithoutPair");
 
     private String resourceKey;
 

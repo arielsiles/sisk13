@@ -2493,3 +2493,17 @@ select[disabled] {
     padding-top: 8px;
     border-top: 1px solid #efefec;
 }
+
+/* Una hora entra en 80px. La clase .input de 200px dejaba la caja tres veces mas ancha
+   que su contenido y desalineaba el formulario del turno. */
+.app-input--hour {
+    width: 80px;
+}
+
+/* Aire entre un campo y su aclaracion. Va por hermano adyacente y no en .app-tag: esa clase
+   tambien se usa dentro de celdas de tabla, donde un margen a la izquierda desalinearia. */
+input + .app-tag,
+select + .app-tag,
+textarea + .app-tag {
+    margin-left: 6px;
+}
