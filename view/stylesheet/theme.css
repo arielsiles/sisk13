@@ -2507,3 +2507,22 @@ select + .app-tag,
 textarea + .app-tag {
     margin-left: 6px;
 }
+
+
+/* Planilla de sueldos: nombre y puesto en UNA linea.
+   La tabla tiene veintitantas columnas de numeros y el navegador reparte el ancho a ojo, asi
+   que las dos columnas de texto largo se parten en tres renglones y la fila queda del alto de
+   un parrafo. Se les fija un minimo y se les prohibe el corte; las de numeros no lo necesitan
+   porque su contenido es corto y de ancho previsible. */
+.app-payroll__name,
+.app-payroll__charge {
+    white-space: nowrap;
+}
+
+.app-payroll__name {
+    min-width: 220px;
+}
+
+.app-payroll__charge {
+    min-width: 230px;
+}

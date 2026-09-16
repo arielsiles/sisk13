@@ -88,6 +88,15 @@ public class GeneratedPayroll implements BaseModel, Cloneable {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "GeneratedPayroll.tableGenerator")
     private Long id;
 
+    /**
+     * Con que motor se controlo la asistencia de esta planilla. Se sella al generar: el reporte
+     * de control lo usa para saber que columnas tienen sentido, y un auditor lo lee sin tener que
+     * recalcular la regla de la fecha de corte.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "motorasistencia", length = 20)
+    private com.encens.khipus.util.employees.AttendanceEngine attendanceEngine;
+
     @Column(name = "nombre", nullable = false, length = 200, unique = true)
     @Length(max = 200)
     private String name;
@@ -313,5 +322,13 @@ public class GeneratedPayroll implements BaseModel, Cloneable {
                 ", version=" + version +
                 ", generationDate=" + generationDate +
                 '}';
+    }
+
+    public com.encens.khipus.util.employees.AttendanceEngine getAttendanceEngine() {
+        return attendanceEngine;
+    }
+
+    public void setAttendanceEngine(com.encens.khipus.util.employees.AttendanceEngine attendanceEngine) {
+        this.attendanceEngine = attendanceEngine;
     }
 }

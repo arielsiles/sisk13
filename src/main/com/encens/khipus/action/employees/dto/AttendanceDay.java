@@ -4,6 +4,7 @@ import com.encens.khipus.model.employees.RH_Mark;
 import com.encens.khipus.service.employees.JourneyResolverService.JourneySource;
 import com.encens.khipus.util.employees.attendance.JourneyAssignment;
 import com.encens.khipus.util.employees.attendance.DayAbsence;
+import com.encens.khipus.util.employees.attendance.ExcusedDay;
 import com.encens.khipus.util.employees.attendance.JourneyEvaluation;
 import com.encens.khipus.util.employees.attendance.ScheduledJourney;
 
@@ -45,6 +46,11 @@ public class AttendanceDay implements Serializable {
        feriado. Derivarlo del origen lo escondia justo en el caso que mas importa ver,
        que es el que se paga distinto. */
     private boolean holiday;
+
+    /* La fecha especial de dia completo que cubre este dia: permiso, vacacion, maternidad. No
+       incluye el feriado, que tiene su propio efecto -suprime la jornada del horario fijo, pero
+       no la del cronograma, porque produccion trabaja los feriados-. */
+    private ExcusedDay excused;
 
     public AttendanceDay(Date day) {
         this.day = day;
@@ -109,16 +115,55 @@ public class AttendanceDay implements Serializable {
     }
 
     /**
+     * Cuanto cuesta el dia y por que. Es la misma clase que consume la planilla: si la pantalla
+     * sumara por su cuenta, con el tiempo dirian cosas distintas.
+     */
+    public DayAbsence getAbsence() {
+        return DayAbsence.of(java.util.Collections.singletonList(getEvaluation()), excused);
+    }
+
+    /**
      * Cuanto dia se perdio. Hoy hay una jornada por dia, asi que da 0 o 1; el medio dia aparece
      * con los turnos partidos, cuando se pierda un bloque y no el otro.
      */
     public double getAbsenceDays() {
-        return DayAbsence.of(java.util.Collections.singletonList(getEvaluation())).getDays();
+        return getAbsence().getDays();
     }
 
-    /** Se perdio la jornada pero SI hubo marcas: falta la otra punta. */
+    /** El dia esta perdonado: permiso, vacacion o maternidad con goce de haber. */
+    public boolean isExcused() {
+        return getAbsence().isExcused();
+    }
+
+    /** Licencia aprobada sin goce de haber: el dia no se paga, pero no se sanciona al doble. */
+    public boolean isUnpaidLeave() {
+        return getAbsence().isUnpaidLeave();
+    }
+
+    public ExcusedDay getExcused() {
+        return excused;
+    }
+
+    public void setExcused(ExcusedDay excused) {
+        this.excused = excused;
+    }
+
+    /**
+     * Se perdio la jornada pero SI hubo marcas: falta la otra punta.
+     * <p/>
+     * Un dia perdonado no entra: no hay nada que revisar ni que corregir en un permiso.
+     */
     public boolean isLostWithMarks() {
-        return isLost() && !isAbsent();
+        return isLost() && !isAbsent() && !isExcused() && !isUnpaidLeave();
+    }
+
+    /**
+     * La clave i18n del motivo del permiso. Las filas cargadas antes de la 6.1.0 no tienen
+     * motivo, y ahi se dice lo unico que se sabe con certeza: que el dia esta justificado.
+     */
+    public String getExcusedReasonKey() {
+        return (null == excused || null == excused.getResourceKey())
+                ? "AttendanceCheck.excusedDefault" : excused.getResourceKey();
     }
 
     public int getLatenessMinutes() {
@@ -150,7 +195,7 @@ public class AttendanceDay implements Serializable {
      * si se duplica, con el tiempo dicen cosas distintas.
      */
     public boolean isOk() {
-        return isWorking() && getEvaluation().isOk();
+        return isWorking() && !isExcused() && !isUnpaidLeave() && getEvaluation().isOk();
     }
 
     /** Ese dia es feriado, haya o no jornada. */
@@ -266,9 +311,14 @@ public class AttendanceDay implements Serializable {
     }
 
     public String getRowStyleClass() {
-        /* Tambien la jornada perdida por marca incompleta: cuesta lo mismo que una falta,
-           asi que tiene que verse igual de fuerte. */
-        if (isLost()) {
+        /* Un dia perdonado se pinta como descanso aunque la jornada figure perdida: no se le
+           descuenta nada, asi que pintarlo de falta seria alarmar por nada. */
+        if (isExcused()) {
+            return "app-check__row app-check__row--rest";
+        }
+        /* Todo lo que cuesta dinero se ve igual de fuerte: la falta de siempre, la jornada
+           perdida por marca incompleta y la licencia sin goce. */
+        if (getAbsenceDays() > 0) {
             return "app-check__row app-check__row--absent";
         }
         /* Toda novedad pinta la fila. Al agregar un estado hay que sumarlo aca tambien: la

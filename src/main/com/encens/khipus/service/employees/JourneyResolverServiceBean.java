@@ -39,7 +39,7 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
     private WorkGroupService workGroupService;
 
     @In
-    private HolidayService holidayService;
+    private SpecialDayService specialDayService;
 
     public ScheduledJourney resolve(Contract contract, Date day) {
         if (null == contract || null == day) {
@@ -81,7 +81,7 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
               arriba y no llegan aca. Una regla de calendario no puede pisar una decision. */
         ContractWorkShift contractShift = findContractShift(contract, date);
         if (null != contractShift) {
-            if (holidayService.isHoliday(contract, date)) {
+            if (specialDayService.isHoliday(contract, date)) {
                 return null;
             }
             return journeyOf(date, contractShift.getWorkShift());
@@ -92,9 +92,13 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
     }
 
     public List<ScheduledJourney> resolve(Contract contract, Date from, Date to) {
-        List<ScheduledJourney> journeys = new ArrayList<ScheduledJourney>();
+        return resolvePeriod(contract, from, to).getJourneys();
+    }
+
+    public PeriodJourneys resolvePeriod(Contract contract, Date from, Date to) {
+        PeriodJourneys period = new PeriodJourneys();
         if (null == contract || null == from || null == to) {
-            return journeys;
+            return period;
         }
 
         /* El periodo se resuelve con tres consultas y no con tres por dia: para un mes de 31
@@ -102,10 +106,10 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
         Date start = startOfDay(from);
         Date end = startOfDay(to);
         Map<Long, ScheduleException> exceptions = exceptionsOf(contract, start, end);
-        Set<Long> holidays = holidayService.holidaysBetween(contract, start, end);
+        Set<Long> holidays = specialDayService.holidaysBetween(contract, start, end);
         Map<String, GroupScheduleDay> scheduleDays = new HashMap<String, GroupScheduleDay>();
         Map<Long, Boolean> inGroup = new HashMap<Long, Boolean>();
-        List<ContractWorkShift> contractShifts = currentContractShifts(contract);
+        List<ContractWorkShift> contractShifts = contractShiftsOf(contract, start, end);
 
         Calendar current = Calendar.getInstance();
         current.setTime(start);
@@ -115,15 +119,18 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
             Date date = current.getTime();
             Long key = date.getTime();
 
+            /* 1. La excepcion de esa persona ese dia. */
             ScheduleException exception = exceptions.get(key);
             if (null != exception) {
-                addIfWorking(journeys, date, exception.getWorkShift());
+                period.put(key, journeyOf(date, exception.getWorkShift()),
+                        JourneySource.EXCEPTION, null, null);
                 current.add(Calendar.DAY_OF_MONTH, 1);
                 continue;
             }
 
-            /* La pertenencia se consulta por dia porque puede cambiar dentro del periodo; el
-               cronograma del grupo, en cambio, se carga entero la primera vez que hace falta. */
+            /* 2. El cronograma del grupo al que pertenecia -o al que estaba prestada-.
+                  La pertenencia se consulta por dia porque puede cambiar dentro del periodo; el
+                  cronograma del grupo, en cambio, se carga entero la primera vez que hace falta. */
             WorkGroupMembership membership = workGroupService.findMembership(contract, date);
             if (null != membership) {
                 Long groupId = membership.getWorkGroup().getId();
@@ -132,20 +139,31 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
                     inGroup.put(groupId, Boolean.TRUE);
                 }
                 GroupScheduleDay scheduleDay = scheduleDays.get(groupKey(groupId, date));
-                if (null != scheduleDay && scheduleDay.isPublished()) {
-                    addIfWorking(journeys, date, scheduleDay.getWorkShift());
+                ScheduledJourney journey = (null != scheduleDay && scheduleDay.isPublished())
+                        ? journeyOf(date, scheduleDay.getWorkShift()) : null;
+                period.put(key, journey, JourneySource.GROUP_SCHEDULE, null, membership);
+                current.add(Calendar.DAY_OF_MONTH, 1);
+                continue;
+            }
+
+            /* 3. El horario fijo del contrato, salvo que sea feriado. */
+            ContractWorkShift contractShift = shiftOfDay(contractShifts, date);
+            if (null != contractShift) {
+                ScheduledJourney journey = journeyOf(date, contractShift.getWorkShift());
+                if (holidays.contains(key)) {
+                    period.put(key, null, JourneySource.HOLIDAY, journey, null);
+                } else {
+                    period.put(key, journey, JourneySource.CONTRACT_SCHEDULE, null, null);
                 }
                 current.add(Calendar.DAY_OF_MONTH, 1);
                 continue;
             }
 
-            ContractWorkShift contractShift = shiftOfDay(contractShifts, date);
-            if (null != contractShift && !holidays.contains(key)) {
-                addIfWorking(journeys, date, contractShift.getWorkShift());
-            }
+            /* 4. Nada: ese dia no se evalua asistencia. */
+            period.put(key, null, JourneySource.NONE, null, null);
             current.add(Calendar.DAY_OF_MONTH, 1);
         }
-        return journeys;
+        return period;
     }
 
     public ScheduledJourney suppressedByHoliday(Contract contract, Date day) {
@@ -172,7 +190,7 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
             return JourneySource.GROUP_SCHEDULE;
         }
         if (null != findContractShift(contract, date)) {
-            return holidayService.isHoliday(contract, date)
+            return specialDayService.isHoliday(contract, date)
                     ? JourneySource.HOLIDAY : JourneySource.CONTRACT_SCHEDULE;
         }
         return JourneySource.NONE;
@@ -238,10 +256,12 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
     }
 
     @SuppressWarnings({"unchecked"})
-    private List<ContractWorkShift> currentContractShifts(Contract contract) {
+    private List<ContractWorkShift> contractShiftsOf(Contract contract, Date from, Date to) {
         List<ContractWorkShift> result = em
-                .createNamedQuery("ContractWorkShift.findCurrentByContract")
+                .createNamedQuery("ContractWorkShift.findByContractAndPeriod")
                 .setParameter("contract", contract)
+                .setParameter("from", from)
+                .setParameter("to", to)
                 .getResultList();
         return null == result ? new ArrayList<ContractWorkShift>() : result;
     }

@@ -25,25 +25,9 @@
             </s:decorate>
         </h:panelGroup>
         <h:panelGroup>
-            <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
-                <h:inputText id="firstName" value="#{managersPayrollDataModel.firstName}" maxlength="100"
-                             tabindex="2"
-                             styleClass="input"/>
-            </s:decorate>
-        </h:panelGroup>
-        <h:panelGroup>
-            <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
-                <h:inputText id="lastName" value="#{managersPayrollDataModel.lastName}" maxlength="100"
-                             tabindex="2"
-                             styleClass="input"/>
-            </s:decorate>
-        </h:panelGroup>
-        <h:panelGroup>
-            <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
-                <h:inputText id="maidenName" value="#{managersPayrollDataModel.maidenName}" maxlength="100"
+            <s:decorate id="personField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ManagersPayroll.person']}</ui:define>
+                <h:inputText id="person" value="#{managersPayrollDataModel.person}" maxlength="100"
                              tabindex="2"
                              styleClass="input"/>
                 <a4j:commandButton action="#{managersPayrollDataModel.search}"
@@ -55,7 +39,7 @@
             </s:decorate>
         </h:panelGroup>
     </h:panelGrid>
-    <rich:jQuery selector="#idNumber" query="focus()" timing="onload"/>
+    <rich:jQuery selector="#person" query="focus()" timing="onload"/>
 </rich:simpleTogglePanel>
 <br/>
 
@@ -97,25 +81,25 @@
                 #{messages['ManagersPayroll.CI']}
             </app:commandSortHeader>
         </rich:column>
-        <rich:column>
+        <rich:column styleClass="app-payroll__name">
             <app:commandSortHeader sortProperty="managersPayroll.employee.lastName"
                                    dataModel="#{managersPayrollDataModel}"
                                    reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.lastName']}
+                #{messages['ManagersPayroll.person']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column styleClass="app-payroll__charge">
+            <app:commandSortHeader sortProperty="managersPayroll.job"
+                                   dataModel="#{managersPayrollDataModel}"
+                                   reRender="managersPayrollList, dataScroller">
+                #{messages['ManagersPayroll.job']}
             </app:commandSortHeader>
         </rich:column>
         <rich:column>
-            <app:commandSortHeader sortProperty="managersPayroll.employee.maidenName"
+            <app:commandSortHeader sortProperty="managersPayroll.seniorityYears"
                                    dataModel="#{managersPayrollDataModel}"
                                    reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.maidenName']}
-            </app:commandSortHeader>
-        </rich:column>
-        <rich:column>
-            <app:commandSortHeader sortProperty="managersPayroll.employee.firstName"
-                                   dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.firstName']}
+                #{messages['ManagersPayroll.seniorityYears']}
             </app:commandSortHeader>
         </rich:column>
         <rich:column>
@@ -126,31 +110,31 @@
             </app:commandSortHeader>
         </rich:column>
         <rich:column>
-            <app:commandSortHeader sortProperty="managersPayroll.area"
-                                   dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.area']}
-            </app:commandSortHeader>
-        </rich:column>
-        <rich:column>
-            <app:commandSortHeader sortProperty="managersPayroll.unit"
-                                   dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.unit']}
-            </app:commandSortHeader>
-        </rich:column>
-        <rich:column>
-            <app:commandSortHeader sortProperty="managersPayroll.job"
-                                   dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.job']}
-            </app:commandSortHeader>
-        </rich:column>
-        <rich:column>
             <app:commandSortHeader sortProperty="managersPayroll.workedDays"
                                    dataModel="#{managersPayrollDataModel}"
                                    reRender="managersPayrollList, dataScroller">
                 #{messages['ManagersPayroll.workedDays']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="managersPayroll.absenceDays"
+                                   dataModel="#{managersPayrollDataModel}"
+                                   reRender="managersPayrollList, dataScroller">
+                #{messages['ManagersPayroll.absenceDays']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="managersPayroll.registryDays"
+                                   dataModel="#{managersPayrollDataModel}"
+                                   reRender="managersPayrollList, dataScroller">
+                #{messages['ManagersPayroll.registryDays']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="managersPayroll.bandAbsenceMinutes"
+                                   dataModel="#{managersPayrollDataModel}"
+                                   reRender="managersPayrollList, dataScroller">
+                #{messages['ManagersPayroll.lostMinutes']}
             </app:commandSortHeader>
         </rich:column>
         <rich:column>
@@ -168,17 +152,17 @@
             </app:commandSortHeader>
         </rich:column>
         <rich:column>
+            <app:commandSortHeader sortProperty="managersPayroll.seniorityBonus"
+                                   dataModel="#{managersPayrollDataModel}"
+                                   reRender="managersPayrollList, dataScroller">
+                #{messages['ManagersPayroll.seniorityBonus']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
             <app:commandSortHeader sortProperty="managersPayroll.otherIncomes"
                                    dataModel="#{managersPayrollDataModel}"
                                    reRender="managersPayrollList, dataScroller">
                 #{messages['ManagersPayroll.otherIncomes']}
-            </app:commandSortHeader>
-        </rich:column>
-        <rich:column>
-            <app:commandSortHeader sortProperty="managersPayroll.incomeOutOfIva"
-                                   dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.incomeOutOfIva']}
             </app:commandSortHeader>
         </rich:column>
         <rich:column>
@@ -207,13 +191,6 @@
                                    dataModel="#{managersPayrollDataModel}"
                                    reRender="managersPayrollList, dataScroller">
                 #{messages['ManagersPayroll.loanDiscount']}
-            </app:commandSortHeader>
-        </rich:column>
-        <rich:column>
-            <app:commandSortHeader sortProperty="managersPayroll.winDiscount"
-                                   dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.winDiscount']}
             </app:commandSortHeader>
         </rich:column>
         <rich:column>
@@ -258,25 +235,6 @@
                 #{messages['ManagersPayroll.liquid']}
             </app:commandSortHeader>
         </rich:column>
-        <rich:column>
-            <app:commandSortHeader sortProperty="managersPayroll.employee.paymentType"
-                                   dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.paymentType']}
-            </app:commandSortHeader>
-        </rich:column>
-        <rich:column>
-            <app:commandSortHeader dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.clientCode']}
-            </app:commandSortHeader>
-        </rich:column>
-        <rich:column>
-            <app:commandSortHeader dataModel="#{managersPayrollDataModel}"
-                                   reRender="managersPayrollList, dataScroller">
-                #{messages['ManagersPayroll.bankAccount']}
-            </app:commandSortHeader>
-        </rich:column>
     </rich:columnGroup>
 </f:facet>
 <rich:column styleClass="center" rendered="#{generatedPayroll.officialPayrollType}">
@@ -290,14 +248,17 @@
 <rich:column styleClass="center">
     <h:outputText value="#{managersPayrollItem.employee.idNumber}"/>
 </rich:column>
-<rich:column>
-    <h:outputText value="#{managersPayrollItem.employee.lastName}"/>
+<rich:column styleClass="app-payroll__name">
+    <h:outputText value="#{managersPayrollItem.employee.fullName}"/>
 </rich:column>
-<rich:column>
-    <h:outputText value="#{managersPayrollItem.employee.maidenName}"/>
+<rich:column styleClass="app-payroll__charge">
+    <h:outputText value="#{managersPayrollItem.job}"/>
 </rich:column>
-<rich:column>
-    <h:outputText value="#{managersPayrollItem.employee.firstName}"/>
+<rich:column styleClass="right">
+    <h:outputText value="#{managersPayrollItem.seniorityYears}"
+                  rendered="#{managersPayrollItem.seniorityYears > 0}">
+        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+    </h:outputText>
 </rich:column>
 <rich:column>
     <h:outputText value="#{managersPayrollItem.contractInitDate}">
@@ -305,17 +266,26 @@
     </h:outputText>
 </rich:column>
 <rich:column>
-    <h:outputText value="#{managersPayrollItem.area}"/>
-</rich:column>
-<rich:column>
-    <h:outputText value="#{managersPayrollItem.unit}"/>
-</rich:column>
-<rich:column>
-    <h:outputText value="#{managersPayrollItem.job}"/>
-</rich:column>
-<rich:column>
     <h:outputText value="#{managersPayrollItem.workedDays}">
         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{managersPayrollItem.absenceDays}"
+                  rendered="#{managersPayrollItem.absenceDays > 0}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{managersPayrollItem.registryDays}"
+                  rendered="#{managersPayrollItem.registryDays > 0}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column>
+    <h:outputText value="#{managersPayrollItem.bandAbsenceMinutes}"
+                  rendered="#{managersPayrollItem.bandAbsenceMinutes > 0}">
+        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
     </h:outputText>
 </rich:column>
 <rich:column>
@@ -329,12 +299,13 @@
     </h:outputText>
 </rich:column>
 <rich:column>
-    <h:outputText value="#{managersPayrollItem.otherIncomes}">
+    <h:outputText value="#{managersPayrollItem.seniorityBonus}"
+                  rendered="#{managersPayrollItem.seniorityBonus > 0}">
         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
     </h:outputText>
 </rich:column>
 <rich:column>
-    <h:outputText value="#{managersPayrollItem.incomeOutOfIva}">
+    <h:outputText value="#{managersPayrollItem.otherIncomes}">
         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
     </h:outputText>
 </rich:column>
@@ -355,11 +326,6 @@
 </rich:column>
 <rich:column>
     <h:outputText value="#{managersPayrollItem.loanDiscount}">
-        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
-    </h:outputText>
-</rich:column>
-<rich:column>
-    <h:outputText value="#{managersPayrollItem.winDiscount}">
         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
     </h:outputText>
 </rich:column>
@@ -392,18 +358,6 @@
     <h:outputText value="#{managersPayrollItem.liquid}">
         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
     </h:outputText>
-</rich:column>
-<rich:column>
-    <h:outputText value="#{messages[managersPayrollItem.employee.paymentType.resourceKey]}"/>
-</rich:column>
-<c:set var="defaultBankAccount"
-       value="${generatedPayrollAction.isBankAccountPaymentType(managersPayrollItem.employee)?generatedPayrollAction.findDefaultBankAccount(managersPayrollItem.employee):null}"
-       scope="request"/>
-<rich:column>
-    <h:outputText value="#{defaultBankAccount.clientCod}" rendered="#{not empty defaultBankAccount}"/>
-</rich:column>
-<rich:column>
-    <h:outputText value="#{defaultBankAccount.accountNumber}" rendered="#{not empty defaultBankAccount}"/>
 </rich:column>
 
 </rich:dataTable>

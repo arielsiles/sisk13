@@ -606,3 +606,67 @@ UPDATE turno
 --              THEN TIMESTAMPDIFF(MINUTE, t.horainicio, t.horafin)
 --              ELSE TIMESTAMPDIFF(MINUTE, t.horainicio, t.horafin) + 24*60 END) duracion
 --   FROM turno t;
+
+
+-- 23) Control de asistencia por persona (plan 12). El 0 de hoy es el valor por omision, no una
+-- decision: dejarlo apagaria el motor nuevo para todos. Los gerentes se eximen despues, a mano.
+
+UPDATE empleado SET flagcontrol = 1;
+
+-- Para eximir: completar los nombres y descomentar.
+-- UPDATE empleado e JOIN persona p ON p.idpersona = e.idempleado SET e.flagcontrol = 0
+--  WHERE CONCAT(p.apellidopaterno, ' ', p.apellidomaterno, ' ', p.nombres) IN ('', '');
+
+
+-- 24) Rastro por dia de la planilla (plan 12). Sin bandas la fila cuelga del contrato, y guarda
+-- la jornada, su origen y por que se perdio el dia.
+
+ALTER TABLE reportecontrol
+  MODIFY COLUMN idbandahorariac BIGINT NULL,
+  ADD COLUMN idcontrato     BIGINT       NULL AFTER idbandahorariac,
+  ADD COLUMN horainicioprog DATETIME     NULL AFTER fecha,
+  ADD COLUMN horafinprog    DATETIME     NULL AFTER horainicioprog,
+  ADD COLUMN origenjornada  VARCHAR(20)  NULL AFTER horafinprog,
+  ADD COLUMN clasefalta     VARCHAR(20)  NULL AFTER origenjornada,
+  ADD COLUMN diasfalta      DECIMAL(4,2) NULL AFTER clasefalta,
+  ADD CONSTRAINT fk_reportecontrol_contrato FOREIGN KEY (idcontrato) REFERENCES contrato (idcontrato);
+
+
+-- 25) Convivencia de los dos motores (plan 12). La fecha de corte por categoria decide cual
+-- corre; vacia significa bandas. El motor usado se sella en cada planilla generada.
+
+ALTER TABLE categoriapuesto
+  ADD COLUMN jornadasdesde DATE NULL AFTER tipogeneracion;
+
+ALTER TABLE planillagenerada
+  ADD COLUMN motorasistencia VARCHAR(20) NULL AFTER tipoplanillagen;
+
+-- 25.1) Las planillas ya generadas son todas del motor de bandas.
+UPDATE planillagenerada SET motorasistencia = 'BANDS' WHERE motorasistencia IS NULL;
+
+-- 25.2) El rastro viejo cuelga de la banda; se le pone tambien el contrato para que la pantalla
+-- del reporte lea las filas de los dos motores por un solo camino.
+UPDATE reportecontrol rc
+  JOIN bandahorariacontrato bhc ON bhc.idbandahorariacontrato = rc.idbandahorariac
+  JOIN contratopuesto cp ON cp.idcontratopuesto = bhc.idcontratopuesto
+   SET rc.idcontrato = cp.idcontrato
+ WHERE rc.idcontrato IS NULL;
+
+-- 25.3) terdemol arranca con el motor nuevo desde su primer periodo con marcas.
+UPDATE categoriapuesto SET jornadasdesde = '2026-07-01' WHERE nombre = 'TERDEMOL CENTRAL';
+
+
+-- 26) Las dos clases de falta en el recibo (plan 12). Solo las llena el motor de jornadas; con
+-- bandas quedan vacias porque ese motor no clasifica las faltas.
+
+ALTER TABLE planillaadministrativos
+  ADD COLUMN diasfaltaausencia DECIMAL(4,2) NULL AFTER diastrabajados,
+  ADD COLUMN diasfaltaregistro DECIMAL(4,2) NULL AFTER diasfaltaausencia;
+
+
+-- 27) Antiguedad en la planilla de sueldos (plan 12). Se calcula para todos, no solo para quien
+-- genera planilla fiscal. El bono sale en cero mientras no haya tramos cargados.
+
+ALTER TABLE planillaadministrativos
+  ADD COLUMN aniosantiguedad INT          NULL AFTER fechainiciocontrato,
+  ADD COLUMN bonoantiguedad  DECIMAL(13,2) NULL AFTER aniosantiguedad;

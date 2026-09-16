@@ -12,6 +12,7 @@ import org.hibernate.validator.Length;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -225,6 +226,17 @@ public class JobCategory implements BaseModel {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idtolerancia", nullable = false, updatable = false, insertable = true)
     private Tolerance tolerance;
+
+    /**
+     * Desde cuando esta categoria se controla con el motor de jornadas. Vacio: sigue con bandas.
+     * <p/>
+     * Es una fecha y no un interruptor para que regenerar un mes viejo reproduzca el mes viejo.
+     * La categoria es la unidad de una corrida de planilla, asi que cada planilla queda con UN
+     * motor y una sola explicacion, y una empresa puede migrar una categoria por vez.
+     */
+    @Column(name = "jornadasdesde")
+    @Temporal(TemporalType.DATE)
+    private Date journeysFrom;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idlimite", nullable = false, updatable = false, insertable = true)
@@ -603,5 +615,13 @@ public class JobCategory implements BaseModel {
                 ", company=" + company +
                 ", version=" + version +
                 '}';
+    }
+
+    public Date getJourneysFrom() {
+        return journeysFrom;
+    }
+
+    public void setJourneysFrom(Date journeysFrom) {
+        this.journeysFrom = journeysFrom;
     }
 }

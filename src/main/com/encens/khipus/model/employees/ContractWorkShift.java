@@ -48,6 +48,15 @@ import java.util.Date;
                 query = "select o from ContractWorkShift o"
                         + " where o.contract = :contract and o.endDate is null"
                         + " order by o.dayOfWeek asc"),
+        /* Los que ALCANZAN un periodo, no solo los abiertos. Resolver un mes con los abiertos
+           hacia desaparecer la jornada de quien despues cambio de horario: al regenerar un mes
+           viejo, sus dias quedaban sin jornada y por lo tanto sin falta ni atraso. */
+        @NamedQuery(name = "ContractWorkShift.findByContractAndPeriod",
+                query = "select o from ContractWorkShift o"
+                        + " where o.contract = :contract"
+                        + " and o.startDate <= :to"
+                        + " and (o.endDate is null or o.endDate >= :from)"
+                        + " order by o.dayOfWeek asc, o.startDate asc"),
         @NamedQuery(name = "ContractWorkShift.countByWorkShift",
                 query = "select count(o) from ContractWorkShift o where o.workShift = :workShift")
 })

@@ -25,6 +25,7 @@ arriba, en [../README.md](../README.md).
 | [plan_09_vacaciones_cierre_reingreso.md](plan_09_vacaciones_cierre_reingreso.md) | El plan de vacaciones no se cierra nunca y el reingreso no genera uno nuevo | **V1–V5 implementados y probados**: cierre al dar de baja, plan nuevo al reingresar |
 | [plan_10_emparejamiento_marcas.md](plan_10_emparejamiento_marcas.md) | La jornada guía el emparejamiento de las marcas | **E1–E6 implementados y probados** con julio 2026 |
 | [plan_11_marca_incompleta.md](plan_11_marca_incompleta.md) | La jornada con una sola punta marcada: ni falta entera ni día pagado | **F1 y F2 implementados** · F3–F5 van con E2.9 |
+| [plan_12_planilla_motor.md](plan_12_planilla_motor.md) | E2.9: la planilla toma los números del motor, y las tres clases de falta | **P1–P10 implementados**, con los dos motores conviviendo · falta verificar julio 2026 |
 
 ## El orden en que salieron
 

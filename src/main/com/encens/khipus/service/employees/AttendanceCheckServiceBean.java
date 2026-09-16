@@ -5,7 +5,10 @@ import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.employees.RH_Mark;
 import com.encens.khipus.model.employees.WorkGroupMembership;
 import com.encens.khipus.model.finances.Contract;
+import com.encens.khipus.model.finances.JobContract;
+import com.encens.khipus.util.employees.AttendanceEngine;
 import com.encens.khipus.util.employees.attendance.AttendanceMark;
+import com.encens.khipus.util.employees.attendance.ExcusedDay;
 import com.encens.khipus.util.employees.attendance.JourneyAssignment;
 import com.encens.khipus.util.employees.attendance.ScheduledJourney;
 import com.encens.khipus.util.employees.attendance.SessionScheduleMatcher;
@@ -39,10 +42,7 @@ public class AttendanceCheckServiceBean implements AttendanceCheckService {
     private JourneyResolverService journeyResolverService;
 
     @In
-    private WorkGroupService workGroupService;
-
-    @In
-    private HolidayService holidayService;
+    private SpecialDayService specialDayService;
 
     @SuppressWarnings({"unchecked"})
     public List<AttendanceDay> check(Contract contract, Date from, Date to) {
@@ -74,7 +74,8 @@ public class AttendanceCheckServiceBean implements AttendanceCheckService {
         /* El mismo motor que va a usar la planilla: las jornadas salen de las cuatro capas y
            GUIAN el emparejamiento de las marcas. El orden importa: emparejar sin el horario a la
            vista es lo que producia atrasos inventados de horas cuando faltaba una marca. */
-        List<ScheduledJourney> journeys = journeyResolverService.resolve(contract, start, end);
+        PeriodJourneys period = journeyResolverService.resolvePeriod(contract, start, end);
+        List<ScheduledJourney> journeys = period.getJourneys();
         WorkSessionBuilder builder = new WorkSessionBuilder(
                 AttendanceMark.ofImported(marks), journeys);
         SessionScheduleMatcher matcher = new SessionScheduleMatcher(
@@ -82,7 +83,11 @@ public class AttendanceCheckServiceBean implements AttendanceCheckService {
 
         /* Los feriados del periodo, de una sola vez. Es un hecho del dia: se muestra tanto
            si suspendio la jornada como si la persona igual vino a trabajar. */
-        java.util.Set<Long> holidays = holidayService.holidaysBetween(contract, start, end);
+        java.util.Set<Long> holidays = specialDayService.holidaysBetween(contract, start, end);
+
+        /* Los dias que no hay que justificar con marcas: permisos, vacaciones, maternidad. Sin
+           esto, la primera vacacion cargada le pondria falta a cada dia de vacaciones. */
+        Map<Long, ExcusedDay> excused = specialDayService.excusedBetween(contract, start, end);
 
         Map<Long, JourneyAssignment> assignmentByDay = new HashMap<Long, JourneyAssignment>();
         for (JourneyAssignment assignment : matcher.getAssignments()) {
@@ -114,16 +119,15 @@ public class AttendanceCheckServiceBean implements AttendanceCheckService {
             AttendanceDay day = new AttendanceDay(date);
             day.setJourney(journeyByDay.get(key));
             day.setAssignment(assignmentByDay.get(key));
-            day.setSource(journeyResolverService.sourceOf(contract, date));
-            if (JourneyResolverService.JourneySource.GROUP_SCHEDULE.equals(day.getSource())) {
-                WorkGroupMembership membership = workGroupService.findMembership(contract, date);
-                if (null != membership) {
-                    day.setGroupName(membership.getWorkGroup().getName());
-                    day.setLoaned(membership.isLoan());
-                }
+            day.setSource(period.sourceOf(key));
+            WorkGroupMembership membership = period.membershipOf(key);
+            if (null != membership) {
+                day.setGroupName(membership.getWorkGroup().getName());
+                day.setLoaned(membership.isLoan());
             }
             day.setHoliday(holidays.contains(key));
-            day.setSuppressedJourney(journeyResolverService.suppressedByHoliday(contract, date));
+            day.setExcused(excused.get(key));
+            day.setSuppressedJourney(period.suppressedOf(key));
             if (marksByDay.containsKey(key)) {
                 day.setMarks(marksByDay.get(key));
             }
@@ -144,6 +148,25 @@ public class AttendanceCheckServiceBean implements AttendanceCheckService {
             }
         }
         return days;
+    }
+
+    public boolean usesJourneys(Contract contract, Date date) {
+        if (null == contract || null == date) {
+            return true;
+        }
+        for (JobContract jobContract : contract.getJobContractList()) {
+            if (null != jobContract.getJob() && null != jobContract.getJob().getJobCategory()) {
+                return AttendanceEngine.of(
+                        jobContract.getJob().getJobCategory().getJourneysFrom(), date).isJourneys();
+            }
+        }
+        /* Sin categoria no hay fecha de corte que consultar. Se asume el motor nuevo, que es el
+           unico que esta pantalla sabe mostrar. */
+        return true;
+    }
+
+    public boolean hasReadableMarkCode(Employee employee) {
+        return null != employee && null != employee.getMarkCode() && markCodeOf(employee) > 0;
     }
 
     /**

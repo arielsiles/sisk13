@@ -102,6 +102,17 @@
                     <s:convertEnum/>
                 </h:selectOneMenu>
             </s:decorate>
+            <!-- Desde cuando esta categoria se controla con el motor de jornadas. Vacio: sigue
+                 con bandas horarias. Es una fecha y no un interruptor para que regenerar un mes
+                 viejo reproduzca el mes viejo y no lo recalcule con el criterio de hoy. -->
+            <s:decorate id="journeysFromField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['JobCategory.journeysFrom']}</ui:define>
+                <rich:calendar id="journeysFrom" value="#{jobCategory.journeysFrom}"
+                               styleClass="input" tabindex="9"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               locale="#{localeSelector.locale}"/>
+            </s:decorate>
             <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['JobCategory.active']}</ui:define>
                 <h:selectBooleanCheckbox id="retentionFlag" value="#{jobCategory.active}"

@@ -342,6 +342,31 @@ public class ManagersPayroll implements GenericPayroll, FiscalInternalGeneralPay
     @Column(name = "descuentoporminutosatraso", nullable = false, precision = 13, scale = 2)
     private BigDecimal tardinessMinutesDiscount;
 
+    /**
+     * Dias de falta por AUSENCIA: no vino y no tiene excusa. Es la unica clase que se duplica.
+     * Vacio cuando la planilla se controlo con bandas horarias, que no clasifica las faltas.
+     */
+    /**
+     * Anios de antiguedad al cierre del periodo, para TODOS, no solo para quien genera planilla
+     * fiscal. La planilla de sueldos es la de revision general y la antiguedad se mira ahi.
+     */
+    @Column(name = "aniosantiguedad")
+    private Integer seniorityYears;
+
+    /**
+     * El bono que le corresponde a esos anios. Cero cuando la empresa no lo tiene configurado:
+     * no depende de la empresa sino de que existan los tramos cargados.
+     */
+    @Column(name = "bonoantiguedad", precision = 13, scale = 2)
+    private BigDecimal seniorityBonus;
+
+    @Column(name = "diasfaltaausencia", precision = 4, scale = 2)
+    private BigDecimal absenceDays;
+
+    /** Dias de falta por MARCA INCOMPLETA: vino y falta una punta. Se descuenta simple. */
+    @Column(name = "diasfaltaregistro", precision = 4, scale = 2)
+    private BigDecimal registryDays;
+
     @Column(name = "minutosausenciabandas", nullable = true)
     private Integer bandAbsenceMinutes;
 
@@ -885,5 +910,37 @@ public class ManagersPayroll implements GenericPayroll, FiscalInternalGeneralPay
                 ", incomeOutOfIva=" + incomeOutOfIva +
                 ", version=" + version +
                 '}';
+    }
+
+    public BigDecimal getAbsenceDays() {
+        return absenceDays;
+    }
+
+    public void setAbsenceDays(BigDecimal absenceDays) {
+        this.absenceDays = absenceDays;
+    }
+
+    public BigDecimal getRegistryDays() {
+        return registryDays;
+    }
+
+    public void setRegistryDays(BigDecimal registryDays) {
+        this.registryDays = registryDays;
+    }
+
+    public Integer getSeniorityYears() {
+        return seniorityYears;
+    }
+
+    public void setSeniorityYears(Integer seniorityYears) {
+        this.seniorityYears = seniorityYears;
+    }
+
+    public BigDecimal getSeniorityBonus() {
+        return seniorityBonus;
+    }
+
+    public void setSeniorityBonus(BigDecimal seniorityBonus) {
+        this.seniorityBonus = seniorityBonus;
     }
 }

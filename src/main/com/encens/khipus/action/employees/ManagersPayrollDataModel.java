@@ -20,11 +20,16 @@ import java.util.List;
 @Name("managersPayrollDataModel")
 @Scope(ScopeType.CONVERSATION)
 public class ManagersPayrollDataModel extends GenericPayrollDataModel<Long, ManagersPayroll> {
+    /**
+     * Dos filtros y no cuatro: el documento y un solo campo de persona.
+     * <p/>
+     * El campo de persona busca sobre nombres y apellidos juntos, en el mismo orden en que la
+     * lista los muestra, asi que se puede escribir un apellido, un nombre o los dos.
+     */
     private static final String[] RESTRICTIONS = {
             "lower(managersPayroll.employee.idNumber) like concat(lower(#{managersPayrollDataModel.idNumber}), '%')",
-            "lower(managersPayroll.employee.lastName) like concat('%', concat(lower(#{managersPayrollDataModel.lastName}), '%'))",
-            "lower(managersPayroll.employee.maidenName) like concat('%', concat(lower(#{managersPayrollDataModel.maidenName}), '%'))",
-            "lower(managersPayroll.employee.firstName) like concat('%', concat(lower(#{managersPayrollDataModel.firstName}), '%'))"
+            "lower(concat(concat(concat(employee.firstName, ' '), concat(employee.lastName, ' ')), employee.maidenName))"
+                    + " like concat('%', concat(lower(#{managersPayrollDataModel.person}), '%'))"
     };
 
     @Create

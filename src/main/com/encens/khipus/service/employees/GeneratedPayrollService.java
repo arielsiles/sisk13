@@ -12,6 +12,7 @@ import com.encens.khipus.model.finances.Contract;
 import com.encens.khipus.model.finances.FinancesBankAccount;
 import com.encens.khipus.model.finances.RotatoryFundCollection;
 import com.encens.khipus.util.employees.PayrollGenerationResult;
+import com.encens.khipus.util.employees.payroll.PayrollBlockers;
 
 import javax.ejb.Local;
 import java.util.Calendar;
@@ -39,6 +40,16 @@ public interface GeneratedPayrollService {
     List<GeneratedPayroll> findGeneratedPayrollsByGestionPayroll(GestionPayroll gestionPayroll);
 
     PayrollGenerationResult fillPayroll(GeneratedPayroll generatedPayroll) throws Exception;
+
+    /**
+     * Cuantas jornadas de la planilla se cobran como falta por faltarles una marca.
+     * <p/>
+     * Es la lista de adelante: pasar a OFICIAL es decision de RRHH y este numero no se la quita,
+     * pero le dice cuanto va a costar antes del paso irreversible. Son dias corregibles -la
+     * pantalla de marcas permite agregar la marca que falta-, y sin este aviso el descuento
+     * aparecia recien en el recibo.
+     */
+    Long countIncompleteMarkDays(GeneratedPayroll generatedPayroll);
 
     PayrollGenerationResult fillProffesorsPayroll(GeneratedPayroll generatedPayroll, List<Employee> employeeList, List<Date> specialDate4BusinessUnit, Map<Date, List<TimeInterval>> specialDateTime4BusinessUnit, Map<Long, List<Date>> specialDate4OrganizationalUnit, Map<Long, Map<Date, List<TimeInterval>>> specialDateTimeForOrganizationalUnit, List<RotatoryFundCollection> newRotatoryFundCollectionList);
 
@@ -127,8 +138,7 @@ public interface GeneratedPayrollService {
                                                 Map<Long, List<Date>> specialDate4OrganizationalUnit,
                                                 Map<Long, Map<Date, List<TimeInterval>>> specialDateTimeForOrganizationalUnit,
                                                 List<RotatoryFundCollection> newRotatoryFundCollectionList,
-                                                List<String> employeesWithoutBands,
-                                                List<String> employeesWithoutContracts);
+                                                PayrollBlockers blockers);
 
     Long countOfficialGeneratedPayrollByGestionPayrollParameters(GestionPayroll gestionPayroll);
 

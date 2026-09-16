@@ -217,9 +217,19 @@
                                     </td>
 
                                     <td>
+                                        <!-- Un dia perdonado no es falta aunque la jornada figure
+                                             perdida: permiso, vacacion o maternidad de dia completo.
+                                             Sin esta distincion, la primera vacacion cargada saldria
+                                             como falta todos los dias. -->
+                                        <h:outputText styleClass="app-tag"
+                                                      value="#{messages[dayItem.excusedReasonKey]}"
+                                                      rendered="#{dayItem.excused}"/>
+                                        <h:outputText styleClass="app-tag app-tag--absent"
+                                                      value="#{messages['AttendanceCheck.unpaidLeave']}"
+                                                      rendered="#{dayItem.unpaidLeave}"/>
                                         <h:outputText styleClass="app-tag app-tag--absent"
                                                       value="#{messages['AttendanceCheck.absent']}"
-                                                      rendered="#{dayItem.absent}"/>
+                                                      rendered="#{dayItem.absent and !dayItem.excused and !dayItem.unpaidLeave}"/>
                                         <h:outputFormat styleClass="app-tag app-tag--warn"
                                                         value="#{messages['AttendanceCheck.late']}"
                                                         rendered="#{dayItem.late}">

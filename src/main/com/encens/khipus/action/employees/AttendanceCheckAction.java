@@ -1,6 +1,7 @@
 package com.encens.khipus.action.employees;
 
 import com.encens.khipus.action.employees.dto.AttendanceDay;
+import com.encens.khipus.action.employees.dto.AttendancePeriodSummary;
 import com.encens.khipus.model.employees.Employee;
 import com.encens.khipus.model.finances.Contract;
 import com.encens.khipus.service.employees.AttendanceCheckService;
@@ -93,6 +94,13 @@ public class AttendanceCheckAction implements Serializable {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
                     "AttendanceCheck.warn.withoutMarkCode", employee.getFullName());
         }
+        /* Esta pantalla corre SOLO el motor de jornadas. Para alguien de una categoria que
+           todavia se controla por bandas mostraria "sin jornada" todos los dias, y eso no es un
+           dato: es la pantalla mintiendo. Se avisa en vez de dejar que lo interprete. */
+        if (!attendanceCheckService.usesJourneys(contract, startDate)) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "AttendanceCheck.warn.bandsEngine", employee.getFullName());
+        }
         try {
             days = attendanceCheckService.check(contract, startDate, endDate);
             checked = true;
@@ -115,68 +123,39 @@ public class AttendanceCheckAction implements Serializable {
 
     // --------------------------------------------------------------- totales
 
-    /** Dias con la jornada cumplida. Una jornada perdida no cuenta como trabajada. */
-    public int getWorkedDays() {
-        int total = 0;
-        for (AttendanceDay day : days) {
-            if (day.isWorking() && !day.isLost()) {
-                total++;
-            }
-        }
-        return total;
+    /**
+     * Los totales del periodo. La pantalla no suma nada por su cuenta: lee el mismo resumen que
+     * consume la planilla, asi que si el recibo no coincide con lo que se ve aca es un defecto y
+     * no una diferencia de criterio.
+     */
+    public AttendancePeriodSummary getSummary() {
+        return AttendancePeriodSummary.of(days);
     }
 
-    /**
-     * Faltas del mes, en dias. Suma medios dias, asi que puede dar 4,5.
-     * <p/>
-     * Cuenta las jornadas perdidas, no solo las que no tienen ninguna marca: un dia con una sola
-     * punta marcada tambien se perdio, y cobrarlo completo seria pagar sin prueba.
-     */
+    public int getWorkedDays() {
+        return getSummary().getWorkedDays();
+    }
+
+    /** Faltas del mes, en dias. Suma medios dias, asi que puede dar 4,5. */
     public double getAbsentDays() {
-        double total = 0;
-        for (AttendanceDay day : days) {
-            total += day.getAbsenceDays();
-        }
-        return total;
+        return getSummary().getLostDays();
     }
 
     /** De las faltas de arriba, cuantas son por marca incompleta. Son las revisables. */
     public int getIncompleteMarkDays() {
-        int total = 0;
-        for (AttendanceDay day : days) {
-            if (day.isLostWithMarks()) {
-                total++;
-            }
-        }
-        return total;
+        return getSummary().getReviewDayCount();
     }
 
     public int getLateDays() {
-        int total = 0;
-        for (AttendanceDay day : days) {
-            if (day.isLate()) {
-                total++;
-            }
-        }
-        return total;
+        return getSummary().getLateDays();
     }
 
     public int getLatenessMinutes() {
-        int total = 0;
-        for (AttendanceDay day : days) {
-            total += day.getLatenessMinutes();
-        }
-        return total;
+        return getSummary().getLatenessMinutes();
     }
 
     public Double getScheduledHours() {
-        long minutes = 0;
-        for (AttendanceDay day : days) {
-            if (day.isWorking()) {
-                minutes += day.getJourney().getMinutes();
-            }
-        }
-        return minutes / 60d;
+        return getSummary().getScheduledHours();
     }
 
     public boolean isEmptyResult() {

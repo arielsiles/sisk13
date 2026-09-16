@@ -82,6 +82,30 @@ Detalle en [03_calculos_planilla.md](03_calculos_planilla.md). Reactivar el cál
 automático implica: cargar la tasa IVA real, habilitar la captura de formularios 110, y
 decidir qué pasa con los RC-IVA históricos cargados a mano.
 
+**La carga a mano sí funciona, aunque el código lo disimula.** A primera vista el movimiento
+`RCIVA` se pierde: se acumula al leer los movimientos de sueldo y unas líneas más abajo, para
+quien genera planilla fiscal, el valor se **asigna** —no se suma— desde la cadena tributaria:
+
+```java
+totalRCIvaDiscount = categoryTributaryPayroll.getRetentionClearance().doubleValue();
+```
+
+No se pierde porque el importe **viaja dentro del generador**: se le pasa como parámetro y
+`RetentionClearanceCalculator` lo vuelve a sumar al final.
+
+```java
+instance.setRetentionClearance(saldoFisico - saldoUsado);
+instance.setRetentionClearance(retentionClearance + totalRCIvaDiscount);   // vuelve el movimiento
+```
+
+Es un viaje de ida y vuelta. Verificado con datos: cargando 100 de RC-IVA a una persona de cada
+lado del flag, **las dos muestran 100**.
+
+Queda anotado igual porque el código se lee al revés de lo que hace: una asignación que parece
+pisar un valor y en realidad lo recupera tres clases más abajo. Al reactivar el módulo hay que
+decidir si el movimiento manual debe **sumarse** al cálculo automático —que es lo que haría hoy—
+o reemplazarlo.
+
 ## 🟠 `otherIncomes` se suma dos veces
 
 [OtherIncomesCalculator](../../src/main/com/encens/khipus/util/employees/payroll/tributary/OtherIncomesCalculator.java)

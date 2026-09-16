@@ -36,6 +36,16 @@ public interface JourneyResolverService {
     List<ScheduledJourney> resolve(Contract contract, Date from, Date to);
 
     /**
+     * Todo lo del periodo de una sola vez: la jornada, de que capa salio, la que el feriado
+     * suprimio y a que grupo pertenecia.
+     * <p/>
+     * Es lo que hay que usar cuando se recorre un periodo. Los metodos por dia cuestan entre tres
+     * y cuatro consultas cada uno; llamarlos dentro de un bucle de treinta y un dias, por cada una
+     * de doscientas cuarenta y cinco personas, son decenas de miles de viajes a la base.
+     */
+    PeriodJourneys resolvePeriod(Contract contract, Date from, Date to);
+
+    /**
      * De donde salio la jornada de ese dia. Se usa en las pantallas de control para poder
      * explicarle a alguien por que se le evaluo contra ese horario.
      */

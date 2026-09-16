@@ -22,33 +22,40 @@ import java.util.List;
 public class ControlReportDataModel extends QueryDataModel<Long, ControlReport> {
 
 
-    private String idNumber = "0";
-    private String lastName;
-    private String maidenName;
-    private String firstName;
+    /**
+     * La busqueda por persona cuelga del CONTRATO y ya no de la banda horaria.
+     * <p/>
+     * Con el motor nuevo no hay banda: el camino viejo -banda, puesto, contrato, empleado- dejaba
+     * la fila huerfana y la busqueda por nombre no encontraba nada.
+     */
+    private String person;
 
     private static final String[] RESTRICTIONS = {
             "controlReport.generatedPayroll = #{controlReportAction.generatedPayroll}",
-            "controlReport.horaryBandContract.jobContract.contract.employee.idNumber = #{controlReportDataModel.idNumber}",
-            "lower(controlReport.horaryBandContract.jobContract.contract.employee.lastName) like concat('%', concat(lower(#{controlReportDataModel.lastName}), '%'))",
-            "lower(controlReport.horaryBandContract.jobContract.contract.employee.maidenName) like concat('%', concat(lower(#{controlReportDataModel.maidenName}), '%'))",
-            "lower(controlReport.horaryBandContract.jobContract.contract.employee.firstName) like concat('%', concat(lower(#{controlReportDataModel.firstName}), '%'))"};
+            "lower(concat(concat(concat(concat(employee.lastName, ' '), concat(employee.maidenName, ' ')), employee.firstName), concat(' ', employee.idNumber)))"
+                    + " like concat('%', concat(lower(#{controlReportDataModel.person}), '%'))"};
 
 
     @Create
     public void init() {
-        //sortProperty = "controlReport.horaryBandContract.jobContract.contract.employee.idNumber";
         sortProperty = "controlReport.date";
     }
 
     @Override
     public String getEjbql() {
         return "select controlReport from ControlReport controlReport " +
-                "left join fetch controlReport.horaryBandContract horaryBandContract " +
-                "left join fetch horaryBandContract.jobContract jobContract" +
-                " left join fetch jobContract.contract contract" +
+                " left join fetch controlReport.contract contract" +
                 " left join fetch contract.employee employee";
 
+    }
+
+    /** Un solo campo para buscar: apellidos, nombre o documento. */
+    public String getPerson() {
+        return person;
+    }
+
+    public void setPerson(String person) {
+        this.person = (null == person || 0 == person.trim().length()) ? null : person.trim();
     }
 
     public List<ControlReport> getSelectedControlReportDates() {
@@ -68,35 +75,4 @@ public class ControlReportDataModel extends QueryDataModel<Long, ControlReport> 
         return Arrays.asList(RESTRICTIONS);
     }
 
-    public String getIdNumber() {
-        return idNumber;
-    }
-
-    public void setIdNumber(String idNumber) {
-        this.idNumber = idNumber;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getMaidenName() {
-        return maidenName;
-    }
-
-    public void setMaidenName(String maidenName) {
-        this.maidenName = maidenName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
 }

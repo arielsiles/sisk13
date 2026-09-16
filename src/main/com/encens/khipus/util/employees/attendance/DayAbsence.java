@@ -3,7 +3,7 @@ package com.encens.khipus.util.employees.attendance;
 import java.util.List;
 
 /**
- * Cuanta falta deja un dia, mirando todas sus jornadas.
+ * Cuanta falta deja un dia, mirando todas sus jornadas, y de que clase es.
  * <p/>
  * <pre>
  * pierde TODAS las jornadas del dia    ->  1 dia
@@ -20,9 +20,21 @@ import java.util.List;
  * <p/>
  * Es la regla del motor viejo sin la adivinanza. No se agrega nada: se saca lo que sobraba. Y de
  * paso desaparece la pregunta del genero para este calculo.
+ *
+ * <h3>Las tres clases</h3>
+ * El dia perdido no siempre cuesta lo mismo, y la planilla necesita saberlo <b>separado</b>:
+ * <table>
+ *   <tr><td><b>Ausencia</b></td><td>no vino y no tiene excusa</td><td>1 dia, y la planilla lo
+ *       duplica</td></tr>
+ *   <tr><td><b>Registro</b></td><td>vino y falta una punta</td><td>1 dia o medio, simple</td></tr>
+ *   <tr><td><b>Sin goce</b></td><td>licencia aprobada sin goce de haber</td><td>1 dia,
+ *       simple</td></tr>
+ * </table>
+ * El x2 es una <b>sancion</b> y es para quien no vino. Quien marco mal cometio un error de
+ * registro; quien tiene licencia sin goce no cometio ninguno: simplemente ese dia no se le paga.
  * <p/>
- * Vive en el motor y no en la pantalla porque la planilla va a usar exactamente esto: si se
- * duplicara, con el tiempo dirian cosas distintas.
+ * Vive en el motor y no en la pantalla porque la planilla usa exactamente esto: si se duplicara,
+ * con el tiempo dirian cosas distintas.
  *
  * @author
  * @version 6.1.0
@@ -34,43 +46,112 @@ public final class DayAbsence {
 
     private final int journeys;
     private final int lost;
+    private final int lostWithMarks;
     private final long lostMinutes;
+    private final long scheduledMinutes;
+    private final ExcusedDay excused;
 
-    private DayAbsence(int journeys, int lost, long lostMinutes) {
+    private DayAbsence(int journeys, int lost, int lostWithMarks,
+                       long lostMinutes, long scheduledMinutes, ExcusedDay excused) {
         this.journeys = journeys;
         this.lost = lost;
+        this.lostWithMarks = lostWithMarks;
         this.lostMinutes = lostMinutes;
+        this.scheduledMinutes = scheduledMinutes;
+        this.excused = excused;
+    }
+
+    public static DayAbsence of(List<JourneyEvaluation> evaluations) {
+        return of(evaluations, null);
     }
 
     /**
      * @param evaluations las jornadas de UN dia. Sin jornadas no hay nada que perder: ese dia no
      *                    le tocaba trabajar.
+     * @param excused     la fecha especial de dia completo que cubre ese dia, o null.
      */
-    public static DayAbsence of(List<JourneyEvaluation> evaluations) {
+    public static DayAbsence of(List<JourneyEvaluation> evaluations, ExcusedDay excused) {
         int total = 0;
         int lost = 0;
+        int withMarks = 0;
         long minutes = 0;
+        long scheduled = 0;
         if (null != evaluations) {
             for (JourneyEvaluation evaluation : evaluations) {
                 if (null == evaluation || null == evaluation.getJourney()) {
                     continue;
                 }
                 total++;
+                scheduled += evaluation.getScheduledMinutes();
                 if (evaluation.isLost()) {
                     lost++;
                     minutes += evaluation.getLostMinutes();
+                    if (!evaluation.isAbsent()) {
+                        withMarks++;
+                    }
                 }
             }
         }
-        return new DayAbsence(total, lost, minutes);
+        return new DayAbsence(total, lost, withMarks, minutes, scheduled, excused);
     }
 
-    /** Cuanto dia se perdio: 0, medio o uno. */
+    /** El dia esta perdonado: permiso, vacacion, feriado propio, con goce de haber. */
+    public boolean isExcused() {
+        return null != excused && excused.isPaid();
+    }
+
+    /**
+     * Licencia aprobada <b>sin</b> goce de haber: el dia no se paga, haya marcado o no.
+     * <p/>
+     * Que no se mire si marco es deliberado. La licencia es un hecho administrativo aprobado; si
+     * alguien tiene licencia sin goce y ademas marco, eso es una contradiccion de datos que RRHH
+     * tiene que resolver, no algo que el motor deba interpretar solo.
+     */
+    public boolean isUnpaidLeave() {
+        return null != excused && !excused.isPaid();
+    }
+
+    /** Cuanto dia se perdio en total: 0, medio o uno. */
     public double getDays() {
-        if (0 == journeys || 0 == lost) {
+        if (0 == journeys || isExcused()) {
+            return 0d;
+        }
+        if (isUnpaidLeave()) {
+            return FULL_DAY;
+        }
+        if (0 == lost) {
             return 0d;
         }
         return lost == journeys ? FULL_DAY : HALF_DAY;
+    }
+
+    /** No vino y no tiene excusa. Es la unica clase que la planilla duplica. */
+    public double getAbsenceDays() {
+        return share(lost - lostWithMarks);
+    }
+
+    /** Vino y falta una punta. Se le descuenta el dia, pero no se lo sanciona al doble. */
+    public double getRegistryDays() {
+        return share(lostWithMarks);
+    }
+
+    /** Licencia sin goce de haber. */
+    public double getUnpaidDays() {
+        return isUnpaidLeave() ? getDays() : 0d;
+    }
+
+    /**
+     * La parte del dia que corresponde a N de las jornadas perdidas.
+     * <p/>
+     * Reparte proporcionalmente porque un dia puede perder dos jornadas por causas distintas
+     * -la manana sin ninguna marca y la tarde con una sola punta-, y ahi el medio dia de cada una
+     * tiene que ir a su clase. Con una sola jornada por dia el reparto es todo o nada.
+     */
+    private double share(int n) {
+        if (0 == n || 0 == lost || isExcused() || isUnpaidLeave()) {
+            return 0d;
+        }
+        return getDays() * n / lost;
     }
 
     public boolean isPartial() {
@@ -89,6 +170,10 @@ public final class DayAbsence {
         return lost;
     }
 
+    public ExcusedDay getExcused() {
+        return excused;
+    }
+
     /**
      * Los minutos programados que se perdieron.
      * <p/>
@@ -96,6 +181,9 @@ public final class DayAbsence {
      * jornada corta, esa decision es del calculo de planilla y el dato ya esta.
      */
     public long getLostMinutes() {
-        return lostMinutes;
+        if (isExcused()) {
+            return 0;
+        }
+        return isUnpaidLeave() ? scheduledMinutes : lostMinutes;
     }
 }
