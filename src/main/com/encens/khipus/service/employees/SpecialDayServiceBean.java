@@ -6,6 +6,7 @@ import com.encens.khipus.model.employees.SpecialDateTarget;
 import com.encens.khipus.model.employees.SpecialDateType;
 import com.encens.khipus.model.finances.Contract;
 import com.encens.khipus.util.employees.attendance.ExcusedDay;
+import com.encens.khipus.util.employees.attendance.ExcusedInterval;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -15,6 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,8 +43,8 @@ public class SpecialDayServiceBean implements SpecialDayService {
      * resto del sistema. En terdemol los 245 empleados tienen `empleado.idunidadnegocio` en
      * nulo, asi que mirar solo ese campo hacia que un feriado nacional no alcanzara a nadie.
      * <p/>
-     * Solo cuentan los de dia completo. Una fecha de medio dia no suspende ni perdona la jornada;
-     * eso es un permiso acotado y se resuelve por otro lado -E2.6-.
+     * `allDay` viene como parametro: las de dia completo suspenden o perdonan la jornada entera,
+     * las parciales justifican un tramo de horas.
      */
     private static final String TARGETED =
             "select o from SpecialDate o"
@@ -69,6 +71,9 @@ public class SpecialDayServiceBean implements SpecialDayService {
      * Excluirlas seria empezar a cobrar dias que hasta ayer estaban perdonados.
      */
     private static final String EXCUSED = TARGETED + " and (o.reason is null or o.reason <> :reason)";
+
+    /** Los permisos por horas: los que NO son de dia completo. El feriado no entra: es de dia. */
+    private static final String PARTIAL = TARGETED;
 
     @In(value = "#{entityManager}")
     private EntityManager em;
@@ -118,6 +123,75 @@ public class SpecialDayServiceBean implements SpecialDayService {
             }
         }
         return excused;
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public Map<Long, List<ExcusedInterval>> excusedIntervalsBetween(Contract contract, Date from, Date to) {
+        Map<Long, List<ExcusedInterval>> intervals = new HashMap<Long, List<ExcusedInterval>>();
+        if (!addressable(contract, from, to)) {
+            return intervals;
+        }
+        List<SpecialDate> specialDates = em.createQuery(PARTIAL)
+                .setParameter("allDay", Boolean.FALSE)
+                .setParameter("from", startOfDay(from))
+                .setParameter("to", startOfDay(to))
+                .setParameter("targetEmployee", SpecialDateTarget.EMPLOYEE)
+                .setParameter("employee", contract.getEmployee())
+                .setParameter("targetBusinessUnit", SpecialDateTarget.BUSINESSUNIT)
+                .setParameter("businessUnit", contract.getEmployee().getBusinessUnit())
+                .setParameter("targetUnit", SpecialDateTarget.ORGANIZATIONALUNIT)
+                .setParameter("contract", contract)
+                .getResultList();
+
+        for (SpecialDate specialDate : specialDates) {
+            if (null == specialDate.getStartTime() || null == specialDate.getEndTime()) {
+                /* Sin horas no hay tramo que perdonar. Una fecha parcial sin horario es un dato
+                   incompleto, y adivinar cual era el tramo seria regalar minutos. */
+                continue;
+            }
+            for (Long key : daysOf(specialDate, from, to)) {
+                List<ExcusedInterval> ofDay = intervals.get(key);
+                if (null == ofDay) {
+                    ofDay = new ArrayList<ExcusedInterval>();
+                    intervals.put(key, ofDay);
+                }
+                Date start = at(new Date(key), specialDate.getStartTime());
+                Date end = at(new Date(key), specialDate.getEndTime());
+                if (!end.after(start)) {
+                    /* El fin antes que el inicio solo puede significar que el tramo termina al dia
+                       siguiente: 23:30 a 03:30 del turno de noche. Sin esto el tramo quedaba vacio
+                       y el permiso no perdonaba nada. */
+                    end = addDays(end, 1);
+                }
+                ofDay.add(new ExcusedInterval(start, end));
+            }
+        }
+        return intervals;
+    }
+
+    /**
+     * La hora de un permiso, puesta sobre el dia que corresponde.
+     * <p/>
+     * `fechaespecial` guarda el horario como hora suelta y el rango como fechas: un permiso de
+     * 14:00 a 18:00 del lunes al miercoles son tres tramos, uno por dia.
+     */
+    private static Date at(Date day, Date hour) {
+        Calendar result = Calendar.getInstance();
+        result.setTime(startOfDay(day));
+        Calendar time = Calendar.getInstance();
+        time.setTime(hour);
+        result.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
+        result.set(Calendar.MINUTE, time.get(Calendar.MINUTE));
+        result.set(Calendar.SECOND, 0);
+        result.set(Calendar.MILLISECOND, 0);
+        return result.getTime();
+    }
+
+    private static Date addDays(Date date, int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_MONTH, days);
+        return calendar.getTime();
     }
 
     private boolean addressable(Contract contract, Date from, Date to) {

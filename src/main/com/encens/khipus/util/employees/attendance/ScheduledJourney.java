@@ -2,6 +2,7 @@ package com.encens.khipus.util.employees.attendance;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,6 +44,10 @@ public class ScheduledJourney {
      */
     private Date windowStart;
     private Date windowEnd;
+
+    /* Los permisos por horas que caen sobre esta jornada. Viven aca y no en la evaluacion
+       porque son un hecho del dia, igual que el horario: la evaluacion los consulta. */
+    private List<ExcusedInterval> excusedIntervals = new ArrayList<ExcusedInterval>();
 
     public ScheduledJourney(Date start, Date end, int entryToleranceMinutes,
                             int earlyExitToleranceMinutes, Long sourceId) {
@@ -137,6 +142,15 @@ public class ScheduledJourney {
         long toStart = Math.abs(moment.getTime() - start.getTime());
         long toEnd = Math.abs(moment.getTime() - end.getTime());
         return toStart <= toEnd;
+    }
+
+    public List<ExcusedInterval> getExcusedIntervals() {
+        return excusedIntervals;
+    }
+
+    public void setExcusedIntervals(List<ExcusedInterval> excusedIntervals) {
+        this.excusedIntervals = null == excusedIntervals
+                ? new ArrayList<ExcusedInterval>() : excusedIntervals;
     }
 
     public Date getWindowStart() {

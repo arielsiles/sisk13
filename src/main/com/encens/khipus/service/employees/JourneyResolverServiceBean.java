@@ -6,6 +6,7 @@ import com.encens.khipus.model.employees.ScheduleException;
 import com.encens.khipus.model.employees.WorkGroupMembership;
 import com.encens.khipus.model.employees.WorkShift;
 import com.encens.khipus.model.finances.Contract;
+import com.encens.khipus.util.employees.attendance.ExcusedInterval;
 import com.encens.khipus.util.employees.attendance.ScheduledJourney;
 import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.In;
@@ -107,6 +108,12 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
         Date end = startOfDay(to);
         Map<Long, ScheduleException> exceptions = exceptionsOf(contract, start, end);
         Set<Long> holidays = specialDayService.holidaysBetween(contract, start, end);
+        /* Los permisos por horas del periodo, de una sola vez. Cuelgan de la jornada porque son
+           un hecho del dia, igual que el horario: la evaluacion los consulta desde ahi.
+           Se piden con un dia de mas: una jornada de noche empieza el 13 y termina el 14, y su
+           permiso de salida puede estar cargado en el 14. */
+        Map<Long, List<ExcusedInterval>> excused =
+                specialDayService.excusedIntervalsBetween(contract, start, addDays(end, 1));
         Map<String, GroupScheduleDay> scheduleDays = new HashMap<String, GroupScheduleDay>();
         Map<Long, Boolean> inGroup = new HashMap<Long, Boolean>();
         List<ContractWorkShift> contractShifts = contractShiftsOf(contract, start, end);
@@ -122,7 +129,7 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
             /* 1. La excepcion de esa persona ese dia. */
             ScheduleException exception = exceptions.get(key);
             if (null != exception) {
-                period.put(key, journeyOf(date, exception.getWorkShift()),
+                period.put(key, excusedJourney(journeyOf(date, exception.getWorkShift()), excused, key),
                         JourneySource.EXCEPTION, null, null);
                 current.add(Calendar.DAY_OF_MONTH, 1);
                 continue;
@@ -141,7 +148,8 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
                 GroupScheduleDay scheduleDay = scheduleDays.get(groupKey(groupId, date));
                 ScheduledJourney journey = (null != scheduleDay && scheduleDay.isPublished())
                         ? journeyOf(date, scheduleDay.getWorkShift()) : null;
-                period.put(key, journey, JourneySource.GROUP_SCHEDULE, null, membership);
+                period.put(key, excusedJourney(journey, excused, key),
+                        JourneySource.GROUP_SCHEDULE, null, membership);
                 current.add(Calendar.DAY_OF_MONTH, 1);
                 continue;
             }
@@ -153,7 +161,8 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
                 if (holidays.contains(key)) {
                     period.put(key, null, JourneySource.HOLIDAY, journey, null);
                 } else {
-                    period.put(key, journey, JourneySource.CONTRACT_SCHEDULE, null, null);
+                    period.put(key, excusedJourney(journey, excused, key),
+                            JourneySource.CONTRACT_SCHEDULE, null, null);
                 }
                 current.add(Calendar.DAY_OF_MONTH, 1);
                 continue;
@@ -197,6 +206,55 @@ public class JourneyResolverServiceBean implements JourneyResolverService {
     }
 
     // ------------------------------------------------------------------ apoyo
+
+    /**
+     * Agrega solo los permisos que se pisan con la jornada.
+     * <p/>
+     * El filtro importa por el turno de noche: la jornada del 29 termina el 30 a las 07:30, asi
+     * que mira tambien los permisos del 30 -ahi puede estar cargada su salida-, pero un permiso
+     * del 30 de 19:30 a 07:30 es de la jornada SIGUIENTE y no la toca. Sin el filtro, ese dia
+     * mostraba "Permiso 19:30-07:30" al lado de "Falta", que no hay forma de explicar.
+     */
+    private static void addTouching(List<ExcusedInterval> target, List<ExcusedInterval> candidates,
+                                    ScheduledJourney journey) {
+        if (null == candidates) {
+            return;
+        }
+        for (ExcusedInterval interval : candidates) {
+            if (interval.overlapMinutes(journey.getStart(), journey.getEnd()) > 0) {
+                target.add(interval);
+            }
+        }
+    }
+
+    /**
+     * Le cuelga a la jornada los permisos por horas que la alcanzan.
+     * <p/>
+     * Una jornada que cruza la medianoche toma tambien los del dia siguiente: empieza el 13 y
+     * termina el 14, asi que un permiso de salida cargado el 14 es suyo. Sin esto, el turno de
+     * noche seria el unico al que los permisos por horas no le sirven.
+     */
+    private static ScheduledJourney excusedJourney(ScheduledJourney journey,
+                                                   Map<Long, List<ExcusedInterval>> excused,
+                                                   Long key) {
+        if (null == journey) {
+            return null;
+        }
+        List<ExcusedInterval> intervals = new ArrayList<ExcusedInterval>();
+        addTouching(intervals, excused.get(key), journey);
+        if (journey.crossesMidnight()) {
+            addTouching(intervals, excused.get(addDays(new Date(key), 1).getTime()), journey);
+        }
+        journey.setExcusedIntervals(intervals);
+        return journey;
+    }
+
+    private static Date addDays(Date date, int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_MONTH, days);
+        return calendar.getTime();
+    }
 
     private static void addIfWorking(List<ScheduledJourney> journeys, Date day, WorkShift shift) {
         ScheduledJourney journey = journeyOf(day, shift);

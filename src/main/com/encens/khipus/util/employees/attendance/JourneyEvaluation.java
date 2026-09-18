@@ -62,9 +62,37 @@ public class JourneyEvaluation {
         return true;
     }
 
-    /** Los minutos que la jornada exigia, cuando se perdio. Cero si se cumplio. */
+    /**
+     * Los minutos que la jornada exigia y no se cubrieron, cuando se perdio.
+     * <p/>
+     * Se descuenta lo que justifica un permiso por horas: si el permiso tapa la jornada entera no
+     * se perdio nada, y si tapa la mitad se perdio la otra mitad. Antes se cobraba la jornada
+     * completa aunque hubiera permiso, porque el permiso solo se miraba para el atraso.
+     */
     public long getLostMinutes() {
-        return isLost() ? getScheduledMinutes() : 0;
+        if (!isLost()) {
+            return 0;
+        }
+        long uncovered = getScheduledMinutes() - getExcusedMinutes();
+        return uncovered <= 0 ? 0 : uncovered;
+    }
+
+    /** Los minutos de la jornada que cubre un permiso por horas. */
+    public long getExcusedMinutes() {
+        return null == journey ? 0 : excused(journey.getStart(), journey.getEnd());
+    }
+
+    /**
+     * La parte de la jornada que se perdio: 1 entera, 0 si el permiso la cubrio toda.
+     * <p/>
+     * Es lo que permite que medio periodo cubierto por permiso cueste medio dia y no uno entero.
+     */
+    public double getLostShare() {
+        long scheduled = getScheduledMinutes();
+        if (!isLost() || scheduled <= 0) {
+            return 0d;
+        }
+        return (double) getLostMinutes() / scheduled;
     }
 
     public Date getEntry() {
@@ -107,7 +135,8 @@ public class JourneyEvaluation {
         if (isLost() || null == getEntry()) {
             return 0;
         }
-        long minutes = minutesBetween(journey.getStart(), getEntry());
+        long minutes = minutesBetween(journey.getStart(), getEntry())
+                - excused(journey.getStart(), getEntry());
         return minutes <= journey.getEntryToleranceMinutes() ? 0 : (int) minutes;
     }
 
@@ -126,7 +155,8 @@ public class JourneyEvaluation {
         if (isLost() || null == getExit() || hasAssumedExit()) {
             return 0;
         }
-        long minutes = minutesBetween(getExit(), journey.getEnd());
+        long minutes = minutesBetween(getExit(), journey.getEnd())
+                - excused(getExit(), journey.getEnd());
         return minutes <= journey.getEarlyExitToleranceMinutes() ? 0 : (int) minutes;
     }
 
@@ -196,6 +226,18 @@ public class JourneyEvaluation {
 
     public JourneyAssignment getAssignment() {
         return assignment;
+    }
+
+    /**
+     * Los minutos de ese tramo que un permiso por horas justifica.
+     * <p/>
+     * Se descuentan ANTES de la tolerancia: el permiso saca el tiempo autorizado y la tolerancia
+     * se aplica a lo que queda. Al reves, media hora de atraso con veinte minutos de permiso
+     * seguiria pasandose de la tolerancia y se cobraria entera.
+     */
+    private long excused(Date from, Date to) {
+        return null == journey ? 0
+                : ExcusedInterval.excusedMinutes(journey.getExcusedIntervals(), from, to);
     }
 
     private static long minutesBetween(Date from, Date to) {

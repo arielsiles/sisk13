@@ -39,11 +39,10 @@
                                popup="true" enableManualInput="true"
                                inputClass="app-filterbar__input app-filterbar__input--date"/>
 
-                <a4j:commandLink action="#{attendanceCheckAction.check}"
-                                 styleClass="app-btn-primary"
-                                 reRender="filterBar, summary, dayList, :globalMessages">
-                    <h:outputText value="#{messages['AttendanceCheck.check']}"/>
-                </a4j:commandLink>
+                <a4j:commandButton action="#{attendanceCheckAction.check}"
+                                   value="#{messages['AttendanceCheck.check']}"
+                                   styleClass="app-btn-primary"
+                                   reRender="filterBar, summary, dayList, :globalMessages"/>
             </a4j:outputPanel>
 
             <!-- Resumen del periodo. Son los numeros que se miran primero.
@@ -227,9 +226,17 @@
                                         <h:outputText styleClass="app-tag app-tag--absent"
                                                       value="#{messages['AttendanceCheck.unpaidLeave']}"
                                                       rendered="#{dayItem.unpaidLeave}"/>
+                                        <!-- Permiso por horas: perdona solo los minutos que cubre.
+                                             Se muestra con el horario porque sin eso una entrada
+                                             tarde sin atraso parece un error del sistema. -->
+                                        <h:outputFormat styleClass="app-tag"
+                                                        value="#{messages['AttendanceCheck.partialLeave']}"
+                                                        rendered="#{dayItem.partiallyExcused}">
+                                            <f:param value="#{dayItem.excusedIntervalsLabel}"/>
+                                        </h:outputFormat>
                                         <h:outputText styleClass="app-tag app-tag--absent"
                                                       value="#{messages['AttendanceCheck.absent']}"
-                                                      rendered="#{dayItem.absent and !dayItem.excused and !dayItem.unpaidLeave}"/>
+                                                      rendered="#{dayItem.absent and !dayItem.excused and !dayItem.unpaidLeave and !dayItem.coveredByLeave}"/>
                                         <h:outputFormat styleClass="app-tag app-tag--warn"
                                                         value="#{messages['AttendanceCheck.late']}"
                                                         rendered="#{dayItem.late}">
@@ -252,7 +259,7 @@
                                              la persona estuvo, y el dia se puede corregir. -->
                                         <h:outputText styleClass="app-tag app-tag--absent"
                                                       value="#{messages['AttendanceCheck.lostWithMarks']}"
-                                                      rendered="#{dayItem.lostWithMarks}"/>
+                                                      rendered="#{dayItem.lostWithMarks and !dayItem.coveredByLeave}"/>
                                         <h:outputText styleClass="app-tag app-tag--ok"
                                                       value="#{messages['AttendanceCheck.ok']}"
                                                       rendered="#{dayItem.ok}"/>

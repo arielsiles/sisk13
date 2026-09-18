@@ -89,6 +89,10 @@
         <end-conversation/>
     </page>
 
+    <page view-id="/employees/hourBank.xhtml">
+        <begin-conversation join="true"/>
+    </page>
+
     <page view-id="/employees/contractConditionList.xhtml">
         <end-conversation/>
     </page>

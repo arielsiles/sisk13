@@ -670,3 +670,53 @@ ALTER TABLE planillaadministrativos
 ALTER TABLE planillaadministrativos
   ADD COLUMN aniosantiguedad INT          NULL AFTER fechainiciocontrato,
   ADD COLUMN bonoantiguedad  DECIMAL(13,2) NULL AFTER aniosantiguedad;
+
+
+-- 28) Banco de horas (plan 13). El saldo es la suma de los movimientos, no un campo: asi
+-- corregir un mes viejo no deja el saldo mintiendo. Se guarda en horas, no en dias.
+-- Sin clave foranea a `fechaespecial`, que no tiene clave primaria en este esquema.
+
+CREATE TABLE movimientobancohoras (
+  idmovimientobancohoras    BIGINT       NOT NULL,
+  idcontrato                BIGINT       NOT NULL,
+  tipo                      VARCHAR(15)  NOT NULL,
+  fecha                     DATE         NOT NULL,
+  horas                     DECIMAL(9,2) NOT NULL,
+  idfechaespecial           BIGINT       NULL,
+  idciclogeneracionplanilla BIGINT       NULL,
+  descripcion               VARCHAR(250) NULL,
+  idusuario                 BIGINT       NULL,
+  fechacreacion             DATETIME     NOT NULL,
+  idcompania                BIGINT       NOT NULL,
+  version                   BIGINT       NOT NULL DEFAULT 0,
+  PRIMARY KEY (idmovimientobancohoras),
+  KEY ix_bancohoras_contrato_fecha (idcontrato, fecha),
+  KEY ix_bancohoras_fechaespecial (idfechaespecial),
+  KEY fk_bancohoras_ciclo (idciclogeneracionplanilla),
+  KEY fk_bancohoras_compania (idcompania),
+  CONSTRAINT fk_bancohoras_contrato FOREIGN KEY (idcontrato) REFERENCES contrato (idcontrato),
+  CONSTRAINT fk_bancohoras_ciclo FOREIGN KEY (idciclogeneracionplanilla) REFERENCES ciclogeneracionplanilla (idciclogeneracionplanilla),
+  CONSTRAINT fk_bancohoras_compania FOREIGN KEY (idcompania) REFERENCES compania (idcompania)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+INSERT INTO secuencia (tabla, valor) VALUES ('movimientobancohoras', 1);
+
+
+-- 28.1) La funcionalidad del banco de horas. permiso = 11: VIEW(1) + CREATE(2) + DELETE(8).
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'HOURBANK', 'Banco de horas', 4, 11, 'Functionality.employees.hourBank', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'HOURBANK');
+
+
+
+-- 29) Banco de horas: corregir un movimiento registrado.
+-- importe: lo pagado, para poder revertirlo si el pago se corrige o se borra.
+ALTER TABLE movimientobancohoras
+  ADD COLUMN importe               DECIMAL(16,2) NULL AFTER descripcion,
+  ADD COLUMN idusuariomodificacion BIGINT        NULL,
+  ADD COLUMN fechamodificacion     DATETIME      NULL;
+
+-- 29.1) La funcionalidad suma UPDATE(4): permiso = 15 = VIEW(1)+CREATE(2)+UPDATE(4)+DELETE(8).
+UPDATE funcionalidad SET permiso = 15 WHERE codigo = 'HOURBANK';

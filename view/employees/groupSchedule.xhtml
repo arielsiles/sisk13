@@ -93,14 +93,13 @@
                               rendered="#{not groupScheduleAction.weekPublished
                                           and not groupScheduleAction.emptyOfGroups}"/>
 
-                <a4j:commandLink action="#{groupScheduleAction.publishWeek}"
-                                 styleClass="app-btn-primary app-cal__publish"
-                                 rendered="#{not groupScheduleAction.weekPublished
+                <a4j:commandButton action="#{groupScheduleAction.publishWeek}"
+                                   value="#{messages['GroupSchedule.publish']}"
+                                   styleClass="app-btn-primary app-cal__publish"
+                                   rendered="#{not groupScheduleAction.weekPublished
                                              and not groupScheduleAction.emptyOfGroups
                                              and s:hasPermission('GROUPSCHEDULE','UPDATE')}"
-                                 reRender="weekBar, scheduleGrid, :globalMessages">
-                    <h:outputText value="#{messages['GroupSchedule.publish']}"/>
-                </a4j:commandLink>
+                                 reRender="weekBar, scheduleGrid, :globalMessages"/>
                 <a4j:commandLink action="#{groupScheduleAction.unpublishWeek}"
                                  styleClass="app-cal__navbtn"
                                  rendered="#{groupScheduleAction.weekPublished

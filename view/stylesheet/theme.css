@@ -2278,6 +2278,17 @@ select[disabled] {
     vertical-align: middle;
 }
 
+/* Al pasar el mouse se marcan las dos lineas de la fila, arriba y abajo.
+   El fondo NO se toca: el color de cada fila ya dice algo -atraso, feriado, falta, dia sin
+   jornada- y pisarlo con un gris de hover borraria ese dato justo cuando se lo esta mirando.
+   Las lineas van por box-shadow interior y no por borde: el borde cambiaria el alto de la fila
+   y la tabla saltaria un pixel al pasar el mouse. El borde propio se vuelve transparente para
+   que no queden dos rayas juntas. */
+.app-check__table tbody tr:hover td {
+    border-bottom-color: transparent;
+    box-shadow: inset 0 1px 0 #b0bac4, inset 0 -1px 0 #b0bac4;
+}
+
 /* Los dias sin jornada se apagan: no son novedad, son la mayoria del mes. */
 .app-check__row--rest td {
     color: #a7a29c;
@@ -2498,6 +2509,69 @@ select[disabled] {
    que su contenido y desalineaba el formulario del turno. */
 .app-input--hour {
     width: 80px;
+}
+
+/* Campos de una barra de formulario (capa app-form).
+   Cada campo es una UNIDAD en columna: arriba la etiqueta con su control, abajo una linea chica
+   para lo que se calcula o para el error. Dos consecuencias buscadas:
+   - la barra solo puede cortarse ENTRE campos, nunca entre una etiqueta y su campo;
+   - mostrar un dato calculado o un error NO corre nada de lugar, porque crece hacia abajo en un
+     alto que ya estaba reservado. */
+.app-form {
+    align-items: flex-start;
+}
+
+.app-form__field {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.app-form__row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.app-form__label {
+    color: #8a8a85;
+}
+
+/* La linea de abajo existe siempre, aunque este vacia: es lo que evita el salto. */
+.app-form__hint {
+    display: block;
+    min-height: 13px;
+    font-size: 10px;
+    line-height: 13px;
+    color: #8a8a85;
+    white-space: nowrap;
+}
+
+.app-form__value {
+    font-weight: bold;
+}
+
+/* Las ruedas de hora y minutos: angostas, para que el reloj se lea como un reloj. */
+.app-form__spin {
+    width: 26px;
+    text-align: center;
+}
+
+/* El detalle cede lugar: se encoge si falta, pero no crece. */
+.app-form__field--detail {
+    flex: 0 1 220px;
+    min-width: 90px;
+}
+
+.app-form__field--detail input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Contra el borde derecho: lo que se muestre aca no empuja ningun campo. */
+.app-form__field--end {
+    margin-left: auto;
 }
 
 /* Aire entre un campo y su aclaracion. Va por hermano adyacente y no en .app-tag: esa clase

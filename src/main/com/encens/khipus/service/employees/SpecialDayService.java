@@ -2,9 +2,11 @@ package com.encens.khipus.service.employees;
 
 import com.encens.khipus.model.finances.Contract;
 import com.encens.khipus.util.employees.attendance.ExcusedDay;
+import com.encens.khipus.util.employees.attendance.ExcusedInterval;
 
 import javax.ejb.Local;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,4 +47,13 @@ public interface SpecialDayService {
      * que no lo tienen: son cosas distintas y {@link ExcusedDay#isPaid()} las separa.
      */
     Map<Long, ExcusedDay> excusedBetween(Contract contract, Date from, Date to);
+
+    /**
+     * Los permisos POR HORAS de un periodo, por inicio de dia.
+     * <p/>
+     * Son las fechas especiales que no son de dia completo: en vez de sacar la jornada entera,
+     * justifican un tramo. El motor viejo ya los leia y el nuevo los ignoraba, asi que a quien
+     * los usa le aparecian atrasos y salidas anticipadas que estaban autorizados.
+     */
+    Map<Long, List<ExcusedInterval>> excusedIntervalsBetween(Contract contract, Date from, Date to);
 }

@@ -47,15 +47,22 @@ public final class DayAbsence {
     private final int journeys;
     private final int lost;
     private final int lostWithMarks;
+    /* Cuanta jornada se perdio, contando cada una entre 0 y 1: una jornada tapada a medias por un
+       permiso por horas suma 0,5 y no 1. Sin permisos vale lo mismo que contar jornadas. */
+    private final double lostShare;
+    private final double lostShareWithMarks;
     private final long lostMinutes;
     private final long scheduledMinutes;
     private final ExcusedDay excused;
 
     private DayAbsence(int journeys, int lost, int lostWithMarks,
+                       double lostShare, double lostShareWithMarks,
                        long lostMinutes, long scheduledMinutes, ExcusedDay excused) {
         this.journeys = journeys;
         this.lost = lost;
         this.lostWithMarks = lostWithMarks;
+        this.lostShare = lostShare;
+        this.lostShareWithMarks = lostShareWithMarks;
         this.lostMinutes = lostMinutes;
         this.scheduledMinutes = scheduledMinutes;
         this.excused = excused;
@@ -74,6 +81,8 @@ public final class DayAbsence {
         int total = 0;
         int lost = 0;
         int withMarks = 0;
+        double share = 0d;
+        double shareWithMarks = 0d;
         long minutes = 0;
         long scheduled = 0;
         if (null != evaluations) {
@@ -86,13 +95,16 @@ public final class DayAbsence {
                 if (evaluation.isLost()) {
                     lost++;
                     minutes += evaluation.getLostMinutes();
+                    share += evaluation.getLostShare();
                     if (!evaluation.isAbsent()) {
                         withMarks++;
+                        shareWithMarks += evaluation.getLostShare();
                     }
                 }
             }
         }
-        return new DayAbsence(total, lost, withMarks, minutes, scheduled, excused);
+        return new DayAbsence(total, lost, withMarks, share, shareWithMarks,
+                minutes, scheduled, excused);
     }
 
     /** El dia esta perdonado: permiso, vacacion, feriado propio, con goce de haber. */
@@ -111,7 +123,14 @@ public final class DayAbsence {
         return null != excused && !excused.isPaid();
     }
 
-    /** Cuanto dia se perdio en total: 0, medio o uno. */
+    /**
+     * Cuanto dia se perdio en total: 0, medio, uno, o la parte que el permiso no cubrio.
+     * <p/>
+     * La regla de siempre no cambia: cada jornada del dia vale su parte -con dos jornadas, media
+     * cada una- y perderlas todas cuesta el dia entero. Lo que se agrega es que una jornada tapada
+     * por un permiso por horas se pierde solo en la parte NO cubierta: en un periodo de 12 h con
+     * permiso de 07:30 a 13:30 y sin marcas, se pierde medio dia, no uno.
+     */
     public double getDays() {
         if (0 == journeys || isExcused()) {
             return 0d;
@@ -119,20 +138,17 @@ public final class DayAbsence {
         if (isUnpaidLeave()) {
             return FULL_DAY;
         }
-        if (0 == lost) {
-            return 0d;
-        }
-        return lost == journeys ? FULL_DAY : HALF_DAY;
+        return round(lostShare / journeys);
     }
 
     /** No vino y no tiene excusa. Es la unica clase que la planilla duplica. */
     public double getAbsenceDays() {
-        return share(lost - lostWithMarks);
+        return share(lostShare - lostShareWithMarks);
     }
 
     /** Vino y falta una punta. Se le descuenta el dia, pero no se lo sanciona al doble. */
     public double getRegistryDays() {
-        return share(lostWithMarks);
+        return share(lostShareWithMarks);
     }
 
     /** Licencia sin goce de haber. */
@@ -141,17 +157,22 @@ public final class DayAbsence {
     }
 
     /**
-     * La parte del dia que corresponde a N de las jornadas perdidas.
+     * La parte del dia que corresponde a las jornadas perdidas de una clase.
      * <p/>
-     * Reparte proporcionalmente porque un dia puede perder dos jornadas por causas distintas
-     * -la manana sin ninguna marca y la tarde con una sola punta-, y ahi el medio dia de cada una
-     * tiene que ir a su clase. Con una sola jornada por dia el reparto es todo o nada.
+     * Reparte porque un dia puede perder dos jornadas por causas distintas -la manana sin ninguna
+     * marca y la tarde con una sola punta-, y ahi el medio dia de cada una tiene que ir a su
+     * clase. Con una sola jornada por dia el reparto es todo o nada.
      */
-    private double share(int n) {
-        if (0 == n || 0 == lost || isExcused() || isUnpaidLeave()) {
+    private double share(double lostShareOfClass) {
+        if (0 == journeys || 0d == lostShareOfClass || isExcused() || isUnpaidLeave()) {
             return 0d;
         }
-        return getDays() * n / lost;
+        return round(lostShareOfClass / journeys);
+    }
+
+    /** Dos decimales: un dia partido en tercios no se muestra ni se paga con decimales infinitos. */
+    private static double round(double value) {
+        return Math.round(value * 100d) / 100d;
     }
 
     public boolean isPartial() {

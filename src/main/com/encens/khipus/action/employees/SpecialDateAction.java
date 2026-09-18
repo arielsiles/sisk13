@@ -80,7 +80,11 @@ public class SpecialDateAction extends GenericAction<SpecialDate> {
     public List<SpecialDateReason> getSelectableSpecialDateReason() {
         List<SpecialDateReason> selectable = new ArrayList<SpecialDateReason>();
         for (SpecialDateReason reason : SpecialDateReason.values()) {
-            if (!SpecialDateReason.VACATION.equals(reason)) {
+            /* El compensatorio queda afuera por el mismo motivo que la vacacion: lo genera el
+               banco de horas, que ademas descuenta del saldo. Cargado a mano quedaria un dia
+               justificado sin respaldo y el saldo mentiria en silencio. */
+            if (!SpecialDateReason.VACATION.equals(reason)
+                    && !SpecialDateReason.COMPENSATORY.equals(reason)) {
                 selectable.add(reason);
             }
         }

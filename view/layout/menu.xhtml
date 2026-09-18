@@ -1453,6 +1453,13 @@
                             value="#{messages['menu.employees.attendanceCheck']}"
                             propagation="none"/>
                 </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('HOURBANK','VIEW')}">
+                    <s:link view="/employees/hourBank.xhtml"
+                            value="#{messages['menu.employees.hourBank']}"
+                            propagation="none"/>
+                </rich:menuItem>
 
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"

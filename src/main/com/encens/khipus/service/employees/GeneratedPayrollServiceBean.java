@@ -2377,7 +2377,9 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
             controlReport.setMinutesDiscount(day.getLatenessMinutes());
             controlReport.setAbsenceClass(absenceClassOf(day));
             controlReport.setAbsenceDays(BigDecimalUtil.toBigDecimal(day.getAbsenceDays()));
-            controlReport.setNumberBandAbsences(day.getAbsence().getLost());
+            /* Una jornada perdida que el permiso por horas cubrio entera no se cuenta: la fila
+               diria "1 falta" con cero dias y cero minutos, y eso no se puede explicar. */
+            controlReport.setNumberBandAbsences(day.isCoveredByLeave() ? 0 : day.getAbsence().getLost());
             controlReport.setBandAbsence((int) day.getAbsence().getLostMinutes());
             controlReport.setPerformanceMinutes((int) day.getEvaluation().getWorkedMinutes());
             em.persist(controlReport);

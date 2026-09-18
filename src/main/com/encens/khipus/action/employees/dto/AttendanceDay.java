@@ -5,6 +5,7 @@ import com.encens.khipus.service.employees.JourneyResolverService.JourneySource;
 import com.encens.khipus.util.employees.attendance.JourneyAssignment;
 import com.encens.khipus.util.employees.attendance.DayAbsence;
 import com.encens.khipus.util.employees.attendance.ExcusedDay;
+import com.encens.khipus.util.employees.attendance.ExcusedInterval;
 import com.encens.khipus.util.employees.attendance.JourneyEvaluation;
 import com.encens.khipus.util.employees.attendance.ScheduledJourney;
 
@@ -130,6 +131,45 @@ public class AttendanceDay implements Serializable {
         return getAbsence().getDays();
     }
 
+    /**
+     * Ese dia tiene un permiso POR HORAS. Tiene que verse: si no, alguien mira una entrada tarde
+     * sin minutos de atraso y no tiene forma de saber por que no se le contaron.
+     */
+    public boolean isPartiallyExcused() {
+        return isWorking() && !getJourney().getExcusedIntervals().isEmpty();
+    }
+
+    /** Los tramos justificados de ese dia, para mostrarlos: "14:00-18:00". */
+    public String getExcusedIntervalsLabel() {
+        if (!isPartiallyExcused()) {
+            return null;
+        }
+        /* El formateador se crea aca y no como constante: SimpleDateFormat no es seguro entre
+           hilos, y una pantalla la miran varios a la vez. */
+        java.text.SimpleDateFormat hour = new java.text.SimpleDateFormat("HH:mm");
+        StringBuilder label = new StringBuilder();
+        for (ExcusedInterval interval : getJourney().getExcusedIntervals()) {
+            if (label.length() > 0) {
+                label.append(", ");
+            }
+            label.append(hour.format(interval.getStart()))
+                    .append("-")
+                    .append(hour.format(interval.getEnd()));
+        }
+        return label.toString();
+    }
+
+    /**
+     * La jornada figura perdida, pero un permiso por horas la cubrio entera: no cuesta nada.
+     * <p/>
+     * Pasa cuando el permiso tapa todo el periodo -07:30 a 19:30 en un turno de 12 h-. Sin esto
+     * la pantalla diria "Falta" en un dia que la planilla no descuenta, y no habria forma de
+     * explicar la diferencia.
+     */
+    public boolean isCoveredByLeave() {
+        return isLost() && !isExcused() && !isUnpaidLeave() && 0d == getAbsence().getDays();
+    }
+
     /** El dia esta perdonado: permiso, vacacion o maternidad con goce de haber. */
     public boolean isExcused() {
         return getAbsence().isExcused();
@@ -166,12 +206,29 @@ public class AttendanceDay implements Serializable {
                 ? "AttendanceCheck.excusedDefault" : excused.getResourceKey();
     }
 
+    /**
+     * Minutos de atraso que se cobran.
+     * <p/>
+     * Un dia perdonado no acumula: si el dia esta cubierto por un permiso de dia completo, una
+     * vacacion o una baja por maternidad, la persona ni siquiera tenia que venir, asi que cobrarle
+     * el atraso de ese dia es descontar por presentarse. Lo mismo con la licencia sin goce, que ya
+     * no se paga: sumarle el atraso seria descontar dos veces el mismo dia.
+     * <p/>
+     * El permiso POR HORAS no entra aca: ese perdona su tramo y lo que sobra si se cobra, que es
+     * lo que hace la evaluacion de la jornada.
+     */
     public int getLatenessMinutes() {
-        return isWorking() ? getEvaluation().getLatenessMinutes() : 0;
+        return chargeable() ? getEvaluation().getLatenessMinutes() : 0;
     }
 
+    /** Misma regla que el atraso: un dia perdonado no acumula salida anticipada. */
     public int getEarlyExitMinutes() {
-        return isWorking() ? getEvaluation().getEarlyExitMinutes() : 0;
+        return chargeable() ? getEvaluation().getEarlyExitMinutes() : 0;
+    }
+
+    /** El dia se evalua y ademas se cobra: le tocaba trabajar y no esta perdonado. */
+    private boolean chargeable() {
+        return isWorking() && !isExcused() && !isUnpaidLeave();
     }
 
     public int getExtraMinutes() {
