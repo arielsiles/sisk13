@@ -330,6 +330,12 @@ cantidad_zona (TN) = UsoMpBaritina · porcentaje / 100
 Se dispara al editar la cantidad del insumo, el porcentaje de una zona o al agregar/quitar
 una zona.
 
+**Disponible (TN)** — solo en líneas BARITINA: saldo de la zona para la MP por defecto de la
+orden, a la fecha del plan y **sin contar esta orden** (mismo cálculo que el desglose por zona
+de Saldos de Almacén, `XProductionBalanceService.computeZoneBalances`). Si lo asignado a la
+zona lo supera, la celda se marca en rojo con aviso. **No bloquea**: los datos de acopio no
+siempre están completos.
+
 ### 4.4 Validación al guardar/aprobar — `validateBaritina`
 
 - Cada fila debe tener **zona seleccionada**.

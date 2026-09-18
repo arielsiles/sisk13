@@ -65,6 +65,9 @@ pantallas viejas que todavía usan `<h:graphicImage>` siguen funcionando igual.
 | `app-ico--journal` | Comprobante contable | Órdenes de compra |
 | `app-ico--levels` | Análisis por niveles | Cuentas de caja |
 | `app-ico--equals` | Conciliación / igualdad | — |
+| `app-ico--expand` | **Desplegar** el detalle de una fila (cerrado) | Saldos de Almacén (zonas) |
+| `app-ico--collapse` | **Plegar** el detalle de una fila (abierto) | Saldos de Almacén (zonas) |
+| `app-ico--alert` | **Advertencia** sobre un dato, sin bloquear | Saldos de Almacén, zonas de la orden |
 
 **Un significado, un icono.** Si *editar* es el lápiz en Turnos, es el lápiz en todas partes. Lo
 que se elige es el **significado**, no el dibujo.

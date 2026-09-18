@@ -22,7 +22,93 @@
                 font-weight: bold;
                 background-color: #dfe7f0;
             }
+            /* Desglose por zona productiva: filas de detalle debajo del articulo. */
+            .zoneToolbar {
+                text-align: right;
+                margin: 0 0 4px;
+                font: 11px Arial, Verdana, sans-serif;
+            }
+            .zoneToolbar input {
+                vertical-align: middle;
+            }
+            .zoneToolbar label {
+                margin-left: 4px;
+            }
+            .balanceTable td.zoneCell {
+                display: none;
+                background-color: #f7f9fb;
+                color: #555;
+            }
+            .balanceTable td.zoneCell.zoneOpen {
+                display: table-cell;
+            }
+            .zoneToggle.app-iconbtn {
+                float: right;
+                width: 18px;
+                height: 18px;
+                border-color: transparent;
+                background: transparent;
+            }
+            .zoneToggle.app-iconbtn:hover {
+                border-color: #a9bccf;
+                background: #f2f4f7;
+            }
+            .zoneName {
+                padding-left: 16px;
+            }
+            .zoneHint {
+                margin-left: 8px;
+                color: #888;
+                font-size: 10px;
+            }
+            .zoneNegative {
+                color: #b03a2e;
+                font-weight: bold;
+            }
+            .zoneNegative .app-ico {
+                margin-right: 4px;
+            }
         </style>
+        <script type="text/javascript">
+            //<![CDATA[
+            // Desglose por zona: las filas de zona vienen ocultas y se abren aca, sin ir al
+            // servidor. La accion vive en una conversacion temporal: un estado "desplegado"
+            // guardado alla se perderia en el siguiente pedido ajax.
+            function khZoneSet(code, open) {
+                var cells = document.querySelectorAll('.balanceTable td.zoneOf_' + code);
+                for (var i = 0; i < cells.length; i++) {
+                    if (open) { cells[i].classList.add('zoneOpen'); } else { cells[i].classList.remove('zoneOpen'); }
+                }
+                var btn = document.querySelector('.balanceTable a.zoneToggle[data-code="' + code + '"]');
+                if (btn) {
+                    btn.setAttribute('data-open', open ? '1' : '0');
+                    btn.title = btn.getAttribute(open ? 'data-title-collapse' : 'data-title-expand');
+                    btn.querySelector('.app-ico').className = 'app-ico ' + (open ? 'app-ico--collapse' : 'app-ico--expand');
+                }
+            }
+            function khZoneSyncAll() {
+                var all = document.getElementById('zoneAll');
+                if (!all) { return; }
+                var btns = document.querySelectorAll('.balanceTable a.zoneToggle');
+                var open = btns.length > 0;
+                for (var i = 0; i < btns.length; i++) {
+                    if (btns[i].getAttribute('data-open') !== '1') { open = false; }
+                }
+                all.checked = open;
+            }
+            function khZoneToggle(btn) {
+                khZoneSet(btn.getAttribute('data-code'), btn.getAttribute('data-open') !== '1');
+                khZoneSyncAll();
+                return false;
+            }
+            function khZonesAll(open) {
+                var btns = document.querySelectorAll('.balanceTable a.zoneToggle');
+                for (var i = 0; i < btns.length; i++) {
+                    khZoneSet(btns[i].getAttribute('data-code'), open);
+                }
+            }
+            //]]>
+        </script>
         <h:form id="warehouseBalanceForm">
 
             <rich:panel id="filterPanel">
@@ -69,6 +155,11 @@
             <rich:spacer height="8"/>
 
             <s:div id="balancePanel">
+                <s:div styleClass="zoneToolbar" rendered="#{xproductionBalanceAction.zoneBreakdownAvailable}">
+                    <input type="checkbox" id="zoneAll" onclick="khZonesAll(this.checked);"/>
+                    <label for="zoneAll">#{messages['XProductionBalance.byZone']}</label>
+                </s:div>
+
                 <rich:dataTable id="balanceTable"
                                 value="#{xproductionBalanceAction.groups}"
                                 var="group"
@@ -87,20 +178,56 @@
                         <h:outputText value="#{group.subGroupName}"/>
                     </rich:column>
 
-                    <rich:subTable var="row" value="#{group.rows}">
-                        <rich:column width="15%">
-                            <h:outputText value="#{row.productItemCode}"/>
+                    <!-- Una linea por articulo y, debajo, una por zona productiva (ocultas hasta desplegar). -->
+                    <rich:subTable var="line" value="#{group.lines}">
+                        <rich:column width="15%" styleClass="#{line.cellClass}">
+                            <s:fragment rendered="#{!line.zoneLine and line.row.zoneTracked}">
+                                <a href="#" class="app-iconbtn zoneToggle" data-open="0"
+                                   data-code="#{line.row.productItemCode}"
+                                   title="#{messages['XProductionBalance.expandZones']}"
+                                   data-title-expand="#{messages['XProductionBalance.expandZones']}"
+                                   data-title-collapse="#{messages['XProductionBalance.collapseZones']}"
+                                   onclick="return khZoneToggle(this);"><span class="app-ico app-ico--expand"/></a>
+                            </s:fragment>
+                            <h:outputText value="#{line.row.productItemCode}" rendered="#{!line.zoneLine}"/>
                         </rich:column>
-                        <rich:column width="55%">
-                            <h:outputText value="#{row.name}"/>
+                        <rich:column width="55%" styleClass="#{line.cellClass}">
+                            <h:outputText value="#{line.row.name}" rendered="#{!line.zoneLine}"/>
+                            <s:fragment rendered="#{line.zoneLine}">
+                                <h:outputText styleClass="zoneName"
+                                              value="#{line.zone.unassigned ? messages['XProductionBalance.zoneUnassigned'] : line.zone.zoneName}"/>
+                                <h:outputText styleClass="zoneHint" rendered="#{line.zone.unassigned}"
+                                              value="#{messages['XProductionBalance.zoneUnassignedHint']}"/>
+                                <s:span styleClass="zoneHint" rendered="#{!line.zone.unassigned}">
+                                    #{messages['XProductionBalance.zoneCollected']}&#160;
+                                    <h:outputText value="#{line.zone.collected}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                    &#183; #{messages['XProductionBalance.zoneConsumed']}&#160;
+                                    <h:outputText value="#{line.zone.consumed}">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </s:span>
+                            </s:fragment>
                         </rich:column>
-                        <rich:column width="12%" styleClass="center">
-                            <h:outputText value="#{row.measureCode}"/>
+                        <rich:column width="12%" styleClass="center #{line.cellClass}">
+                            <h:outputText value="#{line.row.measureCode}" rendered="#{!line.zoneLine}"/>
                         </rich:column>
-                        <rich:column width="18%" styleClass="right">
-                            <h:outputText value="#{row.balance}">
+                        <rich:column width="18%" styleClass="right #{line.cellClass}">
+                            <h:outputText value="#{line.row.balance}" rendered="#{!line.zoneLine}">
                                 <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                             </h:outputText>
+                            <!-- Zona en negativo: se consumio mas de lo acopiado. Se muestra tal cual para
+                                 corregir la zona en las ordenes; "Sin zona" no se marca (es el remanente). -->
+                            <s:span rendered="#{line.zoneLine}"
+                                    styleClass="#{line.zone.negative and !line.zone.unassigned ? 'zoneNegative' : ''}">
+                                <s:fragment rendered="#{line.zone.negative and !line.zone.unassigned}">
+                                    <span class="app-ico app-ico--alert" title="#{messages['XProductionBalance.zoneNegative']}"/>
+                                </s:fragment>
+                                <h:outputText value="#{line.zone.balance}">
+                                    <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                </h:outputText>
+                            </s:span>
                         </rich:column>
                     </rich:subTable>
                 </rich:dataTable>

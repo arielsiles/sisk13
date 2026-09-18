@@ -2,8 +2,10 @@ package com.encens.khipus.action.xproduction;
 
 import com.encens.khipus.model.warehouse.Warehouse;
 import com.encens.khipus.service.xproduction.BalanceGroup;
+import com.encens.khipus.service.xproduction.BalanceLine;
 import com.encens.khipus.service.xproduction.WarehouseBalanceRow;
 import com.encens.khipus.service.xproduction.XProductionBalanceService;
+import com.encens.khipus.service.xproduction.ZoneBalanceRow;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
@@ -80,7 +82,12 @@ public class XProductionBalanceAction {
         return balanceList;
     }
 
-    /** Filas agrupadas por Subgrupo del articulo (la lista ya viene ordenada por subgrupo+nombre). */
+    /**
+     * Filas agrupadas por Subgrupo del articulo (la lista ya viene ordenada por subgrupo+nombre).
+     * Debajo de cada articulo con desglose van las lineas de sus zonas productivas; salen
+     * ocultas y se despliegan en el navegador (la pagina no tiene conversacion larga: un
+     * estado de "desplegado" en el servidor se perderia en el siguiente pedido ajax).
+     */
     public List<BalanceGroup> getGroups() {
         List<BalanceGroup> groups = new ArrayList<BalanceGroup>();
         BalanceGroup current = null;
@@ -91,7 +98,21 @@ public class XProductionBalanceAction {
                 groups.add(current);
             }
             current.getRows().add(row);
+            current.getLines().add(BalanceLine.item(row));
+            for (ZoneBalanceRow zone : row.getZones()) {
+                current.getLines().add(BalanceLine.zone(row, zone));
+            }
         }
         return groups;
+    }
+
+    /** Hay al menos un articulo con desglose por zona: muestra el conmutador "Desglosar por zona". */
+    public boolean isZoneBreakdownAvailable() {
+        for (WarehouseBalanceRow row : balanceList) {
+            if (row.isZoneTracked()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -5,6 +5,7 @@ import com.encens.khipus.model.warehouse.Warehouse;
 import javax.ejb.Local;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Servicio de "Saldos de Almacen" para Materias Primas y Productos Terminados.
@@ -33,4 +34,12 @@ public interface XProductionBalanceService {
      * cuenta solo los movimientos cuya fecha sea &lt;= a la fecha seleccionada.
      */
     List<WarehouseBalanceRow> computeBalances(String companyNumber, String warehouseCode, Date date);
+
+    /**
+     * Saldo por zona productiva de una MP hasta {@code date}: Σ acopio de la zona − Σ consumo
+     * declarado en las ordenes (insumo MP por defecto × % de la zona). Sin la fila "Sin zona".
+     * {@code excludeProductionId} deja afuera una orden (la que se esta editando), o null.
+     * Mapa zona → fila, en la unidad del articulo.
+     */
+    Map<Long, ZoneBalanceRow> computeZoneBalances(String productItemCode, Date date, Long excludeProductionId);
 }

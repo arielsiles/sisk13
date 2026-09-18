@@ -124,6 +124,37 @@ group by u.codArtReprocFinal
 - Esta fuente nació de un caso real (artículo `2074 - ULEXITA PROCESADA` salía con saldo 0)
   porque el reproceso vive en la tabla satélite y no aparecía en las otras 5 fuentes.
 
+### 3.4 Desglose por zona productiva (MP BARITINA)
+
+El saldo de la MP de las líneas **BARITINA con `usa_zonas`** se abre por **zona productiva**.
+Es **solo detalle**: el saldo del artículo sigue saliendo de las 6 fuentes y no cambia.
+
+- **Qué artículos:** los `cod_art` que alguna orden consumió como insumo MP **por defecto**
+  (`defecto = 1`) en una línea `report_template_code = 'BARITINA'` con `usa_zonas = 1`.
+  La línea GENERAL (Roca Fosfórica) queda afuera a propósito, aunque tenga zonas.
+- **Saldo de una zona** hasta la fecha de corte:
+  - **acopio** = Σ `pesobal` de los acopios APR/CONTA de esa zona (`acopiomp.idzonaproductiva`);
+  - **consumo** = Σ `xpr_insumo.cantidad × porcentaje / 100` de las órdenes ≠ ANL que la
+    distribuyeron (`xpr_produccion_baritina_zona`), por fecha del plan.
+  Se usa la cantidad del insumo y no `cantidad_tn`, que viene redondeada a 4 decimales en TN.
+- **Sin zona asignada** = saldo del artículo − Σ zonas. Ahí cae lo que no lleva zona: vales
+  y ajustes (p. ej. `AJ-MP-20260331`) y las órdenes sin distribución. Por construcción, el
+  desglose **suma siempre el saldo**. Al corregir una orden y cargarle zonas, su consumo pasa
+  solo de "Sin zona" a su zona.
+- **Zonas en negativo** se muestran tal cual, en rojo y con aviso: se consumió más de lo
+  acopiado. Son errores de captura de la zona en la orden, y se corrigen ahí.
+
+**UX:** la tabla principal no cambia. Cada artículo desglosable lleva un chevron que abre
+sus zonas debajo (zona, acopio · consumo, saldo) y la barra superior tiene "Desglosar por zona
+productiva" para abrir o cerrar todo. RichFaces no anida `subTable`, así que las líneas de
+zona se intercalan en la misma lista (`BalanceLine`). **Salen siempre, ocultas, y se despliegan
+con JavaScript en el navegador**: la página no tiene conversación larga (la acción vive en una
+conversación temporal), y un estado "desplegado" guardado en el servidor se perdía en el
+siguiente pedido ajax: el clic no hacía nada.
+
+El mismo cálculo (`computeZoneBalances`, excluyendo la orden en edición) alimenta la columna
+**Disponible (TN)** de la distribución por zonas de la orden (ver `xproduction_ordenes_calculos.md` §4.3).
+
 ---
 
 ## 4. Componentes
@@ -133,7 +164,9 @@ group by u.codArtReprocFinal
 | `XProductionBalanceAction` | `@Name @Scope(CONVERSATION)` | Filtro (`selectedWarehouse`), `refresh()`, `getGroups()` (agrupa la lista por subgrupo) |
 | `XProductionBalanceService(Bean)` | `@Stateless @Name @AutoCreate` | `findBalanceWarehouses()` y `computeBalances()` |
 | `WarehouseBalanceRow` | DTO (no entidad) | fila de saldo en memoria: code/name/measureCode/subGroup + `balance` con `add()`/`subtract()` |
-| `BalanceGroup` | DTO (no entidad) | grupo de filas por subgrupo, para el encabezado de la tabla |
+| `BalanceGroup` | DTO (no entidad) | grupo de filas por subgrupo, para el encabezado de la tabla; `lines` con las zonas intercaladas |
+| `ZoneBalanceRow` | DTO (no entidad) | saldo de un artículo en una zona (acopio, consumo, saldo) o la fila "Sin zona asignada" |
+| `BalanceLine` | DTO (no entidad) | línea visible de la tabla: artículo o zona de un artículo desplegado |
 
 `getGroups()` recorre la lista ya ordenada y corta un nuevo `BalanceGroup` cada vez que
 cambia el `subGroupCode` (agrupación por subgrupos consecutivos, sin reordenar).

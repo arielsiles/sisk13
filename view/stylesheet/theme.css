@@ -2462,6 +2462,9 @@ select[disabled] {
 .app-ico--exchange  { -webkit-mask-image: url(../img/exchange-line.svg);    mask-image: url(../img/exchange-line.svg); }
 .app-ico--check     { -webkit-mask-image: url(../img/check-line.svg);       mask-image: url(../img/check-line.svg); }
 .app-ico--close     { -webkit-mask-image: url(../img/x-line.svg);           mask-image: url(../img/x-line.svg); }
+.app-ico--expand    { -webkit-mask-image: url(../img/chevron-right-line.svg); mask-image: url(../img/chevron-right-line.svg); }
+.app-ico--collapse  { -webkit-mask-image: url(../img/chevron-down-line.svg); mask-image: url(../img/chevron-down-line.svg); }
+.app-ico--alert     { -webkit-mask-image: url(../img/alert-line.svg);       mask-image: url(../img/alert-line.svg); }
 
 /* El color lo decide el estado del boton, no el archivo. */
 .app-iconbtn {
