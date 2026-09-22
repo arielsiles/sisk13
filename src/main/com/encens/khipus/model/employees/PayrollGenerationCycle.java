@@ -49,6 +49,10 @@ import java.util.List;
         @NamedQuery(name = "PayrollGenerationCycle.findByStartDate",
                 query = "select payrollGenerationCycle from PayrollGenerationCycle payrollGenerationCycle " +
                         "where payrollGenerationCycle.businessUnit=:businessUnit and payrollGenerationCycle.startDate =:startDate "),
+        @NamedQuery(name = "PayrollGenerationCycle.findLast",
+                query = "select payrollGenerationCycle from PayrollGenerationCycle payrollGenerationCycle " +
+                        "left join fetch payrollGenerationCycle.gestion gestion " +
+                        "order by payrollGenerationCycle.startDate desc"),
         @NamedQuery(name = "PayrollGenerationCycle.countByName",
                 query = "select count(payrollGenerationCycle) from PayrollGenerationCycle payrollGenerationCycle " +
                         "where upper(payrollGenerationCycle.name) =upper(:name) "),

@@ -21,6 +21,30 @@
     </c:if>
     <h:form id="#{dialogId}_generalEmployeeListForm">
         <rich:simpleTogglePanel label="#{messages['Employee.search']}" switchType="client">
+            <c:choose>
+            <!-- Buscador compacto (opt-in con compactSearch): identificacion y nombre completo en
+                 una sola linea. El nombre busca sobre nombre + apellidos a la vez. -->
+            <c:when test="#{compactSearch}">
+            <h:panelGrid columns="5" cellpadding="4" cellspacing="0" border="0">
+                <h:outputLabel for="#{dialogId}-idNumber" value="#{messages['Person.idNumber']}"/>
+                <h:inputText id="#{dialogId}-idNumber" value="#{dataModel.criteria.idNumber}" maxlength="100"
+                             styleClass="input"
+                             tabindex="1">
+                    <app:naturalNumberConverter forId="#{dialogId}-idNumber"/>
+                </h:inputText>
+                <h:outputLabel for="#{dialogId}-employeeName" value="#{messages['GeneralEmployeeList.employeeName']}"/>
+                <h:inputText id="#{dialogId}-employeeName" value="#{dataModel.employeeName}"
+                             maxlength="150" styleClass="input" style="width:320px"
+                             tabindex="2"/>
+                <a4j:commandButton action="#{dataModel.search}"
+                                   reRender="generalEmployeeList, dataScroller"
+                                   styleClass="button" value="#{messages['Common.search']}" id="searchButtonId"
+                                   tabindex="3">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </h:panelGrid>
+            </c:when>
+            <c:otherwise>
             <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
                          columnClasses="width50percent,width50percent">
                 <ui:insert name="searchOptions"/>
@@ -62,6 +86,8 @@
                     </s:decorate>
                 </s:div>
             </h:panelGrid>
+            </c:otherwise>
+            </c:choose>
         </rich:simpleTogglePanel>
         <br/>
         <rich:dataTable value="#{dataModel}" var="employeeItem" id="generalEmployeeList"
@@ -126,7 +152,14 @@
         <app:dataScroller id="dataScroller" for="generalEmployeeList" dataModel="#{dataModel}"/>
         <rich:componentControl for="#{dialogId}" attachTo="closeLink" operation="hide" event="onclick"/>
     </h:form>
-    <c:set var="firstInputToFocusId" value="#{dialogId}-firstName"/>
+    <c:choose>
+        <c:when test="#{compactSearch}">
+            <c:set var="firstInputToFocusId" value="#{dialogId}-employeeName"/>
+        </c:when>
+        <c:otherwise>
+            <c:set var="firstInputToFocusId" value="#{dialogId}-firstName"/>
+        </c:otherwise>
+    </c:choose>
     <script type="text/javascript">
         function focusFirstElement() {
             document.getElementById('#{rich:clientId(firstInputToFocusId)}').focus();

@@ -19,11 +19,13 @@
                         <ui:insert/>
                     </a4j:commandLink>
                 </s:fragment>
-                &#160;
-                <h:graphicImage value="/img/arrowUp.png" height="7" width="10" style="border:0;"
-                                rendered="#{dataModel.sortAsc and dataModel.sortProperty == sortProperty}"/>
-                <h:graphicImage value="/img/arrowDown.png" height="7" width="10" style="border:0"
-                                rendered="#{!dataModel.sortAsc and dataModel.sortProperty == sortProperty}"/>
+                <!-- El espacio va solo con la flecha: suelto, en una columna angosta bajaba a un
+                     segundo renglon vacio y el titulo quedaba desalineado verticalmente. -->
+                <s:fragment rendered="#{dataModel.sortProperty == sortProperty}">&#160;<h:graphicImage
+                        value="/img/arrowUp.png" height="7" width="10" style="border:0;"
+                        rendered="#{dataModel.sortAsc}"/><h:graphicImage
+                        value="/img/arrowDown.png" height="7" width="10" style="border:0"
+                        rendered="#{!dataModel.sortAsc}"/></s:fragment>
             </c:when>
             <c:otherwise>
                 <ui:insert/>

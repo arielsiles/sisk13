@@ -25,7 +25,8 @@ Ese valor es el `workedDays` con que se prorratea el básico.
 
 ```
 basicSalary       = job.salary.amount                       ← si la moneda es $US: × tipoCambio.venta
-dayAbsences       = (faltas del control de asistencia) × 2 − (días sin goce de haber)
+dayAbsences       = jornadas: ausencia × 2 + registro + sinGoce     ← ver "Faltas: dos motores"
+                    bandas:   (faltas del control) × 2 − (días sin goce de haber)
 mensualTotalSalary= basicSalary / 30 × (workedDays − dayAbsences)          ← "básico ganado"
 
 otrosIngresos     = si activeForTaxPayrollGeneration → categoryTributaryPayroll.totalOtherIncomes
@@ -41,55 +42,147 @@ descuentos        = RC-IVA + AFP
 liquido           = mensualTotalSalary + otrosIngresos + ingresosFueraIVA − descuentos
 ```
 
-### Descuento por atrasos acumulados en el mes
+### Descuento por atrasos — dos decisiones, las dos de la empresa
 
-Escalonado sobre el **total ganado**, no sobre el básico (se cambió; el código viejo sobre
-`basicSalary` quedó comentado):
+```
+descuento = valor del día × días que la política descuenta
+```
 
-| Minutos de atraso acumulados | Descuento |
+**Sobre qué base vale el día** lo dice *Preferencias de compañía → Recursos Humanos*:
+
+| Preferencia | El día vale |
+|---|---|
+| **Total ganado** (por defecto) | `totalIncome / 30` — básico ganado + bono de antigüedad + otros ingresos |
+| **Sueldo básico** | `basicSalary / 30` — el sueldo del contrato, el mes completo |
+
+La norma boliviana habla del *haber*, que es el sueldo; varias empresas lo tienen escrito sobre el
+total ganado. Por defecto queda en total ganado, que es lo que se venía haciendo.
+
+**Con qué política se convierte el atraso en días**, en
+[LatenessPolicy](../../src/main/com/encens/khipus/util/employees/payroll/LatenessPolicy.java):
+
+*Por minutos acumulados del mes* — la de siempre, para todos salvo que se configure otra cosa:
+
+| Minutos acumulados | Descuento |
 |---|---|
 | 0 – 30 | 0 |
-| 31 – 60 | `totalIncome / 30 / 2` (½ día) |
-| 61 – 90 | `totalIncome / 30` (1 día) |
-| 91 – 120 | `totalIncome / 30 × 2` (2 días) |
-| ≥ 121 | `totalIncome / 30 × 3` (3 días) |
+| 31 – 60 | ½ día |
+| 61 – 90 | 1 día |
+| 91 – 120 | 2 días |
+| ≥ 121 | 3 días |
 
-Se guarda en `ManagersPayroll.tardinessMinutesDiscount` (`descuentoporminutosatraso`) y
-**sí** entra al total de descuentos.
+*Por evento* — para las áreas marcadas con **Atrasos por evento** en la unidad organizacional:
 
-### Descuento por faltas — la regla del ×2
+| Atraso | Descuento |
+|---|---|
+| cada **4** atrasos de hasta 30 min | 1 día (8 son 2 días; el resto no se arrastra al mes siguiente) |
+| uno de 31 a 120 min | ½ día, **por cada uno** |
+| uno de 121 min o más | ½ día **+ memorándum**, por cada uno |
 
-Ésta es la parte menos evidente del módulo. El control de asistencia produce
-`dayAbsences` en **fracciones de día**:
+Las tres se suman. Ejemplo: 4 atrasos chicos + 2 de 45 min + 1 de 130 min = 1 + 1 + 0,5 = **2,5
+días**, y un memorándum.
+
+**Tres condiciones** para que corra la política por evento, y tienen que darse las tres: la empresa
+la tiene encendida **desde una fecha** —regenerar un mes anterior reproduce lo que se pagó—, el
+área del puesto está marcada —o alguna que la contenga—, y corre el **motor de jornadas**, porque
+la política necesita el atraso día por día y el motor de bandas no lo entrega.
+
+**El tope** son los días que se están pagando: por atrasos no se puede descontar más de lo ganado.
+
+Los **memorándums** se cuentan y se reportan en la columna MEMORANDUMS de la planilla de sueldos
+(`planillaadministrativos.memorandumsatraso`). El sistema **no emite** el documento: avisa a quién
+le corresponde.
+
+El importe se guarda en `ManagersPayroll.tardinessMinutesDiscount` (`descuentoporminutosatraso`),
+**sí** entra al total de descuentos, y la planilla fiscal lo copia de ahí.
+
+### Faltas: dos motores conviviendo
+
+Desde la 6.1.0 hay **dos motores de asistencia** y cada planilla se calcula con uno solo.
+Cuál se usa lo decide una **fecha de corte por categoría de puesto**
+(`categoriapuesto.jornadasdesde`): si el período empieza antes de esa fecha, bandas; desde esa
+fecha, jornadas. Si la categoría no tiene fecha, bandas.
+
+La decisión es una fecha y no un interruptor **a propósito**: un interruptor no tiene memoria, y
+regenerar enero en marzo daría números distintos a los que se pagaron. El motor que se usó queda
+**sellado** en `planillagenerada.motorasistencia`, para poder leer dentro de dos años con qué se
+pagó sin recalcular nada. Ver [AttendanceEngine](../../src/main/com/encens/khipus/util/employees/AttendanceEngine.java).
+
+En terdemol la fecha es **2026-07-01**; ILVA sigue entero en bandas.
+
+---
+
+### Motor de jornadas — las tres clases de falta
+
+El día perdido no siempre cuesta lo mismo, y la planilla lo necesita **separado**:
+
+| Clase | Qué pasó | Cuesta |
+|---|---|---|
+| **Ausencia** | no vino: ninguna marca en la jornada | 1 día **× 2** |
+| **Registro** | vino y marcó **una sola punta** | 1 día, simple |
+| **Sin goce** | licencia aprobada sin goce de haber | 1 día, simple |
+
+```
+díasDescontados = ausencia × 2 + registro + sinGoce
+básicoGanado    = basicSalary / 30 × (workedDays − díasDescontados)
+```
+
+El **× 2 es una sanción y es solo para quien no vino**. Quien marcó mal cometió un error de
+registro, que se corrige; quien tiene licencia sin goce no cometió ninguno: simplemente ese día no
+se le paga. El motor viejo cobraba las tres igual.
+
+**Lo que no cuesta nada:**
+
+| Situación del día | Días |
+|---|---|
+| Permiso de día completo, vacación o maternidad **con goce** | 0 |
+| Feriado | 0 — suspende el horario fijo del contrato, **no** el cronograma del grupo |
+| Día sin jornada: descanso, o sin turno asignado | no se evalúa |
+| Jornada cumplida con al menos una sesión completa | 0 |
+
+**Fracciones.** Si el día tiene dos jornadas —turno partido— y se pierde una, es **medio día**. Y
+un **permiso por horas** reduce la falta en la parte que cubre: en un turno de 12 h con permiso de
+07:30 a 13:30 y sin marcas, se pierde **medio día**, no uno. Si el permiso cubre la jornada entera,
+no se pierde nada. Ver [DayAbsence](../../src/main/com/encens/khipus/util/employees/attendance/DayAbsence.java).
+
+**La red de los 30 días.** Antes de pagar se verifica que los días no sean absurdos —negativos, o
+más de 30—. Si lo son, esa persona **no se genera** y se reporta; un recorte silencioso dejaría el
+número plausible y la causa viva. La red corre **solo** para el motor de jornadas.
+
+### Motor de bandas — como estaba, y así sigue
+
+**No cambió nada**, a propósito: quien lleva años con él tiene que seguir obteniendo lo mismo,
+errores incluidos, hasta que decida pasarse.
+
+El control produce `dayAbsences` en fracciones de día:
 
 - falta una banda de varias del día → `+0,5`
-- faltan todas las bandas del día → `+1` (si es una única banda, `+1` sólo si dura ≥8 h
-  para varones o ≥7 h para mujeres; si no, `+0,5`)
+- faltan todas las bandas del día → `+1` (si es una única banda, `+1` solo si dura ≥ 8 h para
+  varones o ≥ 7 h para mujeres; si no, `+0,5`)
 
-Luego, en `fillManagersPayroll`:
+Y después:
 
 ```java
-dayAbsences = dayAbsences * 2;                                  // sanción: la falta se paga doble
+dayAbsences = dayAbsences * 2;                                  // sanción: todo al doble
 List<Date> unpaid = specialDateService.getSpecialDateRangeUnpaid(employee, init, end);
 dayAbsences = dayAbsences - unpaid.size();                      // licencia sin goce: sólo 1 día
 mensualTotalSalary = basicSalary / 30 * (workedDays - dayAbsences);
 ```
 
-La clave para entenderlo: `getSpecialDateRange(employee, …)` **filtra `credit = PAID`**
+La clave: `getSpecialDateRange(employee, …)` **filtra `credit = PAID`**
 ([SpecialDateServiceBean:59](../../src/main/com/encens/khipus/service/employees/SpecialDateServiceBean.java)).
-O sea:
 
 | Situación del día | ¿Genera ausencia? | Días descontados |
 |---|---|---|
 | Permiso / feriado **con** goce de haber (`PAID`) | no | 0 |
 | Falta injustificada, día completo | sí (`+1`) | **2** |
 | Falta injustificada, una banda | sí (`+0,5`) | **1** |
-| Licencia **sin** goce de haber (`UNPAID`) | sí (no cuenta como permiso) → `+1` → ×2 = 2 | 2 − 1 = **1** |
+| Licencia **sin** goce de haber (`UNPAID`) | sí → `+1` → ×2 = 2 | 2 − 1 = **1** |
 
-> **Borde conocido:** la resta es de 1 por cada día `UNPAID` en el rango, sin verificar que
-> el control de asistencia haya generado efectivamente la ausencia de ese día. Si el
-> empleado marcó normalmente en un día declarado sin goce de haber, `dayAbsences` puede
-> quedar negativo y pagarle **más** de 30 días.
+> **Borde conocido:** la resta es de 1 por cada día `UNPAID` del rango, sin verificar que el
+> control haya generado esa ausencia. Si la persona marcó normalmente en un día declarado sin goce,
+> `dayAbsences` puede quedar **negativo** y pagarle **más de 30 días**. En el motor de jornadas esto
+> no pasa: el día sin goce se resuelve adentro y la red de los 30 días lo frena.
 
 ### El descuento por ausencias NO se suma dos veces
 
@@ -98,9 +191,46 @@ double absenceDiscount = dayAbsences * basicSalary / 30;
 managersPayroll.setAbsenceMinutesDiscount(BigDecimalUtil.toBigDecimal(absenceDiscount));
 ```
 
-`absenceDiscount` se **guarda para el reporte** (`descuentoporminutosausencia`) pero **no**
-se agrega a `totalSumOfDiscounts`: la falta ya se descontó al calcular `mensualTotalSalary`.
-Sumarlo sería doble castigo. Al tocar esta parte, no "corregir" ese aparente olvido.
+`absenceDiscount` se **guarda para el reporte** (`descuentoporminutosausencia`) pero **no** se
+agrega a `totalSumOfDiscounts`: la falta ya se descontó al calcular `mensualTotalSalary`. Sumarlo
+sería doble castigo. Al tocar esta parte, no "corregir" ese aparente olvido. Vale para los dos
+motores.
+
+### Atrasos: cómo se cuentan los minutos
+
+La escala de arriba se aplica a los minutos **acumulados en el mes**. Cómo se llega a ellos, en el
+motor de jornadas:
+
+Cada turno tiene **cuatro números configurados** (`turno`), y hacen cosas distintas:
+
+| Campo | En terdemol | Para qué |
+|---|---|---|
+| `toleranciaentrada` | 10 min | hasta cuánto se puede llegar tarde sin que cuente |
+| `toleranciasalida` | 5 min | hasta cuánto se puede salir antes sin que cuente |
+| `margenantes` | 120 min | desde cuándo una marca ya es de esa jornada |
+| `margendespues` | 240 min | hasta cuándo una marca sigue siendo de esa jornada |
+
+Los **márgenes no perdonan nada**: definen la ventana con la que la marca se asocia a su jornada.
+Con 120 antes y 240 después, un turno de 07:30 a 19:30 recoge marcas desde las 05:30 hasta las
+23:30. Cuando dos ventanas se pisan —el turno de noche y el del día siguiente— se recortan en el
+punto medio, así ninguna marca queda en dos jornadas.
+
+- **La tolerancia es un umbral, no un descuento.** Con 10 minutos de tolerancia, llegar 8 minutos
+  tarde no cuenta; llegar 11 cuenta **11**, no 1. Es el mismo criterio del motor viejo.
+- La **salida anticipada** se mide igual, con su propia tolerancia de 5 minutos: salir 19:26 en un
+  turno que termina 19:30 no cuenta; salir 19:23 cuenta **7** minutos.
+- Un **permiso por horas** se resta **antes** de mirar la tolerancia. Al revés, media hora de
+  atraso con veinte minutos de permiso seguiría pasándose de la tolerancia y se cobraría entera.
+- **No acumulan atraso**: la jornada perdida —ya cuesta el día, cobrar además el atraso sería
+  descontar dos veces—, el día perdonado con goce —la persona ni siquiera tenía que venir— y el
+  día sin goce.
+- La **salida sin marcar** no se castiga como salida anticipada: no se sabe hasta qué hora se
+  quedó. El día queda como marca incompleta, que es clase *registro*.
+
+> **La salida anticipada se calcula y se muestra, pero hoy la planilla NO la descuenta.** Al
+> cálculo le llegan solo los minutos de atraso de entrada
+> ([GeneratedPayrollServiceBean:2512](../../src/main/com/encens/khipus/service/employees/GeneratedPayrollServiceBean.java)).
+> Si alguna vez debe descontarse, es una regla nueva y hay que pedirla.
 
 ### Movimientos de sueldo
 

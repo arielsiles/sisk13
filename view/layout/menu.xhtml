@@ -2823,6 +2823,7 @@
         <s:link view="/admin/companySetting.xhtml"
                 value="#{messages['menu.admin.company']}"
                 rendered="#{s:hasPermission('COMPANYSETTING','VIEW')}"
+                propagation="none"
                 styleClass="tab-cell"/>
         <rich:dropDownMenu value="#{messages['menu.admin.reports']}"
                            rendered="#{s:hasPermission('USERROLEREPORT','VIEW')}">

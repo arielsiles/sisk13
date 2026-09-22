@@ -37,6 +37,8 @@ public interface PayrollGenerationCycleService extends GenericService {
 
     PayrollGenerationCycle getLastPayrollGenerationCycle(PayrollGenerationCycle payrollGenerationCycle);
 
+    PayrollGenerationCycle findLastCycle();
+
     Boolean isReadOnly(PayrollGenerationCycle payrollGenerationCycle);
 
     Boolean hasOfficialPayroll(PayrollGenerationCycle payrollGenerationCycle, BusinessUnit businessUnit, JobCategory jobCategory);

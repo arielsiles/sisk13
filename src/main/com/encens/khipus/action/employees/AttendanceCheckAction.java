@@ -3,10 +3,14 @@ package com.encens.khipus.action.employees;
 import com.encens.khipus.action.employees.dto.AttendanceDay;
 import com.encens.khipus.action.employees.dto.AttendancePeriodSummary;
 import com.encens.khipus.model.employees.Employee;
+import com.encens.khipus.model.employees.Month;
+import com.encens.khipus.model.employees.PayrollGenerationCycle;
 import com.encens.khipus.model.finances.Contract;
 import com.encens.khipus.service.employees.AttendanceCheckService;
 import com.encens.khipus.service.employees.ContractService;
+import com.encens.khipus.service.employees.PayrollGenerationCycleService;
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
@@ -49,23 +53,42 @@ public class AttendanceCheckAction implements Serializable {
     @In(create = true)
     private FacesMessages facesMessages;
 
+    @In
+    private PayrollGenerationCycleService payrollGenerationCycleService;
+
     private Employee employee;
     private Contract contract;
+
+    /* El periodo se elige por gestion y mes. Las fechas quedan vacias y, si se llenan, mandan
+       sobre el mes: sirven para mirar un rango que no calza con un mes entero. */
+    private Integer year;
+    private Month month;
     private Date startDate;
     private Date endDate;
+
+    /* El rango que se verifico de verdad, sea de las fechas o del mes. */
+    private Date checkedStartDate;
+    private Date checkedEndDate;
 
     private List<AttendanceDay> days = new ArrayList<AttendanceDay>();
     private boolean checked = false;
 
-    public AttendanceCheckAction() {
-        /* Arranca en el mes anterior completo, que es el que normalmente se revisa: la planilla
-           de un mes se genera y se controla al mes siguiente. */
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, -1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        startDate = calendar.getTime();
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        endDate = calendar.getTime();
+    /**
+     * Arranca en el ultimo ciclo de generacion de planilla: es el que se esta por pagar o se
+     * acaba de pagar, y el que normalmente se revisa. Sin ciclos, el mes anterior.
+     */
+    @Create
+    public void init() {
+        PayrollGenerationCycle lastCycle = payrollGenerationCycleService.findLastCycle();
+        if (null != lastCycle) {
+            year = lastCycle.getGestion().getYear();
+            month = lastCycle.getMonth();
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, -1);
+            year = calendar.get(Calendar.YEAR);
+            month = Month.getMonthByCalendarIndex(calendar.get(Calendar.MONTH));
+        }
     }
 
     @Restrict("#{s:hasPermission('ATTENDANCECHECK','VIEW')}")
@@ -77,13 +100,32 @@ public class AttendanceCheckAction implements Serializable {
                     "AttendanceCheck.error.employeeRequired");
             return;
         }
-        if (null == startDate || null == endDate || endDate.before(startDate)) {
+        if (null == startDate && null == endDate) {
+            if (null == year || null == month) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                        "AttendanceCheck.error.periodRequired");
+                return;
+            }
+            Calendar calendar = Calendar.getInstance();
+            calendar.clear();
+            calendar.set(year, month.getValue(), 1);
+            checkedStartDate = calendar.getTime();
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+            checkedEndDate = calendar.getTime();
+        } else if (null == startDate || null == endDate) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "AttendanceCheck.error.periodRequired");
+            return;
+        } else if (endDate.before(startDate)) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                     "AttendanceCheck.error.badRange");
             return;
+        } else {
+            checkedStartDate = startDate;
+            checkedEndDate = endDate;
         }
         List<Contract> contracts = contractService.getContractsByEmployeeInDateRange(
-                employee, startDate, endDate);
+                employee, checkedStartDate, checkedEndDate);
         if (contracts.isEmpty()) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
                     "AttendanceCheck.error.withoutContract", employee.getFullName());
@@ -97,12 +139,12 @@ public class AttendanceCheckAction implements Serializable {
         /* Esta pantalla corre SOLO el motor de jornadas. Para alguien de una categoria que
            todavia se controla por bandas mostraria "sin jornada" todos los dias, y eso no es un
            dato: es la pantalla mintiendo. Se avisa en vez de dejar que lo interprete. */
-        if (!attendanceCheckService.usesJourneys(contract, startDate)) {
+        if (!attendanceCheckService.usesJourneys(contract, checkedStartDate)) {
             facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
                     "AttendanceCheck.warn.bandsEngine", employee.getFullName());
         }
         try {
-            days = attendanceCheckService.check(contract, startDate, endDate);
+            days = attendanceCheckService.check(contract, checkedStartDate, checkedEndDate);
             checked = true;
         } catch (Exception e) {
             log.error("No se pudo verificar la asistencia", e);
@@ -182,6 +224,26 @@ public class AttendanceCheckAction implements Serializable {
 
     public Contract getContract() {
         return contract;
+    }
+
+    public Month[] getMonths() {
+        return Month.values();
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public Month getMonth() {
+        return month;
+    }
+
+    public void setMonth(Month month) {
+        this.month = month;
     }
 
     public Date getStartDate() {

@@ -188,6 +188,19 @@ public class PayrollGenerationCycleServiceBean extends GenericServiceBean implem
         }
     }
 
+    /**
+     * El ciclo mas reciente por fecha de inicio fiscal, o null si no hay ninguno. No se ordena por
+     * mes: se guarda como texto del enum y el orden alfabetico no es el del calendario.
+     */
+    @SuppressWarnings({"unchecked"})
+    public PayrollGenerationCycle findLastCycle() {
+        List<PayrollGenerationCycle> cycles = getEventEntityManager()
+                .createNamedQuery("PayrollGenerationCycle.findLast")
+                .setMaxResults(1)
+                .getResultList();
+        return cycles.isEmpty() ? null : cycles.get(0);
+    }
+
     public Boolean isReadOnly(PayrollGenerationCycle payrollGenerationCycle) {
         Long countResult = (Long) getEventEntityManager().createNamedQuery("GestionPayroll.countGeneratedPayrollByPayrollGenerationCycle")
                 .setParameter("payrollGenerationCycle", payrollGenerationCycle)

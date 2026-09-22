@@ -11,6 +11,7 @@ import com.encens.khipus.model.customers.DocumentType;
 import com.encens.khipus.model.employees.Charge;
 import com.encens.khipus.model.employees.JobCategory;
 import com.encens.khipus.util.Constants;
+import com.encens.khipus.util.employees.payroll.LatenessDiscountBase;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -569,6 +570,19 @@ public class CompanyConfiguration {
     @Column(name = "hrsdialaboral", precision = 10, scale = 2, nullable = false)
     @NotNull
     private BigDecimal hrsWorkingDay;
+
+    /* Sobre que base se valoriza el dia al descontar un atraso. Nulo = total ganado, que es lo
+       que se venia haciendo: el valor por defecto no puede cambiarle el numero a nadie. */
+    @Column(name = "basedescuentoatraso", length = 20)
+    @Enumerated(EnumType.STRING)
+    private LatenessDiscountBase latenessDiscountBase;
+
+    /* Desde cuando corre la politica de atrasos POR EVENTO en las areas marcadas. Nulo = nunca,
+       o sea la politica de siempre. Es una fecha y no un interruptor por lo mismo que el motor de
+       asistencia: regenerar un mes viejo tiene que reproducir lo que se pago. */
+    @Column(name = "atrasoporeventodesde")
+    @Temporal(TemporalType.DATE)
+    private Date latenessPerEventFrom;
 
     @Column(name = "email_unisueldo")
     @Email
@@ -1462,6 +1476,22 @@ public class CompanyConfiguration {
 
     public void setBasicBasedChristmasPayroll(boolean basicBasedChristmasPayroll) {
         this.basicBasedChristmasPayroll = basicBasedChristmasPayroll;
+    }
+
+    public LatenessDiscountBase getLatenessDiscountBase() {
+        return latenessDiscountBase;
+    }
+
+    public void setLatenessDiscountBase(LatenessDiscountBase latenessDiscountBase) {
+        this.latenessDiscountBase = latenessDiscountBase;
+    }
+
+    public Date getLatenessPerEventFrom() {
+        return latenessPerEventFrom;
+    }
+
+    public void setLatenessPerEventFrom(Date latenessPerEventFrom) {
+        this.latenessPerEventFrom = latenessPerEventFrom;
     }
 
     public BigDecimal getHrsWorkingDay() {

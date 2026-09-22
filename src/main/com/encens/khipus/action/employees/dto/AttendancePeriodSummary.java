@@ -34,6 +34,7 @@ public class AttendancePeriodSummary implements Serializable {
 
     private int lateDays;
     private int latenessMinutes;
+    private final List<Integer> latenessByDay = new ArrayList<Integer>();
     private int earlyExitMinutes;
     private int extraMinutes;
 
@@ -77,6 +78,11 @@ public class AttendancePeriodSummary implements Serializable {
             summary.lostMinutes += absence.getLostMinutes();
 
             summary.latenessMinutes += day.getLatenessMinutes();
+            if (day.getLatenessMinutes() > 0) {
+                /* Cada atraso por separado, no solo la suma: hay politicas que cobran por evento
+                   -cuatro atrasos de diez minutos no son lo mismo que uno de cuarenta-. */
+                summary.latenessByDay.add(Integer.valueOf(day.getLatenessMinutes()));
+            }
             summary.earlyExitMinutes += day.getEarlyExitMinutes();
             summary.extraMinutes += day.getExtraMinutes();
             if (day.isLate()) {
@@ -149,6 +155,11 @@ public class AttendancePeriodSummary implements Serializable {
 
     public int getLateDays() {
         return lateDays;
+    }
+
+    /** Los minutos de cada dia con atraso, en orden. Los dias sin atraso no entran. */
+    public List<Integer> getLatenessByDay() {
+        return latenessByDay;
     }
 
     public int getLatenessMinutes() {

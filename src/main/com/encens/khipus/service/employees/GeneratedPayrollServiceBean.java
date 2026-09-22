@@ -22,6 +22,8 @@ import com.encens.khipus.action.employees.dto.AttendancePeriodSummary;
 import com.encens.khipus.util.employees.AttendanceEngine;
 import com.encens.khipus.util.employees.PayrollGenerationResult;
 import com.encens.khipus.util.employees.attendance.DayAbsence;
+import com.encens.khipus.util.employees.payroll.LatenessDiscountBase;
+import com.encens.khipus.util.employees.payroll.LatenessPolicy;
 import com.encens.khipus.util.employees.payroll.PayrollBlockers;
 import com.encens.khipus.util.employees.payroll.Seniority;
 import com.encens.khipus.util.employees.payroll.PayrollContract;
@@ -1018,6 +1020,20 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
         AttendanceEngine engine = null == generatedPayroll.getAttendanceEngine()
                 ? AttendanceEngine.BANDS : generatedPayroll.getAttendanceEngine();
 
+        /* Las preferencias de la compania, una vez para toda la planilla: son las mismas para las
+           setenta y pico de personas y consultarlas por cada una seria una consulta por fila. */
+        LatenessDiscountBase latenessDiscountBase = LatenessDiscountBase.TOTAL_INCOME;
+        Date latenessPerEventFrom = null;
+        try {
+            CompanyConfiguration latenessConfiguration = companyConfigurationService.findCompanyConfiguration();
+            latenessDiscountBase = LatenessDiscountBase.orDefault(latenessConfiguration.getLatenessDiscountBase());
+            latenessPerEventFrom = latenessConfiguration.getLatenessPerEventFrom();
+        } catch (CompanyConfigurationNotFoundException e) {
+            /* Sin preferencias se sigue con lo de siempre: una planilla no se frena por una
+               configuracion que nadie toco todavia. */
+            log.error("company configuration was not found, lateness keeps the default", e);
+        }
+
         // iterates each employee
         int index = 0;
         List<Long> employeeIdList = ListUtil.i.getIdList(employeeList);
@@ -1047,6 +1063,8 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
 
             // absences and tardiness
             Double totalSumOfDiscountsPerLateness = 0.0;
+            /* Cuantos atrasos del mes ameritan memorandum. Solo se reporta: emitirlo es de RRHH. */
+            int latenessMemos = 0;
 
             Double totalWinDiscount = 0.0;
             Double totalAdvanceDiscount = 0.0;
@@ -1246,23 +1264,29 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
 
                 BigDecimal totalIncome = BigDecimalUtil.toBigDecimal(mensualTotalSalary + totalSumOfIncomesBeforeIva); // Total Ingresos, Total Ganado
 
-                /** -------- Discount per lateness accumulated in the month ------- **/
-                if (tardinessTotal >= 31 && tardinessTotal <= 60) {
-                    //totalSumOfDiscountsPerLateness = basicSalary / 30 / 2;  // 1/2 día
-                    totalSumOfDiscountsPerLateness = totalIncome.doubleValue() / 30 / 2;  // 1/2 día
-                }
-                if (tardinessTotal >= 61 && tardinessTotal <= 90) {
-                    //totalSumOfDiscountsPerLateness = basicSalary / 30;      // 1 día
-                    totalSumOfDiscountsPerLateness = totalIncome.doubleValue() / 30;      // 1 día
-                }
-                if (tardinessTotal >= 91 && tardinessTotal <= 120) {
-                    //totalSumOfDiscountsPerLateness = basicSalary / 30 * 2;  // 2 días
-                    totalSumOfDiscountsPerLateness = totalIncome.doubleValue() / 30 * 2;  // 2 días
-                }
-                if (tardinessTotal >= 121) {
-                    //totalSumOfDiscountsPerLateness = basicSalary / 30 * 3;  // 3 días
-                    totalSumOfDiscountsPerLateness = totalIncome.doubleValue() / 30 * 3;  // 3 días
-                }
+                /* -------- El descuento por atrasos del mes --------
+                   Dos decisiones, las dos de la empresa y ninguna escrita aca:
+
+                   - SOBRE QUE BASE vale el dia: el total ganado -con bono y otros ingresos- o el
+                     sueldo del contrato. La norma boliviana habla del "haber", que es el sueldo;
+                     varias empresas lo tienen escrito sobre el total ganado. Lo dice la preferencia.
+
+                   - CON QUE POLITICA se convierte el atraso en dias: por minutos acumulados del
+                     mes -la de siempre- o por evento, contando cada atraso por su tamano. La
+                     segunda es por area, porque produccion y administracion conviven en la misma
+                     planilla y no se les cobra igual. */
+                double latenessDayValue = (LatenessDiscountBase.BASIC_SALARY.equals(latenessDiscountBase)
+                        ? basicSalary : totalIncome.doubleValue()) / 30;
+                LatenessPolicy latenessPolicy = latenessPerEventApplies(currentJobContract, gestionPayroll,
+                        latenessPerEventFrom, engine)
+                        ? LatenessPolicy.perEvent(outcome.latenessByDay)
+                        : LatenessPolicy.accumulated(tardinessTotal);
+                /* El tope son los dias que se estan pagando: no se puede descontar por atrasos mas
+                   de lo que se gano. Con la politica de siempre nunca se llega -son 3 dias como
+                   maximo-; con la de por evento, un mes con muchos atrasos si podria. */
+                double latenessDays = latenessPolicy.getDays(workedDays - dayAbsences);
+                latenessMemos = latenessPolicy.getMemos();
+                totalSumOfDiscountsPerLateness = latenessDayValue * latenessDays;
 
 
                 double absenceDiscount = dayAbsences * basicSalary / 30;
@@ -1356,6 +1380,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                         totalSumOfIncomesBeforeIva - seniorityBonusAmount.doubleValue()));
                 managersPayroll.setTotalIncome(BigDecimalUtil.toBigDecimal(mensualTotalSalary + totalSumOfIncomesBeforeIva));
                 managersPayroll.setTardinessMinutesDiscount(BigDecimalUtil.toBigDecimal(totalSumOfDiscountsPerLateness));
+                managersPayroll.setLatenessMemos(Integer.valueOf(latenessMemos));
                 managersPayroll.setDifference(BigDecimalUtil.toBigDecimal(mensualTotalSalary + totalSumOfIncomesBeforeIva - totalSumOfDiscounts));
                 managersPayroll.setIvaRetention(BigDecimalUtil.toBigDecimal(totalRCIvaDiscount));
                 managersPayroll.setIncomeOutOfIva(BigDecimalUtil.toBigDecimal(totalSumOfIncomesOutOfIva));
@@ -2431,6 +2456,9 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
         /** Dias a descontar, con la sancion de cada motor YA aplicada. */
         private double chargedDays;
         private int latenessMinutes;
+        /* El atraso de cada dia. Vacio con bandas horarias, que no lo clasifica por dia: por eso
+           la politica por evento solo puede correr con el motor de jornadas. */
+        private List<Integer> latenessByDay = new ArrayList<Integer>();
         /** Minutos programados que se perdieron. */
         private int lostMinutes;
         /** Lo que va a la columna `minutosatraso` del recibo. */
@@ -2510,6 +2538,7 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
         outcome.workedDays = workedDays;
         outcome.chargedDays = attendance.getChargedDays();
         outcome.latenessMinutes = attendance.getLatenessMinutes();
+        outcome.latenessByDay = attendance.getLatenessByDay();
         outcome.lostMinutes = (int) attendance.getLostMinutes();
         outcome.tardinessMinutes = attendance.getLatenessMinutes();
         outcome.absenceDays = BigDecimalUtil.toBigDecimal(attendance.getAbsenceDays());
@@ -4593,6 +4622,44 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
         }
 
         return PayrollGenerationResult.SUCCESS;
+    }
+
+    /**
+     * Si a esta persona le corre la politica de atrasos POR EVENTO.
+     * <p/>
+     * Tres condiciones, y las tres tienen que darse:
+     * <ul>
+     *   <li>la empresa la tiene encendida <b>desde una fecha</b>: regenerar un mes anterior a esa
+     *       fecha reproduce lo que se pago, igual que con el motor de asistencia;</li>
+     *   <li>el area del puesto esta marcada -o alguna de las que la contienen-, porque produccion
+     *       y administracion conviven en la misma planilla;</li>
+     *   <li>corre el motor de jornadas: la politica necesita el atraso dia por dia, y el motor de
+     *       bandas no lo entrega. Con bandas siempre manda la politica de siempre.</li>
+     * </ul>
+     */
+    private boolean latenessPerEventApplies(JobContract jobContract, GestionPayroll gestionPayroll,
+                                            Date latenessPerEventFrom, AttendanceEngine engine) {
+        if (null == latenessPerEventFrom || null == engine || !engine.isJourneys()) {
+            return false;
+        }
+        if (null == gestionPayroll || null == gestionPayroll.getInitDate()
+                || gestionPayroll.getInitDate().before(latenessPerEventFrom)) {
+            return false;
+        }
+        if (null == jobContract || null == jobContract.getJob()) {
+            return false;
+        }
+        OrganizationalUnit unit = jobContract.getJob().getOrganizationalUnit();
+        /* Se sube por el arbol: marcar PRODUCCION alcanza para sus sub-areas, que es como se
+           configura una vez y no una por cada unidad que alguien agregue despues. */
+        int guard = 0;
+        while (null != unit && guard++ < 20) {
+            if (unit.isLatenessPerEventEnabled()) {
+                return true;
+            }
+            unit = unit.getOrganizationalUnitRoot();
+        }
+        return false;
     }
 
     private DiscountRuleRange findDiscountRuleRange(Integer minutes,

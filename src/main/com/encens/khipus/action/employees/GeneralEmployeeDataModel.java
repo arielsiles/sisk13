@@ -23,7 +23,11 @@ public class GeneralEmployeeDataModel extends QueryDataModel<Long, Employee> {
             {"lower(employee.lastName) like concat('%', concat(lower(#{generalEmployeeDataModel.criteria.lastName}), '%'))",
                     "lower(employee.maidenName) like concat('%', concat(lower(#{generalEmployeeDataModel.criteria.maidenName}), '%'))",
                     "lower(employee.firstName) like concat('%', concat(lower(#{generalEmployeeDataModel.criteria.firstName}), '%'))",
-                    "employee.idNumber like concat(#{generalEmployeeDataModel.criteria.idNumber}, '%')"};
+                    "employee.idNumber like concat(#{generalEmployeeDataModel.criteria.idNumber}, '%')",
+                    "lower(concat(concat(concat(coalesce(employee.firstName,''),' '),concat(coalesce(employee.lastName,''),' ')),coalesce(employee.maidenName,''))) like concat('%', concat(lower(#{generalEmployeeDataModel.employeeName}), '%'))"};
+
+    /* Nombre completo en un solo campo; solo lo usa el buscador compacto (compactSearch). */
+    private String employeeName;
 
     @Create
     public void init() {
@@ -38,6 +42,20 @@ public class GeneralEmployeeDataModel extends QueryDataModel<Long, Employee> {
     @Override
     public List<String> getRestrictions() {
         return Arrays.asList(RESTRICTIONS);
+    }
+
+    @Override
+    public void clear() {
+        employeeName = null;
+        super.clear();
+    }
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
     }
 }
 

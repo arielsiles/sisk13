@@ -14,7 +14,8 @@
     <ui:define name="body">
         <h:form id="attendanceCheckForm">
 
-            <!-- Una sola fila de filtros: persona, desde, hasta y verificar. -->
+            <!-- Una sola fila de filtros: persona, gestion y mes, desde, hasta y verificar.
+                 Las fechas vienen vacias: si se llenan mandan sobre la gestion y el mes. -->
             <a4j:outputPanel id="filterBar" layout="block" styleClass="app-cal__bar">
                 <h:outputText styleClass="app-cal__label" value="#{messages['AttendanceCheck.employee']}"/>
                 <app:selectPopUp id="employee"
@@ -26,6 +27,23 @@
                                  searchModalPanel="generalEmployeeListModalPanel"
                                  reRender="filterBar"
                                  hotKeySelect="alt+1"/>
+
+                <h:outputText styleClass="app-cal__label" value="#{messages['AttendanceCheck.gestion']}"/>
+                <h:selectOneMenu id="year" value="#{attendanceCheckAction.year}"
+                                 styleClass="app-filterbar__select">
+                    <s:selectItems value="#{gestionList}" var="gestionItem"
+                                   label="#{gestionItem.year}" itemValue="#{gestionItem.year}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                </h:selectOneMenu>
+
+                <h:outputText styleClass="app-cal__label" value="#{messages['AttendanceCheck.month']}"/>
+                <h:selectOneMenu id="month" value="#{attendanceCheckAction.month}"
+                                 styleClass="app-filterbar__select">
+                    <s:selectItems value="#{attendanceCheckAction.months}" var="monthItem"
+                                   label="#{messages[monthItem.resourceKey]}"
+                                   noSelectionLabel="" hideNoSelectionLabel="false"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
 
                 <h:outputText styleClass="app-cal__label" value="#{messages['AttendanceCheck.from']}"/>
                 <rich:calendar id="startDate" value="#{attendanceCheckAction.startDate}"
@@ -296,6 +314,7 @@
                     template="/employees/generalEmployeeListModalPanel.xhtml">
             <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
             <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:param name="compactSearch" value="true"/>
             <ui:define name="assignButton">
                 <a4j:commandButton id="assignButton"
                                    title="#{messages['Common.choose']}"

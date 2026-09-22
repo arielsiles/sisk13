@@ -74,6 +74,15 @@
                          tabindex="1">
             </h:inputText>
         </s:decorate>
+        <!-- El area cobra los atrasos por evento. Se marca aca y no en preferencias porque el
+             criterio es del area: produccion y administracion estan en la misma planilla. -->
+        <s:decorate id="latenessPerEventField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['OrganizationalUnit.latenessPerEvent']}</ui:define>
+            <h:selectBooleanCheckbox id="latenessPerEvent"
+                                     value="#{organizationalUnit.latenessPerEvent}"
+                                     title="#{messages['OrganizationalUnit.latenessPerEvent.hint']}"/>
+        </s:decorate>
+
         <s:decorate id="acronymField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['OrganizationalUnit.acronym']}</ui:define>
             <h:inputText id="acronym" value="#{organizationalUnit.acronym}"

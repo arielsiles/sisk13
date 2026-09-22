@@ -367,6 +367,11 @@ public class ManagersPayroll implements GenericPayroll, FiscalInternalGeneralPay
     @Column(name = "diasfaltaregistro", precision = 4, scale = 2)
     private BigDecimal registryDays;
 
+    /* Cuantos atrasos del mes ameritan memorandum -121 minutos o mas, cada uno-. El sistema no
+       emite nada: reporta, para que RRHH sepa a quien le corresponde. */
+    @Column(name = "memorandumsatraso")
+    private Integer latenessMemos;
+
     @Column(name = "minutosausenciabandas", nullable = true)
     private Integer bandAbsenceMinutes;
 
@@ -926,6 +931,19 @@ public class ManagersPayroll implements GenericPayroll, FiscalInternalGeneralPay
 
     public void setRegistryDays(BigDecimal registryDays) {
         this.registryDays = registryDays;
+    }
+
+    public Integer getLatenessMemos() {
+        return latenessMemos;
+    }
+
+    public void setLatenessMemos(Integer latenessMemos) {
+        this.latenessMemos = latenessMemos;
+    }
+
+    /** Le corresponde memorandum por atraso. */
+    public boolean isWithLatenessMemo() {
+        return null != latenessMemos && latenessMemos > 0;
     }
 
     public Integer getSeniorityYears() {

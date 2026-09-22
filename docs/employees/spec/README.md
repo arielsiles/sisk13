@@ -27,6 +27,7 @@ arriba, en [../README.md](../README.md).
 | [plan_11_marca_incompleta.md](plan_11_marca_incompleta.md) | La jornada con una sola punta marcada: ni falta entera ni día pagado | **F1 y F2 implementados** · F3–F5 van con E2.9 |
 | [plan_12_planilla_motor.md](plan_12_planilla_motor.md) | E2.9: la planilla toma los números del motor, y las tres clases de falta | **P1–P10 implementados**, con los dos motores conviviendo · falta verificar julio 2026 |
 | [plan_13_banco_horas.md](plan_13_banco_horas.md) | El banco de horas: acumular por mes y consumir como permiso | **Pendiente de aprobación** |
+| [plan_14_atrasos.md](plan_14_atrasos.md) | Los atrasos: base configurable (total ganado o básico) y política por área | **Implementado** · falta aplicar SQL, desplegar y probar |
 
 ## El orden en que salieron
 

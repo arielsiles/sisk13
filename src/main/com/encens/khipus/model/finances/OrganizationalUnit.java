@@ -86,6 +86,12 @@ public class OrganizationalUnit implements BaseModel {
     @Length(max = 200)
     private String acronym;
 
+    /* Esta area cobra los atrasos POR EVENTO y no por minutos acumulados. Vive en la unidad y no
+       en las preferencias porque el criterio es del area: produccion y administracion conviven en
+       la misma planilla y no se les cobra igual. */
+    @Column(name = "atrasoporevento")
+    private Boolean latenessPerEvent;
+
     @Column(name = "descripcion", length = 200)
     private String description;
 
@@ -170,6 +176,25 @@ public class OrganizationalUnit implements BaseModel {
 
     public void setAcronym(String acronym) {
         this.acronym = acronym;
+    }
+
+    public Boolean getLatenessPerEvent() {
+        return latenessPerEvent;
+    }
+
+    public void setLatenessPerEvent(Boolean latenessPerEvent) {
+        this.latenessPerEvent = latenessPerEvent;
+    }
+
+    /**
+     * Si a esta area se le cobran los atrasos por evento. Sin marcar, la regla de siempre.
+     * <p/>
+     * El nombre lleva "Enabled" a proposito: llamarlo `isLatenessPerEvent` hacia que EL resolviera
+     * la propiedad contra ESE metodo -boolean- y no encontrara setter, asi que la casilla se
+     * mostraba pero la pantalla fallaba al guardar.
+     */
+    public boolean isLatenessPerEventEnabled() {
+        return Boolean.TRUE.equals(latenessPerEvent);
     }
 
     public String getDescription() {

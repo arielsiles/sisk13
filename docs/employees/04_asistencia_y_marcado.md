@@ -2,6 +2,14 @@
 
 Cómo se convierte el marcado biométrico en atrasos y faltas dentro de la planilla.
 
+> **Este archivo describe el motor de BANDAS**, que es el que sigue usando ILVA y el que se aplica
+> a toda categoría de puesto sin fecha de corte. Desde la 6.1.0 existe además el **motor de
+> jornadas** —horario del contrato, cronograma del grupo y excepciones, en lugar de bandas—, que es
+> el que usa terdemol desde julio de 2026. Cómo decide cada planilla con cuál se calcula, y cómo
+> cuenta las faltas y los atrasos cada uno, está en
+> [03_calculos_planilla.md](03_calculos_planilla.md#faltas-dos-motores-conviviendo). El detalle del
+> motor nuevo está en los planes 10 a 13 de [spec/](spec/README.md).
+
 ## Piezas
 
 ```
