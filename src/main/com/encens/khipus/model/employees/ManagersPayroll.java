@@ -336,6 +336,12 @@ public class ManagersPayroll implements GenericPayroll, FiscalInternalGeneralPay
     @Column(name = "descuentossinretencion", nullable = true, precision = 13, scale = 2)
     private BigDecimal discountsOutOfRetention;
 
+    /* Lo que se paga por horas extra este mes: sale del pago registrado en el banco de horas,
+       que escribe `horasextra` del ciclo. Tiene columna propia para que se vea; el importe se
+       resta de OTROS INGRESOS para que la fila siga cuadrando y nadie cobre dos veces. */
+    @Column(name = "horasextraimporte", precision = 13, scale = 2)
+    private BigDecimal extraHoursAmount;
+
     @Column(name = "minutosatraso", nullable = true)
     private Integer tardinessMinutes;
 
@@ -688,6 +694,14 @@ public class ManagersPayroll implements GenericPayroll, FiscalInternalGeneralPay
 
     public void setAbsenceMinutesDiscount(BigDecimal absenceMinutesDiscount) {
         this.absenceMinutesDiscount = absenceMinutesDiscount;
+    }
+
+    public BigDecimal getExtraHoursAmount() {
+        return extraHoursAmount;
+    }
+
+    public void setExtraHoursAmount(BigDecimal extraHoursAmount) {
+        this.extraHoursAmount = extraHoursAmount;
     }
 
     public Integer getTardinessMinutes() {

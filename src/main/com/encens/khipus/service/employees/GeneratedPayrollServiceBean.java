@@ -1248,11 +1248,20 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                     }
                 }
 
+                /* Las horas extra pagadas del mes. Salen de `horasextra` del ciclo, que es lo que
+                   escribe el pago del banco de horas y lo que la planilla tributaria ya venia
+                   leyendo. Aca se necesitan aparte para poder mostrarlas en su columna. */
+                ExtraHoursWorked monthExtraHours = extraHoursWorkedCache.get(currentJobContract.getId());
+                BigDecimal extraHoursAmount = (null == monthExtraHours || null == monthExtraHours.getTotalPaid())
+                        ? BigDecimal.ZERO : monthExtraHours.getTotalPaid();
+
                 /* Quien no genera planilla fiscal no pasa por la cadena tributaria, que es donde
-                   se pagaba el bono. Sin esto, un laboral sin planilla fiscal veria su antiguedad
-                   y no la cobraria. */
+                   se pagaba el bono y donde se pagaban las horas extra. Sin esto, un laboral sin
+                   planilla fiscal veria su antiguedad y sus horas extra, y no las cobraria: las
+                   horas salian de su banco y el dinero no aparecia en ninguna planilla. */
                 if (!activeForTaxPayrollGeneration) {
                     totalOtherIncomes += seniorityBonusAmount.doubleValue();
+                    totalOtherIncomes += extraHoursAmount.doubleValue();
                 }
                 totalSumOfIncomesBeforeIva += totalOtherIncomes;
                 // this discounts are applied directly to liquid
@@ -1377,7 +1386,9 @@ public class GeneratedPayrollServiceBean implements GeneratedPayrollService {
                    mostrarlo en las dos era el mismo importe repetido, que no se puede leer.
                    La resta mantiene la fila cuadrada: basico ganado + bono + otros = total ganado. */
                 managersPayroll.setOtherIncomes(BigDecimalUtil.toBigDecimal(
-                        totalSumOfIncomesBeforeIva - seniorityBonusAmount.doubleValue()));
+                        totalSumOfIncomesBeforeIva - seniorityBonusAmount.doubleValue()
+                                - extraHoursAmount.doubleValue()));
+                managersPayroll.setExtraHoursAmount(extraHoursAmount);
                 managersPayroll.setTotalIncome(BigDecimalUtil.toBigDecimal(mensualTotalSalary + totalSumOfIncomesBeforeIva));
                 managersPayroll.setTardinessMinutesDiscount(BigDecimalUtil.toBigDecimal(totalSumOfDiscountsPerLateness));
                 managersPayroll.setLatenessMemos(Integer.valueOf(latenessMemos));

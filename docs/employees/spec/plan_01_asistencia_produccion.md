@@ -62,10 +62,10 @@ cualquier diferencia.
 | E2.3 | Evaluación direccional: atraso, salida anticipada, tiempo adicional, falta | alto | Implementado — `JourneyEvaluation` |
 | E2.4 | Sesión que cruza medianoche, razonando en jornadas y no en días | alto | Implementado |
 | E2.5 | Entrada sin salida: cerrar en fin de jornada + incidencia | medio | Implementado |
-| E2.6 | Justificación acotada: perdona sólo los minutos que cubre | medio | **Pendiente** |
+| E2.6 | Justificación acotada: perdona sólo los minutos que cubre | medio | Implementado — el permiso por horas del [plan 13](plan_13_banco_horas.md), probado el 20/07 |
 | E2.7 | Reporte de control: nunca dos marcas en null habiendo una; resultados separados | medio | **Pendiente** |
 | E2.8 | Incidencias visibles y accionables | bajo | Parcial: el motor las produce, no se muestran |
-| **E2.9** | **Conectar el motor a `GeneratedPayrollServiceBean`** | **alto** | **Pendiente — es lo que falta para que cuente** |
+| **E2.9** | **Conectar el motor a `GeneratedPayrollServiceBean`** | **alto** | Implementado — [plan 12](plan_12_planilla_motor.md), P1–P10; falta P11, la verificación |
 
 E2.9 no estaba en la lista original: estaba implícito, y conviene que sea una tarea con nombre
 porque es la que convierte todo lo anterior en algo que se paga.
@@ -189,7 +189,7 @@ confirmar cero diferencias.
 |---|---|
 | SPEC | Completo y commiteado |
 | PLAN | Este documento — aprobado |
-| **IMPLEMENT** | **E1 completo** · **E2.1–E2.5 completos** y validados contra julio 2026 · E2.6–E2.9 pendientes · E3 y E4 absorbidos en buena parte por los planes 03 a 06 · E5 pendiente |
+| **IMPLEMENT** | **E1 completo** · **E2.1–E2.6 y E2.9 completos** (E2.9 es el [plan 12](plan_12_planilla_motor.md), a falta de su verificación P11) · E2.7 y E2.8 pendientes · E3 y E4 absorbidos en buena parte por los planes 03 a 06 · E5 pendiente |
 
 ### E1 — qué quedó implementado
 

@@ -138,5 +138,5 @@ rompe. Los datos ya están: 4.537 marcas de 72 personas.
 | Etapa SDD | Estado |
 |---|---|
 | **SPEC** | Este documento |
-| PLAN | Pendiente |
-| IMPLEMENT | No iniciado |
+| PLAN | [plan 10](plan_10_emparejamiento_marcas.md) |
+| IMPLEMENT | Escrito en el plan 10 (E1 a E6), **sin verificar contra datos** |

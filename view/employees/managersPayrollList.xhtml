@@ -78,7 +78,7 @@
         <rich:column colspan="1">
             <rich:spacer/>
         </rich:column>
-        <rich:column colspan="4">
+        <rich:column colspan="5">
             <h:outputText value="#{messages['ManagersPayroll.short.group.incomes']}"/>
         </rich:column>
         <rich:column colspan="8">
@@ -183,6 +183,13 @@
                                    dataModel="#{managersPayrollDataModel}"
                                    reRender="managersPayrollList, dataScroller">
                 #{messages['ManagersPayroll.short.seniorityBonus']}
+            </app:commandSortHeader>
+        </rich:column>
+        <rich:column>
+            <app:commandSortHeader sortProperty="managersPayroll.extraHoursAmount"
+                                   dataModel="#{managersPayrollDataModel}"
+                                   reRender="managersPayrollList, dataScroller">
+                #{messages['ManagersPayroll.extraHoursAmount']}
             </app:commandSortHeader>
         </rich:column>
         <rich:column>
@@ -346,6 +353,11 @@
     </h:outputText>
 </rich:column>
 <rich:column styleClass="right">
+    <h:outputText value="#{managersPayrollItem.extraHoursAmount}">
+        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+    </h:outputText>
+</rich:column>
+<rich:column>
     <h:outputText value="#{managersPayrollItem.otherIncomes}">
         <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
     </h:outputText>

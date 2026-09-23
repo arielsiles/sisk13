@@ -229,7 +229,7 @@ producción hay que confirmar que ese reglamento existe y dice esto.
 |---|---|
 | SPEC | Este documento lo incluye |
 | PLAN | Aprobado, con las respuestas de arriba |
-| **IMPLEMENT** | **A1–A3, B1–B7 hechas** · falta aplicar el SQL, desplegar y probar |
+| **IMPLEMENT** | **A1–A3, B1–B7 hechas** · SQL aplicado en dev y desplegado · falta el SQL en producción y probar |
 
 ### Qué quedó hecho
 
@@ -260,7 +260,7 @@ producción hay que confirmar que ese reglamento existe y dice esto.
 
 ### Falta probar
 
-- Aplicar el SQL y desplegar: sin las columnas nuevas, Hibernate no valida el modelo.
+- Aplicar el SQL en producción: sin las columnas nuevas, Hibernate no valida el modelo. En dev ya está.
 - Marcar PRODUCCION, poner la fecha, regenerar julio y comparar contra la 008.
 - Cambiar la base a sueldo básico y verificar que solo se muevan quienes tienen bono u otros ingresos.
 - Que la planilla fiscal siga coincidiendo al centavo con la de sueldos.

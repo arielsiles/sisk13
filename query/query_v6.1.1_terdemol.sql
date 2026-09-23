@@ -22,3 +22,8 @@ ALTER TABLE unidadorganizacional
 -- 1.2) Cuantos atrasos del mes ameritan memorandum. Se reporta, no se emite.
 ALTER TABLE planillaadministrativos
   ADD COLUMN memorandumsatraso INT NULL;
+
+-- 2) Las horas extra pagadas, con columna propia en la planilla de sueldos.
+-- El importe se resta de OTROS INGRESOS para que la fila cuadre y nadie cobre dos veces.
+ALTER TABLE planillaadministrativos
+  ADD COLUMN horasextraimporte DECIMAL(13,2) NULL;

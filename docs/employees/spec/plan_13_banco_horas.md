@@ -288,12 +288,21 @@ Con ACHOCALLA, contrato 246, julio 2026, turnos de 12 h del GRUPO 1:
   La 007 comprueba el permiso por horas; la 008, que un día perdonado ya no acumula atraso.
   Comparadas las 74 filas de la 007 contra la 008, la única que cambia es la de esta persona.
 
+### Probado el 2026-09-22 y 23
+
+- **Borrar un permiso** con el modal: se va el movimiento **y su fecha especial**, el saldo se
+  recalcula y el día vuelve a evaluarse. Comprobado en la base: no quedan fechas compensatorias
+  huérfanas. Al borrar el permiso del 20/07, ese día recuperó sus 28 minutos de atraso.
+- **Pagar horas**: baja el saldo y escribe `horasextra` del ciclo —4,00 h y 100,00 Bs—.
+- **Borrar el pago**: revierte el importe y **borra la fila** del ciclo, que antes quedaba en cero.
+- **El candado del pago**: lo cierra la planilla **oficial** del ciclo, no cualquier generación.
+  Mirar cualquiera era demasiado duro: julio lleva diecisiete generaciones de prueba y a la primera
+  el pago quedaba trabado sin forma de corregir un error de carga.
+- **El pago aparece en la planilla de sueldos**, en la columna HORAS EXTRAS, también para quien no
+  está en la planilla fiscal. Antes ese importe se perdía.
+
 ### Falta probar
 
-- **Borrar** un movimiento con el modal: cancelar, borrar, y que el permiso se lleve su fecha
-  especial y el día vuelva a evaluarse.
-- **Pagar horas**: que baje el saldo y que escriba `horasextra` del ciclo, y que un pago cuya
-  planilla ya se generó quede sin lápiz ni tacho.
 - **Saldo negativo**: consumir más de lo acumulado y ver la fila en rojo.
 - **El reporte de saldos** por rango, con varias personas y no una sola.
 - **La falta que desaparece**: un permiso de día completo el **29/07** —el día sin marcas— tiene

@@ -12,6 +12,7 @@ import com.encens.khipus.model.employees.SpecialDateTarget;
 import com.encens.khipus.model.employees.SpecialDateType;
 import com.encens.khipus.action.employees.dto.HourBankBalance;
 import com.encens.khipus.model.employees.ExtraHoursWorked;
+import com.encens.khipus.model.employees.GeneratedPayrollType;
 import com.encens.khipus.model.employees.PayrollGenerationCycle;
 import com.encens.khipus.model.employees.WeeklyWorkload;
 import com.encens.khipus.model.finances.JobContract;
@@ -267,14 +268,20 @@ public class HourBankServiceBean extends GenericServiceBean implements HourBankS
                 || null == movement.getPayrollGenerationCycle()) {
             return true;
         }
-        /* La planilla del ciclo ya generada cierra el pago: lo que se pago no se corrige por
-           atras, se corrige generando de nuevo. */
-        List<?> generated = getEntityManager()
-                .createQuery("select o.id from GeneratedPayroll o where o.payrollGenerationCycle = :cycle")
+        /* Lo que cierra el pago es la planilla OFICIAL del ciclo, no cualquier generacion.
+           Mirar cualquiera era demasiado duro: una planilla se genera muchas veces como prueba
+           -en terdemol, diecinueve veces el mismo mes- y a la primera el pago quedaba trabado,
+           sin forma de corregir un error de carga desde la pantalla. Lo que no se toca por atras
+           es lo que ya se pago de verdad. */
+        List<?> official = getEntityManager()
+                .createQuery("select o.id from GeneratedPayroll o"
+                        + " where o.payrollGenerationCycle = :cycle"
+                        + " and o.generatedPayrollType = :official")
                 .setParameter("cycle", movement.getPayrollGenerationCycle())
+                .setParameter("official", GeneratedPayrollType.OFFICIAL)
                 .setMaxResults(1)
                 .getResultList();
-        return generated.isEmpty();
+        return official.isEmpty();
     }
 
     /** Nunca por debajo de cero: horas extra negativas no existen. */
@@ -347,8 +354,17 @@ public class HourBankServiceBean extends GenericServiceBean implements HourBankS
             create(extra);
         } else {
             ExtraHoursWorked extra = existing.get(0);
-            extra.setExtraHours(floor(extra.getExtraHours().add(hours)));
-            extra.setTotalPaid(floor(extra.getTotalPaid().add(paidAmount)));
+            BigDecimal newHours = floor(extra.getExtraHours().add(hours));
+            BigDecimal newPaid = floor(extra.getTotalPaid().add(paidAmount));
+            if (0 == newHours.signum() && 0 == newPaid.signum()) {
+                /* Al revertir el pago la fila queda en cero, y una fila de horas extra con cero
+                   horas y cero pesos no dice nada: ensucia el ciclo y hace dudar de si quedo algo
+                   pendiente. Se borra, que es lo que el pago hizo al reves cuando se registro. */
+                delete(extra);
+                return;
+            }
+            extra.setExtraHours(newHours);
+            extra.setTotalPaid(newPaid);
             update(extra);
         }
     }

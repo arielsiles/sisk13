@@ -29,8 +29,12 @@ dayAbsences       = jornadas: ausencia × 2 + registro + sinGoce     ← ver "Fa
                     bandas:   (faltas del control) × 2 − (días sin goce de haber)
 mensualTotalSalary= basicSalary / 30 × (workedDays − dayAbsences)          ← "básico ganado"
 
+horasExtras       = `horasextra` del ciclo: lo que escribió el pago del banco de horas
+
 otrosIngresos     = si activeForTaxPayrollGeneration → categoryTributaryPayroll.totalOtherIncomes
                     si no                            → Σ SalaryMovement de tipo OTHER_INCOME
+                    en los dos casos se le RESTAN el bono de antigüedad y las horas extras,
+                    que tienen columna propia (ver abajo)
 
 totalIncome       = mensualTotalSalary + otrosIngresos                     ← "total ganado"
 
@@ -231,6 +235,32 @@ punto medio, así ninguna marca queda en dos jornadas.
 > cálculo le llegan solo los minutos de atraso de entrada
 > ([GeneratedPayrollServiceBean:2512](../../src/main/com/encens/khipus/service/employees/GeneratedPayrollServiceBean.java)).
 > Si alguna vez debe descontarse, es una regla nueva y hay que pedirla.
+
+### Horas extras pagadas
+
+El pago de horas del **banco de horas** escribe `horasextra` del ciclo —la tabla de siempre— y la
+planilla lo muestra en su propia columna, **HORAS EXTRAS**, entre el bono de antigüedad y otros
+ingresos.
+
+Quién lo cobra y por qué vía:
+
+| | Cómo llega | Qué hace la planilla de sueldos |
+|---|---|---|
+| **Activo para planilla fiscal** | ya viene dentro de `totalOtherIncomes` de la cadena tributaria | lo muestra en su columna y lo **resta** de OTROS INGRESOS |
+| **No activo** | no pasa por la cadena tributaria | lo **suma** a los ingresos y lo muestra en su columna |
+
+El segundo caso era un agujero: las horas salían del banco y el importe **no aparecía en ninguna
+planilla**. El primero es la trampa opuesta, pagar dos veces, y por eso la resta.
+
+La fila cuadra en los dos casos:
+
+```
+básico ganado + bono antigüedad + horas extras + otros ingresos = total ganado
+```
+
+**AFP y RC-IVA**: quien está en la planilla fiscal los paga sobre el total ganado, que incluye las
+horas extras. Quien no está no pasa por esa cadena y cobra el importe completo, igual que el resto
+de sus ingresos.
 
 ### Movimientos de sueldo
 
