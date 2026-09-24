@@ -48,14 +48,16 @@ import java.util.Date;
         @NamedQuery(name = "HourBankMovement.findBySpecialDate",
                 query = "select o from HourBankMovement o where o.specialDate = :specialDate"
                         + " order by o.id asc"),
-        @NamedQuery(name = "HourBankMovement.balancesInRange",
+        @NamedQuery(name = "HourBankMovement.balancesFrom",
                 query = "select o.contract, o.type, sum(o.hours) from HourBankMovement o"
-                        + " where o.date >= :from and o.date <= :to"
+                        + " where o.date >= :from"
                         + " group by o.contract, o.type"),
-        @NamedQuery(name = "HourBankMovement.sumByTypeInRange",
-                query = "select sum(o.hours) from HourBankMovement o"
-                        + " where o.contract = :contract and o.type = :type"
-                        + " and o.date >= :from and o.date <= :to")
+        /* El saldo anterior de TODOS de una vez. Preguntarlo persona por persona con
+           `balanceAtDate` seria una consulta por fila del reporte. */
+        @NamedQuery(name = "HourBankMovement.balanceBefore",
+                query = "select o.contract, sum(o.hours) from HourBankMovement o"
+                        + " where o.date < :from"
+                        + " group by o.contract")
 })
 
 @Entity

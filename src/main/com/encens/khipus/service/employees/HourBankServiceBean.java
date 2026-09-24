@@ -369,28 +369,41 @@ public class HourBankServiceBean extends GenericServiceBean implements HourBankS
         }
     }
 
+    /**
+     * Los saldos, con el movimiento a partir de una fecha y lo anterior comprimido en un numero.
+     * <p/>
+     * No hay fecha de corte por arriba a proposito: el saldo es de la persona, no del periodo. La
+     * fecha solo separa "lo que ya tenia" de "lo que se movio desde entonces", y por eso la fila
+     * cuadra —anterior + acumulado - usado - pagado = saldo— sin importar que fecha se elija.
+     */
     @SuppressWarnings({"unchecked"})
-    public List<HourBankBalance> balancesBetween(Date from, Date to) {
-        List<Object[]> rows = getEntityManager()
-                .createNamedQuery("HourBankMovement.balancesInRange")
-                .setParameter("from", from)
-                .setParameter("to", to)
-                .getResultList();
-
+    public List<HourBankBalance> balancesFrom(Date from) {
         /* Se arma por contrato para que una persona sea una fila, no una por tipo de movimiento.
            El orden se resuelve al final: en la consulta obligaria a agrupar tambien por nombre. */
         Map<Long, HourBankBalance> byContract = new LinkedHashMap<Long, HourBankBalance>();
+
+        /* Primero el saldo anterior, porque es lo que hace aparecer a quien NO se movio desde la
+           fecha y sin embargo tiene horas a favor o en contra. Al reves, esa gente desaparecia de
+           la pantalla y su saldo con ella. */
+        List<Object[]> previousRows = getEntityManager()
+                .createNamedQuery("HourBankMovement.balanceBefore")
+                .setParameter("from", from)
+                .getResultList();
+        for (Object[] row : previousRows) {
+            Contract contract = (Contract) row[0];
+            rowFor(byContract, contract).setPrevious((BigDecimal) row[1]);
+        }
+
+        List<Object[]> rows = getEntityManager()
+                .createNamedQuery("HourBankMovement.balancesFrom")
+                .setParameter("from", from)
+                .getResultList();
         for (Object[] row : rows) {
             Contract contract = (Contract) row[0];
             HourBankMovementType type = (HourBankMovementType) row[1];
             BigDecimal hours = (BigDecimal) row[2];
 
-            HourBankBalance balance = byContract.get(contract.getId());
-            if (null == balance) {
-                balance = new HourBankBalance(contract);
-                balance.setHoursPerDay(hoursPerDayOf(contract.getEmployee()));
-                byContract.put(contract.getId(), balance);
-            }
+            HourBankBalance balance = rowFor(byContract, contract);
             if (HourBankMovementType.LEAVE.equals(type)) {
                 balance.addUsed(hours);
             } else if (HourBankMovementType.PAYMENT.equals(type)) {
@@ -408,6 +421,17 @@ public class HourBankServiceBean extends GenericServiceBean implements HourBankS
             }
         });
         return balances;
+    }
+
+    /** La fila de esa persona, creandola con su jornada la primera vez que aparece. */
+    private HourBankBalance rowFor(Map<Long, HourBankBalance> byContract, Contract contract) {
+        HourBankBalance balance = byContract.get(contract.getId());
+        if (null == balance) {
+            balance = new HourBankBalance(contract);
+            balance.setHoursPerDay(hoursPerDayOf(contract.getEmployee()));
+            byContract.put(contract.getId(), balance);
+        }
+        return balance;
     }
 
     public BigDecimal leaveHours(Contract contract, Date date, Date startTime, Date endTime) {

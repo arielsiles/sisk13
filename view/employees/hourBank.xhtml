@@ -27,16 +27,10 @@
                                        popup="true" enableManualInput="true"
                                        inputClass="app-filterbar__input app-filterbar__input--date"/>
                         <h:message id="fromMsg" for="from" styleClass="errors"/>
-                        <h:outputText styleClass="app-cal__label" value="#{messages['HourBank.to']}"/>
-                        <rich:calendar id="to" value="#{hourBankAction.to}"
-                                       datePattern="#{messages['patterns.date']}"
-                                       popup="true" enableManualInput="true"
-                                       inputClass="app-filterbar__input app-filterbar__input--date"/>
-                        <h:message id="toMsg" for="to" styleClass="errors"/>
                         <a4j:commandButton action="#{hourBankAction.loadBalances}"
                                            value="#{messages['Common.search']}"
                                            styleClass="app-btn-primary"
-                                           reRender="balanceList, fromMsg, toMsg, :globalMessages"/>
+                                           reRender="balanceList, fromMsg, :globalMessages"/>
                     </a4j:outputPanel>
 
                     <a4j:outputPanel id="balanceList" layout="block" styleClass="app-check">
@@ -50,6 +44,8 @@
                                 <thead>
                                     <tr>
                                         <th class="app-check__head">#{messages['HourBank.employee']}</th>
+                                        <th class="app-check__head"
+                                            title="#{messages['HourBank.previousBalance.help']}">#{messages['HourBank.previousBalance']}</th>
                                         <th class="app-check__head">#{messages['HourBank.accrued']}</th>
                                         <th class="app-check__head">#{messages['HourBank.used']}</th>
                                         <th class="app-check__head">#{messages['HourBank.paid']}</th>
@@ -66,6 +62,11 @@
                                                                  reRender="hourBankTabs">
                                                     <h:outputText value="#{balanceItem.employee.fullName}"/>
                                                 </a4j:commandLink>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{balanceItem.previous}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
                                             </td>
                                             <td>
                                                 <h:outputText value="#{balanceItem.accrued}">
@@ -95,6 +96,19 @@
                                         </tr>
                                     </a4j:repeat>
                                 </tbody>
+                                <tfoot>
+                                    <!-- Cuantas horas debe la empresa en total. Solo en horas: los
+                                         dias de personas con jornadas distintas no se suman. -->
+                                    <tr class="app-check__total">
+                                        <td colspan="5">#{messages['HourBank.total']}</td>
+                                        <td>
+                                            <h:outputText value="#{hourBankAction.totalBalance}">
+                                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                            </h:outputText>
+                                        </td>
+                                        <td/>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </h:panelGroup>
                     </a4j:outputPanel>

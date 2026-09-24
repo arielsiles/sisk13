@@ -159,6 +159,11 @@ public interface HourBankService extends GenericService {
                               PayrollGenerationCycle cycle, BigDecimal amount, String description)
             throws Exception;
 
-    /** Los saldos de todas las personas en un rango. Es el reporte. */
-    List<HourBankBalance> balancesBetween(Date from, Date to);
+    /**
+     * Los saldos de todas las personas. Es el reporte.
+     * <p/>
+     * La fecha separa lo anterior -que viaja comprimido en un numero- del movimiento que se
+     * muestra al detalle. El saldo es el mismo con cualquier fecha: es de la persona.
+     */
+    List<HourBankBalance> balancesFrom(Date from);
 }

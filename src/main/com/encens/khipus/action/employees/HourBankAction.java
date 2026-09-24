@@ -93,10 +93,9 @@ public class HourBankAction implements Serializable {
     private PayrollGenerationCycle cycle;
     private BigDecimal amount;
 
-    /* El reporte: los saldos de todos, para el rango elegido. Es lo que se ve mientras no haya
-       una persona seleccionada. */
+    /* El reporte: los saldos de todos. Es lo que se ve mientras no haya una persona seleccionada.
+       La fecha acota el movimiento que se muestra, NO el saldo: no hay tope por arriba. */
     private Date from;
-    private Date to;
     private List<HourBankBalance> balances;
 
     /* Dos pestanas: los saldos de todos, y los movimientos de una persona. Cada filtro vive con
@@ -111,14 +110,11 @@ public class HourBankAction implements Serializable {
 
     @Create
     public void init() {
-        /* El reporte arranca en el anio corriente. El banco no tiene periodo, pero mostrar todo
-           desde siempre haria una pantalla ilegible el segundo anio. */
+        /* El detalle arranca en el anio corriente: mostrar cada movimiento desde siempre haria una
+           pantalla ilegible el segundo anio. Lo anterior no se pierde, va en el saldo anterior. */
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_YEAR, 1);
         from = calendar.getTime();
-        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
-        calendar.set(Calendar.DAY_OF_MONTH, 31);
-        to = calendar.getTime();
         loadBalances();
     }
 
@@ -650,9 +646,21 @@ public class HourBankAction implements Serializable {
 
     public List<HourBankBalance> getBalances() {
         if (null == balances) {
-            balances = hourBankService.balancesBetween(from, to);
+            balances = hourBankService.balancesFrom(from);
         }
         return balances;
+    }
+
+    /**
+     * Cuantas horas debe la empresa en total. Va solo en horas: sumar dias de personas con
+     * jornadas distintas daria un numero que no significa nada.
+     */
+    public BigDecimal getTotalBalance() {
+        BigDecimal total = BigDecimal.ZERO;
+        for (HourBankBalance balance : getBalances()) {
+            total = total.add(balance.getBalance());
+        }
+        return total;
     }
 
     public String getSelectedTab() {
@@ -677,14 +685,6 @@ public class HourBankAction implements Serializable {
 
     public void setFrom(Date from) {
         this.from = from;
-    }
-
-    public Date getTo() {
-        return to;
-    }
-
-    public void setTo(Date to) {
-        this.to = to;
     }
 
     public PayrollGenerationCycle getCycle() {

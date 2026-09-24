@@ -300,11 +300,27 @@ Con ACHOCALLA, contrato 246, julio 2026, turnos de 12 h del GRUPO 1:
   el pago quedaba trabado sin forma de corregir un error de carga.
 - **El pago aparece en la planilla de sueldos**, en la columna HORAS EXTRAS, también para quien no
   está en la planilla fiscal. Antes ese importe se perdía.
+- **Saldo negativo**: con 20,00 h a favor se pagaron 24,00. El sistema **no lo rechaza** —es lo
+  correcto: se puede adelantar un permiso o pagar de más, y el saldo queda en contra— y el
+  resultado se muestra en rojo en los dos lugares, el resumen de la persona y la fila de la
+  pestaña de saldos. Verificado contra la base: `SUM(horas) = -4.00`. Al borrar el pago, el saldo
+  volvió a 20,00, PAGADO a 0,00 y la fila de `horasextra` del ciclo desapareció.
+
+### Lo que salió de probarlo
+
+Dos cosas que la prueba dejó a la vista y que se resolvieron por separado:
+
+- **La equivalencia en días usa la jornada semanal** (`jornadasemanal`, 8,00 h), no el turno del
+  día. Un permiso de día completo en un turno de 12 h se muestra como 1,50 d. **Se decidió dejarlo
+  así**: el turno cambia día a día —4, 7, 8, 12 h— y no hay un divisor único con el que expresar
+  un saldo global en días; la regla de 8 h es estable y es la de la norma.
+- **La pestaña de saldos dice *saldo* y calcula el neto del período**, así que la misma persona
+  daba −44,00 consultando julio y −4,00 consultando desde 2025. Se abrió el
+  [plan 15](plan_15_saldos_banco_horas.md).
 
 ### Falta probar
 
-- **Saldo negativo**: consumir más de lo acumulado y ver la fila en rojo.
-- **El reporte de saldos** por rango, con varias personas y no una sola.
+- **El reporte de saldos** con varias personas, cuando se rehaga con el [plan 15](plan_15_saldos_banco_horas.md).
 - **La falta que desaparece**: un permiso de día completo el **29/07** —el día sin marcas— tiene
   que dejar la planilla en 29 días, 0 faltas y 0 minutos perdidos.
 - **`COMPENSATORIO` fuera de los motivos** de la pantalla de fechas especiales (H5).

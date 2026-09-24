@@ -26,8 +26,9 @@ arriba, en [../README.md](../README.md).
 | [plan_10_emparejamiento_marcas.md](plan_10_emparejamiento_marcas.md) | La jornada guía el emparejamiento de las marcas | **E1–E6 implementados y probados** con julio 2026 |
 | [plan_11_marca_incompleta.md](plan_11_marca_incompleta.md) | La jornada con una sola punta marcada: ni falta entera ni día pagado | **F1 y F2 implementados** · F3–F5 van con E2.9 |
 | [plan_12_planilla_motor.md](plan_12_planilla_motor.md) | E2.9: la planilla toma los números del motor, y las tres clases de falta | **P1–P10 implementados**, con los dos motores conviviendo · falta verificar julio 2026 |
-| [plan_13_banco_horas.md](plan_13_banco_horas.md) | El banco de horas: acumular por mes y consumir como permiso | **H1–H10 implementados y desplegados** · probados registro, corrección, permisos, borrado y pago · faltan saldo negativo, reporte y carga inicial |
+| [plan_13_banco_horas.md](plan_13_banco_horas.md) | El banco de horas: acumular por mes y consumir como permiso | **H1–H10 implementados y desplegados** · probados registro, corrección, permisos, borrado, pago y saldo negativo · faltan el reporte impreso y la carga inicial |
 | [plan_14_atrasos.md](plan_14_atrasos.md) | Los atrasos: base configurable (total ganado o básico) y política por área | **Implementado, desplegado y validado** en dev con las generaciones 009 a 014 · falta el SQL en producción |
+| [plan_15_saldos_banco_horas.md](plan_15_saldos_banco_horas.md) | La pestaña de saldos dice *saldo* y calcula el neto del período | **S1–S6 implementadas y probadas**: el saldo ya no depende de la fecha |
 
 ## El orden en que salieron
 

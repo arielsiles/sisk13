@@ -2303,6 +2303,13 @@ select[disabled] {
     background: #fdf0f0;
 }
 
+/* El pie de totales: la linea gruesa arriba es la que dice "esto ya no es una fila mas". */
+.app-check__total td {
+    padding: 6px 8px;
+    border-top: 2px solid #d7d7d4;
+    font-weight: bold;
+}
+
 .app-check__day {
     white-space: nowrap;
 }
