@@ -25,7 +25,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.*;
 import org.jboss.seam.annotations.security.Restrict;
-import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.core.Manager;
 import org.jboss.seam.international.StatusMessage;
 
@@ -300,7 +299,6 @@ public class JobContractAction extends GenericAction<JobContract> {
 
     @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
     public String selectJobContract(JobContract instance) {
-        Contexts.getConversationContext().remove("contractAction");
         Manager.instance().endConversation(true);
         return select(instance);
     }

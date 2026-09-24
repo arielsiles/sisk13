@@ -24,8 +24,7 @@ Contract (contrato)          ← alta/baja, modalidad, estado, ciclo, AFP y caja
 
 | Pantalla | Action | Permiso |
 |---|---|---|
-| Contratos | `ContractAction` | `CONTRACT` |
-| Contratos puestos | `JobContractAction` (660 líneas, la más grande del módulo) | `JOBCONTRACT` |
+| Contratos | `JobContractAction` (660 líneas, la más grande del módulo) | `JOBCONTRACT` |
 | Modalidades de contrato | `ContractModeAction` | `CONTRACTMODE` |
 | Cargos | `ChargeAction` | — |
 | Categorías de puesto | `JobCategoryAction` | `JOBCATEGORY` |

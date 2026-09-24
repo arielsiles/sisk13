@@ -48,7 +48,9 @@ public class JobContractDataModel extends QueryDataModel<Long, JobContract> {
                porque un apellido materno nulo anularia toda la concatenacion. */
             "lower(concat(concat(concat(coalesce(employee.firstName,''),' '),concat(coalesce(employee.lastName,''),' ')),coalesce(employee.maidenName,''))) like concat('%', concat(lower(#{jobContractDataModel.employeeName}), '%'))",
             "employee.retentionFlag = #{jobContractDataModel.retentionFlag}",
-            "jobContract.contract.id = #{contractAction.instance.id}",
+            /* Aca habia un filtro por el contrato abierto en la pantalla vieja de Contratos. Esa
+               pantalla ya no existe, y el filtro nunca se aplicaba desde esta lista: sin contrato
+               seleccionado la expresion daba null y la restriccion se omitia. */
             "jobContract.id not in (#{grantedBonusCreateAction.selectedJobContractIdList})"
     };
 
