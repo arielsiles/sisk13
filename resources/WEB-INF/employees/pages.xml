@@ -966,40 +966,6 @@
         </navigation>
     </page>
 
-    <!--Contract-->
-    <page view-id="/employees/contractList.xhtml">
-        <end-conversation/>
-        <navigation from-action="#{contractAction.select(contractItem)}">
-            <rule if-outcome="Success">
-                <redirect view-id="/employees/contract.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-    <page view-id="/employees/contract.xhtml" no-conversation-view-id="/employees/contractList.xhtml">
-        <navigation>
-            <rule>
-                <redirect view-id="/employees/contractList.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation from-action="#{jobContractAction.select(jobContractItem)}">
-            <begin-conversation flush-mode="MANUAL" join="false"/>
-            <rule if-outcome="Success">
-                <redirect view-id="/employees/jobContract.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation from-action="#{jobContractAction.selectJobContract(jobContractItem)}">
-            <rule if-outcome="Success">
-                <redirect view-id="/employees/jobContract.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation
-                from-action="#{generateEmployeeContractAction.generateForwad(jobContractItem.contract.employee,jobContractItem)}">
-            <rule if-outcome="Success">
-                <redirect view-id="/employees/generateEmployeeContract.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-
     <!--Salary Movement-->
     <page view-id="/employees/salaryMovementList.xhtml">
         <end-conversation/>

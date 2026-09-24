@@ -1373,7 +1373,6 @@
     s:hasPermission('EVALUATIONCRITERIA','VIEW') or
     s:hasPermission('SPECIALDATE','VIEW') or
     s:hasPermission('JOBCONTRACT','VIEW') or
-    s:hasPermission('CONTRACT','VIEW') or
     s:hasPermission('HORARYBANDCONTRACT','VIEW') or
     s:hasPermission('ORGANIZATIONALUNIT','VIEW') or
     s:hasPermission('ORGANIZATIONALLEVEL','VIEW') or
@@ -1756,7 +1755,6 @@
                                             s:hasPermission('EVALUATIONCRITERIA','VIEW') or
                                             s:hasPermission('SPECIALDATE','VIEW') or
                                             s:hasPermission('JOBCONTRACT','VIEW') or
-                                            s:hasPermission('CONTRACT','VIEW') or
                                             s:hasPermission('HORARYBANDCONTRACT','VIEW') or
                                             s:hasPermission('ORGANIZATIONALUNIT','VIEW') or
                                             s:hasPermission('ORGANIZATIONALLEVEL','VIEW') or
@@ -1851,14 +1849,6 @@
                             value="#{messages['menu.employees.evaluationCriteria']}"
                             propagation="none"/>
                 </rich:menuItem>
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('CONTRACT','VIEW')}">
-                    <s:link view="/employees/contractList.xhtml"
-                            value="#{messages['menu.rrhh.humanDevelopment.contract']}"
-                            propagation="none"/>
-                </rich:menuItem>
-
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
                                rendered="#{s:hasPermission('ORGANIZATIONALUNIT','VIEW')}">

@@ -38,10 +38,6 @@
     <framework:entity-query name="salaryQuery"
                             ejbql="select o from Salary o order by o.amount ASC"/>
 
-    <factory name="contractList" value="#{contractQuery}"/>
-    <framework:entity-query name="contractQuery"
-                            ejbql="select o from Contract o order by o.numberOfContract ASC"/>
-
     <factory name="gestionPayrollList" value="#{gestionPayrollQuery}"/>
     <framework:entity-query name="gestionPayrollQuery"
                             ejbql="select o from GestionPayroll o order by o.gestionName ASC"/>
