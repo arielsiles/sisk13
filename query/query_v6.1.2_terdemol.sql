@@ -7,3 +7,11 @@ UPDATE contrato c
           JOIN sueldo s  ON s.idsueldo  = pu.idsueldo
          GROUP BY cp.idcontrato) t ON t.idcontrato = c.idcontrato
    SET c.haberbasicolaboral = t.suma;
+
+-- 2) Permite cambiar la modalidad del contrato desde la edicion, sin pasar por Cambiar condicion.
+-- Es para la etapa de pruebas: en produccion el cambio va por Cambiar condicion, que deja rastro.
+SET @nuevo_id = (SELECT MAX(idfuncionalidad) + 1 FROM funcionalidad);
+INSERT INTO funcionalidad (idfuncionalidad, codigo, descripcion, idmodulo, permiso, nombrerecurso, idcompania)
+SELECT @nuevo_id, 'JOBCONTRACTSPECIALUPDATE', 'Cambiar modalidad al editar el contrato', 4, 1, 'Functionality.employees.jobContractSpecialUpdate', 1
+  FROM (SELECT 1) t
+ WHERE NOT EXISTS (SELECT 1 FROM funcionalidad WHERE codigo = 'JOBCONTRACTSPECIALUPDATE');

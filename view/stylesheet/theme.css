@@ -2622,6 +2622,50 @@ textarea + .app-tag {
     font-size: 92%;
 }
 
+/* Cargo en Condicion de contratos: misma idea que en la planilla, ancho fijo y una sola linea.
+   Lo que no entra se corta con '...' y el title muestra el nombre completo. */
+.app-contract__charge-text {
+    display: block;
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 92%;
+}
+
+/* Contrato cerrado: la fila entera en gris medio para separarla de las vigentes sin esconderla.
+   No se toca el fondo, que pelearia con el resaltado del mouse y con la fila alternada. Es el
+   mismo gris que ya usan las etiquetas atenuadas del sistema: 4:1 de contraste, un escalon por
+   debajo del minimo accesible pero todavia comodo de leer en pantalla.
+   Va celda por celda porque el dataTable de RichFaces 3.3 no admite clase de fila condicional. */
+.app-contract__row--dim,
+.rich-table-cell.app-contract__row--dim {
+    color: #8a857f;
+}
+
+/* Sueldo en Condicion de contratos: a la derecha, para que los decimales queden en columna, pero
+   despegado del borde. Va padding y no margin: en un <td> el margin no se aplica. */
+.app-contract__salary {
+    padding-right: 20px;
+}
+
+/* La modalidad en una letra dentro de una etiqueta: L laboral, E eventual. El nombre completo y
+   si es el contrato principal van en el tooltip. El ancho minimo es para que la E y la L, que no
+   miden lo mismo, dejen todos los recuadros de la columna del mismo tamanio. */
+.app-contract__mode,
+.rich-table-cell .app-contract__mode {
+    min-width: 10px;
+    white-space: nowrap;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* En una fila de contrato cerrado la etiqueta se atenua con el resto: el color propio de
+   .app-tag le ganaria al gris de la fila y el recuadro quedaria mas oscuro que su texto. */
+.rich-table-cell.app-contract__row--dim .app-tag {
+    color: #8a857f;
+}
+
 /* Cabecera de dos filas (grupos + columnas): los titulos de uno y dos renglones centrados. */
 .app-payroll th {
     vertical-align: middle !important;

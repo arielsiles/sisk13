@@ -1401,6 +1401,11 @@
                     rendered="#{s:hasPermission('JOBCONTRACT','VIEW')}"
                     propagation="none"/>
 
+            <s:link view="/employees/contractConditionList.xhtml" styleClass="tab-cell"
+                    value="#{messages['menu.employees.contractCondition']}"
+                    rendered="#{s:hasPermission('CONTRACTCONDITION','VIEW')}"
+                    propagation="none"/>
+
             <s:link view="/employees/gestionPayrollList.xhtml" styleClass="tab-cell"
                     action="#{gestionPayrollDataModel.setLastGestionPayroll}"
                     value="#{messages['menu.rrhh.payrollGeneration.gestion']}"
@@ -1472,14 +1477,6 @@
                                rendered="#{s:hasPermission('SCHEDULEEXCEPTION','VIEW')}">
                     <s:link view="/employees/scheduleExceptionList.xhtml"
                             value="#{messages['menu.employees.scheduleException']}"
-                            propagation="none"/>
-                </rich:menuItem>
-
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('CONTRACTCONDITION','VIEW')}">
-                    <s:link view="/employees/contractConditionList.xhtml"
-                            value="#{messages['menu.employees.contractCondition']}"
                             propagation="none"/>
                 </rich:menuItem>
 

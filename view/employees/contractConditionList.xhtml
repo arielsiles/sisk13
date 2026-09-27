@@ -5,6 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:rich="http://richfaces.org/rich"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 xmlns:app="http://encens.com/products/khipus/facelets"
                 template="/layout/template.xhtml">
 
@@ -84,11 +85,19 @@
                 </h:panelGrid>
             </rich:simpleTogglePanel>
 
+            <!-- Un contrato nuevo se carga en la misma pantalla que lo edita: ahi van la persona,
+                 el puesto y el sueldo en un solo paso. -->
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}" view="/employees/jobContract.xhtml"
+                          styleClass="button" propagation="begin"
+                          rendered="#{s:hasPermission('JOBCONTRACT','CREATE')}"/>
+            </div>
+
             <rich:dataTable id="contractConditionList"
                             value="#{contractConditionDataModel}" var="contractItem"
                             rows="#{sessionUser.rowsPerPage}"
                             width="100%"
-                            columnsWidth="30%,13%,14%,11%,11%,10%,11%">
+                            columnsWidth="24%,70px,14%,170px,9%,9%,9%,8%,9%">
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column>
@@ -98,8 +107,11 @@
                                 #{messages['ContractCondition.employee']}
                             </app:commandSortHeader>
                         </rich:column>
-                        <rich:column>#{messages['ContractCondition.mode']}</rich:column>
-                        <rich:column>#{messages['ContractCondition.duration']}</rich:column>
+                        <rich:column styleClass="center"
+                                     title="#{messages['ContractCondition.mode.help']}">#{messages['ContractCondition.mode']}</rich:column>
+                        <rich:column>#{messages['ContractCondition.unit']}</rich:column>
+                        <rich:column>#{messages['Job.charge']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Job.salary']}</rich:column>
                         <rich:column styleClass="center">
                             <app:commandSortHeader sortProperty="contract.initDate"
                                                    dataModel="#{contractConditionDataModel}"
@@ -119,36 +131,71 @@
                     </rich:columnGroup>
                 </f:facet>
 
-                <rich:column>
+                <rich:column styleClass="#{contractItem.inactive ? 'app-contract__row--dim' : ''}">
                     <h:outputText value="#{contractItem.employee.idNumberAndFullName}"/>
                 </rich:column>
-                <rich:column>
-                    <h:outputText value="#{contractItem.contractMode.name}"/>
-                    <!-- Que un contrato sea principal o secundario decide si lleva AFP y
-                         vacaciones. Sin verlo en el listado no hay forma de notar que alguien
-                         quedo sin ninguno. -->
-                    <h:outputText styleClass="app-tag" rendered="#{contractItem.currentMain}"
-                                  value="#{messages['Contract.main.tag']}"/>
+                <!-- Modalidad en una letra, con el nombre completo en el title: LABORAL y EVENTUAL
+                     escritos enteros repetian 71 veces una palabra larga y empujaban el resto.
+                     Que un contrato sea principal o secundario decide si lleva AFP y vacaciones,
+                     asi que tiene que verse; pero hoy los 239 contratos son principales, y un
+                     cartel que aparece en todas las filas no informa nada. Se invierte: el
+                     principal lleva un punto discreto y el secundario -la excepcion, la que hay
+                     que cazar- lleva cartel. -->
+                <rich:column styleClass="center #{contractItem.inactive ? 'app-contract__row--dim' : ''}">
+                    <!-- Un span y no un h:panelGroup: panelGroup ignora el atributo title, asi que
+                         el tooltip no llegaba a dibujarse. La celda muestra la inicial y nada mas;
+                         principal o secundario lo dice el tooltip.
+                         Se lee `main` y no `currentMain`: el segundo es "principal y ademas
+                         vigente", asi que un contrato principal ya cerrado se anunciaria como
+                         secundario. El tooltip dice lo que esta registrado. -->
+                    <span class="app-tag app-contract__mode"
+                          title="#{messages['ContractCondition.mode.tooltip']} #{fn:substring(contractItem.contractMode.name, 0, 1)}#{fn:toLowerCase(fn:substring(contractItem.contractMode.name, 1, fn:length(contractItem.contractMode.name)))} #{contractItem.main ? messages['ContractCondition.mode.tooltip.main'] : messages['ContractCondition.mode.tooltip.secondary']}">
+                        <h:outputText value="#{fn:substring(contractItem.contractMode.name, 0, 1)}"/>
+                    </span>
                 </rich:column>
-                <rich:column>
-                    <h:outputText value="#{messages[contractItem.duration.resourceKey]}"/>
+                <rich:column styleClass="#{contractItem.inactive ? 'app-contract__row--dim' : ''}">
+                    <h:outputText value="#{contractItem.jobContract.job.organizationalUnit.name}"
+                                  title="#{contractItem.jobContract.job.organizationalUnit.name}"/>
                 </rich:column>
-                <rich:column styleClass="center">
+                <!-- El cargo se corta a una linea: hay nombres de tres palabras que desarmaban la
+                     grilla. El texto completo queda en el title. -->
+                <rich:column styleClass="#{contractItem.inactive ? 'app-contract__row--dim' : ''}">
+                    <h:outputText styleClass="app-contract__charge-text"
+                                  value="#{contractItem.jobContract.job.charge.name}"
+                                  title="#{contractItem.jobContract.job.charge.name}"/>
+                </rich:column>
+                <rich:column styleClass="right app-contract__salary #{contractItem.inactive ? 'app-contract__row--dim' : ''}">
+                    <h:outputText value="#{contractItem.jobContract.job.salary.amount}">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center #{contractItem.inactive ? 'app-contract__row--dim' : ''}">
                     <h:outputText value="#{contractItem.initDate}">
                         <f:convertDateTime pattern="#{messages['patterns.date']}"
                                            timeZone="#{sessionUser.timeZone}" type="date"/>
                     </h:outputText>
                 </rich:column>
-                <rich:column styleClass="center">
+                <rich:column styleClass="center #{contractItem.inactive ? 'app-contract__row--dim' : ''}">
                     <h:outputText value="#{contractItem.endDate}">
                         <f:convertDateTime pattern="#{messages['patterns.date']}"
                                            timeZone="#{sessionUser.timeZone}" type="date"/>
                     </h:outputText>
                 </rich:column>
-                <rich:column styleClass="center">
+                <rich:column styleClass="center #{contractItem.inactive ? 'app-contract__row--dim' : ''}">
                     <h:outputText value="#{contractItem.contractState.name}"/>
                 </rich:column>
                 <rich:column styleClass="center">
+                    <!-- Editar lleva a la pantalla del contrato, donde esta el sueldo. Sin
+                         puesto no hay nada que abrir: un contrato a medio cargar no deberia
+                         ofrecer el lapiz. -->
+                    <h:commandLink styleClass="app-iconbtn" immediate="true"
+                                   title="#{messages['Common.edit']}"
+                                   action="#{jobContractAction.select(contractItem.jobContract)}"
+                                   rendered="#{s:hasPermission('JOBCONTRACT','VIEW')
+                                               and not empty contractItem.jobContract}">
+                        <span class="app-ico app-ico--edit"/>
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
                     <a4j:commandLink styleClass="app-iconbtn"
                                      title="#{messages['ContractCondition.change']}"
                                      action="#{contractConditionAction.select(contractItem)}"

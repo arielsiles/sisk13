@@ -95,6 +95,14 @@
 
     <page view-id="/employees/contractConditionList.xhtml">
         <end-conversation/>
+        <!-- Editar el contrato abre la misma pantalla que la lista de Contratos: es el unico
+             lugar donde se carga el sueldo, y duplicarla seria tener dos formas de editar lo
+             mismo. -->
+        <navigation from-action="#{jobContractAction.select(contractItem.jobContract)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/jobContract.xhtml"/>
+            </rule>
+        </navigation>
     </page>
 
     <page view-id="/employees/contractSchedule.xhtml">
@@ -950,10 +958,15 @@
         </navigation>
     </page>
 
-    <page view-id="/employees/jobContract.xhtml" no-conversation-view-id="/employees/jobContractList.xhtml">
+    <!-- Guardar, borrar y cancelar terminan en Condicion de contratos, sea cual sea la lista desde
+         la que se entro: es el listado oficial. Recordar el origen habria pedido un campo de
+         navegacion en el action, y no resolvia el caso de entrar por URL directa, que no tiene
+         origen que recordar. -->
+    <page view-id="/employees/jobContract.xhtml"
+          no-conversation-view-id="/employees/contractConditionList.xhtml">
         <navigation>
             <rule>
-                <redirect view-id="/employees/jobContractList.xhtml"/>
+                <redirect view-id="/employees/contractConditionList.xhtml"/>
             </rule>
         </navigation>
     </page>

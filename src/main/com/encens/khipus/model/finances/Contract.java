@@ -385,6 +385,18 @@ public class Contract implements BaseModel {
         this.jobContractList = jobContractList;
     }
 
+    /**
+     * El puesto de este contrato, o null si todavia no tiene.
+     * <p/>
+     * El modelo admite varios -viene del caso academico, un docente con varias materias-, pero en
+     * la practica cada contrato tiene uno solo. Devolver el primero con nombre propio evita que
+     * las pantallas escriban `jobContractList[0]`, que revienta cuando la lista esta vacia.
+     */
+    @Transient
+    public JobContract getJobContract() {
+        return null == jobContractList || jobContractList.isEmpty() ? null : jobContractList.get(0);
+    }
+
     public Boolean getMainContract() {
         return mainContract;
     }
@@ -404,6 +416,12 @@ public class Contract implements BaseModel {
      */
     public boolean isCurrentMain() {
         return isMain() && null != contractState && !contractState.isInactive();
+    }
+
+    /** El contrato ya esta cerrado. Las listas lo atenuan para separarlo de los vigentes. */
+    @Transient
+    public boolean isInactive() {
+        return null != contractState && contractState.isInactive();
     }
 
     public Boolean getActiveForPayrollGeneration() {
