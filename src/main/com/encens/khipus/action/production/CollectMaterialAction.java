@@ -151,18 +151,20 @@ public class CollectMaterialAction extends GenericAction<CollectMaterial> {
         List<CollectMaterial> collectMaterialList = collectMaterialService.findCollectMaterialNoAccounting( this.startDate, this.endDate);
         String outcome = Outcome.FAIL;
         if (collectMaterialList.size() > 0) {
+            /** El servicio deja cada acopio en CONTA junto con su asiento, en la misma transaccion. */
             outcome = collectMaterialService.createCollectMaterialListAccounting(collectMaterialList,startDate,endDate);
-            for( CollectMaterial collectMaterial:collectMaterialList){
-                collectMaterial.setState(CollectMaterialState.CONTA);
-                update(collectMaterial);
-            }
         }else{
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "No se encontraron registros para contabilizar");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "CollectMaterial.accounting.noRecords");
         }
         if (outcome.equals(Outcome.SUCCESS))
-            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "se contabilizó correctamente");
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "CollectMaterial.accounting.done", collectMaterialList.size());
 
         return outcome;
+    }
+
+    /** Al elegir la fecha de inicio, la fecha fin la acompaña; se puede cambiar despues. */
+    public void syncEndDate(){
+        this.endDate = this.startDate;
     }
 
     public void updateProducerPrice(){
