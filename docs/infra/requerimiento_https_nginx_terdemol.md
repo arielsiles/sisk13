@@ -42,7 +42,7 @@ http://…:8421/… ─301─┘
 | R2 | **`client_max_body_size 20m`**. | El default es 1 MB. KHIPUS acepta hasta 10 MB (`components.xml:136`, `max-request-size="10000000"`). |
 | R3 | Pasar `Host`, `X-Real-IP`, `X-Forwarded-For` y `X-Forwarded-Proto`. | Para las redirecciones y para la IP real. |
 | R4 | Conector de JBoss con `proxyName="terdemol.net" proxyPort="443" scheme="https" secure="true"`. | Las redirecciones que arma JBoss (login, post-redirect-get de Seam) deben salir como `https://terdemol.net/...`. `secure="true"` además marca la cookie `JSESSIONID` como Secure. |
-| R5 | **IP real en el registro de ingresos.** `AuthenticatorAction.java:92` guarda `getRemoteAddr()`, y detrás de nginx sería siempre `127.0.0.1`. | **Hay que decidir** entre (a) un cambio mínimo en el código: usar `X-Forwarded-For` **solo si** `getRemoteAddr()` es `127.0.0.1`; o (b) aceptar `127.0.0.1` en KHIPUS y tomar la IP real del access log de nginx. No existe `RemoteIpValve` para resolverlo solo con configuración. |
+| R5 | **IP real en la pantalla de usuarios en sesión** (`sessionUserLogList.xhtml`). `AuthenticatorAction` usaba `getRemoteAddr()`, que detrás de nginx sería siempre `127.0.0.1`. La IP no se guarda en la BD; vive en memoria (`SessionUserLog`, ámbito de aplicación). | **Decidido: opción (a), ya implementada.** `AuthenticatorAction.clientIp()` usa `X-Real-IP` **solo si** `getRemoteAddr()` es `127.0.0.1`, para que desde afuera no se pueda falsear. Sin nginx se comporta igual que antes, así que entra en el próximo release sin esperar esta ventana. Requiere que nginx mande `X-Real-IP` (R3). No existe `RemoteIpValve` en JBoss Web 2.1 para resolverlo solo con configuración. |
 | R6 | nginx publica **solo** `location /khipus/`. `/` redirige a `/khipus/` y todo lo demás da 404. | Que no se pueda volver a llegar a las consolas ni a un webshell. |
 | R7 | JBoss escucha **solo en 127.0.0.1**, con el HTTP en **8480**. El 8421 pasa a nginx. | Si JBoss queda en 127.0.0.1, todos sus puertos (1098, 1099, 4444–4446, 8009, 8083…) dejan de estar expuestos, aunque ufw falle. |
 | R8 | ufw: abrir **80** y **443**; mantener 8421 (ahora de nginx) y 22. | El 80 lo necesita Let's Encrypt para emitir y renovar el certificado; además redirige a HTTPS. |
@@ -125,7 +125,7 @@ server {
 - [ ] Una operación larga (> 60 s): no debe dar 504.
 - [ ] `https://terdemol.net/jmx-console/`, `/invoker/`, `/admin-console/` y `/status` → 404.
 - [ ] Desde afuera no responden 8480, 1099, 4444 ni 8009: `ss -tlnp` los muestra en 127.0.0.1.
-- [ ] IP registrada en el log de ingresos, según la opción elegida en R5.
+- [ ] La pantalla de usuarios en sesión muestra la IP real del usuario, no `127.0.0.1` (R5). Requiere un release que incluya `AuthenticatorAction.clientIp()`.
 - [ ] `./khipus-deploy.sh status` OK con el nuevo `HEALTH_URL`.
 
 ## 8. Vuelta atrás
@@ -139,6 +139,5 @@ Los usuarios vuelven a `http://terdemol.net:8421/khipus/` sin cambios en los dat
 
 ## 9. Decisiones pendientes
 
-- **R5:** ¿cambio mínimo en el código para registrar la IP real, o aceptar `127.0.0.1` y usar el access log de nginx?
 - La fecha y hora de la ventana.
 - Cuándo subir HSTS a `max-age=31536000`, por ejemplo después de una semana sin problemas.
