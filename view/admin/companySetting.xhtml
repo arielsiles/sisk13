@@ -1162,6 +1162,34 @@
                 </h:inputText>
                 <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.hrsWorkingDay.col']}"/>
             </s:decorate>
+            <!-- Sobre que base vale el dia al descontar un atraso. Por defecto, el total ganado:
+                 es lo que se venia haciendo y cambiarlo moveria sueldos sin que nadie lo pida. -->
+            <s:decorate id="latenessDiscountBaseField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.latenessDiscountBase']}</ui:define>
+                <h:selectOneMenu id="latenessDiscountBase"
+                                 value="#{companySettingAction.instance.latenessDiscountBase}"
+                                 title="#{messages['CompanyConfiguration.latenessDiscountBase.hint']}"
+                                 styleClass="input">
+                    <!-- Sin opcion vacia: las dos que hay cubren todo, y una vacia etiquetada
+                         "Total ganado" aparecia dos veces en la lista. -->
+                    <s:selectItems value="#{companySettingAction.latenessDiscountBases}" var="latenessBaseItem"
+                                   label="#{messages[latenessBaseItem.resourceKey]}"
+                                   hideNoSelectionLabel="true"/>
+                    <s:convertEnum/>
+                </h:selectOneMenu>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.latenessDiscountBase.col']}"/>
+            </s:decorate>
+            <!-- La politica por evento corre desde una FECHA, no desde un interruptor: regenerar un
+                 mes anterior tiene que reproducir lo que se pago. Vacia = apagada. -->
+            <s:decorate id="latenessPerEventFromField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['CompanyConfiguration.latenessPerEventFrom']}</ui:define>
+                <rich:calendar id="latenessPerEventFrom"
+                               value="#{companySettingAction.instance.latenessPerEventFrom}"
+                               datePattern="#{messages['patterns.date']}"
+                               enableManualInput="true"
+                               title="#{messages['CompanyConfiguration.latenessPerEventFrom.hint']}"/>
+                <h:outputText styleClass="colHint" value="#{messages['CompanyConfiguration.latenessPerEventFrom.col']}"/>
+            </s:decorate>
             <s:decorate id="basicBasedChristmasPayrollField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['CompanyConfiguration.basicBasedChristmasPayroll']}</ui:define>
                 <h:selectBooleanCheckbox id="basicBasedChristmasPayroll" value="#{companySettingAction.instance.basicBasedChristmasPayroll}"/>

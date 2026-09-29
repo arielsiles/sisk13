@@ -64,6 +64,15 @@ public class VacationRuleServiceBean extends GenericServiceBean implements Vacat
         return lastVacationRule;
     }
 
+    @SuppressWarnings({"unchecked"})
+    public VacationRule findFirstTranche() {
+        java.util.List<VacationRule> resultList = getEntityManager()
+                .createNamedQuery("VacationRule.findFirstTranche")
+                .setMaxResults(1)
+                .getResultList();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
     public VacationRule findBySeniorityYear(Integer seniorityYear) {
         VacationRule vacationRule = null;
 

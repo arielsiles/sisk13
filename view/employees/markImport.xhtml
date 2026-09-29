@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['MarkImport.title']}</ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+
+        <h:form id="markImportForm" enctype="multipart/form-data">
+
+            <rich:panel id="uploadPanel">
+                <f:facet name="header">#{messages['MarkImport.upload']}</f:facet>
+
+                <s:decorate id="fileField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['MarkImport.file']}</ui:define>
+                    <s:fileUpload id="file"
+                                  styleClass="input"
+                                  accept=".xlsx"
+                                  data="#{markImportAction.file.value}"
+                                  fileName="#{markImportAction.file.name}"
+                                  fileSize="#{markImportAction.file.size}"
+                                  contentType="#{markImportAction.file.contentType}"/>
+                </s:decorate>
+
+                <div class="buttons">
+                    <h:commandButton action="#{markImportAction.analyze}"
+                                     value="#{messages['MarkImport.analyze']}"
+                                     styleClass="button"
+                                     rendered="#{s:hasPermission('MARKIMPORT','CREATE')}"/>
+                    <h:commandButton action="#{markImportAction.clear}"
+                                     value="#{messages['Common.clear']}"
+                                     styleClass="button"
+                                     immediate="true"/>
+                </div>
+            </rich:panel>
+
+            <rich:panel id="previewPanel" rendered="#{markImportAction.analyzed}">
+                <f:facet name="header">#{messages['MarkImport.preview']}</f:facet>
+
+                <h:panelGrid columns="2" cellpadding="3" cellspacing="0" border="0">
+                    <h:outputText value="#{messages['MarkImport.readRows']}"/>
+                    <h:outputText value="#{markImportAction.result.readRows}"/>
+
+                    <h:outputText value="#{messages['MarkImport.newMarks']}"/>
+                    <h:outputText value="#{markImportAction.result.newMarkCount}" styleClass="app-tag"/>
+
+                    <h:outputText value="#{messages['MarkImport.duplicatedMarks']}"/>
+                    <h:outputText value="#{markImportAction.result.duplicatedMarks}"/>
+
+                    <h:outputText value="#{messages['MarkImport.marksWithoutEmployee']}"/>
+                    <h:panelGroup>
+                        <h:outputText value="#{markImportAction.result.marksWithoutEmployee}"
+                                      styleClass="#{markImportAction.result.marksWithoutEmployee > 0 ? 'app-tag app-tag--warn' : ''}"/>
+                    </h:panelGroup>
+
+                    <h:outputText value="#{messages['MarkImport.dateRange']}"/>
+                    <h:panelGroup>
+                        <h:outputText value="#{markImportAction.result.fromDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                        <h:outputText value=" - "/>
+                        <h:outputText value="#{markImportAction.result.toDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                    </h:panelGroup>
+                </h:panelGrid>
+
+                <h:panelGroup rendered="#{markImportAction.result.marksWithoutEmployee > 0}">
+                    <div class="app-tag app-tag--warn">
+                        <h:outputFormat value="#{messages['MarkImport.warn.codesWithoutEmployee']}">
+                            <f:param value="#{markImportAction.result.codesWithoutEmployeeAsText}"/>
+                        </h:outputFormat>
+                    </div>
+                </h:panelGroup>
+
+                <rich:dataTable id="unreadableRows"
+                                value="#{markImportAction.result.unreadableRows}"
+                                var="unreadableRow"
+                                width="100%"
+                                rendered="#{not empty markImportAction.result.unreadableRows}">
+                    <f:facet name="header">#{messages['MarkImport.unreadableRows']}</f:facet>
+                    <rich:column>
+                        <h:outputText value="#{unreadableRow}"/>
+                    </rich:column>
+                </rich:dataTable>
+
+                <div class="buttons">
+                    <h:commandButton action="#{markImportAction.confirm}"
+                                     value="#{messages['MarkImport.confirm']}"
+                                     styleClass="button"
+                                     rendered="#{s:hasPermission('MARKIMPORT','CREATE')}"
+                                     disabled="#{markImportAction.result.newMarkCount == 0}"/>
+                    <h:commandButton action="#{markImportAction.clear}"
+                                     value="#{messages['Common.cancel']}"
+                                     styleClass="button"
+                                     immediate="true"/>
+                </div>
+            </rich:panel>
+
+            <rich:panel id="batchPanel">
+                <f:facet name="header">#{messages['MarkImport.batchList']}</f:facet>
+
+                <rich:dataTable id="batchList"
+                                value="#{markImportBatchDataModel}"
+                                var="batchItem"
+                                rows="#{sessionUser.rowsPerPage}"
+                                width="100%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>#{messages['MarkImport.uploadDate']}</rich:column>
+                            <rich:column>#{messages['MarkImport.file']}</rich:column>
+                            <rich:column>#{messages['MarkImport.dateRange']}</rich:column>
+                            <rich:column styleClass="center">#{messages['MarkImport.newMarks']}</rich:column>
+                            <rich:column styleClass="center">#{messages['MarkImport.duplicatedMarks']}</rich:column>
+                            <rich:column styleClass="center">#{messages['MarkImport.marksWithoutEmployee']}</rich:column>
+                            <rich:column>#{messages['MarkImport.user']}</rich:column>
+                            <rich:column>#{messages['MarkImport.state']}</rich:column>
+                            <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                    <rich:column>
+                        <h:outputText value="#{batchItem.uploadDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.dateTime']}"
+                                               timeZone="#{sessionUser.timeZone}"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{batchItem.fileName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{batchItem.fromDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                        <h:outputText value=" - "/>
+                        <h:outputText value="#{batchItem.toDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{batchItem.newMarks}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{batchItem.duplicatedMarks}"/>
+                    </rich:column>
+                    <rich:column styleClass="right">
+                        <h:outputText value="#{batchItem.marksWithoutEmployee}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{batchItem.user.employee.fullName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{messages[batchItem.state.resourceKey]}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:commandLink value="#{messages['MarkImport.annul']}"
+                                       action="#{markImportAction.annul(batchItem)}"
+                                       rendered="#{s:hasPermission('MARKIMPORT','DELETE')
+                                                   and not batchItem.annulled}"
+                                       onclick="return confirm('#{messages['MarkImport.annul.confirmation']}');"/>
+                    </rich:column>
+                </rich:dataTable>
+                <app:dataScroller id="batchScroller" for="batchList"
+                                  dataModel="#{markImportBatchDataModel}"/>
+            </rich:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

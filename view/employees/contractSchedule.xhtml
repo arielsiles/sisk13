@@ -1,0 +1,179 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['ContractSchedule.title']}</ui:define>
+    <ui:param name="bodyWidth" value="90%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="contractScheduleForm">
+
+            <a4j:outputPanel id="employeeBar" layout="block" styleClass="app-cal__bar">
+                <h:outputText styleClass="app-cal__label"
+                              value="#{messages['ContractSchedule.employee']}"/>
+                <app:selectPopUp id="employee"
+                                 textValue="#{contractScheduleAction.employee.fullName}"
+                                 value="#{contractScheduleAction.employee}"
+                                 styleClass="app-filterbar__input"
+                                 dataModel="#{generalEmployeeDataModel}"
+                                 clearAction="contractScheduleAction.clearEmployee()"
+                                 searchModalPanel="generalEmployeeListModalPanel"
+                                 reRender="employeeBar, palette, weekStrip"
+                                 hotKeySelect="alt+1"/>
+
+                <!-- Dato: desde cuando rige lo que se esta viendo. -->
+                <h:outputText styleClass="app-tag app-tag--published"
+                              rendered="#{contractScheduleAction.scheduleLoaded}"
+                              value="#{messages['ContractSchedule.currentValidFrom']}"/>
+                <h:outputText styleClass="app-tag app-tag--published"
+                              rendered="#{contractScheduleAction.scheduleLoaded}"
+                              value="#{contractScheduleAction.currentValidFrom}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}" type="date"/>
+                </h:outputText>
+
+                <!-- Campo: desde cuando rige lo que se cambie ahora. -->
+                <h:outputText styleClass="app-cal__label"
+                              value="#{messages['ContractSchedule.changeFrom']}"/>
+                <rich:calendar id="validFrom"
+                               value="#{contractScheduleAction.validFrom}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               inputClass="app-filterbar__input app-filterbar__input--date"/>
+
+                <span class="app-cal__spacer"/>
+
+                <h:outputText styleClass="app-cal__range"
+                              rendered="#{contractScheduleAction.employeeSelected}"
+                              value="#{contractScheduleAction.weekHours}">
+                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                </h:outputText>
+                <h:outputText styleClass="app-cal__hint"
+                              rendered="#{contractScheduleAction.employeeSelected}"
+                              value="#{messages['ContractSchedule.weekHours']}"/>
+
+                <a4j:commandLink action="#{contractScheduleAction.close}"
+                                 styleClass="app-cal__navbtn"
+                                 title="#{messages['ContractSchedule.close.hint']}"
+                                 rendered="#{contractScheduleAction.employeeSelected
+                                             and s:hasPermission('CONTRACTSCHEDULE','UPDATE')}"
+                                 reRender="weekStrip, employeeBar, :globalMessages">
+                    <h:outputText value="#{messages['ContractSchedule.close']}"/>
+                </a4j:commandLink>
+            </a4j:outputPanel>
+
+            <a4j:outputPanel id="palette" layout="block" styleClass="app-cal__palette"
+                             rendered="#{contractScheduleAction.employeeSelected
+                                         and s:hasPermission('CONTRACTSCHEDULE','UPDATE')}">
+                <h:outputText styleClass="app-cal__palette-label"
+                              value="#{messages['GroupSchedule.brush']}"/>
+                <a4j:repeat value="#{contractScheduleAction.shifts}" var="shiftItem">
+                    <a4j:commandLink action="#{contractScheduleAction.selectBrush(shiftItem)}"
+                                     styleClass="app-cal__chip #{shiftItem.crossingMidnight
+                                                 ? 'app-cal__chip--night' : 'app-cal__chip--day'}
+                                                 #{contractScheduleAction.isBrushSelected(shiftItem)
+                                                 ? 'app-cal__chip--on' : ''}"
+                                     reRender="palette">
+                        <h:outputText styleClass="app-cal__chip-name" value="#{shiftItem.name}"/>
+                        <h:outputText styleClass="app-cal__chip-hours" value="#{shiftItem.startHour}">
+                            <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                               timeZone="#{sessionUser.timeZone}" type="time"/>
+                        </h:outputText>
+                        <h:outputText styleClass="app-cal__chip-hours"
+                                      value="#{messages['GroupSchedule.range.separator']}"/>
+                        <h:outputText styleClass="app-cal__chip-hours" value="#{shiftItem.endHour}">
+                            <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                               timeZone="#{sessionUser.timeZone}" type="time"/>
+                        </h:outputText>
+                    </a4j:commandLink>
+                </a4j:repeat>
+                <a4j:commandLink action="#{contractScheduleAction.selectRestBrush}"
+                                 styleClass="app-cal__chip app-cal__chip--rest
+                                             #{contractScheduleAction.restBrushSelected
+                                             ? 'app-cal__chip--on' : ''}"
+                                 reRender="palette">
+                    <h:outputText styleClass="app-cal__chip-name"
+                                  value="#{messages['GroupSchedule.brush.rest']}"/>
+                </a4j:commandLink>
+                <h:outputText styleClass="app-cal__hint" value="#{messages['ContractSchedule.hint']}"/>
+            </a4j:outputPanel>
+
+            <!-- Lo escribe el propio clic: vale 1 cuando vino con Shift. -->
+            <h:inputHidden id="rangeFlag" value="#{contractScheduleAction.rangeFlag}"/>
+
+            <a4j:outputPanel id="weekStrip" layout="block" styleClass="app-cal">
+                <h:panelGroup rendered="#{not contractScheduleAction.employeeSelected}">
+                    <div class="app-cal__empty">
+                        <h:outputText value="#{messages['ContractSchedule.empty']}"/>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{contractScheduleAction.employeeSelected}">
+                    <table class="app-cal__table" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <a4j:repeat value="#{contractScheduleAction.cells}" var="headItem">
+                                    <th class="app-cal__head">
+                                        <span class="app-cal__dow">
+                                            <h:outputText value="#{headItem.sample}">
+                                                <f:convertDateTime pattern="#{messages['patterns.dayOfWeekLong']}"
+                                                                   timeZone="#{sessionUser.timeZone}"
+                                                                   type="date"/>
+                                            </h:outputText>
+                                        </span>
+                                    </th>
+                                </a4j:repeat>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="app-cal__row">
+                                <a4j:repeat value="#{contractScheduleAction.cells}" var="cell">
+                                    <td class="app-cal__td">
+                                        <a4j:commandLink action="#{contractScheduleAction.paint(cell)}"
+                                                         styleClass="#{cell.styleClass}"
+                                                         onclick="document.getElementById('contractScheduleForm:rangeFlag').value = event.shiftKey ? '1' : '0';"
+                                                         rendered="#{s:hasPermission('CONTRACTSCHEDULE','UPDATE')}"
+                                                         reRender="weekStrip, employeeBar">
+                                            <span class="app-cal__cell-name">
+                                                <h:outputText value="#{cell.shiftName}"/>
+                                            </span>
+                                            <span class="app-cal__cell-hours">
+                                                <h:outputFormat value="#{messages['GroupSchedule.hours']}"
+                                                                rendered="#{cell.working}">
+                                                    <f:param value="#{cell.hours}"/>
+                                                </h:outputFormat>
+                                            </span>
+                                        </a4j:commandLink>
+                                    </td>
+                                </a4j:repeat>
+                            </tr>
+                        </tbody>
+                    </table>
+                </h:panelGroup>
+            </a4j:outputPanel>
+        </h:form>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{contractScheduleAction.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender=":contractScheduleForm"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

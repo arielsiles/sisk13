@@ -20,6 +20,8 @@ import com.encens.khipus.service.xproduction.XProductionService;
 import com.encens.khipus.service.xproduction.XProductionUlexitaCalc;
 import com.encens.khipus.service.xproduction.XProductionUlexitaService;
 import com.encens.khipus.service.xproduction.XProductionBaritinaService;
+import com.encens.khipus.service.xproduction.XProductionBalanceService;
+import com.encens.khipus.service.xproduction.ZoneBalanceRow;
 import com.encens.khipus.util.BigDecimalUtil;
 import com.encens.khipus.util.Constants;
 import org.jboss.seam.ScopeType;
@@ -29,8 +31,10 @@ import org.jboss.seam.security.Identity;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Name("xproductionAction")
@@ -62,6 +66,9 @@ public class XProductionAction extends GenericAction<XProduction> {
 
     private XProductionBaritina baritinaData;
     private List<XProductionBaritinaZona> baritinaZonaList = new ArrayList<XProductionBaritinaZona>();
+    /* Saldo por zona de la MP, para la columna "Disponible" (ver getZoneAvailability). */
+    private Map<Long, ZoneBalanceRow> zoneAvailability;
+    private String zoneAvailabilityKey;
 
     @In
     private XProductionPlanAction xproductionPlanAction;
@@ -78,6 +85,8 @@ public class XProductionAction extends GenericAction<XProduction> {
     private XProductionUlexitaService xproductionUlexitaService;
     @In
     private XProductionBaritinaService xproductionBaritinaService;
+    @In(create = true)
+    private XProductionBalanceService xproductionBalanceService;
     @In(create = true)
     private ProductItemService productItemService;
     @In(required = false)
@@ -1424,6 +1433,77 @@ public class XProductionAction extends GenericAction<XProduction> {
     public boolean isBaritinaZonaPctComplete() {
         BigDecimal diff = getBaritinaZonaPctTotal().subtract(BigDecimalUtil.toBigDecimal(100)).abs();
         return diff.compareTo(new BigDecimal("0.01")) <= 0;
+    }
+
+    /**
+     * La columna "Disponible (TN)" de la distribucion por zonas: solo en lineas BARITINA con
+     * zonas (mismo alcance que el desglose por zona de Saldos de Almacen).
+     */
+    public boolean isZoneAvailabilityEnabled() {
+        ProductionLine line = getInstance() == null ? null : getInstance().getProductionLine();
+        return line != null && line.isBaritinaTemplate() && line.isZonesEnabled();
+    }
+
+    /**
+     * Saldo de la zona (TN) de la MP por defecto de la orden, a la fecha del plan y sin contar
+     * esta orden: lo que queda para asignarle. Informativo, no bloquea. Null sin zona elegida.
+     */
+    public BigDecimal getZoneAvailableTn(XProductionBaritinaZona zona) {
+        if (zona == null || zona.getProductiveZone() == null) {
+            return null;
+        }
+        XSupply mp = getDefaultRawMaterialSupply();
+        if (mp == null) {
+            return null;
+        }
+        ZoneBalanceRow row = getZoneAvailability(mp.getProductItemCode()).get(zona.getProductiveZone().getId());
+        BigDecimal available = row != null ? row.getBalance() : BigDecimal.ZERO;
+        String unit = mp.getProductItem() != null ? mp.getProductItem().getUsageMeasureCode() : MeasurementUnit.KG.name();
+        return BigDecimalUtil.roundBigDecimal(convertQtyToUnit(available, unit, "TN"), 4);
+    }
+
+    /** La orden asigna a la zona mas de su disponible (suma de las filas de esa zona). Solo aviso. */
+    public boolean isZoneOverAvailable(XProductionBaritinaZona zona) {
+        BigDecimal available = getZoneAvailableTn(zona);
+        if (available == null) {
+            return false;
+        }
+        BigDecimal assigned = BigDecimal.ZERO;
+        for (XProductionBaritinaZona z : baritinaZonaList) {
+            if (z.getProductiveZone() != null && z.getCantidadTn() != null
+                    && z.getProductiveZone().getId().equals(zona.getProductiveZone().getId())) {
+                assigned = assigned.add(z.getCantidadTn());
+            }
+        }
+        return assigned.compareTo(available) > 0;
+    }
+
+    /** Insumo de MP por defecto de la orden (el que se reparte por zona). */
+    private XSupply getDefaultRawMaterialSupply() {
+        if (ingredientSupplyList != null) {
+            for (XSupply supply : ingredientSupplyList) {
+                if (supply.hasFormula() && Boolean.TRUE.equals(supply.getFormulationInput().getInputDefault())) {
+                    return supply;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Saldos por zona de la MP, cacheados por (articulo, fecha del plan, orden): la vista pide
+     * el disponible una vez por fila y por render, y el saldo no depende de lo que se edita.
+     */
+    private Map<Long, ZoneBalanceRow> getZoneAvailability(String productItemCode) {
+        XProductionPlan plan = getInstance().getProductionPlan() != null ? getInstance().getProductionPlan() : productionPlan;
+        Date planDate = plan != null ? plan.getDate() : null;
+        Long productionId = getInstance().getId();
+        String key = productItemCode + "|" + (planDate != null ? planDate.getTime() : "") + "|" + productionId;
+        if (zoneAvailability == null || !key.equals(zoneAvailabilityKey)) {
+            zoneAvailability = xproductionBalanceService.computeZoneBalances(productItemCode, planDate, productionId);
+            zoneAvailabilityKey = key;
+        }
+        return zoneAvailability;
     }
 
     /**

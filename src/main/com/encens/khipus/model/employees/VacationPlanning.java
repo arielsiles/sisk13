@@ -11,6 +11,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,17 +58,17 @@ public class VacationPlanning implements BaseModel {
     @NotNull
     private Integer seniorityYears;
 
-    @Column(name = "diasvacacion", nullable = false)
+    @Column(name = "diasvacacion", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer vacationDays;
+    private BigDecimal vacationDays;
 
-    @Column(name = "diaslibres", nullable = false)
+    @Column(name = "diaslibres", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer daysOff;
+    private BigDecimal daysOff;
 
-    @Column(name = "diasusados", nullable = false)
+    @Column(name = "diasusados", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer daysUsed;
+    private BigDecimal daysUsed;
 
     @Column(name = "fechainicio", nullable = false)
     @Temporal(TemporalType.DATE)
@@ -77,6 +78,25 @@ public class VacationPlanning implements BaseModel {
     @OneToMany(mappedBy = "vacationPlanning", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Filter(name = com.encens.khipus.util.Constants.COMPANY_FILTER_NAME)
     private List<VacationGestion> vacationGestionList = new ArrayList<VacationGestion>(0);
+
+    /**
+     * El dia en que este plan dejo de devengar, que es el ultimo dia de trabajo del contrato.
+     * Nula mientras el periodo sigue abierto.
+     * <p/>
+     * Sin esta fecha el devengo cuenta anios contra el dia de hoy y no mira el contrato: el plan
+     * de alguien que se fue en 2024 seguiria sumando anios en 2030, generando derecho a
+     * vacaciones para una relacion laboral que ya no existe.
+     */
+    @Column(name = "fechacierre")
+    @Temporal(TemporalType.DATE)
+    private Date closeDate;
+
+    /* Fecha del saldo inicial declarado. Cuando esta seteada el sistema NO devenga nada
+       anterior: ese saldo ya contiene todo lo anterior. Nula = el sistema devenga desde el
+       inicio del contrato, y el saldo sale de cargar las vacaciones consumidas. */
+    @Column(name = "fechasaldoinicial")
+    @Temporal(TemporalType.DATE)
+    private Date openingDate;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcontractopuesto", nullable = false)
@@ -115,27 +135,27 @@ public class VacationPlanning implements BaseModel {
         this.seniorityYears = seniorityYears;
     }
 
-    public Integer getVacationDays() {
+    public BigDecimal getVacationDays() {
         return vacationDays;
     }
 
-    public void setVacationDays(Integer vacationDays) {
+    public void setVacationDays(BigDecimal vacationDays) {
         this.vacationDays = vacationDays;
     }
 
-    public Integer getDaysOff() {
+    public BigDecimal getDaysOff() {
         return daysOff;
     }
 
-    public void setDaysOff(Integer daysOff) {
+    public void setDaysOff(BigDecimal daysOff) {
         this.daysOff = daysOff;
     }
 
-    public Integer getDaysUsed() {
+    public BigDecimal getDaysUsed() {
         return daysUsed;
     }
 
-    public void setDaysUsed(Integer daysUsed) {
+    public void setDaysUsed(BigDecimal daysUsed) {
         this.daysUsed = daysUsed;
     }
 
@@ -145,6 +165,36 @@ public class VacationPlanning implements BaseModel {
 
     public void setInitDate(Date initDate) {
         this.initDate = initDate;
+    }
+
+    public Date getCloseDate() {
+        return closeDate;
+    }
+
+    public void setCloseDate(Date closeDate) {
+        this.closeDate = closeDate;
+    }
+
+    /** Un plan cerrado corresponde a un periodo terminado: no devenga mas. */
+    public boolean isClosed() {
+        return null != closeDate;
+    }
+
+    /**
+     * Hasta que fecha devenga este plan: hoy si sigue abierto, y el dia del cierre si termino.
+     * Es el unico lugar donde se decide, para que la pantalla y el proceso no puedan discrepar.
+     */
+    public Date getAccrualLimit() {
+        Date today = new Date();
+        return (null != closeDate && closeDate.before(today)) ? closeDate : today;
+    }
+
+    public Date getOpeningDate() {
+        return openingDate;
+    }
+
+    public void setOpeningDate(Date openingDate) {
+        this.openingDate = openingDate;
     }
 
     public JobContract getJobContract() {

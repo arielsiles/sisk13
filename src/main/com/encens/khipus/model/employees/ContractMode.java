@@ -35,6 +35,15 @@ import javax.persistence.*;
 @Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "modalidadcontrato", uniqueConstraints = @UniqueConstraint(columnNames = {"idcompania", "nombre"}))
 public class ContractMode implements BaseModel {
 
+    /**
+     * La modalidad que da derecho a los beneficios de la relacion laboral: hoy, la antiguedad.
+     * <p/>
+     * Es un nombre y no un flag porque el catalogo es editable por el cliente. Se centraliza aca
+     * para que el dia que alguien lo escriba distinto se corrija en un solo lugar, y no en cada
+     * calculo que lo pregunte.
+     */
+    public static final String LABORAL = "LABORAL";
+
     @Id
     @Column(name = "idmodalidadcontrato", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ContractMode.tableGenerator")
@@ -116,5 +125,10 @@ public class ContractMode implements BaseModel {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    /** Es una relacion laboral dependiente, no un contrato eventual. */
+    public boolean isLaboral() {
+        return null != getName() && LABORAL.equalsIgnoreCase(getName().trim());
     }
 }

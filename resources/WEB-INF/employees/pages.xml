@@ -23,6 +23,131 @@
         </navigation>
     </page>
 
+    <page view-id="/employees/sipContributionRegimeList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{sipContributionRegimeAction.select(sipContributionRegimeItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/sipContributionRegime.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/sipContributionRegime.xhtml"
+          no-conversation-view-id="/employees/sipContributionRegimeList.xhtml">
+        <navigation>
+            <rule>
+                <redirect view-id="/employees/sipContributionRegimeList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/workGroupList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{workGroupAction.select(workGroupItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/workGroup.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/workGroup.xhtml"
+          no-conversation-view-id="/employees/workGroupList.xhtml">
+        <navigation>
+            <!-- Sin if-outcome: vuelve al listado tanto al guardar como al cancelar. Con
+                 `Success` solamente, el boton Cancelar no hacia nada. -->
+            <rule>
+                <redirect view-id="/employees/workGroupList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/workShiftList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{workShiftAction.select(workShiftItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/workShift.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/workShift.xhtml"
+          no-conversation-view-id="/employees/workShiftList.xhtml">
+        <navigation>
+            <!-- Sin if-outcome: vuelve al listado tanto al guardar como al cancelar. Con
+                 `Success` solamente, el boton Cancelar no hacia nada. -->
+            <rule>
+                <redirect view-id="/employees/workShiftList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <!-- El cronograma no usa conversacion: cada clic guarda y se lee de nuevo. La accion de
+         pagina refresca la grilla en cada peticion para que no muestre datos viejos. -->
+    <page view-id="/employees/groupSchedule.xhtml">
+        <end-conversation/>
+        <action execute="#{groupScheduleAction.init}"/>
+    </page>
+
+    <page view-id="/employees/attendanceCheck.xhtml">
+        <end-conversation/>
+    </page>
+
+    <page view-id="/employees/hourBank.xhtml">
+        <begin-conversation join="true"/>
+    </page>
+
+    <page view-id="/employees/contractConditionList.xhtml">
+        <end-conversation/>
+        <!-- Editar el contrato abre la misma pantalla que la lista de Contratos: es el unico
+             lugar donde se carga el sueldo, y duplicarla seria tener dos formas de editar lo
+             mismo. -->
+        <navigation from-action="#{jobContractAction.select(contractItem.jobContract)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/jobContract.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/contractSchedule.xhtml">
+        <end-conversation/>
+        <action execute="#{contractScheduleAction.init}"/>
+    </page>
+
+    <page view-id="/employees/scheduleExceptionList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{scheduleExceptionAction.select(exceptionItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/scheduleException.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/scheduleException.xhtml"
+          no-conversation-view-id="/employees/scheduleExceptionList.xhtml">
+        <navigation>
+            <!-- Sin if-outcome: vuelve al listado tanto al guardar como al cancelar. Con
+                 `Success` solamente, el boton Cancelar no hacia nada. -->
+            <rule>
+                <redirect view-id="/employees/scheduleExceptionList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
+    <page view-id="/employees/weeklyWorkloadList.xhtml">
+        <end-conversation/>
+        <navigation from-action="#{weeklyWorkloadAction.select(weeklyWorkloadItem)}">
+            <rule if-outcome="Success">
+                <redirect view-id="/employees/weeklyWorkload.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+    <page view-id="/employees/weeklyWorkload.xhtml"
+          no-conversation-view-id="/employees/weeklyWorkloadList.xhtml">
+        <navigation>
+            <!-- Sin if-outcome: vuelve al listado tanto al guardar como al cancelar. Con
+                 `Success` solamente, el boton Cancelar no hacia nada. -->
+            <rule>
+                <redirect view-id="/employees/weeklyWorkloadList.xhtml"/>
+            </rule>
+        </navigation>
+    </page>
+
     <page view-id="/employees/cnsRateList.xhtml">
         <end-conversation/>
         <navigation from-action="#{cnsRateAction.select(cnsRateItem)}">
@@ -833,10 +958,15 @@
         </navigation>
     </page>
 
-    <page view-id="/employees/jobContract.xhtml" no-conversation-view-id="/employees/jobContractList.xhtml">
+    <!-- Guardar, borrar y cancelar terminan en Condicion de contratos, sea cual sea la lista desde
+         la que se entro: es el listado oficial. Recordar el origen habria pedido un campo de
+         navegacion en el action, y no resolvia el caso de entrar por URL directa, que no tiene
+         origen que recordar. -->
+    <page view-id="/employees/jobContract.xhtml"
+          no-conversation-view-id="/employees/contractConditionList.xhtml">
         <navigation>
             <rule>
-                <redirect view-id="/employees/jobContractList.xhtml"/>
+                <redirect view-id="/employees/contractConditionList.xhtml"/>
             </rule>
         </navigation>
     </page>
@@ -845,40 +975,6 @@
         <navigation>
             <rule>
                 <redirect view-id="/employees/jobContractList.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-
-    <!--Contract-->
-    <page view-id="/employees/contractList.xhtml">
-        <end-conversation/>
-        <navigation from-action="#{contractAction.select(contractItem)}">
-            <rule if-outcome="Success">
-                <redirect view-id="/employees/contract.xhtml"/>
-            </rule>
-        </navigation>
-    </page>
-    <page view-id="/employees/contract.xhtml" no-conversation-view-id="/employees/contractList.xhtml">
-        <navigation>
-            <rule>
-                <redirect view-id="/employees/contractList.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation from-action="#{jobContractAction.select(jobContractItem)}">
-            <begin-conversation flush-mode="MANUAL" join="false"/>
-            <rule if-outcome="Success">
-                <redirect view-id="/employees/jobContract.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation from-action="#{jobContractAction.selectJobContract(jobContractItem)}">
-            <rule if-outcome="Success">
-                <redirect view-id="/employees/jobContract.xhtml"/>
-            </rule>
-        </navigation>
-        <navigation
-                from-action="#{generateEmployeeContractAction.generateForwad(jobContractItem.contract.employee,jobContractItem)}">
-            <rule if-outcome="Success">
-                <redirect view-id="/employees/generateEmployeeContract.xhtml"/>
             </rule>
         </navigation>
     </page>

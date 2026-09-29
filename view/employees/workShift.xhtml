@@ -1,0 +1,185 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{workShiftAction.managed}">#{messages['WorkShift.edit']}</c:when>
+            <c:otherwise>#{messages['WorkShift.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="workShiftForm">
+            <div class="buttons">
+                <h:commandButton action="#{workShiftAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!workShiftAction.managed and s:hasPermission('WORKSHIFT','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{workShiftAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{workShiftAction.managed and not workShiftAction.locked
+                                             and s:hasPermission('WORKSHIFT','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton action="#{workShiftAction.deactivate}"
+                                 value="#{messages['WorkShift.deactivate']}"
+                                 styleClass="button"
+                                 rendered="#{workShiftAction.locked and workShift.active
+                                             and s:hasPermission('WORKSHIFT','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                                 rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{workShiftAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="4"/>
+            </div>
+
+            <h:panelGroup rendered="#{workShiftAction.locked}">
+                <div class="app-cal__empty">
+                    <h:outputText value="#{messages['WorkShift.locked.hint']}"/>
+                </div>
+            </h:panelGroup>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{workShiftAction.managed}">#{messages['WorkShift.edit']}</c:when>
+                        <c:otherwise>#{messages['WorkShift.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.name']}</ui:define>
+                    <h:inputText id="name" value="#{workShift.name}" required="true"
+                                 maxlength="100" styleClass="input" size="50" tabindex="5"/>
+                </s:decorate>
+
+                <s:decorate id="startHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.startHour']}</ui:define>
+                    <!-- Campo de texto y no rich:calendar: esto es una hora, no una fecha, y el
+                         calendario obligaba a elegir un dia que despues se descarta. -->
+                    <h:inputText id="startHour" value="#{workShift.startHour}" required="true"
+                                 maxlength="5" size="6" styleClass="app-input--hour" tabindex="6">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}" type="time"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.hour.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="endHourField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.endHour']}</ui:define>
+                    <h:inputText id="endHour" value="#{workShift.endHour}" required="true"
+                                 maxlength="5" size="6" styleClass="app-input--hour" tabindex="7">
+                        <s:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}" type="time"/>
+                        <!-- Recien aca se conoce la duracion, que es lo que decide la precarga
+                             de los margenes. Solo precarga en un turno nuevo. -->
+                        <a4j:support event="onchange" action="#{workShiftAction.preloadMargins}"
+                                     reRender="beforeMarginField, afterMarginField, windowField"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.endHour.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="entryToleranceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.entryTolerance']}</ui:define>
+                    <h:inputText id="entryTolerance" value="#{workShift.entryToleranceMinutes}"
+                                 required="true" styleClass="inputNumberSmall" size="6" tabindex="8">
+                        <app:naturalNumberConverter forId="entryTolerance" minimum="0" maximum="240"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.entryTolerance.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="earlyExitToleranceField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.earlyExitTolerance']}</ui:define>
+                    <h:inputText id="earlyExitTolerance" value="#{workShift.earlyExitToleranceMinutes}"
+                                 required="true" styleClass="inputNumberSmall" size="6" tabindex="9">
+                        <app:naturalNumberConverter forId="earlyExitTolerance" minimum="0" maximum="240"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.earlyExitTolerance.hint']}"/>
+                </s:decorate>
+
+                <!-- La ventana decide DE QUE JORNADA es una marca. Es otra cosa que las
+                     tolerancias de arriba, que deciden si la persona esta atrasada. -->
+                <s:decorate id="beforeMarginField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.beforeMargin']}</ui:define>
+                    <h:inputText id="beforeMargin" value="#{workShift.beforeMarginMinutes}"
+                                 required="true" styleClass="inputNumberSmall" size="6" tabindex="10">
+                        <app:naturalNumberConverter forId="beforeMargin" minimum="0" maximum="720"/>
+                        <a4j:support event="onchange" reRender="windowField" ajaxSingle="true"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.beforeMargin.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="afterMarginField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.afterMargin']}</ui:define>
+                    <h:inputText id="afterMargin" value="#{workShift.afterMarginMinutes}"
+                                 required="true" styleClass="inputNumberSmall" size="6" tabindex="11">
+                        <app:naturalNumberConverter forId="afterMargin" minimum="0" maximum="720"/>
+                        <a4j:support event="onchange" reRender="windowField" ajaxSingle="true"/>
+                    </h:inputText>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.afterMargin.hint']}"/>
+                </s:decorate>
+
+                <!-- El resultado a la vista: es lo que hace que dos numeros abstractos se
+                     entiendan sin explicacion. Quien crea un turno corto ve al instante si la
+                     ventana le quedo desproporcionada. -->
+                <s:decorate id="windowField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.window']}</ui:define>
+                    <h:outputText styleClass="app-cal__range" value="#{workShiftAction.windowDescription}"/>
+                </s:decorate>
+                <div class="app-fieldnote">
+                    <h:outputText value="#{messages['WorkShift.window.hint']}"/>
+                </div>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkShift.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{workShift.active}" tabindex="12"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{workShiftAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!workShiftAction.managed and s:hasPermission('WORKSHIFT','CREATE')}"
+                                 tabindex="11"/>
+                <h:commandButton action="#{workShiftAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','UPDATE')}"
+                                 tabindex="12"/>
+                <h:commandButton action="#{workShiftAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="13"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{workShiftAction.managed and s:hasPermission('WORKSHIFT','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['WorkShift.delete.confirmation']}">
+                        <f:param value="#{workShift.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{workShiftAction.delete}" value="#{messages['Common.delete']}"
+                                   immediate="true" styleClass="button"
+                                   rendered="#{s:hasPermission('WORKSHIFT','DELETE')}" tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

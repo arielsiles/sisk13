@@ -32,6 +32,10 @@
                         <f:convertDateTime pattern="#{messages['patterns.date']}"
                                            timeZone="#{sessionUser.timeZone}"
                                            type="date"/>
+                        <a4j:support event="onchanged" ajaxSingle="true"
+                                     action="#{collectMaterialAction.syncEndDate}" reRender="endDateField"/>
+                        <a4j:support event="oninputchange" ajaxSingle="true"
+                                     action="#{collectMaterialAction.syncEndDate}" reRender="endDateField"/>
                     </rich:calendar>
                 </s:decorate>
 

@@ -10,9 +10,12 @@ import com.encens.khipus.exception.employees.VacationPlanningExceedVacationDaysE
 import com.encens.khipus.framework.service.GenericService;
 import com.encens.khipus.model.employees.Vacation;
 import com.encens.khipus.model.employees.VacationGestion;
+import com.encens.khipus.model.employees.VacationPlanning;
 import com.encens.khipus.model.employees.VacationState;
 
 import javax.ejb.Local;
+
+import java.math.BigDecimal;
 
 /**
  * @author
@@ -35,5 +38,8 @@ public interface VacationService extends GenericService {
 
     Boolean hasCurrentState(Vacation vacation, VacationState vacationState);
 
-    Integer sumTotalDaysByVacationGestion(VacationGestion vacationGestion);
+    BigDecimal sumTotalDaysByVacationGestion(VacationGestion vacationGestion);
+
+    /** Dias consumidos por las vacaciones aprobadas de todo el plan, no de una gestion. */
+    BigDecimal sumApprovedDaysByVacationPlanning(VacationPlanning vacationPlanning);
 }

@@ -130,6 +130,19 @@
                                    type="date"/>
             </h:outputText>
         </s:decorate>
+        <!-- Solo de lectura, y a proposito. La fecha de salida no es un dato que alguien
+             escriba: la deduce el sistema de los contratos de la persona. Si se pudiera
+             escribir aca habria dos lugares para cambiar lo mismo, y terminarian diciendo
+             cosas distintas. Se corrige registrando la baja con la fecha correcta. -->
+        <s:decorate id="retireDateField" template="/include/inputField.xhtml" styleClass="formRow"
+                    rendered="#{not empty action.employee.retireDate}">
+            <ui:define name="label">#{messages['Employee.retireDate']}</ui:define>
+            <h:outputText value="#{action.employee.retireDate}">
+                <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                   timeZone="#{sessionUser.timeZone}" type="date"/>
+            </h:outputText>
+            <h:outputText styleClass="app-tag" value="#{messages['Employee.retireDate.hint']}"/>
+        </s:decorate>
         <s:decorate id="paymentTypeField" template="/include/inputField.xhtml" styleClass="formRow">
             <ui:define name="label">#{messages['Employee.paymentType']}</ui:define>
             <h:selectOneMenu id="paymentType"

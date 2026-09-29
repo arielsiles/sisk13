@@ -1,0 +1,266 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['GroupSchedule.title']}</ui:define>
+    <ui:param name="bodyWidth" value="98%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="groupScheduleForm">
+
+            <!-- Barra de la semana: navegacion a la izquierda, estado y publicacion a la derecha.
+                 Es la unica fila fija de la pantalla; todo lo demas es la grilla. -->
+            <a4j:outputPanel id="weekBar" layout="block" styleClass="app-cal__bar">
+                <span class="app-cal__nav">
+                    <a4j:commandLink action="#{groupScheduleAction.previousWeek}"
+                                     styleClass="app-cal__navbtn"
+                                     title="#{messages['GroupSchedule.previousWeek']}"
+                                     reRender="weekBar, scheduleGrid">
+                        <h:outputText value="#{messages['GroupSchedule.previousWeek.symbol']}"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink action="#{groupScheduleAction.currentWeek}"
+                                     styleClass="app-cal__navbtn app-cal__navbtn--today"
+                                     reRender="weekBar, scheduleGrid">
+                        <h:outputText value="#{messages['GroupSchedule.currentWeek']}"/>
+                    </a4j:commandLink>
+                    <a4j:commandLink action="#{groupScheduleAction.nextWeek}"
+                                     styleClass="app-cal__navbtn"
+                                     title="#{messages['GroupSchedule.nextWeek']}"
+                                     reRender="weekBar, scheduleGrid">
+                        <h:outputText value="#{messages['GroupSchedule.nextWeek.symbol']}"/>
+                    </a4j:commandLink>
+                </span>
+
+                <span class="app-cal__range">
+                    <h:outputText value="#{groupScheduleAction.weekStart}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                    <h:outputText value="#{messages['GroupSchedule.range.separator']}"/>
+                    <h:outputText value="#{groupScheduleAction.weekEnd}">
+                        <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                           timeZone="#{sessionUser.timeZone}" type="date"/>
+                    </h:outputText>
+                </span>
+
+                <rich:calendar id="weekPicker"
+                               value="#{groupScheduleAction.weekStart}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="false"
+                               inputClass="app-filterbar__input app-filterbar__input--date">
+                    <a4j:support event="onchanged" reRender="weekBar, scheduleGrid"/>
+                </rich:calendar>
+
+                <a4j:commandLink action="#{groupScheduleAction.copyPreviousWeek}"
+                                 styleClass="app-cal__navbtn"
+                                 title="#{messages['GroupSchedule.copyPreviousWeek.hint']}"
+                                 rendered="#{not groupScheduleAction.emptyOfGroups
+                                             and s:hasPermission('GROUPSCHEDULE','UPDATE')}"
+                                 reRender="weekBar, scheduleGrid, :globalMessages">
+                    <h:outputText value="#{messages['GroupSchedule.copyPreviousWeek']}"/>
+                </a4j:commandLink>
+                <h:commandLink styleClass="app-cal__navbtn"
+                               onclick="return false;"
+                               rendered="#{not groupScheduleAction.emptyOfGroups
+                                           and s:hasPermission('GROUPSCHEDULE','UPDATE')}">
+                    <h:outputText value="#{messages['GroupSchedule.copyGroup']}"/>
+                    <rich:componentControl for="copyGroupDialog" event="onclick"
+                                           disableDefault="true" operation="show"/>
+                </h:commandLink>
+
+                <span class="app-cal__spacer"/>
+
+                <!-- Aviso de semanas pintadas y sin publicar en el mes. Olvidarse de publicar
+                     es silencioso: esos dias no llegan al motor y se pagarian como faltas. -->
+                <h:outputFormat styleClass="app-tag app-tag--warn"
+                                value="#{messages['GroupSchedule.draftWeeks']}"
+                                title="#{messages['GroupSchedule.draftWeeks.hint']}"
+                                rendered="#{groupScheduleAction.hasDraftWeeks}">
+                    <f:param value="#{groupScheduleAction.draftWeekCount}"/>
+                    <f:param value="#{groupScheduleAction.weekStart}"/>
+                </h:outputFormat>
+
+                <h:outputText styleClass="app-tag app-tag--published"
+                              value="#{messages['ScheduleState.published']}"
+                              rendered="#{groupScheduleAction.weekPublished}"/>
+                <h:outputText styleClass="app-tag app-tag--warn"
+                              value="#{messages['ScheduleState.draft']}"
+                              rendered="#{not groupScheduleAction.weekPublished
+                                          and not groupScheduleAction.emptyOfGroups}"/>
+
+                <a4j:commandButton action="#{groupScheduleAction.publishWeek}"
+                                   value="#{messages['GroupSchedule.publish']}"
+                                   styleClass="app-btn-primary app-cal__publish"
+                                   rendered="#{not groupScheduleAction.weekPublished
+                                             and not groupScheduleAction.emptyOfGroups
+                                             and s:hasPermission('GROUPSCHEDULE','UPDATE')}"
+                                 reRender="weekBar, scheduleGrid, :globalMessages"/>
+                <a4j:commandLink action="#{groupScheduleAction.unpublishWeek}"
+                                 styleClass="app-cal__navbtn"
+                                 rendered="#{groupScheduleAction.weekPublished
+                                             and s:hasPermission('GROUPSCHEDULE','UPDATE')}"
+                                 reRender="weekBar, scheduleGrid, :globalMessages">
+                    <h:outputText value="#{messages['GroupSchedule.unpublish']}"/>
+                </a4j:commandLink>
+            </a4j:outputPanel>
+
+            <!-- Paleta: se elige con que se pinta y despues se hace clic en las celdas.
+                 Un solo pincel activo a la vez, como en cualquier editor. -->
+            <a4j:outputPanel id="palette" layout="block" styleClass="app-cal__palette"
+                             rendered="#{s:hasPermission('GROUPSCHEDULE','UPDATE')}">
+                <h:outputText styleClass="app-cal__palette-label"
+                              value="#{messages['GroupSchedule.brush']}"/>
+                <a4j:repeat value="#{groupScheduleAction.shifts}" var="shiftItem">
+                    <a4j:commandLink action="#{groupScheduleAction.selectBrush(shiftItem)}"
+                                     styleClass="app-cal__chip #{shiftItem.crossingMidnight
+                                                 ? 'app-cal__chip--night' : 'app-cal__chip--day'}
+                                                 #{groupScheduleAction.isBrushSelected(shiftItem)
+                                                 ? 'app-cal__chip--on' : ''}"
+                                     reRender="palette">
+                        <h:outputText styleClass="app-cal__chip-name" value="#{shiftItem.name}"/>
+                        <h:outputText styleClass="app-cal__chip-hours" value="#{shiftItem.startHour}">
+                            <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                               timeZone="#{sessionUser.timeZone}" type="time"/>
+                        </h:outputText>
+                        <h:outputText styleClass="app-cal__chip-hours"
+                                      value="#{messages['GroupSchedule.range.separator']}"/>
+                        <h:outputText styleClass="app-cal__chip-hours" value="#{shiftItem.endHour}">
+                            <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                               timeZone="#{sessionUser.timeZone}" type="time"/>
+                        </h:outputText>
+                    </a4j:commandLink>
+                </a4j:repeat>
+                <a4j:commandLink action="#{groupScheduleAction.selectRestBrush}"
+                                 styleClass="app-cal__chip app-cal__chip--rest
+                                             #{groupScheduleAction.restBrushSelected
+                                             ? 'app-cal__chip--on' : ''}"
+                                 reRender="palette">
+                    <h:outputText styleClass="app-cal__chip-name"
+                                  value="#{messages['GroupSchedule.brush.rest']}"/>
+                </a4j:commandLink>
+                <h:outputText styleClass="app-cal__hint" value="#{messages['GroupSchedule.hint']}"/>
+            </a4j:outputPanel>
+
+            <!-- Lo escribe el propio clic: vale 1 cuando vino con Shift. Es la unica linea de
+                 javascript de la pantalla y sirve para pintar un rango de una pasada. -->
+            <h:inputHidden id="rangeFlag" value="#{groupScheduleAction.rangeFlag}"/>
+
+            <a4j:outputPanel id="scheduleGrid" layout="block" styleClass="app-cal">
+
+                <h:panelGroup rendered="#{empty groupScheduleAction.shifts}">
+                    <div class="app-cal__empty">
+                        <h:outputText value="#{messages['GroupSchedule.empty.shifts']}"/>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{groupScheduleAction.emptyOfGroups}">
+                    <div class="app-cal__empty">
+                        <h:outputText value="#{messages['GroupSchedule.empty.groups']}"/>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{not groupScheduleAction.emptyOfGroups}">
+                    <table class="app-cal__table" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr>
+                                <th class="app-cal__head app-cal__head--group">
+                                    <h:outputText value="#{messages['GroupSchedule.group']}"/>
+                                </th>
+                                <a4j:repeat value="#{groupScheduleAction.days}" var="dayItem">
+                                    <th class="app-cal__head">
+                                        <span class="app-cal__dow">
+                                            <h:outputText value="#{dayItem}">
+                                                <f:convertDateTime pattern="#{messages['patterns.dayOfWeek']}"
+                                                                   timeZone="#{sessionUser.timeZone}"
+                                                                   type="date"/>
+                                            </h:outputText>
+                                        </span>
+                                        <span class="app-cal__dom">
+                                            <h:outputText value="#{dayItem}">
+                                                <f:convertDateTime pattern="#{messages['patterns.dayAndMonth']}"
+                                                                   timeZone="#{sessionUser.timeZone}"
+                                                                   type="date"/>
+                                            </h:outputText>
+                                        </span>
+                                    </th>
+                                </a4j:repeat>
+                                <th class="app-cal__head app-cal__head--total">
+                                    <h:outputText value="#{messages['GroupSchedule.total']}"/>
+                                </th>
+                                <th class="app-cal__head app-cal__head--total">
+                                    <h:outputText value="#{messages['GroupSchedule.monthTotal']}"/>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <a4j:repeat value="#{groupScheduleAction.rows}" var="row">
+                                <tr class="app-cal__row">
+                                    <td class="app-cal__group">
+                                        <span class="app-cal__group-name">
+                                            <h:outputText value="#{row.workGroup.name}"/>
+                                        </span>
+                                        <span class="app-cal__group-area">
+                                            <h:outputText value="#{row.workGroup.area}"/>
+                                        </span>
+                                        <a4j:commandLink action="#{groupScheduleAction.paintRow(row)}"
+                                                         styleClass="app-cal__rowfill"
+                                                         title="#{messages['GroupSchedule.fillRow.hint']}"
+                                                         rendered="#{s:hasPermission('GROUPSCHEDULE','UPDATE')}"
+                                                         reRender="weekBar, scheduleGrid">
+                                            <h:outputText value="#{messages['GroupSchedule.fillRow']}"/>
+                                        </a4j:commandLink>
+                                    </td>
+                                    <a4j:repeat value="#{row.cells}" var="cell">
+                                        <td class="app-cal__td">
+                                            <a4j:commandLink action="#{groupScheduleAction.paint(cell)}"
+                                                             styleClass="#{cell.styleClass}"
+                                                             onclick="document.getElementById('groupScheduleForm:rangeFlag').value = event.shiftKey ? '1' : '0';"
+                                                             rendered="#{s:hasPermission('GROUPSCHEDULE','UPDATE')}"
+                                                             reRender="weekBar, scheduleGrid">
+                                                <span class="app-cal__cell-name">
+                                                    <h:outputText value="#{cell.shiftName}"/>
+                                                </span>
+                                                <span class="app-cal__cell-hours">
+                                                    <h:outputFormat value="#{messages['GroupSchedule.hours']}"
+                                                                    rendered="#{cell.working}">
+                                                        <f:param value="#{cell.hours}"/>
+                                                    </h:outputFormat>
+                                                </span>
+                                            </a4j:commandLink>
+                                            <h:panelGroup layout="block" styleClass="#{cell.styleClass}"
+                                                          rendered="#{not s:hasPermission('GROUPSCHEDULE','UPDATE')}">
+                                                <span class="app-cal__cell-name">
+                                                    <h:outputText value="#{cell.shiftName}"/>
+                                                </span>
+                                            </h:panelGroup>
+                                        </td>
+                                    </a4j:repeat>
+                                    <td class="app-cal__total">
+                                        <h:outputFormat value="#{messages['GroupSchedule.hours']}">
+                                            <f:param value="#{row.hours}"/>
+                                        </h:outputFormat>
+                                    </td>
+                                    <td class="app-cal__total app-cal__total--month">
+                                        <h:outputFormat value="#{messages['GroupSchedule.hours']}">
+                                            <f:param value="#{row.monthHours}"/>
+                                        </h:outputFormat>
+                                    </td>
+                                </tr>
+                            </a4j:repeat>
+                        </tbody>
+                    </table>
+                </h:panelGroup>
+            </a4j:outputPanel>
+        </h:form>
+
+        <s:decorate template="/employees/groupScheduleCopyModalPanel.xhtml"
+                    rendered="#{s:hasPermission('GROUPSCHEDULE','UPDATE')}">
+            <ui:param name="dialogId" value="copyGroupDialog"/>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

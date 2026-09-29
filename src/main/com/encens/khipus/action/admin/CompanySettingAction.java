@@ -28,6 +28,7 @@ import java.util.Base64;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import com.encens.khipus.util.employees.payroll.LatenessDiscountBase;
 
 /**
  * CompanySettingAction
@@ -68,12 +69,22 @@ public class CompanySettingAction extends GenericAction<CompanyConfiguration> {
 
     @Factory(value = "companySetting", scope = ScopeType.STATELESS)
     @Restrict("#{s:hasPermission('COMPANYSETTING','VIEW')}")
+    /** Las bases posibles del descuento por atrasos, para el selector de la pestana de RRHH. */
+    public LatenessDiscountBase[] getLatenessDiscountBases() {
+        return LatenessDiscountBase.values();
+    }
+
     public CompanyConfiguration initCompanyConfiguration() {
         return getInstance();
     }
 
+    /*
+     * `join = true`: si se entra con una conversacion ya abierta -por ejemplo viniendo del banco
+     * de horas, que empieza una- esta pantalla se une en lugar de fallar. Sin eso Seam corta con
+     * "begin method invoked from a long-running conversation" y Preferencias no abre.
+     */
     @Create
-    @Begin(ifOutcome = Outcome.SUCCESS, flushMode = FlushModeType.MANUAL)
+    @Begin(ifOutcome = Outcome.SUCCESS, join = true, flushMode = FlushModeType.MANUAL)
     public void loadCompanySettings() {
         Conversation.instance().changeFlushMode(FlushModeType.MANUAL);
         CompanyConfiguration companyConfiguration = null;

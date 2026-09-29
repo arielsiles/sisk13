@@ -44,24 +44,11 @@
                              styleClass="input"
                              tabindex="1"/>
             </s:decorate>
-            <s:decorate id="firstNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Person.firstName']}</ui:define>
-                <h:inputText id="firstName" value="#{dataModel.firstName}"
-                             maxlength="100" styleClass="input"
+            <s:decorate id="employeeNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ContractCondition.employee']}</ui:define>
+                <h:inputText id="employeeName" value="#{dataModel.employeeName}"
+                             maxlength="100" styleClass="input" size="40"
                              tabindex="2"/>
-            </s:decorate>
-            <s:decorate id="lastNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Person.lastName']}</ui:define>
-                <h:inputText id="lastName" value="#{dataModel.lastName}" maxlength="100"
-                             styleClass="input"
-                             tabindex="3"/>
-            </s:decorate>
-            <s:decorate id="maidenNameField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Person.maidenName']}</ui:define>
-                <h:inputText id="maidenName" value="#{dataModel.maidenName}"
-                             maxlength="100"
-                             styleClass="input"
-                             tabindex="4"/>
             </s:decorate>
         </s:div>
         <s:div>

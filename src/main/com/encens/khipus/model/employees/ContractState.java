@@ -31,6 +31,15 @@ import javax.persistence.*;
 @EntityListeners({CompanyListener.class, UpperCaseStringListener.class})
 @Table(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "estadocontrato", uniqueConstraints = {@UniqueConstraint(columnNames = {"idcompania", "nombre"})})
 public class ContractState implements BaseModel {
+
+    /**
+     * El estado del contrato cerrado. `estadocontrato` es una tabla por empresa con el nombre
+     * escrito a mano, no un enumerado, asi que media docena de reglas dependen de que se llame
+     * exactamente asi: la baja, el filtro de vencimientos, la fecha de salida y el contrato
+     * principal. Al menos que dependan de un solo lugar.
+     */
+    public static final String INACTIVE = "INACTIVO";
+
     @Id
     @Column(name = "idestadocontrato", nullable = false)
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "ContractState.tableGenerator")
@@ -51,6 +60,11 @@ public class ContractState implements BaseModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /** true si este estado es el del contrato cerrado. */
+    public boolean isInactive() {
+        return null != name && INACTIVE.equalsIgnoreCase(name.trim());
     }
 
     public String getName() {

@@ -33,4 +33,15 @@ public interface DiscountRuleService extends GenericService {
 
     @SuppressWarnings("unchecked")
     List<DiscountRule> findGlobalActiveDiscountRuleByGestion(Gestion gestion);
+
+    /**
+     * Cuantas planillas OFICIALES se generaron con esta regla. El ciclo de generacion congela
+     * una FK a la regla, no una copia de sus rangos, asi que editarla despues cambia lo que
+     * daria una regeneracion de un mes ya cerrado.
+     *
+     * @return numero de planillas oficiales; 0 si la regla todavia se puede editar
+     */
+    Long countOfficialPayrolls(DiscountRule discountRule);
+
+    boolean isLockedByOfficialPayroll(DiscountRule discountRule);
 }

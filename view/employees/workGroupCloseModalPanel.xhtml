@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <rich:modalPanel id="closeDialog" width="520" zindex="2000" resizeable="false" autosized="true">
+        <f:facet name="header">
+            <h:outputText value="#{messages['WorkGroup.close.title']}"/>
+        </f:facet>
+        <f:facet name="controls">
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeCloseLink"/>
+        </f:facet>
+
+        <h:form id="closeForm">
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <h:outputText styleClass="formNote" value="#{messages['WorkGroup.close.hint']}"/>
+                <h:outputText styleClass="app-cal__range"
+                              value="#{workGroupAction.closingMembership.contract.employee.fullName}"/>
+            </h:panelGrid>
+
+            <s:decorate id="closingDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['WorkGroup.close.date']}</ui:define>
+                <ui:param name="required" value="true"/>
+                <rich:calendar id="closingDate" value="#{workGroupAction.closingDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               styleClass="input" zindex="2100"/>
+            </s:decorate>
+
+            <!-- La aclaracion va en su propia linea: dentro del campo empujaba al calendario
+                 abajo y partia la etiqueta en dos. -->
+            <div class="app-fieldnote">
+                <h:outputText value="#{messages['WorkGroup.close.date.hint']}"/>
+            </div>
+
+            <div class="buttonsRight">
+                <a4j:commandButton id="closeButton"
+                                   action="#{workGroupAction.closeMember}"
+                                   value="#{messages['WorkGroup.closeMember']}"
+                                   styleClass="button"
+                                   reRender="closeForm, :workGroupForm:memberList, :globalMessages"
+                                   oncomplete="if (#{empty workGroupAction.closingMembership}) Richfaces.hideModalPanel('closeDialog');"/>
+                <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" type="button">
+                    <rich:componentControl for="closeDialog" event="onclick" disableDefault="true"
+                                           operation="hide"/>
+                </h:commandButton>
+            </div>
+        </h:form>
+
+        <rich:componentControl for="closeDialog" attachTo="closeCloseLink" operation="hide" event="onclick"/>
+    </rich:modalPanel>
+</ui:composition>

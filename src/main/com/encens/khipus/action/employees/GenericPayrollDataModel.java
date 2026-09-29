@@ -31,6 +31,10 @@ public class GenericPayrollDataModel<ID extends Long, T extends BaseModel> exten
     private String maidenName;
     private String firstName;
 
+    /* Un solo campo para buscar por nombre o apellido. Cuatro cajas para escribir un apellido
+       hacen que se busque en la equivocada; una sola no tiene forma de fallar. */
+    private String person;
+
     public GeneratedPayroll getGeneratedPayroll() {
         if (generatedPayroll == null) {
             generatedPayroll = (GeneratedPayroll) Component.getInstance("generatedPayroll");
@@ -40,6 +44,14 @@ public class GenericPayrollDataModel<ID extends Long, T extends BaseModel> exten
 
     public void setGeneratedPayroll(GeneratedPayroll generatedPayroll) {
         this.generatedPayroll = generatedPayroll;
+    }
+
+    public String getPerson() {
+        return person;
+    }
+
+    public void setPerson(String person) {
+        this.person = (null == person || 0 == person.trim().length()) ? null : person.trim();
     }
 
     public String getIdNumber() {

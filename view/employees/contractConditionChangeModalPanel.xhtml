@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <rich:modalPanel id="changeConditionDialog" width="540" zindex="2000"
+                     resizeable="false" autosized="true">
+        <f:facet name="header">
+            <h:outputText value="#{messages['ContractCondition.change.title']}"/>
+        </f:facet>
+        <f:facet name="controls">
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeChangeLink"/>
+        </f:facet>
+
+        <!-- Formulario propio: el modal se desprende del DOM y sus campos no llegarian al
+             servidor dentro del formulario del listado. -->
+        <h:form id="changeForm">
+            <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <h:outputText styleClass="formNote" value="#{messages['ContractCondition.change.hint']}"/>
+                <h:outputText styleClass="app-cal__range"
+                              value="#{contractConditionAction.contract.employee.fullName}"/>
+            </h:panelGrid>
+
+            <!-- La condicion de hoy, a la vista: sin esto no se sabe desde que se esta
+                 cambiando, y para una simple ampliacion hay que ir a mirar el listado. -->
+            <div class="app-cond__current">
+                <h:outputText styleClass="app-cond__label"
+                              value="#{messages['ContractCondition.current']}"/>
+                <h:outputText styleClass="app-tag"
+                              value="#{contractConditionAction.contract.contractMode.name}"/>
+                <h:outputText styleClass="app-tag"
+                              value="#{messages[contractConditionAction.contract.duration.resourceKey]}"/>
+                <h:outputText styleClass="app-tag"
+                              rendered="#{not empty contractConditionAction.contract.endDate}"
+                              value="#{contractConditionAction.contract.endDate}">
+                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                       timeZone="#{sessionUser.timeZone}" type="date"/>
+                </h:outputText>
+            </div>
+
+            <s:decorate id="changeDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ContractCondition.changeDate']}</ui:define>
+                <ui:param name="required" value="true"/>
+                <rich:calendar id="changeDate" value="#{contractConditionAction.changeDate}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               styleClass="input" zindex="2100"/>
+            </s:decorate>
+
+            <div class="app-fieldnote">
+                <h:outputText value="#{messages['ContractCondition.changeDate.hint']}"/>
+            </div>
+
+            <s:decorate id="newModeField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ContractCondition.mode']}</ui:define>
+                <h:selectOneMenu id="newMode" value="#{contractConditionAction.newContractMode}"
+                                 styleClass="input">
+                    <s:selectItems value="#{contractModeList}" var="modeItem"
+                                   label="#{modeItem.name}"/>
+                    <s:convertEntity/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <s:decorate id="newDurationField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ContractCondition.duration']}</ui:define>
+                <h:selectOneMenu id="newDuration" value="#{contractConditionAction.newDuration}"
+                                 styleClass="input">
+                    <s:selectItems value="#{contractConditionAction.durations}" var="durationItem"
+                                   label="#{messages[durationItem.resourceKey]}"/>
+                    <s:convertEnum/>
+                    <a4j:support event="onchange" reRender="newEndDateField" ajaxSingle="true"/>
+                </h:selectOneMenu>
+            </s:decorate>
+
+            <!-- La fecha de fin solo existe para el plazo fijo. En un indefinido ni se muestra:
+                 dejar el campo a la vista es lo que llevo a que todos tuvieran una fecha. -->
+            <s:decorate id="newEndDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['Contract.endDate']}</ui:define>
+                <rich:calendar id="newEndDate" value="#{contractConditionAction.newEndDate}"
+                               currentDate="#{contractConditionAction.endCalendarMonth}"
+                               datePattern="#{messages['patterns.date']}"
+                               popup="true" enableManualInput="true"
+                               rendered="#{contractConditionAction.fixedTermSelected}"
+                               styleClass="input" zindex="2100"/>
+                <h:outputText styleClass="app-tag"
+                              value="#{messages['ContractCondition.indefinite.hint']}"
+                              rendered="#{not contractConditionAction.fixedTermSelected}"/>
+            </s:decorate>
+
+            <s:decorate id="changeReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ContractCondition.reason']}</ui:define>
+                <h:inputText id="changeReason" value="#{contractConditionAction.changeReason}"
+                             maxlength="250" size="45" styleClass="input"/>
+            </s:decorate>
+
+            <!-- El historial estaba guardado y no se mostraba en ninguna parte. -->
+            <h:panelGroup layout="block" styleClass="app-cond__history"
+                          rendered="#{not empty contractConditionAction.movements}">
+                <h:outputText styleClass="app-cond__label"
+                              value="#{messages['ContractCondition.history']}"/>
+                <rich:dataTable id="movementList" value="#{contractConditionAction.movements}"
+                                var="movementItem" width="100%" columnsWidth="16%,26%,40%,18%">
+                    <rich:column>
+                        <h:outputText value="#{movementItem.date}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText styleClass="app-tag"
+                                      value="#{messages[movementItem.type.resourceKey]}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{movementItem.reason}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="#{movementItem.user.username}"/>
+                    </rich:column>
+                </rich:dataTable>
+            </h:panelGroup>
+
+            <div class="buttonsRight">
+                <a4j:commandButton id="changeButton"
+                                   action="#{contractConditionAction.changeCondition}"
+                                   value="#{messages['ContractCondition.change.action']}"
+                                   styleClass="button"
+                                   reRender=":contractConditionSearch:contractConditionList, :contractConditionSearch:dataScroller, :globalMessages"
+                                   oncomplete="if (!#{contractConditionAction.selected}) Richfaces.hideModalPanel('changeConditionDialog');"/>
+                <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                    <rich:componentControl for="changeConditionDialog" event="onclick"
+                                           disableDefault="true" operation="hide"/>
+                </h:commandButton>
+            </div>
+        </h:form>
+
+        <rich:componentControl for="changeConditionDialog" attachTo="closeChangeLink"
+                               operation="hide" event="onclick"/>
+    </rich:modalPanel>
+</ui:composition>

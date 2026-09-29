@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{sipContributionRegimeAction.managed}">
+                #{messages['SIPContributionRegime.edit']}
+            </c:when>
+            <c:otherwise>
+                #{messages['SIPContributionRegime.new']}
+            </c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="sipContributionRegimeForm">
+            <div class="buttons">
+                <h:commandButton action="#{sipContributionRegimeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!sipContributionRegimeAction.managed and s:hasPermission('SIPCONTRIBUTIONREGIME','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{sipContributionRegimeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{sipContributionRegimeAction.managed and s:hasPermission('SIPCONTRIBUTIONREGIME','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{sipContributionRegimeAction.managed and s:hasPermission('SIPCONTRIBUTIONREGIME','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{sipContributionRegimeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="4"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{sipContributionRegimeAction.managed}">
+                            #{messages['SIPContributionRegime.edit']}
+                        </c:when>
+                        <c:otherwise>
+                            #{messages['SIPContributionRegime.new']}
+                        </c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SIPContributionRegime.name']}</ui:define>
+                    <h:inputText id="name" value="#{sipContributionRegime.name}" required="true"
+                                 maxlength="100" styleClass="input" size="60" tabindex="5"/>
+                </s:decorate>
+
+                <s:decorate id="descriptionField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['SIPContributionRegime.description']}</ui:define>
+                    <h:inputTextarea id="description" value="#{sipContributionRegime.description}"
+                                     styleClass="input" cols="60" rows="3" tabindex="6"/>
+                </s:decorate>
+
+                <app:fieldset id="laborFieldset" title="#{messages['SIPContributionRegime.laborContributions']}">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.contributesIndividualAccount']}</ui:define>
+                        <h:selectBooleanCheckbox id="contributesIndividualAccount"
+                                                 value="#{sipContributionRegime.contributesIndividualAccount}"
+                                                 tabindex="7"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.contributesCommonRisk']}</ui:define>
+                        <h:selectBooleanCheckbox id="contributesCommonRisk"
+                                                 value="#{sipContributionRegime.contributesCommonRisk}"
+                                                 tabindex="8"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.contributesSolidary']}</ui:define>
+                        <h:selectBooleanCheckbox id="contributesSolidary"
+                                                 value="#{sipContributionRegime.contributesSolidary}"
+                                                 tabindex="9"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.contributesComission']}</ui:define>
+                        <h:selectBooleanCheckbox id="contributesComission"
+                                                 value="#{sipContributionRegime.contributesComission}"
+                                                 tabindex="10"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.contributesNationalSolidary']}</ui:define>
+                        <h:selectBooleanCheckbox id="contributesNationalSolidary"
+                                                 value="#{sipContributionRegime.contributesNationalSolidary}"
+                                                 tabindex="11"/>
+                    </s:decorate>
+                </app:fieldset>
+
+                <app:fieldset id="patronalFieldset" title="#{messages['SIPContributionRegime.patronalContributions']}">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.contributesPatronal']}</ui:define>
+                        <h:selectBooleanCheckbox id="contributesPatronal"
+                                                 value="#{sipContributionRegime.contributesPatronal}"
+                                                 tabindex="12"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.contributesCns']}</ui:define>
+                        <h:selectBooleanCheckbox id="contributesCns"
+                                                 value="#{sipContributionRegime.contributesCns}"
+                                                 tabindex="13"/>
+                    </s:decorate>
+                </app:fieldset>
+
+                <app:fieldset id="stateFieldset" title="#{messages['SIPContributionRegime.state']}">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.byDefault']}</ui:define>
+                        <h:selectBooleanCheckbox id="byDefault" value="#{sipContributionRegime.byDefault}"
+                                                 tabindex="14"/>
+                        <h:outputText styleClass="app-tag" value="#{messages['SIPContributionRegime.byDefault.hint']}"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['SIPContributionRegime.active']}</ui:define>
+                        <h:selectBooleanCheckbox id="active" value="#{sipContributionRegime.active}"
+                                                 tabindex="15"/>
+                    </s:decorate>
+                </app:fieldset>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{sipContributionRegimeAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!sipContributionRegimeAction.managed and s:hasPermission('SIPCONTRIBUTIONREGIME','CREATE')}"
+                                 tabindex="16"/>
+                <h:commandButton action="#{sipContributionRegimeAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{sipContributionRegimeAction.managed and s:hasPermission('SIPCONTRIBUTIONREGIME','UPDATE')}"
+                                 tabindex="17"/>
+                <h:commandButton value="#{messages['Common.delete']}"
+                                 styleClass="button"
+                                 rendered="#{sipContributionRegimeAction.managed and s:hasPermission('SIPCONTRIBUTIONREGIME','DELETE')}"
+                                 tabindex="18">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{sipContributionRegimeAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="19"/>
+            </div>
+        </h:form>
+        <rich:jQuery selector="#name" query="focus()" timing="onload"/>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{sipContributionRegimeAction.managed and s:hasPermission('SIPCONTRIBUTIONREGIME','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['SIPContributionRegime.delete.confirmation']}">
+                        <f:param value="#{sipContributionRegime.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{sipContributionRegimeAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true"
+                                   rendered="#{s:hasPermission('SIPCONTRIBUTIONREGIME','DELETE')}"
+                                   tabindex="1000"
+                                   styleClass="button"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

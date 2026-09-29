@@ -123,6 +123,17 @@
             </h:selectOneMenu>
         </s:decorate>
 
+        <s:decorate id="specialDateReasonField" template="/include/inputField.xhtml" styleClass="formRow">
+            <ui:define name="label">#{messages['SpecialDate.reason']}</ui:define>
+            <h:selectOneMenu id="specialDateReason" value="#{specialDateDataModel.criteria.reason}"
+                             styleClass="input" tabindex="7">
+                <s:selectItems value="#{specialDateReason}" var="sdr" label="#{messages[sdr.resourceKey]}"
+                               hideNoSelectionLabel="false"
+                               noSelectionLabel=""/>
+                <s:convertEnum/>
+            </h:selectOneMenu>
+        </s:decorate>
+
         <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
             <a4j:commandButton action="#{specialDateDataModel.search}"
                                reRender="specialDateList, dataScroller, searchPanel"
@@ -149,7 +160,7 @@
 </div>
 <rich:dataTable value="#{specialDateDataModel}" var="specialDateItem" id="specialDateList"
                 rows="#{sessionUser.rowsPerPage}"
-                width="100%" columnsWidth="20%, 10%, 35%, 8%, 8%, 8%, 8%, 5%, 10%">
+                width="100%" columnsWidth="18%, 9%, 27%, 8%, 8%, 7%, 7%, 5%, 6%, 5%">
     <f:facet name="header">
         <rich:columnGroup>
             <rich:column styleClass="center">
@@ -204,6 +215,13 @@
                 </app:commandSortHeader>
             </rich:column>
             <rich:column styleClass="center">
+                <app:commandSortHeader sortProperty="specialDate.reason"
+                                       dataModel="#{specialDateDataModel}"
+                                       reRender="specialDateList, dataScroller">
+                    #{messages['SpecialDate.reason']}
+                </app:commandSortHeader>
+            </rich:column>
+            <rich:column styleClass="center">
                 #{messages['Common.action']}
             </rich:column>
         </rich:columnGroup>
@@ -239,6 +257,9 @@
     </rich:column>
     <rich:column>
         <h:outputText value="#{specialDateItem.rolType}"/>
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{empty specialDateItem.reason ? '' : messages[specialDateItem.reason.resourceKey]}"/>
     </rich:column>
     <rich:column styleClass="center">
         <h:commandLink value="#{messages['Common.select']}"

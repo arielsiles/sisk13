@@ -1354,6 +1354,17 @@
     s:hasPermission('CNSRATE','VIEW') or
     s:hasPermission('IVARATE','VIEW') or
     s:hasPermission('SMNRATE','VIEW') or
+    s:hasPermission('SIPCONTRIBUTIONREGIME','VIEW') or
+    s:hasPermission('GROUPSCHEDULE','VIEW') or
+    s:hasPermission('CONTRACTSCHEDULE','VIEW') or
+    s:hasPermission('SCHEDULEEXCEPTION','VIEW') or
+    s:hasPermission('CONTRACTCONDITION','VIEW') or
+    s:hasPermission('ATTENDANCECHECK','VIEW') or
+    s:hasPermission('VACATIONPLANNING','VIEW') or
+    s:hasPermission('WORKGROUP','VIEW') or
+    s:hasPermission('WORKSHIFT','VIEW') or
+    s:hasPermission('WEEKLYWORKLOAD','VIEW') or
+    s:hasPermission('MARKIMPORT','VIEW') or
     s:hasPermission('EMPLOYEE','VIEW') or
     s:hasPermission('GESTION','VIEW') or
     s:hasPermission('CYCLE','VIEW') or
@@ -1362,7 +1373,6 @@
     s:hasPermission('EVALUATIONCRITERIA','VIEW') or
     s:hasPermission('SPECIALDATE','VIEW') or
     s:hasPermission('JOBCONTRACT','VIEW') or
-    s:hasPermission('CONTRACT','VIEW') or
     s:hasPermission('HORARYBANDCONTRACT','VIEW') or
     s:hasPermission('ORGANIZATIONALUNIT','VIEW') or
     s:hasPermission('ORGANIZATIONALLEVEL','VIEW') or
@@ -1386,9 +1396,9 @@
                     rendered="#{s:hasPermission('EMPLOYEE','VIEW')}"
                     propagation="none"/>
 
-            <s:link view="/employees/jobContractList.xhtml" styleClass="tab-cell"
-                    value="#{messages['menu.rrhh.humanDevelopment.jobContract']}"
-                    rendered="#{s:hasPermission('JOBCONTRACT','VIEW')}"
+            <s:link view="/employees/contractConditionList.xhtml" styleClass="tab-cell"
+                    value="#{messages['menu.employees.contractCondition']}"
+                    rendered="#{s:hasPermission('CONTRACTCONDITION','VIEW')}"
                     propagation="none"/>
 
             <s:link view="/employees/gestionPayrollList.xhtml" styleClass="tab-cell"
@@ -1402,10 +1412,68 @@
                     rendered="#{s:hasPermission('PAYROLLGENERATIONCYCLE','VIEW')}"
                     propagation="none"/>
 
-            <s:link view="/employees/vacationPlanningList.xhtml" styleClass="tab-cell"
-                    value="#{messages['menu.employees.vacationPlanning']}"
-                    rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}"
-                    propagation="none"/>
+            <rich:dropDownMenu value="#{messages['menu.rrhh.planning']}" rendered="#{
+                            s:hasPermission('VACATIONPLANNING','VIEW') or
+                            s:hasPermission('SCHEDULEEXCEPTION','VIEW') or
+                            s:hasPermission('HOURBANK','VIEW') or
+                            s:hasPermission('WORKGROUP','VIEW') or
+                            s:hasPermission('WORKSHIFT','VIEW') or
+                            s:hasPermission('WEEKLYWORKLOAD','VIEW') or
+                            s:hasPermission('MARKIMPORT','VIEW')}">
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('VACATIONPLANNING','VIEW')}">
+                    <s:link view="/employees/vacationPlanningList.xhtml"
+                            value="#{messages['menu.employees.vacationPlanning']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('MARKIMPORT','VIEW')}">
+                    <s:link view="/employees/markImport.xhtml"
+                            value="#{messages['menu.employees.markImport']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('HOURBANK','VIEW')}">
+                    <s:link view="/employees/hourBank.xhtml"
+                            value="#{messages['menu.employees.hourBank']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('SCHEDULEEXCEPTION','VIEW')}">
+                    <s:link view="/employees/scheduleExceptionList.xhtml"
+                            value="#{messages['menu.employees.scheduleException']}"
+                            propagation="none"/>
+                </rich:menuItem>
+
+                <rich:menuSeparator/>
+
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WORKGROUP','VIEW')}">
+                    <s:link view="/employees/workGroupList.xhtml"
+                            value="#{messages['menu.employees.configuration.workGroup']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WORKSHIFT','VIEW')}">
+                    <s:link view="/employees/workShiftList.xhtml"
+                            value="#{messages['menu.employees.configuration.workShift']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('WEEKLYWORKLOAD','VIEW')}">
+                    <s:link view="/employees/weeklyWorkloadList.xhtml"
+                            value="#{messages['menu.employees.configuration.weeklyWorkload']}"
+                            propagation="none"/>
+                </rich:menuItem>
+            </rich:dropDownMenu>
 
             <s:link view="/employees/salaryMovementList.xhtml" styleClass="tab-cell"
                     value="#{messages['menu.employees.configuration.salaryMovement']}"
@@ -1417,14 +1485,19 @@
                     rendered="#{s:hasPermission('SPECIALDATE','VIEW')}"
                     propagation="none"/>
 
-            <s:link view="/employees/horaryBandContractList.xhtml" styleClass="tab-cell"
-                    value="#{messages['menu.employees.configuration.horaryBandContract']}"
-                    rendered="#{s:hasPermission('HORARYBANDCONTRACT','VIEW')}"
+            <s:link view="/employees/contractSchedule.xhtml" styleClass="tab-cell"
+                    value="#{messages['menu.employees.contractSchedule']}"
+                    rendered="#{s:hasPermission('CONTRACTSCHEDULE','VIEW')}"
                     propagation="none"/>
 
-            <s:link view="/employees/bankAccountList.xhtml" styleClass="tab-cell"
-                    value="#{messages['menu.employees.configuration.bankAccount']}"
-                    rendered="#{s:hasPermission('BANKACCOUNT','VIEW')}"
+            <s:link view="/employees/groupSchedule.xhtml" styleClass="tab-cell"
+                    value="#{messages['menu.employees.groupSchedule']}"
+                    rendered="#{s:hasPermission('GROUPSCHEDULE','VIEW')}"
+                    propagation="none"/>
+
+            <s:link view="/employees/attendanceCheck.xhtml" styleClass="tab-cell"
+                    value="#{messages['menu.employees.attendanceCheck']}"
+                    rendered="#{s:hasPermission('ATTENDANCECHECK','VIEW')}"
                     propagation="none"/>
 
             <rich:dropDownMenu value="#{messages['menu.rrhh.payrollGeneration.reports.title']}" rendered="#{
@@ -1654,7 +1727,6 @@
                                             s:hasPermission('EVALUATIONCRITERIA','VIEW') or
                                             s:hasPermission('SPECIALDATE','VIEW') or
                                             s:hasPermission('JOBCONTRACT','VIEW') or
-                                            s:hasPermission('CONTRACT','VIEW') or
                                             s:hasPermission('HORARYBANDCONTRACT','VIEW') or
                                             s:hasPermission('ORGANIZATIONALUNIT','VIEW') or
                                             s:hasPermission('ORGANIZATIONALLEVEL','VIEW') or
@@ -1666,6 +1738,10 @@
                                             s:hasPermission('JOBCATEGORY','VIEW') or
                                             s:hasPermission('BANKENTITY','VIEW') or
                                             s:hasPermission('BANKACCOUNT','VIEW') or
+                                            s:hasPermission('WEEKLYWORKLOAD','VIEW') or
+                                            s:hasPermission('WORKSHIFT','VIEW') or
+                                            s:hasPermission('WORKGROUP','VIEW') or
+                                            s:hasPermission('MARKIMPORT','VIEW') or
                                             s:hasPermission('CURRENCY','VIEW')}">
 
                 <!-- No esta registrado DISMISSAL -->
@@ -1747,14 +1823,6 @@
                 </rich:menuItem>
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
-                               rendered="#{s:hasPermission('CONTRACT','VIEW')}">
-                    <s:link view="/employees/contractList.xhtml"
-                            value="#{messages['menu.rrhh.humanDevelopment.contract']}"
-                            propagation="none"/>
-                </rich:menuItem>
-
-                <rich:menuItem submitMode="none"
-                               styleClass="main-menu-item"
                                rendered="#{s:hasPermission('ORGANIZATIONALUNIT','VIEW')}">
                     <s:link view="/employees/organizationalUnitList.xhtml"
                             value="#{messages['menu.employees.configuration.organizationalUnit']}"
@@ -1795,6 +1863,15 @@
                             value="#{messages['menu.employees.configuration.limit']}"
                             propagation="none"/>
                 </rich:menuItem>
+                <!-- Bandas horarias y horario fijo viven al lado de tolerancias y limites, que
+                     son su configuracion; antes estaban una en la barra y otro en Planificacion. -->
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('HORARYBANDCONTRACT','VIEW')}">
+                    <s:link view="/employees/horaryBandContractList.xhtml"
+                            value="#{messages['menu.employees.configuration.horaryBandContract']}"
+                            propagation="none"/>
+                </rich:menuItem>
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
                                rendered="#{s:hasPermission('SECTOR','VIEW')}">
@@ -1818,6 +1895,13 @@
                 </rich:menuItem>
                 <rich:menuItem submitMode="none"
                                styleClass="main-menu-item"
+                               rendered="#{s:hasPermission('BANKACCOUNT','VIEW')}">
+                    <s:link view="/employees/bankAccountList.xhtml"
+                            value="#{messages['menu.employees.configuration.bankAccount']}"
+                            propagation="none"/>
+                </rich:menuItem>
+                <rich:menuItem submitMode="none"
+                               styleClass="main-menu-item"
                                rendered="#{s:hasPermission('CURRENCY','VIEW')}">
                     <s:link view="/employees/currencyList.xhtml"
                             value="#{messages['menu.rrhh.configuration.currency']}"
@@ -1836,6 +1920,7 @@
                                             s:hasPermission('CNSRATE','VIEW') or
                                             s:hasPermission('IVARATE','VIEW') or
                                             s:hasPermission('SMNRATE','VIEW') or
+                                            s:hasPermission('SIPCONTRIBUTIONREGIME','VIEW') or
                                             s:hasPermission('BONUS','VIEW')   or
                                             s:hasPermission('DISCHARGEDOCUMENT','VIEW')  or
                                             s:hasPermission('VACATIONRULE','VIEW') or
@@ -1866,6 +1951,13 @@
                                    rendered="#{s:hasPermission('SMNRATE','VIEW')}">
                         <s:link view="/employees/smnRateList.xhtml"
                                 value="#{messages['menu.employees.configuration.smnRate']}"
+                                propagation="none"/>
+                    </rich:menuItem>
+                    <rich:menuItem submitMode="none"
+                                   styleClass="main-menu-item"
+                                   rendered="#{s:hasPermission('SIPCONTRIBUTIONREGIME','VIEW')}">
+                        <s:link view="/employees/sipContributionRegimeList.xhtml"
+                                value="#{messages['menu.employees.configuration.sipContributionRegime']}"
                                 propagation="none"/>
                     </rich:menuItem>
                     <rich:menuItem submitMode="none"
@@ -2709,6 +2801,7 @@
         <s:link view="/admin/companySetting.xhtml"
                 value="#{messages['menu.admin.company']}"
                 rendered="#{s:hasPermission('COMPANYSETTING','VIEW')}"
+                propagation="none"
                 styleClass="tab-cell"/>
         <rich:dropDownMenu value="#{messages['menu.admin.reports']}"
                            rendered="#{s:hasPermission('USERROLEREPORT','VIEW')}">

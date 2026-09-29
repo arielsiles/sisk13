@@ -1,0 +1,145 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{scheduleExceptionAction.managed}">#{messages['ScheduleException.edit']}</c:when>
+            <c:otherwise>#{messages['ScheduleException.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="70%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="scheduleExceptionForm">
+            <div class="buttons">
+                <h:commandButton action="#{scheduleExceptionAction.create}"
+                                 value="#{messages['Common.save']}" styleClass="button"
+                                 rendered="#{!scheduleExceptionAction.managed and s:hasPermission('SCHEDULEEXCEPTION','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{scheduleExceptionAction.update}"
+                                 value="#{messages['Common.save']}" styleClass="button"
+                                 rendered="#{scheduleExceptionAction.managed and s:hasPermission('SCHEDULEEXCEPTION','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button"
+                                 rendered="#{scheduleExceptionAction.managed and s:hasPermission('SCHEDULEEXCEPTION','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick"
+                                           disableDefault="true" operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{scheduleExceptionAction.cancel}"
+                                 value="#{messages['Common.cancel']}" styleClass="button"
+                                 immediate="true" tabindex="4"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{scheduleExceptionAction.managed}">#{messages['ScheduleException.edit']}</c:when>
+                        <c:otherwise>#{messages['ScheduleException.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <h:outputText styleClass="formNote" value="#{messages['ScheduleException.hint']}"/>
+                </h:panelGrid>
+
+                <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ScheduleException.employee']}</ui:define>
+                    <app:selectPopUp id="employee"
+                                     textValue="#{scheduleExceptionAction.employee.fullName}"
+                                     value="#{scheduleExceptionAction.employee}"
+                                     dataModel="#{generalEmployeeDataModel}"
+                                     clearAction="scheduleExceptionAction.clearEmployee()"
+                                     searchModalPanel="generalEmployeeListModalPanel"
+                                     reRender="employeeField"
+                                     hotKeySelect="alt+1"
+                                     tabindex="5"/>
+                </s:decorate>
+
+                <s:decorate id="dateField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ScheduleException.date']}</ui:define>
+                    <rich:calendar id="date" value="#{scheduleException.date}"
+                                   datePattern="#{messages['patterns.date']}"
+                                   popup="true" enableManualInput="true"
+                                   styleClass="input" tabindex="6"/>
+                </s:decorate>
+
+                <s:decorate id="workShiftField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ScheduleException.workShift']}</ui:define>
+                    <h:selectOneMenu id="workShift" value="#{scheduleException.workShift}"
+                                     styleClass="input" tabindex="7">
+                        <s:selectItems value="#{scheduleExceptionAction.shifts}" var="shiftItem"
+                                       label="#{shiftItem.name}"
+                                       noSelectionLabel="#{messages['GroupSchedule.brush.rest']}"/>
+                        <s:convertEntity/>
+                    </h:selectOneMenu>
+                    <h:outputText styleClass="app-tag" value="#{messages['ScheduleException.workShift.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="reasonField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['ScheduleException.reason']}</ui:define>
+                    <h:inputText id="reason" value="#{scheduleException.reason}" required="true"
+                                 maxlength="250" size="60" styleClass="input" tabindex="8"/>
+                </s:decorate>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{scheduleExceptionAction.create}"
+                                 value="#{messages['Common.save']}" styleClass="button"
+                                 rendered="#{!scheduleExceptionAction.managed and s:hasPermission('SCHEDULEEXCEPTION','CREATE')}"
+                                 tabindex="9"/>
+                <h:commandButton action="#{scheduleExceptionAction.update}"
+                                 value="#{messages['Common.save']}" styleClass="button"
+                                 rendered="#{scheduleExceptionAction.managed and s:hasPermission('SCHEDULEEXCEPTION','UPDATE')}"
+                                 tabindex="10"/>
+                <h:commandButton action="#{scheduleExceptionAction.cancel}"
+                                 value="#{messages['Common.cancel']}" styleClass="button"
+                                 immediate="true" tabindex="11"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{scheduleExceptionAction.managed and s:hasPermission('SCHEDULEEXCEPTION','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputText value="#{messages['ScheduleException.delete.confirmation']}"/>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{scheduleExceptionAction.delete}"
+                                   value="#{messages['Common.delete']}"
+                                   immediate="true" styleClass="button"
+                                   rendered="#{s:hasPermission('SCHEDULEEXCEPTION','DELETE')}"
+                                   tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{scheduleExceptionAction.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="employeeField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

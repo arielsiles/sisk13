@@ -18,11 +18,22 @@
 <rich:simpleTogglePanel label="#{messages['JobContract.search']}" switchType="client">
     <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
                  columnClasses="width50percent,width50percent">
+        <!-- Izquierda: se escribe directamente. Antes habia que abrir un modal, buscar,
+             elegir y volver: cuatro pasos para filtrar por una persona. Y un solo campo, no tres:
+             con nombre y los dos apellidos separados hay que acertar en cual va el texto. -->
+        <s:div>
+            <s:decorate id="employeeNameField" template="/include/inputField.xhtml" styleClass="formRow">
+                <ui:define name="label">#{messages['ContractCondition.employee']}</ui:define>
+                <h:inputText id="employeeName" value="#{jobContractDataModel.employeeName}"
+                             maxlength="100" styleClass="input" size="40" tabindex="1"/>
+            </s:decorate>
+        </s:div>
+
         <s:div>
             <s:decorate id="businessUnitField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['OrganizationalUnit.businessUnit']}</ui:define>
                 <h:selectOneMenu id="businessUnit" styleClass="input"
-                                 tabindex="1"
+                                 tabindex="4"
                                  value="#{jobContractDataModel.businessUnit}">
                     <s:selectItems value="#{businessUnitList}" var="business"
                                    label="#{business.organization.name}"
@@ -33,49 +44,11 @@
                     <s:convertEntity/>
                 </h:selectOneMenu>
             </s:decorate>
-            <s:decorate id="SectorField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['Job.sector']}</ui:define>
-                <h:selectOneMenu id="sector" styleClass="input"
-                                 tabindex="2"
-                                 value="#{jobContractDataModel.sector}">
-                    <s:selectItems value="#{sectorList}" var="sector"
-                                   label="#{sector.name}"
-                                   hideNoSelectionLabel="false"
-                                   noSelectionLabel=""/>
-                    <a4j:support event="onchange" ajaxSingle="true"
-                                 action="#{jobContractDataModel.refreshJobCategory}"
-                                 reRender="jobCategoryField"/>
-                    <s:convertEntity/>
-                </h:selectOneMenu>
-            </s:decorate>
-
-        </s:div>
-        <s:div>
-            <s:decorate id="employeeField" template="/include/inputField.xhtml" styleClass="formRow">
-                <ui:define name="label">#{messages['JobContract.employee']}</ui:define>
-                <h:inputText styleClass="input" readonly="true"
-                             value="#{jobContractDataModel.employee.fullName}"
-                             tabindex="3"/>
-                <a4j:commandLink id="selectEmployee" ajaxSingle="true" immediate="true"
-                                 tabindex="4"
-                                 title="#{messages['JobContract.selectEmployee']}"
-                                 reRender="employeeField"
-                                 onclick="Richfaces.showModalPanel('generalEmployeeListModalPanel');">
-                    <h:graphicImage value="/img/search.jpg" styleClass="select-image-middle"/>
-                </a4j:commandLink>
-                <a4j:commandLink id="clearEmployee" ajaxSingle="true" immediate="true"
-                                 tabindex="5"
-                                 title="#{messages['Common.clear']}"
-                                 action="#{jobContractDataModel.clearEmployee()}"
-                                 reRender="employeeField">
-                    <h:graphicImage value="/img/clear.jpg" styleClass="select-image-middle"/>
-                </a4j:commandLink>
-            </s:decorate>
 
             <s:decorate id="jobCategoryField" template="/include/inputField.xhtml" styleClass="formRow">
                 <ui:define name="label">#{messages['Job.jobCategory']}</ui:define>
                 <h:selectOneMenu id="jobCategory" styleClass="input"
-                                 tabindex="6"
+                                 tabindex="5"
                                  value="#{jobContractDataModel.jobCategory}">
                     <s:selectItems value="#{jobCategoryList}" var="jobCategory"
                                    label="#{jobCategory.name}"
@@ -87,7 +60,7 @@
                                    reRender="jobContractList, dataScroller"
                                    styleClass="button"
                                    value="#{messages['Common.search']}" id="searchButtonId"
-                                   tabindex="7">
+                                   tabindex="6">
                     <s:defaultAction/>
                 </a4j:commandButton>
             </s:decorate>
@@ -255,20 +228,6 @@
 </div>
 
 </h:form>
-
-<s:decorate id="generalEmployeeListModalPanelContainer" template="/employees/generalEmployeeListModalPanel.xhtml">
-    <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
-    <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
-    <ui:define name="assignButton">
-        <a4j:commandButton id="assignButton" title="#{messages['Common.choose']}"
-                           action="#{jobContractDataModel.setEmployee(employeeItem)}"
-                           image="/img/active.gif"
-                           styleClass="select-image-middle"
-                           ajaxSingle="true"
-                           reRender="employeeField"
-                           oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
-    </ui:define>
-</s:decorate>
 
 </ui:define>
 </ui:composition>

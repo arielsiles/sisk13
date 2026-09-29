@@ -1,6 +1,8 @@
 package com.encens.khipus.service.xproduction;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fila de saldo recalculado de un producto en un almacen. NO es entidad: es un
@@ -15,6 +17,12 @@ public class WarehouseBalanceRow {
     private final String subGroupCode;
     private final String subGroupName;
     private BigDecimal balance;
+    /**
+     * Desglose del saldo por zona productiva (solo MP de lineas BARITINA con zonas), con la
+     * fila "Sin zona asignada" al final: la suma de las filas es siempre {@link #balance}.
+     * Vacio si el articulo no se desglosa.
+     */
+    private List<ZoneBalanceRow> zones = new ArrayList<ZoneBalanceRow>();
 
     public WarehouseBalanceRow(String productItemCode, String name, String measureCode,
                                String subGroupCode, String subGroupName, BigDecimal balance) {
@@ -64,5 +72,17 @@ public class WarehouseBalanceRow {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public List<ZoneBalanceRow> getZones() {
+        return zones;
+    }
+
+    public void setZones(List<ZoneBalanceRow> zones) {
+        this.zones = zones;
+    }
+
+    public boolean isZoneTracked() {
+        return !zones.isEmpty();
     }
 }

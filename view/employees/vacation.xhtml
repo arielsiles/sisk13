@@ -87,21 +87,17 @@
                      columnClasses="width50percent,width50percent">
             <s:div>
 
-                <s:decorate id="vacationGestionField" template="/include/inputField.xhtml" styleClass="formRow">
+                <s:decorate id="vacationGestionField" template="/include/viewField.xhtml" styleClass="formRow">
                     <ui:define name="label">#{messages['Vacation.gestion']}</ui:define>
-                    <h:selectOneMenu id="vacationGestion"
-                                     value="#{vacation.vacationGestion}"
-                                     styleClass="input"
-                                     required="true"
-                                     rendered="#{not readOnly}"
-                                     tabindex="1">
-                        <s:selectItems value="#{vacationAction.vacationGestionList}" var="vacationGestion"
-                                       label="#{vacationGestion.gestion}"
-                                       noSelectionLabel=""
-                                       hideNoSelectionLabel="false"/>
-                        <s:convertEntity/>
-                    </h:selectOneMenu>
-                    <h:outputText value="#{vacation.vacationGestion.gestion}" rendered="#{readOnly}"/>
+                    <h:outputText value="#{vacation.vacationGestion.gestion}"/>
+                    <h:outputText styleClass="app-tag" value="#{messages['Vacation.gestion.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="availableField" template="/include/viewField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['Vacation.available']}</ui:define>
+                    <h:outputText value="#{vacationPlanningAction.balance}" styleClass="inputNumber">
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                    </h:outputText>
                 </s:decorate>
 
                 <s:decorate id="initDateField" template="/include/inputField.xhtml" styleClass="formRow">
@@ -163,12 +159,12 @@
                                  rendered="#{not readOnly}"
                                  required="true"
                                  tabindex="4">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
                                                     forId="totalDays"/>
                     </h:inputText>
                     <h:outputText value="#{vacation.totalDays}" styleClass="inputNumber"
                                   rendered="#{readOnly}">
-                        <app:naturalNumberConverter pattern="#{messages['patterns.integerNumber']}"/>
+                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                     </h:outputText>
                 </s:decorate>
 

@@ -1,0 +1,66 @@
+<rich:modalPanel width="480" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 id="#{dialogId}">
+
+    <f:facet name="header">
+        <h:outputText value="#{messages['GroupSchedule.copyGroup.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeCopyGroupLink"/>
+    </f:facet>
+
+    <!-- Formulario propio: el modal de RichFaces se desprende del DOM y sus campos no
+         llegarian al servidor dentro del formulario de la grilla. -->
+    <h:form id="copyGroupForm">
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <h:outputText styleClass="formNote" value="#{messages['GroupSchedule.copyGroup.hint']}"/>
+        </h:panelGrid>
+
+        <s:decorate id="sourceGroupField" template="/include/inputField.xhtml">
+            <ui:define name="label">#{messages['GroupSchedule.copyGroup.source']}</ui:define>
+            <h:selectOneMenu id="sourceGroup" value="#{groupScheduleAction.sourceGroupId}"
+                             styleClass="input">
+                <f:selectItem itemValue="#{null}" itemLabel="#{messages['Common.choose']}"/>
+                <f:selectItems value="#{groupScheduleAction.groupSelectItems}"/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="targetGroupField" template="/include/inputField.xhtml">
+            <ui:define name="label">#{messages['GroupSchedule.copyGroup.target']}</ui:define>
+            <h:selectOneMenu id="targetGroup" value="#{groupScheduleAction.targetGroupId}"
+                             styleClass="input">
+                <f:selectItem itemValue="#{null}" itemLabel="#{messages['Common.choose']}"/>
+                <f:selectItems value="#{groupScheduleAction.groupSelectItems}"/>
+            </h:selectOneMenu>
+        </s:decorate>
+
+        <s:decorate id="invertShiftsField" template="/include/inputField.xhtml">
+            <ui:define name="label">#{messages['GroupSchedule.copyGroup.invert']}</ui:define>
+            <h:selectBooleanCheckbox id="invertShifts" value="#{groupScheduleAction.invertShifts}"/>
+            <h:outputText styleClass="app-tag" value="#{messages['GroupSchedule.copyGroup.invert.hint']}"/>
+        </s:decorate>
+
+        <div class="buttonsRight">
+            <a4j:commandButton id="copyGroupButton"
+                               action="#{groupScheduleAction.copyGroup}"
+                               value="#{messages['GroupSchedule.copyGroup.action']}"
+                               styleClass="button"
+                               reRender=":groupScheduleForm:weekBar, :groupScheduleForm:scheduleGrid, :globalMessages"
+                               oncomplete="Richfaces.hideModalPanel('#{dialogId}');"/>
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true"
+                                       operation="hide"/>
+            </h:commandButton>
+        </div>
+    </h:form>
+
+    <rich:componentControl for="#{dialogId}" attachTo="closeCopyGroupLink" operation="hide"
+                           event="onclick"/>
+
+</rich:modalPanel>

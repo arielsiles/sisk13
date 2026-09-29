@@ -12,9 +12,6 @@
     #{messages['CategoryFiscalPayroll.title']}
 </ui:define>
 
-<ui:param name="bodyWidth" value="98%"/>
-<ui:param name="bodyAlign" value="center"/>
-
 <ui:param name="selectedTab" value="rrhh"/>
 <ui:define name="body">
 <h:form id="fiscalPayrollGenerated">
@@ -47,7 +44,7 @@
             </s:decorate>
         </s:div>
     </h:panelGrid>
-    <rich:jQuery selector="#personalIdentifier" query="focus()" timing="onload"/>
+    <rich:jQuery selector="#name" query="focus()" timing="onload"/>
 </rich:simpleTogglePanel>
 <br/>
 
@@ -58,7 +55,6 @@
                      immediate="true"/>
 </div>
 
-<s:div style="overflow: auto;">
 <rich:dataTable id="fiscalPayrollDataTable"
                 value="#{categoryFiscalPayrollDataModel}"
                 var="fiscalPayrollItem"
@@ -67,7 +63,7 @@
 <f:facet name="header">
 <rich:columnGroup>
 <!--field groups view-->
-<rich:column colspan="13">
+<rich:column colspan="12">
     <rich:spacer/>
 </rich:column>
 <rich:column colspan="2">
@@ -110,7 +106,7 @@
 <rich:column>
     <h:outputText value="#{messages['FiscalPayroll.pensionFundRegistrationCode']}"/>
 </rich:column>
-<rich:column>
+<rich:column styleClass="app-payroll__name">
     <app:commandSortHeader sortProperty="categoryFiscalPayroll.name"
                            dataModel="#{categoryFiscalPayrollDataModel}"
                            reRender="fiscalPayrollDataTable, dataScroller">
@@ -123,9 +119,6 @@
                            reRender="fiscalPayrollDataTable, dataScroller">
         <h:outputText value="#{messages['FiscalPayroll.pensionFund']}"/>
     </app:commandSortHeader>
-</rich:column>
-<rich:column>
-    <h:outputText value="#{messages['FiscalPayroll.costCenter']}"/>
 </rich:column>
 <rich:column>
     <app:commandSortHeader sortProperty="categoryFiscalPayroll.nationality"
@@ -148,7 +141,7 @@
         <h:outputText value="#{messages['FiscalPayroll.gender']}"/>
     </app:commandSortHeader>
 </rich:column>
-<rich:column>
+<rich:column styleClass="app-payroll__charge">
     <app:commandSortHeader sortProperty="categoryFiscalPayroll.occupation"
                            dataModel="#{categoryFiscalPayrollDataModel}"
                            reRender="fiscalPayrollDataTable, dataScroller">
@@ -294,14 +287,11 @@
 <rich:column>
     <h:outputText value="#{fiscalPayrollItem.jobContract.contract.pensionFundRegistrationCode}"/>
 </rich:column>
-<rich:column>
+<rich:column styleClass="app-payroll__name">
     <h:outputText value="#{fiscalPayrollItem.name}"/>
 </rich:column>
 <rich:column>
     <h:outputText value="#{fiscalPayrollItem.jobContract.contract.pensionFundOrganization.name}"/>
-</rich:column>
-<rich:column>
-    <h:outputText value="#{fiscalPayrollItem.jobContract.job.organizationalUnit.costCenter.code}"/>
 </rich:column>
 <rich:column>
     <h:outputText value="#{fiscalPayrollItem.nationality}"/>
@@ -316,7 +306,7 @@
 <rich:column>
     <h:outputText value="#{messages[fiscalPayrollItem.gender.acronymResourceKey]}"/>
 </rich:column>
-<rich:column>
+<rich:column styleClass="app-payroll__charge">
     <h:outputText value="#{fiscalPayrollItem.occupation}"/>
 </rich:column>
 <rich:column>
@@ -441,7 +431,6 @@
 </rich:dataTable>
 
 <app:dataScroller id="dataScroller" for="fiscalPayrollDataTable" dataModel="#{categoryFiscalPayrollDataModel}"/>
-</s:div>
 
 <div class="buttons">
     <h:commandButton action="#{categoryFiscalPayrollDataModel.cancel}"

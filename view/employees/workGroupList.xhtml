@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['WorkGroup.list']}</ui:define>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="workGroupSearch">
+            <rich:simpleTogglePanel label="#{messages['WorkGroup.search']}" switchType="client">
+                <h:panelGrid columns="2" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width50percent,width50percent">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['WorkGroup.name']}</ui:define>
+                        <h:inputText id="name" value="#{workGroupDataModel.criteria.name}"
+                                     maxlength="100" tabindex="1" styleClass="input"/>
+                    </s:decorate>
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['WorkGroup.area']}</ui:define>
+                        <h:inputText id="area" value="#{workGroupDataModel.criteria.area}"
+                                     maxlength="100" tabindex="2" styleClass="input"/>
+                        <a4j:commandButton id="searchButtonId"
+                                           action="#{workGroupDataModel.search}"
+                                           value="#{messages['Common.search']}"
+                                           reRender="workGroupSearch, workGroupList, dataScroller"
+                                           styleClass="button" tabindex="3">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{workGroupDataModel.clear}"
+                                           value="#{messages['Common.clear']}"
+                                           reRender="workGroupSearch, workGroupList, dataScroller"
+                                           styleClass="button" tabindex="4"/>
+                    </s:decorate>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/workGroup.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('WORKGROUP','CREATE')}"
+                          tabindex="5"/>
+            </div>
+
+            <rich:dataTable id="workGroupList"
+                            value="#{workGroupDataModel}" var="workGroupItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="40%,30%,15%,15%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="workGroup.name"
+                                                   dataModel="#{workGroupDataModel}"
+                                                   reRender="workGroupList, dataScroller">
+                                #{messages['WorkGroup.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="workGroup.area"
+                                                   dataModel="#{workGroupDataModel}"
+                                                   reRender="workGroupList, dataScroller">
+                                #{messages['WorkGroup.area']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">#{messages['WorkGroup.active']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{workGroupItem.name}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{workGroupItem.area}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox value="#{workGroupItem.active}" disabled="true"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink styleClass="app-iconbtn"
+                                   title="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{workGroupAction.select(workGroupItem)}"
+                                   rendered="#{s:hasPermission('WORKGROUP','VIEW')}">
+                        <span class="app-ico app-ico--edit"/>
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="workGroupList" dataModel="#{workGroupDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/workGroup.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('WORKGROUP','CREATE')}"
+                          tabindex="6"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

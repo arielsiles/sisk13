@@ -38,10 +38,6 @@
     <framework:entity-query name="salaryQuery"
                             ejbql="select o from Salary o order by o.amount ASC"/>
 
-    <factory name="contractList" value="#{contractQuery}"/>
-    <framework:entity-query name="contractQuery"
-                            ejbql="select o from Contract o order by o.numberOfContract ASC"/>
-
     <factory name="gestionPayrollList" value="#{gestionPayrollQuery}"/>
     <framework:entity-query name="gestionPayrollQuery"
                             ejbql="select o from GestionPayroll o order by o.gestionName ASC"/>
@@ -141,6 +137,12 @@
     <factory name="horaryBandEndDayList" value="#{horaryBandEndDayQuery}"/>
     <framework:entity-query name="horaryBandEndDayQuery"
                             ejbql="select distinct c.endDay from HoraryBand c order by c.endDay ASC"/>
+
+    <!-- Los ciclos, para elegir en que planilla se paga una hora del banco. Los mas nuevos
+         primero: se paga sobre el ciclo en curso, no sobre uno de hace dos anios. -->
+    <factory name="payrollGenerationCycleList" value="#{payrollGenerationCycleQuery}"/>
+    <framework:entity-query name="payrollGenerationCycleQuery"
+                            ejbql="select c from PayrollGenerationCycle c order by c.generationInitDate DESC"/>
 
     <factory name="toleranceList" value="#{toleranceQuery}"/>
     <framework:entity-query name="toleranceQuery"

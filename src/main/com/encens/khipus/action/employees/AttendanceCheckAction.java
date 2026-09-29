@@ -1,0 +1,264 @@
+package com.encens.khipus.action.employees;
+
+import com.encens.khipus.action.employees.dto.AttendanceDay;
+import com.encens.khipus.action.employees.dto.AttendancePeriodSummary;
+import com.encens.khipus.model.employees.Employee;
+import com.encens.khipus.model.employees.Month;
+import com.encens.khipus.model.employees.PayrollGenerationCycle;
+import com.encens.khipus.model.finances.Contract;
+import com.encens.khipus.service.employees.AttendanceCheckService;
+import com.encens.khipus.service.employees.ContractService;
+import com.encens.khipus.service.employees.PayrollGenerationCycleService;
+import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Create;
+import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Logger;
+import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.security.Restrict;
+import org.jboss.seam.faces.FacesMessages;
+import org.jboss.seam.international.StatusMessage;
+import org.jboss.seam.log.Log;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Verificacion del control de asistencia: que le tocaba a una persona cada dia, que marco y
+ * como cierra.
+ * <p/>
+ * No calcula ni guarda nada. Corre el mismo motor que va a usar la planilla, de modo que lo que
+ * se ve aca es lo que se va a pagar; si algo no cuadra, se ve antes de generar y no despues de
+ * un reclamo.
+ *
+ * @author
+ * @version 6.1.0
+ */
+@Name("attendanceCheckAction")
+@Scope(ScopeType.SESSION)
+public class AttendanceCheckAction implements Serializable {
+
+    @Logger
+    private Log log;
+
+    @In
+    private AttendanceCheckService attendanceCheckService;
+
+    @In
+    private ContractService contractService;
+
+    @In(create = true)
+    private FacesMessages facesMessages;
+
+    @In
+    private PayrollGenerationCycleService payrollGenerationCycleService;
+
+    private Employee employee;
+    private Contract contract;
+
+    /* El periodo se elige por gestion y mes. Las fechas quedan vacias y, si se llenan, mandan
+       sobre el mes: sirven para mirar un rango que no calza con un mes entero. */
+    private Integer year;
+    private Month month;
+    private Date startDate;
+    private Date endDate;
+
+    /* El rango que se verifico de verdad, sea de las fechas o del mes. */
+    private Date checkedStartDate;
+    private Date checkedEndDate;
+
+    private List<AttendanceDay> days = new ArrayList<AttendanceDay>();
+    private boolean checked = false;
+
+    /**
+     * Arranca en el ultimo ciclo de generacion de planilla: es el que se esta por pagar o se
+     * acaba de pagar, y el que normalmente se revisa. Sin ciclos, el mes anterior.
+     */
+    @Create
+    public void init() {
+        PayrollGenerationCycle lastCycle = payrollGenerationCycleService.findLastCycle();
+        if (null != lastCycle) {
+            year = lastCycle.getGestion().getYear();
+            month = lastCycle.getMonth();
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, -1);
+            year = calendar.get(Calendar.YEAR);
+            month = Month.getMonthByCalendarIndex(calendar.get(Calendar.MONTH));
+        }
+    }
+
+    @Restrict("#{s:hasPermission('ATTENDANCECHECK','VIEW')}")
+    public void check() {
+        days = new ArrayList<AttendanceDay>();
+        checked = false;
+        if (null == employee) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "AttendanceCheck.error.employeeRequired");
+            return;
+        }
+        if (null == startDate && null == endDate) {
+            if (null == year || null == month) {
+                facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                        "AttendanceCheck.error.periodRequired");
+                return;
+            }
+            Calendar calendar = Calendar.getInstance();
+            calendar.clear();
+            calendar.set(year, month.getValue(), 1);
+            checkedStartDate = calendar.getTime();
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+            checkedEndDate = calendar.getTime();
+        } else if (null == startDate || null == endDate) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "AttendanceCheck.error.periodRequired");
+            return;
+        } else if (endDate.before(startDate)) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "AttendanceCheck.error.badRange");
+            return;
+        } else {
+            checkedStartDate = startDate;
+            checkedEndDate = endDate;
+        }
+        List<Contract> contracts = contractService.getContractsByEmployeeInDateRange(
+                employee, checkedStartDate, checkedEndDate);
+        if (contracts.isEmpty()) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "AttendanceCheck.error.withoutContract", employee.getFullName());
+            return;
+        }
+        contract = contracts.get(0);
+        if (null == employee.getMarkCode() || employee.getMarkCode().trim().length() == 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "AttendanceCheck.warn.withoutMarkCode", employee.getFullName());
+        }
+        /* Esta pantalla corre SOLO el motor de jornadas. Para alguien de una categoria que
+           todavia se controla por bandas mostraria "sin jornada" todos los dias, y eso no es un
+           dato: es la pantalla mintiendo. Se avisa en vez de dejar que lo interprete. */
+        if (!attendanceCheckService.usesJourneys(contract, checkedStartDate)) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "AttendanceCheck.warn.bandsEngine", employee.getFullName());
+        }
+        try {
+            days = attendanceCheckService.check(contract, checkedStartDate, checkedEndDate);
+            checked = true;
+        } catch (Exception e) {
+            log.error("No se pudo verificar la asistencia", e);
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR,
+                    "AttendanceCheck.error.failed");
+        }
+    }
+
+    public void assignEmployee(Employee selected) {
+        this.employee = selected;
+        this.days = new ArrayList<AttendanceDay>();
+        this.checked = false;
+    }
+
+    public void clearEmployee() {
+        assignEmployee(null);
+    }
+
+    // --------------------------------------------------------------- totales
+
+    /**
+     * Los totales del periodo. La pantalla no suma nada por su cuenta: lee el mismo resumen que
+     * consume la planilla, asi que si el recibo no coincide con lo que se ve aca es un defecto y
+     * no una diferencia de criterio.
+     */
+    public AttendancePeriodSummary getSummary() {
+        return AttendancePeriodSummary.of(days);
+    }
+
+    public int getWorkedDays() {
+        return getSummary().getWorkedDays();
+    }
+
+    /** Faltas del mes, en dias. Suma medios dias, asi que puede dar 4,5. */
+    public double getAbsentDays() {
+        return getSummary().getLostDays();
+    }
+
+    /** De las faltas de arriba, cuantas son por marca incompleta. Son las revisables. */
+    public int getIncompleteMarkDays() {
+        return getSummary().getReviewDayCount();
+    }
+
+    public int getLateDays() {
+        return getSummary().getLateDays();
+    }
+
+    public int getLatenessMinutes() {
+        return getSummary().getLatenessMinutes();
+    }
+
+    public Double getScheduledHours() {
+        return getSummary().getScheduledHours();
+    }
+
+    public boolean isEmptyResult() {
+        return checked && days.isEmpty();
+    }
+
+    // --------------------------------------------------------------- getters
+
+    public List<AttendanceDay> getDays() {
+        return days;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+    public Contract getContract() {
+        return contract;
+    }
+
+    public Month[] getMonths() {
+        return Month.values();
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public Month getMonth() {
+        return month;
+    }
+
+    public void setMonth(Month month) {
+        this.month = month;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+}

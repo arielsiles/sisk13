@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich">
+
+    <!-- Buscador propio del prestamo, y no el general de empleados: aquel esta enganchado al
+         alta de a uno y ofrece a los 245. Aca solo aparece quien pertenece a OTRO grupo en la
+         fecha del prestamo, que es la unica gente que tiene sentido prestar. -->
+    <rich:modalPanel id="loanPickerDialog" width="560" height="420" zindex="3000"
+                     resizeable="false">
+        <f:facet name="header">
+            <h:outputText value="#{messages['WorkGroup.loan.picker.title']}"/>
+        </f:facet>
+        <f:facet name="controls">
+            <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeLoanPickerLink"/>
+        </f:facet>
+
+        <h:form id="loanPickerForm">
+            <div class="app-cal__bar">
+                <h:outputText styleClass="app-cal__label" value="#{messages['WorkGroup.member']}"/>
+                <h:inputText id="loanFilter" value="#{workGroupAction.loanFilter}"
+                             styleClass="app-filterbar__input" maxlength="100"/>
+                <a4j:commandButton value="#{messages['Common.search']}" styleClass="button"
+                                   reRender="loanCandidateList">
+                    <s:defaultAction/>
+                </a4j:commandButton>
+            </div>
+
+            <div class="app-cal__scroll">
+                <rich:dataTable id="loanCandidateList" value="#{workGroupAction.loanCandidateList}"
+                                var="loanItem" width="100%" columnsWidth="58%,26%,16%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>#{messages['WorkGroup.member']}</rich:column>
+                            <rich:column>#{messages['WorkGroup.bulk.currentGroup']}</rich:column>
+                            <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:column>
+                        <h:outputText value="#{loanItem.contract.employee.idNumberAndFullName}"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText styleClass="app-tag" value="#{loanItem.currentGroupName}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <a4j:commandLink styleClass="app-iconbtn"
+                                         title="#{messages['Common.choose']}"
+                                         action="#{workGroupAction.selectLoanCandidate(loanItem)}"
+                                         reRender=":loanForm:loanMemberField"
+                                         oncomplete="Richfaces.hideModalPanel('loanPickerDialog');">
+                            <span class="app-ico app-ico--check"/>
+                        </a4j:commandLink>
+                    </rich:column>
+                </rich:dataTable>
+            </div>
+
+            <div class="buttonsRight">
+                <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" type="button">
+                    <rich:componentControl for="loanPickerDialog" event="onclick"
+                                           disableDefault="true" operation="hide"/>
+                </h:commandButton>
+            </div>
+        </h:form>
+
+        <rich:componentControl for="loanPickerDialog" attachTo="closeLoanPickerLink"
+                               operation="hide" event="onclick"/>
+    </rich:modalPanel>
+</ui:composition>

@@ -1,0 +1,604 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['HourBank.title']}</ui:define>
+    <ui:param name="bodyWidth" value="95%"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="hourBankForm">
+
+            <!-- Dos pestanas y cada filtro con lo que filtra: la pantalla no cambia de forma sola. -->
+            <rich:tabPanel id="hourBankTabs" switchType="ajax"
+                           selectedTab="#{hourBankAction.selectedTab}">
+
+                <!-- ============================================================ SALDOS -->
+                <rich:tab name="balancesTab" label="#{messages['HourBank.tab.balances']}">
+                    <a4j:outputPanel id="balanceBar" layout="block" styleClass="app-cal__bar">
+                        <h:outputText styleClass="app-cal__label" value="#{messages['HourBank.from']}"/>
+                        <rich:calendar id="from" value="#{hourBankAction.from}"
+                                       datePattern="#{messages['patterns.date']}"
+                                       popup="true" enableManualInput="true"
+                                       inputClass="app-filterbar__input app-filterbar__input--date"/>
+                        <h:message id="fromMsg" for="from" styleClass="errors"/>
+                        <a4j:commandButton action="#{hourBankAction.loadBalances}"
+                                           value="#{messages['Common.search']}"
+                                           styleClass="app-btn-primary"
+                                           reRender="balanceList, fromMsg, :globalMessages"/>
+                    </a4j:outputPanel>
+
+                    <a4j:outputPanel id="balanceList" layout="block" styleClass="app-check">
+                        <h:panelGroup rendered="#{empty hourBankAction.balances}">
+                            <div class="app-cal__empty">
+                                <h:outputText value="#{messages['HourBank.empty.balances']}"/>
+                            </div>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty hourBankAction.balances}">
+                            <table class="app-check__table" cellspacing="0" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th class="app-check__head">#{messages['HourBank.employee']}</th>
+                                        <th class="app-check__head"
+                                            title="#{messages['HourBank.previousBalance.help']}">#{messages['HourBank.previousBalance']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.accrued']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.used']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.paid']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.balanceHours']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.balanceDays']}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <a4j:repeat value="#{hourBankAction.balances}" var="balanceItem">
+                                        <tr class="app-check__row #{balanceItem.negative ? 'app-check__row--absent' : ''}">
+                                            <td>
+                                                <!-- Clic en el nombre: abre sus movimientos. -->
+                                                <a4j:commandLink action="#{hourBankAction.select(balanceItem)}"
+                                                                 reRender="hourBankTabs">
+                                                    <h:outputText value="#{balanceItem.employee.fullName}"/>
+                                                </a4j:commandLink>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{balanceItem.previous}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{balanceItem.accrued}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{balanceItem.used}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{balanceItem.paid}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{balanceItem.balance}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{balanceItem.balanceInDays}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
+                                            </td>
+                                        </tr>
+                                    </a4j:repeat>
+                                </tbody>
+                                <tfoot>
+                                    <!-- Cuantas horas debe la empresa en total. Solo en horas: los
+                                         dias de personas con jornadas distintas no se suman. -->
+                                    <tr class="app-check__total">
+                                        <td colspan="5">#{messages['HourBank.total']}</td>
+                                        <td>
+                                            <h:outputText value="#{hourBankAction.totalBalance}">
+                                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                            </h:outputText>
+                                        </td>
+                                        <td/>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </h:panelGroup>
+                    </a4j:outputPanel>
+                </rich:tab>
+
+                <!-- ======================================================= MOVIMIENTOS -->
+                <rich:tab name="movementsTab" label="#{messages['HourBank.tab.movements']}">
+                    <a4j:outputPanel id="personBar" layout="block" styleClass="app-cal__bar">
+                        <h:outputText styleClass="app-cal__label" value="#{messages['HourBank.employee']}"/>
+                        <app:selectPopUp id="employee"
+                                         textValue="#{hourBankAction.employee.fullName}"
+                                         value="#{hourBankAction.employee}"
+                                         styleClass="app-filterbar__input"
+                                         dataModel="#{generalEmployeeDataModel}"
+                                         clearAction="hourBankAction.clearEmployee()"
+                                         searchModalPanel="generalEmployeeListModalPanel"
+                                         reRender="hourBankTabs"
+                                         hotKeySelect="alt+1"/>
+                    </a4j:outputPanel>
+
+                    <h:panelGroup rendered="#{not hourBankAction.loaded}">
+                        <div class="app-cal__empty">
+                            <h:outputText value="#{messages['HourBank.empty.movements']}"/>
+                        </div>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{hourBankAction.loaded}">
+
+                        <h:panelGroup rendered="#{not hourBankAction.dayConfigured}">
+                            <div class="app-cal__empty">
+                                <h:outputText value="#{messages['HourBank.warn.dayNotConfigured']}"/>
+                            </div>
+                        </h:panelGroup>
+
+                        <!-- El saldo: la suma de los movimientos, no un campo guardado. -->
+                        <div class="app-check__summary">
+                            <span class="app-check__stat #{hourBankAction.negativeBalance ? 'app-check__stat--absent' : ''}">
+                                <span class="app-check__stat-value">
+                                    <h:outputText value="#{hourBankAction.balance}">
+                                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </span>
+                                <span class="app-check__stat-label">
+                                    <h:outputText value="#{messages['HourBank.balanceHours']}"/>
+                                </span>
+                            </span>
+                            <span class="app-check__stat #{hourBankAction.negativeBalance ? 'app-check__stat--absent' : ''}">
+                                <span class="app-check__stat-value">
+                                    <h:outputText value="#{hourBankAction.balanceInDays}">
+                                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </span>
+                                <span class="app-check__stat-label">
+                                    <h:outputText value="#{messages['HourBank.balanceDays']}"/>
+                                </span>
+                            </span>
+                            <span class="app-check__stat">
+                                <span class="app-check__stat-value">
+                                    <h:outputText value="#{hourBankAction.accrued}">
+                                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </span>
+                                <span class="app-check__stat-label">
+                                    <h:outputText value="#{messages['HourBank.accrued']}"/>
+                                </span>
+                            </span>
+                            <span class="app-check__stat">
+                                <span class="app-check__stat-value">
+                                    <h:outputText value="#{hourBankAction.used}">
+                                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </span>
+                                <span class="app-check__stat-label">
+                                    <h:outputText value="#{messages['HourBank.used']}"/>
+                                </span>
+                            </span>
+                            <span class="app-check__stat">
+                                <span class="app-check__stat-value">
+                                    <h:outputText value="#{hourBankAction.paid}">
+                                        <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                    </h:outputText>
+                                </span>
+                                <span class="app-check__stat-label">
+                                    <h:outputText value="#{messages['HourBank.paid']}"/>
+                                </span>
+                            </span>
+                        </div>
+
+                        <!-- Un formulario, un boton. Se elige que se registra y aparecen los
+                             campos que corresponden; el mismo formulario corrige.
+                             Cada campo es una UNIDAD: etiqueta, control y su linea de ayuda debajo.
+                             Asi la barra solo puede cortarse ENTRE campos, nunca entre una etiqueta
+                             y su campo, y lo que se calcula -los dias, el resumen del permiso, un
+                             error- aparece debajo del control sin correr nada de lugar. -->
+                        <a4j:outputPanel id="movementForm" layout="block"
+                                         styleClass="app-cal__bar app-form">
+
+                            <!-- Que se registra. La etiqueta sobra: las opciones lo dicen. -->
+                            <h:panelGroup styleClass="app-form__field">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:selectOneMenu id="movementType" value="#{hourBankAction.movementType}"
+                                                     disabled="#{hourBankAction.editing}"
+                                                     title="#{messages['HourBank.movementType']}"
+                                                     styleClass="app-filterbar__input">
+                                        <s:selectItems value="#{hourBankAction.movementTypes}" var="typeItem"
+                                                       label="#{messages[typeItem.resourceKey]}"
+                                                       hideNoSelectionLabel="true"/>
+                                        <s:convertEnum/>
+                                        <a4j:support event="onchange" reRender="movementForm" ajaxSingle="true"
+                                                     process="movementDate"/>
+                                    </h:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="app-form__hint">
+                                    <h:outputText value="#{messages['HourBank.editing']}"
+                                                  rendered="#{hourBankAction.editing}"/>
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+                            <!-- El dia del movimiento. -->
+                            <h:panelGroup styleClass="app-form__field">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:outputText styleClass="app-form__label" value="#{messages['HourBank.date']}"/>
+                                    <rich:calendar id="movementDate" value="#{hourBankAction.movementDate}"
+                                                   datePattern="#{messages['patterns.date']}"
+                                                   popup="true" enableManualInput="true"
+                                                   inputClass="app-filterbar__input app-filterbar__input--date">
+                                        <a4j:support event="onchanged" ajaxSingle="true"
+                                                     process="movementDate"
+                                                     action="#{hourBankAction.dateChanged}"
+                                                     reRender="movementForm"/>
+                                    </rich:calendar>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="app-form__hint">
+                                    <h:message id="movementDateMsg" for="movementDate" styleClass="errors"/>
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+                            <!-- Horas: se piden al registrar y al pagar, no en el permiso. -->
+                            <h:panelGroup styleClass="app-form__field" rendered="#{hourBankAction.hoursRequired}">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:outputText styleClass="app-form__label" value="#{messages['HourBank.hours']}"/>
+                                    <h:inputText id="hours" value="#{hourBankAction.hours}"
+                                                 styleClass="app-filterbar__input app-input--hour">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                                 forId="hours"/>
+                                        <!-- Al salir del campo se vuelve a pintar ya formateado. -->
+                                        <a4j:support event="onblur" ajaxSingle="true"
+                                                     reRender="hours, hoursMsg, hoursInDays"/>
+                                    </h:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="app-form__hint">
+                                    <h:message id="hoursMsg" for="hours" styleClass="errors"/>
+                                    <!-- Se guarda en horas, que es lo exacto; los dias se muestran
+                                         para leerlo como siempre. -->
+                                    <a4j:outputPanel id="hoursInDays" layout="inline"
+                                                     title="#{messages['HourBank.equivalentDays']}">
+                                        <h:panelGroup rendered="#{not empty hourBankAction.hoursInDays}">
+                                            <h:outputText value="#{hourBankAction.hoursInDays}">
+                                                <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                            </h:outputText>
+                                            <h:outputText value=" #{messages['HourBank.dayUnit']}"/>
+                                        </h:panelGroup>
+                                    </a4j:outputPanel>
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+                            <!-- Permiso: el dia entero, o un tramo de horas. -->
+                            <h:panelGroup styleClass="app-form__field" rendered="#{hourBankAction.leaveSelected}">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:outputText styleClass="app-form__label" value="#{messages['HourBank.allDayLeave']}"/>
+                                    <h:selectBooleanCheckbox id="allDayLeave" value="#{hourBankAction.allDayLeave}">
+                                        <a4j:support event="onchange" reRender="movementForm" ajaxSingle="true"
+                                                     process="movementDate"
+                                                     action="#{hourBankAction.dateChanged}"/>
+                                    </h:selectBooleanCheckbox>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="app-form__hint"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="app-form__field"
+                                          rendered="#{hourBankAction.leaveSelected and not hourBankAction.allDayLeave}">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:outputText styleClass="app-form__label" value="#{messages['HourBank.fromHour']}"/>
+                                    <rich:inputNumberSpinner id="startHour" value="#{hourBankAction.startHour}"
+                                                             minValue="0" maxValue="23" step="1"
+                                                             cycled="true" enableManualInput="true"
+                                                             inputSize="2"
+                                                             inputClass="app-form__spin">
+                                        <f:convertNumber pattern="00"/>
+                                        <a4j:support event="onchange" ajaxSingle="true"
+                                                     process="movementDate,startHour,startMinute"
+                                                     action="#{hourBankAction.timesChanged}"
+                                                     reRender="leavePreview, startTimeHint, startHour, startMinute"/>
+                                    </rich:inputNumberSpinner>
+                                    <h:outputText styleClass="app-form__label" value=":"/>
+                                    <!-- Los minutos saltan de a 15 con las flechas -asi se cargan los
+                                         permisos- pero se puede escribir cualquier valor. -->
+                                    <rich:inputNumberSpinner id="startMinute" value="#{hourBankAction.startMinute}"
+                                                             minValue="0" maxValue="59" step="15"
+                                                             cycled="true" enableManualInput="true"
+                                                             inputSize="2"
+                                                             inputClass="app-form__spin">
+                                        <f:convertNumber pattern="00"/>
+                                        <a4j:support event="onchange" ajaxSingle="true"
+                                                     process="movementDate,startHour,startMinute"
+                                                     action="#{hourBankAction.timesChanged}"
+                                                     reRender="leavePreview, startTimeHint, startHour, startMinute"/>
+                                    </rich:inputNumberSpinner>
+                                </h:panelGroup>
+                                <h:panelGroup id="startTimeHint" styleClass="app-form__hint">
+                                    <h:message for="startHour" styleClass="errors"/>
+                                    <h:message for="startMinute" styleClass="errors"/>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                            <h:panelGroup styleClass="app-form__field"
+                                          rendered="#{hourBankAction.leaveSelected and not hourBankAction.allDayLeave}">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:outputText styleClass="app-form__label" value="#{messages['HourBank.toHour']}"/>
+                                    <rich:inputNumberSpinner id="endHour" value="#{hourBankAction.endHour}"
+                                                             minValue="0" maxValue="23" step="1"
+                                                             cycled="true" enableManualInput="true"
+                                                             inputSize="2"
+                                                             title="#{messages['HourBank.endHour.hint']}"
+                                                             inputClass="app-form__spin">
+                                        <f:convertNumber pattern="00"/>
+                                        <a4j:support event="onchange" ajaxSingle="true"
+                                                     process="movementDate,endHour,endMinute"
+                                                     action="#{hourBankAction.timesChanged}"
+                                                     reRender="leavePreview, endTimeHint, endHour, endMinute"/>
+                                    </rich:inputNumberSpinner>
+                                    <h:outputText styleClass="app-form__label" value=":"/>
+                                    <!-- Los minutos saltan de a 15 con las flechas -asi se cargan los
+                                         permisos- pero se puede escribir cualquier valor. -->
+                                    <rich:inputNumberSpinner id="endMinute" value="#{hourBankAction.endMinute}"
+                                                             minValue="0" maxValue="59" step="15"
+                                                             cycled="true" enableManualInput="true"
+                                                             inputSize="2"
+                                                             inputClass="app-form__spin">
+                                        <f:convertNumber pattern="00"/>
+                                        <a4j:support event="onchange" ajaxSingle="true"
+                                                     process="movementDate,endHour,endMinute"
+                                                     action="#{hourBankAction.timesChanged}"
+                                                     reRender="leavePreview, endTimeHint, endHour, endMinute"/>
+                                    </rich:inputNumberSpinner>
+                                </h:panelGroup>
+                                <h:panelGroup id="endTimeHint" styleClass="app-form__hint">
+                                    <h:message for="endHour" styleClass="errors"/>
+                                    <h:message for="endMinute" styleClass="errors"/>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                            <!-- Pago: en que planilla y cuanto. -->
+                            <h:panelGroup styleClass="app-form__field" rendered="#{hourBankAction.paymentSelected}">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:outputText styleClass="app-form__label" value="#{messages['HourBank.cycle']}"/>
+                                    <h:selectOneMenu id="cycle" value="#{hourBankAction.cycle}"
+                                                     styleClass="app-filterbar__input">
+                                        <s:selectItems value="#{payrollGenerationCycleList.resultList}" var="cycleItem"
+                                                       label="#{cycleItem.name}"
+                                                       hideNoSelectionLabel="false" noSelectionLabel=""/>
+                                        <s:convertEntity/>
+                                    </h:selectOneMenu>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="app-form__hint">
+                                    <h:message id="cycleMsg" for="cycle" styleClass="errors"/>
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="app-form__field" rendered="#{hourBankAction.paymentSelected}">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:outputText styleClass="app-form__label" value="#{messages['HourBank.amount']}"/>
+                                    <h:inputText id="amount" value="#{hourBankAction.amount}"
+                                                 styleClass="app-filterbar__input app-input--hour">
+                                        <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"
+                                                                 forId="amount"/>
+                                        <a4j:support event="onblur" ajaxSingle="true" reRender="amount, amountMsg"/>
+                                    </h:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="app-form__hint">
+                                    <h:message id="amountMsg" for="amount" styleClass="errors"/>
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+                            <!-- El detalle: sin etiqueta, la ayuda va dentro del campo. -->
+                            <h:panelGroup styleClass="app-form__field app-form__field--detail">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <h:inputText id="description" value="#{hourBankAction.description}"
+                                                 maxlength="250"
+                                                 styleClass="app-filterbar__input app-ph-detail"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="app-form__hint"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="app-form__field">
+                                <h:panelGroup styleClass="app-form__row">
+                                    <a4j:commandButton action="#{hourBankAction.save}"
+                                                       value="#{messages['HourBank.save']}"
+                                                       styleClass="app-btn-primary"
+                                                       rendered="#{hourBankAction.editing ? s:hasPermission('HOURBANK','UPDATE') : s:hasPermission('HOURBANK','CREATE')}"
+                                                       reRender="hourBankTabs, :globalMessages"/>
+                                    <a4j:commandButton action="#{hourBankAction.cancelEdit}"
+                                                       value="#{messages['Common.cancel']}"
+                                                       styleClass="app-btn-primary"
+                                                       rendered="#{hourBankAction.editing}"
+                                                       reRender="hourBankTabs, :globalMessages"/>
+                                </h:panelGroup>
+                                <h:panelGroup styleClass="app-form__hint"/>
+                            </h:panelGroup>
+
+                            <!-- Lo que va a consumir el permiso, antes de guardar: deja ver que un
+                                 tramo de 23:30 a 03:30 termina al dia siguiente, y que un error de
+                                 tipeo pide mas horas que la jornada. Va al final y contra el borde:
+                                 al aparecer no corre ningun campo. -->
+                            <h:panelGroup styleClass="app-form__field app-form__field--end"
+                                          rendered="#{hourBankAction.leaveSelected}">
+                                <a4j:outputPanel id="leavePreview" styleClass="app-form__row app-form__value">
+                                    <h:panelGroup rendered="#{not empty hourBankAction.leaveHours}">
+                                        <h:outputText value="#{hourBankAction.leaveHours}">
+                                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                        </h:outputText>
+                                        <h:outputText value=" #{messages['HourBank.hourUnit']}"/>
+                                        <h:outputText value=" (#{hourBankAction.leaveHoursInDays} #{messages['HourBank.dayUnit']})"
+                                                      rendered="#{not empty hourBankAction.leaveHoursInDays}"/>
+                                        <h:outputText styleClass="app-form__label" value=" #{hourBankAction.leaveLabel}"
+                                                      rendered="#{not empty hourBankAction.leaveLabel}"/>
+                                    </h:panelGroup>
+                                    <h:outputText styleClass="errors" value="#{messages[hourBankAction.leaveError]}"
+                                                  rendered="#{not empty hourBankAction.leaveError}"/>
+                                </a4j:outputPanel>
+                            </h:panelGroup>
+
+                            <!-- La ayuda dentro del campo: JSF 1.2 no propaga el atributo placeholder,
+                                 asi que se aplica por clase marcadora, como en las barras de filtros
+                                 del resto del sistema. Va dentro del panel para que se vuelva a
+                                 aplicar cada vez que el formulario se redibuja. -->
+                            <script type="text/javascript">
+                                (function () {
+                                    var e = document.querySelector(".app-ph-detail");
+                                    if (e) { e.setAttribute("placeholder", "#{messages['HourBank.description']}"); }
+                                })();
+                            </script>
+                        </a4j:outputPanel>
+
+                        <!-- Los movimientos: de donde sale el saldo. -->
+                        <h:panelGroup rendered="#{empty hourBankAction.movements}">
+                            <div class="app-cal__empty">
+                                <h:outputText value="#{messages['HourBank.empty.personMovements']}"/>
+                            </div>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty hourBankAction.movements}">
+                            <table class="app-check__table" cellspacing="0" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th class="app-check__head">#{messages['HourBank.date']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.type']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.hours']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.days']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.description']}</th>
+                                        <th class="app-check__head">#{messages['HourBank.user']}</th>
+                                        <th class="app-check__head">#{messages['Common.action']}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <a4j:repeat value="#{hourBankAction.movements}" var="movementItem">
+                                        <tr class="app-check__row">
+                                            <td>
+                                                <h:outputText value="#{movementItem.date}">
+                                                    <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                                                       timeZone="#{sessionUser.timeZone}" type="date"/>
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{messages[movementItem.type.resourceKey]}"/>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{movementItem.hours}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{hourBankAction.daysOf(movementItem)}">
+                                                    <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                                                </h:outputText>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{movementItem.description}"/>
+                                            </td>
+                                            <td>
+                                                <h:outputText value="#{movementItem.user.username}"/>
+                                                <!-- Quien lo corrigio: es el rastro que reemplaza al
+                                                     circuito de aprobacion. -->
+                                                <h:outputText styleClass="app-cal__label"
+                                                              value=" #{messages['HourBank.modifiedBy']} #{movementItem.modifiedBy.username}"
+                                                              rendered="#{movementItem.modified}"/>
+                                            </td>
+                                            <td>
+                                                <!-- Se corrige y se borra. Un pago cuya planilla ya se
+                                                     genero no: esas horas ya se pagaron. -->
+                                                <a4j:commandLink action="#{hourBankAction.edit(movementItem)}"
+                                                                 styleClass="app-iconbtn"
+                                                                 rendered="#{hourBankAction.isEditable(movementItem) and s:hasPermission('HOURBANK','UPDATE')}"
+                                                                 title="#{messages['Common.edit']}"
+                                                                 reRender="hourBankTabs, :globalMessages">
+                                                    <span class="app-ico app-ico--edit"/>
+                                                </a4j:commandLink>
+                                                <a4j:commandLink action="#{hourBankAction.prepareDelete(movementItem)}"
+                                                                 styleClass="app-iconbtn app-iconbtn--danger"
+                                                                 rendered="#{hourBankAction.isEditable(movementItem) and s:hasPermission('HOURBANK','DELETE')}"
+                                                                 title="#{messages['Common.delete']}"
+                                                                 immediate="true" ajaxSingle="true"
+                                                                 reRender=":hourBankDeleteForm:hourBankDeleteInfo"
+                                                                 oncomplete="Richfaces.showModalPanel('hourBankDeleteConfirmation');">
+                                                    <span class="app-ico app-ico--trash"/>
+                                                </a4j:commandLink>
+                                            </td>
+                                        </tr>
+                                    </a4j:repeat>
+                                </tbody>
+                            </table>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </rich:tab>
+            </rich:tabPanel>
+        </h:form>
+
+        <!-- La confirmacion de borrado. Va FUERA del formulario de la pantalla: rich:modalPanel
+             mueve su HTML al final del documento, y un formulario dentro de otro no es valido.
+             Lleva formulario e ids propios para poder refrescar SOLO el texto de adentro: volver a
+             dibujar el panel entero lo duplica. -->
+        <rich:modalPanel id="hourBankDeleteConfirmation" autosized="true" minWidth="420" zindex="2000">
+            <f:facet name="header">
+                <h:outputText value="#{messages['Common.delete.confirmation']}"/>
+            </f:facet>
+            <h:form id="hourBankDeleteForm">
+                <a4j:outputPanel id="hourBankDeleteInfo" layout="block">
+                    <p>
+                        <h:outputText value="#{messages['HourBank.delete.confirmation']}"/>
+                    </p>
+                    <!-- Cual es: sin esto hay que confiar en que se toco el tacho correcto. -->
+                    <p>
+                        <h:outputText value="#{hourBankAction.deleting.date}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                        <h:outputText value=" · #{messages[hourBankAction.deleting.type.resourceKey]} · "/>
+                        <h:outputText value="#{hourBankAction.deleting.hours}">
+                            <f:convertNumber pattern="#{messages['patterns.decimalNumber']}"/>
+                        </h:outputText>
+                        <h:outputText value=" #{messages['HourBank.hourUnit']}"/>
+                        <h:outputText value=" · #{hourBankAction.deleting.description}"
+                                      rendered="#{not empty hourBankAction.deleting.description}"/>
+                    </p>
+                    <!-- Lo que ademas se va con el movimiento. -->
+                    <p>
+                        <h:outputText styleClass="app-cal__label"
+                                      value="#{messages['HourBank.delete.leaveNote']}"
+                                      rendered="#{hourBankAction.deleting.specialDate ne null}"/>
+                        <h:outputText styleClass="app-cal__label"
+                                      value="#{messages['HourBank.delete.paymentNote']}"
+                                      rendered="#{hourBankAction.deleting.payrollGenerationCycle ne null}"/>
+                    </p>
+                </a4j:outputPanel>
+                <div class="buttons">
+                    <a4j:commandButton action="#{hourBankAction.delete}"
+                                       value="#{messages['Common.delete']}"
+                                       rendered="#{s:hasPermission('HOURBANK','DELETE')}"
+                                       immediate="true"
+                                       styleClass="button"
+                                       reRender=":hourBankForm:hourBankTabs, :globalMessages"
+                                       oncomplete="Richfaces.hideModalPanel('hourBankDeleteConfirmation');"/>
+                    <h:commandButton value="#{messages['Common.cancel']}" styleClass="button"
+                                     onclick="Richfaces.hideModalPanel('hourBankDeleteConfirmation'); return false;"/>
+                </div>
+            </h:form>
+        </rich:modalPanel>
+
+        <!-- El buscador de personas. El campo de la pestana solo lo abre. -->
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{hourBankAction.assignEmployee(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender=":hourBankForm"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

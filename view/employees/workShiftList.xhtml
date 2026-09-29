@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+
+    <ui:define name="pageTitle">#{messages['WorkShift.list']}</ui:define>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="workShiftSearch">
+            <rich:simpleTogglePanel label="#{messages['WorkShift.search']}" switchType="client">
+                <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0"
+                             columnClasses="width100percent">
+                    <s:decorate template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['WorkShift.name']}</ui:define>
+                        <h:inputText id="name" value="#{workShiftDataModel.criteria.name}"
+                                     maxlength="100" tabindex="1" styleClass="input"/>
+                        <a4j:commandButton id="searchButtonId"
+                                           action="#{workShiftDataModel.search}"
+                                           value="#{messages['Common.search']}"
+                                           reRender="workShiftSearch, workShiftList, dataScroller"
+                                           styleClass="button" tabindex="2">
+                            <s:defaultAction/>
+                        </a4j:commandButton>
+                        <a4j:commandButton action="#{workShiftDataModel.clear}"
+                                           value="#{messages['Common.clear']}"
+                                           reRender="workShiftSearch, workShiftList, dataScroller"
+                                           styleClass="button" tabindex="3"/>
+                    </s:decorate>
+                </h:panelGrid>
+            </rich:simpleTogglePanel>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/workShift.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('WORKSHIFT','CREATE')}"
+                          tabindex="4"/>
+            </div>
+
+            <rich:dataTable id="workShiftList"
+                            value="#{workShiftDataModel}" var="workShiftItem"
+                            rows="#{sessionUser.rowsPerPage}"
+                            width="100%"
+                            columnsWidth="28%,12%,12%,12%,14%,12%,10%">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column>
+                            <app:commandSortHeader sortProperty="workShift.name"
+                                                   dataModel="#{workShiftDataModel}"
+                                                   reRender="workShiftList, dataScroller">
+                                #{messages['WorkShift.name']}
+                            </app:commandSortHeader>
+                        </rich:column>
+                        <rich:column styleClass="center">#{messages['WorkShift.startHour']}</rich:column>
+                        <rich:column styleClass="center">#{messages['WorkShift.endHour']}</rich:column>
+                        <rich:column styleClass="center">#{messages['WorkShift.duration']}</rich:column>
+                        <rich:column styleClass="center">#{messages['WorkShift.tolerances']}</rich:column>
+                        <rich:column styleClass="center">#{messages['WorkShift.active']}</rich:column>
+                        <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+                <rich:column>
+                    <h:outputText value="#{workShiftItem.name}"/>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkShift.crossesMidnight']}"
+                                  rendered="#{workShiftItem.crossingMidnight}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{workShiftItem.startHour}">
+                        <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputText value="#{workShiftItem.endHour}">
+                        <f:convertDateTime pattern="#{messages['patterns.hourMinuteTime']}"
+                                           timeZone="#{sessionUser.timeZone}"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column styleClass="right">
+                    <h:outputText value="#{workShiftItem.durationMinutes}"/>
+                    <h:outputText value=" #{messages['WorkShift.minutes']}"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:outputFormat value="#{messages['WorkShift.tolerances.value']}">
+                        <f:param value="#{workShiftItem.entryToleranceMinutes}"/>
+                        <f:param value="#{workShiftItem.earlyExitToleranceMinutes}"/>
+                    </h:outputFormat>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:selectBooleanCheckbox value="#{workShiftItem.active}" disabled="true"/>
+                </rich:column>
+                <rich:column styleClass="center">
+                    <h:commandLink styleClass="app-iconbtn"
+                                   title="#{messages['Common.select']}"
+                                   immediate="true"
+                                   action="#{workShiftAction.select(workShiftItem)}"
+                                   rendered="#{s:hasPermission('WORKSHIFT','VIEW')}">
+                        <span class="app-ico app-ico--edit"/>
+                        <s:conversationPropagation value="none"/>
+                    </h:commandLink>
+                </rich:column>
+            </rich:dataTable>
+            <app:dataScroller id="dataScroller" for="workShiftList" dataModel="#{workShiftDataModel}"/>
+
+            <div class="buttons">
+                <s:button value="#{messages['Common.new']}"
+                          view="/employees/workShift.xhtml"
+                          styleClass="button"
+                          propagation="begin"
+                          rendered="#{s:hasPermission('WORKSHIFT','CREATE')}"
+                          tabindex="5"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -849,9 +849,13 @@
                         <table cellpadding="0" cellspacing="0" border="0" width="100%" class="rich-table">
                             <thead class="rich-table-thead">
                             <tr class="rich-table-header">
-                                <th class="rich-table-headercell" width="66%">#{messages['XProduction.baritina.zone']}</th>
+                                <th class="rich-table-headercell" width="#{xproductionAction.zoneAvailabilityEnabled ? '50%' : '66%'}">#{messages['XProduction.baritina.zone']}</th>
                                 <th class="rich-table-headercell" width="13%">#{messages['XProduction.baritina.pct']}</th>
                                 <th class="rich-table-headercell" width="16%">#{messages['XProduction.baritina.quantity']}</th>
+                                <c:if test="#{xproductionAction.zoneAvailabilityEnabled}">
+                                    <th class="rich-table-headercell" width="16%"
+                                        title="#{messages['XProduction.baritina.availableHint']}">#{messages['XProduction.baritina.available']}</th>
+                                </c:if>
                                 <th class="rich-table-headercell" width="5%">#{messages['Common.action']}</th>
                             </tr>
                             </thead>
@@ -872,7 +876,8 @@
                                                            hideNoSelectionLabel="false"/>
                                             <s:convertEntity/>
                                             <a4j:support event="onchange" ajaxSingle="true"
-                                                         rendered="#{!xproductionAction.approved}"/>
+                                                         rendered="#{!xproductionAction.approved}"
+                                                         reRender="#{xproductionAction.zoneAvailabilityEnabled ? 'baritinaZonaPanel' : ''}"/>
                                         </h:selectOneMenu>
                                     </td>
                                     <td class="rich-table-cell center">
@@ -895,6 +900,20 @@
                                             <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
                                         </h:inputText>
                                     </td>
+                                    <!-- Saldo de la zona a la fecha del plan sin esta orden. Solo aviso: si la
+                                         cantidad lo supera, la zona quedaria en negativo en Saldos de Almacen. -->
+                                    <c:if test="#{xproductionAction.zoneAvailabilityEnabled}">
+                                        <td class="rich-table-cell right"
+                                            style="#{xproductionAction.isZoneOverAvailable(zonaDetail) ? 'color:#b03a2e; font-weight:bold;' : ''}">
+                                            <s:fragment rendered="#{xproductionAction.isZoneOverAvailable(zonaDetail)}">
+                                                <span class="app-ico app-ico--alert" style="margin-right:4px;"
+                                                      title="#{messages['XProduction.baritina.overAvailable']}"/>
+                                            </s:fragment>
+                                            <h:outputText value="#{xproductionAction.getZoneAvailableTn(zonaDetail)}">
+                                                <app:realNumberConverter pattern="#{messages['patterns.decimalNumber']}"/>
+                                            </h:outputText>
+                                        </td>
+                                    </c:if>
                                     <td class="rich-table-cell center">
                                         <a4j:commandLink immediate="true"
                                                          title="#{messages['Common.remove']}"
@@ -916,6 +935,9 @@
                                     </h:outputText>
                                 </td>
                                 <td class="rich-table-cell"></td>
+                                <c:if test="#{xproductionAction.zoneAvailabilityEnabled}">
+                                    <td class="rich-table-cell"></td>
+                                </c:if>
                                 <td class="rich-table-cell"></td>
                             </tr>
                         </table>

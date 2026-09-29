@@ -3,6 +3,7 @@ package com.encens.khipus.service.xproduction;
 import com.encens.khipus.model.production.CollectMaterialState;
 import com.encens.khipus.model.production.ProductionState;
 import com.encens.khipus.model.warehouse.MovementDetailType;
+import com.encens.khipus.model.xproduction.ProductionLineType;
 import com.encens.khipus.model.warehouse.ProductItem;
 import com.encens.khipus.model.warehouse.ProductItemState;
 import com.encens.khipus.model.warehouse.SubGroup;
@@ -16,10 +17,13 @@ import org.jboss.seam.annotations.Name;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -171,7 +175,145 @@ public class XProductionBalanceServiceBean implements XProductionBalanceService 
             row.subtract(tnToUnit((BigDecimal) r[2], row.getMeasureCode())); // Consumo reproceso -> salida
         }
 
+        // 7) Desglose por zona productiva de la MP BARITINA. Es solo detalle: no toca el saldo
+        //    de ninguna fila, lo reparte (lo que ninguna zona explica va a "Sin zona asignada").
+        attachZoneBreakdown(rows, cutoff);
+
         return new ArrayList<WarehouseBalanceRow>(rows.values());
+    }
+
+    @Override
+    public Map<Long, ZoneBalanceRow> computeZoneBalances(String productItemCode, Date date, Long excludeProductionId) {
+        Map<String, Map<Long, ZoneBalanceRow>> byItem = queryZoneBalances(
+                Collections.singletonList(productItemCode), endOfDay(date != null ? date : new Date()), excludeProductionId);
+        Map<Long, ZoneBalanceRow> zones = byItem.get(productItemCode);
+        return zones != null ? zones : new LinkedHashMap<Long, ZoneBalanceRow>();
+    }
+
+    /**
+     * Carga en cada MP de las lineas BARITINA con zonas su saldo por zona, mas la fila
+     * "Sin zona asignada" = saldo del articulo − Σ zonas, para que el desglose sume siempre
+     * el saldo. Ahi caen los vales/ajustes (no llevan zona) y las ordenes sin distribucion.
+     */
+    @SuppressWarnings("unchecked")
+    private void attachZoneBreakdown(Map<String, WarehouseBalanceRow> rows, Date cutoff) {
+        List<String> tracked = em.createQuery(
+                "select distinct s.productItemCode from XSupply s " +
+                "join s.production pr join pr.productionLine ln join s.formulationInput fi " +
+                "where ln.reportTemplateCode = :baritina and ln.usaZonas = :usaZonas and fi.inputDefault = :inputDefault")
+                .setParameter("baritina", ProductionLineType.BARITINA.getCode())
+                .setParameter("usaZonas", Boolean.TRUE)
+                .setParameter("inputDefault", Boolean.TRUE)
+                .getResultList();
+        List<String> codes = new ArrayList<String>();
+        for (String code : tracked) {
+            if (rows.containsKey(code)) {
+                codes.add(code);
+            }
+        }
+        if (codes.isEmpty()) {
+            return;
+        }
+
+        Map<String, Map<Long, ZoneBalanceRow>> byItem = queryZoneBalances(codes, cutoff, null);
+        for (String code : codes) {
+            WarehouseBalanceRow row = rows.get(code);
+            Map<Long, ZoneBalanceRow> itemZones = byItem.get(code);
+            List<ZoneBalanceRow> zones = itemZones != null
+                    ? new ArrayList<ZoneBalanceRow>(itemZones.values())
+                    : new ArrayList<ZoneBalanceRow>();
+            BigDecimal assigned = BigDecimal.ZERO;
+            for (ZoneBalanceRow zone : zones) {
+                assigned = assigned.add(zone.getBalance());
+            }
+            zones.add(ZoneBalanceRow.unassigned(row.getBalance().subtract(assigned)));
+            row.setZones(zones);
+        }
+    }
+
+    /**
+     * Saldo por (articulo, zona) con los mismos criterios que el saldo total:
+     *   acopio  = Σ pesobal de acopios APR/CONTA de la zona, fecha &lt;= corte;
+     *   consumo = Σ (insumo MP por defecto × porcentaje / 100) de las ordenes != ANL que
+     *             distribuyeron por zona, fecha del plan &lt;= corte.
+     * Se usa la cantidad del insumo y no {@code cantidad_tn}, que esta redondeada a 4
+     * decimales en TN: asi queda en la unidad del articulo y sin error de redondeo.
+     * Filas ordenadas por nombre de zona.
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Map<Long, ZoneBalanceRow>> queryZoneBalances(List<String> codes, Date cutoff,
+                                                                     Long excludeProductionId) {
+        Map<String, Map<Long, ZoneBalanceRow>> byItem = new LinkedHashMap<String, Map<Long, ZoneBalanceRow>>();
+
+        List<Object[]> collected = em.createQuery(
+                "select cm.metaProduct.productItemCode, pz.id, pz.number, pz.name, sum(cm.balanceWeight) " +
+                "from CollectMaterial cm join cm.productiveZone pz " +
+                "where cm.state in (:apr, :conta) and cm.date <= :cutoff " +
+                "and cm.metaProduct.productItemCode in (:codes) " +
+                "group by cm.metaProduct.productItemCode, pz.id, pz.number, pz.name")
+                .setParameter("apr", CollectMaterialState.APR)
+                .setParameter("conta", CollectMaterialState.CONTA)
+                .setParameter("cutoff", cutoff)
+                .setParameter("codes", codes)
+                .getResultList();
+        for (Object[] r : collected) {
+            zoneRow(byItem, r).addCollected((BigDecimal) r[4]);
+        }
+
+        Query consumedQuery = em.createQuery(
+                "select s.productItemCode, pz.id, pz.number, pz.name, sum(s.quantity * z.porcentaje) " +
+                "from XSupply s join s.production pr left join pr.productionPlan pl join s.formulationInput fi, " +
+                "XProductionBaritinaZona z join z.productiveZone pz " +
+                "where z.production = pr and fi.inputDefault = :inputDefault and pr.state <> :anl and " +
+                PRODUCTION_DATE_FILTER +
+                "and s.productItemCode in (:codes) " +
+                (excludeProductionId != null ? "and pr.id <> :exclude " : "") +
+                "group by s.productItemCode, pz.id, pz.number, pz.name")
+                .setParameter("inputDefault", Boolean.TRUE)
+                .setParameter("anl", ProductionState.ANL)
+                .setParameter("cutoff", cutoff)
+                .setParameter("codes", codes);
+        if (excludeProductionId != null) {
+            consumedQuery.setParameter("exclude", excludeProductionId);
+        }
+        for (Object[] r : (List<Object[]>) consumedQuery.getResultList()) {
+            BigDecimal qtyByPct = (BigDecimal) r[4];
+            zoneRow(byItem, r).addConsumed(qtyByPct != null ? qtyByPct.movePointLeft(2) : null);
+        }
+
+        for (Map.Entry<String, Map<Long, ZoneBalanceRow>> entry : byItem.entrySet()) {
+            List<ZoneBalanceRow> sorted = new ArrayList<ZoneBalanceRow>(entry.getValue().values());
+            Collections.sort(sorted, new Comparator<ZoneBalanceRow>() {
+                public int compare(ZoneBalanceRow a, ZoneBalanceRow b) {
+                    return a.getZoneName().compareToIgnoreCase(b.getZoneName());
+                }
+            });
+            Map<Long, ZoneBalanceRow> ordered = new LinkedHashMap<Long, ZoneBalanceRow>();
+            for (ZoneBalanceRow zone : sorted) {
+                ordered.put(zone.getZoneId(), zone);
+            }
+            entry.setValue(ordered);
+        }
+        return byItem;
+    }
+
+    /** Fila (articulo, zona) de una fila de resultado [codArt, idZona, numero, nombre, ...]; la crea si falta. */
+    private ZoneBalanceRow zoneRow(Map<String, Map<Long, ZoneBalanceRow>> byItem, Object[] r) {
+        String code = (String) r[0];
+        Long zoneId = (Long) r[1];
+        Map<Long, ZoneBalanceRow> zones = byItem.get(code);
+        if (zones == null) {
+            zones = new LinkedHashMap<Long, ZoneBalanceRow>();
+            byItem.put(code, zones);
+        }
+        ZoneBalanceRow zone = zones.get(zoneId);
+        if (zone == null) {
+            String number = (String) r[2];
+            String name = (String) r[3];
+            zone = new ZoneBalanceRow(zoneId, number != null ? number + "-" + name : name);
+            zones.put(zoneId, zone);
+        }
+        return zone;
     }
 
     /** Fin del dia (23:59:59.999) de la fecha dada, usado como corte inclusivo "hasta la fecha". */

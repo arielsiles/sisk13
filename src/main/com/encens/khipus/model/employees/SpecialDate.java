@@ -136,6 +136,12 @@ public class SpecialDate implements BaseModel {
     @Enumerated(EnumType.STRING)
     private SpecialDateType credit;
 
+    /* Nulo en las filas anteriores a la 6.1.0: no se infiere el motivo hacia atras porque
+       seria adivinar. Se completa de aca en adelante. */
+    @Column(name = "motivo", length = 30)
+    @Enumerated(EnumType.STRING)
+    private SpecialDateReason reason;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idcontrato", nullable = true)
     private Contract contract;
@@ -310,6 +316,14 @@ public class SpecialDate implements BaseModel {
         this.credit = credit;
     }
 
+    public SpecialDateReason getReason() {
+        return reason;
+    }
+
+    public void setReason(SpecialDateReason reason) {
+        this.reason = reason;
+    }
+
     public OrganizationalUnit getOrganizationalUnit() {
         return organizationalUnit;
     }
@@ -330,10 +344,19 @@ public class SpecialDate implements BaseModel {
         return allDay;
     }
 
+    /**
+     * Un dia completo va de 00:00:00 a 23:59:59.
+     * <p/>
+     * Los milisegundos se ponen en cero a proposito. `toMaxHours` deja 23:59:59.999, y al
+     * guardarlo en una columna TIME sin fraccion de segundo MySQL lo redondea a **24:00:00**:
+     * un valor que MySQL acepta pero que el driver JDBC despues no puede leer -"invalid TIME
+     * value"-. La fila se guardaba bien y explotaba al listarla.
+     */
     public void setAllDay(Boolean allDay) {
         if (allDay) {
             Calendar calendar = Calendar.getInstance();
             DateUtils.toMaxHours(calendar);
+            calendar.set(Calendar.MILLISECOND, 0);
             setEndTime(calendar.getTime());
             DateUtils.toMinHours(calendar);
             setStartTime(calendar.getTime());

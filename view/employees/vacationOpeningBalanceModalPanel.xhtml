@@ -1,0 +1,64 @@
+<rich:modalPanel width="520" zindex="2000" resizeable="false" autosized="true"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:rich="http://richfaces.org/rich"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:a4j="http://richfaces.org/a4j"
+                 xmlns:s="http://jboss.com/products/seam/taglib"
+                 xmlns:app="http://encens.com/products/khipus/facelets"
+                 id="#{dialogId}">
+
+    <f:facet name="header">
+        <h:outputText value="#{messages['VacationPlanning.opening.title']}"/>
+    </f:facet>
+    <f:facet name="controls">
+        <h:graphicImage value="/img/close.png" style="cursor:pointer" id="closeOpeningBalanceLink"/>
+    </f:facet>
+
+    <h:form id="openingBalanceForm">
+        <h:panelGrid columns="1" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <h:outputText styleClass="formNote" value="#{messages['VacationPlanning.opening.hint']}"/>
+        </h:panelGrid>
+
+        <s:decorate id="openingDateField" template="/include/inputField.xhtml">
+            <ui:define name="label">#{messages['VacationPlanning.opening.date']}</ui:define>
+            <rich:calendar id="openingDate"
+                           value="#{vacationPlanningAction.openingDate}"
+                           popup="true"
+                           enableManualInput="true"
+                           datePattern="#{messages['patterns.date']}"
+                           styleClass="input"
+                           zindex="2100"/>
+        </s:decorate>
+
+        <s:decorate id="openingDaysField" template="/include/inputField.xhtml">
+            <ui:define name="label">#{messages['VacationPlanning.opening.days']}</ui:define>
+            <h:inputText id="openingDays" value="#{vacationPlanningAction.openingDays}"
+                         styleClass="inputNumber" size="10">
+                <app:realNumberConverter forId="openingDays" minimum="-999" maximum="999"/>
+            </h:inputText>
+        </s:decorate>
+
+        <s:decorate id="openingDescriptionField" template="/include/inputField.xhtml">
+            <ui:define name="label">#{messages['VacationPlanning.opening.description']}</ui:define>
+            <h:inputText id="openingDescription" value="#{vacationPlanningAction.openingDescription}"
+                         maxlength="250" size="40" styleClass="input"/>
+        </s:decorate>
+
+        <div class="buttonsRight">
+            <a4j:commandButton id="registerOpeningBalanceButton"
+                               action="#{vacationPlanningAction.registerOpeningBalance}"
+                               value="#{messages['VacationPlanning.opening.register']}"
+                               styleClass="button"
+                               reRender="movementPanel, balanceValue, openingButtonTop, openingButtonBottom, globalMessages"
+                               oncomplete="if (#{vacationPlanningAction.openingBalanceRegistered}) Richfaces.hideModalPanel('#{dialogId}');"/>
+            <h:commandButton value="#{messages['Common.cancel']}" styleClass="button" immediate="true">
+                <rich:componentControl for="#{dialogId}" event="onclick" disableDefault="true" operation="hide"/>
+            </h:commandButton>
+        </div>
+    </h:form>
+
+    <rich:componentControl for="#{dialogId}" attachTo="closeOpeningBalanceLink" operation="hide" event="onclick"/>
+
+</rich:modalPanel>

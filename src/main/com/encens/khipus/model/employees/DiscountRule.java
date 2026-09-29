@@ -49,7 +49,18 @@ import java.util.List;
                 query = "select distinct discountRule from DiscountRule discountRule " +
                         "left join fetch discountRule.discountRuleRangeList discountRuleRange " +
                         "where discountRule.discountRuleType=:discountRuleType " +
-                        "and discountRule.active=:active ")
+                        "and discountRule.active=:active "),
+        /* Cuantas planillas OFICIALES se calcularon con esta regla. El ciclo de generacion
+           congela una FK a la regla, no una copia de sus rangos: editarlos reescribiria lo
+           que daria una regeneracion de un mes ya cerrado. */
+        @NamedQuery(name = "DiscountRule.countOfficialPayrollsByDiscountRule",
+                query = "select count(generatedPayroll) from GeneratedPayroll generatedPayroll " +
+                        "where generatedPayroll.payrollGenerationCycle.nationalSolidaryAfpDiscountRule=:discountRule " +
+                        "and generatedPayroll.generatedPayrollType=:generatedPayrollType"),
+        @NamedQuery(name = "DiscountRule.countActiveByTypeButThis",
+                query = "select count(discountRule) from DiscountRule discountRule " +
+                        "where discountRule.discountRuleType=:discountRuleType " +
+                        "and discountRule.active=:active and discountRule.id<>:id")
 })
 
 @TableGenerator(schema = com.encens.khipus.util.Constants.KHIPUS_SCHEMA, name = "DiscountRule.tableGenerator",

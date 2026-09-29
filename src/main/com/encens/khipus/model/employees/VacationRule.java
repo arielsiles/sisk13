@@ -26,6 +26,9 @@ import javax.persistence.*;
                 query = "select vacationRule from VacationRule vacationRule" +
                         " where (:seniorityYear >= vacationRule.fromYears and :seniorityYear <= vacationRule.toYears)" +
                         " or (:seniorityYear >= vacationRule.fromYears and vacationRule.toYears IS NULL)"),
+        @NamedQuery(name = "VacationRule.findFirstTranche",
+                query = "select vacationRule from VacationRule vacationRule" +
+                        " order by vacationRule.fromYears asc"),
         @NamedQuery(name = "VacationRule.findByRangeOverlap",
                 query = "select vacationRule from VacationRule vacationRule" +
                         " where vacationRule.id <> :vacationRuleId " +
@@ -70,6 +73,12 @@ public class VacationRule implements BaseModel {
     @Column(name = "aniosfin", nullable = true)
     private Integer toYears;
 
+    /* Hasta cuantos dias puede quedar el saldo por debajo de cero: son las vacaciones tomadas
+       por adelantado. Cero significa que no se permiten. No es un concepto aparte, son los
+       mismos dias tomados antes de devengarlos, y el saldo se corrige con el proximo devengo. */
+    @Column(name = "diasanticipomaximo", nullable = false)
+    private Integer advanceDaysLimit = 0;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "idcompania", nullable = false, updatable = false, insertable = true)
     private Company company;
@@ -108,6 +117,14 @@ public class VacationRule implements BaseModel {
 
     public void setVacationDays(Integer vacationDays) {
         this.vacationDays = vacationDays;
+    }
+
+    public Integer getAdvanceDaysLimit() {
+        return advanceDaysLimit;
+    }
+
+    public void setAdvanceDaysLimit(Integer advanceDaysLimit) {
+        this.advanceDaysLimit = advanceDaysLimit;
     }
 
     public Integer getFromYears() {

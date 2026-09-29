@@ -69,6 +69,10 @@ public class DiscountRuleRangeAction extends GenericAction<DiscountRuleRange> {
     @End(beforeRedirect = true)
     @Restrict("#{s:hasPermission('DISCOUNTRULE','CREATE')}")
     public String create() {
+        if (discountRuleAction.isLockedByOfficialPayroll()) {
+            discountRuleAction.addLockedByOfficialPayrollMessage();
+            return Outcome.REDISPLAY;
+        }
         if (!isValidRange()) {
             showEmptyRangeMessage();
             return Outcome.REDISPLAY;
@@ -118,6 +122,10 @@ public class DiscountRuleRangeAction extends GenericAction<DiscountRuleRange> {
     @End(beforeRedirect = true)
     @Restrict("#{s:hasPermission('DISCOUNTRULE','UPDATE')}")
     public String update() {
+        if (discountRuleAction.isLockedByOfficialPayroll()) {
+            discountRuleAction.addLockedByOfficialPayrollMessage();
+            return Outcome.REDISPLAY;
+        }
         if (!isValidRange()) {
             showEmptyRangeMessage();
             return Outcome.REDISPLAY;
@@ -153,6 +161,10 @@ public class DiscountRuleRangeAction extends GenericAction<DiscountRuleRange> {
     @End(beforeRedirect = true)
     @Restrict("#{s:hasPermission('DISCOUNTRULE','DELETE')}")
     public String delete() {
+        if (discountRuleAction.isLockedByOfficialPayroll()) {
+            discountRuleAction.addLockedByOfficialPayrollMessage();
+            return Outcome.REDISPLAY;
+        }
         try {
             discountRuleRangeService.deleteDiscountRuleRange(getInstance());
             addDeletedMessage();

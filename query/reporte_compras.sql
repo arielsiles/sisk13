@@ -54,7 +54,7 @@ LEFT JOIN (
           JOIN sf_tmpenc v ON v.id_tmpenc = dc.idtmpenc AND v.estado <> 'ANL'
          WHERE dc.idordencompra IS NOT NULL
 ) ac ON ac.id_com_encoc = e.id_com_encoc
-WHERE e.fecha >= '2025-04-01' AND e.fecha < '2026-04-01'
+WHERE e.fecha >= '2026-04-01' AND e.fecha <= '2026-08-31'
   AND e.estado <> 'ANL'
 GROUP BY e.id_com_encoc
 ORDER BY e.fecha, e.no_orden;
@@ -88,7 +88,7 @@ JOIN inv_mov    mov ON mov.no_cia = iv.no_cia AND mov.no_trans = iv.no_trans AND
 JOIN inv_movdet md  ON md.no_cia  = mov.no_cia AND md.no_trans = mov.no_trans AND md.estado = mov.estado
 JOIN inv_articulos a ON a.no_cia = md.no_cia AND a.cod_art = md.cod_art
 LEFT JOIN sf_tmpenc v ON v.id_tmpenc = iv.idtmpenc AND v.estado <> 'ANL'
-WHERE e.fecha >= '2025-04-01' AND e.fecha < '2026-04-01'
+WHERE e.fecha >= '2026-04-01' AND e.fecha <= '2026-08-31'
   AND e.estado <> 'ANL'
 ORDER BY e.fecha, e.no_orden, md.cod_art;
 

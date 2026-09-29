@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://jboss.com/products/seam/taglib"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:app="http://encens.com/products/khipus/facelets"
+                template="/layout/template.xhtml">
+    <ui:define name="pageTitle">
+        <c:choose>
+            <c:when test="#{workGroupAction.managed}">#{messages['WorkGroup.edit']}</c:when>
+            <c:otherwise>#{messages['WorkGroup.new']}</c:otherwise>
+        </c:choose>
+    </ui:define>
+    <ui:param name="bodyWidth" value="80%"/>
+    <ui:param name="bodyAlign" value="center"/>
+    <ui:param name="selectedTab" value="rrhh"/>
+    <ui:define name="body">
+        <h:form id="workGroupForm">
+            <div class="buttons">
+                <h:commandButton action="#{workGroupAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!workGroupAction.managed and s:hasPermission('WORKGROUP','CREATE')}"
+                                 tabindex="1">
+                    <s:defaultAction/>
+                </h:commandButton>
+                <h:commandButton action="#{workGroupAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{workGroupAction.managed and s:hasPermission('WORKGROUP','UPDATE')}"
+                                 tabindex="2"/>
+                <h:commandButton value="#{messages['Common.delete']}" styleClass="button" type="button"
+                                 rendered="#{workGroupAction.managed and s:hasPermission('WORKGROUP','DELETE')}"
+                                 tabindex="3">
+                    <rich:componentControl for="deleteConfirmation" event="onclick" disableDefault="true"
+                                           operation="show"/>
+                </h:commandButton>
+                <h:commandButton action="#{workGroupAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="4"/>
+            </div>
+
+            <rich:panel id="formPanel">
+                <f:facet name="header">
+                    <c:choose>
+                        <c:when test="#{workGroupAction.managed}">#{messages['WorkGroup.edit']}</c:when>
+                        <c:otherwise>#{messages['WorkGroup.new']}</c:otherwise>
+                    </c:choose>
+                </f:facet>
+
+                <s:decorate id="nameField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkGroup.name']}</ui:define>
+                    <h:inputText id="name" value="#{workGroup.name}" required="true"
+                                 maxlength="100" styleClass="input" size="50" tabindex="5"/>
+                </s:decorate>
+
+                <s:decorate id="areaField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkGroup.area']}</ui:define>
+                    <h:inputText id="area" value="#{workGroup.area}"
+                                 maxlength="100" styleClass="input" size="50" tabindex="6"/>
+                    <h:outputText styleClass="app-tag" value="#{messages['WorkGroup.area.hint']}"/>
+                </s:decorate>
+
+                <s:decorate id="activeField" template="/include/inputField.xhtml" styleClass="formRow">
+                    <ui:define name="label">#{messages['WorkGroup.active']}</ui:define>
+                    <h:selectBooleanCheckbox id="active" value="#{workGroup.active}" tabindex="7"/>
+                </s:decorate>
+            </rich:panel>
+
+            <rich:panel id="memberPanel" rendered="#{workGroupAction.managed}">
+                <f:facet name="header">#{messages['WorkGroup.members']}</f:facet>
+
+                <s:div rendered="#{s:hasPermission('WORKGROUP','UPDATE')}">
+                    <s:decorate id="newMemberField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['WorkGroup.addMember']}</ui:define>
+                        <app:selectPopUp id="newMember"
+                                         textValue="#{workGroupAction.newMember.fullName}"
+                                         value="#{workGroupAction.newMember}"
+                                         dataModel="#{generalEmployeeDataModel}"
+                                         clearAction="workGroupAction.clearNewMember()"
+                                         searchModalPanel="generalEmployeeListModalPanel"
+                                         reRender="newMemberField"
+                                         hotKeySelect="alt+1"
+                                         tabindex="8"/>
+                    </s:decorate>
+
+                    <s:decorate id="newMemberDateField" template="/include/inputField.xhtml" styleClass="formRow">
+                        <ui:define name="label">#{messages['WorkGroup.memberFrom']}</ui:define>
+                        <rich:calendar id="newMemberStartDate"
+                                       value="#{workGroupAction.newMemberStartDate}"
+                                       datePattern="#{messages['patterns.date']}"
+                                       popup="true" enableManualInput="true"
+                                       styleClass="input" tabindex="9"/>
+                        <a4j:commandButton action="#{workGroupAction.addMember}"
+                                           value="#{messages['WorkGroup.addMember.action']}"
+                                           styleClass="button" tabindex="10"
+                                           reRender=":workGroupForm:memberList, newMemberField,
+                                                     newMemberDateField, :globalMessages"/>
+                        <!-- type="button": solo abre el modal, no envia el formulario. -->
+                        <h:commandButton value="#{messages['WorkGroup.bulk.open']}" type="button"
+                                         styleClass="button" tabindex="11">
+                            <rich:componentControl for="bulkDialog" event="onclick"
+                                                   disableDefault="true" operation="show"/>
+                        </h:commandButton>
+                        <h:commandButton value="#{messages['WorkGroup.loan.open']}" type="button"
+                                         styleClass="button" tabindex="12">
+                            <rich:componentControl for="loanDialog" event="onclick"
+                                                   disableDefault="true" operation="show"/>
+                        </h:commandButton>
+                    </s:decorate>
+                </s:div>
+
+                <rich:dataTable id="memberList" value="#{workGroupAction.memberships}" var="memberItem"
+                                width="100%" columnsWidth="34%,10%,13%,13%,12%,18%">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column>#{messages['WorkGroup.member']}</rich:column>
+                            <rich:column styleClass="center">#{messages['WorkGroup.memberType']}</rich:column>
+                            <rich:column styleClass="center">#{messages['WorkGroup.memberFrom']}</rich:column>
+                            <rich:column styleClass="center">#{messages['WorkGroup.memberTo']}</rich:column>
+                            <rich:column styleClass="center">#{messages['WorkGroup.memberState']}</rich:column>
+                            <rich:column styleClass="center">#{messages['Common.action']}</rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+                    <rich:column>
+                        <h:outputText value="#{memberItem.contract.employee.idNumberAndFullName}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:outputText styleClass="app-tag app-tag--warn"
+                                      value="#{messages[memberItem.type.resourceKey]}"
+                                      title="#{memberItem.reason}"
+                                      rendered="#{memberItem.loan}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:outputText value="#{memberItem.startDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:outputText value="#{memberItem.endDate}">
+                            <f:convertDateTime pattern="#{messages['patterns.date']}"
+                                               timeZone="#{sessionUser.timeZone}" type="date"/>
+                        </h:outputText>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <h:outputText styleClass="app-tag" value="#{messages['WorkGroup.member.current']}"
+                                      rendered="#{memberItem.current}"/>
+                    </rich:column>
+                    <rich:column styleClass="center">
+                        <a4j:commandLink styleClass="app-iconbtn"
+                                         title="#{messages['WorkGroup.closeMember']}"
+                                         action="#{workGroupAction.prepareClose(memberItem)}"
+                                         rendered="#{memberItem.current and s:hasPermission('WORKGROUP','UPDATE')}"
+                                         reRender=":closeForm"
+                                         oncomplete="Richfaces.showModalPanel('closeDialog');">
+                            <span class="app-ico app-ico--userMinus"/>
+                        </a4j:commandLink>
+                        <!-- Quitar es deshacer un alta equivocada; no aparece cuando la
+                             pertenencia ya alcanza a una planilla oficial. -->
+                        <a4j:commandLink styleClass="app-iconbtn app-iconbtn--danger"
+                                         title="#{messages['WorkGroup.removeMember.hint']}"
+                                         action="#{workGroupAction.removeMember(memberItem)}"
+                                         rendered="#{workGroupAction.isRemovable(memberItem)
+                                                     and s:hasPermission('WORKGROUP','UPDATE')}"
+                                         reRender=":workGroupForm:memberList, :globalMessages">
+                            <span class="app-ico app-ico--trash"/>
+                        </a4j:commandLink>
+                    </rich:column>
+                </rich:dataTable>
+            </rich:panel>
+
+            <div class="buttons">
+                <h:commandButton action="#{workGroupAction.create}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{!workGroupAction.managed and s:hasPermission('WORKGROUP','CREATE')}"
+                                 tabindex="11"/>
+                <h:commandButton action="#{workGroupAction.update}" value="#{messages['Common.save']}"
+                                 styleClass="button"
+                                 rendered="#{workGroupAction.managed and s:hasPermission('WORKGROUP','UPDATE')}"
+                                 tabindex="12"/>
+                <h:commandButton action="#{workGroupAction.cancel}" value="#{messages['Common.cancel']}"
+                                 styleClass="button" immediate="true" tabindex="13"/>
+            </div>
+        </h:form>
+
+        <s:decorate template="/include/modalDialog.xhtml"
+                    rendered="#{workGroupAction.managed and s:hasPermission('WORKGROUP','DELETE')}">
+            <ui:param name="dialogId" value="deleteConfirmation"/>
+            <ui:define name="dialogTitle">#{messages['Common.delete.confirmation']}</ui:define>
+            <ui:define name="dialogContent">
+                <p>
+                    <h:outputFormat value="#{messages['WorkGroup.delete.confirmation']}">
+                        <f:param value="#{workGroup.name}"/>
+                    </h:outputFormat>
+                </p>
+            </ui:define>
+            <ui:define name="dialogOption">
+                <a4j:commandButton action="#{workGroupAction.delete}" value="#{messages['Common.delete']}"
+                                   immediate="true" styleClass="button"
+                                   rendered="#{s:hasPermission('WORKGROUP','DELETE')}" tabindex="1000"/>
+            </ui:define>
+        </s:decorate>
+
+        <s:decorate template="/employees/workGroupBulkModalPanel.xhtml"
+                    rendered="#{workGroupAction.managed and s:hasPermission('WORKGROUP','UPDATE')}">
+            <ui:param name="dialogId" value="bulkDialog"/>
+        </s:decorate>
+
+        <ui:include src="/employees/workGroupLoanModalPanel.xhtml"/>
+        <ui:include src="/employees/workGroupCloseModalPanel.xhtml"/>
+
+        <s:decorate id="generalEmployeeListModalPanelContainer"
+                    template="/employees/generalEmployeeListModalPanel.xhtml">
+            <ui:param name="dialogId" value="generalEmployeeListModalPanel"/>
+            <ui:param name="dataModel" value="#{generalEmployeeDataModel}"/>
+            <ui:define name="assignButton">
+                <a4j:commandButton id="assignButton"
+                                   title="#{messages['Common.choose']}"
+                                   action="#{workGroupAction.assignNewMember(employeeItem)}"
+                                   image="/img/active.gif"
+                                   styleClass="select-image-middle"
+                                   ajaxSingle="true"
+                                   reRender="newMemberField"
+                                   oncomplete="Richfaces.hideModalPanel('generalEmployeeListModalPanel');"/>
+            </ui:define>
+        </s:decorate>
+    </ui:define>
+</ui:composition>

@@ -9,6 +9,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.validator.NotNull;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,10 @@ import java.util.List;
                         " where vacationGestion.vacationPlanning.id=:vacationPlanningId " +
                         " and vacationGestion.daysOff > 0 " +
                         " order by vacationGestion.gestion"),
+        @NamedQuery(name = "VacationGestion.findByVacationPlanningOrdered",
+                query = "select vacationGestion from VacationGestion vacationGestion" +
+                        " where vacationGestion.vacationPlanning = :vacationPlanning" +
+                        " order by vacationGestion.gestion asc"),
         @NamedQuery(name = "VacationGestion.sumVacationDaysByVacationPlanning",
                 query = "select sum(vacationGestion.vacationDays) from VacationGestion vacationGestion" +
                         " where vacationGestion.vacationPlanning.id=:vacationPlanningId"),
@@ -53,17 +58,17 @@ public class VacationGestion implements BaseModel {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "VacationGestion.tableGenerator")
     private Long id;
 
-    @Column(name = "diaslibres", nullable = false)
+    @Column(name = "diaslibres", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer daysOff;
+    private BigDecimal daysOff;
 
-    @Column(name = "diasusados", nullable = false)
+    @Column(name = "diasusados", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer daysUsed;
+    private BigDecimal daysUsed;
 
-    @Column(name = "diasvacacion", nullable = false)
+    @Column(name = "diasvacacion", nullable = false, precision = 7, scale = 2)
     @NotNull
-    private Integer vacationDays;
+    private BigDecimal vacationDays;
 
     @Column(name = "gestion", nullable = false)
     @NotNull
@@ -94,27 +99,27 @@ public class VacationGestion implements BaseModel {
         this.id = id;
     }
 
-    public Integer getDaysOff() {
+    public BigDecimal getDaysOff() {
         return daysOff;
     }
 
-    public void setDaysOff(Integer daysOff) {
+    public void setDaysOff(BigDecimal daysOff) {
         this.daysOff = daysOff;
     }
 
-    public Integer getDaysUsed() {
+    public BigDecimal getDaysUsed() {
         return daysUsed;
     }
 
-    public void setDaysUsed(Integer daysUsed) {
+    public void setDaysUsed(BigDecimal daysUsed) {
         this.daysUsed = daysUsed;
     }
 
-    public Integer getVacationDays() {
+    public BigDecimal getVacationDays() {
         return vacationDays;
     }
 
-    public void setVacationDays(Integer vacationDays) {
+    public void setVacationDays(BigDecimal vacationDays) {
         this.vacationDays = vacationDays;
     }
 

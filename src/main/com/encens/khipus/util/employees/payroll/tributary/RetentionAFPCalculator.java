@@ -7,55 +7,86 @@ import com.encens.khipus.util.employees.payroll.structure.Calculator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
+ * Aportes del asegurado al Sistema Integral de Pensiones, sobre el total ganado.
+ * <p/>
+ * Que componentes se cobran lo decide el {@link SIPContributionRegime} del contrato. Un
+ * regimen nulo -catalogo vacio o contrato sin regimen asignado- cobra todos los aportes,
+ * que es el comportamiento historico del sistema.
+ *
  * @author
  * @version 3.4
  */
 public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll> {
     private static final int TWO_DECIMAL_SCALE = 2;
-    private static final Double AGE_COMPLIANT_PERCENTAGE = 1.0;
-    private static final Double NOT_AGE_COMPLIANT_PERCENTAGE = 2.71;
-    private AFPRate afpRate;
     private AFPRate laborIndividualAFP;
     private AFPRate laborCommonRiskAFP;
     private AFPRate laborSolidaryContributionAFP;
     private AFPRate laborComissionAFP;
-    private Date endDate;
     private DiscountRule nationalSolidaryAFPDiscountRule;
+    private SIPContributionRegime contributionRegime;
 
-    public RetentionAFPCalculator(AFPRate afpRate,
-                                  AFPRate laborIndividualAFP,
+    public RetentionAFPCalculator(AFPRate laborIndividualAFP,
                                   AFPRate laborCommonRiskAFP,
                                   AFPRate laborSolidaryContributionAFP,
                                   AFPRate laborComissionAFP,
-                                  DiscountRule nationalSolidaryAFPDiscountRule, Date endDate) {
-        this.afpRate = afpRate;
+                                  DiscountRule nationalSolidaryAFPDiscountRule,
+                                  SIPContributionRegime contributionRegime) {
         this.laborIndividualAFP = laborIndividualAFP;
         this.laborCommonRiskAFP = laborCommonRiskAFP;
         this.laborSolidaryContributionAFP = laborSolidaryContributionAFP;
         this.laborComissionAFP = laborComissionAFP;
         this.nationalSolidaryAFPDiscountRule = nationalSolidaryAFPDiscountRule;
-        this.endDate = endDate;
+        this.contributionRegime = contributionRegime;
     }
 
     @Override
     public void execute(CategoryTributaryPayroll instance) {
-        BigDecimal retentionAFP;
-        BigDecimal solydaryAFPRetention = BigDecimal.ZERO;
-        BigDecimal afpRatePercentage;
-        if (!instance.getEmployee().getJubilateFlag()) {
-            afpRatePercentage = afpRate.getRate();
-        } else {
-            Integer ageInDays = instance.getEmployee().computeAgeInDaysAtDate(endDate);
-            Double ageInYears = ageInDays.doubleValue() / Constants.YEAR_DAYS.doubleValue();
-            afpRatePercentage = BigDecimalUtil.toBigDecimal(ageInYears.compareTo(Constants.JUBILATION_AGE) >= 0 ? AGE_COMPLIANT_PERCENTAGE : NOT_AGE_COMPLIANT_PERCENTAGE);
-        }
         BigDecimal totalGrained = instance.getTotalGrained();
-        List<DiscountRuleRange> discountRuleRangeList = findDiscountRuleRangeListInList(totalGrained, nationalSolidaryAFPDiscountRule);
-        for (DiscountRuleRange discountRuleRange : discountRuleRangeList) {
+
+        instance.setLaborIndividualAFP(percentageIf(contributes(SIPContributionConcept.INDIVIDUAL_ACCOUNT),
+                totalGrained, laborIndividualAFP));
+        instance.setLaborCommonRiskAFP(percentageIf(contributes(SIPContributionConcept.COMMON_RISK),
+                totalGrained, laborCommonRiskAFP));
+        instance.setLaborSolidaryContributionAFP(percentageIf(contributes(SIPContributionConcept.SOLIDARY),
+                totalGrained, laborSolidaryContributionAFP));
+        instance.setLaborComissionAFP(percentageIf(contributes(SIPContributionConcept.COMISSION),
+                totalGrained, laborComissionAFP));
+        instance.setSolidaryAFP(contributes(SIPContributionConcept.NATIONAL_SOLIDARY)
+                ? calculateNationalSolidary(instance, totalGrained) : BigDecimal.ZERO);
+
+        instance.setRetentionAFP(BigDecimalUtil.sum(
+                instance.getLaborIndividualAFP(),
+                instance.getLaborCommonRiskAFP(),
+                instance.getLaborSolidaryContributionAFP(),
+                instance.getLaborComissionAFP(),
+                instance.getSolidaryAFP()));
+    }
+
+    private boolean contributes(SIPContributionConcept concept) {
+        return SIPContributionConcept.contributes(contributionRegime, concept);
+    }
+
+    private BigDecimal percentageIf(boolean applies, BigDecimal totalGrained, AFPRate afpRate) {
+        if (!applies || null == afpRate) {
+            return BigDecimal.ZERO;
+        }
+        return BigDecimalUtil.getPercentage(totalGrained, afpRate.getRate(), TWO_DECIMAL_SCALE);
+    }
+
+    /**
+     * Aporte Nacional Solidario: escalonado sobre el excedente de cada tramo de la regla de
+     * descuento. Todos los tramos que cubren el total ganado suman, de modo que la escala
+     * de la Ley 065 se configura agregando filas a la regla, sin tocar codigo.
+     */
+    private BigDecimal calculateNationalSolidary(CategoryTributaryPayroll instance, BigDecimal totalGrained) {
+        BigDecimal result = BigDecimal.ZERO;
+        if (null == nationalSolidaryAFPDiscountRule) {
+            return result;
+        }
+        for (DiscountRuleRange discountRuleRange : findDiscountRuleRangeListInList(totalGrained, nationalSolidaryAFPDiscountRule)) {
             BigDecimal amount;
             if (discountRuleRange.getDiscountRule().getDiscountUnitType().equals(DiscountUnitType.CURRENCY)) {
                 amount = discountRuleRange.getDiscountRule().getCurrency().getSymbol().equalsIgnoreCase("$US") ?
@@ -63,48 +94,15 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
                         discountRuleRange.getAmount();
             } else {
                 //percentage case
-                amount = BigDecimalUtil.divide(BigDecimalUtil.multiply(BigDecimalUtil.subtract(totalGrained, BigDecimalUtil.toBigDecimal(discountRuleRange.getInitRange())), discountRuleRange.getAmount(), Constants.BIG_DECIMAL_DEFAULT_SCALE), BigDecimalUtil.ONE_HUNDRED, Constants.BIG_DECIMAL_DEFAULT_SCALE);
+                amount = BigDecimalUtil.divide(
+                        BigDecimalUtil.multiply(
+                                BigDecimalUtil.subtract(totalGrained, BigDecimalUtil.toBigDecimal(discountRuleRange.getInitRange())),
+                                discountRuleRange.getAmount(), Constants.BIG_DECIMAL_DEFAULT_SCALE),
+                        BigDecimalUtil.ONE_HUNDRED, Constants.BIG_DECIMAL_DEFAULT_SCALE);
             }
-            solydaryAFPRetention = BigDecimalUtil.sum(solydaryAFPRetention, amount);
+            result = BigDecimalUtil.sum(result, amount);
         }
-
-        //retentionAFP = BigDecimalUtil.getPercentage(totalGrained, afpRatePercentage, TWO_DECIMAL_SCALE);
-        //retentionAFP = BigDecimalUtil.sum(retentionAFP, solydaryAFPRetention);
-        instance.setSolidaryAFP(solydaryAFPRetention);
-        //instance.setRetentionAFP(retentionAFP);
-
-        /** revision **/
-
-        instance.setLaborIndividualAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(),  laborIndividualAFP.getRate(), TWO_DECIMAL_SCALE));
-        instance.setLaborCommonRiskAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborCommonRiskAFP.getRate(), TWO_DECIMAL_SCALE));
-        instance.setLaborSolidaryContributionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborSolidaryContributionAFP.getRate(), TWO_DECIMAL_SCALE));
-        instance.setLaborComissionAFP(BigDecimalUtil.getPercentage(instance.getTotalGrained(), laborComissionAFP.getRate(), TWO_DECIMAL_SCALE));
-
-        /** todo AFP **/
-        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("815059")){
-            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
-        }
-        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2862262")){ // Juana Pozo
-            instance.setLaborIndividualAFP(BigDecimal.ZERO);
-            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
-        }
-        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("2868139")){ // Eliseo Camacho
-            instance.setLaborIndividualAFP(BigDecimal.ZERO);
-            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
-        }
-        if(instance.getJobContract().getContract().getEmployee().getIdNumber().equals("921886")){
-            instance.setLaborCommonRiskAFP(BigDecimal.ZERO);
-        }
-        /** **/
-
-        retentionAFP = BigDecimalUtil.sum(
-                instance.getLaborIndividualAFP(),
-                instance.getLaborCommonRiskAFP(),
-                instance.getLaborSolidaryContributionAFP(),
-                instance.getLaborComissionAFP(),
-                instance.getSolidaryAFP());
-        instance.setRetentionAFP(retentionAFP);
-        /** End revision **/
+        return result;
     }
 
     public List<DiscountRuleRange> findDiscountRuleRangeListInList(BigDecimal amount, DiscountRule discountRule) {
@@ -117,5 +115,4 @@ public class RetentionAFPCalculator extends Calculator<CategoryTributaryPayroll>
         }
         return discountRuleRanges;
     }
-
 }

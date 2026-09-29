@@ -29,6 +29,7 @@ public class SpecialDateDataModel extends QueryDataModel<Long, SpecialDate> {
             "specialDate.initPeriod >= #{specialDateDataModel.criteria.initPeriod}",
             "specialDate.endPeriod <= #{specialDateDataModel.criteria.endPeriod}",
             "specialDate.credit = #{specialDateDataModel.criteria.credit}",
+            "specialDate.reason = #{specialDateDataModel.criteria.reason}",
             "employee.idNumber like concat(#{specialDateDataModel.idNumber}, '%')",
             "lower(employee.lastName) like concat('%', concat(lower(#{specialDateDataModel.lastName}), '%'))",
             "lower(employee.maidenName) like concat('%', concat(lower(#{specialDateDataModel.maidenName}), '%'))",

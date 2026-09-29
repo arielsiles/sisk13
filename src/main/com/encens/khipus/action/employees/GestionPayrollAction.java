@@ -334,6 +334,18 @@ public class GestionPayrollAction extends GenericAction<GestionPayroll> {
                 } else if (PayrollGenerationResult.WITHOUT_BANDS.equals(payrollGenerationResult)) {
                     facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "GeneratedPayroll.error.withoutBands", payrollGenerationResult.getResultData()[0]);
                     return Outcome.FAIL;
+                } else if (PayrollGenerationResult.WITHOUT_MAIN_CONTRACT.equals(payrollGenerationResult)) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "GeneratedPayroll.error.withoutMainContract", payrollGenerationResult.getResultData()[0]);
+                    return Outcome.FAIL;
+                } else if (PayrollGenerationResult.SEVERAL_MAIN_CONTRACTS.equals(payrollGenerationResult)) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "GeneratedPayroll.error.severalMainContracts", payrollGenerationResult.getResultData()[0]);
+                    return Outcome.FAIL;
+                } else if (PayrollGenerationResult.WITHOUT_MARK_CODE.equals(payrollGenerationResult)) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "GeneratedPayroll.error.withoutMarkCode", payrollGenerationResult.getResultData()[0]);
+                    return Outcome.FAIL;
+                } else if (PayrollGenerationResult.INCONSISTENT_DAYS.equals(payrollGenerationResult)) {
+                    facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "GeneratedPayroll.error.inconsistentDays", payrollGenerationResult.getResultData()[0]);
+                    return Outcome.FAIL;
                 } else if (PayrollGenerationResult.FAIL.equals(payrollGenerationResult)) {
                     facesMessages.addFromResourceBundle(StatusMessage.Severity.ERROR, "GeneratedPayroll.error.generationAborted");
                     return Outcome.FAIL;
@@ -345,6 +357,14 @@ public class GestionPayrollAction extends GenericAction<GestionPayroll> {
             return Outcome.FAIL;
         }
 
+        /* La lista de adelante: lo que se va a cobrar como falta y todavia se puede corregir.
+           Informativa y no bloqueante -pasar a OFICIAL es decision de RRHH-, pero dicha ANTES del
+           paso irreversible y no despues, cuando la persona reclama por el recibo. */
+        Long incompleteMarkDays = generatedPayrollService.countIncompleteMarkDays(generatedPayroll);
+        if (null != incompleteMarkDays && incompleteMarkDays > 0) {
+            facesMessages.addFromResourceBundle(StatusMessage.Severity.WARN,
+                    "GeneratedPayroll.warn.incompleteMarkDays", incompleteMarkDays);
+        }
         facesMessages.addFromResourceBundle(StatusMessage.Severity.INFO, "GeneratedPayroll.info.generationSucceed");
         return Outcome.SUCCESS;
     }
