@@ -89,7 +89,7 @@ public class AuthenticatorAction implements Serializable {
     }
 
     private void raiseEvents() {
-        String ipAddress = ((HttpServletRequest) facesContext.getExternalContext().getRequest()).getRemoteAddr();
+        String ipAddress = clientIp((HttpServletRequest) facesContext.getExternalContext().getRequest());
         Events.instance().raiseEvent("SessionUserLogAction.userLoggedIn",
                 sessionUser.getUserId(),
                 currentUser.getEmployee().getFullName(),
@@ -100,6 +100,17 @@ public class AuthenticatorAction implements Serializable {
                 sessionUser.getUserId(),
                 JSFUtil.getHttpSession());
         log.debug("raised event: SessionUserUpdaterAction.loggedIn");
+    }
+
+    /** Detras de nginx la conexion viene de 127.0.0.1; la IP real llega en X-Real-IP.
+     *  Solo se confia en ese encabezado si la peticion viene del propio servidor. */
+    private String clientIp(HttpServletRequest request) {
+        String remote = request.getRemoteAddr();
+        String realIp = request.getHeader("X-Real-IP");
+        if ("127.0.0.1".equals(remote) && realIp != null && realIp.trim().length() > 0) {
+            return realIp.trim();
+        }
+        return remote;
     }
 
     public void logOut() {
