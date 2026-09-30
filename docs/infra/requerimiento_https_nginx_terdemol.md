@@ -166,7 +166,7 @@ El acceso a root durante la ventana se dio con un `sudoers.d` temporal (NOPASSWD
       `/1.jsp` y `/khipus/../jmx-console/` → 404.
 - [x] Desde afuera no responden 8480, 1099, 4444, 8009 ni 3306. Los puertos de JBoss escuchan en 127.0.0.1.
 - [x] IP real en `/var/log/nginx/khipus_access.log`.
-- [ ] La pantalla de usuarios en sesión muestra la IP real (R5). v6.1.4 incluye `clientIp()`; confirmarlo en la pantalla.
+- [x] La pantalla de usuarios en sesión muestra la IP real (R5), no `127.0.0.1`. Confirmado con v6.1.4.
 - [x] Stop/start del servicio con JBoss en 127.0.0.1: apagado limpio en 5 s, arranque en 36 s.
 - [x] `./khipus-deploy.sh status` y `./khipus-deploy.sh deploy 6.1.4` con el `HEALTH_URL` nuevo: el deploy espera
       a JBoss y da `Health OK (HTTP 200)` a los 40 s.
@@ -204,4 +204,3 @@ configuración actual). Por eso HSTS se sube recién después de una semana esta
 
 - **Subir HSTS a `max-age=31536000`** después de una semana sin problemas (alrededor del 2026-10-07):
   editar la línea `Strict-Transport-Security` en `/etc/nginx/sites-available/khipus`, `nginx -t` y `systemctl reload nginx`.
-- Confirmar la IP real en la pantalla de usuarios en sesión.
