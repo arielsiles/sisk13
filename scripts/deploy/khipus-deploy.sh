@@ -31,7 +31,7 @@ JBOSS_BIN_DIR="${JBOSS_HOME}/bin"
 JBOSS_USER="jboss"                 # usuario propietario del ear / que corre JBoss
 EAR_NAME="khipus.ear"
 SERVICE_NAME="khipus-jboss"        # nombre del servicio systemd
-JBOSS_BIND_ADDR="0.0.0.0"          # run.sh -b <esto>
+JBOSS_BIND_ADDR="127.0.0.1"        # run.sh -b <esto>; solo local, nginx publica /khipus/ por HTTPS
 
 # Valores confirmados de ESTE servidor (defaults del 'install'; puedes cambiarlos al ejecutar)
 JAVA_HOME_DEFAULT="/opt/jdk"       # JDK 1.8.0_321 (el que usa el usuario jboss)
@@ -42,7 +42,8 @@ BACKUP_EAR_DIR="${HOME}/backups/ears"      # respaldos del ear anterior (TODOS)
 LOG_DIR="${HOME}/backups/deploy-logs"      # logs de cada operacion
 DB_DUMP_SCRIPT="${HOME}/terdemol/dump_terdemol.sh"   # backup de BD antes del deploy
 
-HEALTH_URL="http://terdemol.net:8421/khipus/"
+# Directo a JBoss: el 8421 publico lo atiende nginx y responde 301 aunque JBoss este caido
+HEALTH_URL="http://127.0.0.1:8480/khipus/"
 HEALTH_TIMEOUT_SECONDS=300
 HEALTH_INTERVAL_SECONDS=10
 
@@ -99,7 +100,8 @@ jboss_start() {
 health_check() {
     local waited=0 code
     while [ "$waited" -lt "$HEALTH_TIMEOUT_SECONDS" ]; do
-        code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$HEALTH_URL" 2>/dev/null || echo 000)
+        # curl ya escribe 000 cuando no conecta; no agregar otro
+        code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$HEALTH_URL" 2>/dev/null) || true
         case "$code" in
             200|301|302|401|403) log "Health OK (HTTP $code) en ${HEALTH_URL}"; return 0 ;;
         esac

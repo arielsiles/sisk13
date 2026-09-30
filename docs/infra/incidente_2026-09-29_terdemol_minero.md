@@ -2,7 +2,7 @@
 
 **Servidor:** TERDEMOL producción, `66.228.48.25` (`terdemol.net`), Ubuntu 24.04, JBoss 5.1.0.GA
 **Fecha de atención:** 2026-09-29
-**Estado:** contenido y limpio. Solo queda pendiente el HTTPS (ver al final).
+**Estado:** contenido y limpio. HTTPS con nginx aplicado el 2026-09-30 (ver al final).
 
 > Horas en UTC, salvo que se indique otra cosa. El reloj del servidor está en UTC y los logs
 > de JBoss en hora de La Paz (UTC-4), porque arranca con `-Duser.timezone=America/La_Paz`.
@@ -74,8 +74,8 @@ de las dos puertas se usó primero. Las dos quedaron cerradas.
    `.q-start*`, `~/.config/systemd/user`) y quitadas las líneas de `kwork` de `.bashrc` y `.profile`.
 
 **Endurecimiento**
-8. ufw: se quitó la regla del **3306**. Solo quedan abiertos el **22** y el **8421**. Para conectarse a MySQL
-   desde afuera ahora se usa un túnel: `ssh -N -L 3307:127.0.0.1:3306 terdemol@66.228.48.25` → `localhost:3307`.
+8. ufw: se quitó la regla del **3306**. Quedaron abiertos el **22** y el **8421**; con el HTTPS se sumaron
+   80 y 443. Para conectarse a MySQL desde afuera se usa un túnel (paso 18).
 9. MySQL: se **cambió la clave** de `admin@localhost` con `ALTER USER … REPLACE` (conserva los mismos grants:
    `ALL PRIVILEGES ON sic_terdemol.* WITH GRANT OPTION`) y se actualizó en `khipus-ds.xml`. La versión
    anterior del archivo está en `/root/incidente-2026-09-29/khipus-ds.xml.antes`. La clave nueva **no** se
@@ -95,7 +95,16 @@ de las dos puertas se usó primero. Las dos quedaron cerradas.
 15. Se borró la carpeta de evidencia `/root/incidente-2026-09-29/` porque no se va a hacer análisis forense ni
     denuncia. Lo aprendido queda en este documento.
 16. Código: `AuthenticatorAction` toma la IP real del encabezado `X-Real-IP` cuando la petición viene de nginx
-    (R5 del requerimiento de HTTPS). Sin nginx se comporta igual que antes.
+    (R5 del requerimiento de HTTPS). Sin nginx se comporta igual que antes. Desplegado en v6.1.4.
+17. MySQL: al cambiar la clave con `ALTER USER … IDENTIFIED BY`, `admin@localhost` pasó al método de autenticación
+    por defecto de MySQL 8 (`caching_sha2_password`). KHIPUS y `mysqldump` lo soportan, pero SQLyog Community
+    13.1.1 no (error 2058). Se volvió a `mysql_native_password` con la misma clave y los mismos grants
+    (`ALTER USER 'admin'@'localhost' IDENTIFIED WITH mysql_native_password BY …`, como root de MySQL).
+    `mysql_native_password` es el método viejo y MySQL 9 ya no lo trae: si se migra MySQL o se actualiza el
+    cliente, conviene volver a `caching_sha2_password`.
+18. Acceso remoto a la BD solo por túnel ssh, sin abrir el 3306:
+    `ssh -N -L 3307:127.0.0.1:3306 terdemol@66.228.48.25` y el cliente a `127.0.0.1:3307`, usuario `admin`.
+    El acceso dura lo que dura el túnel.
 
 **Verificación (19:54 UTC)**
 - Carga 0,04. El único proceso de jboss es el java de KHIPUS.
@@ -109,7 +118,8 @@ de las dos puertas se usó primero. Las dos quedaron cerradas.
 
 - [x] Cambiar la clave de sudo de `terdemol`.
 - [x] Borrar la evidencia de `/root/incidente-2026-09-29/`.
-- [ ] Poner nginx con HTTPS delante de JBoss: ver `requerimiento_https_nginx_terdemol.md`.
+- [x] Poner nginx con HTTPS delante de JBoss (2026-09-30): ver `requerimiento_https_nginx_terdemol.md`. JBoss ya no
+      está expuesto a internet y nginx solo publica `/khipus/`.
 
 ## 5. Regla para instalar JBoss en un servidor
 

@@ -128,7 +128,14 @@ Están al inicio de `khipus-deploy.sh` (sección `CONFIG`); ajusta solo si cambi
 | `DOWNLOADS_DIR` | `~/downloads` |
 | `BACKUP_EAR_DIR` | `~/backups/ears` |
 | `LOG_DIR` | `~/backups/deploy-logs` |
-| `HEALTH_URL` | `http://terdemol.net:8421/khipus/` |
+| `JBOSS_BIND_ADDR` | `127.0.0.1` (JBoss solo escucha dentro del servidor) |
+| `HEALTH_URL` | `http://127.0.0.1:8480/khipus/` (directo a JBoss, no por nginx) |
+
+Desde el 2026-09-30 JBoss queda detrás de nginx: los usuarios entran por
+`https://terdemol.net/khipus/` y el antiguo `http://terdemol.net:8421/khipus/` redirige ahí.
+El `HEALTH_URL` no puede apuntar al 8421: ese puerto lo atiende nginx y responde 301 aunque
+JBoss esté caído, así que el deploy nunca haría rollback. Detalle en
+`docs/infra/requerimiento_https_nginx_terdemol.md`.
 
 ---
 
